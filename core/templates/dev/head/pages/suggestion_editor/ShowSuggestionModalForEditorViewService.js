@@ -20,16 +20,15 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
   '$uibModal', '$rootScope', 'ExplorationStatesService',
   'UrlInterpolationService', 'ThreadDataService',
   'ExplorationDataService', 'StateObjectFactory',
-  '$log',
+  '$log', 'SuggestionModalService',
   function($uibModal, $rootScope, ExplorationStatesService,
       UrlInterpolationService, ThreadDataService,
-      ExplorationDataService, StateObjectFactory, $log) {
+      ExplorationDataService, StateObjectFactory, $log,
+      SuggestionModalService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
       'editor_view_suggestion_modal_directive.html'
     );
-
-    var ACTION_ACCEPT_SUGGESTION = 'accept';
 
     var _showEditStateContentSuggestionModal = function(
         activeThread, setActiveThread, isSuggestionHandled,
@@ -72,7 +71,9 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
               setActiveThread(activeThread.threadId);
             });
             // Immediately update editor to reflect accepted suggestion.
-            if (result.action === ACTION_ACCEPT_SUGGESTION) {
+            if (
+              result.action === SuggestionModalService.ACTION_ACCEPT_SUGGESTION
+            ) {
               var suggestion = activeThread.getSuggestion();
 
               var stateName = suggestion.stateName;

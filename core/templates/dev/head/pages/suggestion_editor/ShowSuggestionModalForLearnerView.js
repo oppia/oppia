@@ -18,14 +18,14 @@
 
 oppia.controller('ShowSuggestionModalForLearnerView', [
   '$scope', '$uibModalInstance', 'newContent', 'oldContent',
-  'description',
+  'description', 'SuggestionModalService',
   function($scope, $uibModalInstance, newContent, oldContent,
-      description) {
+      description, SuggestionModalService) {
     $scope.newContent = newContent;
     $scope.oldContent = oldContent;
     $scope.description = description;
     $scope.cancel = function() {
-      $uibModalInstance.dismiss('cancel');
+      SuggestionModalService.cancelSuggestion($uibModalInstance);
     };
   }
 ]);

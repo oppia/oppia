@@ -49,13 +49,5 @@ oppia.factory('SuggestionObjectFactory', [function() {
       suggestionBackendDict.last_updated);
   };
 
-  Suggestion.acceptSuggestion = function($uibModalInstance, paramDict) {
-    $uibModalInstance.close(paramDict);
-  };
-
-  Suggestion.rejectSuggestion = function($uibModalInstance, paramDict) {
-    $uibModalInstance.close(paramDict);
-  };
-
   return Suggestion;
 }]);

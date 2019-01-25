@@ -19,9 +19,11 @@
 oppia.controller('ShowSuggestionModalForLearnerLocalView', [
   '$scope', '$uibModalInstance', '$timeout', 'PlayerPositionService',
   'ExplorationEngineService', 'PlayerTranscriptService',
+  'SuggestionModalService',
   function(
       $scope, $uibModalInstance, $timeout, PlayerPositionService,
-      ExplorationEngineService, PlayerTranscriptService) {
+      ExplorationEngineService, PlayerTranscriptService,
+      SuggestionModalService) {
     var stateName = PlayerPositionService.getCurrentStateName();
     var displayedCard = PlayerTranscriptService.getCard(
       PlayerPositionService.getDisplayedCardIndex());
@@ -38,9 +40,8 @@ oppia.controller('ShowSuggestionModalForLearnerLocalView', [
     }, 500);
 
     $scope.cancelSuggestion = function() {
-      $uibModalInstance.dismiss('cancel');
+      SuggestionModalService.cancelSuggestion($uibModalInstance);
     };
-
     $scope.submitSuggestion = function() {
       data = {
         target_id: ExplorationEngineService.getExplorationId(),

@@ -20,31 +20,22 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
   '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
   'suggestionStatus', 'description', 'oldContent',
   'newContent', 'canReviewActiveThread', 'stateName', 'suggestionType',
-  'SuggestionObjectFactory',
+  'SuggestionModalService',
   function(
       $scope, $log, $uibModalInstance, suggestionIsHandled,
       suggestionStatus, description, oldContent,
       newContent, canReviewActiveThread, stateName, suggestionType,
-      SuggestionObjectFactory
+      SuggestionModalService
   ) {
-    var SUGGESTION_ACCEPTED_MSG = (
-      'This suggestion has already been accepted.');
-    var SUGGESTION_REJECTED_MSG = (
-      'This suggestion has already been rejected.');
-    var ACTION_ACCEPT_SUGGESTION = 'accept';
-    var ACTION_REJECT_SUGGESTION = 'reject';
-    var ACTION_RESUBMIT_SUGGESTION = 'resubmit';
-    var SUGGESTION_ACCEPTED = 'accepted';
-    var SUGGESTION_REJECTED = 'rejected';
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canReject = $scope.isNotHandled;
     $scope.canAccept = $scope.isNotHandled;
     if (!$scope.isNotHandled) {
-      if (suggestionStatus === SUGGESTION_ACCEPTED) {
-        $scope.errorMessage = SUGGESTION_ACCEPTED_MSG;
+      if (suggestionStatus === SuggestionModalService.SUGGESTION_ACCEPTED) {
+        $scope.errorMessage = SuggestionModalService.SUGGESTION_ACCEPTED_MSG;
         $scope.isSuggestionRejected = false;
       } else {
-        $scope.errorMessage = SUGGESTION_REJECTED_MSG;
+        $scope.errorMessage = SuggestionModalService.SUGGESTION_REJECTED_MSG;
         $scope.isSuggestionRejected = true;
       }
     } else {
@@ -65,20 +56,20 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     $scope.suggestionData = {newSuggestionHtml: newContent.html};
     $scope.suggestionEditorIsShown = false;
     $scope.acceptSuggestion = function() {
-      SuggestionObjectFactory.acceptSuggestion(
+      SuggestionModalService.acceptSuggestion(
         $uibModalInstance,
         {
-          action: ACTION_ACCEPT_SUGGESTION,
+          action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
           commitMessage: $scope.commitMessage,
           reviewMessage: $scope.reviewMessage,
         });
     };
 
     $scope.rejectSuggestion = function() {
-      SuggestionObjectFactory.rejectSuggestion(
+      SuggestionModalService.rejectSuggestion(
         $uibModalInstance,
         {
-          action: ACTION_REJECT_SUGGESTION,
+          action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
           commitMessage: null,
           reviewMessage: $scope.reviewMessage
         });
@@ -87,7 +78,7 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
       $scope.suggestionEditorIsShown = true;
     };
     $scope.cancel = function() {
-      $uibModalInstance.dismiss();
+      SuggestionModalService.cancelSuggestion($uibModalInstance);
     };
     $scope.isEditButtonShown = function() {
       return (
@@ -110,7 +101,7 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     };
     $scope.resubmitChanges = function() {
       $uibModalInstance.close({
-        action: ACTION_RESUBMIT_SUGGESTION,
+        action: SuggestionModalService.ACTION_RESUBMIT_SUGGESTION,
         newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
         summaryMessage: $scope.summaryMessage,
         stateName: $scope.stateName,

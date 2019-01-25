@@ -21,24 +21,12 @@ oppia.controller('ShowSuggestionModalForEditorView', [
   '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
   'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
   'description', 'currentContent', 'newContent', 'EditabilityService',
-  'SuggestionObjectFactory',
+  'SuggestionModalService',
   function(
       $scope, $log, $uibModalInstance, suggestionIsHandled,
       suggestionIsValid, unsavedChangesExist, suggestionStatus,
       description, currentContent, newContent, EditabilityService,
-      SuggestionObjectFactory) {
-    var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
-      'accepted.';
-    var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
-      'rejected.';
-    var SUGGESTION_INVALID_MSG = 'This suggestion was made ' +
-      'for a state that no longer exists. It cannot be accepted.';
-    var UNSAVED_CHANGES_MSG = 'You have unsaved changes to ' +
-      'this exploration. Please save/discard your unsaved changes if ' +
-      'you wish to accept.';
-    var ACTION_ACCEPT_SUGGESTION = 'accept';
-    var ACTION_REJECT_SUGGESTION = 'reject';
-
+      SuggestionModalService) {
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canEdit = EditabilityService.isEditable();
     $scope.canReject = $scope.canEdit && $scope.isNotHandled;
@@ -48,13 +36,14 @@ oppia.controller('ShowSuggestionModalForEditorView', [
     if (!$scope.canEdit) {
       $scope.errorMessage = '';
     } else if (!$scope.isNotHandled) {
-      $scope.errorMessage = (suggestionStatus === 'accepted' ||
+      $scope.errorMessage = ((suggestionStatus === 'accepted' ||
         suggestionStatus === 'fixed') ?
-        SUGGESTION_ACCEPTED_MSG : SUGGESTION_REJECTED_MSG;
+      SuggestionModalService.SUGGESTION_ACCEPTED_MSG :
+      SuggestionModalService.SUGGESTION_REJECTED_MSG);
     } else if (!suggestionIsValid) {
-      $scope.errorMessage = SUGGESTION_INVALID_MSG;
+      $scope.errorMessage = SuggestionModalService.SUGGESTION_INVALID_MSG;
     } else if (unsavedChangesExist) {
-      $scope.errorMessage = UNSAVED_CHANGES_MSG;
+      $scope.errorMessage = SuggestionModalService.UNSAVED_CHANGES_MSG;
     } else {
       $scope.errorMessage = '';
     }
@@ -65,10 +54,10 @@ oppia.controller('ShowSuggestionModalForEditorView', [
     $scope.reviewMessage = null;
 
     $scope.acceptSuggestion = function() {
-      SuggestionObjectFactory.acceptSuggestion(
+      SuggestionModalService.acceptSuggestion(
         $uibModalInstance,
         {
-          action: ACTION_ACCEPT_SUGGESTION,
+          action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
           commitMessage: $scope.commitMessage,
           reviewMessage: $scope.reviewMessage,
           // TODO(sll): If audio files exist for the content being
@@ -82,16 +71,16 @@ oppia.controller('ShowSuggestionModalForEditorView', [
     };
 
     $scope.rejectSuggestion = function() {
-      SuggestionObjectFactory.rejectSuggestion(
+      SuggestionModalService.rejectSuggestion(
         $uibModalInstance,
         {
-          action: ACTION_REJECT_SUGGESTION,
+          action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
           reviewMessage: $scope.reviewMessage
         });
     };
 
     $scope.cancelReview = function() {
-      $uibModalInstance.dismiss();
+      SuggestionModalService.cancelSuggestion($uibModalInstance);
     };
   }
 ]);
