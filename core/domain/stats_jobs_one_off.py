@@ -88,7 +88,9 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 stats_models.PlaythroughModel.delete_multi(
                     stats_models.PlaythroughModel.get_multi(playthrough_ids))
                 playthroughs_deleted += len(playthrough_ids)
-            unresolved_issues.clear()
+            # We use slice assignment here to clear the values in
+            # unresolved_issues: https://stackoverflow.com/a/10155987/4859885.
+            unresolved_issues[:] = []
         else:
             for unresolved_issue in unresolved_issues:
                 playthrough_ids = unresolved_issue['playthrough_ids']
@@ -98,13 +100,13 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     if RemoveInvalidPlaythroughsOneOffJob.is_too_old(model)]
                 stats_models.PlaythroughModel.delete_multi(old_models)
                 playthroughs_deleted += len(old_models)
-                # We use slice assignment here to replace the contents of
-                # playthrough_ids (https://stackoverflow.com/a/10155987/4859885)
+                # We use slice assignment here to replace the values in
+                # playthrough_ids: https://stackoverflow.com/a/10155987/4859885.
                 playthrough_ids[:] = [
                     pid for pid in playthrough_ids
                     if not any(model.id == pid for model in old_models)]
-            # We use slice assignment here to replace the contents of
-            # unresolved_issues (https://stackoverflow.com/a/10155987/4859885)
+            # We use slice assignment here to replace the values in
+            # unresolved_issues: https://stackoverflow.com/a/10155987/4859885.
             unresolved_issues[:] = [
                 unresolved_issue for unresolved_issue in unresolved_issues
                 if unresolved_issue['playthrough_ids']]
