@@ -63,7 +63,7 @@
         </div>
         <canvas-sizer id="analyser">
           <div class="oppia-recoding-analyzer" ng-show="recorder.isHtml5 && recorder.status.isRecording && !audioIsCurrentlyBeingSaved">
-            <ng-audio-recorder-analyzer height="92" wave-color="black" ></ng-audio-recorder-analyzer>
+            <ng-audio-recorder-analyzer height="66" wave-color="black" ></ng-audio-recorder-analyzer>
           </div>
           <div class="oppia-audio-wave-view" ng-show="!recorder.status.isRecording && recorder.audioModel && !audioIsCurrentlyBeingSaved">
             <ng-audio-recorder-wave-view wave-color="#009688" progress-color="#ccc" height="38"></ng-audio-recorder-wave-view>
@@ -85,6 +85,13 @@
       </button>
     </div>
   </ng-audio-recorder>
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-retake-button"
+            ng-if="!recorder.status.isRecording && audioBlob"
+            ng-click="reRecord()">
+      Re-take
+    </button>
+  </div>
   <div class="oppia-content-wrapper" ng-if="!recorder.status.isRecording && audioBlob">
     <button class="btn oppia-confirm-button"
             ng-click="saveRecordedAudio()">
@@ -151,7 +158,7 @@
   </div>
   <div class="oppia-content-wrapper" ng-if="!audioNeedsUpdate">
     <button class="btn oppia-audio-button"
-            uib-tooltip="Mark need update"
+            uib-tooltip="Audio needs update"
             tooltip-placement="above"
             ng-disabled="!canTranslate"
             ng-click="toggleAudioNeedsUpdate()">
@@ -159,13 +166,12 @@
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="audioNeedsUpdate">
-    <button class="btn oppia-audio-button"
-            uib-tooltip="Unmark need update"
-            tooltip-placement="above"
+    <button class="btn oppia-audio-button audio-update-needed-button"
+            uib-tooltip="Audio does not need update"
+            tooltip-placement="top"
             ng-disabled="!canTranslate"
             ng-click="toggleAudioNeedsUpdate()">
       <i class="material-icons">warning</i>
-      <i class="material-icons oppia-unmark-icon">clear</i>
     </button>
   </div>
 </div>
@@ -199,16 +205,16 @@
     width: 100%;
   }
   .oppia-audio-recording-bar {
-    width: 100%;
-    height: 100%;
-    display: flex;
     align-items: center;
-    padding: 0px 10px;
     background-color: #f7f7f7;
+    display: flex;
+    height: 100%;
+    padding: 0px 10px;
+    width: 100%;
   }
   .audioRecorder {
-    display: flex;
     align-items: center;
+    display: flex;
   }
   .audioRecorder > div:first-child {
     width: 0 !important;
@@ -217,50 +223,58 @@
     margin: 0 10px;
   }
   .oppia-audio-bar-info {
-    background-color: #6f6f6f;
-    color: white;
-    padding: 5px 40px;
+    background-color: #009688;
     border-radius: 3px;
+    color: white;
     flex: 1;
-    text-align: center;
     font-size: 12px;
     height: 38px;
     line-height: 27px;
+    padding: 5px 40px;
+    text-align: center;
   }
   .oppia-audio-button {
-    color: white;
     background-color: #009688;
     border-radius: 20px;
-    width: 38px;
+    color: white;
     padding-left: 6px;
     transition: background-color .2s cubic-bezier(.35,0,.25,1);
+    width: 38px;
+  }
+  .oppia-retake-button {
+    background-color: #009688;
+    border-radius: 3px;
+    color: white;
+    padding-left: 6px;
+    transition: background-color .2s cubic-bezier(.35,0,.25,1);
+    width: 63px;
   }
   .oppia-confirm-button {
-    color: white;
     background-color: #009688;
-    width: 63px;
     border-radius: 3px;
+    color: white;
     padding-left: 6px;
     transition: background-color .2s cubic-bezier(.35,0,.25,1);
+    width: 63px;
   }
   .oppia-cancel-button {
-    color: white;
     background-color: #9a9a9a;
-    width: 57px;
     border-radius: 3px;
+    color: white;
     padding-left: 6px;
     transition: background-color .2s cubic-bezier(.35,0,.25,1);
+    width: 57px;
   }
   .oppia-audio-button:hover, .oppia-confirm-button:hover {
-    color: white;
     background-color: #01675d;
+    color: white;
   }
   .oppia-cancel-button:hover {
-    color: white;
     background-color: #858585;
+    color: white;
   }
   .oppia-audio-button[disabled] {
-    background-color: #9a9a9a;
+    background-color: #009688;
     pointer-events: auto;
   }
   .oppia-audio-button:focus {
@@ -274,55 +288,54 @@
     flex: 1;
   }
   .oppia-mp3-converting {
-    background-color: #6f6f6f;
-    color: white;
-    padding: 5px 40px;
+    background-color: #009688;
     border-radius: 3px;
+    color: white;
     flex: 1;
-    text-align: center;
     font-size: 12px;
     height: 38px;
     line-height: 27px;
+    padding: 5px 40px;
+    text-align: center;
   }
   .oppia-recording-timer {
     font-size: 14px;
-    width: 83px;
     text-align: center;
+    width: 83px;
   }
   .oppia-slider-section {
-    flex: 1;
-    background-color: #6f6f6f;
-    color: white;
-    padding: 0 15px;
+    background-color: #009688;
     border-radius: 3px;
-    text-align: center;
+    color: white;
+    flex: 1;
     font-size: 12px;
     height: 38px;
+    padding: 0 15px;
+    text-align: center;
+    width: 628px;
   }
   .oppia-translation-bottom-right-container {
-    position: relative;
-    top: 10px;
-    text-align: center;
-    font-size: 12px;
     color: #ce133b;
+    font-size: 12px;
     letter-spacing: 0.5px;
+    position: relative;
+    text-align: center;
+    top: 10px;
   }
-  .oppia-unmark-icon {
-    color: #fff;
-    font-size: 13px;
-    margin-top: -25px;
-    margin-left: -5px;
-    background-color: #7a7a7a;
-    border-radius: 25px;
-    font-weight: bold;
-    border: 1px solid #fff;
+  .audio-update-needed-button
+  {
+    background-color: red;
   }
   ng-audio-recorder {
     width: 100%;
   }
+  audio-translation-bar .tooltip-inner {
+  max-width: none;
+  white-space: nowrap;
+  }
   audio-translation-bar md-progress-linear {
-    padding-top: 12px;
     height: 38px;
+    padding-top: 12px;
   }
   audio-translation-bar md-progress-linear.md-default-theme .md-container {
     background-color: #f8f8f8;
@@ -330,15 +343,15 @@
   audio-translation-bar md-progress-linear.md-default-theme .md-bar {
     background-color: #009688;
   }
-  audio-translation-bar md-slider .md-thumb-container {
-    left: 4px;
+  audio-translation-bar md-slider {
+    width: 628px;
   }
   audio-translation-bar md-slider {
     height: 38px;
   }
   audio-translation-bar md-slider .md-track-container {
-    top: 18px !important;
     height: 1px;
+    top: 18px !important;
   }
   audio-translation-bar md-slider .md-track {
     background-color: #f8f8f8;
@@ -346,17 +359,18 @@
   audio-translation-bar md-slider.md-default-theme .md-track-fill {
     background-color: #009688;
   }
-  audio-translation-bar md-slider .md-thumb {
-    top: 0;
+  audio-translation-bar .md-thumb-container {
+    left: 4px;
+    top: -5px;
   }
   audio-translation-bar md-slider.md-default-theme .md-thumb:after {
-    border-color: #ccc;
     background-color: #009688;
+    border-color: #ccc;
   }
   audio-translation-bar canvas {
     background: #e4e1d1;
-    max-width: unset;
     border-radius: 3px;
+    max-width: unset;
   }
   audio-translation-bar .waveSurfer > wave:first-child {
     border-radius: 3px;
