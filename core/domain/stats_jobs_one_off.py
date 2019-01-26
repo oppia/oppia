@@ -36,6 +36,9 @@ import feconf
 ])
 
 
+PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
+
+
 class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for deleting invalid playthroughs.
 
@@ -72,7 +75,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """
         return (
             playthrough_model is None or
-            playthrough_model.created_on < datetime.datetime(2018, 9, 1))
+            playthrough_model.created_on < PLAYTHROUGH_PROJECT_RELEASE_DATETIME)
 
     @staticmethod
     def map(playthrough_issues_model):
@@ -118,8 +121,91 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (exp_id, playthroughs_deleted)
 
     @staticmethod
-    def reduce(exp_id, playthroughs_deleted_per_job):
-        yield '%s: %s' % (exp_id, sum(map(int, playthroughs_deleted_per_job)))
+    def reduce(exp_id, stringified_playthroughs_deleted_per_job):
+        playthroughs_deleted_per_job = (
+            map(int, stringified_playthroughs_deleted_per_job))
+        yield '%s: %s' % (exp_id, sum(playthroughs_deleted_per_job))
+
+
+class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off playthroughs audit.
+
+    Performs a brief audit of playthrough recordings to make sure they pass
+    simple sanity checks and contain the necessary data to render correctly on
+    the front-end.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.PlaythroughModel]
+
+    @staticmethod
+    def map(playthrough):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            playthrough: PlaythroughModel.
+
+        Yields:
+            tuple. A 2-tuple of the form (playthrough_id, audit_data) where:
+                playthrough_id: str. The id of the playthrough.
+                audit_data: dict(str : *). The dict is structured as:
+                    exp_id: str. The exploration recorded by the playthrough.
+                    created_on: str. The date the model was created in
+                        YYYY-MM-DD format.
+        """
+        if not playthrough.deleted:
+            audit_data = {
+                'exp_id': playthrough.exp_id,
+                'created_on': playthrough.created_on.strftime('%Y-%M-%d'),
+                # TODO(brianrodri): Find other fields worth checking.
+            }
+            yield (playthrough.id, audit_data)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        """Finds errors in playthrough models. Must be declared @staticmethod.
+
+        Args:
+            key: str. The id of the playthrough.
+            stringified_values: list(str). A list of stringified dicts with the
+                following structure:
+                    exp_id: str. The exploration recorded by the playthrough.
+                    created_on: str. The date the model was created in
+                        YYYY-MM-DD format.
+
+        Yields:
+            tuple(str). A 1-tuple whose only element is an error message.
+        """
+        if len(stringified_values) != 1:
+            yield (
+                'playthrough_id:%s should correspond to exactly one model, but '
+                '%d were discovered.' % (key, len(stringified_values))
+                ,
+            )
+            return
+        value = ast.literal_eval(stringified_values[0])
+
+        # Validate the playthrough's exploration id.
+        whitelisted_exploration_ids_for_playthroughs = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+        if value['exp_id'] not in whitelisted_exploration_ids_for_playthroughs:
+            yield (
+                'playthrough_id:%s was recorded in exploration_id:%s which has '
+                'not been curated for recording.' % (key, value['exp_id'])
+                ,
+            )
+
+        # Validate the playthrough's age.
+        created_on = (
+            datetime.datetime.strptime(value['created_on'], '%Y-%M-%d'))
+        if created_on < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
+            yield (
+                'playthrough_id:%s was released on %s, which is before the '
+                'GSoC 2018 submission deadline (2018-09-01) and should '
+                'therefore not exist.' % (key, value['created_on'])
+                ,
+            )
 
 
 class ExplorationIssuesModelCreatorOneOffJob(
