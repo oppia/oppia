@@ -55,7 +55,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
           - Playthroughs have the potential to store personally-identifiable
             information. We want to ensure that we will not record playthroughs
             in explorations with malicious interactions (for example, consider:
-            TextInput -> "Enter your credit card information").  Currently, we
+            TextInput -> "Enter your credit card information"). Currently, we
             accomplish this by only recording playthroughs in explorations
             admins feel confident are safe.
     """
