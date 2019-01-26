@@ -139,7 +139,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (exp_id, playthroughs_deleted)
 
     @staticmethod
-    def reduce(key, stringified_playthroughs_deleted_per_job):
+    def reduce(key, stringified_values):
         """Calculates total playthroughs deleted from a particular exploration.
         Must be declared @staticmethod.
 
@@ -152,11 +152,9 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             tuple(str). A 1-tuple containing a string which summarizes how many
             playthroughs were deleted.
         """
-        playthroughs_deleted_per_job = (
-            map(int, stringified_playthroughs_deleted_per_job))
         yield (
             'exploration_id:%s has had %d invalid playthrough recordings '
-            'deleted.' % (key, sum(playthroughs_deleted_per_job)),)
+            'deleted.' % (key, sum(map(int, stringified_values))),)
 
 
 class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
