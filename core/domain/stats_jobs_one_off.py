@@ -166,7 +166,6 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
     simple sanity checks and contain the necessary data to render correctly on
     the front-end.
     """
-    _INVALID_PLAYTHROUGH_ERROR_KEY = 'characters-not-found-in-ids: (@$^)'
 
     @classmethod
     def entity_classes_to_map_over(cls):
