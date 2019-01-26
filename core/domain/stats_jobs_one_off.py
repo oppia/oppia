@@ -141,7 +141,6 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, stringified_playthroughs_deleted_per_job):
         """Calculates total playthroughs deleted from a particular exploration.
-
         Must be declared @staticmethod.
 
         Args:
