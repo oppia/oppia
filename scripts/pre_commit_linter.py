@@ -646,7 +646,7 @@ def _lint_html_files(all_files):
 
     error_summary = []
     total_error_count = 0
-    failed_messages = []
+    summary_messages = []
     htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
     html_files_to_lint = [
         filename for filename in all_files if filename.endswith('.html')]
@@ -673,21 +673,21 @@ def _lint_html_files(all_files):
         total_error_count += error_count
     total_files_checked = len(html_files_to_lint)
     if total_error_count:
-        failed_message = '(%s files checked, %s errors found)' % (
+        print '(%s files checked, %s errors found)' % (
             total_files_checked, total_error_count)
-        print failed_message
-        failed_messages.append(failed_message)
         summary_message = '%s   HTML linting failed' % (
             _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
     else:
         summary_message = '%s   HTML linting passed' % (
             _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
 
     print ''
     print summary_message
     print 'HTML linting finished.'
     print ''
-    return failed_messages
+    return summary_messages
 
 
 def _get_all_files():
@@ -863,7 +863,7 @@ def _check_newline_character(all_files):
     print '----------------------------------------'
     errors_found = 0
     files_checked = 0
-    failed_messages = []
+    summary_messages = []
     all_files = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
@@ -873,24 +873,21 @@ def _check_newline_character(all_files):
         files_checked += 1
         if len(content) == 1:
             errors_found += 1
-            failed_message = (
-                '%s --> Error: Only one character in file.' % filename)
-            print failed_message
-            failed_messages.append(failed_message)
+            print '%s --> Error: Only one character in file.' % filename
         elif len(content) >= 2 and not re.match(r'[^\n]\n', content[-2:]):
             errors_found += 1
-            failed_message = (
+            print (
                 '%s --> Please ensure that this file ends with exactly one '
                 'newline char.' % filename)
-            print failed_message
-            failed_messages.append(failed_message)
 
     if errors_found:
         summary_message = '%s   Newline character checks failed' % (
             _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
     else:
         summary_message = '%s   Newline character checks passed' % (
             _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
 
     print ''
     print '----------------------------------------'
@@ -901,7 +898,7 @@ def _check_newline_character(all_files):
     else:
         print 'There are no files to be checked.'
 
-    return failed_messages
+    return summary_messages
 
 
 def _check_bad_pattern_in_file(filename, content, pattern):
@@ -918,22 +915,23 @@ def _check_bad_pattern_in_file(filename, content, pattern):
             Object containing details for the pattern to be checked.
 
     Returns:
-        list. A list of error messages.
+        bool. True if there is bad pattern else false.
     """
     regexp = pattern['regexp']
-    failed_messages = []
     if not (any(filename.startswith(excluded_dir)
                 for excluded_dir in pattern['excluded_dirs'])
             or filename in pattern['excluded_files']):
+        bad_pattern_count = 0
         for line_num, line in enumerate(content.split('\n'), 1):
             if line.endswith('disable-bad-pattern-check'):
                 continue
             if re.search(regexp, line):
-                failed_message = '%s --> Line %s: %s' % (
+                print '%s --> Line %s: %s' % (
                     filename, line_num, pattern['message'])
-                print failed_message
-                failed_messages.append(failed_message)
-    return failed_messages
+                bad_pattern_count += 1
+        if bad_pattern_count:
+            return True
+    return False
 
 
 def _check_bad_patterns(all_files):
@@ -942,7 +940,7 @@ def _check_bad_patterns(all_files):
     print '----------------------------------------'
     total_files_checked = 0
     total_error_count = 0
-    failed_messages = []
+    summary_messages = []
     all_files = [
         filename for filename in all_files if not (
             filename.endswith('pre_commit_linter.py') or
@@ -950,6 +948,7 @@ def _check_bad_patterns(all_files):
                 fnmatch.fnmatch(filename, pattern)
                 for pattern in EXCLUDED_PATHS)
             )]
+    failed = False
     for filename in all_files:
         content = FileCache.read(filename)
         total_files_checked += 1
@@ -957,49 +956,43 @@ def _check_bad_patterns(all_files):
             if (pattern in content and
                     not _is_filename_excluded_for_bad_patterns_check(
                         pattern, filename)):
-                failed_message = '%s --> %s' % (
+                failed = True
+                print '%s --> %s' % (
                     filename, BAD_PATTERNS[pattern]['message'])
-                print failed_message
-                failed_messages.append(failed_message)
                 total_error_count += 1
 
         if filename.endswith('.js'):
             for regexp in BAD_PATTERNS_JS_REGEXP:
-                failed_messages_from_bad_pattern = (
-                    _check_bad_pattern_in_file(filename, content, regexp))
-                if failed_messages_from_bad_pattern:
+                if _check_bad_pattern_in_file(filename, content, regexp):
+                    failed = True
                     total_error_count += 1
-                    failed_messages += failed_messages_from_bad_pattern
 
         if filename.endswith('.html'):
             for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
-                failed_messages_from_bad_pattern = (
-                    _check_bad_pattern_in_file(filename, content, regexp))
-                if failed_messages_from_bad_pattern:
+                if _check_bad_pattern_in_file(filename, content, regexp):
+                    failed = True
                     total_error_count += 1
-                    failed_messages += failed_messages_from_bad_pattern
 
         if filename.endswith('.py'):
             for regexp in BAD_PATTERNS_PYTHON_REGEXP:
-                failed_messages_from_bad_pattern = (
-                    _check_bad_pattern_in_file(filename, content, regexp))
-                if failed_messages_from_bad_pattern:
+                if _check_bad_pattern_in_file(filename, content, regexp):
+                    failed = True
                     total_error_count += 1
-                    failed_messages += failed_messages_from_bad_pattern
 
         if filename == 'constants.js':
             for pattern in REQUIRED_STRINGS_CONSTANTS:
                 if pattern not in content:
-                    failed_message = '%s --> %s' % (
+                    failed = True
+                    print '%s --> %s' % (
                         filename,
                         REQUIRED_STRINGS_CONSTANTS[pattern]['message'])
-                    print failed_message
-                    failed_messages.append(failed_message)
                     total_error_count += 1
-    if failed_messages:
+    if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED
+        summary_messages.append(summary_message)
     else:
         summary_message = '%s   Pattern checks passed' % _MESSAGE_TYPE_SUCCESS
+        summary_messages.append(summary_message)
 
     print ''
     print '----------------------------------------'
@@ -1011,7 +1004,7 @@ def _check_bad_patterns(all_files):
             total_files_checked, total_error_count)
         print summary_message
 
-    return failed_messages
+    return summary_messages
 
 
 def _check_import_order(all_files):
@@ -1020,11 +1013,12 @@ def _check_import_order(all_files):
     """
     print 'Starting import-order checks'
     print '----------------------------------------'
-    failed_messages = []
+    summary_messages = []
     files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py')]
+    failed = False
     for filename in files_to_check:
         # This line prints the error message along with file path
         # and returns True if it finds an error else returns False
@@ -1032,25 +1026,33 @@ def _check_import_order(all_files):
         # if check is set to False, it autocorrects import-order errors.
         if (isort.SortImports(
                 filename, check=True, show_diff=True).incorrectly_sorted):
-            failed_message = 'Please resolve import order errors in ' % filename
-            failed_messages.append(failed_message)
+            failed = True
     print ''
     print '----------------------------------------'
     print ''
+    if failed:
+        summary_message = (
+            '%s   Import order checks failed' % _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
 
-    return failed_messages
+    return summary_messages
 
 
 def _check_comments(all_files):
     """This function ensures that comments follow correct style."""
     print 'Starting comment checks'
     print '----------------------------------------'
-    failed_messages = []
+    summary_messages = []
     files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py')]
     message = 'There should be a period at the end of the comment.'
+    failed = False
     space_regex = re.compile(r'^#[^\s].*$')
     capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
     for filename in files_to_check:
@@ -1073,10 +1075,9 @@ def _check_comments(all_files):
                     word in line for word in EXCLUDED_PHRASES)
                 if last_char_is_invalid and (
                         no_word_is_present_in_excluded_phrases):
-                    failed_message = '%s --> Line %s: %s' % (
+                    failed = True
+                    print '%s --> Line %s: %s' % (
                         filename, line_num + 1, message)
-                    print failed_message
-                    failed_messages.append(failed_message)
 
             # Check that comment starts with a space and is not a shebang
             # expression at the start of a bash script which loses function
@@ -1085,10 +1086,9 @@ def _check_comments(all_files):
                 message = (
                     'There should be a space at the beginning '
                     'of the comment.')
-                failed_message = '%s --> Line %s: %s' % (
+                failed = True
+                print '%s --> Line %s: %s' % (
                     filename, line_num + 1, message)
-                print failed_message
-                failed_messages.append(failed_message)
 
             # Check that comment starts with a capital letter.
             if not previous_line.startswith('#') and (
@@ -1096,24 +1096,25 @@ def _check_comments(all_files):
                 message = (
                     'There should be a capital letter'
                     ' to begin the content of the comment.')
-                failed_message = '%s --> Line %s: %s' % (
+                failed = True
+                print '%s --> Line %s: %s' % (
                     filename, line_num + 1, message)
-                print failed_message
-                failed_messages.append(failed_message)
 
     print ''
     print '----------------------------------------'
     print ''
-    if failed_messages:
+    if failed:
         summary_message = (
             '%s   Comments check failed' % _MESSAGE_TYPE_FAILED)
         print summary_message
+        summary_messages.append(summary_message)
     else:
         summary_message = (
             '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
         print summary_message
+        summary_messages.append(summary_message)
 
-    return failed_messages
+    return summary_messages
 
 
 def _check_docstrings(all_files):
@@ -1124,12 +1125,12 @@ def _check_docstrings(all_files):
         all_files: list(str). Names of files to consider during docstring check.
 
     Returns:
-        failed_messages: list(str). Error messages generated by the check.
+        summary_messages: list(str). Summary of messages generated by the check.
     """
 
     print 'Starting docstring checks'
     print '----------------------------------------'
-    failed_messages = []
+    summary_messages = []
     files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
@@ -1145,6 +1146,7 @@ def _check_docstrings(all_files):
     previous_line_message = (
         'There should not be any empty lines before the end of '
         'the multi-line docstring.')
+    failed = False
     is_docstring = False
     is_class_or_function = False
     for filename in files_to_check:
@@ -1170,10 +1172,9 @@ def _check_docstrings(all_files):
             # Check if single line docstring span two lines.
             if line == '"""' and prev_line.startswith('"""') and (
                     is_docstring):
-                failed_message = '%s --> Line %s: %s' % (
+                failed = True
+                print '%s --> Line %s: %s' % (
                     filename, line_num, single_line_docstring_message)
-                print failed_message
-                failed_messages.append(failed_message)
                 is_docstring = False
 
             # Check for single line docstring.
@@ -1182,10 +1183,9 @@ def _check_docstrings(all_files):
                 # characters are double quotes.
                 if (len(line) > 6) and (
                         line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
-                    failed_message = '%s --> Line %s: %s' % (
+                    failed = True
+                    print '%s --> Line %s: %s' % (
                         filename, line_num + 1, missing_period_message)
-                    print failed_message
-                    failed_messages.append(failed_message)
                 is_docstring = False
 
             # Check for multiline docstring.
@@ -1195,10 +1195,9 @@ def _check_docstrings(all_files):
                 if line == '"""':
                     # Check for empty line before the end of docstring.
                     if prev_line == '':
-                        failed_message = '%s --> Line %s: %s' % (
+                        failed = True
+                        print '%s --> Line %s: %s' % (
                             filename, line_num, previous_line_message)
-                        print failed_message
-                        failed_messages.append(failed_message)
                     # Check for punctuation at end of docstring.
                     else:
                         last_char_is_invalid = prev_line[-1] not in (
@@ -1207,18 +1206,16 @@ def _check_docstrings(all_files):
                             word in prev_line for word in EXCLUDED_PHRASES)
                         if last_char_is_invalid and (
                                 no_word_is_present_in_excluded_phrases):
-                            failed_message = '%s --> Line %s: %s' % (
+                            failed = True
+                            print '%s --> Line %s: %s' % (
                                 filename, line_num, missing_period_message)
-                            print failed_message
-                            failed_messages.append(failed_message)
 
                 # Case 2: line contains some words before """. """ should
                 # shift to next line.
                 elif not any(word in line for word in EXCLUDED_PHRASES):
-                    failed_message = '%s --> Line %s: %s' % (
+                    failed = True
+                    print '%s --> Line %s: %s' % (
                         filename, line_num + 1, multiline_docstring_message)
-                    print failed_message
-                    failed_messages.append(failed_message)
 
                 is_docstring = False
 
@@ -1231,24 +1228,25 @@ def _check_docstrings(all_files):
         for func in func_defs:
             func_result = docstring_checker.check_docstrings_arg_order(func)
             for error_line in func_result:
-                failed_message = '%s --> Func %s: %s' % (
+                print '%s --> Func %s: %s' % (
                     filename, func.name, error_line)
-                print failed_message
-                failed_messages.append(failed_message)
+                failed = True
 
     print ''
     print '----------------------------------------'
     print ''
-    if failed_messages:
+    if failed:
         summary_message = (
             '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
         print summary_message
+        summary_messages.append(summary_message)
     else:
         summary_message = (
             '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
         print summary_message
+        summary_messages.append(summary_message)
 
-    return failed_messages
+    return summary_messages
 
 
 def _check_html_directive_name(all_files):
@@ -1263,7 +1261,8 @@ def _check_html_directive_name(all_files):
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.js')]
-    failed_messages = []
+    failed = False
+    summary_messages = []
     # For RegExp explanation, please see https://regex101.com/r/gU7oT6/37.
     pattern_to_match = (
         r'templateUrl: UrlInterpolationService\.[A-z\(]+' +
@@ -1277,18 +1276,19 @@ def _check_html_directive_name(all_files):
             directive_filename = ''.join(matched_pattern).replace(
                 '\'', '').replace('+', '')
             if not directive_filename.endswith('_directive.html'):
+                failed = True
                 total_error_count += 1
-                failed_message = (
+                print (
                     '%s --> Please ensure that this file ends'
                     'with _directive.html.' % directive_filename)
-                print failed_message
-                failed_messages.append(failed_message)
-    if failed_messages:
+    if failed:
         summary_message = '%s   HTML directive name check failed' % (
             _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
     else:
         summary_message = '%s   HTML directive name check passed' % (
             _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
 
     print ''
     print '----------------------------------------'
@@ -1300,7 +1300,7 @@ def _check_html_directive_name(all_files):
             total_files_checked, total_error_count)
         print summary_message
 
-    return failed_messages
+    return summary_messages
 
 
 def _validate_and_parse_js_file(filename, content):
@@ -1324,7 +1324,8 @@ def _check_directive_scope(all_files):
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.js')]
-    failed_messages = []
+    failed = False
+    summary_messages = []
     for filename in files_to_check:
         content = FileCache.read(filename)
         parsed_dict = _validate_and_parse_js_file(filename, content)
@@ -1405,37 +1406,37 @@ def _check_directive_scope(all_files):
                                 scope_value = return_node_property['value']
                                 if scope_value['type'] == 'Literal' and (
                                         scope_value['value']):
-                                    failed_message = (
+                                    failed = True
+                                    print (
                                         'Please ensure that %s '
                                         'directive in %s file '
                                         'does not have scope set to '
                                         'true.' % (directive_name, filename))
-                                    print failed_message
-                                    failed_messages.append(failed_message)
                                 elif scope_value['type'] != 'ObjectExpression':
                                     # Check whether the directive has scope: {}
                                     # else report the error message.
-                                    failed_message = (
+                                    failed = True
+                                    print (
                                         'Please ensure that %s directive '
                                         'in %s file has a scope: {}.' % (
                                             directive_name, filename))
-                                    print failed_message
-                                    failed_messages.append(failed_message)
 
-    if failed_messages:
+    if failed:
         summary_message = '%s   Directive scope check failed' % (
             _MESSAGE_TYPE_FAILED)
         print summary_message
+        summary_messages.append(summary_message)
     else:
         summary_message = '%s  Directive scope check passed' % (
             _MESSAGE_TYPE_SUCCESS)
         print summary_message
+        summary_messages.append(summary_message)
 
     print ''
     print '----------------------------------------'
     print ''
 
-    return failed_messages
+    return summary_messages
 
 
 def _match_line_breaks_in_controller_dependencies(all_files):
@@ -1449,7 +1450,8 @@ def _match_line_breaks_in_controller_dependencies(all_files):
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.js')]
-    failed_messages = []
+    failed = False
+    summary_messages = []
 
     # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
     pattern_to_match = (
@@ -1465,31 +1467,32 @@ def _match_line_breaks_in_controller_dependencies(all_files):
                     '\'', '').replace(' ', ''))[:-1]
             function_parameters = function_parameters.strip().replace(' ', '')
             if stringfied_dependencies != function_parameters:
-                failed_message = (
+                failed = True
+                print (
                     '%s --> Please ensure that line breaks between '
                     'the stringfied dependencies: "%s" and the function '
                     'parameters: "%s" for the corresponding controller '
                     'in this file exactly match.' % (
                         filename, stringfied_dependencies, function_parameters))
-                print failed_message
-                failed_messages.append(failed_message)
 
-    if failed_messages:
+    if failed:
         summary_message = (
             '%s   Controller dependency line break check failed' % (
                 _MESSAGE_TYPE_FAILED))
         print summary_message
+        summary_messages.append(summary_message)
     else:
         summary_message = (
             '%s  Controller dependency line break check passed' % (
                 _MESSAGE_TYPE_SUCCESS))
         print summary_message
+        summary_messages.append(summary_message)
 
     print ''
     print '----------------------------------------'
     print ''
 
-    return failed_messages
+    return summary_messages
 
 
 class TagMismatchException(Exception):
@@ -1641,7 +1644,9 @@ def _check_html_tags_and_attributes(all_files, debug=False):
     html_files_to_lint = [
         filename for filename in all_files if filename.endswith('.html')]
 
-    failed_messages = []
+    failed = False
+    summary_messages = []
+
     for filename in html_files_to_lint:
         file_content = FileCache.read(filename)
         file_lines = FileCache.readlines(filename)
@@ -1652,25 +1657,24 @@ def _check_html_tags_and_attributes(all_files, debug=False):
             raise TagMismatchException('Error in file %s' % filename)
 
         if parser.failed:
-            failed_message = (
-                'Indentation error in file %s. See above for more details' %
-                (filename))
-            failed_messages.append(failed_message)
+            failed = True
 
-    if failed_messages:
+    if failed:
         summary_message = '%s   HTML tag and attribute check failed' % (
             _MESSAGE_TYPE_FAILED)
         print summary_message
+        summary_messages.append(summary_message)
     else:
         summary_message = '%s  HTML tag and attribute check passed' % (
             _MESSAGE_TYPE_SUCCESS)
         print summary_message
+        summary_messages.append(summary_message)
 
     print ''
     print '----------------------------------------'
     print ''
 
-    return failed_messages
+    return summary_messages
 
 
 def _check_for_copyright_notice(all_files):
@@ -1693,7 +1697,8 @@ def _check_for_copyright_notice(all_files):
     regexp_to_check = (
         r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.')
 
-    failed_messages = []
+    failed = False
+    summary_messages = []
 
     for filename in all_files_to_check:
         has_copyright_notice = False
@@ -1703,32 +1708,27 @@ def _check_for_copyright_notice(all_files):
                 break
 
         if not has_copyright_notice:
-            failed_message = (
+            failed = True
+            print (
                 '%s --> Please add a proper copyright notice to this file.' % (
                     filename))
-            print failed_message
-            failed_messages.append(failed_message)
 
-    if failed_messages:
+    if failed:
         summary_message = '%s   Copyright notice check failed' % (
             _MESSAGE_TYPE_FAILED)
         print summary_message
+        summary_messages.append(summary_message)
     else:
         summary_message = '%s  Copyright notice check passed' % (
             _MESSAGE_TYPE_SUCCESS)
         print summary_message
+        summary_messages.append(summary_message)
 
     print ''
     print '----------------------------------------'
     print ''
 
-    return failed_messages
-
-
-def _print_summary_messages(all_failed_messages):
-    """Print complete summary of errors."""
-    for message in all_failed_messages:
-        print message
+    return summary_messages
 
 
 def main():
@@ -1748,21 +1748,17 @@ def main():
     # debug mode which when enabled prints the tag_stack for each file.
     html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
     html_linter_messages = _lint_html_files(all_files)
+    linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     copyright_notice_messages = _check_for_copyright_notice(all_files)
-    linter_messages = _pre_commit_linter(all_files)
     all_messages = (
         directive_scope_messages + controller_dependency_messages +
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
         html_tag_and_attribute_messages + html_linter_messages +
-        pattern_messages + copyright_notice_messages)
-    all_failed_messages = (
-        [message for message in all_messages if not message == []])
-    _print_summary_messages(all_failed_messages)
-    if all_failed_messages or (
-            any([message.startswith(_MESSAGE_TYPE_FAILED) for
-                 message in linter_messages])):
+        linter_messages + pattern_messages + copyright_notice_messages)
+    if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
+            all_messages]):
         sys.exit(1)
 
 
