@@ -82,7 +82,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(playthrough_issues_model):
         """Iterates through all playthroughs associated to an exploration,
-        deleting any that are deemed invalid. Must be declared @staticmethod.
+        deleting any that are illegal. Must be declared @staticmethod.
 
         Ensures:
             Playthroughs deleted by this job are removed as a reference from
@@ -154,7 +154,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             playthroughs were deleted.
         """
         yield (
-            'exploration_id:%s has had %d invalid playthrough recordings '
+            'exploration_id:%s has had %d illegal playthrough recordings '
             'deleted.' % (key, sum(map(int, stringified_values))),)
 
 
