@@ -498,5 +498,7 @@ var constants = {
       }
   },
 
+  "ENABLE_PROMO_BAR": true,
+  
   "CURRENT_STATES_SCHEMA_VERSION": 25
 };
