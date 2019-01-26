@@ -127,7 +127,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield '%s: %s' % (exp_id, sum(playthroughs_deleted_per_job))
 
 
-class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
+class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
     """A one-off playthroughs audit.
 
     Performs a brief audit of playthrough recordings to make sure they pass
@@ -141,11 +141,11 @@ class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
         return [stats_models.PlaythroughModel]
 
     @staticmethod
-    def map(playthrough):
+    def map(playthrough_model):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            playthrough: PlaythroughModel.
+            playthrough_model: PlaythroughModel.
 
         Yields:
             tuple.
@@ -160,20 +160,23 @@ class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
                 (_INVALID_PLAYTHROUGH_ERROR_KEY,
                  (playthrough_id, ValidationError))
         """
-        if not playthrough.deleted:
-            try:
-                stats_domain.Playthrough.from_backend_dict(playthrough)
-            except utils.ValidationError as e:
-                yield (
-                    PlaythroughModelAudit._INVALID_PLAYTHROUGH_ERROR_KEY,
-                    (playthrough.id, e))
-            else:
-                audit_data = {
-                    'exp_id': playthrough.exp_id,
-                    'created_on': playthrough.created_on.strftime('%Y-%M-%d'),
-                    # TODO(brianrodri): Find other fields worth checking.
-                }
-                yield (playthrough.id, audit_data)
+        if playthrough_model.deleted:
+            return
+
+        try:
+            playthrough = (
+                stats_services.get_playthrough_from_model(playthrough_model))
+        except Exception as e:
+            yield (
+                PlaythroughAudit._INVALID_PLAYTHROUGH_ERROR_KEY,
+                (playthrough_model.id, str(e)))
+        else:
+            audit_data = {
+                'exp_id': playthrough_model.exp_id,
+                'created_on':
+                    playthrough_model.created_on.strftime('%Y-%m-%d'),
+            }
+            yield (playthrough_model.id, audit_data)
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -190,18 +193,20 @@ class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
         Yields:
             tuple(str). A 1-tuple whose only element is an error message.
         """
-        if key == PlaythroughModelAudit._INVALID_PLAYTHROUGH_ERROR_KEY:
+        if key == PlaythroughAudit._INVALID_PLAYTHROUGH_ERROR_KEY:
             pid, except_str = ast.literal_eval(stringified_values[0])
             yield (
                 'playthrough_id:%s could not be converted into a domain object '
                 'due to the following error: %s' % (pid, except_str),)
+            return
 
         if len(stringified_values) != 1:
             yield (
                 'playthrough_id:%s should correspond to exactly one model, but '
                 '%d were discovered.' % (key, len(stringified_values)),)
             return
-        value = ast.literal_eval(stringified_values[0])
+        else:
+            value = ast.literal_eval(stringified_values[0])
 
         # Validate the playthrough's exploration id.
         whitelisted_exploration_ids_for_playthroughs = (
@@ -213,7 +218,7 @@ class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
 
         # Validate the playthrough's age.
         created_on = (
-            datetime.datetime.strptime(value['created_on'], '%Y-%M-%d'))
+            datetime.datetime.strptime(value['created_on'], '%Y-%m-%d'))
         if created_on < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
             yield (
                 'playthrough_id:%s was released on %s, which is before the '
