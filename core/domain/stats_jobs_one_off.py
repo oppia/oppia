@@ -57,7 +57,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             in explorations with malicious interactions (for example, consider:
             TextInput -> "Enter your credit card information").
             Currently, we accomplish this by only recording playthroughs in
-            explorations we feel confident are safe.
+            explorations admins feel confident are safe.
     """
 
     @classmethod
