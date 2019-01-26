@@ -246,35 +246,31 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         default_outcome = init_state.interaction.default_outcome
         default_outcome.dest = exploration.init_state_name
-        init_state.interaction.answer_groups.append(
-            state_domain.AnswerGroup.from_dict({
-                'outcome': {
-                    'dest': exploration.init_state_name,
-                    'feedback': {
-                        'content_id': 'feedback_1',
-                        'html': 'Feedback'
-                    },
-                    'labelled_as_correct': False,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        old_answer_groups = init_state.interaction.answer_groups.copy()
+        old_answer_groups.append({
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Feedback'
                 },
-                'rule_specs': [{
-                    'inputs': {
-                        'x': 'Test'
-                    },
-                    'rule_type': 'Contains'
-                }],
-                'training_data': [],
-                'tagged_misconception_id': None
-            })
-        )
-
-        init_state.update_content_ids_to_audio_translations({
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {}
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_misconception_id': None
         })
+
+        init_state.update_interaction_answer_groups(old_answer_groups)
+
         exploration.validate()
 
         interaction = init_state.interaction

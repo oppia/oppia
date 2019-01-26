@@ -127,7 +127,8 @@ oppia.factory('ExplorationStatesService', [
       return angular.copy(propertyRef);
     };
 
-    var saveStateProperty = function(stateName, backendName, newValue) {
+    var saveStateProperty = function(
+        stateName, backendName, newValue, noChangeListRequired) {
       var oldValue = getStatePropertyMemento(stateName, backendName);
       var newBackendValue = angular.copy(newValue);
       var oldBackendValue = angular.copy(oldValue);
@@ -138,8 +139,10 @@ oppia.factory('ExplorationStatesService', [
       }
 
       if (!angular.equals(oldValue, newValue)) {
-        ChangeListService.editStateProperty(
-          stateName, backendName, newBackendValue, oldBackendValue);
+        if (!noChangeListRequired) {
+          ChangeListService.editStateProperty(
+            stateName, backendName, newBackendValue, oldBackendValue);
+        }
 
         var newStateData = _states.getState(stateName);
         var accessorList = PROPERTY_REF_DATA[backendName];
@@ -281,10 +284,11 @@ oppia.factory('ExplorationStatesService', [
           stateName, 'content_ids_to_audio_translations');
       },
       saveContentIdsToAudioTranslations: function(
-          stateName, newContentIdsToAudioTranslations) {
+          stateName, newContentIdsToAudioTranslations, changeListRequired) {
+        var noChangeListRequired = !createChangeList;
         saveStateProperty(
           stateName, 'content_ids_to_audio_translations',
-          newContentIdsToAudioTranslations);
+          newContentIdsToAudioTranslations, noChangeListRequired);
       },
       isInitialized: function() {
         return _states !== null;
