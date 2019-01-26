@@ -134,6 +134,7 @@ class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
     simple sanity checks and contain the necessary data to render correctly on
     the front-end.
     """
+    _INVALID_PLAYTHROUGH_ERROR_KEY = 'characters-not-found-in-ids: (@$^)'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -147,20 +148,32 @@ class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
             playthrough: PlaythroughModel.
 
         Yields:
-            tuple. A 2-tuple of the form (playthrough_id, audit_data) where:
+            tuple.
+            If the playthrough was validated by the domain object, then it will
+            be a 2-tuple of the form (playthrough_id, audit_data) where:
                 playthrough_id: str. The id of the playthrough.
                 audit_data: dict(str : *). The dict is structured as:
                     exp_id: str. The exploration recorded by the playthrough.
                     created_on: str. The date the model was created in
                         YYYY-MM-DD format.
+            Otherwise, it will be it will be a 2-tuple of the form:
+                (_INVALID_PLAYTHROUGH_ERROR_KEY,
+                 (playthrough_id, ValidationError))
         """
         if not playthrough.deleted:
-            audit_data = {
-                'exp_id': playthrough.exp_id,
-                'created_on': playthrough.created_on.strftime('%Y-%M-%d'),
-                # TODO(brianrodri): Find other fields worth checking.
-            }
-            yield (playthrough.id, audit_data)
+            try:
+                stats_domain.Playthrough.from_backend_dict(playthrough)
+            except utils.ValidationError as e:
+                yield (
+                    PlaythroughModelAudit._INVALID_PLAYTHROUGH_ERROR_KEY,
+                    (playthrough.id, e))
+            else:
+                audit_data = {
+                    'exp_id': playthrough.exp_id,
+                    'created_on': playthrough.created_on.strftime('%Y-%M-%d'),
+                    # TODO(brianrodri): Find other fields worth checking.
+                }
+                yield (playthrough.id, audit_data)
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -177,6 +190,12 @@ class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
         Yields:
             tuple(str). A 1-tuple whose only element is an error message.
         """
+        if key == PlaythroughModelAudit._INVALID_PLAYTHROUGH_ERROR_KEY:
+            pid, except_str = ast.literal_eval(stringified_values[0])
+            yield (
+                'playthrough_id:%s could not be converted into a domain object '
+                'due to the following error: %s' % (pid, except_str),)
+
         if len(stringified_values) != 1:
             yield (
                 'playthrough_id:%s should correspond to exactly one model, but '
