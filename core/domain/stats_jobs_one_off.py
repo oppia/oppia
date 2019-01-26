@@ -44,7 +44,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     Playthroughs were introduced as a GSoC 2018 project. During the project,
     some playthroughs were recorded which did not satisfy the requirements we
-    placed on them. This one-off job aims to get rid of such playthroughs to
+    now place on them. This one-off job aims to get rid of such playthroughs to
     keep the database healthy.
 
     Specifically, we want to remove playthroughs which were:
