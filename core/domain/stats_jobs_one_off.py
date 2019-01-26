@@ -180,9 +180,7 @@ class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
         if len(stringified_values) != 1:
             yield (
                 'playthrough_id:%s should correspond to exactly one model, but '
-                '%d were discovered.' % (key, len(stringified_values))
-                ,
-            )
+                '%d were discovered.' % (key, len(stringified_values)),)
             return
         value = ast.literal_eval(stringified_values[0])
 
@@ -192,9 +190,7 @@ class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
         if value['exp_id'] not in whitelisted_exploration_ids_for_playthroughs:
             yield (
                 'playthrough_id:%s was recorded in exploration_id:%s which has '
-                'not been curated for recording.' % (key, value['exp_id'])
-                ,
-            )
+                'not been curated for recording.' % (key, value['exp_id']),)
 
         # Validate the playthrough's age.
         created_on = (
@@ -203,9 +199,7 @@ class PlaythroughModelAudit(jobs.BaseMapReduceOneOffJobManager):
             yield (
                 'playthrough_id:%s was released on %s, which is before the '
                 'GSoC 2018 submission deadline (2018-09-01) and should '
-                'therefore not exist.' % (key, value['created_on'])
-                ,
-            )
+                'therefore not exist.' % (key, value['created_on']),)
 
 
 class ExplorationIssuesModelCreatorOneOffJob(
