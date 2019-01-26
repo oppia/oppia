@@ -39,23 +39,25 @@ import feconf
 PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
 
 
-class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for deleting invalid playthroughs.
+class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for deleting illegal playthroughs.
 
     Playthroughs were introduced as a GSoC 2018 project. During the project,
-    some invalid playthroughs made it through the cracks. This one-off job aims
-    to get rid of them so that our database is filled only with valid instances.
+    some playthroughs were recorded which did not satisfy the requirements we
+    placed on them. This one-off job aims to get rid of such playthroughs to
+    keep the database healthy.
 
     Specifically, we want to remove playthroughs which were:
      1. Created *before* the final release of the project.
-          - These instances are missing important fields and are thus invalid.
-     2. Created for explorations that are not curated for playthroughs.
-          - Playthroughs have the potential to store personal-identifiable
-            information. We want to ensure that we can never record playthroughs
-            with malicious explorations (for example: TextInput -> "Please give
-            me your passport identification number"). Currently, we accomplish
-            this by only recording playthroughs in explorations we are confident
-            are safe.
+          - These playthroughs did not use validation logic before being
+            submitted into the database.
+     2. Created for explorations which are not curated for playthroughs.
+          - Playthroughs have the potential to store personally-identifiable
+            information. We want to ensure that we will not record playthroughs
+            in explorations with malicious interactions (for example, consider:
+            TextInput -> "Enter your credit card details").
+            Currently, we accomplish this by only recording playthroughs in
+            explorations we feel confident are safe.
     """
 
     @classmethod
@@ -79,6 +81,22 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(playthrough_issues_model):
+        """Iterates through all playthroughs associated to an exploration,
+        deleting any that are deemed invalid. Must be declared @staticmethod.
+
+        Ensures:
+            Playthroughs deleted by this job are not referenced by their
+                associated issue.
+            All issues have at least one reference playthrough.
+            All explorations have at least one issue.
+
+        Args:
+            playthrough_issues_model: ExplorationIssuesModel.
+
+        Yields:
+            tuple(str, int). Returns the exploration id the given model is
+            associated to, and the number of playthroughs deleted from it.
+        """
         exp_id = playthrough_issues_model.exp_id
         playthroughs_deleted = 0
         unresolved_issues = playthrough_issues_model.unresolved_issues
@@ -100,7 +118,7 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 old_models = [
                     model for model in stats_models.PlaythroughModel.get_multi(
                         playthrough_ids)
-                    if RemoveInvalidPlaythroughsOneOffJob.is_too_old(model)]
+                    if RemoveIllegalPlaythroughsOneOffJob.is_too_old(model)]
                 stats_models.PlaythroughModel.delete_multi(old_models)
                 playthroughs_deleted += len(old_models)
                 # We use slice assignment here to replace the values in
@@ -121,12 +139,25 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (exp_id, playthroughs_deleted)
 
     @staticmethod
-    def reduce(exp_id, stringified_playthroughs_deleted_per_job):
+    def reduce(key, stringified_playthroughs_deleted_per_job):
+        """Calculates total playthroughs deleted from a particular exploration.
+
+        Must be declared @staticmethod.
+
+        Args:
+            key: str. The id of the exploration.
+            stringified_values: list(str). Each item is the the stringified
+            number of playthroughs deleted. For the given exploration.
+
+        Yields:
+            tuple(str). A 1-tuple containing a string which summarizes how many
+            playthroughs were deleted.
+        """
         playthroughs_deleted_per_job = (
             map(int, stringified_playthroughs_deleted_per_job))
         yield (
             'exploration_id:%s has had %d invalid playthrough recordings '
-            'deleted' % (exp_id, sum(playthroughs_deleted_per_job)),)
+            'deleted' % (key, sum(playthroughs_deleted_per_job)),)
 
 
 class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
