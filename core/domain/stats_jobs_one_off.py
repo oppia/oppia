@@ -148,9 +148,9 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
             playthrough_model: PlaythroughModel.
 
         Yields:
-            A 2-tuple of the form (playthrough_id, audit_data), where the
+            A 2-tuple of the form (playthrough_model.id, audit_data), where the
             structure of audit_data is:
-                exp_id: str. The exploration recorded by the playthrough.
+                exp_id: str. The exploration the playthrough records.
                 created_on: str. The date the model was created in YYYY-MM-DD
                     format.
                 validate_error: str. Stringified exception raised by trying to
@@ -180,9 +180,9 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
 
         Args:
             key: str. The id of the playthrough.
-            stringified_values: list(str). If key is a playthrough id, then each
-                str encodes a dict with the following structure:
-                    exp_id: str. The exploration recorded by the playthrough.
+            stringified_values: list(str). Each string is a stringified dict
+                with the following structure:
+                    exp_id: str. The exploration the playthrough records.
                     created_on: str. The date the model was created in
                         YYYY-MM-DD format.
                     validate_error: str. Stringified exception raised by trying
