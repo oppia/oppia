@@ -156,7 +156,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             map(int, stringified_playthroughs_deleted_per_job))
         yield (
             'exploration_id:%s has had %d invalid playthrough recordings '
-            'deleted' % (key, sum(playthroughs_deleted_per_job)),)
+            'deleted.' % (key, sum(playthroughs_deleted_per_job)),)
 
 
 class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
@@ -234,7 +234,7 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
         if value['validate_error']:
             yield (
                 'playthrough_id:%s could not be validated as a domain object '
-                'because of the error: %s' % (key, value['validate_error']),)
+                'because of the error: %s.' % (key, value['validate_error']),)
 
         whitelisted_exploration_ids_for_playthroughs = (
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
