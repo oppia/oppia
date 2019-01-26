@@ -148,35 +148,31 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
             playthrough_model: PlaythroughModel.
 
         Yields:
-            tuple.
-            If the playthrough was validated by the domain object, then it will
-            be a 2-tuple of the form (playthrough_id, audit_data) where:
-                playthrough_id: str. The id of the playthrough.
-                audit_data: dict(str : *). The dict is structured as:
-                    exp_id: str. The exploration recorded by the playthrough.
-                    created_on: str. The date the model was created in
-                        YYYY-MM-DD format.
-            Otherwise, it will be it will be a 2-tuple of the form:
-                (_INVALID_PLAYTHROUGH_ERROR_KEY,
-                 (playthrough_id, ValidationError))
+            A 2-tuple of the form (playthrough_id, audit_data), where the
+            structure of audit_data is:
+                exp_id: str. The exploration recorded by the playthrough.
+                created_on: str. The date the model was created in YYYY-MM-DD
+                    format.
+                validate_error: str. Stringified exception raised by trying to
+                    create the model as a domain object. Will be empty if no
+                    error occurred.
         """
         if playthrough_model.deleted:
             return
 
         try:
-            playthrough = (
-                stats_services.get_playthrough_from_model(playthrough_model))
+            stats_services.get_playthrough_from_model(playthrough_model)
         except Exception as e:
-            yield (
-                PlaythroughAudit._INVALID_PLAYTHROUGH_ERROR_KEY,
-                (playthrough_model.id, str(e)))
+            validate_error = str(e)
         else:
-            audit_data = {
-                'exp_id': playthrough_model.exp_id,
-                'created_on':
-                    playthrough_model.created_on.strftime('%Y-%m-%d'),
-            }
-            yield (playthrough_model.id, audit_data)
+            validate_error = ''
+
+        audit_data = {
+            'exp_id': playthrough_model.exp_id,
+            'created_on': playthrough_model.created_on.strftime('%Y-%m-%d'),
+            'validate_error': validate_error,
+        }
+        yield (playthrough_model.id, audit_data)
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -184,31 +180,30 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
 
         Args:
             key: str. The id of the playthrough.
-            stringified_values: list(str). A list of stringified dicts with the
-                following structure:
+            stringified_values: list(str). If key is a playthrough id, then each
+                str encodes a dict with the following structure:
                     exp_id: str. The exploration recorded by the playthrough.
                     created_on: str. The date the model was created in
                         YYYY-MM-DD format.
+                    validate_error: str. Stringified exception raised by trying
+                        to create the model as a domain object. Will be empty if
+                        no error occurred.
 
         Yields:
             tuple(str). A 1-tuple whose only element is an error message.
         """
-        if key == PlaythroughAudit._INVALID_PLAYTHROUGH_ERROR_KEY:
-            pid, except_str = ast.literal_eval(stringified_values[0])
-            yield (
-                'playthrough_id:%s could not be converted into a domain object '
-                'due to the following error: %s' % (pid, except_str),)
-            return
-
         if len(stringified_values) != 1:
             yield (
                 'playthrough_id:%s should correspond to exactly one model, but '
                 '%d were discovered.' % (key, len(stringified_values)),)
             return
-        else:
-            value = ast.literal_eval(stringified_values[0])
+        value = ast.literal_eval(stringified_values[0])
 
-        # Validate the playthrough's exploration id.
+        if value['validate_error']:
+            yield (
+                'playthrough_id:%s could not be validated as a domain object '
+                'because of the error: %s' % (key, value['validate_error']),)
+
         whitelisted_exploration_ids_for_playthroughs = (
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         if value['exp_id'] not in whitelisted_exploration_ids_for_playthroughs:
@@ -216,7 +211,6 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                 'playthrough_id:%s was recorded in exploration_id:%s which has '
                 'not been curated for recording.' % (key, value['exp_id']),)
 
-        # Validate the playthrough's age.
         created_on = (
             datetime.datetime.strptime(value['created_on'], '%Y-%m-%d'))
         if created_on < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
