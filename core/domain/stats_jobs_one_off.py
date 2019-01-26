@@ -85,10 +85,11 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         deleting any that are deemed invalid. Must be declared @staticmethod.
 
         Ensures:
-            Playthroughs deleted by this job are not referenced by their
-                associated issue.
-            All issues have at least one reference playthrough.
-            All models have at least one issue.
+            Playthroughs deleted by this job are removed as a reference from
+                their associated issue.
+            All issues have at least one legal playthrough referenced, otherwise
+                they are deleted.
+            All models have at least one issue, otherwise they are deleted.
 
         Args:
             playthrough_issues_model: ExplorationIssuesModel.
