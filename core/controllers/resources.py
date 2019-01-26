@@ -20,6 +20,7 @@ import urllib
 from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import config_domain
 from core.domain import fs_domain
 from core.domain import value_generators_domain
 import feconf
@@ -86,3 +87,24 @@ class AssetDevHandler(base.BaseHandler):
             self.response.write(raw)
         except:
             raise self.PageNotFoundException
+
+
+class PromoBarHandler(base.BaseHandler):
+    """The handler for checking if Promobar is enabled and fetching
+    promobar message.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        if constants.ENABLE_PROMO_BAR:
+            promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
+            promo_bar_message = config_domain.PROMO_BAR_MESSAGE.value
+        else:
+            promo_bar_enabled = False
+            promo_bar_message = ''
+        self.render_json({
+            'promo_bar_enabled': promo_bar_enabled,
+            'promo_bar_message': promo_bar_message
+        })

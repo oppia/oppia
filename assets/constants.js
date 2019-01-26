@@ -502,6 +502,8 @@ var constants = {
       }
   },
 
+  "ENABLE_PROMO_BAR": true,
+
   "ALLOW_YAML_FILE_UPLOAD": false,
 
   "CURRENT_STATES_SCHEMA_VERSION": 25,

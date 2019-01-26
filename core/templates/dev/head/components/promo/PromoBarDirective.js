@@ -19,24 +19,32 @@
  */
 
 oppia.directive('promoBar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'PromoBarService', 'UrlInterpolationService',
+  function(PromoBarService, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        getPromoMessage: '&promoMessage'
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/promo/' +
         'promo_bar_directive.html'),
       controller: [
-        '$scope',
-        function($scope) {
+        '$scope', '$window',
+        function($scope, $window) {
           var isPromoDismissed = function() {
             return !!angular.fromJson(sessionStorage.promoIsDismissed);
           };
           var setPromoDismissed = function(promoIsDismissed) {
             sessionStorage.promoIsDismissed = angular.toJson(promoIsDismissed);
           };
+
+          if ($window.location.pathname.split('/')[1] === 'signup') {
+            $scope.promoBarIsEnabled = false;
+            $scope.getPromoMessage = '';
+          } else {
+            PromoBarService.getPromoBar().then(function(promoBarObject) {
+              $scope.promoBarIsEnabled = promoBarObject.promo_bar_enabled;
+              $scope.getPromoMessage = promoBarObject.promo_bar_message;
+            });
+          }
 
           // TODO(bhenning): Utilize cookies for tracking when a promo is
           // dismissed. Cookies allow for a longer-lived memory of whether the
@@ -50,4 +58,5 @@ oppia.directive('promoBar', [
         }
       ]
     };
-  }]);
+  }
+]);
