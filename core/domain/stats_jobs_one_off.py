@@ -172,7 +172,7 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(playthrough_model):
-        """Implements the map function. Must be declared @staticmethod.
+        """Builds audit data for inspection. Must be declared @staticmethod.
 
         Args:
             playthrough_model: PlaythroughModel.
