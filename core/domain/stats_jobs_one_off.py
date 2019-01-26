@@ -124,7 +124,9 @@ class RemoveInvalidPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(exp_id, stringified_playthroughs_deleted_per_job):
         playthroughs_deleted_per_job = (
             map(int, stringified_playthroughs_deleted_per_job))
-        yield '%s: %s' % (exp_id, sum(playthroughs_deleted_per_job))
+        yield (
+            'exploration_id:%s has had %d invalid playthrough recordings '
+            'deleted' % (exp_id, sum(playthroughs_deleted_per_job)),)
 
 
 class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
