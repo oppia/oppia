@@ -206,7 +206,7 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        """Finds errors in playthrough models. Must be declared @staticmethod.
+        """Yields errors in playthrough models. Must be declared @staticmethod.
 
         Args:
             key: str. The id of the playthrough.
