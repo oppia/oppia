@@ -57,8 +57,11 @@ oppia.factory('ImagePreloaderService', [
           if (_isInFailedDownload(loadedImageFile.filename)) {
             _removeFromFailedDownload(loadedImageFile.filename);
           }
-          var objectUrl = URL.createObjectURL(loadedImageFile.data);
-          onLoadCallback(objectUrl);
+          var obj = {
+            objectUrl: URL.createObjectURL(loadedImageFile.data),
+            loadTime: loadedImageFile.loadTime
+          };
+          onLoadCallback(obj);
         }, function(filename) {
           onErrorCallback();
         });
