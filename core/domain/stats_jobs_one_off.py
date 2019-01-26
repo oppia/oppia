@@ -160,7 +160,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off playthroughs audit.
+    """A one-off audit for playthroughs.
 
     Performs a brief audit of playthrough recordings to make sure they pass
     simple sanity checks and contain the necessary data to render correctly on
