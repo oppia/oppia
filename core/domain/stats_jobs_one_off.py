@@ -146,7 +146,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         Args:
             key: str. The id of the exploration.
             stringified_values: list(str). Each item is the the stringified
-            number of playthroughs deleted. For the given exploration.
+                number of playthroughs deleted. For the given exploration.
 
         Yields:
             tuple(str). A 1-tuple containing a string which summarizes how many
