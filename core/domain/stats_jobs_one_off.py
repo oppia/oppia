@@ -180,8 +180,8 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                 exp_id: str. The exploration the playthrough records.
                 created_on: str. The date the model was created in YYYY-MM-DD
                     format.
-                validate_error: str. Stringified exception raised by trying to
-                    create the model as a domain object. Will be empty if no
+                validate_error: str | None. Stringified exception raised by
+                    trying to create the model as a domain object, or None if no
                     error occurred.
         """
         if playthrough_model.deleted:
@@ -194,7 +194,7 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
         except Exception as e:
             validate_error = str(e)
         else:
-            validate_error = ''
+            validate_error = None
 
         audit_data = {
             'exp_id': playthrough_model.exp_id,
@@ -214,9 +214,9 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     exp_id: str. The exploration the playthrough records.
                     created_on: str. The date the model was created in
                         YYYY-MM-DD format.
-                    validate_error: str. Stringified exception raised by trying
-                        to create the model as a domain object. Will be empty if
-                        no error occurred.
+                    validate_error: str | None. Stringified exception raised by
+                        trying to create the model as a domain object, or None
+                        if no error occurred.
 
         Yields:
             tuple(str). A 1-tuple whose only element is an error message.
@@ -228,7 +228,7 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
             return
         value = ast.literal_eval(stringified_values[0])
 
-        if value['validate_error']:
+        if value['validate_error'] is not None:
             yield (
                 'playthrough_id:%s could not be validated as a domain object '
                 'because of the error: %s.' % (key, value['validate_error']),)
