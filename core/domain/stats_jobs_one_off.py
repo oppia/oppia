@@ -188,7 +188,9 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
             return
 
         try:
-            stats_services.get_playthrough_from_model(playthrough_model)
+            playthrough = (
+                stats_services.get_playthrough_from_model(playthrough_model))
+            playthrough.validate()
         except Exception as e:
             validate_error = str(e)
         else:
