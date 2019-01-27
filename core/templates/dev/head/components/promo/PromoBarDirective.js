@@ -19,8 +19,8 @@
  */
 
 oppia.directive('promoBar', [
-  'PromoBarService', 'UrlInterpolationService',
-  function(PromoBarService, UrlInterpolationService) {
+  'ResourceService', 'UrlInterpolationService', 'ENABLE_PROMO_BAR',
+  function(ResourceService, UrlInterpolationService, ENABLE_PROMO_BAR) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -39,11 +39,14 @@ oppia.directive('promoBar', [
           if ($window.location.pathname.split('/')[1] === 'signup') {
             $scope.promoBarIsEnabled = false;
             $scope.getPromoMessage = '';
-          } else {
-            PromoBarService.getPromoBar().then(function(promoBarObject) {
-              $scope.promoBarIsEnabled = promoBarObject.promo_bar_enabled;
-              $scope.getPromoMessage = promoBarObject.promo_bar_message;
+          } else if (ENABLE_PROMO_BAR) {
+            ResourceService.getPromoBar().then(function(promoBarObject) {
+              $scope.promoBarIsEnabled = promoBarObject.promoBarEnabled;
+              $scope.getPromoMessage = promoBarObject.promoBarMessage;
             });
+          } else {
+            $scope.promoBarIsEnabled = false;
+            $scope.getPromoMessage = '';
           }
 
           // TODO(bhenning): Utilize cookies for tracking when a promo is
