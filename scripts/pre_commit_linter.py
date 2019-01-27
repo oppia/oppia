@@ -247,6 +247,13 @@ EXCLUDED_PATHS = (
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
     '*.mp3', '*.mp4')
 
+EXCLUDED_PATHS_EXT = (
+    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
+    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
+    '*.mp3', '*.mp4', '*.py')
+
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
     'extensions/interactions/LogicProof/static/js/generatedParser.js',
@@ -866,7 +873,8 @@ def _check_newline_character(all_files):
     summary_messages = []
     all_files = [
         filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+        any(fnmatch.fnmatch(filename, pattern)
+            for pattern in EXCLUDED_PATHS_EXT)]
 
     for filename in all_files:
         content = FileCache.read(filename, mode='rb')
