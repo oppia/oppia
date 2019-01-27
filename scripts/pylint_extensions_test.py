@@ -46,7 +46,7 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
     def test_finds_non_explicit_keyword_args(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.ExplicitKeywordArgsChecker)
+            pylint_extensions.KeywordArgsChecker)
         checker_test_object.setup_method()
         func_call_node_one, func_call_node_two, func_call_node_three = (
             astroid.extract_node("""
@@ -54,6 +54,8 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
             test_var_four="test_checker"):
             test_var_five = test_var_two + test_var_three
             return test_var_five
+
+
         test(2, 5, test_var_three=6) #@
         test(2) #@
         test(2, 6, test_var_two=5, test_var_four="test_checker") #@
@@ -96,12 +98,14 @@ class NonExplicitKeywordArgsCheckerTests(unittest.TestCase):
     def test_finds_explicit_keyword_args(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.ExplicitKeywordArgsChecker)
+            pylint_extensions.KeywordArgsChecker)
         checker_test_object.setup_method()
         func_call_node_one, func_call_node_two = (
             astroid.extract_node("""
         def test(test_var_one, test_var_two):
             pass
+
+
         test(1, 2) #@
         test(1, test_var_two=2) #@
         """))

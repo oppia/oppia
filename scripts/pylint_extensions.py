@@ -27,13 +27,13 @@ from pylint.checkers import typecheck
 from pylint.checkers import utils as checker_utils
 
 
-class ExplicitKeywordArgsChecker(checkers.BaseChecker):
+class KeywordArgsChecker(checkers.BaseChecker):
     """Custom pylint checker which checks for explicit keyword arguments
     in any function call.
     """
     __implements__ = interfaces.IAstroidChecker
 
-    name = 'explicit-keyword-args'
+    name = 'keyword-args'
     priority = -1
     msgs = {
         'C0001': (
@@ -42,9 +42,11 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             'All keyword arguments should be explicitly named in function call.'
         ),
         'C0007': (
-         'Keyword argument %s are not to be named explicitly in %s call of %s.',
-         'explicit-keyword-args',
-          'Argument names should not be used explicitly for non-default params'
+            'Keyword argument %s should not be named explicitly in %s call of'
+            ' %s.',
+            'explicit-keyword-args',
+            'Argument names should not be used explicitly for non-default'
+            'parameters.'
         ),
     }
 
@@ -76,6 +78,17 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         if call_site.has_invalid_arguments() or (
                 call_site.has_invalid_keywords()):
             return
+
+        # This try/except block tries to get the function
+        # name. Since each node may differ, multiple
+        # blocks have been used.
+        try:
+            func_name = node.func.attrname
+        except AttributeError:
+            try:
+                func_name = node.func.name
+            except AttributeError:
+                func_name = node.func
 
         num_positional_args = len(call_site.positional_arguments)
         keyword_args = list(call_site.keyword_arguments.keys())
@@ -110,55 +123,30 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         # Check that all parameters with a default value have
         # been called explicitly.
         for [(name, defval), _] in parameters:
-            if defval:
-                if name is None:
-                    display_name = '<tuple>'
-                else:
-                    display_name = repr(name)
+            if name is None:
+                display_name = '<tuple>'
+            else:
+                display_name = repr(name)
 
+            if defval:
                 if name not in keyword_args and (
                         num_positional_args_unused > (
                             num_mandatory_parameters)) and (
                                 callable_name != 'constructor'):
-                    # This try/except block tries to get the function
-                    # name. Since each node may differ, multiple
-                    # blocks have been used.
-                    try:
-                        func_name = node.func.attrname
-                    except AttributeError:
-                        try:
-                            func_name = node.func.name
-                        except AttributeError:
-                            func_name = node.func
 
                     self.add_message(
                         'non-explicit-keyword-args', node=node,
                         args=(
                             display_name,
                             callable_name,
-                            func_name))
+                            func_name), confidence=None)
                     num_positional_args_unused -= 1
 
-            #Executed if name is not having any default value in the function
-            #definition
+            # Executed if name is not having any default value in the function
+            # definition.
             else:
-                if name is None:
-                    display_name = '<tuple>'
-                else:
-                    display_name = repr(name)
-
-                if name in keyword_args:
-                    # This try/except block tries to get the function
-                    # name. Since each node may differ, multiple
-                    # blocks have been used.
-                    try:
-                        func_name = node.func.attrname
-                    except AttributeError:
-                        try:
-                            func_name = node.func.name
-                        except AttributeError:
-                            func_name = node.fun
-
+                if name in keyword_args and (
+                        callable_name != 'constructor'):
                     self.add_message(
                         'explicit-keyword-args', node=node,
                         args=(
@@ -832,7 +820,7 @@ def register(linter):
     Args:
         linter: Pylinter. The Pylinter object.
     """
-    linter.register_checker(ExplicitKeywordArgsChecker(linter))
+    linter.register_checker(KeywordArgsChecker(linter))
     linter.register_checker(HangingIndentChecker(linter))
     linter.register_checker(DocstringParameterChecker(linter))
     linter.register_checker(ImportOnlyModulesChecker(linter))
