@@ -33,7 +33,8 @@ var PreferencesPage = function() {
     by.css('.select2-selection__rendered'));
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
   var systemLanguageSelector = element.all(
-    by.css('.protractor-test-system-language-selector')).first();
+    by.css('.protractor-test-system-language-selector'))
+    .first();
 
   this.get = function() {
     browser.get(USER_PREFERENCES_URL);
@@ -50,24 +51,30 @@ var PreferencesPage = function() {
 
   this.selectSystemLanguage = function(language) {
     systemLanguageSelector.click();
-    var options = element.all(by.css('.select2-dropdown li')).filter(
-      function(elem) {
-        return elem.getText().then(function(text) {
-          return text === language;
+    var options = element.all(by.css('.select2-dropdown li'))
+      .filter(
+        function(elem) {
+          return elem.getText()
+            .then(function(text) {
+              return text === language;
+            });
         });
-      });
-    options.first().click();
+    options.first()
+      .click();
   };
 
   this.selectPreferredAudioLanguage = function(language) {
     preferredAudioLanguageSelector.click();
-    var correctOptions = languageOptionsList.all(by.tagName('li')).filter(
-      function(elem) {
-        return elem.getText().then(function(text) {
-          return text === language;
+    var correctOptions = languageOptionsList.all(by.tagName('li'))
+      .filter(
+        function(elem) {
+          return elem.getText()
+            .then(function(text) {
+              return text === language;
+            });
         });
-      });
-    correctOptions.first().click();
+    correctOptions.first()
+      .click();
   };
 
   this.isFeedbackEmailsCheckboxSelected = function() {
@@ -82,28 +89,35 @@ var PreferencesPage = function() {
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
   this.expectDisplayedFirstSubscriptionToBe = function(name) {
-    expect(subscriptions.first().getText()).toMatch(name);
+    expect(subscriptions.first()
+      .getText())
+      .toMatch(name);
   };
 
   // This function only compares the text displayed on the subscription (which
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
   this.expectDisplayedLastSubscriptionToBe = function(name) {
-    expect(subscriptions.last().getText()).toMatch(name);
+    expect(subscriptions.last()
+      .getText())
+      .toMatch(name);
   };
 
   this.expectPageHeaderToBe = function(text) {
-    expect(pageHeader.getText()).toEqual(text);
+    expect(pageHeader.getText())
+      .toEqual(text);
   };
 
   this.expectPreferredSiteLanguageToBe = function(language) {
     var selectedLanguageElement = systemLanguageSelector.element(
       by.css('.select2-selection__rendered'));
-    expect(selectedLanguageElement.getText()).toEqual(language);
+    expect(selectedLanguageElement.getText())
+      .toEqual(language);
   };
 
   this.expectPreferredAudioLanguageToBe = function(language) {
-    expect(selectedAudioLanguageElement.getText()).toEqual(language);
+    expect(selectedAudioLanguageElement.getText())
+      .toEqual(language);
   };
 
   this.expectPreferredAudioLanguageNotToBe = function(language) {
@@ -111,7 +125,8 @@ var PreferencesPage = function() {
   };
 
   this.expectSubscriptionCountToEqual = function(value) {
-    expect(subscriptions.count()).toEqual(value);
+    expect(subscriptions.count())
+      .toEqual(value);
   };
 };
 

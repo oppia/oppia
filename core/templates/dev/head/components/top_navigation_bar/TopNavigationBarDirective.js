@@ -41,45 +41,48 @@ oppia.directive('topNavigationBar', [
           $scope.isSuperAdmin = null;
           $scope.userIsLoggedIn = null;
           $scope.username = '';
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            if (userInfo.getPreferredSiteLanguageCode()) {
-              $translate.use(userInfo.getPreferredSiteLanguageCode());
-            }
-            $scope.isModerator = userInfo.isModerator();
-            $scope.isAdmin = userInfo.isAdmin();
-            $scope.isSuperAdmin = userInfo.isSuperAdmin();
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
-            $scope.username = userInfo.getUsername();
-            if ($scope.username) {
-              $scope.profilePageUrl = UrlInterpolationService.interpolateUrl(
-                '/profile/<username>', {
-                  username: $scope.username
-                });
-            }
+          UserService.getUserInfoAsync()
+            .then(function(userInfo) {
+              if (userInfo.getPreferredSiteLanguageCode()) {
+                $translate.use(userInfo.getPreferredSiteLanguageCode());
+              }
+              $scope.isModerator = userInfo.isModerator();
+              $scope.isAdmin = userInfo.isAdmin();
+              $scope.isSuperAdmin = userInfo.isSuperAdmin();
+              $scope.userIsLoggedIn = userInfo.isLoggedIn();
+              $scope.username = userInfo.getUsername();
+              if ($scope.username) {
+                $scope.profilePageUrl = UrlInterpolationService.interpolateUrl(
+                  '/profile/<username>', {username: $scope.username});
+              }
 
-            if ($scope.userIsLoggedIn) {
+              if ($scope.userIsLoggedIn) {
               // Show the number of unseen notifications in the navbar and page
               // title, unless the user is already on the dashboard page.
-              $http.get('/notificationshandler').then(function(response) {
-                var data = response.data;
-                if ($window.location.pathname !== '/') {
-                  $scope.numUnseenNotifications = data.num_unseen_notifications;
-                  if ($scope.numUnseenNotifications > 0) {
-                    $window.document.title = (
-                      '(' + $scope.numUnseenNotifications + ') ' +
+                $http.get('/notificationshandler')
+                  .then(function(response) {
+                    var data = response.data;
+                    if ($window.location.pathname !== '/') {
+                      $scope.numUnseenNotifications = data
+                        .num_unseen_notifications;
+                      if ($scope.numUnseenNotifications > 0) {
+                        $window.document.title = (
+                          '(' + $scope.numUnseenNotifications + ') ' +
                       $window.document.title);
-                  }
-                }
-              });
-            }
-          });
-          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-            $scope.profilePictureDataUrl = dataUrl;
-          });
+                      }
+                    }
+                  });
+              }
+            });
+          UserService.getProfileImageDataUrlAsync()
+            .then(function(dataUrl) {
+              $scope.profilePictureDataUrl = dataUrl;
+            });
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'topics_and_skills_dashboard',
-            'topic_editor', 'skill_editor', 'story_editor'];
+            'topic_editor', 'story_editor'
+          ];
           $scope.currentUrl = window.location.pathname.split('/')[1];
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURE_EDITORS;
@@ -91,15 +94,16 @@ oppia.directive('topNavigationBar', [
 
           $scope.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
-            UserService.getLoginAndLogoutUrls().then(
-              function(urlObject) {
-                if (urlObject.login_url) {
-                  $timeout(function() {
-                    $window.location = urlObject.login_url;
-                  }, 150);
+            UserService.getLoginAndLogoutUrls()
+              .then(
+                function(urlObject) {
+                  if (urlObject.login_url) {
+                    $timeout(function() {
+                      $window.location = urlObject.login_url;
+                    }, 150);
+                  }
                 }
-              }
-            );
+              );
           };
 
           $scope.googleSignInIconUrl = (
@@ -127,7 +131,8 @@ oppia.directive('topNavigationBar', [
             // and when you hover on library, both will be highlighted,
             // To avoid that, blur all the a's in nav, so that only one
             // will be highlighted.
-            $('nav a').blur();
+            $('nav a')
+              .blur();
           };
           $scope.closeSubmenu = function(evt) {
             NavigationService.closeSubmenu(evt);
@@ -156,12 +161,14 @@ oppia.directive('topNavigationBar', [
 
           // Close the submenu if focus or click occurs anywhere outside of
           // the menu or outside of its parent (which opens submenu on hover).
-          angular.element(document).on('click', function(evt) {
-            if (!angular.element(evt.target).closest('li').length) {
-              $scope.activeMenuName = '';
-              $scope.$apply();
-            }
-          });
+          angular.element(document)
+            .on('click', function(evt) {
+              if (!angular.element(evt.target)
+                .closest('li').length) {
+                $scope.activeMenuName = '';
+                $scope.$apply();
+              }
+            });
 
           $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
           var currentWindowWidth = WindowDimensionsService.getWidth();
@@ -170,7 +177,8 @@ oppia.directive('topNavigationBar', [
           // which they will be hidden. Earlier elements will be hidden first.
           var NAV_ELEMENTS_ORDER = [
             'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
-            'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
+            'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'
+          ];
           for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
             $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
           }
@@ -197,9 +205,11 @@ oppia.directive('topNavigationBar', [
           });
           $scope.isSidebarShown = function() {
             if (SidebarStatusService.isSidebarShown()) {
-              angular.element(document.body).addClass('oppia-stop-scroll');
+              angular.element(document.body)
+                .addClass('oppia-stop-scroll');
             } else {
-              angular.element(document.body).removeClass('oppia-stop-scroll');
+              angular.element(document.body)
+                .removeClass('oppia-stop-scroll');
             }
             return SidebarStatusService.isSidebarShown();
           };
@@ -281,4 +291,5 @@ oppia.directive('topNavigationBar', [
         }
       ]
     };
-  }]);
+  }
+]);

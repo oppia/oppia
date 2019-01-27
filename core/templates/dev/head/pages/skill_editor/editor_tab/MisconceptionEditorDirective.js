@@ -53,9 +53,7 @@ oppia.directive('misconceptionEditor', [
 
           $scope.FEEDBACK_FORM_SCHEMA = {
             type: 'html',
-            ui_config: {
-              hide_complex_extensions: 'true'
-            }
+            ui_config: {hide_complex_extensions: 'true'}
           };
 
           $scope.openNameEditor = function() {
@@ -147,7 +145,8 @@ oppia.directive('misconceptionEditor', [
             feedbackMemento = null;
             $scope.feedbackEditorIsOpen = false;
           };
-        }]
+        }
+      ]
     };
   }
 ]);

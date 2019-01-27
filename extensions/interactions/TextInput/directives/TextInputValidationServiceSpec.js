@@ -24,7 +24,7 @@ describe('TextInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     validatorService = $injector.get('TextInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');
     agof = $injector.get('AnswerGroupObjectFactory');
@@ -49,22 +49,19 @@ describe('TextInputValidationService', function() {
     });
 
     customizationArguments = {
-      placeholder: {
-        value: ''
-      },
-      rows: {
-        value: 1
-      }
+      placeholder: {value: ''},
+      rows: {value: 1}
     };
 
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
-  }));
+  }]);
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 
   it('should catch non-string value for placeholder', function() {
@@ -72,10 +69,13 @@ describe('TextInputValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: ('Placeholder text must be a string.')
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message: ('Placeholder text must be a string.')
+        }
+      ]);
   });
 
   it('should catch non-integer value for # rows', function() {
@@ -83,10 +83,13 @@ describe('TextInputValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: ('Number of rows must be integral.')
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message: ('Number of rows must be integral.')
+        }
+      ]);
   });
 
   it('should catch an out of range value for # rows', function() {
@@ -94,11 +97,14 @@ describe('TextInputValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: (
-        'Number of rows must be between ' + minRows + ' and ' +
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message: (
+            'Number of rows must be between ' + minRows + ' and ' +
         maxRows + '.')
-    }]);
+        }
+      ]);
   });
 });

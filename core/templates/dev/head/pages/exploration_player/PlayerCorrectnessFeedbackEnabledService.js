@@ -17,19 +17,21 @@
  * feedback is enabled or not.
  */
 
-oppia.factory('PlayerCorrectnessFeedbackEnabledService', [function() {
-  var _correctnessFeedbackIsEnabled = false;
+oppia.factory('PlayerCorrectnessFeedbackEnabledService', [
+  function() {
+    var _correctnessFeedbackIsEnabled = false;
 
-  var _init = function(correctnessFeedbackIsEnabled) {
-    _correctnessFeedbackIsEnabled = correctnessFeedbackIsEnabled;
-  };
+    var _init = function(correctnessFeedbackIsEnabled) {
+      _correctnessFeedbackIsEnabled = correctnessFeedbackIsEnabled;
+    };
 
-  return {
-    init: function(correctnessFeedbackIsEnabled) {
-      _init(correctnessFeedbackIsEnabled);
-    },
-    isEnabled: function() {
-      return _correctnessFeedbackIsEnabled;
-    }
-  };
-}]);
+    return {
+      init: function(correctnessFeedbackIsEnabled) {
+        _init(correctnessFeedbackIsEnabled);
+      },
+      isEnabled: function() {
+        return _correctnessFeedbackIsEnabled;
+      }
+    };
+  }
+]);

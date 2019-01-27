@@ -42,7 +42,9 @@ oppia.controller('Library', [
       LearnerDashboardActivityIdsObjectFactory, LearnerPlaylistService) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
-      'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+      'banner1.svg', 'banner2.svg',
+      'banner3.svg', 'banner4.svg'
+    ];
     $scope.bannerImageFilename = possibleBannerFilenames[
       Math.floor(Math.random() * possibleBannerFilenames.length)];
 
@@ -61,101 +63,103 @@ oppia.controller('Library', [
       var pathnameArray = $window.location.pathname.split('/');
       $scope.groupName = pathnameArray[2];
 
-      $http.get('/librarygrouphandler', {
-        params: {
-          group_name: $scope.groupName
-        }
-      }).success(
-        function(data) {
-          $scope.activityList = data.activity_list;
+      $http.get('/librarygrouphandler',
+        {params: {group_name: $scope.groupName}})
+        .success(
+          function(data) {
+            $scope.activityList = data.activity_list;
 
-          $scope.groupHeaderI18nId = data.header_i18n_id;
+            $scope.groupHeaderI18nId = data.header_i18n_id;
 
-          $rootScope.$broadcast(
-            'preferredLanguageCodesLoaded', data.preferred_language_codes);
+            $rootScope.$broadcast(
+              'preferredLanguageCodesLoaded', data.preferred_language_codes);
 
-          $rootScope.loadingMessage = '';
-        });
+            $rootScope.loadingMessage = '';
+          });
     } else {
-      $http.get('/libraryindexhandler').success(function(data) {
-        $scope.libraryGroups = data.activity_summary_dicts_by_category;
+      $http.get('/libraryindexhandler')
+        .success(function(data) {
+          $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          $scope.activitiesOwned = {explorations: {}, collections: {}};
-          if (userInfo.isLoggedIn()) {
-            $http.get('/creatordashboardhandler/data')
-              .then(function(response) {
-                $scope.libraryGroups.forEach(function(libraryGroup) {
-                  var activitySummaryDicts = (
-                    libraryGroup.activity_summary_dicts);
+          UserService.getUserInfoAsync()
+            .then(function(userInfo) {
+              $scope.activitiesOwned = {explorations: {}, collections: {}};
+              if (userInfo.isLoggedIn()) {
+                $http.get('/creatordashboardhandler/data')
+                  .then(function(response) {
+                    $scope.libraryGroups.forEach(function(libraryGroup) {
+                      var activitySummaryDicts = (
+                        libraryGroup.activity_summary_dicts);
 
-                  var ACTIVITY_TYPE_EXPLORATION = 'exploration';
-                  var ACTIVITY_TYPE_COLLECTION = 'collection';
-                  activitySummaryDicts.forEach(function(activitySummaryDict) {
-                    if (activitySummaryDict.activity_type === (
-                      ACTIVITY_TYPE_EXPLORATION)) {
-                      $scope.activitiesOwned.explorations[
-                        activitySummaryDict.id] = false;
-                    } else if (activitySummaryDict.activity_type === (
-                      ACTIVITY_TYPE_COLLECTION)) {
-                      $scope.activitiesOwned.collections[
-                        activitySummaryDict.id] = false;
-                    } else {
-                      $log.error('INVALID ACTIVITY TYPE: Activity' +
+                      var ACTIVITY_TYPE_EXPLORATION = 'exploration';
+                      var ACTIVITY_TYPE_COLLECTION = 'collection';
+                      activitySummaryDicts.
+                        forEach(function(activitySummaryDict) {
+                          if (activitySummaryDict.activity_type === (
+                            ACTIVITY_TYPE_EXPLORATION)) {
+                            $scope.activitiesOwned.explorations[
+                              activitySummaryDict.id] = false;
+                          } else if (activitySummaryDict.activity_type === (
+                            ACTIVITY_TYPE_COLLECTION)) {
+                            $scope.activitiesOwned.collections[
+                              activitySummaryDict.id] = false;
+                          } else {
+                            $log.error('INVALID ACTIVITY TYPE: Activity' +
                       '(id: ' + activitySummaryDict.id +
                       ', name: ' + activitySummaryDict.title +
                       ', type: ' + activitySummaryDict.activity_type +
                       ') has an invalid activity type, which could ' +
                       'not be recorded as an exploration or a collection.');
-                    }
+                          }
+                        });
+
+                      response.data.explorations_list
+                        .forEach(function(ownedExplorations) {
+                          $scope.activitiesOwned.explorations[
+                            ownedExplorations.id] = true;
+                        });
+
+                      response.data.collections_list
+                        .forEach(function(ownedCollections) {
+                          $scope.activitiesOwned.collections[
+                            ownedCollections.id] = true;
+                        });
+                    });
+                    $rootScope.loadingMessage = '';
                   });
-
-                  response.data.explorations_list
-                    .forEach(function(ownedExplorations) {
-                      $scope.activitiesOwned.explorations[
-                        ownedExplorations.id] = true;
-                    });
-
-                  response.data.collections_list
-                    .forEach(function(ownedCollections) {
-                      $scope.activitiesOwned.collections[
-                        ownedCollections.id] = true;
-                    });
-                });
+              } else {
                 $rootScope.loadingMessage = '';
-              });
-          } else {
-            $rootScope.loadingMessage = '';
+              }
+            });
+
+          $rootScope.$broadcast(
+            'preferredLanguageCodesLoaded', data.preferred_language_codes);
+
+          // Initialize the carousel(s) on the library index page.
+          // Pause is necessary to ensure all elements have loaded.
+          $timeout(initCarousels, 390);
+
+
+          // Check if actual and expected widths are the same.
+          // If not produce an error that would be caught by e2e tests.
+          $timeout(function() {
+            var actualWidth = $('exploration-summary-tile')
+              .width();
+            if (actualWidth && actualWidth !== LIBRARY_TILE_WIDTH_PX) {
+              console.error(
+                'The actual width of tile is different than the expected' +
+              ' width. Actual size: ' + actualWidth + ', Expected size: ' +
+              LIBRARY_TILE_WIDTH_PX);
+            }
+          }, 3000);
+          // The following initializes the tracker to have all
+          // elements flush left.
+          // Transforms the group names into translation ids
+          $scope.leftmostCardIndices = [];
+          for (i = 0; i < $scope.libraryGroups.length; i++) {
+            $scope.leftmostCardIndices.push(0);
           }
         });
-
-        $rootScope.$broadcast(
-          'preferredLanguageCodesLoaded', data.preferred_language_codes);
-
-        // Initialize the carousel(s) on the library index page.
-        // Pause is necessary to ensure all elements have loaded.
-        $timeout(initCarousels, 390);
-
-
-        // Check if actual and expected widths are the same.
-        // If not produce an error that would be caught by e2e tests.
-        $timeout(function() {
-          var actualWidth = $('exploration-summary-tile').width();
-          if (actualWidth && actualWidth !== LIBRARY_TILE_WIDTH_PX) {
-            console.error(
-              'The actual width of tile is different than the expected width.' +
-              ' Actual size: ' + actualWidth + ', Expected size: ' +
-              LIBRARY_TILE_WIDTH_PX);
-          }
-        }, 3000);
-        // The following initializes the tracker to have all
-        // elements flush left.
-        // Transforms the group names into translation ids
-        $scope.leftmostCardIndices = [];
-        for (i = 0; i < $scope.libraryGroups.length; i++) {
-          $scope.leftmostCardIndices.push(0);
-        }
-      });
     }
 
     $scope.setActiveGroup = function(groupIndex) {
@@ -180,22 +184,23 @@ oppia.controller('Library', [
         return;
       }
 
-      var windowWidth = $(window).width() * 0.85;
+      var windowWidth = $(window)
+        .width() * 0.85;
       // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to compensate
       // for padding and margins. 20 is just an arbitrary number.
       $scope.tileDisplayCount = Math.min(
         Math.floor(windowWidth / (LIBRARY_TILE_WIDTH_PX + 20)),
         MAX_NUM_TILES_PER_ROW);
 
-      $('.oppia-library-carousel').css({
-        width: ($scope.tileDisplayCount * LIBRARY_TILE_WIDTH_PX) + 'px'
-      });
+      $('.oppia-library-carousel')
+        .css({width: ($scope.tileDisplayCount * LIBRARY_TILE_WIDTH_PX) + 'px'});
 
       // The following determines whether to enable left scroll after resize.
       for (var i = 0; i < $scope.libraryGroups.length; i++) {
         var carouselJQuerySelector = (
           '.oppia-library-carousel-tiles:eq(n)'.replace('n', i));
-        var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
+        var carouselScrollPositionPx = $(carouselJQuerySelector)
+          .scrollLeft();
         var index = Math.ceil(carouselScrollPositionPx / LIBRARY_TILE_WIDTH_PX);
         $scope.leftmostCardIndices[i] = index;
       }
@@ -211,7 +216,8 @@ oppia.controller('Library', [
         '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind));
 
       var direction = isLeftScroll ? -1 : 1;
-      var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
+      var carouselScrollPositionPx = $(carouselJQuerySelector)
+        .scrollLeft();
 
       // Prevent scrolling if there more carousel pixed widths than
       // there are tile widths.
@@ -235,18 +241,17 @@ oppia.controller('Library', [
       var newScrollPositionPx = carouselScrollPositionPx +
         ($scope.tileDisplayCount * LIBRARY_TILE_WIDTH_PX * direction);
 
-      $(carouselJQuerySelector).animate({
-        scrollLeft: newScrollPositionPx
-      }, {
-        duration: 800,
-        queue: false,
-        start: function() {
-          isAnyCarouselCurrentlyScrolling = true;
-        },
-        complete: function() {
-          isAnyCarouselCurrentlyScrolling = false;
-        }
-      });
+      $(carouselJQuerySelector)
+        .animate({scrollLeft: newScrollPositionPx}, {
+          duration: 800,
+          queue: false,
+          start: function() {
+            isAnyCarouselCurrentlyScrolling = true;
+          },
+          complete: function() {
+            isAnyCarouselCurrentlyScrolling = false;
+          }
+        });
     };
 
     // The carousels do not work when the width is 1 card long, so we need to
@@ -264,21 +269,24 @@ oppia.controller('Library', [
         Math.max($scope.leftmostCardIndices[ind] - 1, 0));
     };
 
-    $(window).resize(function() {
-      initCarousels();
-      // This is needed, otherwise $scope.tileDisplayCount takes a long time
-      // (several seconds) to update.
-      $scope.$apply();
-    });
+    $(window)
+      .resize(function() {
+        initCarousels();
+        // This is needed, otherwise $scope.tileDisplayCount takes a long time
+        // (several seconds) to update.
+        $scope.$apply();
+      });
 
     var activateSearchMode = function() {
       if ($scope.pageMode !== LIBRARY_PAGE_MODES.SEARCH) {
-        $('.oppia-library-container').fadeOut(function() {
-          $scope.pageMode = LIBRARY_PAGE_MODES.SEARCH;
-          $timeout(function() {
-            $('.oppia-library-container').fadeIn();
-          }, 50);
-        });
+        $('.oppia-library-container')
+          .fadeOut(function() {
+            $scope.pageMode = LIBRARY_PAGE_MODES.SEARCH;
+            $timeout(function() {
+              $('.oppia-library-container')
+                .fadeIn();
+            }, 50);
+          });
       }
     };
 

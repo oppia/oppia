@@ -22,9 +22,7 @@ oppia.directive('promoBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        getPromoMessage: '&promoMessage'
-      },
+      scope: {getPromoMessage: '&promoMessage'},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/promo/' +
         'promo_bar_directive.html'),
@@ -50,4 +48,5 @@ oppia.directive('promoBar', [
         }
       ]
     };
-  }]);
+  }
+]);

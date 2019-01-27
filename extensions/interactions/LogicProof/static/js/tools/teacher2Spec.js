@@ -58,52 +58,56 @@ describe('Build line templates', function() {
     expect(
       buildThenDisplay(
         'and_introduce', 'from p and q we have p\u2227q', 'p, q', 'p\u2227q',
-        '', [])).toEqual({
-      name: 'and_introduce',
-      reader_view: 'from p and q we have p\u2227q',
-      antecedents: 'p, q',
-      results: 'p\u2227q',
-      variables: '',
-      error: []
-    });
+        '', []))
+      .toEqual({
+        name: 'and_introduce',
+        reader_view: 'from p and q we have p\u2227q',
+        antecedents: 'p, q',
+        results: 'p\u2227q',
+        variables: '',
+        error: []
+      });
 
     expect(
       buildThenDisplay(
         'and_introduce', 'from p we have p\u2227q', 'p', 'p\u2227q', '', [
           'Should this be "from {{p}} and {{q}} we have {{p\u2227q}}"?',
           'To prove {{p\u2227q}} you need to have shown {{q}} as well'
-        ])).toEqual({
-      name: 'and_introduce',
-      reader_view: 'from p we have p\u2227q',
-      antecedents: 'p',
-      results: 'p\u2227q',
-      variables: '',
-      error: [
-        'Should this be "from {{p}} and {{q}} we have {{p\u2227q}}"?',
-        'To prove {{p\u2227q}} you need to have shown {{q}} as well'
-      ]
-    });
+        ]))
+      .toEqual({
+        name: 'and_introduce',
+        reader_view: 'from p we have p\u2227q',
+        antecedents: 'p',
+        results: 'p\u2227q',
+        variables: '',
+        error: [
+          'Should this be "from {{p}} and {{q}} we have {{p\u2227q}}"?',
+          'To prove {{p\u2227q}} you need to have shown {{q}} as well'
+        ]
+      });
 
     expect(
       buildThenDisplay(
         'for_all_introduce', '{{a|element}} was arbitrary hence \u2200x.p',
         'p[x->a]', '\u2200x.p', 'a', []
-      )).toEqual({
-      name: 'for_all_introduce',
-      reader_view: '{{a|element}} was arbitrary hence \u2200x.p',
-      antecedents: 'p[x->a]',
-      results: '\u2200x.p',
-      variables: 'a',
-      error: []
-    });
+      ))
+      .toEqual({
+        name: 'for_all_introduce',
+        reader_view: '{{a|element}} was arbitrary hence \u2200x.p',
+        antecedents: 'p[x->a]',
+        results: '\u2200x.p',
+        variables: 'a',
+        error: []
+      });
   });
 
   it('should reject templates with hidden operators', function() {
     expect(
       errorWrapper2(
         buildThenDisplay, 'name', 'from q we have r', 'q', 'p', '', [])
-    ).toThrowError(
-      'It will not be possible to uniquely identify p from a line of this ' +
+    )
+      .toThrowError(
+        'It will not be possible to uniquely identify p from a line of this ' +
       'form.');
 
     // FUTURE: render this test passable
@@ -111,8 +115,9 @@ describe('Build line templates', function() {
       errorWrapper2(
         buildThenDisplay, 'exists_introduce',
         'from p[x->a] we have \u2203x.p', 'p[x->a]', '\u2203x.p', 'a', [])
-    ).toThrowError(
-      'It will not be possible to uniquely identify a from a line of this ' +
+    )
+      .toThrowError(
+        'It will not be possible to uniquely identify a from a line of this ' +
       'form.');
   });
 
@@ -120,8 +125,9 @@ describe('Build line templates', function() {
     expect(
       errorWrapper2(
         buildThenDisplay, 'name', 'take p satisfying q[x->p]', '', '', '', [])
-    ).toThrowError(
-      'p yields a boolean but you are trying to use it to give a element.');
+    )
+      .toThrowError(
+        'p yields a boolean but you are trying to use it to give a element.');
   });
 });
 
@@ -134,41 +140,25 @@ describe('Build line template table', function() {
   };
 
   it('should build and display examples correctly', function() {
-    expect(buildThenDisplay([{
-      name: 'a',
-      reader_view: 'p hence q',
-      antecedents: 'p',
-      results: 'q',
-      variables: '',
-      error: []
-    }, {
-      name: 'b',
-      reader_view: '\u2203x.p\u2227q if contradiction we have from r',
-      antecedents: 'r, p, q',
-      results: '',
-      variables: 'x',
-      error: ['How unwise {{x|variable}}.']
-    }])).toEqual([{
-      name: 'a',
-      reader_view: 'p hence q',
-      antecedents: 'p',
-      results: 'q',
-      variables: '',
-      error: []
-    }, {
-      name: 'b',
-      reader_view: '\u2203x.(p\u2227q) if contradiction we have from r',
-      antecedents: 'r, p, q',
-      results: '',
-      variables: 'x',
-      error: ['How unwise {{x|variable}}.']
-    }]);
-  });
-
-  it('should reject tables with erroneous lines', function() {
-    expect((function() {
-      try {
-        buildThenDisplay([{
+    expect(buildThenDisplay([
+      {
+        name: 'a',
+        reader_view: 'p hence q',
+        antecedents: 'p',
+        results: 'q',
+        variables: '',
+        error: []
+      }, {
+        name: 'b',
+        reader_view: '\u2203x.p\u2227q if contradiction we have from r',
+        antecedents: 'r, p, q',
+        results: '',
+        variables: 'x',
+        error: ['How unwise {{x|variable}}.']
+      }
+    ]))
+      .toEqual([
+        {
           name: 'a',
           reader_view: 'p hence q',
           antecedents: 'p',
@@ -176,18 +166,43 @@ describe('Build line template table', function() {
           variables: '',
           error: []
         }, {
-          name: 'a',
-          reader_view: '\u2203x.p\u2227 if contradiction we have from r',
+          name: 'b',
+          reader_view: '\u2203x.(p\u2227q) if contradiction we have from r',
           antecedents: 'r, p, q',
           results: '',
           variables: 'x',
           error: ['How unwise {{x|variable}}.']
-        }]);
+        }
+      ]);
+  });
+
+  it('should reject tables with erroneous lines', function() {
+    expect((function() {
+      try {
+        buildThenDisplay([
+          {
+            name: 'a',
+            reader_view: 'p hence q',
+            antecedents: 'p',
+            results: 'q',
+            variables: '',
+            error: []
+          }, {
+            name: 'a',
+            reader_view: '\u2203x.p\u2227 if contradiction we have from r',
+            antecedents: 'r, p, q',
+            results: '',
+            variables: 'x',
+            error: ['How unwise {{x|variable}}.']
+          }
+        ]);
       } catch (err) {
         return err;
       }
-    })()[1]).toEqual(
-      'The name \'if\' is reserved for vocabulary and so cannot be used here.');
+    })()[1])
+      .toEqual(
+        'The name \'if\' is reserved for vocabulary and so cannot ' +
+        'be used here.');
   });
 });
 
@@ -205,62 +220,75 @@ describe('Build mistake entry', function() {
     expect(
       logicProofTeacher2.buildMistakeEntry(
         'name', '~target()\u2208results(n)', ['{{num_lines()-1}}'],
-        logicProofData.BASE_CONTROL_LANGUAGE)).toEqual({
-      name: 'name',
-      occurs: {
-        top_operator_name: 'not',
-        top_kind_name: 'unary_connective',
-        arguments: [{
-          top_operator_name: 'is_in',
-          top_kind_name: 'binary_relation',
-          arguments: [{
-            top_operator_name: 'target',
-            top_kind_name: 'prefix_function',
-            arguments: [],
-            dummies: [],
-            type: 'formula'
-          }, {
-            top_operator_name: 'results',
-            top_kind_name: 'prefix_function',
-            arguments: [{
-              top_operator_name: 'n',
-              top_kind_name: 'variable',
-              arguments: [],
+        logicProofData.BASE_CONTROL_LANGUAGE))
+      .toEqual({
+        name: 'name',
+        occurs: {
+          top_operator_name: 'not',
+          top_kind_name: 'unary_connective',
+          arguments: [
+            {
+              top_operator_name: 'is_in',
+              top_kind_name: 'binary_relation',
+              arguments: [
+                {
+                  top_operator_name: 'target',
+                  top_kind_name: 'prefix_function',
+                  arguments: [],
+                  dummies: [],
+                  type: 'formula'
+                }, {
+                  top_operator_name: 'results',
+                  top_kind_name: 'prefix_function',
+                  arguments: [
+                    {
+                      top_operator_name: 'n',
+                      top_kind_name: 'variable',
+                      arguments: [],
+                      dummies: [],
+                      type: 'integer'
+                    }
+                  ],
+                  dummies: [],
+                  type: 'set_of_formulas'
+                }
+              ],
               dummies: [],
-              type: 'integer'
-            }],
-            dummies: [],
-            type: 'set_of_formulas'
-          }],
+              type: 'boolean'
+            }
+          ],
           dummies: [],
           type: 'boolean'
-        }],
-        dummies: [],
-        type: 'boolean'
-      },
-      message: [[{
-        format: 'expression',
-        content: {
-          top_operator_name: 'subtraction',
-          top_kind_name: 'binary_function',
-          arguments: [{
-            top_operator_name: 'num_lines',
-            top_kind_name: 'prefix_function',
-            arguments: [],
-            dummies: [],
-            type: 'integer'
-          }, {
-            top_operator_name: 1,
-            top_kind_name: 'constant',
-            arguments: [],
-            dummies: [],
-            type: 'integer'
-          }],
-          dummies: [],
-          type: 'integer'
-        }
-      }]]
-    });
+        },
+        message: [
+          [
+            {
+              format: 'expression',
+              content: {
+                top_operator_name: 'subtraction',
+                top_kind_name: 'binary_function',
+                arguments: [
+                  {
+                    top_operator_name: 'num_lines',
+                    top_kind_name: 'prefix_function',
+                    arguments: [],
+                    dummies: [],
+                    type: 'integer'
+                  }, {
+                    top_operator_name: 1,
+                    top_kind_name: 'constant',
+                    arguments: [],
+                    dummies: [],
+                    type: 'integer'
+                  }
+                ],
+                dummies: [],
+                type: 'integer'
+              }
+            }
+          ]
+        ]
+      });
   });
 
   it('should build then display entries correctly', function() {
@@ -270,14 +298,15 @@ describe('Build mistake entry', function() {
           'The first line of a proof should not be indented',
           'Don\'t indent the first line of your proof'
         ])
-    ).toEqual({
-      name: 'name',
-      occurs: '(n=1)\u2227(indentation(n)>0)',
-      message: [
-        'The first line of a proof should not be indented',
-        'Don\'t indent the first line of your proof'
-      ]
-    });
+    )
+      .toEqual({
+        name: 'name',
+        occurs: '(n=1)\u2227(indentation(n)>0)',
+        message: [
+          'The first line of a proof should not be indented',
+          'Don\'t indent the first line of your proof'
+        ]
+      });
   });
 
   it('should reject mis-typed combinations of expressions', function() {
@@ -285,10 +314,12 @@ describe('Build mistake entry', function() {
       errorWrapper2(
         buildThenDisplay, 'name', 'template(n) = \'given\'',
         ['examine {{antecedents(n-1)+1}}'])
-    ).toThrowError(
-      'antecedents yields a set_of_formulas but you are trying to use it to ' +
+    )
+      .toThrowError(
+        'antecedents yields a set_of_formulas but you are trying ' +
+        'to use it to ' +
       'give a integer.'
-    );
+      );
   });
 });
 
@@ -298,7 +329,23 @@ describe('Build mistake section', function() {
       logicProofTeacher2.displayMistakeSection(
         logicProofTeacher2.buildMistakeSection(
           'layout',
-          [{
+          [
+            {
+              name: 'mistake_1',
+              occurs: 'entry(1,antecedents(n))\u2208assumptions()',
+              message: ['wrong']
+            }, {
+              name: 'mistake_2',
+              occurs: 'num_lines()>3',
+              message: ['Try to assess {{indentation(22)}}']
+            }
+          ], []
+        ), logicProofData.BASE_CONTROL_LANGUAGE.operators)
+    )
+      .toEqual({
+        name: 'layout',
+        entries: [
+          {
             name: 'mistake_1',
             occurs: 'entry(1,antecedents(n))\u2208assumptions()',
             message: ['wrong']
@@ -306,34 +353,26 @@ describe('Build mistake section', function() {
             name: 'mistake_2',
             occurs: 'num_lines()>3',
             message: ['Try to assess {{indentation(22)}}']
-          }], []
-        ), logicProofData.BASE_CONTROL_LANGUAGE.operators)
-    ).toEqual({
-      name: 'layout',
-      entries: [{
-        name: 'mistake_1',
-        occurs: 'entry(1,antecedents(n))\u2208assumptions()',
-        message: ['wrong']
-      }, {
-        name: 'mistake_2',
-        occurs: 'num_lines()>3',
-        message: ['Try to assess {{indentation(22)}}']
-      }]
-    });
+          }
+        ]
+      });
   });
 
   it('should reject invalid entries', function() {
     expect((function() {
       try {
-        logicProofTeacher2.buildMistakeSection('variables', [{
-          name: 'a mistake',
-          occurs: 'operator(n)=\'and\'',
-          message: ['Dear dear']
-        }], []);
+        logicProofTeacher2.buildMistakeSection('variables', [
+          {
+            name: 'a mistake',
+            occurs: 'operator(n)=\'and\'',
+            message: ['Dear dear']
+          }
+        ], []);
       } catch (err) {
         return err;
       }
-    })()[0]).toEqual('The operator operator could not be identified.');
+    })()[0])
+      .toEqual('The operator operator could not be identified.');
   });
 });
 
@@ -350,60 +389,71 @@ describe('Build control function', function() {
     expect(
       logicProofTeacher2.buildControlFunction(
         'f(x)', 'x+2', 'a description', logicProofData.BASE_CONTROL_LANGUAGE)
-    ).toEqual({
-      name: 'f',
-      variables: [{
-        top_kind_name: 'variable',
-        top_operator_name: 'x',
-        arguments: [],
-        dummies: []
-      }],
-      typing: [{
-        arguments: [{
-          type: 'integer',
-          arbitrarily_many: false
-        }],
-        dummies: [],
-        output: 'integer'
-      }],
-      definition: {
-        top_operator_name: 'addition',
-        top_kind_name: 'binary_function',
-        arguments: [{
-          top_operator_name: 'x',
-          top_kind_name: 'variable',
-          arguments: [],
+    )
+      .toEqual({
+        name: 'f',
+        variables: [
+          {
+            top_kind_name: 'variable',
+            top_operator_name: 'x',
+            arguments: [],
+            dummies: []
+          }
+        ],
+        typing: [
+          {
+            arguments: [
+              {
+                type: 'integer',
+                arbitrarily_many: false
+              }
+            ],
+            dummies: [],
+            output: 'integer'
+          }
+        ],
+        definition: {
+          top_operator_name: 'addition',
+          top_kind_name: 'binary_function',
+          arguments: [
+            {
+              top_operator_name: 'x',
+              top_kind_name: 'variable',
+              arguments: [],
+              dummies: [],
+              type: 'integer'
+            }, {
+              top_operator_name: 2,
+              top_kind_name: 'constant',
+              arguments: [],
+              dummies: [],
+              type: 'integer'
+            }
+          ],
           dummies: [],
           type: 'integer'
-        }, {
-          top_operator_name: 2,
-          top_kind_name: 'constant',
-          arguments: [],
-          dummies: [],
-          type: 'integer'
-        }],
-        dummies: [],
-        type: 'integer'
-      },
-      description: 'a description'
-    });
+        },
+        description: 'a description'
+      });
   });
 
   it('should build then display examples correctly', function() {
-    expect(buildThenDisplay('f(n)', 'n+2', 'a')).toEqual({
-      LHS: 'f(n)',
-      RHS: 'n+2',
-      description: 'a'
-    });
+    expect(buildThenDisplay('f(n)', 'n+2', 'a'))
+      .toEqual({
+        LHS: 'f(n)',
+        RHS: 'n+2',
+        description: 'a'
+      });
 
     expect(
       buildThenDisplay('is_scope_creator(n)',
         'template(n)=\'given\' \u2228 template(n)=\'assumption\'', '')
-    ).toEqual({
-      LHS: 'is_scope_creator(n)',
-      RHS: '(template(n)=\'given\')\u2228(template(n)=\'assumption\')',
-      description: ''
-    });
+    )
+      .toEqual({
+        LHS: 'is_scope_creator(n)',
+        RHS: '(template(n)=\'given\')\u2228(template(n)=\'assumption\')',
+        description: ''
+      });
   });
 
   it('should reject undefined functions', function() {
@@ -411,15 +461,17 @@ describe('Build control function', function() {
       errorWrapper2(
         buildThenDisplay, 'bad_function(x,y)', 'missing_function(x-y, x+y)',
         '')
-    ).toThrowError('The operator missing_function could not be identified.');
+    )
+      .toThrowError('The operator missing_function could not be identified.');
   });
 
   it('should forbid type mismatches', function() {
     expect(
       errorWrapper2(
         buildThenDisplay, 'f(n)', 'template(n) + 3', '')
-    ).toThrowError(
-      'template yields a string but you are trying to use it to give a ' +
+    )
+      .toThrowError(
+        'template yields a string but you are trying to use it to give a ' +
       'integer.');
   });
 
@@ -427,8 +479,9 @@ describe('Build control function', function() {
     expect(
       errorWrapper2(
         buildThenDisplay, 'f(n)', 'n', '')
-    ).toThrowError(
-      'Unfortunately this cannot be accepted as it has multiple possible ' +
+    )
+      .toThrowError(
+        'Unfortunately this cannot be accepted as it has multiple possible ' +
       'typings.');
   });
 
@@ -436,8 +489,10 @@ describe('Build control function', function() {
     expect(
       errorWrapper2(
         buildThenDisplay, 'n(x,y)', 'x-y', '')
-    ).toThrowError(
-      'You cannot use n as a function name; it is reserved to refer to line ' +
+    )
+      .toThrowError(
+        'You cannot use n as a function name; it is reserved to ' +
+        'refer to line ' +
       'numbers');
   });
 });
@@ -462,36 +517,42 @@ describe('Build control function table', function() {
             }
           ]
         ), logicProofData.BASE_CONTROL_LANGUAGE.operators)
-    ).toEqual([{
-      LHS: 'is_scope_creator(n)',
-      RHS: '(template(n)=\'given\')\u2228(template(n)=\'assumption\')',
-      description: 'a'
-    }, {
-      LHS: 'is_in_scope(m,n)',
-      RHS: '((~is_scope_creator(m))\u2227((indentation(n)>=indentation(m))' +
-        '\u2227(~\u2203k<=n.(k>=m)\u2227(indentation(k)<indentation(m)))))' +
-        '\u2228((indentation(n)>indentation(m))\u2227(~\u2203k<=n.(k>=m)' +
+    )
+      .toEqual([
+        {
+          LHS: 'is_scope_creator(n)',
+          RHS: '(template(n)=\'given\')\u2228(template(n)=\'assumption\')',
+          description: 'a'
+        }, {
+          LHS: 'is_in_scope(m,n)',
+          RHS: '((~is_scope_creator(m))\u2227((indentation(n)>=indentation' +
+        '(m))\u2227(~\u2203k<=n.(k>=m)\u2227(indentation(k)<indentation(m))' +
+        ')))\u2228((indentation(n)>indentation(m))\u2227(~\u2203k<=n.(k>=m)' +
         '\u2227(indentation(k)<=indentation(m))))',
-      description: 'b'
-    }]);
+          description: 'b'
+        }
+      ]);
   });
 
   it('should reject tables with invalid lines', function() {
     expect((function() {
       try {
-        logicProofTeacher2.buildControlFunctionTable([{
-          LHS: 'f(n)',
-          RHS: 'indentation(n) - 2',
-          description: ''
-        }, {
-          LHS: 'f(n)',
-          RHS: 'indentation(n) - 2',
-          description: ''
-        }]);
+        logicProofTeacher2.buildControlFunctionTable([
+          {
+            LHS: 'f(n)',
+            RHS: 'indentation(n) - 2',
+            description: ''
+          }, {
+            LHS: 'f(n)',
+            RHS: 'indentation(n) - 2',
+            description: ''
+          }
+        ]);
       } catch (err) {
         return err.message;
       }
-    })()).toEqual('The function f has already been defined.');
+    })())
+      .toEqual('The function f has already been defined.');
   });
 });
 
@@ -502,23 +563,27 @@ describe('Parse messages describing student mistakes', function() {
         logicProofTeacher2.parseMessage(
           'stuff {{p\u2227q}} thingies', 'control'),
         logicProofData.BASE_CONTROL_LANGUAGE.operators)
-      ).toEqual('stuff {{p\u2227q}} thingies');
+      )
+        .toEqual('stuff {{p\u2227q}} thingies');
     });
 
   it('should parse general messages correctly', function() {
     expect(
       logicProofTeacher2.parseMessage(
         'Your use of {{item}} is wrong.', 'general')
-    ).toEqual([{
-      isFixed: true,
-      content: 'Your use of '
-    }, {
-      isFixed: false,
-      content: 'item'
-    }, {
-      isFixed: true,
-      content: ' is wrong.'
-    }]);
+    )
+      .toEqual([
+        {
+          isFixed: true,
+          content: 'Your use of '
+        }, {
+          isFixed: false,
+          content: 'item'
+        }, {
+          isFixed: true,
+          content: ' is wrong.'
+        }
+      ]);
   });
 
   it('should forbid unparseable expression templates', function() {
@@ -526,7 +591,8 @@ describe('Parse messages describing student mistakes', function() {
       errorWrapper2(
         logicProofTeacher2.parseMessage,
         'By lack of arbitraryness this fails for {{p[[x->a]}}.', 'line')
-    ).toThrowError('It was not possible to parse {{p[[x->a]}}.');
+    )
+      .toThrowError('It was not possible to parse {{p[[x->a]}}.');
   });
 
   it('should forbid unmatched {{', function() {
@@ -534,6 +600,7 @@ describe('Parse messages describing student mistakes', function() {
       errorWrapper2(
         logicProofTeacher2.parseMessage,
         'of {{result(scoper(n))}}.{{d)', 'control')
-    ).toThrowError('This has an unmatched {{.');
+    )
+      .toThrowError('This has an unmatched {{.');
   });
 });

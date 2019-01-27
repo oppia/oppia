@@ -21,7 +21,7 @@ describe('State classifier mapping service', function() {
 
   describe('Test correct retrieval of classifier details', function() {
     var mappingService;
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       mappingService = $injector.get('StateClassifierMappingService');
 
       mappingService.init({
@@ -31,15 +31,18 @@ describe('State classifier mapping service', function() {
           data_schema_version: 1
         }
       });
-    }));
+    }]);
 
     it('should return correct classifier details.', function() {
       var stateName = 'stateName1';
       var retrievedClassifier = mappingService.getClassifier(stateName);
 
-      expect(retrievedClassifier.algorithmId).toEqual('TestClassifier');
-      expect(retrievedClassifier.classifierData).toEqual({});
-      expect(retrievedClassifier.dataSchemaVersion).toEqual(1);
+      expect(retrievedClassifier.algorithmId)
+        .toEqual('TestClassifier');
+      expect(retrievedClassifier.classifierData)
+        .toEqual({});
+      expect(retrievedClassifier.dataSchemaVersion)
+        .toEqual(1);
     });
   });
 });

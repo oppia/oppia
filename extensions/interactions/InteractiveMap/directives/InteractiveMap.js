@@ -27,9 +27,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
       EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
-      scope: {
-        getLastAnswer: '&lastAnswer'
-      },
+      scope: {getLastAnswer: '&lastAnswer'},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/InteractiveMap/directives/' +
         'interactive_map_interaction_directive.html'),
@@ -38,28 +36,21 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
         function($scope, $attrs, $timeout, CurrentInteractionService) {
           $scope.coords = [
             HtmlEscaperService.escapedJsonToObj($attrs.latitudeWithValue),
-            HtmlEscaperService.escapedJsonToObj($attrs.longitudeWithValue)];
+            HtmlEscaperService.escapedJsonToObj($attrs.longitudeWithValue)
+          ];
           $scope.zoom = (
             HtmlEscaperService.escapedJsonToObj($attrs.zoomWithValue));
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.mapMarkers = [];
 
           $scope.setOverlay = function() {
-            $scope.overlayStyle = {
-              'background-color': 'black'
-            };
-            $scope.mapStyle = {
-              opacity: '0.8'
-            };
+            $scope.overlayStyle = {'background-color': 'black'};
+            $scope.mapStyle = {opacity: '0.8'};
           };
 
           $scope.hideOverlay = function() {
-            $scope.overlayStyle = {
-              'background-color': 'white'
-            };
-            $scope.mapStyle = {
-              opacity: '1'
-            };
+            $scope.overlayStyle = {'background-color': 'white'};
+            $scope.mapStyle = {opacity: '1'};
           };
 
 
@@ -144,16 +135,18 @@ oppia.directive('oppiaResponseInteractiveMap', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/InteractiveMap/directives/' +
         'interactive_map_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
-        var latLongPair = _answer[0] + ',' + _answer[1];
-        $scope.staticMapUrl =
+          var latLongPair = _answer[0] + ',' + _answer[1];
+          $scope.staticMapUrl =
           'https://maps.googleapis.com/maps/api/staticmap?' +
           'center=' + latLongPair + '&zoom=4&size=500x400' +
           '&maptype=roadmap&visual_refresh=true&markers=color:red|' +
           latLongPair + '&sensor=false';
-      }]
+        }
+      ]
     };
   }
 ]);
@@ -167,14 +160,18 @@ oppia.directive('oppiaShortResponseInteractiveMap', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/InteractiveMap/directives/' +
         'interactive_map_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';
-        $scope.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
-        $scope.formattedCoords += ', ';
-        $scope.formattedCoords += Math.abs(_answer[1]).toFixed(3) + '° ';
-        $scope.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          $scope.formattedCoords = Math.abs(_answer[0])
+            .toFixed(3) + '° ';
+          $scope.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
+          $scope.formattedCoords += ', ';
+          $scope.formattedCoords += Math.abs(_answer[1])
+            .toFixed(3) + '° ';
+          $scope.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
+        }
+      ]
     };
   }
 ]);
@@ -210,5 +207,6 @@ oppia.factory('interactiveMapRulesService', [
         return actualDistance > inputs.d;
       }
     };
-  }]
+  }
+]
 );

@@ -64,19 +64,21 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
              * guppy div directly.
              */
             var positionButtonOverlay = function() {
-              var guppyOffset = $(guppyDivElt).position();
+              var guppyOffset = $(guppyDivElt)
+                .position();
               var guppySize = guppyDivElt.getBoundingClientRect();
 
               // If the guppy div hasn't rendered yet, retry after 100ms.
               if (guppySize.width === 0 || guppySize.height === 0) {
                 $timeout(positionButtonOverlay, 100);
               } else {
-                $('#startMathInputButton').css({
-                  top: guppyOffset.top,
-                  left: guppyOffset.left,
-                  width: guppySize.width,
-                  height: guppySize.height
-                });
+                $('#startMathInputButton')
+                  .css({
+                    top: guppyOffset.top,
+                    left: guppyOffset.left,
+                    width: guppySize.width,
+                    height: guppySize.height
+                  });
               }
             };
             positionButtonOverlay();
@@ -105,7 +107,8 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               // Get content of the text input field as an array of characters.
               var textContent = document
                 .querySelector('#fakeInputForMathExpression').value
-                .toLowerCase().split('');
+                .toLowerCase()
+                .split('');
 
               // Replay key combination for each character on the document.
               for (var i = 0; i < textContent.length; i++) {
@@ -120,21 +123,26 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             };
 
             // Debounce clear/refill cycles to 1 per 100ms.
-            $('#fakeInputForMathExpression').on(
-              'input change compositionupdate keydown',
-              DebouncerService.debounce(function() {
+            $('#fakeInputForMathExpression')
+              .on(
+                'input change compositionupdate keydown',
+                DebouncerService.debounce(function() {
+                  setGuppyContentFromInput();
+                }, 100)
+              )
+              .on('blur', function() {
+                guppyInstance.activate();
                 setGuppyContentFromInput();
-              }, 100)
-            ).on('blur', function() {
-              guppyInstance.activate();
-              setGuppyContentFromInput();
-            });
+              });
           };
           var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
             '/overrides/guppy/oppia_symbols.json');
           Guppy.init({
-            symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
-              oppiaSymbolsUrl]});
+            symbols: [
+              '/third_party/static/guppy-b5055b/sym/symbols.json',
+              oppiaSymbolsUrl
+            ]
+          });
           var guppyInstance = new Guppy(guppyDivId, {
             settings: {
               empty_content: (
@@ -225,10 +233,12 @@ oppia.directive('oppiaResponseMathExpressionInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MathExpressionInput/directives/' +
         'math_expression_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.latexAnswer = HtmlEscaperService.escapedJsonToObj(
-          $attrs.answer).latex;
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.latexAnswer = HtmlEscaperService.escapedJsonToObj(
+            $attrs.answer).latex;
+        }
+      ]
     };
   }
 ]);
@@ -242,20 +252,25 @@ oppia.directive('oppiaShortResponseMathExpressionInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MathExpressionInput/directives/' +
         'math_expression_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.latexAnswer = HtmlEscaperService.escapedJsonToObj(
-          $attrs.answer).latex;
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.latexAnswer = HtmlEscaperService.escapedJsonToObj(
+            $attrs.answer).latex;
+        }
+      ]
     };
   }
 ]);
 
-oppia.factory('mathExpressionInputRulesService', [function() {
-  return {
-    IsMathematicallyEquivalentTo: function(answer, inputs) {
-      return (
-        MathExpression.fromLatex(answer.latex).equals(
-          MathExpression.fromLatex(inputs.x)));
-    }
-  };
-}]);
+oppia.factory('mathExpressionInputRulesService', [
+  function() {
+    return {
+      IsMathematicallyEquivalentTo: function(answer, inputs) {
+        return (
+          MathExpression.fromLatex(answer.latex)
+            .equals(
+              MathExpression.fromLatex(inputs.x)));
+      }
+    };
+  }
+]);

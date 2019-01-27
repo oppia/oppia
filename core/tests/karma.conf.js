@@ -83,11 +83,7 @@ module.exports = function(config) {
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
-      reporters: [{
-        type: 'html'
-      }, {
-        type: 'json'
-      }],
+      reporters: [{type: 'html'}, {type: 'json'}],
       subdir: '.',
       dir: '../karma_coverage_reports/'
     },
@@ -128,8 +124,6 @@ module.exports = function(config) {
       // Every key must start with /.
       prependPrefix: '/',
     },
-    jsonFixturesPreprocessor: {
-      variableName: '__fixtures__'
-    }
+    jsonFixturesPreprocessor: {variableName: '__fixtures__'}
   });
 };

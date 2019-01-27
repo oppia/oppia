@@ -36,9 +36,7 @@ oppia.directive('oppiaInteractiveSetInput', [
             WindowDimensionsService, CurrentInteractionService) {
           $scope.schema = {
             type: 'list',
-            items: {
-              type: 'unicode'
-            },
+            items: {type: 'unicode'},
             ui_config: {
               // TODO(mili): Translate this in the HTML.
               add_element_text: $translate.instant(
@@ -103,9 +101,11 @@ oppia.directive('oppiaResponseSetInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/SetInput/directives/' +
         'set_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        }
+      ]
     };
   }
 ]);
@@ -119,52 +119,57 @@ oppia.directive('oppiaShortResponseSetInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/SetInput/directives/' +
         'set_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.displayedAnswer = (
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          $scope.displayedAnswer = (
           _answer.length > 0 ? _answer.join(', ') :
           'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
-      }]
+        }
+      ]
     };
   }
 ]);
 
-oppia.factory('setInputRulesService', [function() {
-  return {
-    Equals: function(answer, inputs) {
-      return answer.length === inputs.x.length && inputs.x.every(function(val) {
-        return answer.indexOf(val) >= 0;
-      });
-    },
-    IsSubsetOf: function(answer, inputs) {
-      return answer.length < inputs.x.length && answer.every(function(val) {
-        return inputs.x.indexOf(val) >= 0;
-      });
-    },
-    IsSupersetOf: function(answer, inputs) {
-      return answer.length > inputs.x.length && inputs.x.every(function(val) {
-        return answer.indexOf(val) >= 0;
-      });
-    },
-    HasElementsIn: function(answer, inputs) {
-      return inputs.x.some(function(val) {
-        return answer.indexOf(val) >= 0;
-      });
-    },
-    HasElementsNotIn: function(answer, inputs) {
-      return answer.some(function(val) {
-        return inputs.x.indexOf(val) === -1;
-      });
-    },
-    OmitsElementsIn: function(answer, inputs) {
-      return inputs.x.some(function(val) {
-        return answer.indexOf(val) === -1;
-      });
-    },
-    IsDisjointFrom: function(answer, inputs) {
-      return inputs.x.every(function(val) {
-        return answer.indexOf(val) === -1;
-      });
-    }
-  };
-}]);
+oppia.factory('setInputRulesService', [
+  function() {
+    return {
+      Equals: function(answer, inputs) {
+        return answer.length === inputs.x.length &&
+         inputs.x.every(function(val) {
+           return answer.indexOf(val) >= 0;
+         });
+      },
+      IsSubsetOf: function(answer, inputs) {
+        return answer.length < inputs.x.length && answer.every(function(val) {
+          return inputs.x.indexOf(val) >= 0;
+        });
+      },
+      IsSupersetOf: function(answer, inputs) {
+        return answer.length > inputs.x.length && inputs.x.every(function(val) {
+          return answer.indexOf(val) >= 0;
+        });
+      },
+      HasElementsIn: function(answer, inputs) {
+        return inputs.x.some(function(val) {
+          return answer.indexOf(val) >= 0;
+        });
+      },
+      HasElementsNotIn: function(answer, inputs) {
+        return answer.some(function(val) {
+          return inputs.x.indexOf(val) === -1;
+        });
+      },
+      OmitsElementsIn: function(answer, inputs) {
+        return inputs.x.some(function(val) {
+          return answer.indexOf(val) === -1;
+        });
+      },
+      IsDisjointFrom: function(answer, inputs) {
+        return inputs.x.every(function(val) {
+          return answer.indexOf(val) === -1;
+        });
+      }
+    };
+  }
+]);

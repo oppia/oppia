@@ -195,9 +195,7 @@ oppia.factory('StateGraphLayoutService', [
         }
 
         var maxDepth = 0;
-        var maxOffsetInEachLevel = {
-          0: 0
-        };
+        var maxOffsetInEachLevel = {0: 0};
         var trunkNodesIndentationLevels = getIndentationLevels(
           adjacencyLists, bestPath);
 

@@ -159,7 +159,6 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       return filenamesInState;
     };
 
-    return {
-      getImageFilenamesInState: _getImageFilenamesInState
-    };
-  }]);
+    return {getImageFilenamesInState: _getImageFilenamesInState};
+  }
+]);

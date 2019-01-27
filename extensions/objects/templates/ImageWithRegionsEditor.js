@@ -26,9 +26,7 @@ oppia.directive('imageWithRegionsEditor', [
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/image_with_regions_editor_directive.html'),
       controller: [
@@ -133,8 +131,9 @@ oppia.directive('imageWithRegionsEditor', [
           // Calculates the dimensions of the image, assuming that the width
           // of the image is scaled down to fit the svg element if necessary.
           var _calculateImageDimensions = function() {
-            var svgElement = $($element).find(
-              '.oppia-image-with-regions-editor-svg');
+            var svgElement = $($element)
+              .find(
+                '.oppia-image-with-regions-editor-svg');
             var displayedImageWidth = Math.min(
               svgElement.width(), $scope.originalImageWidth);
             var scalingRatio = displayedImageWidth / $scope.originalImageWidth;
@@ -169,18 +168,21 @@ oppia.directive('imageWithRegionsEditor', [
             if (newVal !== '') {
               // Loads the image in hanging <img> tag so as to get the
               // width and height.
-              $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).on(
-                'load', function() {
-                  $scope.originalImageWidth = this.width;
-                  $scope.originalImageHeight = this.height;
-                  $scope.$apply();
-                }
-              );
+              $('<img/>')
+                .attr('src', $scope.getPreviewUrl(newVal))
+                .on(
+                  'load', function() {
+                    $scope.originalImageWidth = this.width;
+                    $scope.originalImageHeight = this.height;
+                    $scope.$apply();
+                  }
+                );
             }
           });
 
           var hasDuplicates = function(originalArray) {
-            var array = originalArray.slice(0).sort();
+            var array = originalArray.slice(0)
+              .sort();
             for (var i = 1; i < array.length; i++) {
               if (array[i - 1] === array[i]) {
                 return true;
@@ -283,8 +285,9 @@ oppia.directive('imageWithRegionsEditor', [
           };
 
           $scope.onSvgMouseMove = function(evt) {
-            var svgElement = $($element).find(
-              '.oppia-image-with-regions-editor-svg');
+            var svgElement = $($element)
+              .find(
+                '.oppia-image-with-regions-editor-svg');
             $scope.mouseX = evt.pageX - svgElement.offset().left;
             $scope.mouseY = evt.pageY - svgElement.offset().top;
             if ($scope.userIsCurrentlyDrawing) {
@@ -506,7 +509,8 @@ oppia.directive('imageWithRegionsEditor', [
                   $scope.confirmClear = function() {
                     $uibModalInstance.close();
                   };
-                }]
+                }
+              ]
             }).result.then(function() {
               $scope.value.imagePath = '';
               $scope.value.labeledRegions = [];

@@ -17,7 +17,8 @@
  * subtopic domain objects.
  */
 
-oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
+oppia.factory('SubtopicObjectFactory', [
+  'SkillSummaryObjectFactory',
   function(SkillSummaryObjectFactory) {
     var Subtopic = function(
         subtopicId, title, skillIds, skillIdToDescriptionMap) {
@@ -96,7 +97,8 @@ oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
     Subtopic.prototype.removeSkill = function(skillId) {
       var index = this._skillSummaries.map(function(skillSummary) {
         return skillSummary.getId();
-      }).indexOf(skillId);
+      })
+        .indexOf(skillId);
       if (index > -1) {
         this._skillSummaries.splice(index, 1);
       } else {

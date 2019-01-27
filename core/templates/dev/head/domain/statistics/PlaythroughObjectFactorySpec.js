@@ -19,22 +19,28 @@
 describe('Playthrough Object Factory', function() {
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     this.pof = $injector.get('PlaythroughObjectFactory');
     this.laof = $injector.get('LearnerActionObjectFactory');
-  }));
+  }]);
 
   it('should create a new playthrough', function() {
     var actions = [this.laof.createNew('AnswerSubmit', {}, 1)];
     var playthroughObject = this.pof.createNew(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
-    expect(playthroughObject.playthroughId).toEqual('playthroughId1');
-    expect(playthroughObject.expId).toEqual('expId1');
-    expect(playthroughObject.expVersion).toEqual(1);
-    expect(playthroughObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughObject.issueCustomizationArgs).toEqual({});
-    expect(playthroughObject.actions).toEqual(actions);
+    expect(playthroughObject.playthroughId)
+      .toEqual('playthroughId1');
+    expect(playthroughObject.expId)
+      .toEqual('expId1');
+    expect(playthroughObject.expVersion)
+      .toEqual(1);
+    expect(playthroughObject.issueType)
+      .toEqual('EarlyQuit');
+    expect(playthroughObject.issueCustomizationArgs)
+      .toEqual({});
+    expect(playthroughObject.actions)
+      .toEqual(actions);
   });
 
   it('should create a new playthrough from a backend dict', function() {
@@ -45,21 +51,31 @@ describe('Playthrough Object Factory', function() {
         exp_version: 1,
         issue_type: 'EarlyQuit',
         issue_customization_args: {},
-        actions: [{
-          action_type: 'AnswerSubmit',
-          action_customization_args: {},
-          schema_version: 1
-        }]
+        actions: [
+          {
+            action_type: 'AnswerSubmit',
+            action_customization_args: {},
+            schema_version: 1
+          }
+        ]
       }
     );
 
-    expect(playthroughObject.playthroughId).toEqual('playthroughId1');
-    expect(playthroughObject.expId).toEqual('expId1');
-    expect(playthroughObject.expVersion).toEqual(1);
-    expect(playthroughObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughObject.issueCustomizationArgs).toEqual({});
-    expect(playthroughObject.actions).toEqual([this.laof.createNew(
-      'AnswerSubmit', {}, 1)]);
+    expect(playthroughObject.playthroughId)
+      .toEqual('playthroughId1');
+    expect(playthroughObject.expId)
+      .toEqual('expId1');
+    expect(playthroughObject.expVersion)
+      .toEqual(1);
+    expect(playthroughObject.issueType)
+      .toEqual('EarlyQuit');
+    expect(playthroughObject.issueCustomizationArgs)
+      .toEqual({});
+    expect(playthroughObject.actions)
+      .toEqual([
+        this.laof.createNew(
+          'AnswerSubmit', {}, 1)
+      ]);
   });
 
   it('should convert a playthrough to a backend dict', function() {
@@ -68,17 +84,20 @@ describe('Playthrough Object Factory', function() {
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
     var playthroughDict = playthroughObject.toBackendDict();
-    expect(playthroughDict).toEqual({
-      id: 'playthroughId1',
-      exp_id: 'expId1',
-      exp_version: 1,
-      issue_type: 'EarlyQuit',
-      issue_customization_args: {},
-      actions: [{
-        action_type: 'AnswerSubmit',
-        action_customization_args: {},
-        schema_version: 1
-      }]
-    });
+    expect(playthroughDict)
+      .toEqual({
+        id: 'playthroughId1',
+        exp_id: 'expId1',
+        exp_version: 1,
+        issue_type: 'EarlyQuit',
+        issue_customization_args: {},
+        actions: [
+          {
+            action_type: 'AnswerSubmit',
+            action_customization_args: {},
+            schema_version: 1
+          }
+        ]
+      });
   });
 });

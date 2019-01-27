@@ -46,11 +46,11 @@ oppia.factory('ExplorationRecommendationsService', [
           recommendationsUrlParams.include_system_recommendations = 'true';
         }
 
-        $http.get('/explorehandler/recommendations/' + explorationId, {
-          params: recommendationsUrlParams
-        }).then(function(response) {
-          successCallback(response.data.summaries);
-        });
+        $http.get('/explorehandler/recommendations/' + explorationId,
+          {params: recommendationsUrlParams})
+          .then(function(response) {
+            successCallback(response.data.summaries);
+          });
       }
     };
   }

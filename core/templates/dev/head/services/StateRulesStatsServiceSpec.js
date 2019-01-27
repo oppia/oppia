@@ -20,9 +20,9 @@ describe('State Rules Stats Service', function() {
   var StateRulesStatsService = null;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     StateRulesStatsService = $injector.get('StateRulesStatsService');
-  }));
+  }]);
 
   it(
     'should claim text-input interaction states support issues overview',
@@ -33,61 +33,69 @@ describe('State Rules Stats Service', function() {
       expect(
         StateRulesStatsService.stateSupportsImprovementsOverview(
           TEXT_INPUT_STATE)
-      ).toBe(true);
+      )
+        .toBe(true);
     });
 
   describe('Stats Computation', function() {
     var $httpBackend = null;
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       $httpBackend = $injector.get('$httpBackend');
-    }));
+    }]);
     afterEach(function() {
       $httpBackend.verifyNoOutstandingExpectation();
       $httpBackend.verifyNoOutstandingRequest();
     });
 
     var EXPLORATION_ID = '7';
-    beforeEach(inject(function(ContextService) {
+    beforeEach(inject[function(ContextService) {
       spyOn(
         ContextService, 'getExplorationId'
       ).and.returnValue(EXPLORATION_ID);
-    }));
+    }]);
 
     it('should respond with answer frequencies', function() {
       // Only including properties required for stat computation.
       var HOLA_STATE = {name: 'Hola', interaction: {id: 'TextInput'}};
       // Only including properties required for stat computation.
       var HOLA_STATE_RULES_STATS_RESPONSE = {
-        visualizations_info: [{
-          data: [
-            {answer: 'Ni Hao', frequency: 5},
-            {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola', frequency: 1}
-          ]
-        }]
-      };
-      var successHandler = jasmine.createSpy('success');
-      var failureHandler = jasmine.createSpy('failure');
-      $httpBackend.expectGET('/createhandler/state_rules_stats/7/Hola').respond(
-        HOLA_STATE_RULES_STATS_RESPONSE
-      );
-
-      StateRulesStatsService.computeStateRulesStats(
-        HOLA_STATE
-      ).then(successHandler, failureHandler);
-      $httpBackend.flush();
-
-      expect(successHandler).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          visualizations_info: [jasmine.objectContaining({
+        visualizations_info: [
+          {
             data: [
               {answer: 'Ni Hao', frequency: 5},
               {answer: 'Aloha', frequency: 3},
               {answer: 'Hola', frequency: 1}
             ]
-          })]
-        })
-      );
+          }
+        ]
+      };
+      var successHandler = jasmine.createSpy('success');
+      var failureHandler = jasmine.createSpy('failure');
+      $httpBackend.expectGET('/createhandler/state_rules_stats/7/Hola')
+        .respond(
+          HOLA_STATE_RULES_STATS_RESPONSE
+        );
+
+      StateRulesStatsService.computeStateRulesStats(
+        HOLA_STATE
+      )
+        .then(successHandler, failureHandler);
+      $httpBackend.flush();
+
+      expect(successHandler)
+        .toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            visualizations_info: [
+              jasmine.objectContaining({
+                data: [
+                  {answer: 'Ni Hao', frequency: 5},
+                  {answer: 'Aloha', frequency: 3},
+                  {answer: 'Hola', frequency: 1}
+                ]
+              })
+            ]
+          })
+        );
       expect(failureHandler).not.toHaveBeenCalled();
     });
 
@@ -96,47 +104,65 @@ describe('State Rules Stats Service', function() {
       var HOLA_STATE = {
         name: 'Hola',
         interaction: {
-          answerGroups: [{
-            rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
-            outcome: {dest: 'Me Llamo'}
-          }, {
-            rules: [{type: 'Contains', inputs: {x: 'hola'}}],
-            outcome: {dest: 'Me Llamo'}
-          }, {
-            rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
-            outcome: {dest: 'Hola'}
-          }],
+          answerGroups: [
+            {
+              rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
+              outcome: {dest: 'Me Llamo'}
+            }, {
+              rules: [{type: 'Contains', inputs: {x: 'hola'}}],
+              outcome: {dest: 'Me Llamo'}
+            }, {
+              rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
+              outcome: {dest: 'Hola'}
+            }
+          ],
           defaultOutcome: {dest: 'Hola'},
           id: 'TextInput'
         }
       };
       // Only including properties required for stat computation.
       var HOLA_STATE_RULES_STATS_RESPONSE = {
-        visualizations_info: [{
-          data: [{answer: 'Ni Hao'}, {answer: 'Aloha'}, {answer: 'Hola'}],
-          addressed_info_is_supported: true
-        }]
+        visualizations_info: [
+          {
+            data: [{answer: 'Ni Hao'}, {answer: 'Aloha'}, {answer: 'Hola'}],
+            addressed_info_is_supported: true
+          }
+        ]
       };
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
-      $httpBackend.expectGET('/createhandler/state_rules_stats/7/Hola').respond(
-        HOLA_STATE_RULES_STATS_RESPONSE);
+      $httpBackend.expectGET('/createhandler/state_rules_stats/7/Hola')
+        .respond(
+          HOLA_STATE_RULES_STATS_RESPONSE);
 
-      StateRulesStatsService.computeStateRulesStats(HOLA_STATE).then(
-        successHandler, failureHandler);
+      StateRulesStatsService.computeStateRulesStats(HOLA_STATE)
+        .then(
+          successHandler, failureHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          visualizations_info: [jasmine.objectContaining({
-            data: [
-              jasmine.objectContaining({answer: 'Ni Hao', is_addressed: false}),
-              jasmine.objectContaining({answer: 'Aloha', is_addressed: false}),
-              jasmine.objectContaining({answer: 'Hola', is_addressed: true})
+      expect(successHandler)
+        .toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            visualizations_info: [
+              jasmine.objectContaining({
+                data: [
+                  jasmine.objectContaining({
+                    answer: 'Ni Hao',
+                    is_addressed: false
+                  }),
+                  jasmine.objectContaining({
+                    answer: 'Aloha',
+                    is_addressed: false
+                  }),
+                  jasmine.objectContaining({
+                    answer: 'Hola',
+                    is_addressed: true
+                  })
+                ]
+              })
             ]
-          })]
-        })
-      );
+          })
+        );
       expect(failureHandler).not.toHaveBeenCalled();
     });
 
@@ -145,44 +171,54 @@ describe('State Rules Stats Service', function() {
       var failureHandler = jasmine.createSpy('failure');
 
       $httpBackend.expectGET(
-        '/createhandler/state_rules_stats/7/Fraction').respond(
-        {visualizations_info: [{
-          data: [
-            {
-              answer: {
-                isNegative: false,
-                wholeNumber: 0,
-                numerator: 1,
-                denominator: 2
-              },
-              frequency: 3
-            },
-            {
-              answer: {
-                isNegative: false,
-                wholeNumber: 0,
-                numerator: 0,
-                denominator: 1
-              },
-              frequency: 5
-            }]
-        }]});
+        '/createhandler/state_rules_stats/7/Fraction')
+        .respond(
+          {
+            visualizations_info: [
+              {
+                data: [
+                  {
+                    answer: {
+                      isNegative: false,
+                      wholeNumber: 0,
+                      numerator: 1,
+                      denominator: 2
+                    },
+                    frequency: 3
+                  },
+                  {
+                    answer: {
+                      isNegative: false,
+                      wholeNumber: 0,
+                      numerator: 0,
+                      denominator: 1
+                    },
+                    frequency: 5
+                  }
+                ]
+              }
+            ]
+          });
 
       StateRulesStatsService.computeStateRulesStats(
-        {name: 'Fraction', interaction: {id: 'FractionInput'}}).then(
-        successHandler, failureHandler);
+        {name: 'Fraction', interaction: {id: 'FractionInput'}})
+        .then(
+          successHandler, failureHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          visualizations_info: [jasmine.objectContaining({
-            data: [
-              jasmine.objectContaining({ answer: '1/2' }),
-              jasmine.objectContaining({ answer: '0' })
+      expect(successHandler)
+        .toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            visualizations_info: [
+              jasmine.objectContaining({
+                data: [
+                  jasmine.objectContaining({ answer: '1/2' }),
+                  jasmine.objectContaining({ answer: '0' })
+                ]
+              })
             ]
-          })]
-        })
-      );
+          })
+        );
     });
   });
 });

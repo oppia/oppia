@@ -22,21 +22,24 @@ describe('Editor state service', function() {
   describe('editor state service', function() {
     var ecs = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       ecs = $injector.get('StateEditorService');
-    }));
+    }]);
 
     it('should correctly set and get state names', function() {
       ecs.setActiveStateName('A State');
-      expect(ecs.getActiveStateName()).toBe('A State');
+      expect(ecs.getActiveStateName())
+        .toBe('A State');
     });
 
     it('should not allow invalid state names to be set', function() {
       ecs.setActiveStateName('');
-      expect(ecs.getActiveStateName()).toBeNull();
+      expect(ecs.getActiveStateName())
+        .toBeNull();
 
       ecs.setActiveStateName(null);
-      expect(ecs.getActiveStateName()).toBeNull();
+      expect(ecs.getActiveStateName())
+        .toBeNull();
     });
 
     it('should correctly return answer choices for interaction', function() {
@@ -50,34 +53,40 @@ describe('Editor state service', function() {
       };
       expect(
         ecs.getAnswerChoices('MultipleChoiceInput', customizationArgs)
-      ).toEqual([{
-        val: 0,
-        label: 'Choice 1',
-      }, {
-        val: 1,
-        label: 'Choice 2',
-      }]);
+      )
+        .toEqual([
+          {
+            val: 0,
+            label: 'Choice 1',
+          }, {
+            val: 1,
+            label: 'Choice 2',
+          }
+        ]);
 
       customizationArgs = {
         imageAndRegions: {
-          value: {
-            labeledRegions: [{
-              label: 'Label 1'
-            }, {
-              label: 'Label 2'
-            }]
-          }
+          value:
+         {
+           labeledRegions: [
+             {label: 'Label 1'},
+             {label: 'Label 2'}
+           ]
+         }
         }
       };
       expect(
         ecs.getAnswerChoices('ImageClickInput', customizationArgs)
-      ).toEqual([{
-        val: 'Label 1',
-        label: 'Label 1',
-      }, {
-        val: 'Label 2',
-        label: 'Label 2',
-      }]);
+      )
+        .toEqual([
+          {
+            val: 'Label 1',
+            label: 'Label 1',
+          }, {
+            val: 'Label 2',
+            label: 'Label 2',
+          }
+        ]);
 
       customizationArgs = {
         choices: {
@@ -89,22 +98,28 @@ describe('Editor state service', function() {
       };
       expect(
         ecs.getAnswerChoices('ItemSelectionInput', customizationArgs)
-      ).toEqual([{
-        val: 'Choice 1',
-        label: 'Choice 1',
-      }, {
-        val: 'Choice 2',
-        label: 'Choice 2',
-      }]);
+      )
+        .toEqual([
+          {
+            val: 'Choice 1',
+            label: 'Choice 1',
+          }, {
+            val: 'Choice 2',
+            label: 'Choice 2',
+          }
+        ]);
       expect(
         ecs.getAnswerChoices('DragAndDropSortInput', customizationArgs)
-      ).toEqual([{
-        val: 'Choice 1',
-        label: 'Choice 1',
-      }, {
-        val: 'Choice 2',
-        label: 'Choice 2',
-      }]);
+      )
+        .toEqual([
+          {
+            val: 'Choice 1',
+            label: 'Choice 1',
+          }, {
+            val: 'Choice 2',
+            label: 'Choice 2',
+          }
+        ]);
     });
   });
 });

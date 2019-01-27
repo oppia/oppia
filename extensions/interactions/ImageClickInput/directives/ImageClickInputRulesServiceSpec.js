@@ -20,35 +20,31 @@ describe('Image Click Input rules service', function() {
   beforeEach(module('oppia'));
 
   var icirs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     icirs = $injector.get('imageClickInputRulesService');
-  }));
+  }]);
 
   it('should have a correct \'is in region\' rule', function() {
     expect(icirs.IsInRegion({
       clickPosition: [0.5, 0.5],
       clickedRegions: ['a', 'b', 'c']
-    }, {
-      x: 'b'
-    })).toBe(true);
+    }, {x: 'b'}))
+      .toBe(true);
     expect(icirs.IsInRegion({
       clickPosition: [0.3, 1.0],
       clickedRegions: ['123']
-    }, {
-      x: '123'
-    })).toBe(true);
+    }, {x: '123'}))
+      .toBe(true);
 
     expect(icirs.IsInRegion({
       clickPosition: [1.0, 0.5],
       clickedRegions: ['a', 'b', 'c']
-    }, {
-      x: 'd'
-    })).toBe(false);
+    }, {x: 'd'}))
+      .toBe(false);
     expect(icirs.IsInRegion({
       clickPosition: [0.5, 0.5],
       clickedRegions: []
-    }, {
-      x: 'a'
-    })).toBe(false);
+    }, {x: 'a'}))
+      .toBe(false);
   });
 });

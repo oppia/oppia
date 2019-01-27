@@ -67,4 +67,5 @@ oppia.directive('editorNavbarBreadcrumb', [
         }
       ]
     };
-  }]);
+  }
+]);

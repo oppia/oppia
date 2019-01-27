@@ -95,4 +95,5 @@ oppia.directive('roleGraph', [
         }
       ]
     };
-  }]);
+  }
+]);

@@ -80,7 +80,8 @@ oppia.factory('NumberWithUnitsObjectFactory', [
 
     NumberWithUnits.prototype.toString = function() {
       var numberWithUnitsString = '';
-      var unitsString = UnitsObjectFactory.fromList(this.units).toString();
+      var unitsString = UnitsObjectFactory.fromList(this.units)
+        .toString();
       if (unitsString.includes('$')) {
         unitsString = unitsString.replace('$', '');
         numberWithUnitsString += '$' + ' ';
@@ -107,7 +108,8 @@ oppia.factory('NumberWithUnitsObjectFactory', [
 
     NumberWithUnits.prototype.toMathjsCompatibleString = function() {
       var numberWithUnitsString = '';
-      var unitsString = UnitsObjectFactory.fromList(this.units).toString();
+      var unitsString = UnitsObjectFactory.fromList(this.units)
+        .toString();
       unitsString = UnitsObjectFactory.toMathjsCompatibleString(unitsString);
 
       if (this.type === 'real') {
@@ -156,8 +158,10 @@ oppia.factory('NumberWithUnitsObjectFactory', [
             value = rawInput;
             units = '';
           } else {
-            value = rawInput.substr(0, ind).trim();
-            units = rawInput.substr(ind).trim();
+            value = rawInput.substr(0, ind)
+              .trim();
+            units = rawInput.substr(ind)
+              .trim();
           }
 
           var keys = Object.keys(CURRENCY_UNITS);
@@ -190,7 +194,8 @@ oppia.factory('NumberWithUnitsObjectFactory', [
           if (ind === -1) {
             throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
           }
-          units = rawInput.substr(0, ind).trim();
+          units = rawInput.substr(0, ind)
+            .trim();
 
           startsWithCorrectCurrencyUnit = false;
           for (var i = 0; i < keys.length; i++) {
@@ -208,12 +213,16 @@ oppia.factory('NumberWithUnitsObjectFactory', [
           units = units + ' ';
 
           var ind2 = rawInput.indexOf(
-            rawInput.substr(ind).match(/[a-z(]/i));
+            rawInput.substr(ind)
+              .match(/[a-z(]/i));
           if (ind2 !== -1) {
-            value = rawInput.substr(ind, ind2 - ind).trim();
-            units += rawInput.substr(ind2).trim();
+            value = rawInput.substr(ind, ind2 - ind)
+              .trim();
+            units += rawInput.substr(ind2)
+              .trim();
           } else {
-            value = rawInput.substr(ind).trim();
+            value = rawInput.substr(ind)
+              .trim();
             units = units.trim();
           }
         }
@@ -254,7 +263,8 @@ oppia.factory('NumberWithUnitsObjectFactory', [
   }
 ]);
 
-oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
+oppia.factory('UnitsObjectFactory', [
+  'CURRENCY_UNITS',
   function(CURRENCY_UNITS) {
     var Units = function(unitsList) {
       this.units = unitsList;
@@ -271,7 +281,8 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
       for (var i = 0; i < units.length; i++) {
         if ('*/()# '.includes(units[i]) && unit !== 'per') {
           if (unit.length > 0) {
-            if ((unitList.length > 0) && isunit(unitList.slice(-1).pop())) {
+            if ((unitList.length > 0) && isunit(unitList.slice(-1)
+              .pop())) {
               unitList.push('*');
             }
             unitList.push(unit);
@@ -354,9 +365,7 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
     };
 
     Units.prototype.toDict = function() {
-      return {
-        units: this.units
-      };
+      return {units: this.units};
     };
 
     Units.fromList = function(unitsList) {
@@ -386,13 +395,14 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
       for (var i = 0; i < keys.length; i++) {
         if (CURRENCY_UNITS[keys[i]].base_unit === null) {
           // Base unit (like: rupees, dollar etc.).
-          math.createUnit(CURRENCY_UNITS[keys[i]].name, {
-            aliases: CURRENCY_UNITS[keys[i]].aliases});
+          math.createUnit(CURRENCY_UNITS[keys[i]].name,
+            {aliases: CURRENCY_UNITS[keys[i]].aliases});
         } else {
           // Sub unit (like: paise, cents etc.).
           math.createUnit(CURRENCY_UNITS[keys[i]].name, {
             definition: CURRENCY_UNITS[keys[i]].base_unit,
-            aliases: CURRENCY_UNITS[keys[i]].aliases});
+            aliases: CURRENCY_UNITS[keys[i]].aliases
+          });
         }
       }
     };
@@ -440,4 +450,5 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
     };
 
     return Units;
-  }]);
+  }
+]);

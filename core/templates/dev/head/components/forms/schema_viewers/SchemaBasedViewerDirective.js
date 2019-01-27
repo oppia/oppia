@@ -28,4 +28,5 @@ oppia.directive('schemaBasedViewer', [
         'schema_based_viewer_directive.html'),
       restrict: 'E'
     };
-  }]);
+  }
+]);

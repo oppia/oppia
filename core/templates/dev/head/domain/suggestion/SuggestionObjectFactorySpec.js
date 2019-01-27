@@ -23,9 +23,9 @@ describe('Suggestion object factory', function() {
 
   var SuggestionObjectFactory = null;
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     SuggestionObjectFactory = $injector.get('SuggestionObjectFactory');
-  }));
+  }]);
 
   it('should create a new suggestion from a backend dict.', function() {
     suggestionBackendDict = {
@@ -47,16 +47,27 @@ describe('Suggestion object factory', function() {
     };
     suggestion = SuggestionObjectFactory.createFromBackendDict(
       suggestionBackendDict);
-    expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');
-    expect(suggestion.targetType).toEqual('exploration');
-    expect(suggestion.targetId).toEqual('exp1');
-    expect(suggestion.suggestionId).toEqual('exploration.exp1.thread1');
-    expect(suggestion.status).toEqual('accepted');
-    expect(suggestion.authorName).toEqual('author');
-    expect(suggestion.stateName).toEqual('state_1');
-    expect(suggestion.newValue).toEqual('new suggestion content');
-    expect(suggestion.oldValue).toEqual('old suggestion content');
-    expect(suggestion.lastUpdated).toEqual(1000);
-    expect(suggestion.getThreadId()).toEqual('exploration.exp1.thread1');
+    expect(suggestion.suggestionType)
+      .toEqual('edit_exploration_state_content');
+    expect(suggestion.targetType)
+      .toEqual('exploration');
+    expect(suggestion.targetId)
+      .toEqual('exp1');
+    expect(suggestion.suggestionId)
+      .toEqual('exploration.exp1.thread1');
+    expect(suggestion.status)
+      .toEqual('accepted');
+    expect(suggestion.authorName)
+      .toEqual('author');
+    expect(suggestion.stateName)
+      .toEqual('state_1');
+    expect(suggestion.newValue)
+      .toEqual('new suggestion content');
+    expect(suggestion.oldValue)
+      .toEqual('old suggestion content');
+    expect(suggestion.lastUpdated)
+      .toEqual(1000);
+    expect(suggestion.getThreadId())
+      .toEqual('exploration.exp1.thread1');
   });
 });

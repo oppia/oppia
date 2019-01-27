@@ -52,33 +52,35 @@ oppia.factory('StateRulesStatsService', [
             encodeURIComponent(explorationId),
             encodeURIComponent(state.name)
           ].join('/')
-        ).then(function(response) {
-          return {
-            state_name: state.name,
-            exploration_id: explorationId,
-            visualizations_info: response.data.visualizations_info.map(
-              function(vizInfo) {
-                var newVizInfo = angular.copy(vizInfo);
-                newVizInfo.data.forEach(function(vizInfoDatum) {
+        )
+          .then(function(response) {
+            return {
+              state_name: state.name,
+              exploration_id: explorationId,
+              visualizations_info: response.data.visualizations_info.map(
+                function(vizInfo) {
+                  var newVizInfo = angular.copy(vizInfo);
+                  newVizInfo.data.forEach(function(vizInfoDatum) {
                   // If data is a FractionInput, need to change data so that
                   // visualization displays the input in a readable manner.
-                  if (state.interaction.id === 'FractionInput') {
-                    vizInfoDatum.answer =
+                    if (state.interaction.id === 'FractionInput') {
+                      vizInfoDatum.answer =
                         FractionObjectFactory.fromDict(
-                          vizInfoDatum.answer).toString();
-                  }
-                  if (newVizInfo.addressed_info_is_supported) {
-                    vizInfoDatum.is_addressed =
+                          vizInfoDatum.answer)
+                          .toString();
+                    }
+                    if (newVizInfo.addressed_info_is_supported) {
+                      vizInfoDatum.is_addressed =
                       AnswerClassificationService
                         .isClassifiedExplicitlyOrGoesToNewState(
                           state.name, state, vizInfoDatum.answer,
                           interactionRulesService);
-                  }
-                });
-                return newVizInfo;
-              })
-          };
-        });
+                    }
+                  });
+                  return newVizInfo;
+                })
+            };
+          });
       }
     };
   }

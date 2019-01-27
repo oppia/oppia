@@ -86,8 +86,8 @@ oppia.factory('ExplorationStatesService', [
     // Maps backend names to the corresponding frontend dict accessor lists.
     var PROPERTY_REF_DATA = {
       answer_groups: ['interaction', 'answerGroups'],
-      confirmed_unclassified_answers: [
-        'interaction', 'confirmedUnclassifiedAnswers'],
+      confirmed_unclassified_answers:
+       ['interaction', 'confirmedUnclassifiedAnswers'],
       content: ['content'],
       content_ids_to_audio_translations: ['contentIdsToAudioTranslations'],
       default_outcome: ['interaction', 'defaultOutcome'],
@@ -173,22 +173,23 @@ oppia.factory('ExplorationStatesService', [
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
         // Initialize the solutionValidityService.
         SolutionValidityService.init(_states.getStateNames());
-        _states.getStateNames().forEach(function(stateName) {
-          var solution = _states.getState(stateName).interaction.solution;
-          if (solution) {
-            var result = (
-              AnswerClassificationService.getMatchingClassificationResult(
-                stateName,
-                _states.getState(stateName).interaction,
-                solution.correctAnswer,
-                $injector.get(
-                  AngularNameService.getNameOfInteractionRulesService(
-                    _states.getState(stateName).interaction.id))));
-            var solutionIsValid = stateName !== result.outcome.dest;
-            SolutionValidityService.updateValidity(
-              stateName, solutionIsValid);
-          }
-        });
+        _states.getStateNames()
+          .forEach(function(stateName) {
+            var solution = _states.getState(stateName).interaction.solution;
+            if (solution) {
+              var result = (
+                AnswerClassificationService.getMatchingClassificationResult(
+                  stateName,
+                  _states.getState(stateName).interaction,
+                  solution.correctAnswer,
+                  $injector.get(
+                    AngularNameService.getNameOfInteractionRulesService(
+                      _states.getState(stateName).interaction.id))));
+              var solutionIsValid = stateName !== result.outcome.dest;
+              SolutionValidityService.updateValidity(
+                stateName, solutionIsValid);
+            }
+          });
       },
       getStates: function() {
         return angular.copy(_states);

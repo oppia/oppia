@@ -105,4 +105,5 @@ oppia.factory('PlaythroughObjectFactory', [
     };
 
     return Playthrough;
-  }]);
+  }
+]);

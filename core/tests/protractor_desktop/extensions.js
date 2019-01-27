@@ -55,13 +55,15 @@ describe('rich-text components', function() {
       // and click on them.
       richTextEditor.addRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
-      richTextEditor.addRteComponent('Tabs', [{
-        title: 'title 1',
-        content: forms.toRichText('contents 1')
-      }, {
-        title: 'title 1',
-        content: forms.toRichText('contents 2')
-      }]);
+      richTextEditor.addRteComponent('Tabs', [
+        {
+          title: 'title 1',
+          content: forms.toRichText('contents 1')
+        }, {
+          title: 'title 1',
+          content: forms.toRichText('contents 2')
+        }
+      ]);
     });
 
     explorationEditorPage.navigateToPreviewTab();
@@ -74,13 +76,15 @@ describe('rich-text components', function() {
       richTextChecker.readRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
       richTextChecker.readRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
-      richTextChecker.readRteComponent('Tabs', [{
-        title: 'title 1',
-        content: forms.toRichText('contents 1')
-      }, {
-        title: 'title 1',
-        content: forms.toRichText('contents 2')
-      }]);
+      richTextChecker.readRteComponent('Tabs', [
+        {
+          title: 'title 1',
+          content: forms.toRichText('contents 1')
+        }, {
+          title: 'title 1',
+          content: forms.toRichText('contents 2')
+        }
+      ]);
     });
 
     explorationEditorPage.discardChanges();
@@ -133,9 +137,11 @@ describe('Interactions', function() {
         explorationEditorMainTab.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
 
-        explorationEditorMainTab.addResponse.apply(null, [
-          interactionId, forms.toRichText('yes'), null, false
-        ].concat(test.ruleArguments));
+        explorationEditorMainTab.addResponse.apply(null,
+          [
+            interactionId, forms.toRichText('yes'),
+            null, false
+          ].concat(test.ruleArguments));
 
         if (!defaultOutcomeSet) {
           // The default outcome will be preserved for subsequent tests.
@@ -158,11 +164,12 @@ describe('Interactions', function() {
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
           '.protractor-test-close-help-card-button'));
-        clearHelpcardButton.isPresent().then(function(isPresent) {
-          if (isPresent) {
-            clearHelpcardButton.click();
-          }
-        });
+        clearHelpcardButton.isPresent()
+          .then(function(isPresent) {
+            if (isPresent) {
+              clearHelpcardButton.click();
+            }
+          });
         for (var j = 0; j < test.correctAnswers.length; j++) {
           explorationPlayerPage.submitAnswer(
             interactionId, test.correctAnswers[j]);
@@ -188,9 +195,7 @@ describe('Interactions', function() {
     explorationEditorMainTab.setStateName('Graph');
     explorationEditorMainTab.setContent(forms.toRichText(
       'Draw a complete graph with the given vertices.'));
-    var graphDict = {
-      vertices: [[277, 77], [248, 179], [405, 144]]
-    };
+    var graphDict = {vertices: [[277, 77], [248, 179], [405, 144]]};
     explorationEditorMainTab.setInteraction('GraphInput', graphDict);
     graphDict = {
       edges: [[0, 1], [1, 2], [0, 2]],
@@ -244,9 +249,7 @@ describe('Interactions', function() {
     // Play Graph Input interaction.
     explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'Draw a complete graph with the given vertices.'));
-    graphDict = {
-      edges: [[1, 2], [1, 0], [0, 2]]
-    };
+    graphDict = {edges: [[1, 2], [1, 0], [0, 2]]};
     explorationPlayerPage.submitAnswer('GraphInput', graphDict);
     explorationPlayerPage.expectLatestFeedbackToMatch(
       forms.toRichText('Good job!'));

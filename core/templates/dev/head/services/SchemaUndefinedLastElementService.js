@@ -17,16 +17,18 @@
  * is undefined.
  */
 
-oppia.factory('SchemaUndefinedLastElementService', [function() {
-  return {
+oppia.factory('SchemaUndefinedLastElementService', [
+  function() {
+    return {
     // Returns true if the input value, taken as the last element in a list,
     // should be considered as 'undefined' and therefore deleted.
-    getUndefinedValue: function(schema) {
-      if (schema.type === 'unicode' || schema.type === 'html') {
-        return '';
-      } else {
-        return undefined;
+      getUndefinedValue: function(schema) {
+        if (schema.type === 'unicode' || schema.type === 'html') {
+          return '';
+        } else {
+          return undefined;
+        }
       }
-    }
-  };
-}]);
+    };
+  }
+]);

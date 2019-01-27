@@ -105,7 +105,8 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
               ]
             }).result.then(function() {});
           };
-        }]
+        }
+      ]
     };
   }
 ]);
@@ -120,11 +121,14 @@ oppia.directive('oppiaResponseNumberWithUnits', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
         'number_with_units_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = NumberWithUnitsObjectFactory.fromDict(
-          answer).toString();
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          $scope.answer = NumberWithUnitsObjectFactory.fromDict(
+            answer)
+            .toString();
+        }
+      ]
     };
   }
 ]);
@@ -139,11 +143,14 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
         'number_with_units_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = NumberWithUnitsObjectFactory.fromDict(
-          answer).toString();
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          $scope.answer = NumberWithUnitsObjectFactory.fromDict(
+            answer)
+            .toString();
+        }
+      ]
     };
   }
 ]);
@@ -166,9 +173,11 @@ oppia.factory('numberWithUnitsRulesService', [
         inputsString = inputs.toMathjsCompatibleString();
 
         answerList = NumberWithUnitsObjectFactory.fromRawInputString(
-          answerString).toDict();
+          answerString)
+          .toDict();
         inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
-          inputsString).toDict();
+          inputsString)
+          .toDict();
         return angular.equals(answerList, inputsList);
       },
       IsEquivalentTo: function(answer, inputs) {
@@ -184,7 +193,8 @@ oppia.factory('numberWithUnitsRulesService', [
         }
         answerString = answer.toMathjsCompatibleString();
         inputsString = inputs.toMathjsCompatibleString();
-        return math.unit(answerString).equals(math.unit(inputsString));
+        return math.unit(answerString)
+          .equals(math.unit(inputsString));
       }
     };
   }

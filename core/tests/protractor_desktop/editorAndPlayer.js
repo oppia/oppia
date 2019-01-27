@@ -57,8 +57,9 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.setStateName('card 1');
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorMainTab.setInteraction('Continue');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'card 2', true, null);
+    explorationEditorMainTab.getResponseEditor('default')
+      .setDestination(
+        'card 2', true, null);
 
     explorationEditorMainTab.moveToState('card 2');
     explorationEditorMainTab.setContent(forms.toRichText(
@@ -77,14 +78,18 @@ describe('Full exploration editor', function() {
     general.moveToPlayer();
     explorationPlayerPage.submitAnswer('Continue');
     element.all(
-      by.css('.protractor-test-back-button')).then(function(buttons) {
-      expect(buttons.length).toBe(1);
-    });
+      by.css('.protractor-test-back-button'))
+      .then(function(buttons) {
+        expect(buttons.length)
+          .toBe(1);
+      });
     explorationPlayerPage.submitAnswer('LogicProof');
     element.all(
-      by.css('.protractor-test-back-button')).then(function(buttons) {
-      expect(buttons.length).toBe(0);
-    });
+      by.css('.protractor-test-back-button'))
+      .then(function(buttons) {
+        expect(buttons.length)
+          .toBe(0);
+      });
 
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
@@ -100,45 +105,52 @@ describe('Full exploration editor', function() {
       'Parent Exploration 1',
       'Algebra',
       'This is the topmost parent exploration.');
-    general.getExplorationIdFromEditor().then(function(explorationId) {
-      var parentId1 = explorationId;
-
-      workflow.createAndPublishExploration(
-        'Parent Exploration 2',
-        'Algebra',
-        'This is the second parent exploration to which refresher ' +
-        'exploration redirects.');
-      general.getExplorationIdFromEditor().then(function(explorationId) {
-        var parentId2 = explorationId;
+    general.getExplorationIdFromEditor()
+      .then(function(explorationId) {
+        var parentId1 = explorationId;
 
         workflow.createAndPublishExploration(
-          'Refresher Exploration',
+          'Parent Exploration 2',
           'Algebra',
-          'This is the most basic refresher exploration');
-        general.getExplorationIdFromEditor().then(function(explorationId) {
-          var refresherExplorationId = explorationId;
+          'This is the second parent exploration to which refresher ' +
+        'exploration redirects.');
+        general.getExplorationIdFromEditor()
+          .then(function(explorationId) {
+            var parentId2 = explorationId;
 
-          browser.get('/explore/' + refresherExplorationId + '?parent=' +
+            workflow.createAndPublishExploration(
+              'Refresher Exploration',
+              'Algebra',
+              'This is the most basic refresher exploration');
+            general.getExplorationIdFromEditor()
+              .then(function(explorationId) {
+                var refresherExplorationId = explorationId;
+
+                browser.get('/explore/' + refresherExplorationId + '?parent=' +
             parentId1 + '&parent=' + parentId2);
-          waitFor.pageToFullyLoad();
+                waitFor.pageToFullyLoad();
 
-          explorationPlayerPage.clickOnReturnToParentButton();
+                explorationPlayerPage.clickOnReturnToParentButton();
 
-          browser.getCurrentUrl().then(function(url) {
-            var currentExplorationId = url.split('/')[4].split('?')[0];
-            expect(currentExplorationId).toBe(parentId2);
+                browser.getCurrentUrl()
+                  .then(function(url) {
+                    var currentExplorationId = url.split('/')[4].split('?')[0];
+                    expect(currentExplorationId)
+                      .toBe(parentId2);
 
-            explorationPlayerPage.clickOnReturnToParentButton();
+                    explorationPlayerPage.clickOnReturnToParentButton();
 
-            browser.getCurrentUrl().then(function(url) {
-              currentExplorationId = url.split('/')[4];
-              expect(currentExplorationId).toBe(parentId1);
-              users.logout();
-            });
+                    browser.getCurrentUrl()
+                      .then(function(url) {
+                        currentExplorationId = url.split('/')[4];
+                        expect(currentExplorationId)
+                          .toBe(parentId1);
+                        users.logout();
+                      });
+                  });
+              });
           });
-        });
       });
-    });
   });
 
   it('should give option for redirection when author has specified ' +
@@ -213,20 +225,22 @@ describe('Full exploration editor', function() {
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
     // Add refresher exploration's Id to both parent explorations.
-    general.getExplorationIdFromEditor().then(function(refresherExplorationId) {
-      creatorDashboardPage.get();
-      creatorDashboardPage.editExploration('Parent Exploration in collection');
-      responseEditor = explorationEditorMainTab.getResponseEditor('default');
-      responseEditor.setDestination(null, false, refresherExplorationId);
-      explorationEditorPage.saveChanges('Add Refresher Exploration Id');
+    general.getExplorationIdFromEditor()
+      .then(function(refresherExplorationId) {
+        creatorDashboardPage.get();
+        creatorDashboardPage.editExploration('Parent Exploration in ' +
+        'collection');
+        responseEditor = explorationEditorMainTab.getResponseEditor('default');
+        responseEditor.setDestination(null, false, refresherExplorationId);
+        explorationEditorPage.saveChanges('Add Refresher Exploration Id');
 
-      creatorDashboardPage.get();
-      creatorDashboardPage.editExploration(
-        'Parent Exploration not in collection');
-      responseEditor = explorationEditorMainTab.getResponseEditor('default');
-      responseEditor.setDestination(null, false, refresherExplorationId);
-      explorationEditorPage.saveChanges('Add Refresher Exploration Id');
-    });
+        creatorDashboardPage.get();
+        creatorDashboardPage.editExploration(
+          'Parent Exploration not in collection');
+        responseEditor = explorationEditorMainTab.getResponseEditor('default');
+        responseEditor.setDestination(null, false, refresherExplorationId);
+        explorationEditorPage.saveChanges('Add Refresher Exploration Id');
+      });
 
     // Create collection and add created exploration.
     creatorDashboardPage.get();
@@ -262,16 +276,20 @@ describe('Full exploration editor', function() {
     libraryPage.playCollection('Test Collection');
     // Click first exploration in collection.
     element.all(by.css(
-      '.protractor-test-collection-exploration')).first().click();
+      '.protractor-test-collection-exploration'))
+      .first()
+      .click();
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
     explorationPlayerPage.clickConfirmRedirectionButton();
     // Check the current url to see if collection_id is present in it.
-    browser.getCurrentUrl().then(function(url) {
-      var pathname = url.split('/');
-      expect(
-        pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
-      users.logout();
-    });
+    browser.getCurrentUrl()
+      .then(function(url) {
+        var pathname = url.split('/');
+        expect(
+          pathname[4].split('?')[1].split('=')[0])
+          .toEqual('collection_id');
+        users.logout();
+      });
   });
 
   it('should navigate multiple states correctly, with parameters', function() {
@@ -284,8 +302,9 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.setInteraction('NumericInput');
     explorationEditorMainTab.addResponse(
       'NumericInput', null, 'final card', true, 'Equals', 21);
-    explorationEditorMainTab.getResponseEditor(0).setDestination(
-      'card 2', true, null);
+    explorationEditorMainTab.getResponseEditor(0)
+      .setDestination(
+        'card 2', true, null);
 
     explorationEditorMainTab.moveToState('card 2');
     explorationEditorMainTab.setContent(forms.toRichText(
@@ -296,8 +315,9 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 1', false,
       'Equals', 'return');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'final card', false, null);
+    explorationEditorMainTab.getResponseEditor('default')
+      .setDestination(
+        'final card', false, null);
     // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
     explorationEditorMainTab.setInteraction('EndExploration');
@@ -333,10 +353,12 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.expectCurrentStateToBe('card1');
     explorationEditorMainTab.setContent(forms.toRichText('card1 content'));
     explorationEditorMainTab.setInteraction('TextInput');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'final card', true, null);
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'card2', true, null);
+    explorationEditorMainTab.getResponseEditor('default')
+      .setDestination(
+        'final card', true, null);
+    explorationEditorMainTab.getResponseEditor('default')
+      .setDestination(
+        'card2', true, null);
     explorationEditorMainTab.moveToState('card2');
     // NOTE: we must move to the state before checking state names to avoid
     // inexplicable failures of the protractor utility that reads state names
@@ -355,10 +377,12 @@ describe('Full exploration editor', function() {
 
     // Check deletion of states and changing the first state.
     explorationEditorMainTab.setInteraction('TextInput');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'final card', true, null);
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'second', true, null);
+    explorationEditorMainTab.getResponseEditor('default')
+      .setDestination(
+        'final card', true, null);
+    explorationEditorMainTab.getResponseEditor('default')
+      .setDestination(
+        'second', true, null);
     explorationEditorMainTab.moveToState('second');
     explorationEditorMainTab.expectStateNamesToBe(
       ['final card', 'first', 'second']);
@@ -377,19 +401,25 @@ describe('Full exploration editor', function() {
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setObjective('do some stuff here');
     explorationEditorPage.navigateToMainTab();
-    general.getExplorationIdFromEditor().then(function(explorationId) {
-      expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
+    general.getExplorationIdFromEditor()
+      .then(function(explorationId) {
+        expect(browser.getCurrentUrl())
+          .toEqual(
+            general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
         explorationId + '#/gui/second');
-      browser.navigate().back();
-      expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
+        browser.navigate()
+          .back();
+        expect(browser.getCurrentUrl())
+          .toEqual(
+            general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
         explorationId + '#/settings');
-      browser.navigate().back();
-      expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
+        browser.navigate()
+          .back();
+        expect(browser.getCurrentUrl())
+          .toEqual(
+            general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
         explorationId + '#/gui/second');
-    });
+      });
 
     // Refreshing to prevent stale elements after backing from previous page.
     browser.refresh();
@@ -413,7 +443,8 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.addResponse(
       'NumericInput', null, 'final card', false,
       'IsGreaterThan', 2);
-    explorationEditorMainTab.getResponseEditor(0).deleteResponse();
+    explorationEditorMainTab.getResponseEditor(0)
+      .deleteResponse();
 
     // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
@@ -471,7 +502,8 @@ describe('Full exploration editor', function() {
     responseEditor.addRule('TextInput', 'Contains', 'okay');
 
     // Ensure that the only rule for this group cannot be deleted.
-    explorationEditorMainTab.getResponseEditor(1).expectCannotDeleteRule(0);
+    explorationEditorMainTab.getResponseEditor(1)
+      .expectCannotDeleteRule(0);
 
     // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
@@ -495,10 +527,11 @@ describe('Full exploration editor', function() {
     libraryPage.get();
     libraryPage.findExploration('Testing multiple rules');
     libraryPage.playExploration('Testing multiple rules');
-    general.getExplorationIdFromPlayer().then(function(explorationId) {
-      browser.get(general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
+    general.getExplorationIdFromPlayer()
+      .then(function(explorationId) {
+        browser.get(general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
           explorationId);
-    });
+      });
     explorationEditorMainTab.exitTutorial();
 
     // Verify nothing can change with this user.

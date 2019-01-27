@@ -82,10 +82,11 @@ oppia.controller('SettingsTab', [
       $scope.explorationParamChangesService = ExplorationParamChangesService;
       $scope.UserEmailPreferencesService = UserEmailPreferencesService;
 
-      ExplorationDataService.getData().then(function() {
-        $scope.refreshSettingsTab();
-        $scope.hasPageLoaded = true;
-      });
+      ExplorationDataService.getData()
+        .then(function() {
+          $scope.refreshSettingsTab();
+          $scope.hasPageLoaded = true;
+        });
     };
 
     $scope.refreshSettingsTab = function() {
@@ -118,19 +119,21 @@ oppia.controller('SettingsTab', [
 
     $scope.initSettingsTab();
 
-    $scope.ROLES = [{
-      name: 'Manager (can edit permissions)',
-      value: 'owner'
-    }, {
-      name: 'Collaborator (can make changes)',
-      value: 'editor'
-    }, {
-      name: 'Translator (can do audio translations)',
-      value: 'translator'
-    }, {
-      name: 'Playtester (can give feedback)',
-      value: 'viewer'
-    }];
+    $scope.ROLES = [
+      {
+        name: 'Manager (can edit permissions)',
+        value: 'owner'
+      }, {
+        name: 'Collaborator (can make changes)',
+        value: 'editor'
+      }, {
+        name: 'Translator (can do audio translations)',
+        value: 'translator'
+      }, {
+        name: 'Playtester (can give feedback)',
+        value: 'viewer'
+      }
+    ];
 
     $scope.saveExplorationTitle = function() {
       ExplorationTitleService.saveDisplayedValue();
@@ -312,9 +315,10 @@ oppia.controller('SettingsTab', [
         ]
       }).result.then(function() {
         EditableExplorationBackendApiService.deleteExploration(
-          $scope.explorationId).then(function() {
-          $window.location = CREATOR_DASHBOARD_PAGE_URL;
-        });
+          $scope.explorationId)
+          .then(function() {
+            $window.location = CREATOR_DASHBOARD_PAGE_URL;
+          });
       });
     };
 
@@ -323,53 +327,50 @@ oppia.controller('SettingsTab', [
 
       var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
 
-      $http.get(moderatorEmailDraftUrl).then(function(response) {
+      $http.get(moderatorEmailDraftUrl)
+        .then(function(response) {
         // If the draft email body is empty, email functionality will not be
         // exposed to the mdoerator.
-        var draftEmailBody = response.data.draft_email_body;
+          var draftEmailBody = response.data.draft_email_body;
 
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/settings_tab/' +
+          $uibModal.open({
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/settings_tab/' +
             'moderator_unpublish_exploration_modal_directive.html'),
-          backdrop: true,
-          resolve: {
-            draftEmailBody: function() {
-              return draftEmailBody;
-            }
-          },
-          controller: [
-            '$scope', '$uibModalInstance', 'draftEmailBody',
-            function($scope, $uibModalInstance, draftEmailBody) {
-              $scope.willEmailBeSent = Boolean(draftEmailBody);
-              $scope.emailBody = draftEmailBody;
+            backdrop: true,
+            resolve: {
+              draftEmailBody: function() {
+                return draftEmailBody;
+              }
+            },
+            controller: [
+              '$scope', '$uibModalInstance', 'draftEmailBody',
+              function($scope, $uibModalInstance, draftEmailBody) {
+                $scope.willEmailBeSent = Boolean(draftEmailBody);
+                $scope.emailBody = draftEmailBody;
 
-              if ($scope.willEmailBeSent) {
-                $scope.EMAIL_BODY_SCHEMA = {
-                  type: 'unicode',
-                  ui_config: {
-                    rows: 20
-                  }
+                if ($scope.willEmailBeSent) {
+                  $scope.EMAIL_BODY_SCHEMA = {
+                    type: 'unicode',
+                    ui_config: {rows: 20}
+                  };
+                }
+
+                $scope.reallyTakeAction = function() {
+                  $uibModalInstance.close({emailBody: $scope.emailBody});
+                };
+
+                $scope.cancel = function() {
+                  $uibModalInstance.dismiss('cancel');
+                  AlertsService.clearWarnings();
                 };
               }
-
-              $scope.reallyTakeAction = function() {
-                $uibModalInstance.close({
-                  emailBody: $scope.emailBody
-                });
-              };
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-                AlertsService.clearWarnings();
-              };
-            }
-          ]
-        }).result.then(function(result) {
-          ExplorationRightsService.saveModeratorChangeToBackend(
-            result.emailBody);
+            ]
+          }).result.then(function(result) {
+            ExplorationRightsService.saveModeratorChangeToBackend(
+              result.emailBody);
+          });
         });
-      });
     };
 
     $scope.isExplorationLockedForEditing = function() {

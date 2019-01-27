@@ -259,4 +259,5 @@ oppia.directive('stateSolutionEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

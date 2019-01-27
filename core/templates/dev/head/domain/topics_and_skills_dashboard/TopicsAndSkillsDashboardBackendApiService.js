@@ -23,8 +23,6 @@ oppia.factory('TopicsAndSkillsDashboardBackendApiService', [
       return $http.get('/topics_and_skills_dashboard/data');
     };
 
-    return {
-      fetchDashboardData: _fetchDashboardData
-    };
+    return {fetchDashboardData: _fetchDashboardData};
   }
 ]);

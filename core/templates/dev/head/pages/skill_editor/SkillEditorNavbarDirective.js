@@ -106,13 +106,14 @@ oppia.directive('skillEditorNavbar', [
 
           var _publishSkill = function() {
             SkillRightsBackendApiService.setSkillPublic(
-              $scope.skill.getId(), $scope.skill.getVersion()).then(
-              function() {
-                $scope.skillRights.setPublic();
-                SkillEditorStateService.setSkillRights(
-                  $scope.skillRights);
-                AlertsService.addSuccessMessage('Skill Published.');
-              });
+              $scope.skill.getId(), $scope.skill.getVersion())
+              .then(
+                function() {
+                  $scope.skillRights.setPublic();
+                  SkillEditorStateService.setSkillRights(
+                    $scope.skillRights);
+                  AlertsService.addSuccessMessage('Skill Published.');
+                });
           };
 
           $scope.saveChanges = function() {
@@ -157,12 +158,14 @@ oppia.directive('skillEditorNavbar', [
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
                   };
-                }]
+                }
+              ]
             }).result.then(function() {
               _publishSkill();
             });
           };
-        }]
+        }
+      ]
     };
   }
 ]);

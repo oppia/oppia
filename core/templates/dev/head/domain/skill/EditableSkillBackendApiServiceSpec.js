@@ -24,7 +24,7 @@ describe('Editable skill backend API service', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     EditableSkillBackendApiService = $injector.get(
       'EditableSkillBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');
@@ -58,10 +58,8 @@ describe('Editable skill backend API service', function() {
       version: 3
     };
 
-    sampleResponse = {
-      skill: skillDict
-    };
-  }));
+    sampleResponse = {skill: skillDict};
+  }]);
 
 
   afterEach(function() {
@@ -74,13 +72,16 @@ describe('Editable skill backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/skill_editor_handler/data/1').respond(
-        sampleResponse);
-      EditableSkillBackendApiService.fetchSkill('1').then(
-        successHandler, failHandler);
+      $httpBackend.expect('GET', '/skill_editor_handler/data/1')
+        .respond(
+          sampleResponse);
+      EditableSkillBackendApiService.fetchSkill('1')
+        .then(
+          successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleResponse.skill);
+      expect(successHandler)
+        .toHaveBeenCalledWith(sampleResponse.skill);
       expect(failHandler).not.toHaveBeenCalled();
     });
 
@@ -89,14 +90,17 @@ describe('Editable skill backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/skill_editor_handler/data/1').respond(
-        500, 'Error loading skill 1.');
-      EditableSkillBackendApiService.fetchSkill('1').then(
-        successHandler, failHandler);
+      $httpBackend.expect('GET', '/skill_editor_handler/data/1')
+        .respond(
+          500, 'Error loading skill 1.');
+      EditableSkillBackendApiService.fetchSkill('1')
+        .then(
+          successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error loading skill 1.');
+      expect(failHandler)
+        .toHaveBeenCalledWith('Error loading skill 1.');
     });
 
   it('should make a request to update the skill in the backend',
@@ -104,27 +108,29 @@ describe('Editable skill backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/skill_editor_handler/data/1').respond(
-        sampleResponse);
+      $httpBackend.expect('GET', '/skill_editor_handler/data/1')
+        .respond(
+          sampleResponse);
 
       var skillDict = null;
-      EditableSkillBackendApiService.fetchSkill('1').then(
-        function(data) {
-          skillDict = data;
-        });
+      EditableSkillBackendApiService.fetchSkill('1')
+        .then(
+          function(data) {
+            skillDict = data;
+          });
       $httpBackend.flush();
 
       $httpBackend.expect('PUT', '/skill_editor_handler/data/1')
-        .respond({
-          skill: skillDict
-        });
+        .respond({skill: skillDict});
 
       EditableSkillBackendApiService.updateSkill(
         skillDict.id, skillDict.version, 'commit message', []
-      ).then(successHandler, failHandler);
+      )
+        .then(successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(skillDict);
+      expect(successHandler)
+        .toHaveBeenCalledWith(skillDict);
       expect(failHandler).not.toHaveBeenCalled();
     });
 });

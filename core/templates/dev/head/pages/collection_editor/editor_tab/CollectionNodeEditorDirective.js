@@ -40,7 +40,8 @@ oppia.directive('collectionNodeEditor', [
           // Deletes this collection node from the frontend collection
           // object and also updates the changelist.
           $scope.deleteNode = function() {
-            var explorationId = $scope.getCollectionNode().getExplorationId();
+            var explorationId = $scope.getCollectionNode()
+              .getExplorationId();
             if (!CollectionLinearizerService.removeCollectionNode(
               $scope.collection, explorationId)) {
               AlertsService.fatalWarning(
@@ -52,7 +53,8 @@ oppia.directive('collectionNodeEditor', [
           // Shifts this collection node left in the linearized list of the
           // collection, if possible.
           $scope.shiftNodeLeft = function() {
-            var explorationId = $scope.getCollectionNode().getExplorationId();
+            var explorationId = $scope.getCollectionNode()
+              .getExplorationId();
             if (!CollectionLinearizerService.shiftNodeLeft(
               $scope.collection, explorationId)) {
               AlertsService.fatalWarning(
@@ -64,7 +66,8 @@ oppia.directive('collectionNodeEditor', [
           // Shifts this collection node right in the linearized list of the
           // collection, if possible.
           $scope.shiftNodeRight = function() {
-            var explorationId = $scope.getCollectionNode().getExplorationId();
+            var explorationId = $scope.getCollectionNode()
+              .getExplorationId();
             if (!CollectionLinearizerService.shiftNodeRight(
               $scope.collection, explorationId)) {
               AlertsService.fatalWarning(
@@ -75,4 +78,5 @@ oppia.directive('collectionNodeEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

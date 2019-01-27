@@ -53,9 +53,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
     }
 
     oppiaAvatar.hide();
-    tutorCard.css({
-      'min-width': 0
-    });
+    tutorCard.css({'min-width': 0});
     tutorCard.animate({
       left: tutorCardAnimatedLeft,
       width: tutorCardAnimatedWidth,
@@ -80,30 +78,31 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
       return;
     }
     var tutorCard = element;
-    $('.conversation-skin-oppia-avatar.show-tutor-card').hide(0, function() {
-      tutorCard.css({
-        left: tutorCardAnimatedLeft,
-        width: tutorCardAnimatedWidth,
-        height: 0,
-        opacity: 0,
-        'min-width': 0
-      });
-      tutorCard.animate({
-        left: tutorCardLeft,
-        width: tutorCardWidth,
-        height: tutorCardHeight,
-        opacity: 1
-      }, 500, function() {
+    $('.conversation-skin-oppia-avatar.show-tutor-card')
+      .hide(0, function() {
         tutorCard.css({
-          left: '',
-          width: '',
-          height: '',
-          opacity: '',
-          'min-width': ''
+          left: tutorCardAnimatedLeft,
+          width: tutorCardAnimatedWidth,
+          height: 0,
+          opacity: 0,
+          'min-width': 0
         });
-        done();
+        tutorCard.animate({
+          left: tutorCardLeft,
+          width: tutorCardWidth,
+          height: tutorCardHeight,
+          opacity: 1
+        }, 500, function() {
+          tutorCard.css({
+            left: '',
+            width: '',
+            height: '',
+            opacity: '',
+            'min-width': ''
+          });
+          done();
+        });
       });
-    });
   };
 
   return {
@@ -122,22 +121,20 @@ oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
     var expectedNextHeight = $(
       '.conversation-skin-future-tutor-card ' +
       '.oppia-learner-view-card-content'
-    ).height();
+    )
+      .height();
 
     // Fix the current card height, so that it does not change during the
     // animation, even though its contents might.
     element.css('height', currentHeight);
 
-    jQuery(element).animate({
-      opacity: 0
-    }, TIME_FADEOUT_MSEC).animate({
-      height: expectedNextHeight
-    }, TIME_HEIGHT_CHANGE_MSEC).animate({
-      opacity: 1
-    }, TIME_FADEIN_MSEC, function() {
-      element.css('height', '');
-      done();
-    });
+    jQuery(element)
+      .animate({opacity: 0}, TIME_FADEOUT_MSEC)
+      .animate({height: expectedNextHeight}, TIME_HEIGHT_CHANGE_MSEC)
+      .animate({opacity: 1}, TIME_FADEIN_MSEC, function() {
+        element.css('height', '');
+        done();
+      });
 
     return function(cancel) {
       if (cancel) {
@@ -148,18 +145,18 @@ oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
     };
   };
 
-  return {
-    addClass: animateCardChange
-  };
+  return {addClass: animateCardChange};
 });
 
 oppia.animation('.conversation-skin-animate-cards', function() {
   // This removes the newly-added class once the animation is finished.
   var animateCards = function(element, className, done) {
-    var tutorCardElt = jQuery(element).find(
-      '.conversation-skin-main-tutor-card');
-    var supplementalCardElt = jQuery(element).find(
-      '.conversation-skin-supplemental-card-container');
+    var tutorCardElt = jQuery(element)
+      .find(
+        '.conversation-skin-main-tutor-card');
+    var supplementalCardElt = jQuery(element)
+      .find(
+        '.conversation-skin-supplemental-card-container');
 
     if (className === 'animate-to-two-cards') {
       var supplementalWidth = supplementalCardElt.width();
@@ -168,21 +165,20 @@ oppia.animation('.conversation-skin-animate-cards', function() {
         'min-width': '0',
         opacity: '0'
       });
-      supplementalCardElt.animate({
-        width: supplementalWidth
-      }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
-        supplementalCardElt.animate({
-          opacity: '1'
-        }, TIME_FADEIN_MSEC, function() {
-          supplementalCardElt.css({
-            width: '',
-            'min-width': '',
-            opacity: ''
-          });
-          jQuery(element).removeClass('animate-to-two-cards');
-          done();
+      supplementalCardElt.animate({width: supplementalWidth},
+        TIME_NUM_CARDS_CHANGE_MSEC, function() {
+          supplementalCardElt.animate({opacity: '1'}, TIME_FADEIN_MSEC,
+            function() {
+              supplementalCardElt.css({
+                width: '',
+                'min-width': '',
+                opacity: ''
+              });
+              jQuery(element)
+                .removeClass('animate-to-two-cards');
+              done();
+            });
         });
-      });
 
       return function(cancel) {
         if (cancel) {
@@ -192,7 +188,8 @@ oppia.animation('.conversation-skin-animate-cards', function() {
             opacity: ''
           });
           supplementalCardElt.stop();
-          jQuery(element).removeClass('animate-to-two-cards');
+          jQuery(element)
+            .removeClass('animate-to-two-cards');
         }
       };
     } else if (className === 'animate-to-one-card') {
@@ -200,12 +197,12 @@ oppia.animation('.conversation-skin-animate-cards', function() {
         opacity: 0,
         'min-width': 0
       });
-      supplementalCardElt.animate({
-        width: 0
-      }, TIME_NUM_CARDS_CHANGE_MSEC, function() {
-        jQuery(element).removeClass('animate-to-one-card');
-        done();
-      });
+      supplementalCardElt.animate({width: 0}, TIME_NUM_CARDS_CHANGE_MSEC,
+        function() {
+          jQuery(element)
+            .removeClass('animate-to-one-card');
+          done();
+        });
 
       return function(cancel) {
         if (cancel) {
@@ -216,7 +213,8 @@ oppia.animation('.conversation-skin-animate-cards', function() {
           });
           supplementalCardElt.stop();
 
-          jQuery(element).removeClass('animate-to-one-card');
+          jQuery(element)
+            .removeClass('animate-to-one-card');
         }
       };
     } else {
@@ -224,9 +222,7 @@ oppia.animation('.conversation-skin-animate-cards', function() {
     }
   };
 
-  return {
-    addClass: animateCards
-  };
+  return {addClass: animateCards};
 });
 
 oppia.directive('conversationSkin', [
@@ -306,9 +302,10 @@ oppia.directive('conversationSkin', [
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
 
           $scope.isLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.isLoggedIn = userInfo.isLoggedIn();
-          });
+          UserService.getUserInfoAsync()
+            .then(function(userInfo) {
+              $scope.isLoggedIn = userInfo.isLoggedIn();
+            });
 
           var hasInteractedAtLeastOnce = false;
           $scope.answerIsBeingProcessed = false;
@@ -670,7 +667,8 @@ oppia.directive('conversationSkin', [
 
             PlayerTranscriptService.addNewInput(answer, false);
 
-            var timeAtServerCall = new Date().getTime();
+            var timeAtServerCall = new Date()
+              .getTime();
             PlayerPositionService.recordAnswerSubmission();
             var currentEngineService =
               ExplorationPlayerStateService.getCurrentEngineService();
@@ -711,7 +709,8 @@ oppia.directive('conversationSkin', [
                 var millisecsLeftToWait = (
                   !$scope.displayedCard.isInteractionInline() ? 1.0 :
                   Math.max(MIN_CARD_LOADING_DELAY_MSEC - (
-                    new Date().getTime() - timeAtServerCall),
+                    new Date()
+                      .getTime() - timeAtServerCall),
                   1.0));
 
                 $timeout(function() {
@@ -746,17 +745,18 @@ oppia.directive('conversationSkin', [
                       $scope.displayedCard.markAsCompleted();
                       ConceptCardBackendApiService.fetchConceptCard(
                         missingPrerequisiteSkillId
-                      ).then(function(conceptCardBackendDict) {
-                        $scope.conceptCard =
+                      )
+                        .then(function(conceptCardBackendDict) {
+                          $scope.conceptCard =
                           ConceptCardObjectFactory.createFromBackendDict(
                             conceptCardBackendDict);
-                        if (helpCardAvailable) {
-                          $scope.$broadcast('helpCardAvailable', {
-                            helpCardHtml: feedbackHtml,
-                            hasContinueButton: true
-                          });
-                        }
-                      });
+                          if (helpCardAvailable) {
+                            $scope.$broadcast('helpCardAvailable', {
+                              helpCardHtml: feedbackHtml,
+                              hasContinueButton: true
+                            });
+                          }
+                        });
                     }
                     if (refreshInteraction) {
                       // Replace the previous interaction with another of the
@@ -782,13 +782,14 @@ oppia.directive('conversationSkin', [
                           stringified_exp_ids: JSON.stringify(
                             [refresherExplorationId])
                         }
-                      }).then(function(response) {
-                        if (response.data.summaries.length > 0) {
-                          RefresherExplorationConfirmationModalService.
-                            displayRedirectConfirmationModal(
-                              refresherExplorationId, confirmRedirection);
-                        }
-                      });
+                      })
+                        .then(function(response) {
+                          if (response.data.summaries.length > 0) {
+                            RefresherExplorationConfirmationModalService.
+                              displayRedirectConfirmationModal(
+                                refresherExplorationId, confirmRedirection);
+                          }
+                        });
                     }
                     FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                     scrollToBottom();
@@ -938,23 +939,26 @@ oppia.directive('conversationSkin', [
               }
               var tutorCardBottom = (
                 tutorCard.offset().top + tutorCard.outerHeight());
-              if ($(window).scrollTop() +
-                    $(window).height() < tutorCardBottom) {
-                $('html, body').animate({
-                  scrollTop: tutorCardBottom - $(window).height() + 12
-                }, {
-                  duration: TIME_SCROLL_MSEC,
-                  easing: 'easeOutQuad'
-                });
+              if ($(window)
+                .scrollTop() +
+                    $(window)
+                      .height() < tutorCardBottom) {
+                $('html, body')
+                  .animate({
+                    scrollTop: tutorCardBottom - $(window)
+                      .height() + 12
+                  }, {
+                    duration: TIME_SCROLL_MSEC,
+                    easing: 'easeOutQuad'
+                  });
               }
             }, 100);
           };
 
           var scrollToTop = function() {
             $timeout(function() {
-              $('html, body').animate({
-                scrollTop: 0
-              }, 800, 'easeOutQuart');
+              $('html, body')
+                .animate({scrollTop: 0}, 800, 'easeOutQuart');
               return false;
             });
           };
@@ -999,8 +1003,10 @@ oppia.directive('conversationSkin', [
 
           var fixSupplementOnScroll = function() {
             var supplementCard = $('div.conversation-skin-supplemental-card');
-            var topMargin = $('.navbar-container').height() - 20;
-            if ($(window).scrollTop() > topMargin) {
+            var topMargin = $('.navbar-container')
+              .height() - 20;
+            if ($(window)
+              .scrollTop() > topMargin) {
               supplementCard.addClass(
                 'conversation-skin-supplemental-card-fixed');
             } else {
@@ -1024,15 +1030,17 @@ oppia.directive('conversationSkin', [
                 stringified_collection_ids: JSON.stringify(
                   [$scope.collectionId])
               }
-            }).then(
-              function(response) {
-                $scope.collectionSummary = response.data.summaries[0];
-              },
-              function() {
-                AlertsService.addWarning(
-                  'There was an error while fetching the collection summary.');
-              }
-            );
+            })
+              .then(
+                function(response) {
+                  $scope.collectionSummary = response.data.summaries[0];
+                },
+                function() {
+                  AlertsService.addWarning(
+                    'There was an error while fetching the collection ' +
+                    'summary.');
+                }
+              );
           }
 
           $scope.onNavigateFromIframe = function() {
@@ -1060,4 +1068,5 @@ oppia.directive('conversationSkin', [
         }
       ]
     };
-  }]);
+  }
+]);

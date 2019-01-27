@@ -155,10 +155,13 @@ oppia.directive('oppiaResponseFractionInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/FractionInput/directives/' +
         'fraction_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = FractionObjectFactory.fromDict(answer).toString();
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          $scope.answer = FractionObjectFactory.fromDict(answer)
+            .toString();
+        }
+      ]
     };
   }
 ]);
@@ -173,10 +176,13 @@ oppia.directive('oppiaShortResponseFractionInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/FractionInput/directives/' +
         'fraction_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = FractionObjectFactory.fromDict(answer).toString();
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          $scope.answer = FractionObjectFactory.fromDict(answer)
+            .toString();
+        }
+      ]
     };
   }
 ]);
@@ -188,7 +194,8 @@ oppia.factory('fractionInputRulesService', [
   'FractionObjectFactory',
   function(FractionObjectFactory) {
     var toFloat = function(fractionDict) {
-      return FractionObjectFactory.fromDict(fractionDict).toFloat();
+      return FractionObjectFactory.fromDict(fractionDict)
+        .toFloat();
     };
 
     return {
@@ -197,7 +204,8 @@ oppia.factory('fractionInputRulesService', [
       },
       IsEquivalentToAndInSimplestForm: function(answer, inputs) {
         var simplestForm =
-          FractionObjectFactory.fromDict(inputs.f).convertToSimplestForm();
+          FractionObjectFactory.fromDict(inputs.f)
+            .convertToSimplestForm();
         return toFloat(answer) === toFloat(inputs.f) &&
           angular.equals(answer, simplestForm);
       },

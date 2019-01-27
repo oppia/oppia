@@ -36,9 +36,7 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
       RESOLVE_ISSUE_URL) {
     var getFullIssuesUrl = function(explorationId) {
       return UrlInterpolationService.interpolateUrl(
-        FETCH_ISSUES_URL, {
-          exploration_id: explorationId
-        });
+        FETCH_ISSUES_URL, {exploration_id: explorationId});
     };
 
     var getFullPlaythroughUrl = function(expId, playthroughId) {
@@ -51,29 +49,26 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
 
     var getFullResolveIssueUrl = function(explorationId) {
       return UrlInterpolationService.interpolateUrl(
-        RESOLVE_ISSUE_URL, {
-          exploration_id: explorationId
-        });
+        RESOLVE_ISSUE_URL, {exploration_id: explorationId});
     };
     return {
       fetchIssues: function(explorationId, explorationVersion) {
-        return $http.get(getFullIssuesUrl(explorationId), {
-          params: {
-            exp_version: explorationVersion
-          }
-        }).then(function(response) {
-          var unresolvedIssuesDicts = response.data;
-          return unresolvedIssuesDicts.map(
-            PlaythroughIssueObjectFactory.createFromBackendDict);
-        });
+        return $http.get(getFullIssuesUrl(explorationId),
+          {params: {exp_version: explorationVersion}})
+          .then(function(response) {
+            var unresolvedIssuesDicts = response.data;
+            return unresolvedIssuesDicts.map(
+              PlaythroughIssueObjectFactory.createFromBackendDict);
+          });
       },
       fetchPlaythrough: function(expId, playthroughId) {
-        return $http.get(getFullPlaythroughUrl(expId, playthroughId)).then(
-          function(response) {
-            var playthroughDict = response.data;
-            return PlaythroughObjectFactory.createFromBackendDict(
-              playthroughDict);
-          });
+        return $http.get(getFullPlaythroughUrl(expId, playthroughId))
+          .then(
+            function(response) {
+              var playthroughDict = response.data;
+              return PlaythroughObjectFactory.createFromBackendDict(
+                playthroughDict);
+            });
       },
       resolveIssue: function(issue, expId, expVersion) {
         $http.post(getFullResolveIssueUrl(expId), {
@@ -81,5 +76,19 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
           exp_version: expVersion
         });
       },
+      fetchWhitelistedExplorationsForPlaythroughs: function() {
+        if (whitelistCache !== null) {
+          return Promise.resolve(whitelistCache);
+        } else {
+          return $http.get(FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST)
+            .then(
+              function(response) {
+                whitelistCache =
+                response.data.whitelisted_exploration_ids_for_playthroughs;
+                return whitelistCache;
+              });
+        }
+      },
     };
-  }]);
+  }
+]);

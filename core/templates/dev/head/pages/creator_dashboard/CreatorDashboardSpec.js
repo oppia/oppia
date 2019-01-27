@@ -22,21 +22,23 @@ describe('Creator dashboard controller', function() {
     var scope, ctrl;
     var mockDashboardBackendApiService;
     var dashboardData = {
-      explorationsList: [{
-        category: 'Featured category',
-        id: 'featured_exp_id',
-        num_open_threads: 2,
-        num_total_threads: 3,
-        status: 'public',
-        title: 'Featured exploration'
-      }, {
-        category: 'Private category',
-        id: 'private_exp_id',
-        num_open_threads: 0,
-        num_total_threads: 0,
-        status: 'private',
-        title: 'Private exploration'
-      }],
+      explorationsList: [
+        {
+          category: 'Featured category',
+          id: 'featured_exp_id',
+          num_open_threads: 2,
+          num_total_threads: 3,
+          status: 'public',
+          title: 'Featured exploration'
+        }, {
+          category: 'Private category',
+          id: 'private_exp_id',
+          num_open_threads: 0,
+          num_total_threads: 0,
+          status: 'private',
+          title: 'Private exploration'
+        }
+      ],
       collectionsList: [],
       dashboardStats: {
         total_plays: 2,
@@ -58,18 +60,18 @@ describe('Creator dashboard controller', function() {
       module('oppia');
       module(function($provide) {
         $provide.factory(
-          'CreatorDashboardBackendApiService', ['$q', function($q) {
-            var fetchDashboardData = function() {
-              return $q.resolve(dashboardData);
-            };
-            return {
-              fetchDashboardData: fetchDashboardData
-            };
-          }]);
+          'CreatorDashboardBackendApiService', [
+            '$q', function($q) {
+              var fetchDashboardData = function() {
+                return $q.resolve(dashboardData);
+              };
+              return {fetchDashboardData: fetchDashboardData};
+            }
+          ]);
       });
     });
 
-    beforeEach(inject(
+    beforeEach(inject[
       function($controller, $rootScope, CreatorDashboardBackendApiService) {
         mockDashboardBackendApiService = CreatorDashboardBackendApiService;
         spyOn(mockDashboardBackendApiService, 'fetchDashboardData')
@@ -81,13 +83,17 @@ describe('Creator dashboard controller', function() {
           CreatorDashboardBackendApiService: mockDashboardBackendApiService
         });
       }
-    ));
+    ]);
 
     it('should have the correct data for creator dashboard', function() {
-      expect(scope.explorationsList).toEqual(dashboardData.explorations_list);
-      expect(scope.collectionsList).toEqual(dashboardData.collections_list);
-      expect(scope.dashboardStats).toEqual(dashboardData.dashboard_stats);
-      expect(scope.lastWeekStats).toEqual(dashboardData.last_week_stats);
+      expect(scope.explorationsList)
+        .toEqual(dashboardData.explorations_list);
+      expect(scope.collectionsList)
+        .toEqual(dashboardData.collections_list);
+      expect(scope.dashboardStats)
+        .toEqual(dashboardData.dashboard_stats);
+      expect(scope.lastWeekStats)
+        .toEqual(dashboardData.last_week_stats);
     });
   });
 });

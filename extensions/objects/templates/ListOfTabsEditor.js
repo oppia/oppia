@@ -21,44 +21,41 @@ oppia.directive('listOfTabsEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/list_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'dict',
-            properties: [{
-              name: 'title',
-              description: 'Tab title',
-              schema: {
-                type: 'unicode',
-                validators: [{
-                  id: 'is_nonempty'
-                }]
-              }
-            }, {
-              name: 'content',
-              description: 'Tab content',
-              schema: {
-                type: 'html',
-                ui_config: {
-                  hide_complex_extensions: true
+      controller: [
+        '$scope', function($scope) {
+          $scope.SCHEMA = {
+            type: 'list',
+            items: {
+              type: 'dict',
+              properties: [
+                {
+                  name: 'title',
+                  description: 'Tab title',
+                  schema: {
+                    type: 'unicode',
+                    validators: [{id: 'is_nonempty'}]
+                  }
+                }, {
+                  name: 'content',
+                  description: 'Tab content',
+                  schema: {
+                    type: 'html',
+                    ui_config: {hide_complex_extensions: true}
+                  }
                 }
-              }
-            }]
-          },
-          ui_config: {
-            add_element_text: 'Add new tab'
-          }
-        };
+              ]
+            },
+            ui_config: {add_element_text: 'Add new tab'}
+          };
 
-        if (!$scope.value) {
-          $scope.value = [];
+          if (!$scope.value) {
+            $scope.value = [];
+          }
         }
-      }]
+      ]
     };
-  }]);
+  }
+]);

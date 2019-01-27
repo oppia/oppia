@@ -66,30 +66,31 @@ oppia.directive('oppiaInteractiveEndExploration', [
                 stringified_exp_ids: JSON.stringify(
                   authorRecommendedExplorationIds)
               }
-            }).then(function(response) {
-              var data = response.data;
-              var foundExpIds = [];
-              data.summaries.map(function(expSummary) {
-                foundExpIds.push(expSummary.id);
-              });
+            })
+              .then(function(response) {
+                var data = response.data;
+                var foundExpIds = [];
+                data.summaries.map(function(expSummary) {
+                  foundExpIds.push(expSummary.id);
+                });
 
-              var missingExpIds = [];
-              authorRecommendedExplorationIds.forEach(function(expId) {
-                if (foundExpIds.indexOf(expId) === -1) {
-                  missingExpIds.push(expId);
-                }
-              });
+                var missingExpIds = [];
+                authorRecommendedExplorationIds.forEach(function(expId) {
+                  if (foundExpIds.indexOf(expId) === -1) {
+                    missingExpIds.push(expId);
+                  }
+                });
 
-              if (missingExpIds.length === 0) {
-                $scope.errorMessage = '';
-              } else {
-                var listOfIds = missingExpIds.join('", "');
-                $scope.errorMessage = (
-                  'Warning: exploration(s) with the IDs "' + listOfIds +
+                if (missingExpIds.length === 0) {
+                  $scope.errorMessage = '';
+                } else {
+                  var listOfIds = missingExpIds.join('", "');
+                  $scope.errorMessage = (
+                    'Warning: exploration(s) with the IDs "' + listOfIds +
                   '" will ' + 'not be shown as recommendations because they ' +
                   'either do not exist, or are not publicly viewable.');
-              }
-            });
+                }
+              });
           }
         }
       ]
@@ -97,22 +98,28 @@ oppia.directive('oppiaInteractiveEndExploration', [
   }
 ]);
 
-oppia.directive('oppiaResponseEndExploration', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    template: ''
-  };
-}]);
+oppia.directive('oppiaResponseEndExploration', [
+  function() {
+    return {
+      restrict: 'E',
+      scope: {},
+      template: ''
+    };
+  }
+]);
 
-oppia.directive('oppiaShortResponseEndExploration', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    template: ''
-  };
-}]);
+oppia.directive('oppiaShortResponseEndExploration', [
+  function() {
+    return {
+      restrict: 'E',
+      scope: {},
+      template: ''
+    };
+  }
+]);
 
-oppia.factory('endExplorationRulesService', [function() {
-  return {};
-}]);
+oppia.factory('endExplorationRulesService', [
+  function() {
+    return {};
+  }
+]);

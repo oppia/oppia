@@ -21,13 +21,14 @@ oppia.directive('graphEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/graph_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = true;
-      }]
+      controller: [
+        '$scope', function($scope) {
+          $scope.alwaysEditable = true;
+        }
+      ]
     };
-  }]);
+  }
+]);

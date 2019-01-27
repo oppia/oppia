@@ -24,26 +24,27 @@ describe('Prediction algorithm registry service', function() {
 
     beforeEach(function() {
       module(function($provide) {
-        $provide.factory('PredictionSampleService', [function() {
-          return {
-            predict: function(classifierData, answer) {
-              return 1;
-            }
-          };
-        }]);
+        $provide.factory('PredictionSampleService', [
+          function() {
+            return {
+              predict: function(classifierData, answer) {
+                return 1;
+              }
+            };
+          }
+        ]);
       });
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       registryService = $injector.get('PredictionAlgorithmRegistryService');
       predictionService = $injector.get('PredictionSampleService');
 
       registryService.setMapping({
-        TestClassifier: {
-          v1: 'PredictionSampleService'
-        }
+        TestClassifier:
+        {v1: 'PredictionSampleService'}
       });
-    }));
+    }]);
 
     it('should return correct prediction algorithm service.', function() {
       var algorithmId = 'TestClassifier';
@@ -51,8 +52,9 @@ describe('Prediction algorithm registry service', function() {
       var generatedPredictionService = registryService.getPredictionService(
         algorithmId, dataSchemaVersion);
 
-      expect(generatedPredictionService.toString()).toEqual(
-        predictionService.toString());
+      expect(generatedPredictionService.toString())
+        .toEqual(
+          predictionService.toString());
     });
   });
 });

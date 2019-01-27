@@ -118,7 +118,8 @@ var LearnerDashboardPage = function() {
     element.all(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', title))
       .then(function(items) {
-        expect(items.length).toBe(0);
+        expect(items.length)
+          .toBe(0);
       });
   };
 
@@ -127,14 +128,17 @@ var LearnerDashboardPage = function() {
       '.protractor-test-collection-summary-tile-title', title));
     waitFor.visibilityOf(
       collectionTitle, 'Unable to find collection ' + title);
-    expect(collectionTitle.isDisplayed()).toBe(true);
+    expect(collectionTitle.isDisplayed())
+      .toBe(true);
   };
 
   this.expectTitleOfExplorationSummaryTileToBeHidden = function(title) {
     element.all(by.cssContainingText(
-      '.protractor-test-exp-summary-tile-title', title)).then(function(items) {
-      expect(items.length).toBe(0);
-    });
+      '.protractor-test-exp-summary-tile-title', title))
+      .then(function(items) {
+        expect(items.length)
+          .toBe(0);
+      });
   };
 
   this.expectTitleOfExplorationSummaryTileToMatch = function(title) {
@@ -142,34 +146,43 @@ var LearnerDashboardPage = function() {
       by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
     waitFor.visibilityOf(
       explorationTitle, 'Unable to find exploration ' + title);
-    expect(explorationTitle.isDisplayed()).toBe(true);
+    expect(explorationTitle.isDisplayed())
+      .toBe(true);
   };
 
   this.expectSubscriptionFirstNameToMatch = function(name) {
     waitFor.visibilityOf(
       subscriptionName.first(),
       'Subscription First Name takes too long to appear');
-    expect(subscriptionName.first().getText()).toMatch(name);
+    expect(subscriptionName.first()
+      .getText())
+      .toMatch(name);
   };
 
   this.expectSubscriptionLastNameToMatch = function(name) {
     waitFor.visibilityOf(
       subscriptionName.last(),
       'Subscription Last Name takes too long to appear');
-    expect(subscriptionName.last().getText()).toMatch(name);
+    expect(subscriptionName.last()
+      .getText())
+      .toMatch(name);
   };
 
   this.expectFeedbackExplorationTitleToMatch = function(title) {
     waitFor.visibilityOf(
       feedbackExplorationTitle.first(),
       'Feedback Exploration Title takes too long to appear');
-    expect(feedbackExplorationTitle.first().getText()).toMatch(title);
+    expect(feedbackExplorationTitle.first()
+      .getText())
+      .toMatch(title);
   };
 
   this.expectFeedbackMessageToMatch = function(message) {
     waitFor.visibilityOf(
       feedbackMessage.first(), 'Feedback Message takes too long to appear');
-    expect(feedbackMessage.first().getText()).toMatch(message);
+    expect(feedbackMessage.first()
+      .getText())
+      .toMatch(message);
   };
 
   this.checkIncompleteExplorationSection = function(explorationTitle) {

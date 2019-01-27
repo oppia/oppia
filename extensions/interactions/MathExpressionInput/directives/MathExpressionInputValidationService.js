@@ -54,4 +54,5 @@ oppia.factory('MathExpressionInputValidationService', [
         return warningsList;
       }
     };
-  }]);
+  }
+]);

@@ -20,36 +20,42 @@ describe('SidebarStatusService', function() {
   var SidebarStatusService;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector, _$window_) {
+  beforeEach(inject[function($injector, _$window_) {
     $window = _$window_;
     $window.innerWidth = 600;
     SidebarStatusService = $injector.get('SidebarStatusService');
-  }));
+  }]);
 
   it('should open the sidebar if its not open', function() {
     SidebarStatusService.openSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(true);
+    expect(SidebarStatusService.isSidebarShown())
+      .toBe(true);
   });
 
   it('should close the sidebar when its open', function() {
     SidebarStatusService.openSidebar();
     SidebarStatusService.closeSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(false);
+    expect(SidebarStatusService.isSidebarShown())
+      .toBe(false);
   });
 
   it('should toggle the sidebar to open and then close', function() {
     SidebarStatusService.toggleSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(true);
+    expect(SidebarStatusService.isSidebarShown())
+      .toBe(true);
     SidebarStatusService.toggleSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(false);
+    expect(SidebarStatusService.isSidebarShown())
+      .toBe(false);
   });
 
 
   it('should falsify pendingSidebarClick on document click', function() {
     SidebarStatusService.openSidebar();
     SidebarStatusService.onDocumentClick();
-    expect(SidebarStatusService.isSidebarShown()).toBe(true);
+    expect(SidebarStatusService.isSidebarShown())
+      .toBe(true);
     SidebarStatusService.onDocumentClick();
-    expect(SidebarStatusService.isSidebarShown()).toBe(false);
+    expect(SidebarStatusService.isSidebarShown())
+      .toBe(false);
   });
 });

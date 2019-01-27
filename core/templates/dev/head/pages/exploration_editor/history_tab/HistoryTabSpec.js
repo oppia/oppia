@@ -22,10 +22,10 @@ describe('HistoryTab controller', function() {
   describe('HistoryTab', function() {
     var $scope, historyTabCtrl;
 
-    beforeEach(inject(function($controller, $rootScope) {
+    beforeEach(inject[function($controller, $rootScope) {
       $scope = $rootScope.$new();
       historyTabCtrl = $controller('HistoryTab', {$scope: $scope});
-    }));
+    }]);
 
     it('should get version numbers of revisions to be displayed',
       function() {
@@ -65,12 +65,15 @@ describe('HistoryTab controller', function() {
           {vnum: 1, selected: false}
         ];
         $scope.computeVersionsToDisplay();
-        expect($scope.versionNumbersToDisplay).toEqual([
-          32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16,
-          15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3]);
+        expect($scope.versionNumbersToDisplay)
+          .toEqual([
+            32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16,
+            15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3
+          ]);
         $scope.displayedCurrentPageNumber = 2;
         $scope.computeVersionsToDisplay();
-        expect($scope.versionNumbersToDisplay).toEqual([2, 1]);
+        expect($scope.versionNumbersToDisplay)
+          .toEqual([2, 1]);
       }
     );
   });

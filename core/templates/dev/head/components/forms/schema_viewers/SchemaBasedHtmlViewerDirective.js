@@ -19,12 +19,11 @@
 oppia.directive('schemaBasedHtmlViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
-        localValue: '='
-      },
+      scope: {localValue: '='},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_viewers/' +
         'schema_based_html_viewer_directive.html'),
       restrict: 'E'
     };
-  }]);
+  }
+]);

@@ -16,16 +16,16 @@ var logicProofParser = (function(){
      * characters. Note that "\0" and "\v" escape sequences are not used
      * because JSHint does not like the first and IE the second.
      */
-     return '"' + s
-      .replace(/\\/g, '\\\\')  // backslash
-      .replace(/"/g, '\\"')    // closing quote character
+    return '"' + s
+      .replace(/\\/g, '\\\\') // backslash
+      .replace(/"/g, '\\"') // closing quote character
       .replace(/\x08/g, '\\b') // backspace
-      .replace(/\t/g, '\\t')   // horizontal tab
-      .replace(/\n/g, '\\n')   // line feed
-      .replace(/\f/g, '\\f')   // form feed
-      .replace(/\r/g, '\\r')   // carriage return
-      .replace(/[\x00-\x07\x0B\x0E-\x1F\x80-\uFFFF]/g, escape)
-      + '"';
+      .replace(/\t/g, '\\t') // horizontal tab
+      .replace(/\n/g, '\\n') // line feed
+      .replace(/\f/g, '\\f') // form feed
+      .replace(/\r/g, '\\r') // carriage return
+      .replace(/[\x00-\x07\x0B\x0E-\x1F\x80-\uFFFF]/g, escape) +
+      '"';
   }
 
   var result = {
@@ -37,83 +37,83 @@ var logicProofParser = (function(){
      */
     parse: function(input, startRule) {
       var parseFunctions = {
-        "expressionTemplate": parse_expressionTemplate,
-        "booleanTemplate": parse_booleanTemplate,
-        "substitution": parse_substitution,
-        "elementTemplate": parse_elementTemplate,
-        "variableTemplate": parse_variableTemplate,
-        "listOfBooleanTemplates": parse_listOfBooleanTemplates,
-        "commaThenBooleanTemplate": parse_commaThenBooleanTemplate,
-        "expressionTemplate2": parse_expressionTemplate2,
-        "booleanTemplate2": parse_booleanTemplate2,
-        "formulaLHS": parse_formulaLHS,
-        "listOfVariables": parse_listOfVariables,
-        "commaThenVariable": parse_commaThenVariable,
-        "expression": parse_expression,
-        "listOfExpressions": parse_listOfExpressions,
-        "commaThenExpression": parse_commaThenExpression,
-        "iffSymbol": parse_iffSymbol,
-        "impliesSymbol": parse_impliesSymbol,
-        "forAllSymbol": parse_forAllSymbol,
-        "existsSymbol": parse_existsSymbol,
-        "andSymbol": parse_andSymbol,
-        "orSymbol": parse_orSymbol,
-        "notSymbol": parse_notSymbol,
-        "equalsSymbol": parse_equalsSymbol,
-        "lessThanOrEqualsSymbol": parse_lessThanOrEqualsSymbol,
-        "greaterThanOrEqualsSymbol": parse_greaterThanOrEqualsSymbol,
-        "lessThanSymbol": parse_lessThanSymbol,
-        "greaterThanSymbol": parse_greaterThanSymbol,
-        "notEqualsSymbol": parse_notEqualsSymbol,
-        "membershipSymbol": parse_membershipSymbol,
-        "addition": parse_addition,
-        "subtraction": parse_subtraction,
-        "multiplication": parse_multiplication,
-        "division": parse_division,
-        "exponentiation": parse_exponentiation,
-        "iffFormula": parse_iffFormula,
-        "impliesFormula": parse_impliesFormula,
-        "quantifierFormula": parse_quantifierFormula,
-        "forAllFormula": parse_forAllFormula,
-        "existsFormula": parse_existsFormula,
-        "boundedForAllFormula": parse_boundedForAllFormula,
-        "boundedExistsFormula": parse_boundedExistsFormula,
-        "orFormula": parse_orFormula,
-        "andFormula": parse_andFormula,
-        "andRHS": parse_andRHS,
-        "unaryFormula": parse_unaryFormula,
-        "notFormula": parse_notFormula,
-        "notRHS": parse_notRHS,
-        "infixRelationFormula": parse_infixRelationFormula,
-        "infixRelationName": parse_infixRelationName,
-        "boundableInfixRelationName": parse_boundableInfixRelationName,
-        "infixRelationRHS": parse_infixRelationRHS,
-        "additionArgument": parse_additionArgument,
-        "additionRHS": parse_additionRHS,
-        "subtractionArgument": parse_subtractionArgument,
-        "subtractionRHS": parse_subtractionRHS,
-        "multiplicationArgument": parse_multiplicationArgument,
-        "multiplicationRHS": parse_multiplicationRHS,
-        "divisionArgument": parse_divisionArgument,
-        "divisionRHS": parse_divisionRHS,
-        "exponentiationArgument": parse_exponentiationArgument,
-        "exponentiationRHS": parse_exponentiationRHS,
-        "reducedArgument": parse_reducedArgument,
-        "bracketExpression": parse_bracketExpression,
-        "prefixFunction": parse_prefixFunction,
-        "rangedFunction": parse_rangedFunction,
-        "constant": parse_constant,
-        "string": parse_string,
-        "variable": parse_variable,
-        "name": parse_name
+        expressionTemplate: parse_expressionTemplate,
+        booleanTemplate: parse_booleanTemplate,
+        substitution: parse_substitution,
+        elementTemplate: parse_elementTemplate,
+        variableTemplate: parse_variableTemplate,
+        listOfBooleanTemplates: parse_listOfBooleanTemplates,
+        commaThenBooleanTemplate: parse_commaThenBooleanTemplate,
+        expressionTemplate2: parse_expressionTemplate2,
+        booleanTemplate2: parse_booleanTemplate2,
+        formulaLHS: parse_formulaLHS,
+        listOfVariables: parse_listOfVariables,
+        commaThenVariable: parse_commaThenVariable,
+        expression: parse_expression,
+        listOfExpressions: parse_listOfExpressions,
+        commaThenExpression: parse_commaThenExpression,
+        iffSymbol: parse_iffSymbol,
+        impliesSymbol: parse_impliesSymbol,
+        forAllSymbol: parse_forAllSymbol,
+        existsSymbol: parse_existsSymbol,
+        andSymbol: parse_andSymbol,
+        orSymbol: parse_orSymbol,
+        notSymbol: parse_notSymbol,
+        equalsSymbol: parse_equalsSymbol,
+        lessThanOrEqualsSymbol: parse_lessThanOrEqualsSymbol,
+        greaterThanOrEqualsSymbol: parse_greaterThanOrEqualsSymbol,
+        lessThanSymbol: parse_lessThanSymbol,
+        greaterThanSymbol: parse_greaterThanSymbol,
+        notEqualsSymbol: parse_notEqualsSymbol,
+        membershipSymbol: parse_membershipSymbol,
+        addition: parse_addition,
+        subtraction: parse_subtraction,
+        multiplication: parse_multiplication,
+        division: parse_division,
+        exponentiation: parse_exponentiation,
+        iffFormula: parse_iffFormula,
+        impliesFormula: parse_impliesFormula,
+        quantifierFormula: parse_quantifierFormula,
+        forAllFormula: parse_forAllFormula,
+        existsFormula: parse_existsFormula,
+        boundedForAllFormula: parse_boundedForAllFormula,
+        boundedExistsFormula: parse_boundedExistsFormula,
+        orFormula: parse_orFormula,
+        andFormula: parse_andFormula,
+        andRHS: parse_andRHS,
+        unaryFormula: parse_unaryFormula,
+        notFormula: parse_notFormula,
+        notRHS: parse_notRHS,
+        infixRelationFormula: parse_infixRelationFormula,
+        infixRelationName: parse_infixRelationName,
+        boundableInfixRelationName: parse_boundableInfixRelationName,
+        infixRelationRHS: parse_infixRelationRHS,
+        additionArgument: parse_additionArgument,
+        additionRHS: parse_additionRHS,
+        subtractionArgument: parse_subtractionArgument,
+        subtractionRHS: parse_subtractionRHS,
+        multiplicationArgument: parse_multiplicationArgument,
+        multiplicationRHS: parse_multiplicationRHS,
+        divisionArgument: parse_divisionArgument,
+        divisionRHS: parse_divisionRHS,
+        exponentiationArgument: parse_exponentiationArgument,
+        exponentiationRHS: parse_exponentiationRHS,
+        reducedArgument: parse_reducedArgument,
+        bracketExpression: parse_bracketExpression,
+        prefixFunction: parse_prefixFunction,
+        rangedFunction: parse_rangedFunction,
+        constant: parse_constant,
+        string: parse_string,
+        variable: parse_variable,
+        name: parse_name
       };
 
       if (startRule !== undefined) {
         if (parseFunctions[startRule] === undefined) {
-          throw new Error("Invalid rule name: " + quote(startRule) + ".");
+          throw new Error('Invalid rule name: ' + quote(startRule) + '.');
         }
       } else {
-        startRule = "expression";
+        startRule = 'expression';
       }
 
       var pos = 0;
@@ -146,7 +146,8 @@ var logicProofParser = (function(){
           length = 4;
         }
 
-        return '\\' + escapeChar + padLeft(charCode.toString(16).toUpperCase(), '0', length);
+        return '\\' + escapeChar + padLeft(charCode.toString(16)
+          .toUpperCase(), '0', length);
       }
 
       function matchFailed(failure) {
@@ -163,7 +164,7 @@ var logicProofParser = (function(){
       }
 
       function parse_expressionTemplate() {
-        var cacheKey = "expressionTemplate@" + pos;
+        var cacheKey = 'expressionTemplate@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -182,13 +183,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_booleanTemplate() {
-        var cacheKey = "booleanTemplate@" + pos;
+        var cacheKey = 'booleanTemplate@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -220,12 +221,12 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, expression, subs) {
-              return {
-                expression: expression,
-                substitutions: subs,
-                type: 'boolean',
-              };
-            })(pos0, result0[0], result0[1]);
+            return {
+              expression: expression,
+              substitutions: subs,
+              type: 'boolean',
+            };
+          })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -233,13 +234,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_substitution() {
-        var cacheKey = "substitution@" + pos;
+        var cacheKey = 'substitution@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -252,36 +253,36 @@ var logicProofParser = (function(){
         pos0 = pos;
         pos1 = pos;
         if (input.charCodeAt(pos) === 91) {
-          result0 = "[";
+          result0 = '[';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"[\"");
+            matchFailed('"["');
           }
         }
         if (result0 !== null) {
           result1 = parse_variable();
           if (result1 !== null) {
-            if (input.substr(pos, 2) === "->") {
-              result2 = "->";
+            if (input.substr(pos, 2) === '->') {
+              result2 = '->';
               pos += 2;
             } else {
               result2 = null;
               if (reportFailures === 0) {
-                matchFailed("\"->\"");
+                matchFailed('"->"');
               }
             }
             if (result2 !== null) {
               result3 = parse_expression();
               if (result3 !== null) {
                 if (input.charCodeAt(pos) === 93) {
-                  result4 = "]";
+                  result4 = ']';
                   pos++;
                 } else {
                   result4 = null;
                   if (reportFailures === 0) {
-                    matchFailed("\"]\"");
+                    matchFailed('"]"');
                   }
                 }
                 if (result4 !== null) {
@@ -308,10 +309,10 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, from, to) {
-              var output = {};
-              output[from.top_operator_name] = to;
-              return output;
-            })(pos0, result0[1], result0[3]);
+            var output = {};
+            output[from.top_operator_name] = to;
+            return output;
+          })(pos0, result0[1], result0[3]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -319,13 +320,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_elementTemplate() {
-        var cacheKey = "elementTemplate@" + pos;
+        var cacheKey = 'elementTemplate@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -337,25 +338,25 @@ var logicProofParser = (function(){
 
         pos0 = pos;
         pos1 = pos;
-        if (input.substr(pos, 2) === "{{") {
-          result0 = "{{";
+        if (input.substr(pos, 2) === '{{') {
+          result0 = '{{';
           pos += 2;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"{{\"");
+            matchFailed('"{{"');
           }
         }
         if (result0 !== null) {
           result1 = parse_additionArgument();
           if (result1 !== null) {
-            if (input.substr(pos, 10) === "|element}}") {
-              result2 = "|element}}";
+            if (input.substr(pos, 10) === '|element}}') {
+              result2 = '|element}}';
               pos += 10;
             } else {
               result2 = null;
               if (reportFailures === 0) {
-                matchFailed("\"|element}}\"");
+                matchFailed('"|element}}"');
               }
             }
             if (result2 !== null) {
@@ -374,12 +375,12 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, element) {
-              return {
-                expression: element,
-                substitutions: [],
-                type: 'element',
-              };
-            })(pos0, result0[1]);
+            return {
+              expression: element,
+              substitutions: [],
+              type: 'element',
+            };
+          })(pos0, result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -387,13 +388,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_variableTemplate() {
-        var cacheKey = "variableTemplate@" + pos;
+        var cacheKey = 'variableTemplate@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -405,25 +406,25 @@ var logicProofParser = (function(){
 
         pos0 = pos;
         pos1 = pos;
-        if (input.substr(pos, 2) === "{{") {
-          result0 = "{{";
+        if (input.substr(pos, 2) === '{{') {
+          result0 = '{{';
           pos += 2;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"{{\"");
+            matchFailed('"{{"');
           }
         }
         if (result0 !== null) {
           result1 = parse_variable();
           if (result1 !== null) {
-            if (input.substr(pos, 11) === "|variable}}") {
-              result2 = "|variable}}";
+            if (input.substr(pos, 11) === '|variable}}') {
+              result2 = '|variable}}';
               pos += 11;
             } else {
               result2 = null;
               if (reportFailures === 0) {
-                matchFailed("\"|variable}}\"");
+                matchFailed('"|variable}}"');
               }
             }
             if (result2 !== null) {
@@ -442,13 +443,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, variable) {
-              return {
-                expression: variable,
-                substitutions: [],
-                type: 'element',
-                kind: 'variable'
-              };
-            })(pos0, result0[1]);
+            return {
+              expression: variable,
+              substitutions: [],
+              type: 'element',
+              kind: 'variable'
+            };
+          })(pos0, result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -456,13 +457,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_listOfBooleanTemplates() {
-        var cacheKey = "listOfBooleanTemplates@" + pos;
+        var cacheKey = 'listOfBooleanTemplates@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -475,7 +476,7 @@ var logicProofParser = (function(){
         pos0 = pos;
         pos1 = pos;
         result0 = parse_booleanTemplate();
-        result0 = result0 !== null ? result0 : "";
+        result0 = result0 !== null ? result0 : '';
         if (result0 !== null) {
           result1 = [];
           result2 = parse_commaThenBooleanTemplate();
@@ -495,12 +496,12 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, av, avList) {
-              var result = (av === '') ? [] : [av];
-              for (var i = 0; i < avList.length; i++) {
-                result.push(avList[i]);
-              }
-              return result;
-            })(pos0, result0[0], result0[1]);
+            var result = (av === '') ? [] : [av];
+            for (var i = 0; i < avList.length; i++) {
+              result.push(avList[i]);
+            }
+            return result;
+          })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -508,13 +509,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_commaThenBooleanTemplate() {
-        var cacheKey = "commaThenBooleanTemplate@" + pos;
+        var cacheKey = 'commaThenBooleanTemplate@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -527,12 +528,12 @@ var logicProofParser = (function(){
         pos0 = pos;
         pos1 = pos;
         if (input.charCodeAt(pos) === 44) {
-          result0 = ",";
+          result0 = ',';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\",\"");
+            matchFailed('","');
           }
         }
         if (result0 !== null) {
@@ -548,7 +549,9 @@ var logicProofParser = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, av) { return av; })(pos0, result0[1]);
+          result0 = (function(offset, av) {
+            return av;
+          })(pos0, result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -556,13 +559,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_expressionTemplate2() {
-        var cacheKey = "expressionTemplate2@" + pos;
+        var cacheKey = 'expressionTemplate2@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -581,13 +584,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_booleanTemplate2() {
-        var cacheKey = "booleanTemplate2@" + pos;
+        var cacheKey = 'booleanTemplate2@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -599,13 +602,13 @@ var logicProofParser = (function(){
 
         pos0 = pos;
         pos1 = pos;
-        if (input.substr(pos, 2) === "{{") {
-          result0 = "{{";
+        if (input.substr(pos, 2) === '{{') {
+          result0 = '{{';
           pos += 2;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"{{\"");
+            matchFailed('"{{"');
           }
         }
         if (result0 !== null) {
@@ -618,13 +621,13 @@ var logicProofParser = (function(){
               result3 = parse_substitution();
             }
             if (result2 !== null) {
-              if (input.substr(pos, 2) === "}}") {
-                result3 = "}}";
+              if (input.substr(pos, 2) === '}}') {
+                result3 = '}}';
                 pos += 2;
               } else {
                 result3 = null;
                 if (reportFailures === 0) {
-                  matchFailed("\"}}\"");
+                  matchFailed('"}}"');
                 }
               }
               if (result3 !== null) {
@@ -647,12 +650,12 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, expression, subs) {
-              return {
-                expression: expression,
-                substitutions: subs,
-                type: 'boolean',
-              };
-            })(pos0, result0[1], result0[2]);
+            return {
+              expression: expression,
+              substitutions: subs,
+              type: 'boolean',
+            };
+          })(pos0, result0[1], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -660,13 +663,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_formulaLHS() {
-        var cacheKey = "formulaLHS@" + pos;
+        var cacheKey = 'formulaLHS@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -681,24 +684,24 @@ var logicProofParser = (function(){
         result0 = parse_name();
         if (result0 !== null) {
           if (input.charCodeAt(pos) === 40) {
-            result1 = "(";
+            result1 = '(';
             pos++;
           } else {
             result1 = null;
             if (reportFailures === 0) {
-              matchFailed("\"(\"");
+              matchFailed('"("');
             }
           }
           if (result1 !== null) {
             result2 = parse_listOfVariables();
             if (result2 !== null) {
               if (input.charCodeAt(pos) === 41) {
-                result3 = ")";
+                result3 = ')';
                 pos++;
               } else {
                 result3 = null;
                 if (reportFailures === 0) {
-                  matchFailed("\")\"");
+                  matchFailed('")"');
                 }
               }
               if (result3 !== null) {
@@ -721,13 +724,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, name, arguments) {
-              return {
-                top_kind_name: 'binary_function',
-                top_operator_name: name,
-                arguments: arguments,
-                dummies:[]
-              }
-            })(pos0, result0[0], result0[2]);
+            return {
+              top_kind_name: 'binary_function',
+              top_operator_name: name,
+              arguments: arguments,
+              dummies: []
+            };
+          })(pos0, result0[0], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -735,13 +738,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_listOfVariables() {
-        var cacheKey = "listOfVariables@" + pos;
+        var cacheKey = 'listOfVariables@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -754,7 +757,7 @@ var logicProofParser = (function(){
         pos0 = pos;
         pos1 = pos;
         result0 = parse_variable();
-        result0 = result0 !== null ? result0 : "";
+        result0 = result0 !== null ? result0 : '';
         if (result0 !== null) {
           result1 = [];
           result2 = parse_commaThenVariable();
@@ -774,12 +777,12 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, av, avList) {
-              var result = (av === '') ? [] : [av];
-              for (var i = 0; i < avList.length; i++) {
-                result.push(avList[i]);
-              }
-              return result;
-            })(pos0, result0[0], result0[1]);
+            var result = (av === '') ? [] : [av];
+            for (var i = 0; i < avList.length; i++) {
+              result.push(avList[i]);
+            }
+            return result;
+          })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -787,13 +790,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_commaThenVariable() {
-        var cacheKey = "commaThenVariable@" + pos;
+        var cacheKey = 'commaThenVariable@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -806,12 +809,12 @@ var logicProofParser = (function(){
         pos0 = pos;
         pos1 = pos;
         if (input.charCodeAt(pos) === 44) {
-          result0 = ",";
+          result0 = ',';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\",\"");
+            matchFailed('","');
           }
         }
         if (result0 !== null) {
@@ -827,7 +830,9 @@ var logicProofParser = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, av) { return av; })(pos0, result0[1]);
+          result0 = (function(offset, av) {
+            return av;
+          })(pos0, result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -835,13 +840,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_expression() {
-        var cacheKey = "expression@" + pos;
+        var cacheKey = 'expression@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -854,7 +859,9 @@ var logicProofParser = (function(){
         pos0 = pos;
         result0 = parse_iffFormula();
         if (result0 !== null) {
-          result0 = (function(offset, a) {return a;})(pos0, result0);
+          result0 = (function(offset, a) {
+            return a;
+          })(pos0, result0);
         }
         if (result0 === null) {
           pos = pos0;
@@ -862,13 +869,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_listOfExpressions() {
-        var cacheKey = "listOfExpressions@" + pos;
+        var cacheKey = 'listOfExpressions@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -881,7 +888,7 @@ var logicProofParser = (function(){
         pos0 = pos;
         pos1 = pos;
         result0 = parse_expression();
-        result0 = result0 !== null ? result0 : "";
+        result0 = result0 !== null ? result0 : '';
         if (result0 !== null) {
           result1 = [];
           result2 = parse_commaThenExpression();
@@ -901,12 +908,12 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, av, avList) {
-              var result = (av === '') ? []: [av];
-              for (var i = 0; i < avList.length; i++) {
-                result.push(avList[i]);
-              }
-              return result;
-            })(pos0, result0[0], result0[1]);
+            var result = (av === '') ? [] : [av];
+            for (var i = 0; i < avList.length; i++) {
+              result.push(avList[i]);
+            }
+            return result;
+          })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -914,13 +921,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_commaThenExpression() {
-        var cacheKey = "commaThenExpression@" + pos;
+        var cacheKey = 'commaThenExpression@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -933,12 +940,12 @@ var logicProofParser = (function(){
         pos0 = pos;
         pos1 = pos;
         if (input.charCodeAt(pos) === 44) {
-          result0 = ",";
+          result0 = ',';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\",\"");
+            matchFailed('","');
           }
         }
         if (result0 !== null) {
@@ -954,7 +961,9 @@ var logicProofParser = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, av) { return av; })(pos0, result0[1]);
+          result0 = (function(offset, av) {
+            return av;
+          })(pos0, result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -962,13 +971,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_iffSymbol() {
-        var cacheKey = "iffSymbol@" + pos;
+        var cacheKey = 'iffSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -977,25 +986,25 @@ var logicProofParser = (function(){
 
         var result0;
 
-        if (input.substr(pos, 3) === "<=>") {
-          result0 = "<=>";
+        if (input.substr(pos, 3) === '<=>') {
+          result0 = '<=>';
           pos += 3;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"<=>\"");
+            matchFailed('"<=>"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_impliesSymbol() {
-        var cacheKey = "impliesSymbol@" + pos;
+        var cacheKey = 'impliesSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1004,25 +1013,25 @@ var logicProofParser = (function(){
 
         var result0;
 
-        if (input.substr(pos, 2) === "=>") {
-          result0 = "=>";
+        if (input.substr(pos, 2) === '=>') {
+          result0 = '=>';
           pos += 2;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"=>\"");
+            matchFailed('"=>"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_forAllSymbol() {
-        var cacheKey = "forAllSymbol@" + pos;
+        var cacheKey = 'forAllSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1032,24 +1041,24 @@ var logicProofParser = (function(){
         var result0;
 
         if (input.charCodeAt(pos) === 8704) {
-          result0 = "\u2200";
+          result0 = '\u2200';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"\\u2200\"");
+            matchFailed('"\\u2200"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_existsSymbol() {
-        var cacheKey = "existsSymbol@" + pos;
+        var cacheKey = 'existsSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1059,24 +1068,24 @@ var logicProofParser = (function(){
         var result0;
 
         if (input.charCodeAt(pos) === 8707) {
-          result0 = "\u2203";
+          result0 = '\u2203';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"\\u2203\"");
+            matchFailed('"\\u2203"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_andSymbol() {
-        var cacheKey = "andSymbol@" + pos;
+        var cacheKey = 'andSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1086,24 +1095,24 @@ var logicProofParser = (function(){
         var result0;
 
         if (input.charCodeAt(pos) === 8743) {
-          result0 = "\u2227";
+          result0 = '\u2227';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"\\u2227\"");
+            matchFailed('"\\u2227"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_orSymbol() {
-        var cacheKey = "orSymbol@" + pos;
+        var cacheKey = 'orSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1113,24 +1122,24 @@ var logicProofParser = (function(){
         var result0;
 
         if (input.charCodeAt(pos) === 8744) {
-          result0 = "\u2228";
+          result0 = '\u2228';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"\\u2228\"");
+            matchFailed('"\\u2228"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_notSymbol() {
-        var cacheKey = "notSymbol@" + pos;
+        var cacheKey = 'notSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1140,24 +1149,24 @@ var logicProofParser = (function(){
         var result0;
 
         if (input.charCodeAt(pos) === 126) {
-          result0 = "~";
+          result0 = '~';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"~\"");
+            matchFailed('"~"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_equalsSymbol() {
-        var cacheKey = "equalsSymbol@" + pos;
+        var cacheKey = 'equalsSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1169,16 +1178,18 @@ var logicProofParser = (function(){
 
         pos0 = pos;
         if (input.charCodeAt(pos) === 61) {
-          result0 = "=";
+          result0 = '=';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"=\"");
+            matchFailed('"="');
           }
         }
         if (result0 !== null) {
-          result0 = (function(offset) {return 'equals'})(pos0);
+          result0 = (function(offset) {
+            return 'equals';
+          })(pos0);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1186,13 +1197,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_lessThanOrEqualsSymbol() {
-        var cacheKey = "lessThanOrEqualsSymbol@" + pos;
+        var cacheKey = 'lessThanOrEqualsSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1203,17 +1214,19 @@ var logicProofParser = (function(){
         var pos0;
 
         pos0 = pos;
-        if (input.substr(pos, 2) === "<=") {
-          result0 = "<=";
+        if (input.substr(pos, 2) === '<=') {
+          result0 = '<=';
           pos += 2;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"<=\"");
+            matchFailed('"<="');
           }
         }
         if (result0 !== null) {
-          result0 = (function(offset) {return 'less_than_or_equals'})(pos0);
+          result0 = (function(offset) {
+            return 'less_than_or_equals';
+          })(pos0);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1221,13 +1234,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_greaterThanOrEqualsSymbol() {
-        var cacheKey = "greaterThanOrEqualsSymbol@" + pos;
+        var cacheKey = 'greaterThanOrEqualsSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1238,17 +1251,19 @@ var logicProofParser = (function(){
         var pos0;
 
         pos0 = pos;
-        if (input.substr(pos, 2) === ">=") {
-          result0 = ">=";
+        if (input.substr(pos, 2) === '>=') {
+          result0 = '>=';
           pos += 2;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\">=\"");
+            matchFailed('">="');
           }
         }
         if (result0 !== null) {
-          result0 = (function(offset) {return 'greater_than_or_equals'})(pos0);
+          result0 = (function(offset) {
+            return 'greater_than_or_equals';
+          })(pos0);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1256,13 +1271,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_lessThanSymbol() {
-        var cacheKey = "lessThanSymbol@" + pos;
+        var cacheKey = 'lessThanSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1274,16 +1289,18 @@ var logicProofParser = (function(){
 
         pos0 = pos;
         if (input.charCodeAt(pos) === 60) {
-          result0 = "<";
+          result0 = '<';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"<\"");
+            matchFailed('"<"');
           }
         }
         if (result0 !== null) {
-          result0 = (function(offset) {return 'less_than'})(pos0);
+          result0 = (function(offset) {
+            return 'less_than';
+          })(pos0);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1291,13 +1308,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_greaterThanSymbol() {
-        var cacheKey = "greaterThanSymbol@" + pos;
+        var cacheKey = 'greaterThanSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1309,16 +1326,18 @@ var logicProofParser = (function(){
 
         pos0 = pos;
         if (input.charCodeAt(pos) === 62) {
-          result0 = ">";
+          result0 = '>';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\">\"");
+            matchFailed('">"');
           }
         }
         if (result0 !== null) {
-          result0 = (function(offset) {return 'greater_than'})(pos0);
+          result0 = (function(offset) {
+            return 'greater_than';
+          })(pos0);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1326,13 +1345,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_notEqualsSymbol() {
-        var cacheKey = "notEqualsSymbol@" + pos;
+        var cacheKey = 'notEqualsSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1343,17 +1362,19 @@ var logicProofParser = (function(){
         var pos0;
 
         pos0 = pos;
-        if (input.substr(pos, 2) === "!=") {
-          result0 = "!=";
+        if (input.substr(pos, 2) === '!=') {
+          result0 = '!=';
           pos += 2;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"!=\"");
+            matchFailed('"!="');
           }
         }
         if (result0 !== null) {
-          result0 = (function(offset) {return 'not_equals'})(pos0);
+          result0 = (function(offset) {
+            return 'not_equals';
+          })(pos0);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1361,13 +1382,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_membershipSymbol() {
-        var cacheKey = "membershipSymbol@" + pos;
+        var cacheKey = 'membershipSymbol@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1379,16 +1400,18 @@ var logicProofParser = (function(){
 
         pos0 = pos;
         if (input.charCodeAt(pos) === 8712) {
-          result0 = "\u2208";
+          result0 = '\u2208';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"\\u2208\"");
+            matchFailed('"\\u2208"');
           }
         }
         if (result0 !== null) {
-          result0 = (function(offset) {return 'is_in';})(pos0);
+          result0 = (function(offset) {
+            return 'is_in';
+          })(pos0);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1396,13 +1419,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_addition() {
-        var cacheKey = "addition@" + pos;
+        var cacheKey = 'addition@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1412,24 +1435,24 @@ var logicProofParser = (function(){
         var result0;
 
         if (input.charCodeAt(pos) === 43) {
-          result0 = "+";
+          result0 = '+';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"+\"");
+            matchFailed('"+"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_subtraction() {
-        var cacheKey = "subtraction@" + pos;
+        var cacheKey = 'subtraction@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1439,24 +1462,24 @@ var logicProofParser = (function(){
         var result0;
 
         if (input.charCodeAt(pos) === 45) {
-          result0 = "-";
+          result0 = '-';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"-\"");
+            matchFailed('"-"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_multiplication() {
-        var cacheKey = "multiplication@" + pos;
+        var cacheKey = 'multiplication@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1466,24 +1489,24 @@ var logicProofParser = (function(){
         var result0;
 
         if (input.charCodeAt(pos) === 42) {
-          result0 = "*";
+          result0 = '*';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"*\"");
+            matchFailed('"*"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_division() {
-        var cacheKey = "division@" + pos;
+        var cacheKey = 'division@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1493,24 +1516,24 @@ var logicProofParser = (function(){
         var result0;
 
         if (input.charCodeAt(pos) === 47) {
-          result0 = "/";
+          result0 = '/';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"/\"");
+            matchFailed('"/"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_exponentiation() {
-        var cacheKey = "exponentiation@" + pos;
+        var cacheKey = 'exponentiation@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1520,24 +1543,24 @@ var logicProofParser = (function(){
         var result0;
 
         if (input.charCodeAt(pos) === 94) {
-          result0 = "^";
+          result0 = '^';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"^\"");
+            matchFailed('"^"');
           }
         }
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_iffFormula() {
-        var cacheKey = "iffFormula@" + pos;
+        var cacheKey = 'iffFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1570,13 +1593,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, right) {
-              return {
-                top_kind_name: 'binary_connective',
-                top_operator_name: 'iff',
-                arguments: [left, right],
-                dummies: []
-              }
-            })(pos0, result0[0], result0[2]);
+            return {
+              top_kind_name: 'binary_connective',
+              top_operator_name: 'iff',
+              arguments: [left, right],
+              dummies: []
+            };
+          })(pos0, result0[0], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1587,13 +1610,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_impliesFormula() {
-        var cacheKey = "impliesFormula@" + pos;
+        var cacheKey = 'impliesFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1626,13 +1649,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, right) {
-              return {
-                top_kind_name: 'binary_connective',
-                top_operator_name: 'implies',
-                arguments: [left, right],
-                dummies: []
-              }
-            })(pos0, result0[0], result0[2]);
+            return {
+              top_kind_name: 'binary_connective',
+              top_operator_name: 'implies',
+              arguments: [left, right],
+              dummies: []
+            };
+          })(pos0, result0[0], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1643,13 +1666,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_quantifierFormula() {
-        var cacheKey = "quantifierFormula@" + pos;
+        var cacheKey = 'quantifierFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1665,13 +1688,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_forAllFormula() {
-        var cacheKey = "forAllFormula@" + pos;
+        var cacheKey = 'forAllFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1688,15 +1711,15 @@ var logicProofParser = (function(){
           result1 = parse_variable();
           if (result1 !== null) {
             if (input.charCodeAt(pos) === 46) {
-              result2 = ".";
+              result2 = '.';
               pos++;
             } else {
               result2 = null;
               if (reportFailures === 0) {
-                matchFailed("\".\"");
+                matchFailed('"."');
               }
             }
-            result2 = result2 !== null ? result2 : "";
+            result2 = result2 !== null ? result2 : '';
             if (result2 !== null) {
               result3 = parse_quantifierFormula();
               if (result3 !== null) {
@@ -1719,13 +1742,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, right) {
-              return {
-                top_kind_name: 'quantifier',
-                top_operator_name: 'for_all',
-                arguments: [right],
-                dummies: [left]
-              };
-            })(pos0, result0[1], result0[3]);
+            return {
+              top_kind_name: 'quantifier',
+              top_operator_name: 'for_all',
+              arguments: [right],
+              dummies: [left]
+            };
+          })(pos0, result0[1], result0[3]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1736,13 +1759,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_existsFormula() {
-        var cacheKey = "existsFormula@" + pos;
+        var cacheKey = 'existsFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1759,15 +1782,15 @@ var logicProofParser = (function(){
           result1 = parse_variable();
           if (result1 !== null) {
             if (input.charCodeAt(pos) === 46) {
-              result2 = ".";
+              result2 = '.';
               pos++;
             } else {
               result2 = null;
               if (reportFailures === 0) {
-                matchFailed("\".\"");
+                matchFailed('"."');
               }
             }
-            result2 = result2 !== null ? result2 : "";
+            result2 = result2 !== null ? result2 : '';
             if (result2 !== null) {
               result3 = parse_quantifierFormula();
               if (result3 !== null) {
@@ -1790,13 +1813,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, right) {
-              return {
-                top_kind_name: 'quantifier',
-                top_operator_name: 'exists',
-                arguments: [right],
-                dummies: [left]
-              };
-            })(pos0, result0[1], result0[3]);
+            return {
+              top_kind_name: 'quantifier',
+              top_operator_name: 'exists',
+              arguments: [right],
+              dummies: [left]
+            };
+          })(pos0, result0[1], result0[3]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1807,13 +1830,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_boundedForAllFormula() {
-        var cacheKey = "boundedForAllFormula@" + pos;
+        var cacheKey = 'boundedForAllFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1834,15 +1857,15 @@ var logicProofParser = (function(){
               result3 = parse_additionArgument();
               if (result3 !== null) {
                 if (input.charCodeAt(pos) === 46) {
-                  result4 = ".";
+                  result4 = '.';
                   pos++;
                 } else {
                   result4 = null;
                   if (reportFailures === 0) {
-                    matchFailed("\".\"");
+                    matchFailed('"."');
                   }
                 }
-                result4 = result4 !== null ? result4 : "";
+                result4 = result4 !== null ? result4 : '';
                 if (result4 !== null) {
                   result5 = parse_quantifierFormula();
                   if (result5 !== null) {
@@ -1873,18 +1896,20 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, k, relation, n, A) {
-              return {
-                top_kind_name: 'bounded_quantifier',
-                top_operator_name: 'bounded_for_all',
-                arguments: [{
+            return {
+              top_kind_name: 'bounded_quantifier',
+              top_operator_name: 'bounded_for_all',
+              arguments: [
+                {
                   top_kind_name: 'binary_relation',
                   top_operator_name: relation,
                   arguments: [k, n],
                   dummies: []
-                }, A],
-                dummies: [k]
-              };
-            })(pos0, result0[1], result0[2], result0[3], result0[5]);
+                }, A
+              ],
+              dummies: [k]
+            };
+          })(pos0, result0[1], result0[2], result0[3], result0[5]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1895,13 +1920,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_boundedExistsFormula() {
-        var cacheKey = "boundedExistsFormula@" + pos;
+        var cacheKey = 'boundedExistsFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -1922,15 +1947,15 @@ var logicProofParser = (function(){
               result3 = parse_additionArgument();
               if (result3 !== null) {
                 if (input.charCodeAt(pos) === 46) {
-                  result4 = ".";
+                  result4 = '.';
                   pos++;
                 } else {
                   result4 = null;
                   if (reportFailures === 0) {
-                    matchFailed("\".\"");
+                    matchFailed('"."');
                   }
                 }
-                result4 = result4 !== null ? result4 : "";
+                result4 = result4 !== null ? result4 : '';
                 if (result4 !== null) {
                   result5 = parse_quantifierFormula();
                   if (result5 !== null) {
@@ -1961,18 +1986,20 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, k, relation, n, A) {
-              return {
-                top_kind_name: 'bounded_quantifier',
-                top_operator_name: 'bounded_exists',
-                arguments: [{
+            return {
+              top_kind_name: 'bounded_quantifier',
+              top_operator_name: 'bounded_exists',
+              arguments: [
+                {
                   top_kind_name: 'binary_relation',
                   top_operator_name: relation,
                   arguments: [k, n],
                   dummies: []
-                }, A],
-                dummies: [k]
-              };
-            })(pos0, result0[1], result0[2], result0[3], result0[5]);
+                }, A
+              ],
+              dummies: [k]
+            };
+          })(pos0, result0[1], result0[2], result0[3], result0[5]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1980,13 +2007,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_orFormula() {
-        var cacheKey = "orFormula@" + pos;
+        var cacheKey = 'orFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2019,13 +2046,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, right) {
-              return {
-                top_kind_name: 'binary_connective',
-                top_operator_name: 'or',
-                arguments: [left, right],
-                dummies: []
-              };
-            })(pos0, result0[0], result0[2]);
+            return {
+              top_kind_name: 'binary_connective',
+              top_operator_name: 'or',
+              arguments: [left, right],
+              dummies: []
+            };
+          })(pos0, result0[0], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -2036,13 +2063,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_andFormula() {
-        var cacheKey = "andFormula@" + pos;
+        var cacheKey = 'andFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2075,13 +2102,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, right) {
-              return {
-                top_kind_name: 'binary_connective',
-                top_operator_name: 'and',
-                arguments: [left, right],
-                dummies: []
-              }
-            })(pos0, result0[0], result0[2]);
+            return {
+              top_kind_name: 'binary_connective',
+              top_operator_name: 'and',
+              arguments: [left, right],
+              dummies: []
+            };
+          })(pos0, result0[0], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -2092,13 +2119,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_andRHS() {
-        var cacheKey = "andRHS@" + pos;
+        var cacheKey = 'andRHS@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2114,13 +2141,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_unaryFormula() {
-        var cacheKey = "unaryFormula@" + pos;
+        var cacheKey = 'unaryFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2136,13 +2163,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_notFormula() {
-        var cacheKey = "notFormula@" + pos;
+        var cacheKey = 'notFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2169,13 +2196,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, right) {
-              return {
-                top_kind_name: 'unary_connective',
-                top_operator_name: 'not',
-                arguments: [right],
-                dummies: []
-              }
-            })(pos0, result0[1]);
+            return {
+              top_kind_name: 'unary_connective',
+              top_operator_name: 'not',
+              arguments: [right],
+              dummies: []
+            };
+          })(pos0, result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -2183,13 +2210,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_notRHS() {
-        var cacheKey = "notRHS@" + pos;
+        var cacheKey = 'notRHS@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2205,13 +2232,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_infixRelationFormula() {
-        var cacheKey = "infixRelationFormula@" + pos;
+        var cacheKey = 'infixRelationFormula@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2244,13 +2271,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, name, right) {
-               return {
-                top_kind_name: 'binary_relation',
-                top_operator_name: name,
-                arguments: [left, right],
-                dummies: []
-               }
-            })(pos0, result0[0], result0[1], result0[2]);
+            return {
+              top_kind_name: 'binary_relation',
+              top_operator_name: name,
+              arguments: [left, right],
+              dummies: []
+            };
+          })(pos0, result0[0], result0[1], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -2261,13 +2288,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_infixRelationName() {
-        var cacheKey = "infixRelationName@" + pos;
+        var cacheKey = 'infixRelationName@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2298,13 +2325,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_boundableInfixRelationName() {
-        var cacheKey = "boundableInfixRelationName@" + pos;
+        var cacheKey = 'boundableInfixRelationName@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2323,13 +2350,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_infixRelationRHS() {
-        var cacheKey = "infixRelationRHS@" + pos;
+        var cacheKey = 'infixRelationRHS@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2348,13 +2375,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_additionArgument() {
-        var cacheKey = "additionArgument@" + pos;
+        var cacheKey = 'additionArgument@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2387,13 +2414,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, right) {
-              return {
-                top_kind_name: 'binary_function',
-                top_operator_name: 'addition',
-                arguments: [left, right],
-                dummies: []
-              }
-            })(pos0, result0[0], result0[2]);
+            return {
+              top_kind_name: 'binary_function',
+              top_operator_name: 'addition',
+              arguments: [left, right],
+              dummies: []
+            };
+          })(pos0, result0[0], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -2404,13 +2431,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_additionRHS() {
-        var cacheKey = "additionRHS@" + pos;
+        var cacheKey = 'additionRHS@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2429,13 +2456,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_subtractionArgument() {
-        var cacheKey = "subtractionArgument@" + pos;
+        var cacheKey = 'subtractionArgument@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2468,13 +2495,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, right) {
-              return {
-                top_kind_name: 'binary_function',
-                top_operator_name: 'subtraction',
-                arguments: [left, right],
-                dummies: []
-              }
-            })(pos0, result0[0], result0[2]);
+            return {
+              top_kind_name: 'binary_function',
+              top_operator_name: 'subtraction',
+              arguments: [left, right],
+              dummies: []
+            };
+          })(pos0, result0[0], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -2485,13 +2512,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_subtractionRHS() {
-        var cacheKey = "subtractionRHS@" + pos;
+        var cacheKey = 'subtractionRHS@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2510,13 +2537,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_multiplicationArgument() {
-        var cacheKey = "multiplicationArgument@" + pos;
+        var cacheKey = 'multiplicationArgument@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2549,13 +2576,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, right) {
-              return {
-                top_kind_name: 'binary_function',
-                top_operator_name: 'multiplication',
-                arguments: [left, right],
-                dummies: []
-              }
-            })(pos0, result0[0], result0[2]);
+            return {
+              top_kind_name: 'binary_function',
+              top_operator_name: 'multiplication',
+              arguments: [left, right],
+              dummies: []
+            };
+          })(pos0, result0[0], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -2566,13 +2593,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_multiplicationRHS() {
-        var cacheKey = "multiplicationRHS@" + pos;
+        var cacheKey = 'multiplicationRHS@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2591,13 +2618,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_divisionArgument() {
-        var cacheKey = "divisionArgument@" + pos;
+        var cacheKey = 'divisionArgument@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2630,13 +2657,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, right) {
-              return {
-                top_kind_name: 'binary_function',
-                top_operator_name: 'division',
-                arguments: [left, right],
-                dummies: []
-              }
-            })(pos0, result0[0], result0[2]);
+            return {
+              top_kind_name: 'binary_function',
+              top_operator_name: 'division',
+              arguments: [left, right],
+              dummies: []
+            };
+          })(pos0, result0[0], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -2647,13 +2674,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_divisionRHS() {
-        var cacheKey = "divisionRHS@" + pos;
+        var cacheKey = 'divisionRHS@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2672,13 +2699,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_exponentiationArgument() {
-        var cacheKey = "exponentiationArgument@" + pos;
+        var cacheKey = 'exponentiationArgument@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2711,13 +2738,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, left, right) {
-              return {
-                top_kind_name: 'binary_function',
-                top_operator_name: 'exponentiation',
-                arguments: [left, right],
-                dummies: []
-              }
-            })(pos0, result0[0], result0[2]);
+            return {
+              top_kind_name: 'binary_function',
+              top_operator_name: 'exponentiation',
+              arguments: [left, right],
+              dummies: []
+            };
+          })(pos0, result0[0], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -2728,13 +2755,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_exponentiationRHS() {
-        var cacheKey = "exponentiationRHS@" + pos;
+        var cacheKey = 'exponentiationRHS@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2753,13 +2780,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_reducedArgument() {
-        var cacheKey = "reducedArgument@" + pos;
+        var cacheKey = 'reducedArgument@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2781,13 +2808,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_bracketExpression() {
-        var cacheKey = "bracketExpression@" + pos;
+        var cacheKey = 'bracketExpression@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2800,24 +2827,24 @@ var logicProofParser = (function(){
         pos0 = pos;
         pos1 = pos;
         if (input.charCodeAt(pos) === 40) {
-          result0 = "(";
+          result0 = '(';
           pos++;
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("\"(\"");
+            matchFailed('"("');
           }
         }
         if (result0 !== null) {
           result1 = parse_expression();
           if (result1 !== null) {
             if (input.charCodeAt(pos) === 41) {
-              result2 = ")";
+              result2 = ')';
               pos++;
             } else {
               result2 = null;
               if (reportFailures === 0) {
-                matchFailed("\")\"");
+                matchFailed('")"');
               }
             }
             if (result2 !== null) {
@@ -2835,7 +2862,9 @@ var logicProofParser = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, e) {return e;})(pos0, result0[1]);
+          result0 = (function(offset, e) {
+            return e;
+          })(pos0, result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -2843,13 +2872,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_prefixFunction() {
-        var cacheKey = "prefixFunction@" + pos;
+        var cacheKey = 'prefixFunction@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2864,24 +2893,24 @@ var logicProofParser = (function(){
         result0 = parse_name();
         if (result0 !== null) {
           if (input.charCodeAt(pos) === 40) {
-            result1 = "(";
+            result1 = '(';
             pos++;
           } else {
             result1 = null;
             if (reportFailures === 0) {
-              matchFailed("\"(\"");
+              matchFailed('"("');
             }
           }
           if (result1 !== null) {
             result2 = parse_listOfExpressions();
             if (result2 !== null) {
               if (input.charCodeAt(pos) === 41) {
-                result3 = ")";
+                result3 = ')';
                 pos++;
               } else {
                 result3 = null;
                 if (reportFailures === 0) {
-                  matchFailed("\")\"");
+                  matchFailed('")"');
                 }
               }
               if (result3 !== null) {
@@ -2904,13 +2933,13 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, name, arguments) {
-              return {
-                top_kind_name: 'prefix_function',
-                top_operator_name: name,
-                arguments: arguments,
-                dummies: []
-              }
-            })(pos0, result0[0], result0[2]);
+            return {
+              top_kind_name: 'prefix_function',
+              top_operator_name: name,
+              arguments: arguments,
+              dummies: []
+            };
+          })(pos0, result0[0], result0[2]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -2921,13 +2950,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_rangedFunction() {
-        var cacheKey = "rangedFunction@" + pos;
+        var cacheKey = 'rangedFunction@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -2942,12 +2971,12 @@ var logicProofParser = (function(){
         result0 = parse_name();
         if (result0 !== null) {
           if (input.charCodeAt(pos) === 123) {
-            result1 = "{";
+            result1 = '{';
             pos++;
           } else {
             result1 = null;
             if (reportFailures === 0) {
-              matchFailed("\"{\"");
+              matchFailed('"{"');
             }
           }
           if (result1 !== null) {
@@ -2958,24 +2987,24 @@ var logicProofParser = (function(){
                 result4 = parse_additionArgument();
                 if (result4 !== null) {
                   if (input.charCodeAt(pos) === 124) {
-                    result5 = "|";
+                    result5 = '|';
                     pos++;
                   } else {
                     result5 = null;
                     if (reportFailures === 0) {
-                      matchFailed("\"|\"");
+                      matchFailed('"|"');
                     }
                   }
                   if (result5 !== null) {
                     result6 = parse_expression();
                     if (result6 !== null) {
                       if (input.charCodeAt(pos) === 125) {
-                        result7 = "}";
+                        result7 = '}';
                         pos++;
                       } else {
                         result7 = null;
                         if (reportFailures === 0) {
-                          matchFailed("\"}\"");
+                          matchFailed('"}"');
                         }
                       }
                       if (result7 !== null) {
@@ -3014,18 +3043,20 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, name, k, relation, n, A) {
-              return {
-                top_kind_name: 'ranged_function',
-                top_operator_name: name,
-                arguments: [{
+            return {
+              top_kind_name: 'ranged_function',
+              top_operator_name: name,
+              arguments: [
+                {
                   top_kind_name: 'binary_relation',
                   top_operator_name: relation,
                   arguments: [k, n],
                   dummies: []
-                }, A],
-                dummies: [k]
-              };
-            })(pos0, result0[0], result0[2], result0[3], result0[4], result0[6]);
+                }, A
+              ],
+              dummies: [k]
+            };
+          })(pos0, result0[0], result0[2], result0[3], result0[4], result0[6]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -3033,13 +3064,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_constant() {
-        var cacheKey = "constant@" + pos;
+        var cacheKey = 'constant@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -3056,7 +3087,7 @@ var logicProofParser = (function(){
         } else {
           result1 = null;
           if (reportFailures === 0) {
-            matchFailed("[0-9]");
+            matchFailed('[0-9]');
           }
         }
         if (result1 !== null) {
@@ -3069,7 +3100,7 @@ var logicProofParser = (function(){
             } else {
               result1 = null;
               if (reportFailures === 0) {
-                matchFailed("[0-9]");
+                matchFailed('[0-9]');
               }
             }
           }
@@ -3078,14 +3109,14 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, digits) {
-              return {
-                top_kind_name: 'constant',
-                top_operator_name: parseInt(digits.join(""), 10),
-                arguments: [],
-                dummies: [],
-                type: 'integer'
-              };
-            })(pos0, result0);
+            return {
+              top_kind_name: 'constant',
+              top_operator_name: parseInt(digits.join(''), 10),
+              arguments: [],
+              dummies: [],
+              type: 'integer'
+            };
+          })(pos0, result0);
         }
         if (result0 === null) {
           pos = pos0;
@@ -3096,13 +3127,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_string() {
-        var cacheKey = "string@" + pos;
+        var cacheKey = 'string@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -3131,7 +3162,7 @@ var logicProofParser = (function(){
           } else {
             result2 = null;
             if (reportFailures === 0) {
-              matchFailed("[a-zA-Z0-9_]");
+              matchFailed('[a-zA-Z0-9_]');
             }
           }
           while (result2 !== null) {
@@ -3142,7 +3173,7 @@ var logicProofParser = (function(){
             } else {
               result2 = null;
               if (reportFailures === 0) {
-                matchFailed("[a-zA-Z0-9_]");
+                matchFailed('[a-zA-Z0-9_]');
               }
             }
           }
@@ -3172,14 +3203,14 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, characters) {
-              return {
-                top_kind_name: 'constant',
-                top_operator_name: '\'' + characters.join('') + '\'',
-                arguments: [],
-                dummies: [],
-                type: 'string'
-              }
-            })(pos0, result0[1]);
+            return {
+              top_kind_name: 'constant',
+              top_operator_name: '\'' + characters.join('') + '\'',
+              arguments: [],
+              dummies: [],
+              type: 'string'
+            };
+          })(pos0, result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -3187,13 +3218,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_variable() {
-        var cacheKey = "variable@" + pos;
+        var cacheKey = 'variable@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -3207,13 +3238,13 @@ var logicProofParser = (function(){
         result0 = parse_name();
         if (result0 !== null) {
           result0 = (function(offset, name) {
-              return {
-                top_kind_name: 'variable',
-                top_operator_name: name,
-                arguments: [],
-                dummies: []
-              };
-            })(pos0, result0);
+            return {
+              top_kind_name: 'variable',
+              top_operator_name: name,
+              arguments: [],
+              dummies: []
+            };
+          })(pos0, result0);
         }
         if (result0 === null) {
           pos = pos0;
@@ -3221,13 +3252,13 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
 
       function parse_name() {
-        var cacheKey = "name@" + pos;
+        var cacheKey = 'name@' + pos;
         var cachedResult = cache[cacheKey];
         if (cachedResult) {
           pos = cachedResult.nextPos;
@@ -3245,7 +3276,7 @@ var logicProofParser = (function(){
         } else {
           result0 = null;
           if (reportFailures === 0) {
-            matchFailed("[A-Za-z]");
+            matchFailed('[A-Za-z]');
           }
         }
         if (result0 !== null) {
@@ -3256,7 +3287,7 @@ var logicProofParser = (function(){
           } else {
             result2 = null;
             if (reportFailures === 0) {
-              matchFailed("[A-Za-z0-9_]");
+              matchFailed('[A-Za-z0-9_]');
             }
           }
           while (result2 !== null) {
@@ -3267,7 +3298,7 @@ var logicProofParser = (function(){
             } else {
               result2 = null;
               if (reportFailures === 0) {
-                matchFailed("[A-Za-z0-9_]");
+                matchFailed('[A-Za-z0-9_]');
               }
             }
           }
@@ -3283,8 +3314,8 @@ var logicProofParser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, first, middle) {
-              return first + middle.join('');
-            })(pos0, result0[0], result0[1]);
+            return first + middle.join('');
+          })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -3292,7 +3323,7 @@ var logicProofParser = (function(){
 
         cache[cacheKey] = {
           nextPos: pos,
-          result:  result0
+          result: result0
         };
         return result0;
       }
@@ -3326,11 +3357,13 @@ var logicProofParser = (function(){
 
         for (var i = 0; i < Math.max(pos, rightmostFailuresPos); i++) {
           var ch = input.charAt(i);
-          if (ch === "\n") {
-            if (!seenCR) { line++; }
+          if (ch === '\n') {
+            if (!seenCR) {
+              line++;
+            }
             column = 1;
             seenCR = false;
-          } else if (ch === "\r" || ch === "\u2028" || ch === "\u2029") {
+          } else if (ch === '\r' || ch === '\u2028' || ch === '\u2029') {
             line++;
             column = 1;
             seenCR = true;
@@ -3388,7 +3421,9 @@ var logicProofParser = (function(){
     },
 
     /* Returns the parser source code. */
-    toSource: function() { return this._source; }
+    toSource: function() {
+      return this._source;
+    }
   };
 
   /* Thrown when a parser encounters a syntax error. */
@@ -3399,23 +3434,24 @@ var logicProofParser = (function(){
 
       switch (expected.length) {
         case 0:
-          expectedHumanized = "end of input";
+          expectedHumanized = 'end of input';
           break;
         case 1:
           expectedHumanized = expected[0];
           break;
         default:
-          expectedHumanized = expected.slice(0, expected.length - 1).join(", ")
-            + " or "
-            + expected[expected.length - 1];
+          expectedHumanized = expected.slice(0, expected.length - 1)
+            .join(', ') +
+            ' or ' +
+            expected[expected.length - 1];
       }
 
-      foundHumanized = found ? quote(found) : "end of input";
+      foundHumanized = found ? quote(found) : 'end of input';
 
-      return "Expected " + expectedHumanized + " but " + foundHumanized + " found.";
+      return 'Expected ' + expectedHumanized + ' but ' + foundHumanized + ' found.';
     }
 
-    this.name = "SyntaxError";
+    this.name = 'SyntaxError';
     this.expected = expected;
     this.found = found;
     this.message = buildMessage(expected, found);

@@ -36,12 +36,12 @@ describe('GenerateContentIdService', function() {
     worked_example_1: {}
   };
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     gcis = $injector.get('GenerateContentIdService');
     scitat = $injector.get('StateContentIdsToAudioTranslationsService');
     citatof = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
     scitat.displayed = citatof.createFromBackendDict(citatDict);
-  }));
+  }]);
 
   it('should generate content id for new feedbacks', function() {
     expect(
@@ -65,6 +65,7 @@ describe('GenerateContentIdService', function() {
   it('should throw error for unknown content id', function() {
     expect(function() {
       gcis.getNextId('xyz');
-    }).toThrowError('Unknown component name provided.');
+    })
+      .toThrowError('Unknown component name provided.');
   });
 });

@@ -24,14 +24,17 @@ var customizeInteraction = function(elem, buttonText) {
   if (buttonText) {
     objects.UnicodeStringEditor(
       elem.element(by.tagName('schema-based-unicode-editor'))
-    ).setValue(buttonText);
+    )
+      .setValue(buttonText);
   }
 };
 
 var expectInteractionDetailsToMatch = function(elem, buttonText) {
   expect(
-    element(by.css('.protractor-test-continue-button')).getText()
-  ).toBe(buttonText.toUpperCase());
+    element(by.css('.protractor-test-continue-button'))
+      .getText()
+  )
+    .toBe(buttonText.toUpperCase());
 };
 
 var submitAnswer = function() {

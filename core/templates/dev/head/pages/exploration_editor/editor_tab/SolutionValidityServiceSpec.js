@@ -24,7 +24,7 @@ describe('Solution Validity Service', function() {
 
     var scope, svs;
 
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(inject[function($injector, $rootScope) {
       scope = $rootScope.$new();
       svs = $injector.get('SolutionValidityService');
 
@@ -34,14 +34,17 @@ describe('Solution Validity Service', function() {
           svs.init();
 
           svs.updateValidity('State 1', true);
-          expect(svs.isSolutionValid('State 1')).toBe(true);
+          expect(svs.isSolutionValid('State 1'))
+            .toBe(true);
 
           svs.deleteSolutionValidity('State 1');
-          expect(Object.keys(svs.getAllValidities())).toEqual([]);
+          expect(Object.keys(svs.getAllValidities()))
+            .toEqual([]);
 
           svs.updateValidity('State 1', false);
-          expect(svs.isSolutionValid('State 1')).toBe(false);
+          expect(svs.isSolutionValid('State 1'))
+            .toBe(false);
         });
-    }));
+    }]);
   });
 });

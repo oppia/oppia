@@ -24,7 +24,8 @@ CKEDITOR.plugins.add('pre', {
 
     // This part will provide toolbar button highlighting in editor.
     editor.attachStyleStateChange(style, function(state) {
-      !editor.readOnly && editor.getCommand('pre').setState(state);
+      !editor.readOnly && editor.getCommand('pre')
+        .setState(state);
     });
 
     editor.ui.addButton( 'Pre', {

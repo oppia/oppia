@@ -116,4 +116,5 @@ oppia.factory('GuestCollectionProgressService', [
         return _getNextExplorationId(collection, completedExplorationIds);
       }
     };
-  }]);
+  }
+]);

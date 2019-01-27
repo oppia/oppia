@@ -27,51 +27,49 @@ oppia.directive('mathLatexStringEditor', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/math_latex_string_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.placeholderText = '\\frac{x}{y}';
-        $scope.alwaysEditable = $scope.getAlwaysEditable();
+      controller: [
+        '$scope', function($scope) {
+          $scope.placeholderText = '\\frac{x}{y}';
+          $scope.alwaysEditable = $scope.getAlwaysEditable();
 
-        // Reset the component each time the value changes (e.g. if this is part
-        // of an editable list).
-        $scope.$watch('value', function() {
-          $scope.localValue = {
-            label: $scope.value || ''
-          };
-        }, true);
+          // Reset the component each time the value changes (e.g. if this is part
+          // of an editable list).
+          $scope.$watch('value', function() {
+            $scope.localValue = {label: $scope.value || ''};
+          }, true);
 
-        if ($scope.alwaysEditable) {
-          $scope.$watch('localValue.label', function(newValue) {
-            $scope.value = newValue;
-          });
-        } else {
-          $scope.openEditor = function() {
-            $scope.active = true;
-          };
-
-          $scope.closeEditor = function() {
-            $scope.active = false;
-          };
-
-          $scope.replaceValue = function(newValue) {
-            $scope.localValue = {
-              label: newValue
+          if ($scope.alwaysEditable) {
+            $scope.$watch('localValue.label', function(newValue) {
+              $scope.value = newValue;
+            });
+          } else {
+            $scope.openEditor = function() {
+              $scope.active = true;
             };
-            $scope.value = newValue;
+
+            $scope.closeEditor = function() {
+              $scope.active = false;
+            };
+
+            $scope.replaceValue = function(newValue) {
+              $scope.localValue = {label: newValue};
+              $scope.value = newValue;
+              $scope.closeEditor();
+            };
+
+            $scope.$on('externalSave', function() {
+              if ($scope.active) {
+                $scope.replaceValue($scope.localValue.label);
+                // The $scope.$apply() call is needed to propagate the replaced
+                // value.
+                $scope.$apply();
+              }
+            });
+
             $scope.closeEditor();
-          };
-
-          $scope.$on('externalSave', function() {
-            if ($scope.active) {
-              $scope.replaceValue($scope.localValue.label);
-              // The $scope.$apply() call is needed to propagate the replaced
-              // value.
-              $scope.$apply();
-            }
-          });
-
-          $scope.closeEditor();
+          }
         }
-      }]
+      ]
     };
   }
 ]);

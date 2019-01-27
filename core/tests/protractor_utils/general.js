@@ -31,31 +31,27 @@ var CONSOLE_ERRORS_TO_IGNORE = [];
 
 var checkForConsoleErrors = function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
-  browser.manage().logs().get('browser').then(function(browserLogs) {
-    var fatalErrors = [];
-    // The mobile tests run on the latest version of Chrome.
-    // The newer versions report 'Slow Network' as a console error.
-    // This causes the tests to fail, therefore, we remove such logs.
-    if (browser.isMobile) {
-      browserLogs = browserLogs.filter(function(browserLog) {
-        return !(browserLog.message.includes(' Slow network is detected.'));
-      });
-    }
-    for (var i = 0; i < browserLogs.length; i++) {
-      if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
-        var errorFatal = true;
-        for (var j = 0; j < irrelevantErrors.length; j++) {
-          if (browserLogs[i].message.match(irrelevantErrors[j])) {
-            errorFatal = false;
+  browser.manage()
+    .logs()
+    .get('browser')
+    .then(function(browserLogs) {
+      var fatalErrors = [];
+      for (var i = 0; i < browserLogs.length; i++) {
+        if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
+          var errorFatal = true;
+          for (var j = 0; j < irrelevantErrors.length; j++) {
+            if (browserLogs[i].message.match(irrelevantErrors[j])) {
+              errorFatal = false;
+            }
+          }
+          if (errorFatal) {
+            fatalErrors.push(browserLogs[i]);
           }
         }
-        if (errorFatal) {
-          fatalErrors.push(browserLogs[i]);
-        }
       }
-    }
-    expect(fatalErrors).toEqual([]);
-  });
+      expect(fatalErrors)
+        .toEqual([]);
+    });
 };
 
 var isInDevMode = function() {
@@ -80,13 +76,15 @@ var FIRST_STATE_DEFAULT_NAME = 'Introduction';
 var _getExplorationId = function(currentUrlPrefix) {
   return {
     then: function(callbackFunction) {
-      browser.getCurrentUrl().then(function(url) {
-        expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
-        var explorationId = url.slice(
-          currentUrlPrefix.length,
-          currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
-        return callbackFunction(explorationId);
-      });
+      browser.getCurrentUrl()
+        .then(function(url) {
+          expect(url.slice(0, currentUrlPrefix.length))
+            .toBe(currentUrlPrefix);
+          var explorationId = url.slice(
+            currentUrlPrefix.length,
+            currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
+          return callbackFunction(explorationId);
+        });
     }
   };
 };
@@ -119,16 +117,19 @@ var openPlayer = function(explorationId) {
 // Takes the user from an exploration editor to its player.
 // NOTE: we do not use the preview button because that will open a new window.
 var moveToPlayer = function() {
-  getExplorationIdFromEditor().then(openPlayer);
+  getExplorationIdFromEditor()
+    .then(openPlayer);
 };
 
 // Takes the user from the exploration player to its editor.
 var moveToEditor = function() {
-  getExplorationIdFromPlayer().then(openEditor);
+  getExplorationIdFromPlayer()
+    .then(openEditor);
 };
 
 var expect404Error = function() {
-  expect(element(by.css('.protractor-test-error-container')).getText()).
+  expect(element(by.css('.protractor-test-error-container'))
+    .getText()).
     toMatch('Error 404');
 };
 
@@ -136,23 +137,27 @@ var expect404Error = function() {
 var ensurePageHasNoTranslationIds = function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
-  element(by.css('.oppia-base-container')).getAttribute('innerHTML').then(
-    function(promiseValue) {
+  element(by.css('.oppia-base-container'))
+    .getAttribute('innerHTML')
+    .then(
+      function(promiseValue) {
       // First remove all the attributes translate and variables that are
       // not displayed
-      var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
-      var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
-      var REGEX_NG_TOP_NAV_VISIBILITY =
+        var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
+        var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
+        var REGEX_NG_TOP_NAV_VISIBILITY =
         new RegExp('ng-show="navElementsVisibilityStatus.I18N_', 'g');
-      expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
-        .replace(REGEX_NG_VARIABLE, '')
-        .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
-    });
+        expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
+          .replace(REGEX_NG_VARIABLE, '')
+          .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
+      });
 };
 
 var acceptAlert = function() {
   waitFor.alertToBePresent();
-  browser.switchTo().alert().accept();
+  browser.switchTo()
+    .alert()
+    .accept();
   waitFor.pageToFullyLoad();
 };
 
@@ -169,22 +174,27 @@ var _getUniqueLogMessages = function(logs) {
 
 var checkConsoleErrorsExist = function(expectedErrors) {
   // Checks that browser logs match entries in expectedErrors array.
-  browser.manage().logs().get('browser').then(function(browserLogs) {
+  browser.manage()
+    .logs()
+    .get('browser')
+    .then(function(browserLogs) {
     // Some browsers such as chrome raise two errors for a missing resource.
     // To keep consistent behaviour across browsers, we keep only the logs
     // that have a unique value for their message attribute.
-    var uniqueLogMessages = _getUniqueLogMessages(browserLogs);
-    expect(uniqueLogMessages.length).toBe(expectedErrors.length);
-    for (var i = 0; i < expectedErrors.length; i++) {
-      var errorPresent = false;
-      for (var j = 0; j < uniqueLogMessages.length; j++) {
-        if (uniqueLogMessages[j].match(expectedErrors[i])) {
-          errorPresent = true;
+      var uniqueLogMessages = _getUniqueLogMessages(browserLogs);
+      expect(uniqueLogMessages.length)
+        .toBe(expectedErrors.length);
+      for (var i = 0; i < expectedErrors.length; i++) {
+        var errorPresent = false;
+        for (var j = 0; j < uniqueLogMessages.length; j++) {
+          if (uniqueLogMessages[j].match(expectedErrors[i])) {
+            errorPresent = true;
+          }
         }
+        expect(errorPresent)
+          .toBe(true);
       }
-      expect(errorPresent).toBe(true);
-    }
-  });
+    });
 };
 
 exports.acceptAlert = acceptAlert;

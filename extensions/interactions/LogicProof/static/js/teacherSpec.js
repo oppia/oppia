@@ -24,7 +24,8 @@ describe('Build questions', function() {
         logicProofTeacher.buildQuestion(
           'f(2)=3,\u2200x.x>1', 'p\u2227q', logicProofData.BASE_VOCABULARY
         ).assumptions, logicProofData.BASE_STUDENT_LANGUAGE.operators)
-    ).toEqual('f(2)=3, \u2200x.(x>1)');
+    )
+      .toEqual('f(2)=3, \u2200x.(x>1)');
   });
 
   it('should build results correctly', function() {
@@ -32,39 +33,43 @@ describe('Build questions', function() {
       logicProofShared.displayExpression(
         logicProofTeacher.buildQuestion(
           ' ', 'p\u2227q', logicProofData.BASE_VOCABULARY).results[0],
-        logicProofData.BASE_STUDENT_LANGUAGE.operators)).toEqual('p\u2227q');
+        logicProofData.BASE_STUDENT_LANGUAGE.operators))
+      .toEqual('p\u2227q');
     expect(
       logicProofTeacher.buildQuestion(
         'R(albert)\u2227R(betty)', 'p', logicProofData.BASE_VOCABULARY
-      ).results).toEqual([{
-      top_kind_name: 'variable',
-      top_operator_name: 'p',
-      arguments: [],
-      dummies: []
-    }]);
+      ).results)
+      .toEqual([
+        {
+          top_kind_name: 'variable',
+          top_operator_name: 'p',
+          arguments: [],
+          dummies: []
+        }
+      ]);
   });
 
   it('should reject mis-typed expressions', function() {
     expect(function() {
       logicProofTeacher.buildQuestion(
         'f(x,y)=z', 'f(x)=z', logicProofData.BASE_VOCABULARY);
-    }).toThrow(
-      {
-        message: 'f must have 1 arguments.'
-      }
-    );
+    })
+      .toThrow(
+        {message: 'f must have 1 arguments.'}
+      );
   });
 
   it('should forbid the use of reserved words', function() {
     expect(function() {
       logicProofTeacher.buildQuestion('we\u2227you', 'p=q',
         logicProofData.BASE_VOCABULARY);
-    }).toThrow(
-      {
-        message: (
-          'The name \'we\' is reserved for vocabulary and so cannot ' +
+    })
+      .toThrow(
+        {
+          message: (
+            'The name \'we\' is reserved for vocabulary and so cannot ' +
           'be used here.')
-      }
-    );
+        }
+      );
   });
 });

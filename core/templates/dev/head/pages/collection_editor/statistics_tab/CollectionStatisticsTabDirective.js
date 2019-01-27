@@ -25,4 +25,5 @@ oppia.directive('collectionStatisticsTab', [
         'collection_statistics_tab_directive.html'),
       controller: [function() {}]
     };
-  }]);
+  }
+]);

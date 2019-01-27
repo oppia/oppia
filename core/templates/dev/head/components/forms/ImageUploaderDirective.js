@@ -32,8 +32,9 @@ oppia.directive('imageUploader', [
       link: function(scope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();
-          $('.image-uploader-drop-area').removeClass(
-            'image-uploader-is-active');
+          $('.image-uploader-drop-area')
+            .removeClass(
+              'image-uploader-is-active');
         };
 
         var validateUploadedFile = function(file, filename) {
@@ -64,51 +65,59 @@ oppia.directive('imageUploader', [
           return null;
         };
 
-        $(elt).bind('drop', function(e) {
-          onDragEnd(e);
-          var file = e.originalEvent.dataTransfer.files[0];
-          scope.errorMessage = validateUploadedFile(file, file.name);
-          if (!scope.errorMessage) {
+        $(elt)
+          .bind('drop', function(e) {
+            onDragEnd(e);
+            var file = e.originalEvent.dataTransfer.files[0];
+            scope.errorMessage = validateUploadedFile(file, file.name);
+            if (!scope.errorMessage) {
             // Only fire this event if validations pass.
-            scope.onFileChanged(file, file.name);
-          }
-          scope.$apply();
-        });
+              scope.onFileChanged(file, file.name);
+            }
+            scope.$apply();
+          });
 
-        $(elt).bind('dragover', function(e) {
-          e.preventDefault();
-          $('.image-uploader-drop-area').addClass('image-uploader-is-active');
-        });
+        $(elt)
+          .bind('dragover', function(e) {
+            e.preventDefault();
+            $('.image-uploader-drop-area')
+              .addClass('image-uploader-is-active');
+          });
 
-        $(elt).bind('dragleave', onDragEnd);
+        $(elt)
+          .bind('dragleave', onDragEnd);
 
         // If the user accidentally drops an image outside of the image-uploader
         // we want to prevent the browser from applying normal drag-and-drop
         // logic, which is to load the image in the browser tab.
-        $(window).bind('dragover', function(e) {
-          e.preventDefault();
-        });
+        $(window)
+          .bind('dragover', function(e) {
+            e.preventDefault();
+          });
 
-        $(window).bind('drop', function(e) {
-          e.preventDefault();
-        });
+        $(window)
+          .bind('drop', function(e) {
+            e.preventDefault();
+          });
 
         // We generate a random class name to distinguish this input from
         // others in the DOM.
         scope.fileInputClassName = (
           'image-uploader-file-input' + IdGenerationService.generateNewId());
-        angular.element(document).on(
-          'change', '.' + scope.fileInputClassName, function(evt) {
-            var file = evt.currentTarget.files[0];
-            var filename = evt.target.value.split(/(\\|\/)/g).pop();
-            scope.errorMessage = validateUploadedFile(file, filename);
-            if (!scope.errorMessage) {
+        angular.element(document)
+          .on(
+            'change', '.' + scope.fileInputClassName, function(evt) {
+              var file = evt.currentTarget.files[0];
+              var filename = evt.target.value.split(/(\\|\/)/g)
+                .pop();
+              scope.errorMessage = validateUploadedFile(file, filename);
+              if (!scope.errorMessage) {
               // Only fire this event if validations pass.
-              scope.onFileChanged(file, filename);
+                scope.onFileChanged(file, filename);
+              }
+              scope.$apply();
             }
-            scope.$apply();
-          }
-        );
+          );
       }
     };
   }

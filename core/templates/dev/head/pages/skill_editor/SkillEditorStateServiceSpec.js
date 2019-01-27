@@ -77,7 +77,7 @@ describe('Skill editor state service', function() {
       [fakeSkillRightsBackendApiService][0]);
   }));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     SkillEditorStateService = $injector.get(
       'SkillEditorStateService');
     SkillObjectFactory = $injector.get('SkillObjectFactory');
@@ -142,7 +142,7 @@ describe('Skill editor state service', function() {
       skillRightsObject);
 
     fakeEditableSkillBackendApiService.newBackendSkillObject = skillDict;
-  }));
+  }]);
 
   it('should request to load the skill from the backend', function() {
     spyOn(fakeEditableSkillBackendApiService, 'fetchSkill').and.callThrough();
@@ -152,29 +152,38 @@ describe('Skill editor state service', function() {
   });
 
   it('should track whether it is currently loading the skill', function() {
-    expect(SkillEditorStateService.isLoadingSkill()).toBe(false);
+    expect(SkillEditorStateService.isLoadingSkill())
+      .toBe(false);
     SkillEditorStateService.loadSkill('1');
-    expect(SkillEditorStateService.isLoadingSkill()).toBe(true);
+    expect(SkillEditorStateService.isLoadingSkill())
+      .toBe(true);
     $rootScope.$apply();
-    expect(SkillEditorStateService.isLoadingSkill()).toBe(false);
+    expect(SkillEditorStateService.isLoadingSkill())
+      .toBe(false);
   });
 
   it('should indicate a collection is no longer loading after an error',
     function() {
-      expect(SkillEditorStateService.isLoadingSkill()).toBe(false);
+      expect(SkillEditorStateService.isLoadingSkill())
+        .toBe(false);
       fakeEditableSkillBackendApiService.failure = 'Internal 500 error';
       SkillEditorStateService.loadSkill('1');
-      expect(SkillEditorStateService.isLoadingSkill()).toBe(true);
+      expect(SkillEditorStateService.isLoadingSkill())
+        .toBe(true);
       $rootScope.$apply();
-      expect(SkillEditorStateService.isLoadingSkill()).toBe(false);
+      expect(SkillEditorStateService.isLoadingSkill())
+        .toBe(false);
     });
 
   it('should report that a skill has loaded through loadSkill()', function() {
-    expect(SkillEditorStateService.hasLoadedSkill()).toBe(false);
+    expect(SkillEditorStateService.hasLoadedSkill())
+      .toBe(false);
     var newSkill = SkillEditorStateService.loadSkill('1');
-    expect(SkillEditorStateService.hasLoadedSkill()).toBe(false);
+    expect(SkillEditorStateService.hasLoadedSkill())
+      .toBe(false);
     $rootScope.$apply();
-    expect(SkillEditorStateService.hasLoadedSkill()).toBe(true);
+    expect(SkillEditorStateService.hasLoadedSkill())
+      .toBe(true);
   });
 
   it('should return the last skill loaded as the same object', function() {
@@ -185,8 +194,10 @@ describe('Skill editor state service', function() {
     SkillEditorStateService.loadSkill('1');
     $rootScope.$apply();
     var actualSkill = SkillEditorStateService.getSkill();
-    expect(actualSkill).toEqual(expectedSkill);
-    expect(actualSkill).toBe(previousSkill);
+    expect(actualSkill)
+      .toEqual(expectedSkill);
+    expect(actualSkill)
+      .toBe(previousSkill);
     expect(actualSkill).not.toBe(expectedSkill);
   });
 
@@ -194,7 +205,8 @@ describe('Skill editor state service', function() {
     function() {
       expect(function() {
         SkillEditorStateService.saveSkill('commit message');
-      }).toThrow();
+      })
+        .toThrow();
     });
 
   it('should not save the skill if there are no pending changes',
@@ -202,7 +214,8 @@ describe('Skill editor state service', function() {
       SkillEditorStateService.loadSkill('1');
       $rootScope.$apply();
       expect(SkillEditorStateService.saveSkill(
-        'commit message')).toBe(false);
+        'commit message'))
+        .toBe(false);
     });
 
   it('should be able to save the collection and pending changes',
@@ -216,7 +229,8 @@ describe('Skill editor state service', function() {
       $rootScope.$apply();
 
       expect(SkillEditorStateService.saveSkill(
-        'commit message')).toBe(true);
+        'commit message'))
+        .toBe(true);
       $rootScope.$apply();
 
       var expectedId = '1';
@@ -224,9 +238,10 @@ describe('Skill editor state service', function() {
       var expectedCommitMessage = 'commit message';
       var updateSkillSpy = (
         fakeEditableSkillBackendApiService.updateSkill);
-      expect(updateSkillSpy).toHaveBeenCalledWith(
-        expectedId, expectedVersion, expectedCommitMessage,
-        jasmine.any(Object));
+      expect(updateSkillSpy)
+        .toHaveBeenCalledWith(
+          expectedId, expectedVersion, expectedCommitMessage,
+          jasmine.any(Object));
     });
 
   it('should track whether it is currently saving the skill',
@@ -236,12 +251,15 @@ describe('Skill editor state service', function() {
         SkillEditorStateService.getSkill(), 'new description');
       $rootScope.$apply();
 
-      expect(SkillEditorStateService.isSavingSkill()).toBe(false);
+      expect(SkillEditorStateService.isSavingSkill())
+        .toBe(false);
       SkillEditorStateService.saveSkill('commit message');
-      expect(SkillEditorStateService.isSavingSkill()).toBe(true);
+      expect(SkillEditorStateService.isSavingSkill())
+        .toBe(true);
 
       $rootScope.$apply();
-      expect(SkillEditorStateService.isSavingSkill()).toBe(false);
+      expect(SkillEditorStateService.isSavingSkill())
+        .toBe(false);
     });
 
   it('should indicate a skill is no longer saving after an error',
@@ -251,14 +269,17 @@ describe('Skill editor state service', function() {
         SkillEditorStateService.getSkill(), 'new description');
       $rootScope.$apply();
 
-      expect(SkillEditorStateService.isSavingSkill()).toBe(false);
+      expect(SkillEditorStateService.isSavingSkill())
+        .toBe(false);
       fakeEditableSkillBackendApiService.failure = 'Internal 500 error';
 
       SkillEditorStateService.saveSkill('commit message');
-      expect(SkillEditorStateService.isSavingSkill()).toBe(true);
+      expect(SkillEditorStateService.isSavingSkill())
+        .toBe(true);
 
       $rootScope.$apply();
-      expect(SkillEditorStateService.isSavingSkill()).toBe(false);
+      expect(SkillEditorStateService.isSavingSkill())
+        .toBe(false);
     });
 
   it('should request to load the skill rights from the backend',
@@ -273,10 +294,14 @@ describe('Skill editor state service', function() {
 
   it('should initially return an interstitial skill rights object', function() {
     var skillRights = SkillEditorStateService.getSkillRights();
-    expect(skillRights.getSkillId()).toEqual(null);
-    expect(skillRights.getCreatorId()).toEqual(null);
-    expect(skillRights.isPrivate()).toEqual(true);
-    expect(skillRights.canEditSkillDescription()).toEqual(false);
+    expect(skillRights.getSkillId())
+      .toEqual(null);
+    expect(skillRights.getCreatorId())
+      .toEqual(null);
+    expect(skillRights.isPrivate())
+      .toEqual(true);
+    expect(skillRights.canEditSkillDescription())
+      .toEqual(false);
   });
 
   it('should be able to set a new skill rights with an in-place copy',
@@ -289,9 +314,11 @@ describe('Skill editor state service', function() {
       SkillEditorStateService.setSkillRights(expectedSkillRights);
 
       var actualSkillRights = SkillEditorStateService.getSkillRights();
-      expect(actualSkillRights).toEqual(expectedSkillRights);
+      expect(actualSkillRights)
+        .toEqual(expectedSkillRights);
 
-      expect(actualSkillRights).toBe(previousSkillRights);
+      expect(actualSkillRights)
+        .toBe(previousSkillRights);
       expect(actualSkillRights).not.toBe(expectedSkillRights);
     }
   );

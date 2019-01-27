@@ -51,7 +51,7 @@ describe('Solution Verification Service', function() {
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     ess = $injector.get('ExplorationStatesService');
     siis = $injector.get('StateInteractionIdService');
     scas = $injector.get('StateCustomizationArgsService');
@@ -77,22 +77,26 @@ describe('Solution Verification Service', function() {
         },
         interaction: {
           id: 'TextInput',
-          answer_groups: [{
-            outcome: {
-              dest: 'End State',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'End State',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-            rule_specs: [{
-              inputs: {x: 'abc'},
-              rule_type: 'Contains'
-            }]
-          }],
+              rule_specs: [
+                {
+                  inputs: {x: 'abc'},
+                  rule_type: 'Contains'
+                }
+              ]
+            }
+          ],
           default_outcome: {
             dest: 'First State',
             feedback: {
@@ -103,17 +107,19 @@ describe('Solution Verification Service', function() {
             param_changes: [],
             refresher_exploration_id: null
           },
-          hints: [{
-            hint_content: {
-              content_id: 'hint_1',
-              html: 'one'
+          hints: [
+            {
+              hint_content: {
+                content_id: 'hint_1',
+                html: 'one'
+              }
+            }, {
+              hint_content: {
+                content_id: 'hint_2',
+                html: 'two'
+              }
             }
-          }, {
-            hint_content: {
-              content_id: 'hint_2',
-              html: 'two'
-            }
-          }]
+          ]
         },
         param_changes: []
       },
@@ -129,19 +135,21 @@ describe('Solution Verification Service', function() {
         },
         interaction: {
           id: 'TextInput',
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'default',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
+          answer_groups: [
+            {
+              rule_specs: [],
+              outcome: {
+                dest: 'default',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
             }
-          }],
+          ],
           default_outcome: {
             dest: 'default',
             feedback: {
@@ -155,7 +163,7 @@ describe('Solution Verification Service', function() {
         param_changes: []
       }
     });
-  }));
+  }]);
 
   describe('Success case', function() {
     it('should verify a correct solution', function() {
@@ -172,7 +180,8 @@ describe('Solution Verification Service', function() {
       expect(
         svs.verifySolution('First State', state.interaction,
           ess.getState('First State').interaction.solution.correctAnswer)
-      ).toBe(true);
+      )
+        .toBe(true);
 
       see.setInQuestionMode(true);
       state.interaction.answerGroups[0].outcome.dest = 'First State';
@@ -180,7 +189,8 @@ describe('Solution Verification Service', function() {
       expect(
         svs.verifySolution('First State', state.interaction,
           ess.getState('First State').interaction.solution.correctAnswer)
-      ).toBe(true);
+      )
+        .toBe(true);
     });
   });
 
@@ -199,7 +209,8 @@ describe('Solution Verification Service', function() {
       expect(
         svs.verifySolution('First State', state.interaction,
           ess.getState('First State').interaction.solution.correctAnswer)
-      ).toBe(false);
+      )
+        .toBe(false);
     });
   });
 });

@@ -18,24 +18,23 @@ oppia.directive('booleanEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
-      controller: ['$scope', function($scope) {
+      controller: [
+        '$scope', function($scope) {
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('value', function(newValue) {
-          $scope.localValue = {
-            label: newValue || false
-          };
-        }, true);
+          $scope.$watch('value', function(newValue) {
+            $scope.localValue = {label: newValue || false};
+          }, true);
 
-        $scope.$watch('localValue.label', function(newValue) {
-          $scope.value = newValue;
-        });
-      }],
+          $scope.$watch('localValue.label', function(newValue) {
+            $scope.value = newValue;
+          });
+        }
+      ],
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/boolean_editor_directive.html'),
     };
-  }]);
+  }
+]);

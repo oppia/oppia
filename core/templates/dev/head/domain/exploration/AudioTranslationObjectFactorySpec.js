@@ -22,7 +22,7 @@ describe('AudioTranslation object factory', function() {
   describe('AudioTranslationObjectFactory', function() {
     var scope, atof, audioTranslation;
 
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(inject[function($injector, $rootScope) {
       scope = $rootScope.$new();
       atof = $injector.get('AudioTranslationObjectFactory');
       audioTranslation = atof.createFromBackendDict({
@@ -30,55 +30,61 @@ describe('AudioTranslation object factory', function() {
         file_size_bytes: 200000,
         needs_update: false
       });
-    }));
+    }]);
 
-    it('should correctly mark audio as needing update', inject(function() {
+    it('should correctly mark audio as needing update', inject[function() {
       audioTranslation.markAsNeedingUpdate();
-      expect(audioTranslation).toEqual(atof.createFromBackendDict({
-        filename: 'a.mp3',
-        file_size_bytes: 200000,
-        needs_update: true
-      }));
-    }));
+      expect(audioTranslation)
+        .toEqual(atof.createFromBackendDict({
+          filename: 'a.mp3',
+          file_size_bytes: 200000,
+          needs_update: true
+        }));
+    }]);
 
-    it('should toggle needs update attribute correctly', inject(function() {
+    it('should toggle needs update attribute correctly', inject[function() {
       audioTranslation.toggleNeedsUpdateAttribute();
-      expect(audioTranslation).toEqual(atof.createFromBackendDict({
-        filename: 'a.mp3',
-        file_size_bytes: 200000,
-        needs_update: true
-      }));
+      expect(audioTranslation)
+        .toEqual(atof.createFromBackendDict({
+          filename: 'a.mp3',
+          file_size_bytes: 200000,
+          needs_update: true
+        }));
 
       audioTranslation.toggleNeedsUpdateAttribute();
-      expect(audioTranslation).toEqual(atof.createFromBackendDict({
-        filename: 'a.mp3',
-        file_size_bytes: 200000,
-        needs_update: false
-      }));
-    }));
-
-    it('should convert to backend dict correctly', inject(function() {
-      expect(audioTranslation.toBackendDict()).toEqual({
-        filename: 'a.mp3',
-        file_size_bytes: 200000,
-        needs_update: false
-      });
-    }));
-
-    it('should create a new audio translation', inject(function() {
-      expect(atof.createNew('filename.mp3', 100000)).toEqual(
-        atof.createFromBackendDict({
-          filename: 'filename.mp3',
-          file_size_bytes: 100000,
+      expect(audioTranslation)
+        .toEqual(atof.createFromBackendDict({
+          filename: 'a.mp3',
+          file_size_bytes: 200000,
           needs_update: false
-        })
-      );
-    }));
+        }));
+    }]);
 
-    it('should get the correct file size in MB', inject(function() {
+    it('should convert to backend dict correctly', inject[function() {
+      expect(audioTranslation.toBackendDict())
+        .toEqual({
+          filename: 'a.mp3',
+          file_size_bytes: 200000,
+          needs_update: false
+        });
+    }]);
+
+    it('should create a new audio translation', inject[function() {
+      expect(atof.createNew('filename.mp3', 100000))
+        .toEqual(
+          atof.createFromBackendDict({
+            filename: 'filename.mp3',
+            file_size_bytes: 100000,
+            needs_update: false
+          })
+        );
+    }]);
+
+    it('should get the correct file size in MB', inject[function() {
       var NUM_BYTES_IN_MB = 1 << 20;
-      expect(audioTranslation.getFileSizeMB()).toEqual(
-        200000 / NUM_BYTES_IN_MB);
-    }));
+      expect(audioTranslation.getFileSizeMB())
+        .toEqual(
+          200000 / NUM_BYTES_IN_MB);
+    }]);
   });
 });

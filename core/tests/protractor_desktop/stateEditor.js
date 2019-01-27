@@ -97,8 +97,9 @@ describe('State editor', function() {
     explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'final card', true, null);
+    explorationEditorMainTab.getResponseEditor('default')
+      .setDestination(
+        'final card', true, null);
 
     // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
@@ -126,16 +127,19 @@ describe('State editor', function() {
       function(richTextEditor) {
         richTextEditor.appendBoldText('correct');
       }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
-    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
-      'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
+    explorationEditorMainTab.getResponseEditor(0)
+      .expectRuleToBe(
+        'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
     explorationEditorMainTab.getResponseEditor(0)
       .expectFeedbackInstructionToBe('correct');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('out of bounds'));
+    explorationEditorMainTab.getResponseEditor('default')
+      .setFeedback(
+        forms.toRichText('out of bounds'));
     explorationEditorMainTab.getResponseEditor('default')
       .expectFeedbackInstructionToBe('out of bounds');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      null, false, null);
+    explorationEditorMainTab.getResponseEditor('default')
+      .setDestination(
+        null, false, null);
 
     // Setup a terminating state.
 
@@ -194,10 +198,12 @@ describe('State editor', function() {
     // does not have any customization options. To dismiss this modal, user
     // clicks 'Okay' implying that he/she has got the message.
     explorationEditorMainTab.setInteraction('NumericInput');
-    element(by.css('.protractor-test-interaction')).click();
+    element(by.css('.protractor-test-interaction'))
+      .click();
     var okayBtn = element(
       by.css('.protractor-test-close-no-customization-modal'));
-    expect(okayBtn.isPresent()).toBe(true);
+    expect(okayBtn.isPresent())
+      .toBe(true);
     okayBtn.click();
 
     // Continue input has customization options. Therefore, on re-clicking, a
@@ -206,10 +212,12 @@ describe('State editor', function() {
     // button.
     explorationEditorMainTab.deleteInteraction();
     explorationEditorMainTab.setInteraction('Continue');
-    element(by.css('.protractor-test-interaction')).click();
+    element(by.css('.protractor-test-interaction'))
+      .click();
     var saveInteractionBtn = element(
       by.css('.protractor-test-save-interaction'));
-    expect(saveInteractionBtn.isPresent()).toBe(true);
+    expect(saveInteractionBtn.isPresent())
+      .toBe(true);
     saveInteractionBtn.click();
 
     users.logout();
@@ -233,8 +241,9 @@ describe('State editor', function() {
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('You must be happy!'),
       'I am happy', true, 'FuzzyEquals', 'happy');
-    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
-      'TextInput', 'FuzzyEquals', ['"happy"']);
+    explorationEditorMainTab.getResponseEditor(0)
+      .expectRuleToBe(
+        'TextInput', 'FuzzyEquals', ['"happy"']);
     explorationEditorMainTab.getResponseEditor(0)
       .expectFeedbackInstructionToBe('You must be happy!');
     // Verify newly created state.
@@ -245,8 +254,9 @@ describe('State editor', function() {
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('You cannot be sad!'),
       '(try again)', false, 'FuzzyEquals', 'sad');
-    explorationEditorMainTab.getResponseEditor(1).expectRuleToBe(
-      'TextInput', 'FuzzyEquals', ['"sad"']);
+    explorationEditorMainTab.getResponseEditor(1)
+      .expectRuleToBe(
+        'TextInput', 'FuzzyEquals', ['"sad"']);
     explorationEditorPage.saveChanges();
     users.logout();
   });
@@ -290,8 +300,9 @@ describe('State editor', function() {
       [forms.toRichText('return'), forms.toRichText('complete')]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 2', false, 'Equals', 'return');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'final card', true, null);
+    explorationEditorMainTab.getResponseEditor('default')
+      .setDestination(
+        'final card', true, null);
     // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
     explorationEditorMainTab.setInteraction('EndExploration');
@@ -339,11 +350,14 @@ describe('State editor', function() {
       'NumericInput', forms.toRichText('What is the product of 8 and 8?'),
       '2nd Question', true, 'Equals', 64);
     // Verify rule parameter input by checking editor's response tab.
-    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
-      'NumericInput', 'Equals', ['64']);
+    explorationEditorMainTab.getResponseEditor(0)
+      .expectRuleToBe(
+        'NumericInput', 'Equals', ['64']);
     explorationEditorMainTab.addHint('hint one');
-    explorationEditorMainTab.getHintEditor(0).setHint('modified hint one');
-    explorationEditorMainTab.getHintEditor(0).deleteHint();
+    explorationEditorMainTab.getHintEditor(0)
+      .setHint('modified hint one');
+    explorationEditorMainTab.getHintEditor(0)
+      .deleteHint();
     explorationEditorPage.saveChanges();
     users.logout();
   });
@@ -385,8 +399,9 @@ describe('State editor', function() {
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
       'Finnish');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
+    explorationEditorMainTab.getResponseEditor('default')
+      .setFeedback(
+        forms.toRichText('Try again'));
     explorationEditorMainTab.addHint('Try language of Finland');
     explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'Finnish',
@@ -445,8 +460,9 @@ describe('State editor', function() {
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Good job'), 'Two', true, 'Equals',
       'One');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
+    explorationEditorMainTab.getResponseEditor('default')
+      .setFeedback(
+        forms.toRichText('Try again'));
 
     explorationEditorMainTab.moveToState('Two');
     explorationEditorMainTab.setContent(
@@ -455,8 +471,9 @@ describe('State editor', function() {
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Good job'), 'Three', true, 'Equals',
       'Two');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
+    explorationEditorMainTab.getResponseEditor('default')
+      .setFeedback(
+        forms.toRichText('Try again'));
     explorationEditorMainTab.addHint('The number 2 in words.');
     explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'Two',
@@ -469,8 +486,9 @@ describe('State editor', function() {
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
       'Three');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
+    explorationEditorMainTab.getResponseEditor('default')
+      .setFeedback(
+        forms.toRichText('Try again'));
 
     explorationEditorMainTab.moveToState('End');
     explorationEditorMainTab.setInteraction('EndExploration');
@@ -551,21 +569,25 @@ describe('State editor', function() {
       var heightMessage = element(by.css('.oppia-card-height-limit-warning'));
 
       richTextEditor.appendPlainText(content);
-      expect(heightMessage.isPresent()).toBe(false);
+      expect(heightMessage.isPresent())
+        .toBe(false);
 
       richTextEditor.appendPlainText('\n\n\nline5');
       waitFor.visibilityOf(
         heightMessage, 'Card height limit message not displayed');
 
       richTextEditor.appendPlainText('\b\b\b\b\b\b\b\b');
-      expect(heightMessage.isPresent()).toBe(false);
+      expect(heightMessage.isPresent())
+        .toBe(false);
 
       richTextEditor.appendPlainText('\n\n\nline5');
       waitFor.visibilityOf(
         heightMessage, 'Card height limit message not displayed');
 
-      element(by.css('.oppia-hide-card-height-warning-icon')).click();
-      expect(heightMessage.isPresent()).toBe(false);
+      element(by.css('.oppia-hide-card-height-warning-icon'))
+        .click();
+      expect(heightMessage.isPresent())
+        .toBe(false);
 
       users.logout();
     });

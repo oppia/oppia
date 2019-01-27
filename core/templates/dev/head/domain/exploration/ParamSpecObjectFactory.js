@@ -36,9 +36,7 @@ oppia.factory('ParamSpecObjectFactory', [
 
     /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
     ParamSpec.prototype.toBackendDict = function() {
-      return {
-        obj_type: this._objType.getName(),
-      };
+      return {obj_type: this._objType.getName(), };
     };
 
     /**

@@ -84,30 +84,32 @@ oppia.directive('questionsTab', [
             if (!$scope.questionIsBeingUpdated) {
               EditableQuestionBackendApiService.createQuestion(
                 $scope.skill.getId(), $scope.question.toBackendDict(true)
-              ).then(function() {
-                SkillEditorStateService.fetchQuestionSummaries(
-                  $scope.skill.getId(), true
-                );
-                $scope.currentPage = 0;
-              });
+              )
+                .then(function() {
+                  SkillEditorStateService.fetchQuestionSummaries(
+                    $scope.skill.getId(), true
+                  );
+                  $scope.currentPage = 0;
+                });
             } else {
               if (QuestionUndoRedoService.hasChanges()) {
                 $scope.questionIsBeingSaved = true;
                 // TODO(tjiang11): Allow user to specify a commit message.
                 EditableQuestionBackendApiService.updateQuestion(
                   $scope.questionId, $scope.question.getVersion(), 'blank',
-                  QuestionUndoRedoService.getCommittableChangeList()).then(
-                  function() {
-                    QuestionUndoRedoService.clearChanges();
-                    SkillEditorStateService.fetchQuestionSummaries(
-                      $scope.skill.getId(), true
-                    );
-                    $scope.questionIsBeingSaved = false;
-                  }, function(error) {
-                    AlertsService.addWarning(
-                      error || 'There was an error saving the question.');
-                    $scope.questionIsBeingSaved = false;
-                  });
+                  QuestionUndoRedoService.getCommittableChangeList())
+                  .then(
+                    function() {
+                      QuestionUndoRedoService.clearChanges();
+                      SkillEditorStateService.fetchQuestionSummaries(
+                        $scope.skill.getId(), true
+                      );
+                      $scope.questionIsBeingSaved = false;
+                    }, function(error) {
+                      AlertsService.addWarning(
+                        error || 'There was an error saving the question.');
+                      $scope.questionIsBeingSaved = false;
+                    });
               }
             }
           };
@@ -123,19 +125,25 @@ oppia.directive('questionsTab', [
 
           $scope.editQuestion = function(questionSummary) {
             EditableQuestionBackendApiService.fetchQuestion(
-              questionSummary.id).then(function(response) {
-              $scope.question =
+              questionSummary.id)
+              .then(function(response) {
+                response.associated_skill_dicts.forEach(function(skillDict) {
+                  skillDict.misconceptions.forEach(function(misconception) {
+                    $scope.misconceptions.append(misconception);
+                  });
+                });
+                $scope.question =
                 QuestionObjectFactory.createFromBackendDict(
                   response.question_dict);
-              $scope.questionId = $scope.question.getId();
-              $scope.questionStateData = $scope.question.getStateData();
-              $scope.questionIsBeingUpdated = true;
+                $scope.questionId = $scope.question.getId();
+                $scope.questionStateData = $scope.question.getStateData();
+                $scope.questionIsBeingUpdated = true;
 
-              $scope.openQuestionEditor();
-            }, function(errorResponse) {
-              AlertsService.addWarning(
-                errorResponse.error || 'Failed to fetch question.');
-            });
+                $scope.openQuestionEditor();
+              }, function(errorResponse) {
+                AlertsService.addWarning(
+                  errorResponse.error || 'Failed to fetch question.');
+              });
           };
 
           $scope.openQuestionEditor = function() {
@@ -188,4 +196,5 @@ oppia.directive('questionsTab', [
         }
       ]
     };
-  }]);
+  }
+]);

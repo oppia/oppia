@@ -47,34 +47,40 @@ oppia.factory('PlaythroughIssuesService', [
     };
 
     var renderEarlyQuitIssueSuggestions = function(issue) {
-      var suggestions = [$sce.trustAsHtml(
-        'Review the cards up to and including <span class="state_link">' +
+      var suggestions = [
+        $sce.trustAsHtml(
+          'Review the cards up to and including <span class="state_link">' +
         '"' + issue.issueCustomizationArgs.state_name.value + '"</span> for' +
         ' errors, ambiguities or insufficient motivation.'
-      )];
+        )
+      ];
       return suggestions;
     };
 
     var renderMultipleIncorrectIssueSuggestions = function(stateName) {
-      var suggestions = [$sce.trustAsHtml(
-        'Check the wording of the card <span class="state_link">"' +
+      var suggestions = [
+        $sce.trustAsHtml(
+          'Check the wording of the card <span class="state_link">"' +
         stateName + '</span> to ensure it is not confusing.'
-      ), $sce.trustAsHtml(
-        'Consider addressing the answers submitted in the sample playthroughs' +
-        ' explicitly, using answer groups.'
-      )];
+        ), $sce.trustAsHtml(
+          'Consider addressing the answers submitted in the sample' +
+        ' playthroughs explicitly, using answer groups.'
+        )
+      ];
       return suggestions;
     };
 
     var renderCyclicTransitionsIssueSuggestions = function(issue) {
       var stateNames = issue.issueCustomizationArgs.state_names.value;
       var finalIndex = stateNames.length - 1;
-      var suggestions = [$sce.trustAsHtml(
-        'Check that the concept presented in <span class="state_link">"' +
+      var suggestions = [
+        $sce.trustAsHtml(
+          'Check that the concept presented in <span class="state_link">"' +
         stateNames[0] + '"</span> has been reinforced sufficiently by the ' +
         'time the learner gets to <span class="state_link">"' +
         stateNames[finalIndex] + '</span>.'
-      )];
+        )
+      ];
       return suggestions;
     };
 
@@ -90,18 +96,34 @@ oppia.factory('PlaythroughIssuesService', [
       initSession: function(newExplorationId, newExplorationVersion) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
+        if (testOnlyWhitelistedExplorationIds !== undefined) {
+          whitelistedExplorationIds = testOnlyWhitelistedExplorationIds;
+        } else {
+          PlaythroughIssuesBackendApiService
+            .fetchWhitelistedExplorationsForPlaythroughs()
+            .then(
+              function(newWhitelistedExplorationIds) {
+                whitelistedExplorationIds = newWhitelistedExplorationIds;
+              });
+        }
+      },
+      isExplorationEligibleForPlaythroughIssues: function(explorationId) {
+        return whitelistedExplorationIds !== null &&
+          whitelistedExplorationIds.indexOf(explorationId) !== -1;
       },
       getIssues: function() {
         return PlaythroughIssuesBackendApiService.fetchIssues(
-          explorationId, explorationVersion).then(function(issues) {
-          return issues;
-        });
+          explorationId, explorationVersion)
+          .then(function(issues) {
+            return issues;
+          });
       },
       getPlaythrough: function(playthroughId) {
         return PlaythroughIssuesBackendApiService.fetchPlaythrough(
-          explorationId, playthroughId).then(function(playthrough) {
-          return playthrough;
-        });
+          explorationId, playthroughId)
+          .then(function(playthrough) {
+            return playthrough;
+          });
       },
       renderIssueStatement: function(issue) {
         var issueType = issue.issueType;
@@ -131,4 +153,5 @@ oppia.factory('PlaythroughIssuesService', [
           issue, explorationId, explorationVersion);
       }
     };
-  }]);
+  }
+]);

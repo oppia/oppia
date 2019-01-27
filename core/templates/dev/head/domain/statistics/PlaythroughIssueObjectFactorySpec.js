@@ -19,18 +19,23 @@
 describe('Playthrough Issue Object Factory', function() {
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     this.piof = $injector.get('PlaythroughIssueObjectFactory');
-  }));
+  }]);
 
   it('should create a new exploration issue', function() {
     var explorationIssueObject = new this.piof('EarlyQuit', {}, [], 1, true);
 
-    expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
-    expect(explorationIssueObject.issueCustomizationArgs).toEqual({});
-    expect(explorationIssueObject.playthroughIds).toEqual([]);
-    expect(explorationIssueObject.schemaVersion).toEqual(1);
-    expect(explorationIssueObject.isValid).toEqual(true);
+    expect(explorationIssueObject.issueType)
+      .toEqual('EarlyQuit');
+    expect(explorationIssueObject.issueCustomizationArgs)
+      .toEqual({});
+    expect(explorationIssueObject.playthroughIds)
+      .toEqual([]);
+    expect(explorationIssueObject.schemaVersion)
+      .toEqual(1);
+    expect(explorationIssueObject.isValid)
+      .toEqual(true);
   });
 
   it('should create a new exploration issue from a backend dict', function() {
@@ -42,10 +47,15 @@ describe('Playthrough Issue Object Factory', function() {
       is_valid: true
     });
 
-    expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
-    expect(explorationIssueObject.issueCustomizationArgs).toEqual({});
-    expect(explorationIssueObject.playthroughIds).toEqual([]);
-    expect(explorationIssueObject.schemaVersion).toEqual(1);
-    expect(explorationIssueObject.isValid).toEqual(true);
+    expect(explorationIssueObject.issueType)
+      .toEqual('EarlyQuit');
+    expect(explorationIssueObject.issueCustomizationArgs)
+      .toEqual({});
+    expect(explorationIssueObject.playthroughIds)
+      .toEqual([]);
+    expect(explorationIssueObject.schemaVersion)
+      .toEqual(1);
+    expect(explorationIssueObject.isValid)
+      .toEqual(true);
   });
 });

@@ -17,7 +17,8 @@
  * particular answer from some particular state.
  */
 
-oppia.factory('AnswerStatsObjectFactory', [function() {
+oppia.factory('AnswerStatsObjectFactory', [
+  function() {
   /**
    * @constructor
    * @param {*} answer - raw answer object.
@@ -26,26 +27,26 @@ oppia.factory('AnswerStatsObjectFactory', [function() {
    * @param {boolean} isAddressed - whether this answer is addressed by the
    *    associated state's answer groups.
    */
-  var AnswerStats = function(answer, answerHtml, frequency, isAddressed) {
+    var AnswerStats = function(answer, answerHtml, frequency, isAddressed) {
     /** @type {*} */
-    this.answer = angular.copy(answer);
-    /** @type {string} */
-    this.answerHtml = answerHtml;
-    /** @type {number} */
-    this.frequency = frequency;
-    /** @type {boolean} */
-    this.isAddressed = isAddressed;
-  };
-
-  /** @returns {answer, frequency: number} */
-  AnswerStats.prototype.toBackendDict = function() {
-    return {
-      answer: angular.copy(this.answer),
-      frequency: this.frequency
+      this.answer = angular.copy(answer);
+      /** @type {string} */
+      this.answerHtml = answerHtml;
+      /** @type {number} */
+      this.frequency = frequency;
+      /** @type {boolean} */
+      this.isAddressed = isAddressed;
     };
-  };
 
-  /**
+    /** @returns {answer, frequency: number} */
+    AnswerStats.prototype.toBackendDict = function() {
+      return {
+        answer: angular.copy(this.answer),
+        frequency: this.frequency
+      };
+    };
+
+    /**
    * Returns a stale instance; specifically, {@link AnswerStats.isAddressed}
    * will always be false.
    * Use {@link StateTopAnswerStatsService#refreshStateStats} to keep these
@@ -54,14 +55,15 @@ oppia.factory('AnswerStatsObjectFactory', [function() {
    * @param {{answer, frequency: number}} backendDict
    * @returns {AnswerStats}
    */
-  AnswerStats.createFromBackendDict = function(backendDict) {
+    AnswerStats.createFromBackendDict = function(backendDict) {
     // TODO(brianrodri): Use a proper service which takes the state's
     // interaction type into account for generating the answer's HTML.
-    var answerHtml = (typeof backendDict.answer === 'string') ?
+      var answerHtml = (typeof backendDict.answer === 'string') ?
       backendDict.answer : angular.toJson(backendDict.answer);
-    return new AnswerStats(
-      backendDict.answer, answerHtml, backendDict.frequency, false);
-  };
+      return new AnswerStats(
+        backendDict.answer, answerHtml, backendDict.frequency, false);
+    };
 
-  return AnswerStats;
-}]);
+    return AnswerStats;
+  }
+]);

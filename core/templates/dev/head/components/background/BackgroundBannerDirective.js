@@ -27,7 +27,9 @@ oppia.directive('backgroundBanner', [
         '$scope',
         function($scope) {
           var possibleBannerFilenames = [
-            'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
+            'bannerA.svg', 'bannerB.svg',
+            'bannerC.svg', 'bannerD.svg'
+          ];
           var bannerImageFilename = possibleBannerFilenames[
             Math.floor(Math.random() * possibleBannerFilenames.length)];
           $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
@@ -35,4 +37,5 @@ oppia.directive('backgroundBanner', [
         }
       ]
     };
-  }]);
+  }
+]);

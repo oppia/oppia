@@ -19,65 +19,66 @@ oppia.directive('musicPhraseEditor', [
   function(UrlInterpolationService, AlertsService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/music_phrase_editor_directive.html'),
-      controller: ['$scope', function($scope) {
+      controller: [
+        '$scope', function($scope) {
         // The maximum number of notes allowed in a music phrase.
-        var _MAX_NOTES_IN_PHRASE = 8;
+          var _MAX_NOTES_IN_PHRASE = 8;
 
-        $scope.schema = {
-          type: 'list',
-          items: {
-            type: 'unicode',
-            choices: [
-              'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5',
-              'G5', 'A5'
-            ]
-          },
-          ui_config: {
-            add_element_text: 'Add Note ♩'
-          },
-          validators: [{
-            id: 'has_length_at_most',
-            max_value: _MAX_NOTES_IN_PHRASE
-          }]
-        };
-
-        // Reset the component each time the value changes (e.g. if this is part
-        // of an editable list).
-        $scope.$watch('value', function(newValue) {
-          // TODO(sll): Check that $scope.value is a list.
-          $scope.localValue = [];
-          if (newValue) {
-            for (var i = 0; i < newValue.length; i++) {
-              $scope.localValue.push(newValue[i].readableNoteName);
-            }
-          }
-        }, true);
-
-        $scope.$watch('localValue', function(newValue, oldValue) {
-          if (newValue && oldValue) {
-            if (newValue.length > _MAX_NOTES_IN_PHRASE) {
-              AlertsService.addWarning(
-                'There are too many notes on the staff.');
-            } else {
-              var parentValues = [];
-              for (var i = 0; i < newValue.length; i++) {
-                parentValues.push({
-                  readableNoteName: newValue[i],
-                  noteDuration: {
-                    num: 1,
-                    den: 1
-                  }
-                });
+          $scope.schema = {
+            type: 'list',
+            items: {
+              type: 'unicode',
+              choices: [
+                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5',
+                'F5', 'G5', 'A5'
+              ]
+            },
+            ui_config: {add_element_text: 'Add Note ♩'},
+            validators: [
+              {
+                id: 'has_length_at_most',
+                max_value: _MAX_NOTES_IN_PHRASE
               }
-              $scope.value = parentValues;
+            ]
+          };
+
+          // Reset the component each time the value changes (e.g. if this is part
+          // of an editable list).
+          $scope.$watch('value', function(newValue) {
+          // TODO(sll): Check that $scope.value is a list.
+            $scope.localValue = [];
+            if (newValue) {
+              for (var i = 0; i < newValue.length; i++) {
+                $scope.localValue.push(newValue[i].readableNoteName);
+              }
             }
-          }
-        }, true);
-      }]
+          }, true);
+
+          $scope.$watch('localValue', function(newValue, oldValue) {
+            if (newValue && oldValue) {
+              if (newValue.length > _MAX_NOTES_IN_PHRASE) {
+                AlertsService.addWarning(
+                  'There are too many notes on the staff.');
+              } else {
+                var parentValues = [];
+                for (var i = 0; i < newValue.length; i++) {
+                  parentValues.push({
+                    readableNoteName: newValue[i],
+                    noteDuration: {
+                      num: 1,
+                      den: 1
+                    }
+                  });
+                }
+                $scope.value = parentValues;
+              }
+            }
+          }, true);
+        }
+      ]
     };
-  }]);
+  }
+]);

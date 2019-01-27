@@ -17,37 +17,39 @@
    domain objects.
  */
 
-oppia.factory('SuggestionObjectFactory', [function() {
-  var Suggestion = function(
-      suggestionType, suggestionId, targetType, targetId, status, authorName,
-      stateName, newValue, oldValue, lastUpdated) {
-    this.suggestionType = suggestionType;
-    this.suggestionId = suggestionId;
-    this.targetType = targetType;
-    this.targetId = targetId;
-    this.status = status;
-    this.authorName = authorName;
-    this.stateName = stateName;
-    this.newValue = newValue;
-    this.oldValue = oldValue;
-    this.lastUpdated = lastUpdated;
-  };
+oppia.factory('SuggestionObjectFactory', [
+  function() {
+    var Suggestion = function(
+        suggestionType, suggestionId, targetType, targetId, status, authorName,
+        stateName, newValue, oldValue, lastUpdated) {
+      this.suggestionType = suggestionType;
+      this.suggestionId = suggestionId;
+      this.targetType = targetType;
+      this.targetId = targetId;
+      this.status = status;
+      this.authorName = authorName;
+      this.stateName = stateName;
+      this.newValue = newValue;
+      this.oldValue = oldValue;
+      this.lastUpdated = lastUpdated;
+    };
 
-  Suggestion.prototype.getThreadId = function() {
-    return this.suggestionId;
-  };
+    Suggestion.prototype.getThreadId = function() {
+      return this.suggestionId;
+    };
 
-  Suggestion.createFromBackendDict = function(suggestionBackendDict) {
-    return new Suggestion(
-      suggestionBackendDict.suggestion_type,
-      suggestionBackendDict.suggestion_id, suggestionBackendDict.target_type,
-      suggestionBackendDict.target_id, suggestionBackendDict.status,
-      suggestionBackendDict.author_name,
-      suggestionBackendDict.change.state_name,
-      suggestionBackendDict.change.new_value,
-      suggestionBackendDict.change.old_value,
-      suggestionBackendDict.last_updated);
-  };
+    Suggestion.createFromBackendDict = function(suggestionBackendDict) {
+      return new Suggestion(
+        suggestionBackendDict.suggestion_type,
+        suggestionBackendDict.suggestion_id, suggestionBackendDict.target_type,
+        suggestionBackendDict.target_id, suggestionBackendDict.status,
+        suggestionBackendDict.author_name,
+        suggestionBackendDict.change.state_name,
+        suggestionBackendDict.change.new_value,
+        suggestionBackendDict.change.old_value,
+        suggestionBackendDict.last_updated);
+    };
 
-  return Suggestion;
-}]);
+    return Suggestion;
+  }
+]);

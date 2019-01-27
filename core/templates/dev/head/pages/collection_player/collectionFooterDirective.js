@@ -21,9 +21,7 @@ oppia.directive('collectionFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        twitterText: '@'
-      },
+      scope: {twitterText: '@'},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_player/' +
         'collection_footer_directive.html'),
@@ -40,4 +38,5 @@ oppia.directive('collectionFooter', [
         }
       ]
     };
-  }]);
+  }
+]);

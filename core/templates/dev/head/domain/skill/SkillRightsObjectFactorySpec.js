@@ -21,9 +21,9 @@ describe('Skill rights object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     SkillRightsObjectFactory = $injector.get('SkillRightsObjectFactory');
-  }));
+  }]);
 
   it('should be able to set public', function() {
     var initialSkillRightsBackendObject = {
@@ -36,23 +36,31 @@ describe('Skill rights object factory', function() {
     var skillRights = SkillRightsObjectFactory.createFromBackendDict(
       initialSkillRightsBackendObject);
 
-    expect(skillRights.isPublic()).toBe(false);
-    expect(skillRights.isPrivate()).toBe(true);
+    expect(skillRights.isPublic())
+      .toBe(false);
+    expect(skillRights.isPrivate())
+      .toBe(true);
 
     skillRights.setPublic();
 
-    expect(skillRights.isPublic()).toBe(true);
-    expect(skillRights.isPrivate()).toBe(false);
+    expect(skillRights.isPublic())
+      .toBe(true);
+    expect(skillRights.isPrivate())
+      .toBe(false);
   });
 
   it('should create an interstitial skill rights object', function() {
     var interstitialSkillRights =
       SkillRightsObjectFactory.createInterstitialSkillRights();
 
-    expect(interstitialSkillRights.getSkillId()).toEqual(null);
-    expect(interstitialSkillRights.getCreatorId()).toEqual(null);
-    expect(interstitialSkillRights.isPrivate()).toBe(true);
-    expect(interstitialSkillRights.canEditSkillDescription()).toBe(false);
+    expect(interstitialSkillRights.getSkillId())
+      .toEqual(null);
+    expect(interstitialSkillRights.getCreatorId())
+      .toEqual(null);
+    expect(interstitialSkillRights.isPrivate())
+      .toBe(true);
+    expect(interstitialSkillRights.canEditSkillDescription())
+      .toBe(false);
   });
 
   it('should make a copy from another skill rights object', function() {
@@ -70,9 +78,13 @@ describe('Skill rights object factory', function() {
       SkillRightsObjectFactory.createInterstitialSkillRights();
 
     interstitialSkillRights.copyFromSkillRights(sampleSkillRights);
-    expect(interstitialSkillRights.getSkillId()).toEqual('1');
-    expect(interstitialSkillRights.getCreatorId()).toEqual('2');
-    expect(interstitialSkillRights.canEditSkillDescription()).toBe(true);
-    expect(interstitialSkillRights.isPrivate()).toBe(false);
+    expect(interstitialSkillRights.getSkillId())
+      .toEqual('1');
+    expect(interstitialSkillRights.getCreatorId())
+      .toEqual('2');
+    expect(interstitialSkillRights.canEditSkillDescription())
+      .toBe(true);
+    expect(interstitialSkillRights.isPrivate())
+      .toBe(false);
   });
 });

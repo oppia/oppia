@@ -24,8 +24,10 @@ var customizeInteraction = function(interactionEditor, graphDict) {
   var graphInputContainer = interactionEditor.element(by.css(
     '.protractor-test-graph-input-viz-container'));
   if (graphDict) {
-    forms.GraphEditor(graphInputContainer).clearDefaultGraph();
-    forms.GraphEditor(graphInputContainer).setValue(graphDict);
+    forms.GraphEditor(graphInputContainer)
+      .clearDefaultGraph();
+    forms.GraphEditor(graphInputContainer)
+      .setValue(graphDict);
   }
 };
 
@@ -45,7 +47,8 @@ var submitAnswer = function(conversationInput, graphDict) {
   var graphInputContainer = conversationInput.element(by.css(
     '.protractor-test-graph-input-viz-container'));
   if (graphDict) {
-    forms.GraphEditor(graphInputContainer).setValue(graphDict);
+    forms.GraphEditor(graphInputContainer)
+      .setValue(graphDict);
   }
   var submitAnswerButton = element(by.css(
     '.protractor-test-submit-answer-button'));
@@ -55,26 +58,22 @@ var submitAnswer = function(conversationInput, graphDict) {
 };
 
 var answerObjectType = 'Graph';
-var initialGraph = {
-  vertices: [[277, 77], [248, 179], [405, 144]]
-};
+var initialGraph = {vertices: [[277, 77], [248, 179], [405, 144]]};
 var responseGraphDict = {
   edges: [[0, 1], [1, 2], [0, 2]],
   vertices: [[277, 77], [248, 179], [405, 144]]
 };
-var wrongAnswerGraph = {
-  edges: [[0, 1], [1, 2]]
-};
-var correctAnswerGraph = {
-  edges: [[0, 1], [1, 2], [0, 2]]
-};
-var testSuite = [{
-  interactionArguments: [initialGraph],
-  ruleArguments: ['IsIsomorphicTo', responseGraphDict],
-  expectedInteractionDetails: [initialGraph],
-  wrongAnswers: [wrongAnswerGraph],
-  correctAnswers: [correctAnswerGraph]
-}];
+var wrongAnswerGraph = {edges: [[0, 1], [1, 2]]};
+var correctAnswerGraph = {edges: [[0, 1], [1, 2], [0, 2]]};
+var testSuite = [
+  {
+    interactionArguments: [initialGraph],
+    ruleArguments: ['IsIsomorphicTo', responseGraphDict],
+    expectedInteractionDetails: [initialGraph],
+    wrongAnswers: [wrongAnswerGraph],
+    correctAnswers: [correctAnswerGraph]
+  }
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

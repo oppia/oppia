@@ -27,9 +27,10 @@ oppia.directive('playthroughIssuesDirective', [
       controller: [
         '$scope', 'PlaythroughIssuesService',
         function($scope, PlaythroughIssuesService) {
-          PlaythroughIssuesService.getIssues().then(function(issues) {
-            $scope.issues = issues;
-          });
+          PlaythroughIssuesService.getIssues()
+            .then(function(issues) {
+              $scope.issues = issues;
+            });
 
           $scope.getIssueIndex = function(issue) {
             return $scope.issues.indexOf(issue);
@@ -71,4 +72,5 @@ oppia.directive('playthroughIssuesDirective', [
         }
       ]
     };
-  }]);
+  }
+]);

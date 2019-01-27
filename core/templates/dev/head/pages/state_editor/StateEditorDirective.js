@@ -96,4 +96,5 @@ oppia.directive('stateEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

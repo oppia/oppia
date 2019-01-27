@@ -16,41 +16,45 @@
  * @fileoverview Service for debouncing function calls.
  */
 
-oppia.factory('DebouncerService', [function() {
-  return {
+oppia.factory('DebouncerService', [
+  function() {
+    return {
     // Returns a function that will not be triggered as long as it continues to
     // be invoked. The function only gets executed after it stops being called
     // for `wait` milliseconds.
-    debounce: function(func, millisecsToWait) {
-      var timeout;
-      var context = this;
-      var args = arguments;
-      var timestamp;
-      var result;
+      debounce: function(func, millisecsToWait) {
+        var timeout;
+        var context = this;
+        var args = arguments;
+        var timestamp;
+        var result;
 
-      var later = function() {
-        var last = new Date().getTime() - timestamp;
-        if (last < millisecsToWait) {
-          timeout = setTimeout(later, millisecsToWait - last);
-        } else {
-          timeout = null;
-          result = func.apply(context, args);
-          if (!timeout) {
-            context = null;
-            args = null;
+        var later = function() {
+          var last = new Date()
+            .getTime() - timestamp;
+          if (last < millisecsToWait) {
+            timeout = setTimeout(later, millisecsToWait - last);
+          } else {
+            timeout = null;
+            result = func.apply(context, args);
+            if (!timeout) {
+              context = null;
+              args = null;
+            }
           }
-        }
-      };
+        };
 
-      return function() {
-        context = this;
-        args = arguments;
-        timestamp = new Date().getTime();
-        if (!timeout) {
-          timeout = setTimeout(later, millisecsToWait);
-        }
-        return result;
-      };
-    }
-  };
-}]);
+        return function() {
+          context = this;
+          args = arguments;
+          timestamp = new Date()
+            .getTime();
+          if (!timeout) {
+            timeout = setTimeout(later, millisecsToWait);
+          }
+          return result;
+        };
+      }
+    };
+  }
+]);

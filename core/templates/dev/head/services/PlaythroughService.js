@@ -111,7 +111,8 @@ oppia.factory('PlaythroughService', [
           visitedStates.push(destStateName);
           var cycleString = visitedStates.slice(
             cycleStartIndex, visitedStates.length
-          ).toString();
+          )
+            .toString();
           if (cycleIdentifier.cycle === cycleString) {
             cycleIdentifier.num_cycles += 1;
           } else {
@@ -147,19 +148,15 @@ oppia.factory('PlaythroughService', [
       if (isMultipleIncorrectSubmissionsIssue()) {
         playthrough.issueType = ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS;
         playthrough.issueCustomizationArgs = {
-          state_name: {
-            value: multipleIncorrectStateName.state_name
-          },
-          num_times_answered_incorrectly: {
-            value: multipleIncorrectStateName.num_times_incorrect
-          }
+          state_name: {value: multipleIncorrectStateName.state_name},
+          num_times_answered_incorrectly:
+          {value: multipleIncorrectStateName.num_times_incorrect}
         };
       } else if (isCyclicStateTransitionsIssue()) {
         playthrough.issueType = ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS;
         playthrough.issueCustomizationArgs = {
-          state_names: {
-            value: cycleIdentifier.cycle.split(',')
-          }
+          state_names:
+          {value: cycleIdentifier.cycle.split(',')}
         };
       } else if (isEarlyQuitIssue(timeSpentInExpInSecs)) {
         playthrough.issueType = ISSUE_TYPE_EARLY_QUIT;
@@ -170,9 +167,7 @@ oppia.factory('PlaythroughService', [
                 playthrough.actions.length - 1].actionCustomizationArgs
                 .state_name.value
           },
-          time_spent_in_exp_in_secs: {
-            value: timeSpentInExpInSecs
-          }
+          time_spent_in_exp_in_secs: {value: timeSpentInExpInSecs}
         };
       }
     };
@@ -196,9 +191,8 @@ oppia.factory('PlaythroughService', [
     };
 
     var getFullPlaythroughUrl = function() {
-      return UrlInterpolationService.interpolateUrl(STORE_PLAYTHROUGH_URL, {
-        exploration_id: playthrough.expId
-      });
+      return UrlInterpolationService.interpolateUrl(STORE_PLAYTHROUGH_URL,
+        {exploration_id: playthrough.expId});
     };
 
     var isPlaythroughDiscarded = function() {
@@ -224,11 +218,7 @@ oppia.factory('PlaythroughService', [
         }
         var expStartLearnerAction = LearnerActionObjectFactory.createNew(
           ACTION_TYPE_EXPLORATION_START,
-          {
-            state_name: {
-              value: initStateName
-            }
-          },
+          {state_name: {value: initStateName}},
           CURRENT_ACTION_SCHEMA_VERSION);
 
         playthrough.actions.unshift(expStartLearnerAction);
@@ -254,24 +244,12 @@ oppia.factory('PlaythroughService', [
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
           ACTION_TYPE_ANSWER_SUBMIT,
           {
-            state_name: {
-              value: stateName
-            },
-            dest_state_name: {
-              value: destStateName
-            },
-            interaction_id: {
-              value: interactionId
-            },
-            submitted_answer: {
-              value: answer
-            },
-            feedback: {
-              value: feedback
-            },
-            time_spent_state_in_msecs: {
-              value: timeSpentInStateSecs
-            }
+            state_name: {value: stateName},
+            dest_state_name: {value: destStateName},
+            interaction_id: {value: interactionId},
+            submitted_answer: {value: answer},
+            feedback: {value: feedback},
+            time_spent_state_in_msecs: {value: timeSpentInStateSecs}
           },
           CURRENT_ACTION_SCHEMA_VERSION
         ));
@@ -293,12 +271,8 @@ oppia.factory('PlaythroughService', [
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
           ACTION_TYPE_EXPLORATION_QUIT,
           {
-            state_name: {
-              value: stateName
-            },
-            time_spent_in_state_in_msecs: {
-              value: timeSpentInStateSecs
-            }
+            state_name: {value: stateName},
+            time_spent_in_state_in_msecs: {value: timeSpentInStateSecs}
           },
           CURRENT_ACTION_SCHEMA_VERSION
         ));
@@ -332,4 +306,5 @@ oppia.factory('PlaythroughService', [
         }
       }
     };
-  }]);
+  }
+]);

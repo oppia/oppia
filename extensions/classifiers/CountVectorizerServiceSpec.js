@@ -21,19 +21,19 @@ describe('Count vectorizer service', function() {
 
   describe('Test count vectorizer service', function() {
     var service;
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       service = $injector.get('CountVectorizerService');
-    }));
+    }]);
 
     it('should produce correct vector from tokens', function() {
       var tokens = ['a', 'b', 'a', 'c', 'd', 'b', 'a'];
-      var vocabulary = {
-        a: 0, b: 1, c: 2
-      };
+      var vocabulary = {a: 0, b: 1, c: 2};
       var vector = service.vectorize(tokens, vocabulary);
       var expectedVector = [3, 2, 1];
-      expect(vector.length).toEqual(3);
-      expect(vector).toEqual(expectedVector);
+      expect(vector.length)
+        .toEqual(3);
+      expect(vector)
+        .toEqual(expectedVector);
     });
   });
 });

@@ -251,4 +251,5 @@ oppia.factory('LearnerActionRenderService', [
         return groupedDisplayBlocks.displayBlocks;
       }
     };
-  }]);
+  }
+]);

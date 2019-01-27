@@ -83,7 +83,8 @@ oppia.factory('SearchService', [
 
       var items = itemCodes.substring(
         EXPECTED_PREFIX.length, itemCodes.length - EXPECTED_SUFFIX.length
-      ).split('" OR "');
+      )
+        .split('" OR "');
 
       var selections = selectionDetails[itemsType].selections;
       for (var i = 0; i < items.length; i++) {
@@ -114,34 +115,40 @@ oppia.factory('SearchService', [
 
         _isCurrentlyFetchingResults = true;
         numSearchesInProgress++;
-        $http.get(queryUrl).then(function(response) {
-          var data = response.data;
-          _lastQuery = searchQuery;
-          _lastSelectedCategories = angular.copy(selectedCategories);
-          _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
-          _searchCursor = data.search_cursor;
-          numSearchesInProgress--;
+        $http.get(queryUrl)
+          .then(function(response) {
+            var data = response.data;
+            _lastQuery = searchQuery;
+            _lastSelectedCategories = angular.copy(selectedCategories);
+            _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
+            _searchCursor = data.search_cursor;
+            numSearchesInProgress--;
 
-          $rootScope.$broadcast(
-            'initialSearchResultsLoaded', data.activity_list);
-          _isCurrentlyFetchingResults = false;
-          var checkMismatch = function(searchQuery) {
-            var isMismatch = true;
-            $('.oppia-search-bar-input').each(function(index) {
-              if ($(this).val().trim() === searchQuery) {
-                isMismatch = false;
-              }
-            });
-            return isMismatch;
-          };
-          if (checkMismatch(searchQuery)) {
-            $log.error('Mismatch');
-            $log.error('SearchQuery: ' + searchQuery);
-            $log.error('Input: ' + $('.oppia-search-bar-input').val().trim());
-          }
-        }, function() {
-          numSearchesInProgress--;
-        });
+            $rootScope.$broadcast(
+              'initialSearchResultsLoaded', data.activity_list);
+            _isCurrentlyFetchingResults = false;
+            var checkMismatch = function(searchQuery) {
+              var isMismatch = true;
+              $('.oppia-search-bar-input')
+                .each(function(index) {
+                  if ($(this)
+                    .val()
+                    .trim() === searchQuery) {
+                    isMismatch = false;
+                  }
+                });
+              return isMismatch;
+            };
+            if (checkMismatch(searchQuery)) {
+              $log.error('Mismatch');
+              $log.error('SearchQuery: ' + searchQuery);
+              $log.error('Input: ' + $('.oppia-search-bar-input')
+                .val()
+                .trim());
+            }
+          }, function() {
+            numSearchesInProgress--;
+          });
 
         // Translate the new explorations loaded.
         $translate.refresh();
@@ -212,14 +219,15 @@ oppia.factory('SearchService', [
         }
 
         _isCurrentlyFetchingResults = true;
-        $http.get(queryUrl).then(function(response) {
-          _searchCursor = response.data.search_cursor;
-          _isCurrentlyFetchingResults = false;
+        $http.get(queryUrl)
+          .then(function(response) {
+            _searchCursor = response.data.search_cursor;
+            _isCurrentlyFetchingResults = false;
 
-          if (successCallback) {
-            successCallback(response.data, hasReachedEndOfPage());
-          }
-        });
+            if (successCallback) {
+              successCallback(response.data, hasReachedEndOfPage());
+            }
+          });
       }
     };
   }

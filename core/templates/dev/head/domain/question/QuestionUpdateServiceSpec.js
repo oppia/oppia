@@ -26,7 +26,7 @@ describe('Question update service', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     QuestionUpdateService = $injector.get('QuestionUpdateService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
@@ -42,14 +42,16 @@ describe('Question update service', function() {
       },
       param_changes: [],
       interaction: {
-        answer_groups: [{
-          rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
-          outcome: {
-            dest: 'Me Llamo',
-            feedback: {html: 'buen trabajo!'},
-            labelled_as_correct: true
+        answer_groups: [
+          {
+            rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
+            outcome: {
+              dest: 'Me Llamo',
+              feedback: {html: 'buen trabajo!'},
+              labelled_as_correct: true
+            }
           }
-        }],
+        ],
         default_outcome: {
           dest: 'Hola',
           feedback: {html: 'try again!'},
@@ -70,14 +72,16 @@ describe('Question update service', function() {
       },
       param_changes: [],
       interaction: {
-        answer_groups: [{
-          rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
-          outcome: {
-            dest: 'Me Llamo',
-            feedback: {html: 'buen trabajo!'},
-            labelled_as_correct: true
+        answer_groups: [
+          {
+            rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
+            outcome: {
+              dest: 'Me Llamo',
+              feedback: {html: 'buen trabajo!'},
+              labelled_as_correct: true
+            }
           }
-        }],
+        ],
         default_outcome: {
           dest: 'Hola',
           feedback: {html: 'try again!'},
@@ -100,14 +104,17 @@ describe('Question update service', function() {
     };
     sampleQuestion = QuestionObjectFactory.createFromBackendDict(
       sampleQuestionBackendObject);
-  }));
+  }]);
 
   it('should update the language code of the question', function() {
-    expect(sampleQuestion.getLanguageCode()).toEqual('en');
+    expect(sampleQuestion.getLanguageCode())
+      .toEqual('en');
     QuestionUpdateService.setQuestionLanguageCode(sampleQuestion, 'zh');
-    expect(sampleQuestion.getLanguageCode()).toEqual('zh');
+    expect(sampleQuestion.getLanguageCode())
+      .toEqual('zh');
     QuestionUndoRedoService.undoChange(sampleQuestion);
-    expect(sampleQuestion.getLanguageCode()).toEqual('en');
+    expect(sampleQuestion.getLanguageCode())
+      .toEqual('en');
   });
 
   it('should update the state data of the question', function() {
@@ -119,8 +126,10 @@ describe('Question update service', function() {
     };
     QuestionUpdateService.setQuestionStateData(
       sampleQuestion, updateFunction);
-    expect(sampleQuestion.getStateData()).toEqual(expectedOutputState);
+    expect(sampleQuestion.getStateData())
+      .toEqual(expectedOutputState);
     QuestionUndoRedoService.undoChange(sampleQuestion);
-    expect(sampleQuestion.getStateData()).toEqual(oldStateData);
+    expect(sampleQuestion.getStateData())
+      .toEqual(oldStateData);
   });
 });

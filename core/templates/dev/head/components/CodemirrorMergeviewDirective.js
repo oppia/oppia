@@ -57,5 +57,6 @@ oppia.directive('codemirrorMergeview', [
         });
       }
     };
-  }]
+  }
+]
 );

@@ -24,8 +24,11 @@ oppia.directive('socialButtons', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/social_buttons/' +
         'social_buttons_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-      }]
+      controller: [
+        '$scope', function($scope) {
+          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        }
+      ]
     };
-  }]);
+  }
+]);

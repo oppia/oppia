@@ -21,16 +21,17 @@ oppia.directive('profileLinkText', [
   function(UrlInterpolationService, SYSTEM_USER_IDS) {
     return {
       restrict: 'E',
-      scope: {
-        username: '&'
-      },
+      scope: {username: '&'},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/profile_link/' +
         'profile_link_text_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.isUsernameLinkable = function(username) {
-          return SYSTEM_USER_IDS.indexOf(username) === -1;
-        };
-      }]
+      controller: [
+        '$scope', function($scope) {
+          $scope.isUsernameLinkable = function(username) {
+            return SYSTEM_USER_IDS.indexOf(username) === -1;
+          };
+        }
+      ]
     };
-  }]);
+  }
+]);

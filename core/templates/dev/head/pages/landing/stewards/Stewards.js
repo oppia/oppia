@@ -61,27 +61,33 @@ oppia.controller('Stewards', [
     var getButtonDefinitions = function(tabName) {
       if (tabName === $scope.TAB_NAME_PARENTS ||
           tabName === $scope.TAB_NAME_TEACHERS) {
-        return [{
-          text: 'Browse Lessons',
-          href: '/library'
-        }, {
-          text: 'Subscribe to our Newsletter',
-          href: 'https://tinyletter.com/oppia'
-        }];
+        return [
+          {
+            text: 'Browse Lessons',
+            href: '/library'
+          }, {
+            text: 'Subscribe to our Newsletter',
+            href: 'https://tinyletter.com/oppia'
+          }
+        ];
       } else if (tabName === $scope.TAB_NAME_NONPROFITS) {
-        return [{
-          text: 'Get Involved',
-          href: 'https://www.oppiafoundation.org/partnerships#get-in-touch'
-        }, {
-          text: 'Browse Lessons',
-          href: '/library'
-        }];
+        return [
+          {
+            text: 'Get Involved',
+            href: 'https://www.oppiafoundation.org/partnerships#get-in-touch'
+          }, {
+            text: 'Browse Lessons',
+            href: '/library'
+          }
+        ];
       } else if (tabName === $scope.TAB_NAME_VOLUNTEERS) {
         // TODO(sll): Add "Get in Touch" link that points to contact form.
-        return [{
-          text: 'Browse Volunteer Opportunities',
-          href: 'https://www.oppiafoundation.org/volunteer'
-        }];
+        return [
+          {
+            text: 'Browse Volunteer Opportunities',
+            href: 'https://www.oppiafoundation.org/volunteer'
+          }
+        ];
       } else {
         throw Error('Invalid tab name: ' + tabName);
       }

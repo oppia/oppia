@@ -32,20 +32,25 @@ var SubscriptionDashboardPage = function() {
   this.expectSubscriptionFirstNameToMatch = function(name) {
     waitFor.visibilityOf(
       subscriptionName.first(), 'First Subscriber Name is not visible');
-    expect(subscriptionName.first().getText()).toMatch(name);
+    expect(subscriptionName.first()
+      .getText())
+      .toMatch(name);
   };
 
   this.expectSubscriptionLastNameToMatch = function(name) {
     waitFor.visibilityOf(
       subscriptionName.last(), 'Last Subscriber Name is not visible');
-    expect(subscriptionName.last().getText()).toMatch(name);
+    expect(subscriptionName.last()
+      .getText())
+      .toMatch(name);
   };
 
   this.expectSubscriptionCountToEqual = function(value) {
     waitFor.visibilityOf(
       subscriptionName.first(),
       'Subscriber Name Card takes too long to appear');
-    expect(subscriptionName.count()).toEqual(value);
+    expect(subscriptionName.count())
+      .toEqual(value);
   };
 
   this.navigateToSubscriptionButton = function() {

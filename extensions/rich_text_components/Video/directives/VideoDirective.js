@@ -82,7 +82,8 @@ oppia.directive('oppiaNoninteractiveVideo', [
           if (ContextService.isInExplorationEditorMode()) {
             $scope.tabIndexVal = -1;
           }
-        }]
+        }
+      ]
     };
   }
 ]);

@@ -139,20 +139,18 @@ oppia.factory('ExplorationSaveService', [
           onStartSaveCallback();
         }
 
-        ExplorationRightsService.publish().then(
-          function() {
-            if (onSaveDoneCallback) {
-              onSaveDoneCallback();
-            }
+        ExplorationRightsService.publish()
+          .then(
+            function() {
+              if (onSaveDoneCallback) {
+                onSaveDoneCallback();
+              }
 
-            showCongratulatorySharingModal();
-            SiteAnalyticsService.registerPublishExplorationEvent(
-              ExplorationDataService.explorationId);
-            whenModalClosed.resolve();
-          });
-      }, function() {
-        AlertsService.clearWarnings();
-        whenModalClosed.resolve();
+              showCongratulatorySharingModal();
+              SiteAnalyticsService.registerPublishExplorationEvent(
+                ExplorationDataService.explorationId);
+              whenModalClosed.resolve();
+            });
       });
 
       return whenModalClosed.promise;
@@ -191,9 +189,7 @@ oppia.factory('ExplorationSaveService', [
           $log.info('Changes to this exploration were saved successfully.');
           ChangeListService.discardAllChanges();
           $rootScope.$broadcast('initExplorationPage');
-          $rootScope.$broadcast('refreshVersionHistory', {
-            forceRefresh: true
-          });
+          $rootScope.$broadcast('refreshVersionHistory', {forceRefresh: true});
           AlertsService.addSuccessMessage('Changes saved.');
           saveIsInProgress = false;
           whenSavingDone.resolve();
@@ -422,16 +418,17 @@ oppia.factory('ExplorationSaveService', [
                 onStartLoadingCallback();
               }
 
-              saveDraftToBackend(commitMessage).then(function() {
-                if (onEndLoadingCallback) {
-                  onEndLoadingCallback();
-                }
-                openPublishExplorationModal(
-                  onStartLoadingCallback, onEndLoadingCallback)
-                  .then(function() {
-                    whenModalsClosed.resolve();
-                  });
-              });
+              saveDraftToBackend(commitMessage)
+                .then(function() {
+                  if (onEndLoadingCallback) {
+                    onEndLoadingCallback();
+                  }
+                  openPublishExplorationModal(
+                    onStartLoadingCallback, onEndLoadingCallback)
+                    .then(function() {
+                      whenModalsClosed.resolve();
+                    });
+                });
             } else {
               openPublishExplorationModal(
                 onStartLoadingCallback, onEndLoadingCallback)
@@ -474,115 +471,123 @@ oppia.factory('ExplorationSaveService', [
           return;
         }
 
-        ExplorationDataService.getLastSavedData().then(function(data) {
-          var oldStates = StatesObjectFactory.createFromBackendDict(
-            data.states).getStateObjects();
-          var newStates = ExplorationStatesService.getStates()
-            .getStateObjects();
-          var diffGraphData = ExplorationDiffService.getDiffGraphData(
-            oldStates, newStates, [{
-              changeList: ChangeListService.getChangeList(),
-              directionForwards: true
-            }]);
-          diffData = {
-            nodes: diffGraphData.nodes,
-            links: diffGraphData.links,
-            finalStateIds: diffGraphData.finalStateIds,
-            v1InitStateId: diffGraphData.originalStateIds[data.init_state_name],
-            v2InitStateId: diffGraphData.stateIds[
-              ExplorationInitStateNameService.displayed],
-            v1States: oldStates,
-            v2States: newStates
-          };
+        ExplorationDataService.getLastSavedData()
+          .then(function(data) {
+            var oldStates = StatesObjectFactory.createFromBackendDict(
+              data.states)
+              .getStateObjects();
+            var newStates = ExplorationStatesService.getStates()
+              .getStateObjects();
+            var diffGraphData = ExplorationDiffService.getDiffGraphData(
+              oldStates, newStates, [
+                {
+                  changeList: ChangeListService.getChangeList(),
+                  directionForwards: true
+                }
+              ]);
+            diffData = {
+              nodes: diffGraphData.nodes,
+              links: diffGraphData.links,
+              finalStateIds: diffGraphData.finalStateIds,
+              v1InitStateId: diffGraphData.originalStateIds[
+                data.init_state_name],
+              v2InitStateId: diffGraphData.stateIds[
+                ExplorationInitStateNameService.displayed],
+              v1States: oldStates,
+              v2States: newStates
+            };
 
-          // TODO(wxy): after diff supports exploration metadata, add a check to
-          // exit if changes cancel each other out.
+            // TODO(wxy): after diff supports exploration metadata, add a check to
+            // exit if changes cancel each other out.
 
-          AlertsService.clearWarnings();
+            AlertsService.clearWarnings();
 
-          // If the modal is open, do not open another one.
-          if (modalIsOpen) {
-            return;
-          }
+            // If the modal is open, do not open another one.
+            if (modalIsOpen) {
+              return;
+            }
 
-          var modalInstance = $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/' +
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration_editor/' +
               'exploration_save_modal_directive.html'),
-            backdrop: true,
-            resolve: {
-              isExplorationPrivate: function() {
-                return ExplorationRightsService.isPrivate();
+              backdrop: true,
+              resolve: {
+                isExplorationPrivate: function() {
+                  return ExplorationRightsService.isPrivate();
+                },
+                diffData: function() {
+                  return diffData;
+                }
               },
-              diffData: function() {
-                return diffData;
-              }
-            },
-            windowClass: 'oppia-save-exploration-modal',
-            controller: [
-              '$scope', '$uibModalInstance', 'isExplorationPrivate',
-              function(
-                  $scope, $uibModalInstance, isExplorationPrivate) {
-                $scope.showDiff = false;
-                $scope.onClickToggleDiffButton = function() {
-                  $scope.showDiff = !$scope.showDiff;
-                  if ($scope.showDiff) {
-                    $('.oppia-save-exploration-modal').addClass(
-                      'oppia-save-exploration-wide-modal');
-                  } else {
-                    $('.oppia-save-exploration-modal').removeClass(
-                      'oppia-save-exploration-wide-modal');
-                  }
-                };
+              windowClass: 'oppia-save-exploration-modal',
+              controller: [
+                '$scope', '$uibModalInstance', 'isExplorationPrivate',
+                function(
+                    $scope, $uibModalInstance, isExplorationPrivate) {
+                  $scope.showDiff = false;
+                  $scope.onClickToggleDiffButton = function() {
+                    $scope.showDiff = !$scope.showDiff;
+                    if ($scope.showDiff) {
+                      $('.oppia-save-exploration-modal')
+                        .addClass(
+                          'oppia-save-exploration-wide-modal');
+                    } else {
+                      $('.oppia-save-exploration-modal')
+                        .removeClass(
+                          'oppia-save-exploration-wide-modal');
+                    }
+                  };
 
-                $scope.diffData = diffData;
-                $scope.isExplorationPrivate = isExplorationPrivate;
+                  $scope.diffData = diffData;
+                  $scope.isExplorationPrivate = isExplorationPrivate;
 
-                $scope.earlierVersionHeader = 'Last saved';
-                $scope.laterVersionHeader = 'New changes';
+                  $scope.earlierVersionHeader = 'Last saved';
+                  $scope.laterVersionHeader = 'New changes';
 
-                $scope.save = function(commitMessage) {
-                  $uibModalInstance.close(commitMessage);
-                };
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
-                  AlertsService.clearWarnings();
-                };
-              }
-            ]
-          });
-
-          // Modal is Opened
-          modalIsOpen = true;
-
-          modalInstance.opened.then(function() {
-            // Toggle loading dots off after modal is opened
-            if (onEndLoadingCallback) {
-              onEndLoadingCallback();
-            }
-            // The $timeout seems to be needed
-            // in order to give the modal time to render.
-            $timeout(function() {
-              FocusManagerService.setFocus('saveChangesModalOpened');
+                  $scope.save = function(commitMessage) {
+                    $uibModalInstance.close(commitMessage);
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                    AlertsService.clearWarnings();
+                  };
+                }
+              ]
             });
-          });
 
-          modalInstance.result.then(function(commitMessage) {
-            modalIsOpen = false;
+            // Modal is Opened
+            modalIsOpen = true;
 
-            // Toggle loading dots back on for loading from backend.
-            if (onStartLoadingCallback) {
-              onStartLoadingCallback();
-            }
+            modalInstance.opened.then(function() {
+            // Toggle loading dots off after modal is opened
+              if (onEndLoadingCallback) {
+                onEndLoadingCallback();
+              }
+              // The $timeout seems to be needed
+              // in order to give the modal time to render.
+              $timeout(function() {
+                FocusManagerService.setFocus('saveChangesModalOpened');
+              });
+            });
 
-            saveDraftToBackend(commitMessage).then(function() {
+            modalInstance.result.then(function(commitMessage) {
+              modalIsOpen = false;
+
+              // Toggle loading dots back on for loading from backend.
+              if (onStartLoadingCallback) {
+                onStartLoadingCallback();
+              }
+
+              saveDraftToBackend(commitMessage)
+                .then(function() {
+                  whenModalClosed.resolve();
+                });
+            }, function() {
+              modalIsOpen = false;
               whenModalClosed.resolve();
             });
-          }, function() {
-            modalIsOpen = false;
-            whenModalClosed.resolve();
           });
-        });
         return whenModalClosed.promise;
       }
     };

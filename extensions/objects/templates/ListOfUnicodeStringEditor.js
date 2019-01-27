@@ -21,22 +21,21 @@ oppia.directive('listOfUnicodeStringEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/list_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'unicode'
-          }
-        };
+      controller: [
+        '$scope', function($scope) {
+          $scope.SCHEMA = {
+            type: 'list',
+            items: {type: 'unicode'}
+          };
 
-        if (!$scope.value) {
-          $scope.value = [];
+          if (!$scope.value) {
+            $scope.value = [];
+          }
         }
-      }]
+      ]
     };
-  }]);
+  }
+]);

@@ -22,27 +22,27 @@ describe('HTML escaper', function() {
   describe('HTML escaper service', function() {
     var ohe = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       ohe = $injector.get('HtmlEscaperService');
-    }));
+    }]);
 
     it('should correctly translate between escaped and unescaped strings',
       function() {
         var strs = ['abc', 'a&b<html>', '&&&&&'];
         for (var i = 0; i < strs.length; i++) {
           expect(ohe.escapedStrToUnescapedStr(
-            ohe.unescapedStrToEscapedStr(strs[i]))).toEqual(strs[i]);
+            ohe.unescapedStrToEscapedStr(strs[i])))
+            .toEqual(strs[i]);
         }
       }
     );
 
     it('should correctly escape and unescape JSON', function() {
-      var objs = [{
-        a: 'b'
-      }, ['a', 'b'], 2, true, 'abc'];
+      var objs = [{a: 'b'}, ['a', 'b'], 2, true, 'abc'];
       for (var i = 0; i < objs.length; i++) {
         expect(ohe.escapedJsonToObj(
-          ohe.objToEscapedJson(objs[i]))).toEqual(objs[i]);
+          ohe.objToEscapedJson(objs[i])))
+          .toEqual(objs[i]);
       }
     });
   });

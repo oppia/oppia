@@ -21,9 +21,7 @@ oppia.directive('profileLinkImage', [
   function(UrlInterpolationService, SYSTEM_USER_IDS) {
     return {
       restrict: 'E',
-      scope: {
-        username: '&'
-      },
+      scope: {username: '&'},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/profile_link/' +
         'profile_link_image_directive.html'),
@@ -46,11 +44,14 @@ oppia.directive('profileLinkImage', [
           // Returns a promise for the user profile picture, or the default
           // image if user is not logged in or has not uploaded a profile
           // picture, or the player is in preview mode.
-          $http.get($scope.profileImageUrl).then(function(response) {
-            $scope.profilePicture = (
-              response.data.profile_picture_data_url_for_username ||
+          $http.get($scope.profileImageUrl)
+            .then(function(response) {
+              $scope.profilePicture = (
+                response.data.profile_picture_data_url_for_username ||
               DEFAULT_PROFILE_IMAGE_PATH);
-          });
-        }]
+            });
+        }
+      ]
     };
-  }]);
+  }
+]);

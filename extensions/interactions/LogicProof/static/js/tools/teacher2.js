@@ -120,9 +120,8 @@ var logicProofTeacher2 = (function() {
     for (var i = 0; i < hiddenOperators.length; i++) {
       if (!language.operators.hasOwnProperty(hiddenOperators[i]) &&
           visibleOperators.indexOf(hiddenOperators[i]) === -1) {
-        throw new logicProofShared.UserError('hidden_operator', {
-          operator: hiddenOperators[i]
-        });
+        throw new logicProofShared.UserError('hidden_operator',
+          {operator: hiddenOperators[i]});
       }
     }
   };
@@ -161,34 +160,28 @@ var logicProofTeacher2 = (function() {
     var possibleReaderViews = logicProofShared.parseLineString(
       readerViewString, language.operators, vocabulary, true);
     if (possibleReaderViews.length > 1) {
-      throw new logicProofShared.UserError('ambiguous_parsing', {
-        field: 'reader view'
-      });
+      throw new logicProofShared.UserError('ambiguous_parsing',
+        {field: 'reader view'});
     }
     readerView = possibleReaderViews[0];
     try {
       var antecedents = logicProofParser.parse(
         antecedentsString.replace(/ /g, ''), 'listOfBooleanTemplates');
     } catch (err) {
-      throw new logicProofShared.UserError('unparseable', {
-        field: 'antecedents'
-      });
+      throw new logicProofShared.UserError('unparseable',
+        {field: 'antecedents'});
     }
     try {
       var results = logicProofParser.parse(
         resultsString.replace(/ /g, ''), 'listOfBooleanTemplates');
     } catch (err) {
-      throw new logicProofShared.UserError('unparseable', {
-        field: 'results'
-      });
+      throw new logicProofShared.UserError('unparseable', {field: 'results'});
     }
     try {
       var variables = logicProofParser.parse(
         variablesString.replace(/ /g, ''), 'listOfVariables');
     } catch (err) {
-      throw new logicProofShared.UserError('unparseable', {
-        field: 'variables'
-      });
+      throw new logicProofShared.UserError('unparseable', {field: 'variables'});
     }
     var errors = [];
     for (var i = 0; i < errorStrings.length; i++) {
@@ -371,11 +364,13 @@ var logicProofTeacher2 = (function() {
     // This is available to refer to the line number
     availableOperators.n = {
       kind: 'variable',
-      typing: [{
-        arguments: [],
-        dummies: [],
-        output: 'integer'
-      }]
+      typing: [
+        {
+          arguments: [],
+          dummies: [],
+          output: 'integer'
+        }
+      ]
     };
     newLanguage = {
       operators: availableOperators,
@@ -429,9 +424,8 @@ var logicProofTeacher2 = (function() {
       var occurs = logicProofParser.parse(
         occursString.replace(/ /g, ''), 'expression');
     } catch (err) {
-      throw new logicProofShared.UserError('unparseable', {
-        field: 'description of when this mistake occurs'
-      });
+      throw new logicProofShared.UserError('unparseable',
+        {field: 'description of when this mistake occurs'});
     }
     var messages = [];
     for (var i = 0; i < messageStrings.length; i++) {
@@ -583,55 +577,54 @@ var logicProofTeacher2 = (function() {
       if (language.operators.hasOwnProperty(
         formulaLHS.arguments[i].top_operator_name)) {
         throw new logicProofShared.UserError(
-          'argument_is_function_name', {
-            argument: formulaLHS.arguments[i].top_operator_name
-          });
+          'argument_is_function_name',
+          {argument: formulaLHS.arguments[i].top_operator_name});
       } else if (availableOperators.hasOwnProperty(
         formulaLHS.arguments[i].top_operator_name)) {
         throw new logicProofShared.UserError(
-          'duplicate_argument', {
-            argument: formulaLHS.arguments[i].top_operator_name
-          });
+          'duplicate_argument',
+          {argument: formulaLHS.arguments[i].top_operator_name});
       } else if (
-        logicProofShared.getOperatorsFromExpression(formulaRHS).indexOf(
-          formulaLHS.arguments[i].top_operator_name) === -1) {
+        logicProofShared.getOperatorsFromExpression(formulaRHS)
+          .indexOf(
+            formulaLHS.arguments[i].top_operator_name) === -1) {
         throw new logicProofShared.UserError(
-          'unused_argument', {
-            argument: formulaLHS.arguments[i].top_operator_name
-          });
+          'unused_argument',
+          {argument: formulaLHS.arguments[i].top_operator_name});
       } else {
         availableOperators[formulaLHS.arguments[i].top_operator_name] = {
           kind: 'variable',
           // We can't tell the types of the arguments yet, but they should be
           // deducible from the RHS.
-          typing: [{
-            arguments: [],
-            dummies: [],
-            output: 'integer'
-          }, {
-            arguments: [],
-            dummies: [],
-            output: 'string'
-          }, {
-            arguments: [],
-            dummies: [],
-            output: 'formula'
-          }, {
-            arguments: [],
-            dummies: [],
-            output: 'set_of_formulas'
-          }]
+          typing: [
+            {
+              arguments: [],
+              dummies: [],
+              output: 'integer'
+            }, {
+              arguments: [],
+              dummies: [],
+              output: 'string'
+            }, {
+              arguments: [],
+              dummies: [],
+              output: 'formula'
+            }, {
+              arguments: [],
+              dummies: [],
+              output: 'set_of_formulas'
+            }
+          ]
         };
       }
     }
     // The RHS cannot use any operator not found on the LHS or in the given list
-    var typeCheck = logicProofShared.assignTypesToExpression(formulaRHS, [
-      'boolean', 'integer', 'string', 'formula', 'set_of_formulas'
-    ], {
-      operators: availableOperators,
-      kinds: language.kinds,
-      types: language.types
-    }, ['constant']);
+    var typeCheck = logicProofShared.assignTypesToExpression(formulaRHS,
+      ['boolean', 'integer', 'string', 'formula', 'set_of_formulas'], {
+        operators: availableOperators,
+        kinds: language.kinds,
+        types: language.types
+      }, ['constant']);
     if (typeCheck.length > 1) {
       throw new logicProofShared.UserError('ambiguous_typing', {});
     }
@@ -646,11 +639,13 @@ var logicProofTeacher2 = (function() {
       });
     }
     return {
-      typing: [{
-        arguments: argumentTypes,
-        dummies: [],
-        output: typeCheck[0].typedExpression.type
-      }],
+      typing: [
+        {
+          arguments: argumentTypes,
+          dummies: [],
+          output: typeCheck[0].typedExpression.type
+        }
+      ],
       typedDefinition: typeCheck[0].typedExpression
     };
   };
@@ -683,17 +678,15 @@ var logicProofTeacher2 = (function() {
       var formulaLHS = logicProofParser.parse(
         LHSstring.replace(/ /g, ''), 'formulaLHS');
     } catch (err) {
-      throw new logicProofShared.UserError('unparseable', {
-        field: 'left-hand side'
-      });
+      throw new logicProofShared.UserError('unparseable',
+        {field: 'left-hand side'});
     }
     try {
       var formulaRHS = logicProofParser.parse(
         RHSstring.replace(/ /g, ''), 'expression');
     } catch (err) {
-      throw new logicProofShared.UserError('unparseable', {
-        field: 'right-hand side'
-      });
+      throw new logicProofShared.UserError('unparseable',
+        {field: 'right-hand side'});
     }
     var validation = validateAndTypeControlFunction(
       formulaLHS, formulaRHS, controlLanguage);
@@ -817,14 +810,14 @@ var logicProofTeacher2 = (function() {
             logicProofParser.parse(
               fragmentString.replace(/ /g, ''), 'expressionTemplate2') :
             logicProofParser.parse(
-              fragmentString.slice(2, fragmentString.length - 2).replace(
-                / /g, ''),
+              fragmentString.slice(2, fragmentString.length - 2)
+                .replace(
+                  / /g, ''),
               'expression')
         };
       } catch (err) {
-        throw new logicProofShared.UserError('unparseable_fragment', {
-          fragment: fragmentString
-        });
+        throw new logicProofShared.UserError('unparseable_fragment',
+          {fragment: fragmentString});
       }
     }
   };
@@ -877,9 +870,8 @@ var logicProofTeacher2 = (function() {
       if (vocabularyWords.indexOf(operatorsToCheck[i]) !== -1 &&
           operatorsToCheck[i].length > 1 &&
           !knownOperators.hasOwnProperty(operatorsToCheck[i])) {
-        throw new logicProofShared.UserError('forbidden_word', {
-          word: operatorsToCheck[i]
-        });
+        throw new logicProofShared.UserError('forbidden_word',
+          {word: operatorsToCheck[i]});
       }
     }
   };

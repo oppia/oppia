@@ -27,7 +27,8 @@ oppia.directive('storySummaryTile', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/story_summary_tile_directive.html'),
-      controller: ['$scope',
+      controller: [
+        '$scope',
         function($scope) {
           $scope.getStoryLink = function() {
             return UrlInterpolationService.getStoryUrl(
@@ -40,4 +41,5 @@ oppia.directive('storySummaryTile', [
         }
       ]
     };
-  }]);
+  }
+]);

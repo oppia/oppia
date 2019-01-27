@@ -38,18 +38,19 @@ oppia.factory('PretestQuestionBackendApiService', [
           cursor: _cursor
         });
 
-      $http.get(pretestDataUrl).then(function(response) {
-        var pretestQuestionDicts =
+      $http.get(pretestDataUrl)
+        .then(function(response) {
+          var pretestQuestionDicts =
           angular.copy(response.data.pretest_question_dicts);
-        _cursor = response.data.next_start_cursor;
-        if (successCallback) {
-          successCallback(pretestQuestionDicts);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+          _cursor = response.data.next_start_cursor;
+          if (successCallback) {
+            successCallback(pretestQuestionDicts);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     return {

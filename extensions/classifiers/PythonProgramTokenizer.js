@@ -141,12 +141,14 @@ oppia.factory('PythonProgramTokenizer', [
       "'''", '"""', "r'''", 'r"""', "R'''", 'R"""',
       "u'''", 'u"""', "U'''", 'U"""', "ur'''", 'ur"""', "Ur'''", 'Ur"""',
       "uR'''", 'uR"""', "UR'''", 'UR"""', "b'''", 'b"""', "B'''", 'B"""',
-      "br'''", 'br"""', "Br'''", 'Br"""', "bR'''", 'bR"""', "BR'''", 'BR"""'];
+      "br'''", 'br"""', "Br'''", 'Br"""', "bR'''", 'bR"""', "BR'''", 'BR"""'
+    ];
 
     var singleQuoted = [
       "'", '"', "r'", 'r"', "R'", 'R"', "u'", 'u"', "U'", 'U"', "ur'",
       'ur"', "Ur'", 'Ur"', "uR'", 'uR"', "UR'", 'UR"', "b'", 'b"', "B'", 'B"',
-      "br'", 'br"', "Br'", 'Br"', "bR'", 'bR"', "BR'", 'BR"'];
+      "br'", 'br"', "Br'", 'Br"', "bR'", 'bR"', "BR'", 'BR"'
+    ];
 
     var tabsize = 8;
 
@@ -226,7 +228,8 @@ oppia.factory('PythonProgramTokenizer', [
             // Skip comments or blank lines.
             if (('#\r\n').indexOf(line[pos]) !== -1) {
               if (line[pos] === '#') {
-                commentToken = line.slice(pos).replace('\\r\\n', '');
+                commentToken = line.slice(pos)
+                  .replace('\\r\\n', '');
                 nlPos = pos + commentToken.length;
                 tokenizedProgram.push(
                   [PythonProgramTokenType.COMMENT, commentToken]);
@@ -235,7 +238,8 @@ oppia.factory('PythonProgramTokenizer', [
               } else {
                 tokenizedProgram.push([
                   PythonProgramTokenType.line[pos] === '#' ? COMMENT : NL,
-                  line.slice(pos)]);
+                  line.slice(pos)
+                ]);
               }
               continue;
             }
@@ -351,4 +355,5 @@ oppia.factory('PythonProgramTokenizer', [
         return tokenizedProgram;
       }
     };
-  }]);
+  }
+]);

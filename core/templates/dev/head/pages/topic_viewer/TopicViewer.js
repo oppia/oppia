@@ -33,16 +33,17 @@ oppia.controller('TopicViewer', [
     $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
 
     $rootScope.loadingMessage = 'Loading';
-    TopicViewerBackendApiService.fetchTopicData($scope.topicName).then(
-      function(topicDataDict) {
-        $scope.canonicalStoriesList = topicDataDict.canonical_story_dicts;
-        $rootScope.loadingMessage = '';
-      },
-      function(errorResponse) {
-        if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-          AlertsService.addWarning('Failed to get dashboard data');
+    TopicViewerBackendApiService.fetchTopicData($scope.topicName)
+      .then(
+        function(topicDataDict) {
+          $scope.canonicalStoriesList = topicDataDict.canonical_story_dicts;
+          $rootScope.loadingMessage = '';
+        },
+        function(errorResponse) {
+          if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+            AlertsService.addWarning('Failed to get dashboard data');
+          }
         }
-      }
-    );
+      );
   }
 ]);

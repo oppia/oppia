@@ -60,7 +60,8 @@ oppia.directive('oppiaNoninteractiveLink', [
           if (ContextService.isInExplorationEditorMode()) {
             $scope.tabIndexVal = -1;
           }
-        }]
+        }
+      ]
     };
   }
 ]);

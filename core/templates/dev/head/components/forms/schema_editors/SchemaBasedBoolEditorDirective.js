@@ -30,4 +30,5 @@ oppia.directive('schemaBasedBoolEditor', [
         'schema_based_bool_editor_directive.html'),
       restrict: 'E'
     };
-  }]);
+  }
+]);

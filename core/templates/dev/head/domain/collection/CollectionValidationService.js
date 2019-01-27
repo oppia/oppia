@@ -23,19 +23,23 @@ oppia.factory('CollectionValidationService', [
   'CollectionLinearizerService',
   function(CollectionLinearizerService) {
     var _getNonexistentExplorationIds = function(collection) {
-      return collection.getCollectionNodes().filter(function(collectionNode) {
-        return !collectionNode.doesExplorationExist();
-      }).map(function(collectionNode) {
-        return collectionNode.getExplorationId();
-      });
+      return collection.getCollectionNodes()
+        .filter(function(collectionNode) {
+          return !collectionNode.doesExplorationExist();
+        })
+        .map(function(collectionNode) {
+          return collectionNode.getExplorationId();
+        });
     };
 
     var _getPrivateExplorationIds = function(collection) {
-      return collection.getCollectionNodes().filter(function(collectionNode) {
-        return collectionNode.isExplorationPrivate();
-      }).map(function(collectionNode) {
-        return collectionNode.getExplorationId();
-      });
+      return collection.getCollectionNodes()
+        .filter(function(collectionNode) {
+          return collectionNode.isExplorationPrivate();
+        })
+        .map(function(collectionNode) {
+          return collectionNode.getExplorationId();
+        });
     };
 
     // Validates that the tags for the collection are in the proper format,
@@ -61,7 +65,8 @@ oppia.factory('CollectionValidationService', [
     // returns true if all tags were normalized.
     var validateTagsNormalized = function(tags) {
       return tags.every(function(tag) {
-        return tag === tag.trim().replace(/\s+/g, ' ');
+        return tag === tag.trim()
+          .replace(/\s+/g, ' ');
       });
     };
 
@@ -125,4 +130,5 @@ oppia.factory('CollectionValidationService', [
           validateTagsNormalized(tags);
       }
     };
-  }]);
+  }
+]);

@@ -17,85 +17,87 @@
  * tree.
  */
 
-oppia.factory('VersionTreeService', [function() {
-  var _snapshots = null;
-  var _treeParents = null;
-  return {
-    init: function(snapshotsData) {
-      _treeParents = {};
-      _snapshots = {};
-      var numberOfVersions = snapshotsData.length;
+oppia.factory('VersionTreeService', [
+  function() {
+    var _snapshots = null;
+    var _treeParents = null;
+    return {
+      init: function(snapshotsData) {
+        _treeParents = {};
+        _snapshots = {};
+        var numberOfVersions = snapshotsData.length;
 
-      // Populate _snapshots so _snapshots[i] corresponds to version i
-      for (var i = 0; i < numberOfVersions; i++) {
-        _snapshots[i + 1] = snapshotsData[i];
-      }
-
-      // Generate the version tree of an exploration from its snapshots
-      for (var versionNum = 2; versionNum <= numberOfVersions; versionNum++) {
-        if (_snapshots[versionNum].commit_type === 'revert') {
-          for (var i = 0; i < _snapshots[versionNum].commit_cmds.length; i++) {
-            if (_snapshots[versionNum].commit_cmds[i].cmd ===
-                'AUTO_revert_version_number') {
-              _treeParents[versionNum] =
-                  _snapshots[versionNum].commit_cmds[i].version_number;
-            }
-          }
-        } else {
-          _treeParents[versionNum] = versionNum - 1;
+        // Populate _snapshots so _snapshots[i] corresponds to version i
+        for (var i = 0; i < numberOfVersions; i++) {
+          _snapshots[i + 1] = snapshotsData[i];
         }
-      }
-      _treeParents[1] = -1;
-    },
-    /**
+
+        // Generate the version tree of an exploration from its snapshots
+        for (var versionNum = 2; versionNum <= numberOfVersions; versionNum++) {
+          if (_snapshots[versionNum].commit_type === 'revert') {
+            for (var i = 0; i < _snapshots[versionNum].commit_cmds.length;
+              i++) {
+              if (_snapshots[versionNum].commit_cmds[i].cmd ===
+                'AUTO_revert_version_number') {
+                _treeParents[versionNum] =
+                  _snapshots[versionNum].commit_cmds[i].version_number;
+              }
+            }
+          } else {
+            _treeParents[versionNum] = versionNum - 1;
+          }
+        }
+        _treeParents[1] = -1;
+      },
+      /**
      * Returns a object whose keys are the version number and whose value is
      * the parent of each version, where parent points to previous version
      * in general or reverted version if commit is a reversion.
      * The parent of the root (version 1) is -1.
      */
-    getVersionTree: function() {
-      if (_treeParents === null) {
-        throw new Error('version tree not initialized.');
-      }
-      return _treeParents;
-    },
-    // Finds lowest common ancestor of v1 and v2 in the version tree.
-    findLCA: function(v1, v2) {
+      getVersionTree: function() {
+        if (_treeParents === null) {
+          throw new Error('version tree not initialized.');
+        }
+        return _treeParents;
+      },
+      // Finds lowest common ancestor of v1 and v2 in the version tree.
+      findLCA: function(v1, v2) {
       // Find paths from root to v1 and v2
-      var pathToV1 = [];
-      var pathToV2 = [];
-      while (_treeParents[v1] !== -1) {
-        pathToV1.push(v1);
-        if (_treeParents[v1] === undefined) {
-          throw new Error('Could not find parent of ' + v1);
+        var pathToV1 = [];
+        var pathToV2 = [];
+        while (_treeParents[v1] !== -1) {
+          pathToV1.push(v1);
+          if (_treeParents[v1] === undefined) {
+            throw new Error('Could not find parent of ' + v1);
+          }
+          v1 = _treeParents[v1];
         }
-        v1 = _treeParents[v1];
-      }
-      pathToV1.push(1);
-      pathToV1.reverse();
+        pathToV1.push(1);
+        pathToV1.reverse();
 
-      while (_treeParents[v2] !== -1) {
-        pathToV2.push(v2);
-        if (_treeParents[v2] === undefined) {
-          throw new Error('Could not find parent of ' + v2);
+        while (_treeParents[v2] !== -1) {
+          pathToV2.push(v2);
+          if (_treeParents[v2] === undefined) {
+            throw new Error('Could not find parent of ' + v2);
+          }
+          v2 = _treeParents[v2];
         }
-        v2 = _treeParents[v2];
-      }
-      pathToV2.push(1);
-      pathToV2.reverse();
+        pathToV2.push(1);
+        pathToV2.reverse();
 
-      // Compare paths
-      var maxIndex = Math.min(pathToV1.length, pathToV2.length) - 1;
-      var lca = null;
-      for (var i = maxIndex; i >= 0; i--) {
-        if (pathToV1[i] === pathToV2[i]) {
-          lca = pathToV1[i];
-          break;
+        // Compare paths
+        var maxIndex = Math.min(pathToV1.length, pathToV2.length) - 1;
+        var lca = null;
+        for (var i = maxIndex; i >= 0; i--) {
+          if (pathToV1[i] === pathToV2[i]) {
+            lca = pathToV1[i];
+            break;
+          }
         }
-      }
-      return lca;
-    },
-    /**
+        return lca;
+      },
+      /**
      * Returns the change list of a version of the exploration.
      * Should be called only after getVersionTree is called to initialize
      * _snapshots. Should not be called to retrieve change list of version 1.
@@ -114,13 +116,14 @@ oppia.factory('VersionTreeService', [function() {
      * for 'revert':
      *  - 'version_number': version number reverted to
      */
-    getChangeList: function(version) {
-      if (_snapshots === null) {
-        throw new Error('snapshots is not initialized');
-      } else if (version === 1) {
-        throw new Error('Tried to retrieve change list of version 1');
+      getChangeList: function(version) {
+        if (_snapshots === null) {
+          throw new Error('snapshots is not initialized');
+        } else if (version === 1) {
+          throw new Error('Tried to retrieve change list of version 1');
+        }
+        return angular.copy(_snapshots[version].commit_cmds);
       }
-      return angular.copy(_snapshots[version].commit_cmds);
-    }
-  };
-}]);
+    };
+  }
+]);

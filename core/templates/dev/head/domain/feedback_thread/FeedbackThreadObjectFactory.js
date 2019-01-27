@@ -17,39 +17,41 @@
    thread domain objects.
  */
 
-oppia.factory('FeedbackThreadObjectFactory', [function() {
-  var FeedbackThread = function(
-      status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-      stateName, threadId) {
-    this.status = status;
-    this.subject = subject;
-    this.summary = summary;
-    this.originalAuthorName = originalAuthorName;
-    this.lastUpdated = lastUpdated;
-    this.messageCount = messageCount;
-    this.stateName = stateName;
-    this.threadId = threadId;
-    this.messages = [];
-  };
+oppia.factory('FeedbackThreadObjectFactory', [
+  function() {
+    var FeedbackThread = function(
+        status, subject, summary, originalAuthorName, lastUpdated, messageCount,
+        stateName, threadId) {
+      this.status = status;
+      this.subject = subject;
+      this.summary = summary;
+      this.originalAuthorName = originalAuthorName;
+      this.lastUpdated = lastUpdated;
+      this.messageCount = messageCount;
+      this.stateName = stateName;
+      this.threadId = threadId;
+      this.messages = [];
+    };
 
-  FeedbackThread.prototype.setMessages = function(messages) {
-    this.messages = messages;
-  };
+    FeedbackThread.prototype.setMessages = function(messages) {
+      this.messages = messages;
+    };
 
-  FeedbackThread.createFromBackendDict = function(feedbackThreadBackendDict) {
-    return new FeedbackThread(
-      feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
-      feedbackThreadBackendDict.summary,
-      feedbackThreadBackendDict.original_author_username,
-      feedbackThreadBackendDict.last_updated,
-      feedbackThreadBackendDict.message_count,
-      feedbackThreadBackendDict.state_name,
-      feedbackThreadBackendDict.thread_id);
-  };
+    FeedbackThread.createFromBackendDict = function(feedbackThreadBackendDict) {
+      return new FeedbackThread(
+        feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
+        feedbackThreadBackendDict.summary,
+        feedbackThreadBackendDict.original_author_username,
+        feedbackThreadBackendDict.last_updated,
+        feedbackThreadBackendDict.message_count,
+        feedbackThreadBackendDict.state_name,
+        feedbackThreadBackendDict.thread_id);
+    };
 
-  FeedbackThread.prototype.isSuggestionThread = function() {
-    return false;
-  };
+    FeedbackThread.prototype.isSuggestionThread = function() {
+      return false;
+    };
 
-  return FeedbackThread;
-}]);
+    return FeedbackThread;
+  }
+]);

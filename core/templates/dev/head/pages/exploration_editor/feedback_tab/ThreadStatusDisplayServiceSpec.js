@@ -21,9 +21,9 @@
 describe('Thread Status Display Service', function() {
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   var ThreadStatusDisplayService;
-  beforeEach(inject(function(_ThreadStatusDisplayService_) {
+  beforeEach(inject[function(_ThreadStatusDisplayService_) {
     ThreadStatusDisplayService = _ThreadStatusDisplayService_;
-  }));
+  }]);
 
   it('should give human readable status for status choice', function() {
     var mockStatusChoices = ThreadStatusDisplayService.STATUS_CHOICES;
@@ -32,34 +32,41 @@ describe('Thread Status Display Service', function() {
       mockStatusID = mockStatusChoices[i].id;
       expect(
         ThreadStatusDisplayService.getHumanReadableStatus(
-          mockStatusID)).toBe(mockStatusChoices[i].text);
+          mockStatusID))
+        .toBe(mockStatusChoices[i].text);
     }
 
     var mockStatusID = 'INVALID_STATUS';
     expect(
       ThreadStatusDisplayService.getHumanReadableStatus(
-        mockStatusID)).toBe('');
+        mockStatusID))
+      .toBe('');
   });
 
   it('should give appropriate label class for status id', function() {
     var mockStatusID = 'open';
-    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-info');
+    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID))
+      .toBe(
+        'label label-info');
 
     mockStatusID = 'fixed';
-    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
+    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID))
+      .toBe(
+        'label label-default');
 
     mockStatusID = 'ignored';
-    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
+    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID))
+      .toBe(
+        'label label-default');
 
     mockStatusID = 'not_actionable';
-    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
+    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID))
+      .toBe(
+        'label label-default');
 
     mockStatusID = 'compliment';
-    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-success');
+    expect(ThreadStatusDisplayService.getLabelClass(mockStatusID))
+      .toBe(
+        'label label-success');
   });
 });

@@ -106,59 +106,61 @@ oppia.controller('HistoryTab', [
     // Refreshes the displayed version history log.
     $scope.refreshVersionHistory = function() {
       $rootScope.loadingMessage = 'Loading';
-      ExplorationDataService.getData().then(function(data) {
-        var currentVersion = data.version;
-        /**
+      ExplorationDataService.getData()
+        .then(function(data) {
+          var currentVersion = data.version;
+          /**
          * $scope.compareVersionMetadata is an object with keys
          * 'earlierVersion' and 'laterVersion' whose values are the metadata
          * of the compared versions, containing 'committerId', 'createdOn',
          * 'commitMessage', and 'versionNumber'.
          */
-        $scope.compareVersions = {};
-        $scope.compareVersionMetadata = {};
+          $scope.compareVersions = {};
+          $scope.compareVersionMetadata = {};
 
-        // Contains the IDs of the versions selected for comparison. Should
-        // contain a maximum of two elements.
-        $scope.selectedVersionsArray = [];
+          // Contains the IDs of the versions selected for comparison. Should
+          // contain a maximum of two elements.
+          $scope.selectedVersionsArray = [];
 
-        $scope.hideHistoryGraph = true;
+          $scope.hideHistoryGraph = true;
 
-        // Disable all comparisons if there are less than two revisions in
-        // total.
-        $scope.comparisonsAreDisabled = (currentVersion < 2);
+          // Disable all comparisons if there are less than two revisions in
+          // total.
+          $scope.comparisonsAreDisabled = (currentVersion < 2);
 
-        $scope.compareVersionsButtonIsHidden = $scope.comparisonsAreDisabled;
+          $scope.compareVersionsButtonIsHidden = $scope.comparisonsAreDisabled;
 
-        $scope.versionCountPrompt = 'Please select any 2.';
+          $scope.versionCountPrompt = 'Please select any 2.';
 
-        $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
-          explorationSnapshots = response.data.snapshots;
-          VersionTreeService.init(explorationSnapshots);
+          $http.get($scope.explorationAllSnapshotsUrl)
+            .then(function(response) {
+              explorationSnapshots = response.data.snapshots;
+              VersionTreeService.init(explorationSnapshots);
 
-          // Re-populate versionCheckboxArray and explorationVersionMetadata
-          // when history is refreshed.
-          $scope.versionCheckboxArray = [];
-          $scope.explorationVersionMetadata = {};
-          var lowestVersionIndex = 0;
-          for (var i = currentVersion - 1; i >= lowestVersionIndex; i--) {
-            var versionNumber = explorationSnapshots[i].version_number;
-            $scope.explorationVersionMetadata[versionNumber] = {
-              committerId: explorationSnapshots[i].committer_id,
-              createdOnStr: (
-                DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-                  explorationSnapshots[i].created_on_ms)),
-              commitMessage: explorationSnapshots[i].commit_message,
-              versionNumber: explorationSnapshots[i].version_number
-            };
-            $scope.versionCheckboxArray.push({
-              vnum: explorationSnapshots[i].version_number,
-              selected: false
+              // Re-populate versionCheckboxArray and explorationVersionMetadata
+              // when history is refreshed.
+              $scope.versionCheckboxArray = [];
+              $scope.explorationVersionMetadata = {};
+              var lowestVersionIndex = 0;
+              for (var i = currentVersion - 1; i >= lowestVersionIndex; i--) {
+                var versionNumber = explorationSnapshots[i].version_number;
+                $scope.explorationVersionMetadata[versionNumber] = {
+                  committerId: explorationSnapshots[i].committer_id,
+                  createdOnStr: (
+                    DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+                      explorationSnapshots[i].created_on_ms)),
+                  commitMessage: explorationSnapshots[i].commit_message,
+                  versionNumber: explorationSnapshots[i].version_number
+                };
+                $scope.versionCheckboxArray.push({
+                  vnum: explorationSnapshots[i].version_number,
+                  selected: false
+                });
+              }
+              $rootScope.loadingMessage = '';
+              $scope.computeVersionsToDisplay();
             });
-          }
-          $rootScope.loadingMessage = '';
-          $scope.computeVersionsToDisplay();
         });
-      });
     };
 
     var getVersionHeader = function(versionMetadata) {
@@ -187,18 +189,19 @@ oppia.controller('HistoryTab', [
         $scope.explorationVersionMetadata[laterComparedVersion];
 
       CompareVersionsService.getDiffGraphData(earlierComparedVersion,
-        laterComparedVersion).then(
-        function(response) {
-          $log.info('Retrieved version comparison data');
-          $log.info(response);
+        laterComparedVersion)
+        .then(
+          function(response) {
+            $log.info('Retrieved version comparison data');
+            $log.info(response);
 
-          $scope.diffData = response;
-          $scope.earlierVersionHeader = getVersionHeader(
-            $scope.compareVersionMetadata.earlierVersion);
-          $scope.laterVersionHeader = getVersionHeader(
-            $scope.compareVersionMetadata.laterVersion);
-        }
-      );
+            $scope.diffData = response;
+            $scope.earlierVersionHeader = getVersionHeader(
+              $scope.compareVersionMetadata.earlierVersion);
+            $scope.laterVersionHeader = getVersionHeader(
+              $scope.compareVersionMetadata.laterVersion);
+          }
+        );
     };
 
     // Check if valid versions were selected
@@ -259,9 +262,10 @@ oppia.controller('HistoryTab', [
         $http.post($scope.revertExplorationUrl, {
           current_version: ExplorationDataService.data.version,
           revert_to_version: version
-        }).then(function() {
-          location.reload();
-        });
+        })
+          .then(function() {
+            location.reload();
+          });
       });
     };
 

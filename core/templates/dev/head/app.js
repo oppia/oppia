@@ -141,9 +141,7 @@ oppia.run([
             template: componentTemplate,
             draggable: false,
             edit: function(event) {
-              editor.fire('lockSnapshot', {
-                dontUpdate: true
-              });
+              editor.fire('lockSnapshot', {dontUpdate: true});
               // Prevent default action since we are using our own edit modal.
               event.cancel();
               // Save this for creating the widget later.
@@ -181,7 +179,8 @@ oppia.run([
                    * represented by that.element. See:
                    * http://docs.ckeditor.com/#!/api/CKEDITOR.dom.element
                    */
-                  $compile($(that.element.$).contents())($rootScope);
+                  $compile($(that.element.$)
+                    .contents())($rootScope);
                   // $timeout ensures we do not take the undo snapshot until
                   // after angular finishes its changes to the component tags.
                   $timeout(function() {
@@ -192,7 +191,8 @@ oppia.run([
                       var widgetContainer = that.element.getParent();
                       range.moveToPosition(
                         widgetContainer, CKEDITOR.POSITION_AFTER_END);
-                      editor.getSelection().selectRanges([range]);
+                      editor.getSelection()
+                        .selectRanges([range]);
                       // Another timeout needed so the undo snapshot is
                       // not taken until the caret is in the right place.
                       $timeout(function() {
@@ -233,22 +233,22 @@ oppia.run([
               var that = this;
               // Set attributes of component according to data values.
               customizationArgSpecs.forEach(function(spec) {
-                that.element.getChild(0).setAttribute(
-                  spec.name + '-with-value',
-                  HtmlEscaperService.objToEscapedJson(
-                    that.data[spec.name] || ''));
+                that.element.getChild(0)
+                  .setAttribute(
+                    spec.name + '-with-value',
+                    HtmlEscaperService.objToEscapedJson(
+                      that.data[spec.name] || ''));
               });
             },
             init: function() {
-              editor.fire('lockSnapshot', {
-                dontUpdate: true
-              });
+              editor.fire('lockSnapshot', {dontUpdate: true});
               var that = this;
               var isMissingAttributes = false;
               // On init, read values from component attributes and save them.
               customizationArgSpecs.forEach(function(spec) {
-                var value = that.element.getChild(0).getAttribute(
-                  spec.name + '-with-value');
+                var value = that.element.getChild(0)
+                  .getAttribute(
+                    spec.name + '-with-value');
                 if (value) {
                   that.setData(
                     spec.name, HtmlEscaperService.escapedJsonToObj(value));
@@ -259,7 +259,8 @@ oppia.run([
 
               if (!isMissingAttributes) {
                 // Need to manually $compile so the directive renders.
-                $compile($(this.element.$).contents())($rootScope);
+                $compile($(this.element.$)
+                  .contents())($rootScope);
               }
               $timeout(function() {
                 editor.fire('unlockSnapshot');
@@ -299,10 +300,12 @@ oppia.config([
 
     // Set default headers for POST and PUT requests.
     $httpProvider.defaults.headers.post = {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type':
+     'application/x-www-form-urlencoded'
     };
     $httpProvider.defaults.headers.put = {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type':
+    'application/x-www-form-urlencoded'
     };
 
     // Add an interceptor to convert requests to strings and to log and show
@@ -343,100 +346,106 @@ oppia.config([
   }
 ]);
 
-oppia.config(['$provide', function($provide) {
-  $provide.decorator('$log', ['$delegate', 'DEV_MODE',
-    function($delegate, DEV_MODE) {
-      var _originalError = $delegate.error;
+oppia.config([
+  '$provide', function($provide) {
+    $provide.decorator('$log', [
+      '$delegate', 'DEV_MODE',
+      function($delegate, DEV_MODE) {
+        var _originalError = $delegate.error;
 
-      if (!DEV_MODE) {
-        $delegate.log = function() {};
-        $delegate.info = function() {};
-        // TODO(sll): Send errors (and maybe warnings) to the backend.
-        $delegate.warn = function() { };
-        $delegate.error = function(message) {
-          if (String(message).indexOf('$digest already in progress') === -1) {
-            _originalError(message);
-          }
-        };
-        // This keeps angular-mocks happy (in tests).
-        $delegate.error.logs = [];
+        if (!DEV_MODE) {
+          $delegate.log = function() {};
+          $delegate.info = function() {};
+          // TODO(sll): Send errors (and maybe warnings) to the backend.
+          $delegate.warn = function() { };
+          $delegate.error = function(message) {
+            if (String(message)
+              .indexOf('$digest already in progress') === -1) {
+              _originalError(message);
+            }
+          };
+          // This keeps angular-mocks happy (in tests).
+          $delegate.error.logs = [];
+        }
+
+        return $delegate;
       }
+    ]);
+  }
+]);
 
-      return $delegate;
-    }
-  ]);
-}]);
+oppia.config([
+  'toastrConfig', function(toastrConfig) {
+    angular.extend(toastrConfig, {
+      allowHtml: false,
+      iconClasses: {
+        error: 'toast-error',
+        info: 'toast-info',
+        success: 'toast-success',
+        warning: 'toast-warning'
+      },
+      positionClass: 'toast-bottom-right',
+      messageClass: 'toast-message',
+      progressBar: false,
+      tapToDismiss: true,
+      titleClass: 'toast-title'
+    });
+  }
+]);
 
-oppia.config(['toastrConfig', function(toastrConfig) {
-  angular.extend(toastrConfig, {
-    allowHtml: false,
-    iconClasses: {
-      error: 'toast-error',
-      info: 'toast-info',
-      success: 'toast-success',
-      warning: 'toast-warning'
-    },
-    positionClass: 'toast-bottom-right',
-    messageClass: 'toast-message',
-    progressBar: false,
-    tapToDismiss: true,
-    titleClass: 'toast-title'
-  });
-}]);
-
-oppia.config(['recorderServiceProvider', function(recorderServiceProvider) {
-  recorderServiceProvider.forceSwf(false);
-  recorderServiceProvider.withMp3Conversion(true, {
-    bitRate: 128
-  });
-}]);
+oppia.config([
+  'recorderServiceProvider', function(recorderServiceProvider) {
+    recorderServiceProvider.forceSwf(false);
+    recorderServiceProvider.withMp3Conversion(true, {bitRate: 128});
+  }
+]);
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
-oppia.factory('$exceptionHandler', ['$log', function($log) {
-  var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
-  var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
+oppia.factory('$exceptionHandler', [
+  '$log', function($log) {
+    var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
+    var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
-  return function(exception, cause) {
-    var messageAndSourceAndStackTrace = [
-      '',
-      'Cause: ' + cause,
-      exception.message,
-      String(exception.stack),
-      '    at URL: ' + window.location.href
-    ].join('\n');
+    return function(exception, cause) {
+      var messageAndSourceAndStackTrace = [
+        '',
+        'Cause: ' + cause,
+        exception.message,
+        String(exception.stack),
+        '    at URL: ' + window.location.href
+      ].join('\n');
 
-    // To prevent an overdose of errors, throttle to at most 1 error every
-    // MIN_TIME_BETWEEN_ERRORS_MSEC.
-    if (Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
+      // To prevent an overdose of errors, throttle to at most 1 error every
+      // MIN_TIME_BETWEEN_ERRORS_MSEC.
+      if (Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
       // Catch all errors, to guard against infinite recursive loops.
-      try {
+        try {
         // We use jQuery here instead of Angular's $http, since the latter
         // creates a circular dependency.
-        $.ajax({
-          type: 'POST',
-          url: '/frontend_errors',
-          data: $.param({
-            csrf_token: GLOBALS.csrf_token,
-            payload: JSON.stringify({
-              error: messageAndSourceAndStackTrace
-            }),
-            source: document.URL
-          }, true),
-          contentType: 'application/x-www-form-urlencoded',
-          dataType: 'text',
-          async: true
-        });
+          $.ajax({
+            type: 'POST',
+            url: '/frontend_errors',
+            data: $.param({
+              csrf_token: GLOBALS.csrf_token,
+              payload: JSON.stringify({error: messageAndSourceAndStackTrace}),
+              source: document.URL
+            }, true),
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: 'text',
+            async: true
+          });
 
-        timeOfLastPostedError = Date.now();
-      } catch (loggingError) {
-        $log.warn('Error logging failed.');
+          timeOfLastPostedError = Date.now();
+        } catch (loggingError) {
+          $log.warn('Error logging failed.');
+        }
       }
-    }
 
-    $log.error.apply($log, arguments);
-  };
-}]);
+      $log.error.apply($log, arguments);
+    };
+  }
+]);
 
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 

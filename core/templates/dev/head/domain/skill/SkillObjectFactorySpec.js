@@ -28,7 +28,7 @@ describe('Skill object factory', function() {
     var skillContentsDict = null;
     var skillDict = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       SkillObjectFactory = $injector.get('SkillObjectFactory');
       MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       ConceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');
@@ -80,38 +80,53 @@ describe('Skill object factory', function() {
         superseding_skill_id: '2',
         all_questions_merged: false
       };
-    }));
+    }]);
 
     it('should create a new skill from a backend dictionary', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
-      expect(skill.getId()).toEqual('1');
-      expect(skill.getDescription()).toEqual('test description');
-      expect(skill.getMisconceptions()).toEqual(
-        [MisconceptionObjectFactory.createFromBackendDict(
-          misconceptionDict1),
-        MisconceptionObjectFactory.createFromBackendDict(
-          misconceptionDict2)]);
-      expect(skill.getConceptCard()).toEqual(
-        ConceptCardObjectFactory.createFromBackendDict(skillContentsDict));
-      expect(skill.getLanguageCode()).toEqual('en');
-      expect(skill.getVersion()).toEqual(3);
-      expect(skill.getSupersedingSkillId()).toEqual('2');
-      expect(skill.getAllQuestionsMerged()).toEqual(false);
+      expect(skill.getId())
+        .toEqual('1');
+      expect(skill.getDescription())
+        .toEqual('test description');
+      expect(skill.getMisconceptions())
+        .toEqual(
+          [
+            MisconceptionObjectFactory.createFromBackendDict(
+              misconceptionDict1),
+            MisconceptionObjectFactory.createFromBackendDict(
+              misconceptionDict2)
+          ]);
+      expect(skill.getConceptCard())
+        .toEqual(
+          ConceptCardObjectFactory.createFromBackendDict(skillContentsDict));
+      expect(skill.getLanguageCode())
+        .toEqual('en');
+      expect(skill.getVersion())
+        .toEqual(3);
+      expect(skill.getSupersedingSkillId())
+        .toEqual('2');
+      expect(skill.getAllQuestionsMerged())
+        .toEqual(false);
     });
 
     it('should delete a misconception given its id', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
       skill.deleteMisconception(2);
-      expect(skill.getMisconceptions()).toEqual(
-        [MisconceptionObjectFactory.createFromBackendDict(
-          misconceptionDict2)]);
+      expect(skill.getMisconceptions())
+        .toEqual(
+          [
+            MisconceptionObjectFactory.createFromBackendDict(
+              misconceptionDict2)
+          ]);
     });
 
     it('should get the correct next misconception id', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
-      expect(skill.getNextMisconceptionId()).toEqual(6);
+      expect(skill.getNextMisconceptionId())
+        .toEqual(6);
       skill.deleteMisconception(4);
-      expect(skill.getNextMisconceptionId()).toEqual(6);
+      expect(skill.getNextMisconceptionId())
+        .toEqual(6);
 
       var misconceptionToAdd1 = MisconceptionObjectFactory
         .createFromBackendDict({
@@ -122,27 +137,38 @@ describe('Skill object factory', function() {
         });
 
       skill.appendMisconception(misconceptionToAdd1);
-      expect(skill.getNextMisconceptionId()).toEqual(7);
+      expect(skill.getNextMisconceptionId())
+        .toEqual(7);
       skill.deleteMisconception(6);
-      expect(skill.getNextMisconceptionId()).toEqual(7);
+      expect(skill.getNextMisconceptionId())
+        .toEqual(7);
     });
 
     it('should convert to a backend dictionary', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
-      expect(skill.toBackendDict()).toEqual(skillDict);
+      expect(skill.toBackendDict())
+        .toEqual(skillDict);
     });
 
     it('should be able to create an interstitial skill', function() {
       var skill = SkillObjectFactory.createInterstitialSkill();
-      expect(skill.getId()).toEqual(null);
-      expect(skill.getDescription()).toEqual('Skill description loading');
-      expect(skill.getMisconceptions()).toEqual([]);
-      expect(skill.getConceptCard()).toEqual(
-        ConceptCardObjectFactory.createInterstitialConceptCard());
-      expect(skill.getLanguageCode()).toEqual('en');
-      expect(skill.getVersion()).toEqual(1);
-      expect(skill.getSupersedingSkillId()).toEqual(null);
-      expect(skill.getAllQuestionsMerged()).toEqual(false);
+      expect(skill.getId())
+        .toEqual(null);
+      expect(skill.getDescription())
+        .toEqual('Skill description loading');
+      expect(skill.getMisconceptions())
+        .toEqual([]);
+      expect(skill.getConceptCard())
+        .toEqual(
+          ConceptCardObjectFactory.createInterstitialConceptCard());
+      expect(skill.getLanguageCode())
+        .toEqual('en');
+      expect(skill.getVersion())
+        .toEqual(1);
+      expect(skill.getSupersedingSkillId())
+        .toEqual(null);
+      expect(skill.getAllQuestionsMerged())
+        .toEqual(false);
     });
   });
 });

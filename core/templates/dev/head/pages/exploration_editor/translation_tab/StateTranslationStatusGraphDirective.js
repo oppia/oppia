@@ -20,9 +20,7 @@ oppia.directive('stateTranslationStatusGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        isTranslationTabBusy: '='
-      },
+      scope: {isTranslationTabBusy: '='},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_status_graph_directive.html'),
@@ -57,4 +55,5 @@ oppia.directive('stateTranslationStatusGraph', [
         }
       ]
     };
-  }]);
+  }
+]);

@@ -133,4 +133,5 @@ oppia.factory('ImageClickInputValidationService', [
         return warningsList;
       }
     };
-  }]);
+  }
+]);

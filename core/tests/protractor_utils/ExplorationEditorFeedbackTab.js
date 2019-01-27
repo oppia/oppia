@@ -55,41 +55,51 @@ var ExplorationEditorFeedbackTab = function() {
    * Workflows
    */
   this.acceptSuggestion = function(suggestionDescription) {
-    return element.all(by.css(suggestionRowClassName)).then(function(rows) {
-      var matchingSuggestionRows = rows.filter(function() {
-        return explorationFeedbackSubject.getText().then(function(subject) {
-          return suggestionDescription.indexOf(subject) !== -1;
+    return element.all(by.css(suggestionRowClassName))
+      .then(function(rows) {
+        var matchingSuggestionRows = rows.filter(function() {
+          return explorationFeedbackSubject.getText()
+            .then(function(subject) {
+              return suggestionDescription.indexOf(subject) !== -1;
+            });
         });
+        expect(matchingSuggestionRows[0].isDisplayed())
+          .toBe(true);
+        matchingSuggestionRows[0].click();
+        expect(viewSuggestionButton.isDisplayed())
+          .toBe(true);
+        viewSuggestionButton.click();
+        expect(acceptSuggestionButton.isDisplayed())
+          .toBe(true);
+        suggestionCommitMessageInput.sendKeys('Commit message');
+        acceptSuggestionButton.click();
+        waitFor.invisibilityOf(
+          acceptSuggestionButton,
+          'Suggestion modal takes too long to disappear');
       });
-      expect(matchingSuggestionRows[1].isDisplayed()).toBe(true);
-      matchingSuggestionRows[1].click();
-      expect(viewSuggestionButton.isDisplayed()).toBe(true);
-      viewSuggestionButton.click();
-      expect(acceptSuggestionButton.isDisplayed()).toBe(true);
-      suggestionCommitMessageInput.sendKeys('Commit message');
-      acceptSuggestionButton.click();
-      waitFor.invisibilityOf(
-        acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
-    });
   };
 
   this.expectToHaveFeedbackThread = function() {
-    expect(feedbackTabRow.isPresent()).toBe(true);
+    expect(feedbackTabRow.isPresent())
+      .toBe(true);
   };
 
   this.getSuggestionThreads = function() {
     var threads = [];
     waitFor.visibilityOf(
-      element.all(by.css(suggestionRowClassName)).first(),
+      element.all(by.css(suggestionRowClassName))
+        .first(),
       'No suggestion threads are visible');
-    return element.all(by.css(suggestionRowClassName)).then(function(rows) {
-      rows.forEach(function() {
-        explorationFeedbackSubject.getText().then(function(subject) {
-          threads.push(subject);
+    return element.all(by.css(suggestionRowClassName))
+      .then(function(rows) {
+        rows.forEach(function() {
+          explorationFeedbackSubject.getText()
+            .then(function(subject) {
+              threads.push(subject);
+            });
         });
+        return threads;
       });
-      return threads;
-    });
   };
 
   this.goBackToAllFeedbacks = function() {
@@ -99,44 +109,54 @@ var ExplorationEditorFeedbackTab = function() {
   this.readFeedbackMessages = function() {
     var messages = [];
     waitFor.visibilityOf(
-      element.all(by.css(suggestionRowClassName)).first(),
+      element.all(by.css(suggestionRowClassName))
+        .first(),
       'No feedback messages are visible.');
-    return element.all(by.css(suggestionRowClassName)).then(function(rows) {
-      rows.forEach(function(row) {
-        row.click();
-        waitFor.visibilityOf(
-          explorationFeedback, 'Feedback message text is not visible');
-        explorationFeedback.getText().then(function(message) {
-          messages.push(message);
+    return element.all(by.css(suggestionRowClassName))
+      .then(function(rows) {
+        rows.forEach(function(row) {
+          row.click();
+          waitFor.visibilityOf(
+            explorationFeedback, 'Feedback message text is not visible');
+          explorationFeedback.getText()
+            .then(function(message) {
+              messages.push(message);
+            });
+          feedbackBackButton.click();
         });
-        feedbackBackButton.click();
+        return messages;
       });
-      return messages;
-    });
   };
 
   this.rejectSuggestion = function(suggestionDescription) {
-    return element.all(by.css(suggestionRowClassName)).then(function(rows) {
-      var matchingSuggestionRows = rows.filter(function() {
-        return explorationFeedbackSubject.getText().then(function(subject) {
-          return suggestionDescription.indexOf(subject) !== -1;
+    return element.all(by.css(suggestionRowClassName))
+      .then(function(rows) {
+        var matchingSuggestionRows = rows.filter(function() {
+          return explorationFeedbackSubject.getText()
+            .then(function(subject) {
+              return suggestionDescription.indexOf(subject) !== -1;
+            });
         });
+        expect(matchingSuggestionRows[1].isDisplayed())
+          .toBe(true);
+        matchingSuggestionRows[1].click();
+        expect(viewSuggestionButton.isDisplayed())
+          .toBe(true);
+        viewSuggestionButton.click();
+        expect(rejectSuggestionButton.isDisplayed())
+          .toBe(true);
+        suggestionReviewMessageInput.sendKeys('Review message');
+        rejectSuggestionButton.click();
+        waitFor.invisibilityOf(
+          acceptSuggestionButton,
+          'Suggestion modal takes too long to disappear');
       });
-      expect(matchingSuggestionRows[1].isDisplayed()).toBe(true);
-      matchingSuggestionRows[1].click();
-      expect(viewSuggestionButton.isDisplayed()).toBe(true);
-      viewSuggestionButton.click();
-      expect(rejectSuggestionButton.isDisplayed()).toBe(true);
-      suggestionReviewMessageInput.sendKeys('Review message');
-      rejectSuggestionButton.click();
-      waitFor.invisibilityOf(
-        acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
-    });
   };
 
   this.sendResponseToLatestFeedback = function(feedbackResponse) {
     element.all(by.css('.protractor-test-oppia-feedback-tab-row')).
-      first().click();
+      first()
+      .click();
     feedbackResponseTextArea.sendKeys(feedbackResponse);
     feedbackSendResponseButton.click();
   };

@@ -22,7 +22,7 @@ describe('Story node object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     StoryNodeObjectFactory = $injector.get('StoryNodeObjectFactory');
 
     var sampleStoryNodeBackendDict = {
@@ -37,59 +37,75 @@ describe('Story node object factory', function() {
     };
     _sampleStoryNode = StoryNodeObjectFactory.createFromBackendDict(
       sampleStoryNodeBackendDict);
-  }));
+  }]);
 
   it('should correctly create a node from node id alone', function() {
     var storyNode = StoryNodeObjectFactory.createFromIdAndTitle(
       'node_1', 'Title 1');
-    expect(storyNode.getId()).toEqual('node_1');
-    expect(storyNode.getTitle()).toEqual('Title 1');
-    expect(storyNode.getDestinationNodeIds()).toEqual([]);
-    expect(storyNode.getPrerequisiteSkillIds()).toEqual([]);
-    expect(storyNode.getAcquiredSkillIds()).toEqual([]);
-    expect(storyNode.getOutline()).toEqual('');
-    expect(storyNode.getOutlineStatus()).toEqual(false);
-    expect(storyNode.getExplorationId()).toEqual(null);
+    expect(storyNode.getId())
+      .toEqual('node_1');
+    expect(storyNode.getTitle())
+      .toEqual('Title 1');
+    expect(storyNode.getDestinationNodeIds())
+      .toEqual([]);
+    expect(storyNode.getPrerequisiteSkillIds())
+      .toEqual([]);
+    expect(storyNode.getAcquiredSkillIds())
+      .toEqual([]);
+    expect(storyNode.getOutline())
+      .toEqual('');
+    expect(storyNode.getOutlineStatus())
+      .toEqual(false);
+    expect(storyNode.getExplorationId())
+      .toEqual(null);
   });
 
   it('should correctly validate a valid story node', function() {
-    expect(_sampleStoryNode.validate()).toEqual([]);
+    expect(_sampleStoryNode.validate())
+      .toEqual([]);
   });
 
   it('should correctly validate story nodes', function() {
     _sampleStoryNode.addPrerequisiteSkillId('skill_2');
     _sampleStoryNode.addDestinationNodeId('node_1');
 
-    expect(_sampleStoryNode.validate()).toEqual([
-      'The skill with id skill_2 is common to both the acquired and' +
+    expect(_sampleStoryNode.validate())
+      .toEqual([
+        'The skill with id skill_2 is common to both the acquired and' +
       ' prerequisite skill id list in node with id node_1',
-      'The destination node id of node with id node_1 points to itself.'
-    ]);
+        'The destination node id of node with id node_1 points to itself.'
+      ]);
   });
 
   it('should correctly throw error when duplicate values are added to arrays',
     function() {
       expect(function() {
         _sampleStoryNode.addDestinationNodeId('node_2');
-      }).toThrow();
+      })
+        .toThrow();
       expect(function() {
         _sampleStoryNode.addPrerequisiteSkillId('skill_1');
-      }).toThrow();
+      })
+        .toThrow();
       expect(function() {
         _sampleStoryNode.addAcquiredSkillId('skill_2');
-      }).toThrow();
+      })
+        .toThrow();
     });
 
   it('should correctly throw error when invalid values are deleted from arrays',
     function() {
       expect(function() {
         _sampleStoryNode.removeDestinationNodeId('node_5');
-      }).toThrow();
+      })
+        .toThrow();
       expect(function() {
         _sampleStoryNode.removePrerequisiteSkillId('skill_4');
-      }).toThrow();
+      })
+        .toThrow();
       expect(function() {
         _sampleStoryNode.removeAcquiredSkillId('skill_4');
-      }).toThrow();
+      })
+        .toThrow();
     });
 });

@@ -24,7 +24,7 @@ describe('InteractiveMapValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     validatorService = $injector.get('InteractiveMapValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     oof = $injector.get('OutcomeObjectFactory');
@@ -44,36 +44,33 @@ describe('InteractiveMapValidationService', function() {
     });
 
     customizationArguments = {
-      latitude: {
-        value: 0
-      },
-      longitude: {
-        value: 0
-      }
+      latitude: {value: 0},
+      longitude: {value: 0}
     };
-    goodAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
-        rule_type: 'Within',
-        inputs: {
-          d: 100
-        }
-      }), rof.createFromBackendDict({
-        rule_type: 'NotWithin',
-        inputs: {
-          d: 50
-        }
-      })],
-      goodDefaultOutcome,
-      false,
-      null
-    )];
-  }));
+    goodAnswerGroups = [
+      agof.createNew(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Within',
+            inputs: {d: 100}
+          }), rof.createFromBackendDict({
+            rule_type: 'NotWithin',
+            inputs: {d: 50}
+          })
+        ],
+        goodDefaultOutcome,
+        false,
+        null
+      )
+    ];
+  }]);
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 
   it('should expect latitude and longitude customization arguments',
@@ -81,7 +78,8 @@ describe('InteractiveMapValidationService', function() {
       expect(function() {
         validatorService.getAllWarnings(
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      }).toThrow('Expected customization arguments to have properties: ' +
+      })
+        .toThrow('Expected customization arguments to have properties: ' +
         'latitude, longitude');
     }
   );
@@ -94,26 +92,32 @@ describe('InteractiveMapValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please pick a starting latitude between -90 and 90.'
-    }, {
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please pick a starting longitude between -180 and 180.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please pick a starting latitude between -90 and 90.'
+        }, {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please pick a starting longitude between -180 and 180.'
+        }
+      ]);
 
     customizationArguments.latitude.value = 120;
     customizationArguments.longitude.value = -200;
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please pick a starting latitude between -90 and 90.'
-    }, {
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please pick a starting longitude between -180 and 180.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please pick a starting latitude between -90 and 90.'
+        }, {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please pick a starting longitude between -180 and 180.'
+        }
+      ]);
   });
 
   it('should expect all rule types to refer to positive distances',
@@ -123,15 +127,20 @@ describe('InteractiveMapValidationService', function() {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: (
-          'Please ensure that rule 1 in group 1 refers to a valid distance.')
-      }, {
-        type: WARNING_TYPES.CRITICAL,
-        message: (
-          'Please ensure that rule 2 in group 1 refers to a valid distance.')
-      }]);
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'Please ensure that rule 1 in group 1 refers to ' +
+              'a valid distance.')
+          }, {
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'Please ensure that rule 2 in group 1 refers to ' +
+              'a valid distance.')
+          }
+        ]);
     }
   );
 });

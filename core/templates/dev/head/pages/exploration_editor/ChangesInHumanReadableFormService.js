@@ -30,9 +30,10 @@ oppia.factory('ChangesInHumanReadableFormService', [
         ruleElm.html('<p>Type: ' + rule.type + '</p>');
         ruleElm.append(
           '<p>Value: ' + (
-            Object.keys(rule.inputs).map(function(input) {
-              return rule.inputs[input];
-            })
+            Object.keys(rule.inputs)
+              .map(function(input) {
+                return rule.inputs[input];
+              })
           ).toString() + '</p>');
         rulesList.push(ruleElm);
       });
@@ -94,19 +95,22 @@ oppia.factory('ChangesInHumanReadableFormService', [
         switch (lostChange.cmd) {
           case CMD_ADD_STATE:
             outerHtml.append(
-              angular.element('<li></li>').html(
-                'Added state: ' + lostChange.state_name));
+              angular.element('<li></li>')
+                .html(
+                  'Added state: ' + lostChange.state_name));
             break;
           case CMD_RENAME_STATE:
             outerHtml.append(
-              angular.element('<li></li>').html(
-                'Renamed state: ' + lostChange.old_state_name + ' to ' +
+              angular.element('<li></li>')
+                .html(
+                  'Renamed state: ' + lostChange.old_state_name + ' to ' +
                   lostChange.new_state_name));
             break;
           case CMD_DELETE_STATE:
             outerHtml.append(
-              angular.element('<li></li>').html(
-                'Deleted state: ' + lostChange.state_name));
+              angular.element('<li></li>')
+                .html(
+                  'Deleted state: ' + lostChange.state_name));
             break;
           case CMD_EDIT_STATE_PROPERTY:
             var newValue = getStatePropertyValue(lostChange.new_value);
@@ -121,9 +125,10 @@ oppia.factory('ChangesInHumanReadableFormService', [
                 if (newValue !== null) {
                   // TODO(sll): Also add display of audio translations here.
                   stateWiseEditsMapping[stateName].push(
-                    angular.element('<div></div>').html(
-                      '<strong>Edited content: </strong><div class="content">' +
-                        newValue.html + '</div>')
+                    angular.element('<div></div>')
+                      .html(
+                        '<strong>Edited content: </strong><div class=' +
+                        '"content">' + newValue.html + '</div>')
                       .addClass('state-edit-desc'));
                 }
                 break;
@@ -142,7 +147,8 @@ oppia.factory('ChangesInHumanReadableFormService', [
                                      oldValue);
                 }
                 stateWiseEditsMapping[stateName].push(
-                  angular.element('<div></div>').html(lostChangeValue)
+                  angular.element('<div></div>')
+                    .html(lostChangeValue)
                     .addClass('state-edit-desc'));
                 break;
 
@@ -156,7 +162,8 @@ oppia.factory('ChangesInHumanReadableFormService', [
                   lostChangeValue = 'Edited Interaction Customizations';
                 }
                 stateWiseEditsMapping[stateName].push(
-                  angular.element('<div></div>').html(lostChangeValue)
+                  angular.element('<div></div>')
+                    .html(lostChangeValue)
                     .addClass('state-edit-desc'));
                 break;
 
@@ -175,7 +182,8 @@ oppia.factory('ChangesInHumanReadableFormService', [
                   if (rulesList.length > 0) {
                     answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
                     var rulesListHtml = (
-                      angular.element('<ol></ol>').addClass('rules-list'));
+                      angular.element('<ol></ol>')
+                        .addClass('rules-list'));
                     for (var rule in rulesList) {
                       rulesListHtml.html(rulesList[rule][0].outerHTML);
                     }
@@ -292,5 +300,6 @@ oppia.factory('ChangesInHumanReadableFormService', [
         }
       }
     };
-  }]
+  }
+]
 );

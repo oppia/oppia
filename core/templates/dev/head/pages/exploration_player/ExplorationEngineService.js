@@ -181,7 +181,8 @@ oppia.factory('ExplorationEngineService', [
     var initParams = function(manualParamChanges) {
       var baseParams = {};
       exploration.paramSpecs.forEach(function(paramName, paramSpec) {
-        baseParams[paramName] = paramSpec.getType().createDefaultValue();
+        baseParams[paramName] = paramSpec.getType()
+          .createDefaultValue();
       });
 
       var startingParams = makeParams(
@@ -367,9 +368,8 @@ oppia.factory('ExplorationEngineService', [
           return;
         }
 
-        var questionHtml = makeQuestion(newState, [newParams, {
-          answer: 'answer'
-        }]);
+        var questionHtml = makeQuestion(newState,
+          [newParams, {answer: 'answer'}]);
         if (questionHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');

@@ -30,22 +30,27 @@ describe('Rule spec services', function() {
     );
   };
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     ruleTemplates =
       window.__fixtures__['extensions/interactions/rule_templates'];
-    Object.keys(ruleTemplates).forEach(function(interactionId) {
-      var serviceName = getRulesServiceName(interactionId);
-      rulesServices[serviceName] = $injector.get(serviceName);
-    });
-  }));
+    Object.keys(ruleTemplates)
+      .forEach(function(interactionId) {
+        var serviceName = getRulesServiceName(interactionId);
+        rulesServices[serviceName] = $injector.get(serviceName);
+      });
+  }]);
 
   it('should include evaluation methods for all explicit rules', function() {
-    Object.keys(ruleTemplates).forEach(function(interactionId) {
-      var serviceName = getRulesServiceName(interactionId);
-      Object.keys(ruleTemplates[interactionId]).forEach(function(ruleName) {
-        expect(rulesServices[serviceName][ruleName]).toBeDefined(
-          '. ERROR: ' + ruleName + ' not found in service ' + serviceName);
+    Object.keys(ruleTemplates)
+      .forEach(function(interactionId) {
+        var serviceName = getRulesServiceName(interactionId);
+        Object.keys(ruleTemplates[interactionId])
+          .forEach(function(ruleName) {
+            expect(rulesServices[serviceName][ruleName])
+              .toBeDefined(
+                '. ERROR: ' + ruleName + ' not found in service ' +
+                serviceName);
+          });
       });
-    });
   });
 });

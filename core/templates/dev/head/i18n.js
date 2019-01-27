@@ -61,13 +61,13 @@ oppia.controller('I18nFooter', [
 
     $scope.changeLanguage = function() {
       $translate.use($scope.currentLanguageCode);
-      UserService.getUserInfoAsync().then(function(userInfo) {
-        if (userInfo.isLoggedIn()) {
-          $http.put(siteLanguageUrl, {
-            site_language_code: $scope.currentLanguageCode
-          });
-        }
-      });
+      UserService.getUserInfoAsync()
+        .then(function(userInfo) {
+          if (userInfo.isLoggedIn()) {
+            $http.put(siteLanguageUrl,
+              {site_language_code: $scope.currentLanguageCode});
+          }
+        });
     };
   }
 ]);

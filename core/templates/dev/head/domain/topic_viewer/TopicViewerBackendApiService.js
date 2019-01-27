@@ -24,20 +24,19 @@ oppia.factory('TopicViewerBackendApiService', [
     var topicDataDict = null;
     var _fetchTopicData = function(topicName, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
-        TOPIC_DATA_URL_TEMPLATE, {
-          topic_name: topicName
-        });
+        TOPIC_DATA_URL_TEMPLATE, {topic_name: topicName});
 
-      $http.get(topicDataUrl).then(function(response) {
-        topicDataDict = angular.copy(response.data);
-        if (successCallback) {
-          successCallback(topicDataDict);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(topicDataUrl)
+        .then(function(response) {
+          topicDataDict = angular.copy(response.data);
+          if (successCallback) {
+            successCallback(topicDataDict);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     return {

@@ -14,9 +14,9 @@
 
 describe('ImprovementsService', function() {
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     this.ImprovementsService = $injector.get('ImprovementsService');
-  }));
+  }]);
 
   describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', function() {
     it('returns true for states with TextInput interactions', function() {
@@ -25,7 +25,8 @@ describe('ImprovementsService', function() {
       expect(
         this.ImprovementsService
           .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
-      ).toBe(true);
+      )
+        .toBe(true);
     });
 
     it('returns false for states with FractionInput interactions', function() {
@@ -34,7 +35,8 @@ describe('ImprovementsService', function() {
       expect(
         this.ImprovementsService
           .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
-      ).toBe(false);
+      )
+        .toBe(false);
     });
   });
 });

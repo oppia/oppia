@@ -127,39 +127,43 @@ oppia.factory('TopicEditorStateService', [
       loadTopic: function(topicId) {
         _topicIsLoading = true;
         EditableTopicBackendApiService.fetchTopic(
-          topicId).then(
-          function(newBackendTopicObject) {
-            _updateTopic(
-              newBackendTopicObject.topicDict,
-              newBackendTopicObject.skillIdToDescriptionDict
-            );
-            EditableTopicBackendApiService.fetchStories(topicId).then(
-              function(canonicalStorySummaries) {
-                _setCanonicalStorySummaries(canonicalStorySummaries);
-              });
-            EditableTopicBackendApiService.fetchQuestions(
-              topicId, _nextCursorForQuestions).then(
-              function(returnObject) {
-                _setQuestionSummaries(returnObject.questionSummaries);
-                _setNextQuestionsCursor(returnObject.nextCursor);
-              }
-            );
-          },
-          function(error) {
+          topicId)
+          .then(
+            function(newBackendTopicObject) {
+              _updateTopic(
+                newBackendTopicObject.topicDict,
+                newBackendTopicObject.skillIdToDescriptionDict
+              );
+              EditableTopicBackendApiService.fetchStories(topicId)
+                .then(
+                  function(canonicalStorySummaries) {
+                    _setCanonicalStorySummaries(canonicalStorySummaries);
+                  });
+              EditableTopicBackendApiService.fetchQuestions(
+                topicId, _nextCursorForQuestions)
+                .then(
+                  function(returnObject) {
+                    _setQuestionSummaries(returnObject.questionSummaries);
+                    _setNextQuestionsCursor(returnObject.nextCursor);
+                  }
+                );
+            },
+            function(error) {
+              AlertsService.addWarning(
+                error || 'There was an error when loading the topic.');
+              _topicIsLoading = false;
+            });
+        TopicRightsBackendApiService.fetchTopicRights(
+          topicId)
+          .then(function(newBackendTopicRightsObject) {
+            _updateTopicRights(newBackendTopicRightsObject);
+            _topicIsLoading = false;
+          }, function(error) {
             AlertsService.addWarning(
-              error || 'There was an error when loading the topic.');
+              error ||
+            'There was an error when loading the topic rights.');
             _topicIsLoading = false;
           });
-        TopicRightsBackendApiService.fetchTopicRights(
-          topicId).then(function(newBackendTopicRightsObject) {
-          _updateTopicRights(newBackendTopicRightsObject);
-          _topicIsLoading = false;
-        }, function(error) {
-          AlertsService.addWarning(
-            error ||
-            'There was an error when loading the topic rights.');
-          _topicIsLoading = false;
-        });
       },
 
       /**
@@ -175,14 +179,15 @@ oppia.factory('TopicEditorStateService', [
           return;
         }
         EditableTopicBackendApiService.fetchSubtopicPage(
-          topicId, subtopicId).then(
-          function(newBackendSubtopicPageObject) {
-            _updateSubtopicPage(newBackendSubtopicPageObject);
-          },
-          function(error) {
-            AlertsService.addWarning(
-              error || 'There was an error when loading the topic.');
-          });
+          topicId, subtopicId)
+          .then(
+            function(newBackendSubtopicPageObject) {
+              _updateSubtopicPage(newBackendSubtopicPageObject);
+            },
+            function(error) {
+              AlertsService.addWarning(
+                error || 'There was an error when loading the topic.');
+            });
       },
 
       /**
@@ -229,12 +234,13 @@ oppia.factory('TopicEditorStateService', [
           _nextCursorForQuestions = '';
         }
         EditableTopicBackendApiService.fetchQuestions(
-          topicId, _nextCursorForQuestions).then(
-          function(returnObject) {
-            _setQuestionSummaries(returnObject.questionSummaries);
-            _setNextQuestionsCursor(returnObject.nextCursor);
-          }
-        );
+          topicId, _nextCursorForQuestions)
+          .then(
+            function(returnObject) {
+              _setQuestionSummaries(returnObject.questionSummaries);
+              _setNextQuestionsCursor(returnObject.nextCursor);
+            }
+          );
       },
 
       getQuestionSummaries: function(index) {
@@ -375,42 +381,43 @@ oppia.factory('TopicEditorStateService', [
         _topicIsBeingSaved = true;
         EditableTopicBackendApiService.updateTopic(
           _topic.getId(), _topic.getVersion(),
-          commitMessage, UndoRedoService.getCommittableChangeList()).then(
-          function(topicBackendObject) {
-            _updateTopic(
-              topicBackendObject.topicDict,
-              topicBackendObject.skillIdToDescriptionDict
-            );
-            var changeList = UndoRedoService.getCommittableChangeList();
-            for (var i = 0; i < changeList.length; i++) {
-              if (changeList[i].property_name === 'canonical_story_ids') {
-                if (changeList[i].new_value.length ===
+          commitMessage, UndoRedoService.getCommittableChangeList())
+          .then(
+            function(topicBackendObject) {
+              _updateTopic(
+                topicBackendObject.topicDict,
+                topicBackendObject.skillIdToDescriptionDict
+              );
+              var changeList = UndoRedoService.getCommittableChangeList();
+              for (var i = 0; i < changeList.length; i++) {
+                if (changeList[i].property_name === 'canonical_story_ids') {
+                  if (changeList[i].new_value.length ===
                     changeList[i].old_value.length - 1) {
-                  deletedStoryId = changeList[i].old_value.filter(
-                    function(storyId) {
-                      return changeList[i].new_value.indexOf(storyId) === -1;
-                    }
-                  )[0];
-                  EditableStoryBackendApiService.deleteStory(
-                    _topic.getId(), deletedStoryId);
-                } else if (
-                  changeList[i].new_value.length <
+                    deletedStoryId = changeList[i].old_value.filter(
+                      function(storyId) {
+                        return changeList[i].new_value.indexOf(storyId) === -1;
+                      }
+                    )[0];
+                    EditableStoryBackendApiService.deleteStory(
+                      _topic.getId(), deletedStoryId);
+                  } else if (
+                    changeList[i].new_value.length <
                   changeList[i].old_value.length) {
-                  throw Error(
-                    'More than one story should not be deleted at a time.');
+                    throw Error(
+                      'More than one story should not be deleted at a time.');
+                  }
                 }
               }
-            }
-            UndoRedoService.clearChanges();
-            _topicIsBeingSaved = false;
-            if (successCallback) {
-              successCallback();
-            }
-          }, function(error) {
-            AlertsService.addWarning(
-              error || 'There was an error when saving the topic.');
-            _topicIsBeingSaved = false;
-          });
+              UndoRedoService.clearChanges();
+              _topicIsBeingSaved = false;
+              if (successCallback) {
+                successCallback();
+              }
+            }, function(error) {
+              AlertsService.addWarning(
+                error || 'There was an error when saving the topic.');
+              _topicIsBeingSaved = false;
+            });
         return true;
       },
 

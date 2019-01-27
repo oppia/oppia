@@ -25,24 +25,29 @@ var customizeInteraction = function() {
 
 var expectInteractionDetailsToMatch = function(elem) {
   expect(
-    elem.element(by.tagName('oppia-interactive-numeric-input')).isPresent()
-  ).toBe(true);
+    elem.element(by.tagName('oppia-interactive-numeric-input'))
+      .isPresent()
+  )
+    .toBe(true);
 };
 
 var submitAnswer = function(elem, answer) {
   elem.element(by.tagName('oppia-interactive-numeric-input')).
-    element(by.tagName('input')).sendKeys(answer + '\n');
+    element(by.tagName('input'))
+    .sendKeys(answer + '\n');
 };
 
 var answerObjectType = 'Real';
 
-var testSuite = [{
-  interactionArguments: [],
-  ruleArguments: ['IsWithinTolerance', 2, 143],
-  expectedInteractionDetails: [],
-  wrongAnswers: [146, 130],
-  correctAnswers: [142]
-}];
+var testSuite = [
+  {
+    interactionArguments: [],
+    ruleArguments: ['IsWithinTolerance', 2, 143],
+    expectedInteractionDetails: [],
+    wrongAnswers: [146, 130],
+    correctAnswers: [142]
+  }
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

@@ -43,7 +43,7 @@ describe('State content editor directive', function() {
     });
   });
 
-  beforeEach(inject(function($compile, $injector, $rootScope, $templateCache) {
+  beforeEach(inject[function($compile, $injector, $rootScope, $templateCache) {
     shof = $injector.get('SubtitledHtmlObjectFactory');
     cls = $injector.get('ChangeListService');
     citat = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
@@ -74,19 +74,21 @@ describe('State content editor directive', function() {
         },
         interaction: {
           id: 'TextInput',
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'unused',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
+          answer_groups: [
+            {
+              rule_specs: [],
+              outcome: {
+                dest: 'unused',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-          }],
+            }
+          ],
           default_outcome: {
             dest: 'default',
             feedback: {
@@ -113,19 +115,21 @@ describe('State content editor directive', function() {
         },
         interaction: {
           id: 'TextInput',
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'unused',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
+          answer_groups: [
+            {
+              rule_specs: [],
+              outcome: {
+                dest: 'unused',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
             }
-          }],
+          ],
           default_outcome: {
             dest: 'default',
             feedback: {
@@ -152,19 +156,21 @@ describe('State content editor directive', function() {
         },
         interaction: {
           id: 'TextInput',
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'unused',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
+          answer_groups: [
+            {
+              rule_specs: [],
+              outcome: {
+                dest: 'unused',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
             }
-          }],
+          ],
           default_outcome: {
             dest: 'default',
             feedback: {
@@ -177,14 +183,16 @@ describe('State content editor directive', function() {
           },
           hints: []
         },
-        param_changes: [{
-          name: 'comparison',
-          generator_id: 'Copier',
-          customization_args: {
-            value: 'something clever',
-            parse_with_jinja: false
+        param_changes: [
+          {
+            name: 'comparison',
+            generator_id: 'Copier',
+            customization_args: {
+              value: 'something clever',
+              parse_with_jinja: false
+            }
           }
-        }]
+        ]
       }
     });
 
@@ -205,38 +213,47 @@ describe('State content editor directive', function() {
     var compiledElem = $compile(elem)(outerScope);
     outerScope.$digest();
     ctrlScope = compiledElem[0].getControllerScope();
-  }));
+  }]);
 
   it('should start with the content editor not being open', function() {
-    expect(ctrlScope.contentEditorIsOpen).toBe(false);
+    expect(ctrlScope.contentEditorIsOpen)
+      .toBe(false);
   });
 
   it('should correctly handle no-op edits', function() {
-    expect(ctrlScope.contentEditorIsOpen).toBe(false);
-    expect(scs.savedMemento).toEqual(_getContent(
-      'content', 'This is some content.'));
+    expect(ctrlScope.contentEditorIsOpen)
+      .toBe(false);
+    expect(scs.savedMemento)
+      .toEqual(_getContent(
+        'content', 'This is some content.'));
     ctrlScope.openStateContentEditor();
-    expect(ctrlScope.contentEditorIsOpen).toBe(true);
+    expect(ctrlScope.contentEditorIsOpen)
+      .toBe(true);
     scs.displayed = _getContent('content', 'This is some content.');
     ctrlScope.onSaveContentButtonClicked();
 
-    expect(ctrlScope.contentEditorIsOpen).toBe(false);
-    expect(cls.getChangeList()).toEqual([]);
+    expect(ctrlScope.contentEditorIsOpen)
+      .toBe(false);
+    expect(cls.getChangeList())
+      .toEqual([]);
   });
 
   it('should check that content edits are saved correctly', function() {
-    expect(cls.getChangeList()).toEqual([]);
+    expect(cls.getChangeList())
+      .toEqual([]);
 
     ctrlScope.openStateContentEditor();
     scs.displayed = _getContent('content', 'babababa');
     ctrlScope.onSaveContentButtonClicked();
-    expect(outerScope.saveStateContent).toHaveBeenCalled();
+    expect(outerScope.saveStateContent)
+      .toHaveBeenCalled();
 
     ctrlScope.openStateContentEditor();
     scs.displayed = _getContent(
       'content', 'And now for something completely different.');
     ctrlScope.onSaveContentButtonClicked();
-    expect(outerScope.saveStateContent).toHaveBeenCalled();
+    expect(outerScope.saveStateContent)
+      .toHaveBeenCalled();
   });
 
   it('should not save changes to content when edit is cancelled', function() {
@@ -244,13 +261,17 @@ describe('State content editor directive', function() {
 
     scs.displayed = _getContent('content', 'Test Content');
     ctrlScope.cancelEdit();
-    expect(ctrlScope.contentEditorIsOpen).toBe(false);
-    expect(scs.savedMemento).toEqual(contentBeforeEdit);
-    expect(scs.displayed).toEqual(contentBeforeEdit);
+    expect(ctrlScope.contentEditorIsOpen)
+      .toBe(false);
+    expect(scs.savedMemento)
+      .toEqual(contentBeforeEdit);
+    expect(scs.displayed)
+      .toEqual(contentBeforeEdit);
   });
 
   it('should call the callback function on-save', function() {
     ctrlScope.onSaveContentButtonClicked();
-    expect(outerScope.saveStateContent).toHaveBeenCalled();
+    expect(outerScope.saveStateContent)
+      .toHaveBeenCalled();
   });
 });

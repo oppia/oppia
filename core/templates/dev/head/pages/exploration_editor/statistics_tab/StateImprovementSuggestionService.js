@@ -28,38 +28,39 @@ oppia.factory('StateImprovementSuggestionService', [
         };
 
         var rankedStates = [];
-        explorationStates.getStateNames().forEach(function(stateName) {
-          if (!allStateStats.hasOwnProperty(stateName)) {
-            return;
-          }
+        explorationStates.getStateNames()
+          .forEach(function(stateName) {
+            if (!allStateStats.hasOwnProperty(stateName)) {
+              return;
+            }
 
-          var stateStats = allStateStats[stateName];
-          var totalEntryCount = stateStats.total_entry_count;
-          var noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
+            var stateStats = allStateStats[stateName];
+            var totalEntryCount = stateStats.total_entry_count;
+            var noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
 
-          if (totalEntryCount === 0) {
-            return;
-          }
+            if (totalEntryCount === 0) {
+              return;
+            }
 
-          var threshold = 0.2 * totalEntryCount;
-          var eligibleFlags = [];
-          var state = explorationStates.getState(stateName);
-          var stateInteraction = state.interaction;
-          if (noAnswerSubmittedCount > threshold) {
-            eligibleFlags.push({
-              rank: noAnswerSubmittedCount,
-              improveType: IMPROVE_TYPE_INCOMPLETE,
-            });
-          }
-          if (eligibleFlags.length > 0) {
-            eligibleFlags.sort(rankComparator);
-            rankedStates.push({
-              rank: eligibleFlags[0].rank,
-              stateName: stateName,
-              type: eligibleFlags[0].improveType,
-            });
-          }
-        });
+            var threshold = 0.2 * totalEntryCount;
+            var eligibleFlags = [];
+            var state = explorationStates.getState(stateName);
+            var stateInteraction = state.interaction;
+            if (noAnswerSubmittedCount > threshold) {
+              eligibleFlags.push({
+                rank: noAnswerSubmittedCount,
+                improveType: IMPROVE_TYPE_INCOMPLETE,
+              });
+            }
+            if (eligibleFlags.length > 0) {
+              eligibleFlags.sort(rankComparator);
+              rankedStates.push({
+                rank: eligibleFlags[0].rank,
+                stateName: stateName,
+                type: eligibleFlags[0].improveType,
+              });
+            }
+          });
 
         // The returned suggestions are sorted decreasingly by their ranks.
         rankedStates.sort(rankComparator);

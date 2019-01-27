@@ -54,16 +54,18 @@ oppia.directive('topicEditorNavbar', [
             if (!$scope.topicRights.canPublishTopic()) {
               return false;
             }
-            TopicRightsBackendApiService.publishTopic($scope.topicId).then(
-              function() {
-                $scope.topicRights.markTopicAsPublished();
-                TopicEditorStateService.setTopicRights($scope.topicRights);
-              }
-            ).then(function() {
-              var successToast = 'Topic published.';
-              AlertsService.addSuccessMessage(
-                successToast, 1000);
-            });
+            TopicRightsBackendApiService.publishTopic($scope.topicId)
+              .then(
+                function() {
+                  $scope.topicRights.markTopicAsPublished();
+                  TopicEditorStateService.setTopicRights($scope.topicRights);
+                }
+              )
+              .then(function() {
+                var successToast = 'Topic published.';
+                AlertsService.addSuccessMessage(
+                  successToast, 1000);
+              });
           };
 
           $scope.discardChanges = function() {
@@ -108,22 +110,24 @@ oppia.directive('topicEditorNavbar', [
 
             modalInstance.result.then(function(commitMessage) {
               TopicEditorStateService.saveTopic(commitMessage);
-            }).then(function() {
-              var successToast = 'Changes saved.';
-              AlertsService.addSuccessMessage(
-                successToast, 1000);
-            });
+            })
+              .then(function() {
+                var successToast = 'Changes saved.';
+                AlertsService.addSuccessMessage(
+                  successToast, 1000);
+              });
           };
 
           $scope.unpublishTopic = function() {
             if (!$scope.topicRights.canPublishTopic()) {
               return false;
             }
-            TopicRightsBackendApiService.unpublishTopic($scope.topicId).then(
-              function() {
-                $scope.topicRights.markTopicAsUnpublished();
-                TopicEditorStateService.setTopicRights($scope.topicRights);
-              });
+            TopicRightsBackendApiService.unpublishTopic($scope.topicId)
+              .then(
+                function() {
+                  $scope.topicRights.markTopicAsUnpublished();
+                  TopicEditorStateService.setTopicRights($scope.topicRights);
+                });
           };
 
           $scope.$on(EVENT_TOPIC_INITIALIZED, _validateTopic);
@@ -133,4 +137,5 @@ oppia.directive('topicEditorNavbar', [
         }
       ]
     };
-  }]);
+  }
+]);

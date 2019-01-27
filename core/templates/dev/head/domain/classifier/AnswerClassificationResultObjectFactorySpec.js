@@ -22,23 +22,27 @@ describe('Answer classification result object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     acrof = $injector.get('AnswerClassificationResultObjectFactory');
     oof = $injector.get('OutcomeObjectFactory');
     DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
       'DEFAULT_OUTCOME_CLASSIFICATION');
-  }));
+  }]);
 
   it('should create a new result', function() {
     var answerClassificationResult = acrof.createNew(
       oof.createNew('default', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
     );
 
-    expect(answerClassificationResult.outcome).toEqual(
-      oof.createNew('default', '', []));
-    expect(answerClassificationResult.answerGroupIndex).toEqual(1);
-    expect(answerClassificationResult.ruleIndex).toEqual(0);
-    expect(answerClassificationResult.classificationCategorization).toEqual(
-      DEFAULT_OUTCOME_CLASSIFICATION);
+    expect(answerClassificationResult.outcome)
+      .toEqual(
+        oof.createNew('default', '', []));
+    expect(answerClassificationResult.answerGroupIndex)
+      .toEqual(1);
+    expect(answerClassificationResult.ruleIndex)
+      .toEqual(0);
+    expect(answerClassificationResult.classificationCategorization)
+      .toEqual(
+        DEFAULT_OUTCOME_CLASSIFICATION);
   });
 });

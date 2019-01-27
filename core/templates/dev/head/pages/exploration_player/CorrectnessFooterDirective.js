@@ -25,4 +25,5 @@ oppia.directive('correctnessFooter', [
         '/pages/exploration_player/' +
         'correctness_footer_directive.html')
     };
-  }]);
+  }
+]);

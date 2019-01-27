@@ -20,47 +20,45 @@
 // 'isAddressed'. The exact format for each of these is specific to the
 // particular visualization.
 
-oppia.directive('oppiaVisualizationBarChart', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    controller: [
-      '$scope', '$attrs', '$element', 'HtmlEscaperService',
-      function($scope, $attrs, $element, HtmlEscaperService) {
-        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
-        $scope.options =
+oppia.directive('oppiaVisualizationBarChart', [
+  function() {
+    return {
+      restrict: 'E',
+      scope: {},
+      controller: [
+        '$scope', '$attrs', '$element', 'HtmlEscaperService',
+        function($scope, $attrs, $element, HtmlEscaperService) {
+          $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+          $scope.options =
           HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
 
-        var dataArray = [['Answers', '']];
-        for (var i = 0; i < $scope.data.length; i++) {
-          dataArray.push([
-            String($scope.data[i].answer), $scope.data[i].frequency]);
-        }
-
-        var data = google.visualization.arrayToDataTable(dataArray);
-
-        var options = {
-          chartArea: {
-            width: '60%'
-          },
-          hAxis: {
-            title: 'Number of times answer was submitted',
-            minValue: 0
-          },
-          legend: {
-            position: 'none'
-          },
-          vAxis: {
-            title: 'Answer choice'
+          var dataArray = [['Answers', '']];
+          for (var i = 0; i < $scope.data.length; i++) {
+            dataArray.push([
+              String($scope.data[i].answer),
+              $scope.data[i].frequency
+            ]);
           }
-        };
 
-        var chart = new google.visualization.BarChart($element[0]);
-        chart.draw(data, options);
-      }
-    ]
-  };
-}]);
+          var data = google.visualization.arrayToDataTable(dataArray);
+
+          var options = {
+            chartArea: {width: '60%'},
+            hAxis: {
+              title: 'Number of times answer was submitted',
+              minValue: 0
+            },
+            legend: {position: 'none'},
+            vAxis: {title: 'Answer choice'}
+          };
+
+          var chart = new google.visualization.BarChart($element[0]);
+          chart.draw(data, options);
+        }
+      ]
+    };
+  }
+]);
 
 oppia.directive('oppiaVisualizationFrequencyTable', [
   'UrlInterpolationService', function(UrlInterpolationService) {

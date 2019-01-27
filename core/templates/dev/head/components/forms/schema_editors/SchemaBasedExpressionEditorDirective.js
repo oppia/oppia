@@ -33,4 +33,5 @@ oppia.directive('schemaBasedExpressionEditor', [
       ),
       restrict: 'E'
     };
-  }]);
+  }
+]);

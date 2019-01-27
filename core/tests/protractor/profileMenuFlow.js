@@ -35,8 +35,9 @@ describe('Profile menu flow', function() {
 
   it('should land on the learner dashboard after successful login',
     function() {
-      expect(browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/learner_dashboard');
+      expect(browser.getCurrentUrl())
+        .toEqual(
+          'http://localhost:9001/learner_dashboard');
     });
 
   describe('profile dropdown menu', function() {
@@ -58,7 +59,8 @@ describe('Profile menu flow', function() {
           profileLink, 'Could not click on the profile link');
         profileLink.click();
         waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/profile/desktopAndMobileVisitor');
+        expect(browser.getCurrentUrl())
+          .toEqual('http://localhost:9001/profile/desktopAndMobileVisitor');
       });
 
     it('should visit the creator dashboard from the profile dropdown menu',
@@ -70,7 +72,8 @@ describe('Profile menu flow', function() {
           'Could not click on the creator dashboard link');
         creatorDashboardLink.click();
         waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/creator_dashboard');
+        expect(browser.getCurrentUrl())
+          .toEqual('http://localhost:9001/creator_dashboard');
       });
 
     it('should visit the learner dashboard from the profile dropdown menu',
@@ -82,7 +85,8 @@ describe('Profile menu flow', function() {
           'Could not click on the learner dashboard link');
         learnerDashboardLink.click();
         waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/learner_dashboard');
+        expect(browser.getCurrentUrl())
+          .toEqual('http://localhost:9001/learner_dashboard');
       });
 
     it('should visit the notifications page from the profile dropdown menu',
@@ -94,7 +98,8 @@ describe('Profile menu flow', function() {
           'Could not click on the notifications dashboard link');
         notificationsDashboardLink.click();
         waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/notifications_dashboard');
+        expect(browser.getCurrentUrl())
+          .toEqual('http://localhost:9001/notifications_dashboard');
       });
 
     it('should visit the preferences page from the profile dropdown menu',
@@ -106,7 +111,8 @@ describe('Profile menu flow', function() {
           'Could not click on the preferences link');
         preferencesLink.click();
         waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/preferences');
+        expect(browser.getCurrentUrl())
+          .toEqual('http://localhost:9001/preferences');
       });
   });
 

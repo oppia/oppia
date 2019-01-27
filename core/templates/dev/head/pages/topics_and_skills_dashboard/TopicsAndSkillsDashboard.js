@@ -46,46 +46,48 @@ oppia.controller('TopicsAndSkillsDashboard', [
     $scope.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
 
     var _initDashboard = function() {
-      TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-        function(response) {
-          $scope.topicSummaries = response.data.topic_summary_dicts;
-          $scope.editableTopicSummaries = $scope.topicSummaries.filter(
-            function(summary) {
-              return summary.can_edit_topic === true;
-            }
-          );
-          $scope.untriagedSkillSummaries =
+      TopicsAndSkillsDashboardBackendApiService.fetchDashboardData()
+        .then(
+          function(response) {
+            $scope.topicSummaries = response.data.topic_summary_dicts;
+            $scope.editableTopicSummaries = $scope.topicSummaries.filter(
+              function(summary) {
+                return summary.can_edit_topic === true;
+              }
+            );
+            $scope.untriagedSkillSummaries =
             response.data.untriaged_skill_summary_dicts;
-          $scope.mergeableSkillSummaries =
+            $scope.mergeableSkillSummaries =
             response.data.mergeable_skill_summary_dicts;
-          $scope.unpublishedSkillSummaries =
+            $scope.unpublishedSkillSummaries =
             response.data.unpublished_skill_summary_dicts;
-          $scope.activeTab = $scope.TAB_NAME_TOPICS;
-          $scope.userCanCreateTopic = response.data.can_create_topic;
-          $scope.userCanCreateSkill = response.data.can_create_skill;
-          $rootScope.$broadcast(
-            EVENT_TYPE_TOPIC_CREATION_ENABLED, $scope.userCanCreateTopic);
-          $rootScope.$broadcast(
-            EVENT_TYPE_SKILL_CREATION_ENABLED, $scope.userCanCreateSkill);
-          $scope.userCanDeleteTopic = response.data.can_delete_topic;
-          $scope.userCanDeleteSkill = response.data.can_delete_skill;
-          if ($scope.topicSummaries.length === 0 &&
+            $scope.activeTab = $scope.TAB_NAME_TOPICS;
+            $scope.userCanCreateTopic = response.data.can_create_topic;
+            $scope.userCanCreateSkill = response.data.can_create_skill;
+            $rootScope.$broadcast(
+              EVENT_TYPE_TOPIC_CREATION_ENABLED, $scope.userCanCreateTopic);
+            $rootScope.$broadcast(
+              EVENT_TYPE_SKILL_CREATION_ENABLED, $scope.userCanCreateSkill);
+            $scope.userCanDeleteTopic = response.data.can_delete_topic;
+            $scope.userCanDeleteSkill = response.data.can_delete_skill;
+            if ($scope.topicSummaries.length === 0 &&
               $scope.untriagedSkillSummaries.length !== 0) {
-            $scope.activeTab = $scope.TAB_NAME_UNTRIAGED_SKILLS;
-          } else if (
-            $scope.topicSummaries.length === 0 &&
+              $scope.activeTab = $scope.TAB_NAME_UNTRIAGED_SKILLS;
+            } else if (
+              $scope.topicSummaries.length === 0 &&
             $scope.unpublishedSkillSummaries.length !== 0) {
-            $scope.activeTab = $scope.TAB_NAME_UNPUBLISHED_SKILLS;
+              $scope.activeTab = $scope.TAB_NAME_UNPUBLISHED_SKILLS;
+            }
+          },
+          function(errorResponse) {
+            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+              AlertsService.addWarning('Failed to get dashboard data');
+            } else {
+              AlertsService.addWarning('Unexpected error code from ' +
+              'the server.');
+            }
           }
-        },
-        function(errorResponse) {
-          if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-            AlertsService.addWarning('Failed to get dashboard data');
-          } else {
-            AlertsService.addWarning('Unexpected error code from the server.');
-          }
-        }
-      );
+        );
     };
 
     $scope.isTopicTabHelpTextVisible = function() {
@@ -118,7 +120,8 @@ oppia.controller('TopicsAndSkillsDashboard', [
             $scope.newSkillDescription = '';
             $scope.createNewSkill = function() {
               $uibModalInstance.close({
-                description: $scope.newSkillDescription
+                description:
+                 $scope.newSkillDescription
               });
             };
 

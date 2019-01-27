@@ -24,22 +24,25 @@ oppia.directive('dragAndDropPositiveIntEditor', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/drag_and_drop_positive_int_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        if (!parseInt($scope.value)) {
-          $scope.value = 1;
+      controller: [
+        '$scope', function($scope) {
+          if (!parseInt($scope.value)) {
+            $scope.value = 1;
+          }
+          if (!$scope.selectedRank) {
+            $scope.selectedRank = '';
+          }
+          $scope.allowedRanks = [];
+          $scope.initArgs = $scope.getInitArgs();
+          $scope.choices = $scope.initArgs.choices;
+          for (var i = 0; i < $scope.choices.length; i++) {
+            $scope.allowedRanks.push(i + 1);
+          }
+          $scope.selection = function(selectedRank) {
+            $scope.value = parseInt(selectedRank);
+          };
         }
-        if (!$scope.selectedRank) {
-          $scope.selectedRank = '';
-        }
-        $scope.allowedRanks = [];
-        $scope.initArgs = $scope.getInitArgs();
-        $scope.choices = $scope.initArgs.choices;
-        for (var i = 0; i < $scope.choices.length; i++) {
-          $scope.allowedRanks.push(i + 1);
-        }
-        $scope.selection = function(selectedRank) {
-          $scope.value = parseInt(selectedRank);
-        };
-      }]
+      ]
     };
-  }]);
+  }
+]);

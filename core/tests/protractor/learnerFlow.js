@@ -257,9 +257,10 @@ describe('Learner dashboard functionality', function() {
       libraryPage.playExploration('Dummy Exploration');
       // Wait for player page to completely load
       waitFor.pageToFullyLoad();
-      general.getExplorationIdFromPlayer().then(function(explorationId) {
-        general.openEditor(explorationId);
-      });
+      general.getExplorationIdFromPlayer()
+        .then(function(explorationId) {
+          general.openEditor(explorationId);
+        });
       explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.deleteExploration();
       users.logout();
@@ -322,9 +323,11 @@ describe('Learner dashboard functionality', function() {
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
     var firstExploration = browser.isMobile ? element.all(
-      by.css('.protractor-mobile-test-collection-exploration')).first() :
+      by.css('.protractor-mobile-test-collection-exploration'))
+      .first() :
       element.all(
-        by.css('.protractor-test-collection-exploration')).first();
+        by.css('.protractor-test-collection-exploration'))
+        .first();
     // Click first exploration in collection.
     waitFor.elementToBeClickable(
       firstExploration, 'Could not click first exploration in collection');
@@ -360,9 +363,11 @@ describe('Learner dashboard functionality', function() {
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
     var firstExploration = browser.isMobile ? element.all(
-      by.css('.protractor-mobile-test-collection-exploration')).first() :
+      by.css('.protractor-mobile-test-collection-exploration'))
+      .first() :
       element.all(
-        by.css('.protractor-test-collection-exploration')).first();
+        by.css('.protractor-test-collection-exploration'))
+        .first();
     // Click first exploration in collection.
     waitFor.elementToBeClickable(
       firstExploration, 'Could not click first exploration in collection');

@@ -37,38 +37,47 @@ describe('Answer Groups Cache Service', function() {
     };
 
     var scope, agcs;
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(inject[function($injector, $rootScope) {
       scope = $rootScope.$new();
       agcs = $injector.get('AnswerGroupsCacheService');
-    }));
+    }]);
 
     it('sets a value in the cache', function() {
       agcs.set('InteractionId', answerGroup);
-      expect(agcs.contains('InteractionId')).toBe(true);
+      expect(agcs.contains('InteractionId'))
+        .toBe(true);
     });
 
     it('returns null when value isnt available in the cache', function() {
-      expect(agcs.get('NonPresentInteractionId')).toEqual(null);
+      expect(agcs.get('NonPresentInteractionId'))
+        .toEqual(null);
     });
 
     it('gets a value from the cache', function() {
       agcs.set('InteractionId', answerGroup);
-      expect(agcs.get('InteractionId')).toEqual(answerGroup);
+      expect(agcs.get('InteractionId'))
+        .toEqual(answerGroup);
     });
 
     it('successfully checks if the value is available in cache', function() {
       agcs.set('InteractionId', answerGroup);
-      expect(agcs.contains('InteractionId')).toBe(true);
-      expect(agcs.contains('NonPresentInteractionId')).toBe(false);
-      expect(agcs.contains('')).toBe(false);
-      expect(agcs.contains(1)).toBe(false);
+      expect(agcs.contains('InteractionId'))
+        .toBe(true);
+      expect(agcs.contains('NonPresentInteractionId'))
+        .toBe(false);
+      expect(agcs.contains(''))
+        .toBe(false);
+      expect(agcs.contains(1))
+        .toBe(false);
     });
 
     it('resets the cache', function() {
       agcs.set('InteractionId', answerGroup);
-      expect(agcs.contains('InteractionId')).toBe(true);
+      expect(agcs.contains('InteractionId'))
+        .toBe(true);
       agcs.reset();
-      expect(agcs.contains('InteractionId')).toBe(false);
+      expect(agcs.contains('InteractionId'))
+        .toBe(false);
     });
   });
 });

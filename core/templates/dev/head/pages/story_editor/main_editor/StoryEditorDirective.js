@@ -74,7 +74,8 @@ oppia.directive('storyEditor', [
 
           $scope.isInitialNode = function(nodeId) {
             return (
-              $scope.story.getStoryContents().getInitialNodeId() === nodeId);
+              $scope.story.getStoryContents()
+                .getInitialNodeId() === nodeId);
           };
 
           $scope.markAsInitialNode = function(nodeId) {
@@ -155,18 +156,18 @@ oppia.directive('storyEditor', [
               StoryUpdateService.addStoryNode($scope.story, title);
               _initEditor();
               // If the first node is added, open it just after creation.
-              if ($scope.story.getStoryContents().getNodes().length === 1) {
+              if ($scope.story.getStoryContents()
+                .getNodes().length === 1) {
                 $scope.setNodeToEdit(
-                  $scope.story.getStoryContents().getInitialNodeId());
+                  $scope.story.getStoryContents()
+                    .getInitialNodeId());
               }
             });
           };
 
           $scope.NOTES_SCHEMA = {
             type: 'html',
-            ui_config: {
-              startupFocusEnabled: false
-            }
+            ui_config: {startupFocusEnabled: false}
           };
 
           $scope.updateNotes = function(newNotes) {
@@ -212,4 +213,5 @@ oppia.directive('storyEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

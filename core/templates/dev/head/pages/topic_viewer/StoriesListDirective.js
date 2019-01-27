@@ -25,7 +25,8 @@ oppia.directive('storiesList', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_viewer/stories_list_directive.html'),
-      controller: ['WindowDimensionsService', '$scope', '$timeout',
+      controller: [
+        'WindowDimensionsService', '$scope', '$timeout',
         function(WindowDimensionsService, $scope, $timeout) {
           var STORY_TILE_WIDTH_PX = 360;
           $scope.leftmostCardIndices = 0;
@@ -38,18 +39,22 @@ oppia.directive('storiesList', [
               return;
             }
 
-            var windowWidth = $(window).width() * 0.85;
+            var windowWidth = $(window)
+              .width() * 0.85;
             $scope.tileDisplayCount = Math.min(
               Math.floor(windowWidth / (STORY_TILE_WIDTH_PX + 20)),
               MAX_NUM_TILES_PER_ROW);
 
-            $('.oppia-topic-viewer-carousel').css({
-              width: ($scope.tileDisplayCount * STORY_TILE_WIDTH_PX) + 'px'
-            });
+            $('.oppia-topic-viewer-carousel')
+              .css({
+                width: ($scope.tileDisplayCount * STORY_TILE_WIDTH_PX) +
+                'px'
+              });
 
             var carouselJQuerySelector = ('.oppia-topic-viewer-carousel');
             var carouselScrollPositionPx = $(
-              carouselJQuerySelector).scrollLeft();
+              carouselJQuerySelector)
+              .scrollLeft();
 
             var index = Math.ceil(
               carouselScrollPositionPx / STORY_TILE_WIDTH_PX);
@@ -66,7 +71,8 @@ oppia.directive('storiesList', [
 
             var direction = isLeftScroll ? -1 : 1;
             var carouselScrollPositionPx = $(
-              carouselJQuerySelector).scrollLeft();
+              carouselJQuerySelector)
+              .scrollLeft();
 
             // Prevent scrolling if there more carousel pixed widths than
             // there are tile widths.
@@ -88,18 +94,17 @@ oppia.directive('storiesList', [
 
             var newScrollPositionPx = carouselScrollPositionPx +
               ($scope.tileDisplayCount * STORY_TILE_WIDTH_PX * direction);
-            $(carouselJQuerySelector).animate({
-              scrollLeft: newScrollPositionPx
-            }, {
-              duration: 800,
-              queue: false,
-              start: function() {
-                isAnyCarouselCurrentlyScrolling = true;
-              },
-              complete: function() {
-                isAnyCarouselCurrentlyScrolling = false;
-              }
-            });
+            $(carouselJQuerySelector)
+              .animate({scrollLeft: newScrollPositionPx}, {
+                duration: 800,
+                queue: false,
+                start: function() {
+                  isAnyCarouselCurrentlyScrolling = true;
+                },
+                complete: function() {
+                  isAnyCarouselCurrentlyScrolling = false;
+                }
+              });
           };
 
           var topicViewerWindowCutoffPx = 895;
@@ -122,11 +127,13 @@ oppia.directive('storiesList', [
             initCarousels();
           }, 390);
 
-          $(window).resize(function() {
-            initCarousels();
-            $scope.$apply();
-          });
+          $(window)
+            .resize(function() {
+              initCarousels();
+              $scope.$apply();
+            });
         }
       ]
     };
-  }]);
+  }
+]);

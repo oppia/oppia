@@ -21,7 +21,7 @@ describe('Solution object factory', function() {
 
   describe('SolutionObjectFactory', function() {
     var scope, sof, solution;
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(inject[function($injector, $rootScope) {
       scope = $rootScope.$new();
       sof = $injector.get('SolutionObjectFactory');
       solution = sof.createFromBackendDict({
@@ -32,31 +32,34 @@ describe('Solution object factory', function() {
           html: 'This is the explanation to the answer'
         }
       });
-    }));
+    }]);
 
 
     it('should create a new solution', function() {
-      expect(solution.toBackendDict()).toEqual({
-        answer_is_exclusive: false,
-        correct_answer: 'This is a correct answer!',
-        explanation: {
-          content_id: 'solution',
-          html: 'This is the explanation to the answer'
-        }
-      });
+      expect(solution.toBackendDict())
+        .toEqual({
+          answer_is_exclusive: false,
+          correct_answer: 'This is a correct answer!',
+          explanation: {
+            content_id: 'solution',
+            html: 'This is the explanation to the answer'
+          }
+        });
     });
 
     it('should create summary correctly', function() {
-      expect(solution.getSummary('TextInput')).toEqual(
-        'One solution is "&quot;This is a correct answer!&quot;". ' +
+      expect(solution.getSummary('TextInput'))
+        .toEqual(
+          'One solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
         ascii: 'one',
         latex: 'one'
       });
-      expect(solution.getSummary('MathExpressionInput')).toEqual(
-        'One solution is "one". This is the explanation to the answer.');
+      expect(solution.getSummary('MathExpressionInput'))
+        .toEqual(
+          'One solution is "one". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
         code: 'a=10',
@@ -64,8 +67,9 @@ describe('Solution object factory', function() {
         evaluation: '',
         output: ''
       });
-      expect(solution.getSummary('CodeRepl')).toEqual(
-        'One solution is "a=10". This is the explanation to the answer.');
+      expect(solution.getSummary('CodeRepl'))
+        .toEqual(
+          'One solution is "a=10". This is the explanation to the answer.');
 
       solution.setCorrectAnswer({
         isNegative: false,
@@ -73,8 +77,9 @@ describe('Solution object factory', function() {
         numerator: 1,
         denominator: 6
       });
-      expect(solution.getSummary('FractionInput')).toEqual(
-        'One solution is "1/6". This is the explanation to the answer.');
+      expect(solution.getSummary('FractionInput'))
+        .toEqual(
+          'One solution is "1/6". This is the explanation to the answer.');
     });
   });
 });

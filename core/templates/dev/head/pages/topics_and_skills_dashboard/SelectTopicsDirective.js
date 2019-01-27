@@ -43,4 +43,5 @@ oppia.directive('selectTopics', [
         }
       ]
     };
-  }]);
+  }
+]);

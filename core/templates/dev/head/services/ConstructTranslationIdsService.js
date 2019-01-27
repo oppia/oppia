@@ -24,8 +24,11 @@ oppia.factory('ConstructTranslationIdsService', [
       getLibraryId: function(prefix, name) {
         return (
           'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +
-            name.toUpperCase().split(' ').join('_'));
+            name.toUpperCase()
+              .split(' ')
+              .join('_'));
       }
     };
-  }]
+  }
+]
 );

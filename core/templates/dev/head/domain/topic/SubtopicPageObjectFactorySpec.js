@@ -22,28 +22,36 @@ describe('Subtopic page object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-  }));
+  }]);
 
   it('should be able to create a subtopic page object with given topic and ' +
     'subtopic id', function() {
     var subtopicPage = SubtopicPageObjectFactory.createDefault(
       'topic_id', 2);
-    expect(subtopicPage.getId()).toBe('topic_id-2');
-    expect(subtopicPage.getTopicId()).toBe('topic_id');
-    expect(subtopicPage.getPageContents().getHtml()).toEqual('');
-    expect(subtopicPage.getLanguageCode()).toEqual('en');
+    expect(subtopicPage.getId())
+      .toBe('topic_id-2');
+    expect(subtopicPage.getTopicId())
+      .toBe('topic_id');
+    expect(subtopicPage.getHtmlData())
+      .toEqual('');
+    expect(subtopicPage.getLanguageCode())
+      .toEqual('en');
   });
 
   it('should be able to create an interstitial subtopic page object',
     function() {
       var subtopicPage =
         SubtopicPageObjectFactory.createInterstitialSubtopicPage();
-      expect(subtopicPage.getId()).toEqual(null);
-      expect(subtopicPage.getTopicId()).toEqual(null);
-      expect(subtopicPage.getPageContents()).toEqual(null);
-      expect(subtopicPage.getLanguageCode()).toBe('en');
+      expect(subtopicPage.getId())
+        .toEqual(null);
+      expect(subtopicPage.getTopicId())
+        .toEqual(null);
+      expect(subtopicPage.getHtmlData())
+        .toEqual(null);
+      expect(subtopicPage.getLanguageCode())
+        .toBe('en');
     });
 
   it('should be able to copy from another subtopic page', function() {
@@ -55,9 +63,7 @@ describe('Subtopic page object factory', function() {
           html: '<p>Data</p>',
           content_id: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {}
-        }
+        content_ids_to_audio_translations: {content: {}}
       },
       language_code: 'en'
     });
@@ -70,9 +76,7 @@ describe('Subtopic page object factory', function() {
           html: '<p>Data2</p>',
           content_id: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {}
-        }
+        content_ids_to_audio_translations: {content: {}}
       },
       language_code: 'en'
     });
@@ -82,6 +86,7 @@ describe('Subtopic page object factory', function() {
 
     firstSubtopicPage.copyFromSubtopicPage(secondSubtopicPage);
     expect(firstSubtopicPage).not.toBe(secondSubtopicPage);
-    expect(firstSubtopicPage).toEqual(secondSubtopicPage);
+    expect(firstSubtopicPage)
+      .toEqual(secondSubtopicPage);
   });
 });

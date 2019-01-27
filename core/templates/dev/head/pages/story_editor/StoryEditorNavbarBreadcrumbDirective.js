@@ -56,13 +56,12 @@ oppia.directive('storyEditorNavbarBreadcrumb', [
             } else {
               $window.open(
                 UrlInterpolationService.interpolateUrl(
-                  TOPIC_EDITOR_URL_TEMPLATE, {
-                    topicId: topicId
-                  }
+                  TOPIC_EDITOR_URL_TEMPLATE, {topicId: topicId}
                 ), '_self');
             }
           };
         }
       ]
     };
-  }]);
+  }
+]);

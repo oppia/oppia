@@ -23,14 +23,14 @@ describe('Stopwatch object factory', function() {
     var StopwatchObjectFactory = null;
     var errorLog = [];
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       StopwatchObjectFactory = $injector.get('StopwatchObjectFactory');
       spyOn($injector.get('$log'), 'error').and.callFake(
         function(errorMessage) {
           errorLog.push(errorMessage);
         }
       );
-    }));
+    }]);
 
     var changeCurrentTime = function(stopwatch, desiredCurrentTime) {
       stopwatch._getCurrentTime = function() {
@@ -43,7 +43,8 @@ describe('Stopwatch object factory', function() {
       changeCurrentTime(stopwatch, 0);
       stopwatch.reset();
       changeCurrentTime(stopwatch, 500);
-      expect(stopwatch.getTimeInSecs()).toEqual(0.5);
+      expect(stopwatch.getTimeInSecs())
+        .toEqual(0.5);
     });
 
     it('should not reset stopwatch when current time is retrieved', function() {
@@ -51,8 +52,10 @@ describe('Stopwatch object factory', function() {
       changeCurrentTime(stopwatch, 0);
       stopwatch.reset();
       changeCurrentTime(stopwatch, 500);
-      expect(stopwatch.getTimeInSecs()).toEqual(0.5);
-      expect(stopwatch.getTimeInSecs()).toEqual(0.5);
+      expect(stopwatch.getTimeInSecs())
+        .toEqual(0.5);
+      expect(stopwatch.getTimeInSecs())
+        .toEqual(0.5);
     });
 
     it('should correctly reset the stopwatch', function() {
@@ -60,19 +63,26 @@ describe('Stopwatch object factory', function() {
       changeCurrentTime(stopwatch, 0);
       stopwatch.reset();
       changeCurrentTime(stopwatch, 500);
-      expect(stopwatch.getTimeInSecs()).toEqual(0.5);
+      expect(stopwatch.getTimeInSecs())
+        .toEqual(0.5);
       stopwatch.reset();
-      expect(stopwatch.getTimeInSecs()).toEqual(0);
+      expect(stopwatch.getTimeInSecs())
+        .toEqual(0);
       changeCurrentTime(stopwatch, 800);
-      expect(stopwatch.getTimeInSecs()).toEqual(0.3);
+      expect(stopwatch.getTimeInSecs())
+        .toEqual(0.3);
     });
 
     it('should error if getTimeInSecs() is called before reset()', function() {
       var stopwatch = StopwatchObjectFactory.create();
       changeCurrentTime(stopwatch, 29);
-      expect(stopwatch.getTimeInSecs()).toBeNull();
-      expect(errorLog).toEqual([
-        'Tried to retrieve the elapsed time, but no start time was set.']);
+      expect(stopwatch.getTimeInSecs())
+        .toBeNull();
+      expect(errorLog)
+        .toEqual([
+          'Tried to retrieve the elapsed time, but no ' +
+        'start time was set.'
+        ]);
     });
 
     it('should instantiate independent stopwatches', function() {
@@ -89,8 +99,10 @@ describe('Stopwatch object factory', function() {
 
       changeCurrentTime(stopwatch1, 100);
       changeCurrentTime(stopwatch2, 100);
-      expect(stopwatch1.getTimeInSecs()).toEqual(0.1);
-      expect(stopwatch2.getTimeInSecs()).toEqual(0.05);
+      expect(stopwatch1.getTimeInSecs())
+        .toEqual(0.1);
+      expect(stopwatch2.getTimeInSecs())
+        .toEqual(0.05);
     });
   });
 });

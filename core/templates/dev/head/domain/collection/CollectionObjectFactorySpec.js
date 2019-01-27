@@ -23,7 +23,7 @@ describe('Collection object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
 
@@ -38,7 +38,7 @@ describe('Collection object factory', function() {
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
-  }));
+  }]);
 
   var _addCollectionNode = function(explorationId) {
     var collectionNodeBackendObject = {
@@ -55,14 +55,22 @@ describe('Collection object factory', function() {
 
   it('should be able to create an empty collection object', function() {
     var collection = CollectionObjectFactory.createEmptyCollection();
-    expect(collection.getId()).toBeUndefined();
-    expect(collection.getTitle()).toBeUndefined();
-    expect(collection.getCategory()).toBeUndefined();
-    expect(collection.getObjective()).toBeUndefined();
-    expect(collection.getLanguageCode()).toBeUndefined();
-    expect(collection.getTags()).toBeUndefined();
-    expect(collection.getVersion()).toBeUndefined();
-    expect(collection.getCollectionNodes()).toEqual([]);
+    expect(collection.getId())
+      .toBeUndefined();
+    expect(collection.getTitle())
+      .toBeUndefined();
+    expect(collection.getCategory())
+      .toBeUndefined();
+    expect(collection.getObjective())
+      .toBeUndefined();
+    expect(collection.getLanguageCode())
+      .toBeUndefined();
+    expect(collection.getTags())
+      .toBeUndefined();
+    expect(collection.getVersion())
+      .toBeUndefined();
+    expect(collection.getCollectionNodes())
+      .toEqual([]);
   });
 
   it('should contain a collection node defined in the backend object',
@@ -75,17 +83,22 @@ describe('Collection object factory', function() {
         id: 'collection_id',
         nodes: [collectionNodeBackendObject]
       });
-      expect(collection.containsCollectionNode('exp_id0')).toBe(true);
-      expect(collection.getCollectionNodes()).toEqual([
-        CollectionNodeObjectFactory.create(collectionNodeBackendObject)
-      ]);
+      expect(collection.containsCollectionNode('exp_id0'))
+        .toBe(true);
+      expect(collection.getCollectionNodes())
+        .toEqual([
+          CollectionNodeObjectFactory
+            .create(collectionNodeBackendObject)
+        ]);
     }
   );
 
   it('should contain added explorations and not contain removed ones',
     function() {
-      expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(false);
-      expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
+      expect(_sampleCollection.containsCollectionNode('exp_id0'))
+        .toBe(false);
+      expect(_sampleCollection.getCollectionNodeCount())
+        .toEqual(0);
 
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
@@ -94,16 +107,24 @@ describe('Collection object factory', function() {
       var collectionNode = CollectionNodeObjectFactory.create(
         collectionNodeBackendObject);
 
-      expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(true);
-      expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(true);
-      expect(_sampleCollection.getCollectionNodes()).toEqual([
-        CollectionNodeObjectFactory.create(collectionNodeBackendObject)
-      ]);
-      expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
+      expect(_sampleCollection.addCollectionNode(collectionNode))
+        .toBe(true);
+      expect(_sampleCollection.containsCollectionNode('exp_id0'))
+        .toBe(true);
+      expect(_sampleCollection.getCollectionNodes())
+        .toEqual([
+          CollectionNodeObjectFactory
+            .create(collectionNodeBackendObject)
+        ]);
+      expect(_sampleCollection.getCollectionNodeCount())
+        .toEqual(1);
 
-      expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
-      expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(false);
-      expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
+      expect(_sampleCollection.deleteCollectionNode('exp_id0'))
+        .toBe(true);
+      expect(_sampleCollection.containsCollectionNode('exp_id0'))
+        .toBe(false);
+      expect(_sampleCollection.getCollectionNodeCount())
+        .toEqual(0);
     }
   );
 
@@ -115,16 +136,20 @@ describe('Collection object factory', function() {
     var collectionNode = CollectionNodeObjectFactory.create(
       collectionNodeBackendObject);
 
-    expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(true);
-    expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(false);
+    expect(_sampleCollection.addCollectionNode(collectionNode))
+      .toBe(true);
+    expect(_sampleCollection.addCollectionNode(collectionNode))
+      .toBe(false);
   });
 
   it('should fail to delete nonexistent explorations', function() {
-    expect(_sampleCollection.deleteCollectionNode('fake_exp_id')).toBe(false);
+    expect(_sampleCollection.deleteCollectionNode('fake_exp_id'))
+      .toBe(false);
   });
 
   it('should be able to clear all nodes from a collection', function() {
-    expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
+    expect(_sampleCollection.getCollectionNodeCount())
+      .toEqual(0);
 
     var collectionNodeBackendObject1 = {
       exploration_id: 'exp_id0',
@@ -140,22 +165,30 @@ describe('Collection object factory', function() {
       collectionNodeBackendObject2);
 
     _sampleCollection.addCollectionNode(collectionNode1);
-    expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
-    expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(true);
+    expect(_sampleCollection.getCollectionNodeCount())
+      .toEqual(1);
+    expect(_sampleCollection.containsCollectionNode('exp_id0'))
+      .toBe(true);
 
     _sampleCollection.clearCollectionNodes();
-    expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
-    expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(false);
-    expect(_sampleCollection.getCollectionNodes()).toEqual([]);
+    expect(_sampleCollection.getCollectionNodeCount())
+      .toEqual(0);
+    expect(_sampleCollection.containsCollectionNode('exp_id0'))
+      .toBe(false);
+    expect(_sampleCollection.getCollectionNodes())
+      .toEqual([]);
 
     _sampleCollection.addCollectionNode(collectionNode2);
-    expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
-    expect(_sampleCollection.containsCollectionNode('exp_id1')).toBe(true);
+    expect(_sampleCollection.getCollectionNodeCount())
+      .toEqual(1);
+    expect(_sampleCollection.containsCollectionNode('exp_id1'))
+      .toBe(true);
   });
 
   it('should be able to retrieve a mutable collection node by exploration id',
     function() {
-      expect(_getCollectionNode('exp_id0')).toBeUndefined();
+      expect(_getCollectionNode('exp_id0'))
+        .toBeUndefined();
       var collectionNodeBackendObject = {
         exploration_id: 'exp_id0',
         exploration: {}
@@ -164,8 +197,9 @@ describe('Collection object factory', function() {
         CollectionNodeObjectFactory.create(collectionNodeBackendObject));
 
       var collectionNodeBefore = _getCollectionNode('exp_id0');
-      expect(collectionNodeBefore).toEqual(CollectionNodeObjectFactory.create(
-        collectionNodeBackendObject));
+      expect(collectionNodeBefore)
+        .toEqual(CollectionNodeObjectFactory.create(
+          collectionNodeBackendObject));
     }
   );
 
@@ -176,14 +210,19 @@ describe('Collection object factory', function() {
       _addCollectionNode('b_exp_id2');
 
       var collectionNodes = _sampleCollection.getCollectionNodes();
-      expect(collectionNodes[0].getExplorationId()).toEqual('c_exp_id0');
-      expect(collectionNodes[1].getExplorationId()).toEqual('a_exp_id1');
-      expect(collectionNodes[2].getExplorationId()).toEqual('b_exp_id2');
+      expect(collectionNodes[0].getExplorationId())
+        .toEqual('c_exp_id0');
+      expect(collectionNodes[1].getExplorationId())
+        .toEqual('a_exp_id1');
+      expect(collectionNodes[2].getExplorationId())
+        .toEqual('b_exp_id2');
 
       _sampleCollection.deleteCollectionNode('a_exp_id1');
       collectionNodes = _sampleCollection.getCollectionNodes();
-      expect(collectionNodes[0].getExplorationId()).toEqual('c_exp_id0');
-      expect(collectionNodes[1].getExplorationId()).toEqual('b_exp_id2');
+      expect(collectionNodes[0].getExplorationId())
+        .toEqual('c_exp_id0');
+      expect(collectionNodes[1].getExplorationId())
+        .toEqual('b_exp_id2');
     }
   );
 
@@ -191,7 +230,8 @@ describe('Collection object factory', function() {
     function() {
       _addCollectionNode('exp_id0');
       _addCollectionNode('exp_id1');
-      expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
+      expect(_sampleCollection.getCollectionNodeCount())
+        .toEqual(2);
 
       // Ensure the array itself cannot be mutated and then reflected in the
       // collection object.
@@ -200,14 +240,17 @@ describe('Collection object factory', function() {
 
       expect(
         _sampleCollection.getCollectionNodes()).not.toEqual(collectionNodes);
-      expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
+      expect(_sampleCollection.getCollectionNodeCount())
+        .toEqual(2);
 
       // Ensure contained collection nodes can be mutated and reflected in the
       // collection object.
       collectionNodes = _sampleCollection.getBindableCollectionNodes();
-      expect(_sampleCollection.getBindableCollectionNodes()).toEqual(
-        collectionNodes);
-      expect(_getCollectionNode('exp_id1')).toEqual(collectionNodes[1]);
+      expect(_sampleCollection.getBindableCollectionNodes())
+        .toEqual(
+          collectionNodes);
+      expect(_getCollectionNode('exp_id1'))
+        .toEqual(collectionNodes[1]);
     }
   );
 
@@ -215,18 +258,22 @@ describe('Collection object factory', function() {
     function() {
       _addCollectionNode('exp_id0');
       _addCollectionNode('exp_id1');
-      expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
+      expect(_sampleCollection.getCollectionNodeCount())
+        .toEqual(2);
 
       // The array itself can be mutated.
       var collectionNodes = _sampleCollection.getBindableCollectionNodes();
       collectionNodes.splice(0, 1);
-      expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
+      expect(_sampleCollection.getCollectionNodeCount())
+        .toEqual(1);
 
       // Collection nodes can be mutated and reflected in the collection object.
       collectionNodes = _sampleCollection.getBindableCollectionNodes();
-      expect(_sampleCollection.getBindableCollectionNodes()).toEqual(
-        collectionNodes);
-      expect(_getCollectionNode('exp_id1')).toEqual(collectionNodes[1]);
+      expect(_sampleCollection.getBindableCollectionNodes())
+        .toEqual(
+          collectionNodes);
+      expect(_getCollectionNode('exp_id1'))
+        .toEqual(collectionNodes[1]);
     }
   );
 
@@ -235,15 +282,13 @@ describe('Collection object factory', function() {
     _addCollectionNode('exp_id1');
     _addCollectionNode('exp_id2');
 
-    expect(_sampleCollection.getExplorationIds()).toEqual([
-      'exp_id0', 'exp_id1', 'exp_id2'
-    ]);
+    expect(_sampleCollection.getExplorationIds())
+      .toEqual(['exp_id0', 'exp_id1', 'exp_id2']);
 
     _sampleCollection.deleteCollectionNode('exp_id1');
 
-    expect(_sampleCollection.getExplorationIds()).toEqual([
-      'exp_id0', 'exp_id2'
-    ]);
+    expect(_sampleCollection.getExplorationIds())
+      .toEqual(['exp_id0', 'exp_id2']);
   });
 
   it('should be able to copy from another collection', function() {
@@ -269,6 +314,7 @@ describe('Collection object factory', function() {
 
     _sampleCollection.copyFromCollection(secondCollection);
     expect(_sampleCollection).not.toBe(secondCollection);
-    expect(_sampleCollection).toEqual(secondCollection);
+    expect(_sampleCollection)
+      .toEqual(secondCollection);
   });
 });

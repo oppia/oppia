@@ -35,7 +35,8 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
-    element(by.cssContainingText('option', language)).click();
+    element(by.cssContainingText('option', language))
+    .click();
   // Wait for the language-change request to reach the backend.
   waitFor.pageToFullyLoad();
 };
@@ -59,7 +60,9 @@ describe('Basic user journeys', function() {
 
       browser.get(general.MODERATOR_URL_SUFFIX);
       general.checkForConsoleErrors([
-        'Failed to load resource: the server responded with a status of 401']);
+        'Failed to load resource: the ' +
+      'server responded with a status of 401'
+      ]);
       users.logout();
     });
 
@@ -96,22 +99,28 @@ describe('Basic user journeys', function() {
       users.createUser('alice@preferences.com', 'alicePreferences');
       users.login('alice@preferences.com');
       preferencesPage.get();
-      expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(true);
+      expect(preferencesPage.isEditorRoleEmailsCheckboxSelected())
+        .toBe(true);
       preferencesPage.toggleEditorRoleEmailsCheckbox();
-      expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
+      expect(preferencesPage.isEditorRoleEmailsCheckboxSelected())
+        .toBe(false);
       browser.refresh();
-      expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
+      expect(preferencesPage.isEditorRoleEmailsCheckboxSelected())
+        .toBe(false);
     });
 
     it('should change feedback message email checkbox value', function() {
       users.createUser('bob@preferences.com', 'bobPreferences');
       users.login('bob@preferences.com');
       preferencesPage.get();
-      expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(true);
+      expect(preferencesPage.isFeedbackEmailsCheckboxSelected())
+        .toBe(true);
       preferencesPage.toggleFeedbackEmailsCheckbox();
-      expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
+      expect(preferencesPage.isFeedbackEmailsCheckboxSelected())
+        .toBe(false);
       browser.refresh();
-      expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
+      expect(preferencesPage.isFeedbackEmailsCheckboxSelected())
+        .toBe(false);
     });
 
     afterEach(function() {
@@ -138,14 +147,18 @@ describe('Oppia static pages tour', function() {
 
     LINKS_CLASS_NAMES.forEach(function(className) {
       var dropdown = element(by.css('.protractor-test-about-oppia-list-item'));
-      browser.actions().mouseMove(dropdown).perform();
-      dropdown.element(by.css(className)).click();
+      browser.actions()
+        .mouseMove(dropdown)
+        .perform();
+      dropdown.element(by.css(className))
+        .click();
       waitFor.pageToFullyLoad();
     });
   });
 
   it('visits the donate link', function() {
-    element(by.css('.protractor-test-donate-link')).click();
+    element(by.css('.protractor-test-donate-link'))
+      .click();
     waitFor.pageToFullyLoad();
   });
 
@@ -155,12 +168,14 @@ describe('Oppia static pages tour', function() {
   });
 
   it('visits the terms page', function() {
-    element(by.css('.protractor-test-terms-link')).click();
+    element(by.css('.protractor-test-terms-link'))
+      .click();
     waitFor.pageToFullyLoad();
   });
 
   it('visits the privacy page', function() {
-    element(by.css('.protractor-test-privacy-policy-link')).click();
+    element(by.css('.protractor-test-privacy-policy-link'))
+      .click();
     waitFor.pageToFullyLoad();
   });
 
@@ -244,53 +259,56 @@ describe('Site language', function() {
 
     users.login('langCreator@explorations.com');
     workflow.createExploration();
-    general.getExplorationIdFromEditor().then(function(expId) {
-      firstExplorationId = expId;
-      explorationEditorMainTab.setContent(forms.toRichText('Language Test'));
-      explorationEditorMainTab.setInteraction('NumericInput');
-      explorationEditorMainTab.addResponse(
-        'NumericInput', forms.toRichText('Nice!!'),
-        'END', true, 'IsLessThanOrEqualTo', 0);
-      explorationEditorMainTab.getResponseEditor('default').setFeedback(
-        forms.toRichText('Ok!!'));
-      explorationEditorMainTab.moveToState('END');
-      explorationEditorMainTab.setContent(forms.toRichText('END'));
-      explorationEditorMainTab.setInteraction('EndExploration');
+    general.getExplorationIdFromEditor()
+      .then(function(expId) {
+        firstExplorationId = expId;
+        explorationEditorMainTab.setContent(forms.toRichText('Language Test'));
+        explorationEditorMainTab.setInteraction('NumericInput');
+        explorationEditorMainTab.addResponse(
+          'NumericInput', forms.toRichText('Nice!!'),
+          'END', true, 'IsLessThanOrEqualTo', 0);
+        explorationEditorMainTab.getResponseEditor('default')
+          .setFeedback(
+            forms.toRichText('Ok!!'));
+        explorationEditorMainTab.moveToState('END');
+        explorationEditorMainTab.setContent(forms.toRichText('END'));
+        explorationEditorMainTab.setInteraction('EndExploration');
 
-      // Save changes.
-      title = 'Language Test';
-      category = 'Languages';
-      objective = 'To test site language.';
-      explorationEditorPage.navigateToSettingsTab();
-      explorationEditorSettingsTab.setTitle(title);
-      explorationEditorSettingsTab.setCategory(category);
-      explorationEditorSettingsTab.setObjective(objective);
-      explorationEditorPage.saveChanges('Done!');
+        // Save changes.
+        title = 'Language Test';
+        category = 'Languages';
+        objective = 'To test site language.';
+        explorationEditorPage.navigateToSettingsTab();
+        explorationEditorSettingsTab.setTitle(title);
+        explorationEditorSettingsTab.setCategory(category);
+        explorationEditorSettingsTab.setObjective(objective);
+        explorationEditorPage.saveChanges('Done!');
 
-      // Publish changes.
-      workflow.publishExploration();
-      users.logout();
+        // Publish changes.
+        workflow.publishExploration();
+        users.logout();
 
-      users.login('lang@collections.com');
-      creatorDashboardPage.get();
-      creatorDashboardPage.clickCreateActivityButton();
-      creatorDashboardPage.clickCreateCollectionButton();
-      browser.getCurrentUrl().then(function(url) {
-        var pathname = url.split('/');
-        // in the url a # is added at the end that is not part of collection ID
-        collectionId = pathname[5].slice(0, -1);
+        users.login('lang@collections.com');
+        creatorDashboardPage.get();
+        creatorDashboardPage.clickCreateActivityButton();
+        creatorDashboardPage.clickCreateCollectionButton();
+        browser.getCurrentUrl()
+          .then(function(url) {
+            var pathname = url.split('/');
+            // in the url a # is added at the end that is not part of collection ID
+            collectionId = pathname[5].slice(0, -1);
+          });
+        // Add existing explorations.
+        collectionEditorPage.addExistingExploration(firstExplorationId);
+        collectionEditorPage.saveDraft();
+        collectionEditorPage.closeSaveModal();
+        collectionEditorPage.publishCollection();
+        collectionEditorPage.setTitle('Test Collection');
+        collectionEditorPage.setObjective('This is the test collection.');
+        collectionEditorPage.setCategory('Algebra');
+        collectionEditorPage.saveChanges();
+        users.logout();
       });
-      // Add existing explorations.
-      collectionEditorPage.addExistingExploration(firstExplorationId);
-      collectionEditorPage.saveDraft();
-      collectionEditorPage.closeSaveModal();
-      collectionEditorPage.publishCollection();
-      collectionEditorPage.setTitle('Test Collection');
-      collectionEditorPage.setObjective('This is the test collection.');
-      collectionEditorPage.setCategory('Algebra');
-      collectionEditorPage.saveChanges();
-      users.logout();
-    });
   });
 
   beforeEach(function() {
@@ -369,7 +387,8 @@ describe('Site language', function() {
     // Spanish is still selected.
     var placeholder = element(by.css('.protractor-test-float-form-input'))
       .getAttribute('placeholder');
-    expect(placeholder).toEqual('Ingresa un número');
+    expect(placeholder)
+      .toEqual('Ingresa un número');
     general.ensurePageHasNoTranslationIds();
     users.logout();
   });
@@ -383,14 +402,16 @@ describe('Site language', function() {
       // Checking collection player page.
       browser.get('/collection/' + collectionId);
       waitFor.pageToFullyLoad();
-      expect(element(by.css('.oppia-share-collection-footer')).getText())
+      expect(element(by.css('.oppia-share-collection-footer'))
+        .getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
       general.ensurePageHasNoTranslationIds();
 
       // Checking exploration player page.
       browser.get('/explore/' + firstExplorationId);
       waitFor.pageToFullyLoad();
-      expect(element(by.css('.author-profile-text')).getText())
+      expect(element(by.css('.author-profile-text'))
+        .getText())
         .toEqual('PERFILES DE AUTORES');
       general.ensurePageHasNoTranslationIds();
     }

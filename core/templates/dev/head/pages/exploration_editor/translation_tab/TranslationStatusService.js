@@ -41,45 +41,46 @@ oppia.factory('TranslationStatusService', [
       explorationAudioRequiredCount = 0;
       explorationAudioNotAvailableCount = 0;
       if (ExplorationStatesService.isInitialized()) {
-        ExplorationStatesService.getStateNames().forEach(function(stateName) {
-          var noTranslationCount = 0;
-          var contentIdsToAudioTranslations = ExplorationStatesService
-            .getContentIdsToAudioTranslationsMemento(stateName);
-          var allContentId = contentIdsToAudioTranslations.getAllContentId();
-          var interactionId = ExplorationStatesService
-            .getInteractionIdMemento(stateName);
-          // This is used to prevent users from adding unwanted hints audio, as
-          // of now we do not delete interaction.hints when a user deletes
-          // interaction, so these hints audio are not counted in checking
-          // status of a state.
-          if (!interactionId ||
+        ExplorationStatesService.getStateNames()
+          .forEach(function(stateName) {
+            var noTranslationCount = 0;
+            var contentIdsToAudioTranslations = ExplorationStatesService
+              .getContentIdsToAudioTranslationsMemento(stateName);
+            var allContentId = contentIdsToAudioTranslations.getAllContentId();
+            var interactionId = ExplorationStatesService
+              .getInteractionIdMemento(stateName);
+            // This is used to prevent users from adding unwanted hints audio, as
+            // of now we do not delete interaction.hints when a user deletes
+            // interaction, so these hints audio are not counted in checking
+            // status of a state.
+            if (!interactionId ||
             INTERACTION_SPECS[interactionId].is_linear ||
             INTERACTION_SPECS[interactionId].is_terminal) {
-            allContentId = ['content'];
-          }
-          explorationAudioRequiredCount += allContentId.length;
-          allContentId.forEach(function(contentId) {
-            availableTranslationLanguageCodes = contentIdsToAudioTranslations
-              .getAudioLanguageCodes(contentId);
-            if (availableTranslationLanguageCodes.indexOf(langCode) > -1) {
-              var audioTranslation = contentIdsToAudioTranslations
-                .getAudioTranslation(contentId, langCode);
-              if (audioTranslation.needsUpdate) {
-                stateNeedsUpdateWarnings[stateName] = NEEDS_UPDATE_MESSAGE;
+              allContentId = ['content'];
+            }
+            explorationAudioRequiredCount += allContentId.length;
+            allContentId.forEach(function(contentId) {
+              availableTranslationLanguageCodes = contentIdsToAudioTranslations
+                .getAudioLanguageCodes(contentId);
+              if (availableTranslationLanguageCodes.indexOf(langCode) > -1) {
+                var audioTranslation = contentIdsToAudioTranslations
+                  .getAudioTranslation(contentId, langCode);
+                if (audioTranslation.needsUpdate) {
+                  stateNeedsUpdateWarnings[stateName] = NEEDS_UPDATE_MESSAGE;
+                }
+              } else {
+                noTranslationCount++;
               }
+            });
+            explorationAudioNotAvailableCount += noTranslationCount;
+            if (noTranslationCount === 0) {
+              stateWiseStatusColor[stateName] = ALL_AUDIO_AVAILABLE_COLOR;
+            } else if (noTranslationCount === allContentId.length) {
+              stateWiseStatusColor[stateName] = NO_AUDIO_AVAILABLE_COLOR;
             } else {
-              noTranslationCount++;
+              stateWiseStatusColor[stateName] = FEW_AUDIO_AVAILABLE_COLOR;
             }
           });
-          explorationAudioNotAvailableCount += noTranslationCount;
-          if (noTranslationCount === 0) {
-            stateWiseStatusColor[stateName] = ALL_AUDIO_AVAILABLE_COLOR;
-          } else if (noTranslationCount === allContentId.length) {
-            stateWiseStatusColor[stateName] = NO_AUDIO_AVAILABLE_COLOR;
-          } else {
-            stateWiseStatusColor[stateName] = FEW_AUDIO_AVAILABLE_COLOR;
-          }
-        });
       }
     };
 
@@ -92,13 +93,14 @@ oppia.factory('TranslationStatusService', [
           contentIdList.push(componentName);
         } else {
           var searchKey = componentName + '_';
-          contentIdsToAudioTranslations.getAllContentId().forEach(
-            function(contentId) {
-              if (contentId.indexOf(searchKey) > -1) {
-                contentIdList.push(contentId);
+          contentIdsToAudioTranslations.getAllContentId()
+            .forEach(
+              function(contentId) {
+                if (contentId.indexOf(searchKey) > -1) {
+                  contentIdList.push(contentId);
+                }
               }
-            }
-          );
+            );
           if (componentName === 'feedback') {
             contentIdList.push('default_outcome');
           }
@@ -115,7 +117,8 @@ oppia.factory('TranslationStatusService', [
       if (contentIdList) {
         contentIdList.forEach(function(contentId) {
           if (contentIdsToAudioTranslations
-            .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
+            .getAudioLanguageCodes(contentId)
+            .indexOf(langCode) > -1) {
             availableAudioCount++;
           }
         });
@@ -136,7 +139,8 @@ oppia.factory('TranslationStatusService', [
         for (index in contentIdList) {
           contentId = contentIdList[index];
           if (contentIdsToAudioTranslations
-            .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
+            .getAudioLanguageCodes(contentId)
+            .indexOf(langCode) > -1) {
             var audioTranslation = contentIdsToAudioTranslations
               .getAudioTranslation(contentId, langCode);
             if (audioTranslation.needsUpdate) {
@@ -153,7 +157,8 @@ oppia.factory('TranslationStatusService', [
         StateContentIdsToAudioTranslationsService.displayed;
       if (contentIdsToAudioTranslations) {
         if (contentIdsToAudioTranslations
-          .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
+          .getAudioLanguageCodes(contentId)
+          .indexOf(langCode) > -1) {
           return ALL_AUDIO_AVAILABLE_COLOR;
         } else {
           return NO_AUDIO_AVAILABLE_COLOR;
@@ -166,7 +171,8 @@ oppia.factory('TranslationStatusService', [
         StateContentIdsToAudioTranslationsService.displayed;
       if (contentIdsToAudioTranslations) {
         if (contentIdsToAudioTranslations
-          .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
+          .getAudioLanguageCodes(contentId)
+          .indexOf(langCode) > -1) {
           var audioTranslation = contentIdsToAudioTranslations
             .getAudioTranslation(contentId, langCode);
           if (audioTranslation.needsUpdate) {
@@ -205,4 +211,5 @@ oppia.factory('TranslationStatusService', [
         return _getActiveStateContentIdNeedsUpdateStatus(contentId);
       }
     };
-  }]);
+  }
+]);

@@ -28,19 +28,21 @@ oppia.factory('RteHelperService', [
       UrlInterpolationService, FocusManagerService) {
     var _RICH_TEXT_COMPONENTS = [];
 
-    Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
-      _RICH_TEXT_COMPONENTS.push({
-        backendId: RTE_COMPONENT_SPECS[componentId].backend_id,
-        customizationArgSpecs: angular.copy(
-          RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
-        id: RTE_COMPONENT_SPECS[componentId].frontend_id,
-        iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
-        isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
-        isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
-        requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
-        tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
+    Object.keys(RTE_COMPONENT_SPECS)
+      .sort()
+      .forEach(function(componentId) {
+        _RICH_TEXT_COMPONENTS.push({
+          backendId: RTE_COMPONENT_SPECS[componentId].backend_id,
+          customizationArgSpecs: angular.copy(
+            RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
+          id: RTE_COMPONENT_SPECS[componentId].frontend_id,
+          iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
+          isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
+          isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
+          requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
+          tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
+        });
       });
-    });
 
     var _createCustomizationArgDictFromAttrs = function(attrs) {
       var customizationArgsDict = {};

@@ -25,7 +25,8 @@ oppia.controller('EmailDashboardResult', [
     var TEST_BULK_EMAIL_URL = '/emaildashboardtestbulkemailhandler/<query_id>';
 
     var getQueryId = function() {
-      return $window.location.pathname.split('/').slice(-1)[0];
+      return $window.location.pathname.split('/')
+        .slice(-1)[0];
     };
 
     var validateEmailSubjectAndBody = function() {
@@ -43,9 +44,7 @@ oppia.controller('EmailDashboardResult', [
 
     $scope.submitEmail = function() {
       var resultHandlerUrl = UrlInterpolationService.interpolateUrl(
-        RESULT_HANDLER_URL, {
-          query_id: getQueryId()
-        });
+        RESULT_HANDLER_URL, {query_id: getQueryId()});
       var dataIsValid = validateEmailSubjectAndBody();
 
       if ($scope.emailOption === 'custom' &&
@@ -64,17 +63,17 @@ oppia.controller('EmailDashboardResult', [
             $scope.emailOption !== 'all' ? $scope.max_recipients : null)
         };
 
-        $http.post(resultHandlerUrl, {
-          data: data
-        }).success(function() {
-          $scope.emailSubmitted = true;
-          $timeout(function() {
-            $window.location.href = EMAIL_DASHBOARD_PAGE;
-          }, 4000);
-        }).error(function() {
-          $scope.errorHasOccurred = true;
-          $scope.submitIsInProgress = false;
-        });
+        $http.post(resultHandlerUrl, {data: data})
+          .success(function() {
+            $scope.emailSubmitted = true;
+            $timeout(function() {
+              $window.location.href = EMAIL_DASHBOARD_PAGE;
+            }, 4000);
+          })
+          .error(function() {
+            $scope.errorHasOccurred = true;
+            $scope.submitIsInProgress = false;
+          });
         $scope.invalid.subject = false;
         $scope.invalid.body = false;
         $scope.invalid.maxRecipients = false;
@@ -90,35 +89,34 @@ oppia.controller('EmailDashboardResult', [
     $scope.cancelEmail = function() {
       $scope.submitIsInProgress = true;
       var cancelUrlHandler = UrlInterpolationService.interpolateUrl(
-        CANCEL_EMAIL_HANDLER_URL, {
-          query_id: getQueryId()
-        });
+        CANCEL_EMAIL_HANDLER_URL, {query_id: getQueryId()});
 
-      $http.post(cancelUrlHandler).success(function() {
-        $scope.emailCancelled = true;
-        $timeout(function() {
-          $window.location.href = EMAIL_DASHBOARD_PAGE;
-        }, 4000);
-      }).error(function() {
-        $scope.errorHasOccurred = true;
-        $scope.submitIsInProgress = false;
-      });
+      $http.post(cancelUrlHandler)
+        .success(function() {
+          $scope.emailCancelled = true;
+          $timeout(function() {
+            $window.location.href = EMAIL_DASHBOARD_PAGE;
+          }, 4000);
+        })
+        .error(function() {
+          $scope.errorHasOccurred = true;
+          $scope.submitIsInProgress = false;
+        });
     };
 
     $scope.sendTestEmail = function() {
       var testEmailHandlerUrl = UrlInterpolationService.interpolateUrl(
-        TEST_BULK_EMAIL_URL, {
-          query_id: getQueryId()
-        });
+        TEST_BULK_EMAIL_URL, {query_id: getQueryId()});
       var dataIsValid = validateEmailSubjectAndBody();
 
       if (dataIsValid) {
         $http.post(testEmailHandlerUrl, {
           email_subject: $scope.emailSubject,
           email_body: $scope.emailBody
-        }).success(function() {
-          $scope.testEmailSentSuccesfully = true;
-        });
+        })
+          .success(function() {
+            $scope.testEmailSentSuccesfully = true;
+          });
         $scope.invalid.subject = false;
         $scope.invalid.body = false;
         $scope.invalid.maxRecipients = false;
@@ -137,7 +135,8 @@ oppia.controller('EmailDashboardResult', [
     $scope.POSSIBLE_EMAIL_INTENTS = [
       'bulk_email_marketing', 'bulk_email_improve_exploration',
       'bulk_email_create_exploration', 'bulk_email_creator_reengagement',
-      'bulk_email_learner_reengagement'];
+      'bulk_email_learner_reengagement'
+    ];
     $scope.emailIntent = $scope.POSSIBLE_EMAIL_INTENTS[0];
     $scope.emailSubmitted = false;
     $scope.submitIsInProgress = false;

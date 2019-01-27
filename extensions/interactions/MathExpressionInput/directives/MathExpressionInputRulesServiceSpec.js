@@ -20,58 +20,51 @@ describe('Math expression input rules service', function() {
   beforeEach(module('oppia'));
 
   var meirs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     meirs = $injector.get('mathExpressionInputRulesService');
-  }));
+  }]);
 
   it('should have a correct equivalence rule', function() {
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x',
       latex: 'x'
-    }, {
-      x: 'x'
-    })).toBe(true);
+    }, {x: 'x'}))
+      .toBe(true);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x + x - x',
       latex: 'x + x - x'
-    }, {
-      x: 'x'
-    })).toBe(true);
+    }, {x: 'x'}))
+      .toBe(true);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x',
       latex: 'x'
-    }, {
-      x: 'x + x - x'
-    })).toBe(true);
+    }, {x: 'x + x - x'}))
+      .toBe(true);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x^2/x',
       latex: 'x^{2}/x'
-    }, {
-      x: 'x'
-    })).toBe(true);
+    }, {x: 'x'}))
+      .toBe(true);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'y',
       latex: 'y'
-    }, {
-      x: 'x'
-    })).toBe(false);
+    }, {x: 'x'}))
+      .toBe(false);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x^2',
       latex: 'x^{2}'
-    }, {
-      x: 'x'
-    })).toBe(false);
+    }, {x: 'x'}))
+      .toBe(false);
 
     expect(meirs.IsMathematicallyEquivalentTo({
       ascii: 'x + 0.1',
       latex: 'x + 0.1'
-    }, {
-      x: 'x'
-    })).toBe(false);
+    }, {x: 'x'}))
+      .toBe(false);
   });
 });

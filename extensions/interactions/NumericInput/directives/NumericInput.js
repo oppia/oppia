@@ -75,13 +75,15 @@ oppia.directive('oppiaResponseNumericInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumericInput/directives/' +
         'numeric_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        // If the answer is an integer, omit the fractional part.
-        if ($scope.answer % 1 === 0) {
-          $scope.answer = Math.round($scope.answer);
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          // If the answer is an integer, omit the fractional part.
+          if ($scope.answer % 1 === 0) {
+            $scope.answer = Math.round($scope.answer);
+          }
         }
-      }]
+      ]
     };
   }
 ]);
@@ -95,42 +97,46 @@ oppia.directive('oppiaShortResponseNumericInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumericInput/directives/' +
         'numeric_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        // If the answer is an integer, omit the fractional part.
-        if ($scope.answer % 1 === 0) {
-          $scope.answer = Math.round($scope.answer);
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          // If the answer is an integer, omit the fractional part.
+          if ($scope.answer % 1 === 0) {
+            $scope.answer = Math.round($scope.answer);
+          }
         }
-      }]
+      ]
     };
   }
 ]);
 
-oppia.factory('numericInputRulesService', [function() {
-  return {
-    Equals: function(answer, inputs) {
-      return answer === inputs.x;
-    },
-    IsLessThan: function(answer, inputs) {
-      return answer < inputs.x;
-    },
-    IsGreaterThan: function(answer, inputs) {
-      return answer > inputs.x;
-    },
-    IsLessThanOrEqualTo: function(answer, inputs) {
-      return answer <= inputs.x;
-    },
-    IsGreaterThanOrEqualTo: function(answer, inputs) {
-      return answer >= inputs.x;
-    },
-    IsInclusivelyBetween: function(answer, inputs) {
+oppia.factory('numericInputRulesService', [
+  function() {
+    return {
+      Equals: function(answer, inputs) {
+        return answer === inputs.x;
+      },
+      IsLessThan: function(answer, inputs) {
+        return answer < inputs.x;
+      },
+      IsGreaterThan: function(answer, inputs) {
+        return answer > inputs.x;
+      },
+      IsLessThanOrEqualTo: function(answer, inputs) {
+        return answer <= inputs.x;
+      },
+      IsGreaterThanOrEqualTo: function(answer, inputs) {
+        return answer >= inputs.x;
+      },
+      IsInclusivelyBetween: function(answer, inputs) {
       // TODO(wxy): have frontend validation at creation time to check that
       // inputs.a <= inputs.b
-      return answer >= inputs.a && answer <= inputs.b;
-    },
-    IsWithinTolerance: function(answer, inputs) {
-      return answer >= inputs.x - inputs.tol &&
+        return answer >= inputs.a && answer <= inputs.b;
+      },
+      IsWithinTolerance: function(answer, inputs) {
+        return answer >= inputs.x - inputs.tol &&
         answer <= inputs.x + inputs.tol;
-    }
-  };
-}]);
+      }
+    };
+  }
+]);

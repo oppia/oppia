@@ -28,5 +28,6 @@ oppia.factory('FileDownloadRequestObjectFactory', [
     };
 
     return FileDownloadRequest;
-  }]
+  }
+]
 );

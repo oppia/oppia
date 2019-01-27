@@ -68,25 +68,27 @@ oppia.factory('CollectionEditorStateService', [
       loadCollection: function(collectionId) {
         _collectionIsLoading = true;
         EditableCollectionBackendApiService.fetchCollection(
-          collectionId).then(
-          function(newBackendCollectionObject) {
-            _updateCollection(newBackendCollectionObject);
-          },
-          function(error) {
+          collectionId)
+          .then(
+            function(newBackendCollectionObject) {
+              _updateCollection(newBackendCollectionObject);
+            },
+            function(error) {
+              AlertsService.addWarning(
+                error || 'There was an error when loading the collection.');
+              _collectionIsLoading = false;
+            });
+        CollectionRightsBackendApiService.fetchCollectionRights(
+          collectionId)
+          .then(function(newBackendCollectionRightsObject) {
+            _updateCollectionRights(newBackendCollectionRightsObject);
+            _collectionIsLoading = false;
+          }, function(error) {
             AlertsService.addWarning(
-              error || 'There was an error when loading the collection.');
+              error ||
+            'There was an error when loading the collection rights.');
             _collectionIsLoading = false;
           });
-        CollectionRightsBackendApiService.fetchCollectionRights(
-          collectionId).then(function(newBackendCollectionRightsObject) {
-          _updateCollectionRights(newBackendCollectionRightsObject);
-          _collectionIsLoading = false;
-        }, function(error) {
-          AlertsService.addWarning(
-            error ||
-            'There was an error when loading the collection rights.');
-          _collectionIsLoading = false;
-        });
       },
 
       /**
@@ -173,19 +175,20 @@ oppia.factory('CollectionEditorStateService', [
         _collectionIsBeingSaved = true;
         EditableCollectionBackendApiService.updateCollection(
           _collection.getId(), _collection.getVersion(),
-          commitMessage, UndoRedoService.getCommittableChangeList()).then(
-          function(collectionBackendObject) {
-            _updateCollection(collectionBackendObject);
-            UndoRedoService.clearChanges();
-            _collectionIsBeingSaved = false;
-            if (successCallback) {
-              successCallback();
-            }
-          }, function(error) {
-            AlertsService.addWarning(
-              error || 'There was an error when saving the collection.');
-            _collectionIsBeingSaved = false;
-          });
+          commitMessage, UndoRedoService.getCommittableChangeList())
+          .then(
+            function(collectionBackendObject) {
+              _updateCollection(collectionBackendObject);
+              UndoRedoService.clearChanges();
+              _collectionIsBeingSaved = false;
+              if (successCallback) {
+                successCallback();
+              }
+            }, function(error) {
+              AlertsService.addWarning(
+                error || 'There was an error when saving the collection.');
+              _collectionIsBeingSaved = false;
+            });
         return true;
       },
 

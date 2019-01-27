@@ -26,13 +26,16 @@ var forms = require('../../core/tests/protractor_utils/forms.js');
 var BooleanEditor = function(elem) {
   return {
     setValue: function(value) {
-      elem.element(by.tagName('input')).isSelected().then(
-        function(currentValue) {
-          if (value !== currentValue) {
-            elem.element(by.tagName('input')).click();
+      elem.element(by.tagName('input'))
+        .isSelected()
+        .then(
+          function(currentValue) {
+            if (value !== currentValue) {
+              elem.element(by.tagName('input'))
+                .click();
+            }
           }
-        }
-      );
+        );
     }
   };
 };
@@ -42,10 +45,18 @@ var CoordTwoDim = function(elem) {
     // The 'coordinates' arg is a two-element list whose elements represent
     // latitude and longitude respectively.
     setValue: function(coordinates) {
-      elem.all(by.tagName('input')).first().clear();
-      elem.all(by.tagName('input')).first().sendKeys(coordinates[0]);
-      elem.all(by.tagName('input')).last().clear();
-      elem.all(by.tagName('input')).last().sendKeys(coordinates[1]);
+      elem.all(by.tagName('input'))
+        .first()
+        .clear();
+      elem.all(by.tagName('input'))
+        .first()
+        .sendKeys(coordinates[0]);
+      elem.all(by.tagName('input'))
+        .last()
+        .clear();
+      elem.all(by.tagName('input'))
+        .last()
+        .sendKeys(coordinates[1]);
     }
   };
 };
@@ -55,11 +66,14 @@ var FilepathEditor = function(elem) {
     upload: function(filepath) {
       // TODO (Jacob) Modify filepath relative to the directory from which the
       // protractor code is operating.
-      elem.element(by.css('.protractor-test-file-upload')).sendKeys(filepath);
+      elem.element(by.css('.protractor-test-file-upload'))
+        .sendKeys(filepath);
     },
     setName: function(name) {
-      elem.element(by.css('.protractor-test-file-name')).clear();
-      elem.element(by.css('.protractor-test-file-name')).sendKeys(name);
+      elem.element(by.css('.protractor-test-file-name'))
+        .clear();
+      elem.element(by.css('.protractor-test-file-name'))
+        .sendKeys(name);
     }
   };
 };
@@ -67,15 +81,20 @@ var FilepathEditor = function(elem) {
 var FractionEditor = function(elem) {
   return {
     setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+      elem.element(by.tagName('input'))
+        .clear();
+      elem.element(by.tagName('input'))
+        .sendKeys(value);
     },
     expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+      elem.element(by.tagName('input'))
+        .getAttribute('value')
+        .then(
+          function(value) {
+            expect(value)
+              .toEqual(expectedValue);
+          }
+        );
     }
   };
 };
@@ -83,15 +102,20 @@ var FractionEditor = function(elem) {
 var IntEditor = function(elem) {
   return {
     setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+      elem.element(by.tagName('input'))
+        .clear();
+      elem.element(by.tagName('input'))
+        .sendKeys(value);
     },
     expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+      elem.element(by.tagName('input'))
+        .getAttribute('value')
+        .then(
+          function(value) {
+            expect(value)
+              .toEqual(expectedValue);
+          }
+        );
     }
   };
 };
@@ -99,8 +123,10 @@ var IntEditor = function(elem) {
 var MathLatexStringEditor = function(elem) {
   return {
     setValue: function(rawLatex) {
-      elem.element(by.tagName('textarea')).clear();
-      elem.element(by.tagName('textarea')).sendKeys(rawLatex);
+      elem.element(by.tagName('textarea'))
+        .clear();
+      elem.element(by.tagName('textarea'))
+        .sendKeys(rawLatex);
     }
   };
 };
@@ -108,15 +134,20 @@ var MathLatexStringEditor = function(elem) {
 var NonnegativeIntEditor = function(elem) {
   return {
     setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+      elem.element(by.tagName('input'))
+        .clear();
+      elem.element(by.tagName('input'))
+        .sendKeys(value);
     },
     expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+      elem.element(by.tagName('input'))
+        .getAttribute('value')
+        .then(
+          function(value) {
+            expect(value)
+              .toEqual(expectedValue);
+          }
+        );
     }
   };
 };
@@ -124,15 +155,20 @@ var NonnegativeIntEditor = function(elem) {
 var NormalizedStringEditor = function(elem) {
   return {
     setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+      elem.element(by.tagName('input'))
+        .clear();
+      elem.element(by.tagName('input'))
+        .sendKeys(value);
     },
     expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+      elem.element(by.tagName('input'))
+        .getAttribute('value')
+        .then(
+          function(value) {
+            expect(value)
+              .toEqual(expectedValue);
+          }
+        );
     }
   };
 };
@@ -140,15 +176,20 @@ var NormalizedStringEditor = function(elem) {
 var NumberWithUnitsEditor = function(elem) {
   return {
     setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+      elem.element(by.tagName('input'))
+        .clear();
+      elem.element(by.tagName('input'))
+        .sendKeys(value);
     },
     expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+      elem.element(by.tagName('input'))
+        .getAttribute('value')
+        .then(
+          function(value) {
+            expect(value)
+              .toEqual(expectedValue);
+          }
+        );
     }
   };
 };
@@ -156,7 +197,8 @@ var NumberWithUnitsEditor = function(elem) {
 var ParameterNameEditor = function(elem) {
   return {
     setValue: function(text) {
-      elem.element(by.cssContainingText('option', text)).click();
+      elem.element(by.cssContainingText('option', text))
+        .click();
     }
   };
 };
@@ -164,15 +206,20 @@ var ParameterNameEditor = function(elem) {
 var SanitizedUrlEditor = function(elem) {
   return {
     setValue: function(text) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(text);
+      elem.element(by.tagName('input'))
+        .clear();
+      elem.element(by.tagName('input'))
+        .sendKeys(text);
     },
     expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+      elem.element(by.tagName('input'))
+        .getAttribute('value')
+        .then(
+          function(value) {
+            expect(value)
+              .toEqual(expectedValue);
+          }
+        );
     }
   };
 };
@@ -180,15 +227,20 @@ var SanitizedUrlEditor = function(elem) {
 var UnicodeStringEditor = function(elem) {
   return {
     setValue: function(text) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(text);
+      elem.element(by.tagName('input'))
+        .clear();
+      elem.element(by.tagName('input'))
+        .sendKeys(text);
     },
     expectValueToBe: function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+      elem.element(by.tagName('input'))
+        .getAttribute('value')
+        .then(
+          function(value) {
+            expect(value)
+              .toEqual(expectedValue);
+          }
+        );
     }
   };
 };

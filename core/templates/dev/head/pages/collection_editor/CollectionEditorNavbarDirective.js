@@ -74,12 +74,13 @@ oppia.directive('collectionEditorNavbar', [
             // TODO(bhenning): This also needs a confirmation of destructive
             // action since it is not reversible.
             CollectionRightsBackendApiService.setCollectionPublic(
-              $scope.collectionId, $scope.collection.getVersion()).then(
-              function() {
-                $scope.collectionRights.setPublic();
-                CollectionEditorStateService.setCollectionRights(
-                  $scope.collectionRights);
-              });
+              $scope.collectionId, $scope.collection.getVersion())
+              .then(
+                function() {
+                  $scope.collectionRights.setPublic();
+                  CollectionEditorStateService.setCollectionRights(
+                    $scope.collectionRights);
+                });
           };
 
           $scope.$on(
@@ -236,17 +237,19 @@ oppia.directive('collectionEditorNavbar', [
           // public and the user has access to the collection.
           $scope.unpublishCollection = function() {
             CollectionRightsBackendApiService.setCollectionPrivate(
-              $scope.collectionId, $scope.collection.getVersion()).then(
-              function() {
-                $scope.collectionRights.setPrivate();
-                CollectionEditorStateService.setCollectionRights(
-                  $scope.collectionRights);
-              }, function() {
-                AlertsService.addWarning(
-                  'There was an error when unpublishing the collection.');
-              });
+              $scope.collectionId, $scope.collection.getVersion())
+              .then(
+                function() {
+                  $scope.collectionRights.setPrivate();
+                  CollectionEditorStateService.setCollectionRights(
+                    $scope.collectionRights);
+                }, function() {
+                  AlertsService.addWarning(
+                    'There was an error when unpublishing the collection.');
+                });
           };
         }
       ]
     };
-  }]);
+  }
+]);

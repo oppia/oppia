@@ -255,5 +255,6 @@ oppia.directive('trainingPanel', [
         }
       ]
     };
-  }]
+  }
+]
 );

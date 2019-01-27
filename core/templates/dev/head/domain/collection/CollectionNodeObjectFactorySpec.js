@@ -21,9 +21,9 @@ describe('Collection node object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
-  }));
+  }]);
 
   var _createEmptyCollectionNode = function(explorationId) {
     return CollectionNodeObjectFactory.create({
@@ -48,11 +48,14 @@ describe('Collection node object factory', function() {
 
     var collectionNode = CollectionNodeObjectFactory.create(
       collectionNodeBackendObject);
-    expect(collectionNode.getExplorationId()).toEqual('exp_id0');
-    expect(collectionNode.getExplorationTitle()).toEqual('exp title');
+    expect(collectionNode.getExplorationId())
+      .toEqual('exp_id0');
+    expect(collectionNode.getExplorationTitle())
+      .toEqual('exp title');
 
     var summaryObject = collectionNode.getExplorationSummaryObject();
-    expect(summaryObject).toEqual(explorationSummaryBackendObject);
+    expect(summaryObject)
+      .toEqual(explorationSummaryBackendObject);
 
     delete summaryObject.category;
     expect(summaryObject).not.toEqual(
@@ -63,8 +66,10 @@ describe('Collection node object factory', function() {
     function() {
       var collectionNode = CollectionNodeObjectFactory.createFromExplorationId(
         'exp_id0');
-      expect(collectionNode.getExplorationId()).toEqual('exp_id0');
-      expect(collectionNode.doesExplorationExist()).toBe(false);
+      expect(collectionNode.getExplorationId())
+        .toEqual('exp_id0');
+      expect(collectionNode.doesExplorationExist())
+        .toBe(false);
     }
   );
 });

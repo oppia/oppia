@@ -25,7 +25,7 @@ describe('Datetime Formatter', function() {
     var df = null;
     var OldDate = Date;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       df = $injector.get('DateTimeFormatService');
 
       // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
@@ -33,15 +33,18 @@ describe('Datetime Formatter', function() {
       spyOn(window, 'Date').and.callFake(function() {
         return new OldDate(NOW_MILLIS);
       });
-    }));
+    }]);
 
     it('should correctly indicate recency', function() {
       // 1 second ago is recent.
-      expect(df.isRecent(NOW_MILLIS - 1)).toBe(true);
+      expect(df.isRecent(NOW_MILLIS - 1))
+        .toBe(true);
       // 72 hours ago is recent.
-      expect(df.isRecent(NOW_MILLIS - 72 * 60 * 60 * 1000)).toBe(true);
+      expect(df.isRecent(NOW_MILLIS - 72 * 60 * 60 * 1000))
+        .toBe(true);
       // 8 days ago is not recent.
-      expect(df.isRecent(NOW_MILLIS - 8 * 24 * 60 * 60 * 1000)).toBe(false);
+      expect(df.isRecent(NOW_MILLIS - 8 * 24 * 60 * 60 * 1000))
+        .toBe(false);
     });
   });
 });

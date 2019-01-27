@@ -20,16 +20,14 @@ describe('Multiple choice input rules service', function() {
   beforeEach(module('oppia'));
 
   var mcirs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     mcirs = $injector.get('multipleChoiceInputRulesService');
-  }));
+  }]);
 
   it('should have a correct \'equals\' rule', function() {
-    expect(mcirs.Equals(3, {
-      x: 3
-    })).toBe(true);
-    expect(mcirs.Equals(3, {
-      x: 4
-    })).toBe(false);
+    expect(mcirs.Equals(3, {x: 3}))
+      .toBe(true);
+    expect(mcirs.Equals(3, {x: 4}))
+      .toBe(false);
   });
 });

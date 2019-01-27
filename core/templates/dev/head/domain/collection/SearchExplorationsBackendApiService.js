@@ -25,15 +25,14 @@ oppia.factory('SearchExplorationsBackendApiService', [
     var _fetchExplorations = function(
         searchQuery, successCallback, errorCallback) {
       queryUrl = UrlInterpolationService.interpolateUrl(
-        SEARCH_EXPLORATION_URL_TEMPLATE, {
-          query: btoa(searchQuery)
-        }
+        SEARCH_EXPLORATION_URL_TEMPLATE, {query: btoa(searchQuery)}
       );
-      $http.get(queryUrl).then(function(response) {
-        successCallback(response.data);
-      }, function(errorResponse) {
-        errorCallback(errorResponse.data);
-      });
+      $http.get(queryUrl)
+        .then(function(response) {
+          successCallback(response.data);
+        }, function(errorResponse) {
+          errorCallback(errorResponse.data);
+        });
     };
     return {
       /**
@@ -47,4 +46,5 @@ oppia.factory('SearchExplorationsBackendApiService', [
         });
       }
     };
-  }]);
+  }
+]);

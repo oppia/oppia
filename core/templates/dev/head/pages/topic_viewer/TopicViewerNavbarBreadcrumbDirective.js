@@ -22,14 +22,17 @@ oppia.directive('topicsViewerNavbarBreadcrumb', [
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_viewer/topic_viewer_navbar_breadcrumb_directive.html'),
-      controller: ['$scope', 'TopicViewerBackendApiService', 'UrlService',
+      controller: [
+        '$scope', 'TopicViewerBackendApiService', 'UrlService',
         function($scope, TopicViewerBackendApiService, UrlService) {
           TopicViewerBackendApiService.fetchTopicData(
-            UrlService.getTopicNameFromLearnerUrl()).then(
-            function(topicDataDict) {
-              $scope.topicName = topicDataDict.topic_name;
-            });
+            UrlService.getTopicNameFromLearnerUrl())
+            .then(
+              function(topicDataDict) {
+                $scope.topicName = topicDataDict.topic_name;
+              });
         }
       ]
     };
-  }]);
+  }
+]);

@@ -32,7 +32,8 @@ oppia.directive('summaryListHeader', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_list_header_directive.html'),
-      controller: ['$scope',
+      controller: [
+        '$scope',
         function($scope) {
           $scope.deleteItem = function(evt) {
             $scope.getOnDeleteFn()($scope.getIndex(), evt);

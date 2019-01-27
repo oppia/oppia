@@ -21,37 +21,42 @@ describe('EditabilityService', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     EditabilityService = $injector.get('EditabilityService');
-  }));
+  }]);
 
   it('should allow to edit an exploration after the tutorial ends', function() {
     EditabilityService.onEndTutorial();
     EditabilityService.markEditable();
-    expect(EditabilityService.isEditable()).toBe(true);
+    expect(EditabilityService.isEditable())
+      .toBe(true);
   });
 
   it('should allow to translate an exploration after the tutorial ends',
     function() {
       EditabilityService.onEndTutorial();
       EditabilityService.markTranslatable();
-      expect(EditabilityService.isTranslatable()).toBe(true);
+      expect(EditabilityService.isTranslatable())
+        .toBe(true);
     });
 
   it('should allow to edit an exploration outside the tutorial mode',
     function() {
       EditabilityService.markEditable();
-      expect(EditabilityService.isEditableOutsideTutorialMode()).toBe(true);
+      expect(EditabilityService.isEditableOutsideTutorialMode())
+        .toBe(true);
     });
 
   it('should not allow to edit an exploration during tutorial mode',
     function() {
       EditabilityService.onStartTutorial();
-      expect(EditabilityService.isEditable()).toBe(false);
+      expect(EditabilityService.isEditable())
+        .toBe(false);
     });
 
   it('should not allow to edit an uneditable exploration', function() {
     EditabilityService.markNotEditable();
-    expect(EditabilityService.isEditable()).toBe(false);
+    expect(EditabilityService.isEditable())
+      .toBe(false);
   });
 });

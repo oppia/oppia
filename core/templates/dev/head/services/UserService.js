@@ -32,10 +32,12 @@ oppia.factory('UserService', [
         }
         return $http.get(
           '/userinfohandler'
-        ).then(function(response) {
-          userInfo = UserInfoObjectFactory.createFromBackendDict(response.data);
-          return userInfo;
-        });
+        )
+          .then(function(response) {
+            userInfo = UserInfoObjectFactory
+              .createFromBackendDict(response.data);
+            return userInfo;
+          });
       } else {
         return $q.resolve(UserInfoObjectFactory.createDefault());
       }
@@ -50,12 +52,13 @@ oppia.factory('UserService', [
         if (GLOBALS.userIsLoggedIn) {
           return $http.get(
             '/preferenceshandler/profile_picture'
-          ).then(function(response) {
-            if (response.data.profile_picture_data_url) {
-              profilePictureDataUrl = response.data.profile_picture_data_url;
-            }
-            return profilePictureDataUrl;
-          });
+          )
+            .then(function(response) {
+              if (response.data.profile_picture_data_url) {
+                profilePictureDataUrl = response.data.profile_picture_data_url;
+              }
+              return profilePictureDataUrl;
+            });
         } else {
           return $q.resolve(profilePictureDataUrl);
         }
@@ -67,16 +70,13 @@ oppia.factory('UserService', [
         });
       },
       getLoginAndLogoutUrls: function() {
-        var urlParameters = {
-          current_url: $window.location.href
-        };
-        return $http.get('/url_handler', {params: urlParameters}).then(
-          function(response) {
-            return {
-              login_url: response.data.login_url,
-            };
-          }
-        );
+        var urlParameters = {current_url: $window.location.href};
+        return $http.get('/url_handler', {params: urlParameters})
+          .then(
+            function(response) {
+              return {login_url: response.data.login_url, };
+            }
+          );
       },
       getUserInfoAsync: getUserInfoAsync
     };

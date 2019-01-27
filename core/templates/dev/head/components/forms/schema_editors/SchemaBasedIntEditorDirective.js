@@ -45,4 +45,5 @@ oppia.directive('schemaBasedIntEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

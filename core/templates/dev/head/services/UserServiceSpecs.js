@@ -20,30 +20,34 @@ describe('User Service', function() {
   var UserService;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     UserService = $injector.get('UserService');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
-  }));
+  }]);
 
   it('should return image data', function() {
     var requestUrl = '/preferenceshandler/profile_picture';
-    $httpBackend.expect('GET', requestUrl).respond(200, {
-      profile_picture_data_url: 'image data'
-    });
+    $httpBackend.expect('GET', requestUrl)
+      .respond(200, {profile_picture_data_url: 'image data'});
 
-    UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-      expect(dataUrl).toBe('image data');
-    });
+    UserService.getProfileImageDataUrlAsync()
+      .then(function(dataUrl) {
+        expect(dataUrl)
+          .toBe('image data');
+      });
     $httpBackend.flush();
 
-    $httpBackend.expect('GET', requestUrl).respond(404);
+    $httpBackend.expect('GET', requestUrl)
+      .respond(404);
 
-    UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-      expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.png'));
-    });
+    UserService.getProfileImageDataUrlAsync()
+      .then(function(dataUrl) {
+        expect(dataUrl)
+          .toBe(UrlInterpolationService.getStaticImageUrl(
+            '/avatar/user_blue_72px.png'));
+      });
     $httpBackend.flush();
   });
 });

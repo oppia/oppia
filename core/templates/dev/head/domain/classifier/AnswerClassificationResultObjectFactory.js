@@ -17,19 +17,21 @@
  *     Classification Result domain objects.
  */
 
-oppia.factory('AnswerClassificationResultObjectFactory', [function() {
-  var AnswerClassificationResult = function(
-      outcome, answerGroupIndex, ruleIndex, classificationCategorization) {
-    this.outcome = outcome;
-    this.answerGroupIndex = answerGroupIndex;
-    this.ruleIndex = ruleIndex;
-    this.classificationCategorization = classificationCategorization;
-  };
+oppia.factory('AnswerClassificationResultObjectFactory', [
+  function() {
+    var AnswerClassificationResult = function(
+        outcome, answerGroupIndex, ruleIndex, classificationCategorization) {
+      this.outcome = outcome;
+      this.answerGroupIndex = answerGroupIndex;
+      this.ruleIndex = ruleIndex;
+      this.classificationCategorization = classificationCategorization;
+    };
 
-  AnswerClassificationResult.createNew = function(
-      outcome, answerGroupIndex, ruleIndex, classificationCategorization) {
-    return new AnswerClassificationResult(
-      outcome, answerGroupIndex, ruleIndex, classificationCategorization);
-  };
-  return AnswerClassificationResult;
-}]);
+    AnswerClassificationResult.createNew = function(
+        outcome, answerGroupIndex, ruleIndex, classificationCategorization) {
+      return new AnswerClassificationResult(
+        outcome, answerGroupIndex, ruleIndex, classificationCategorization);
+    };
+    return AnswerClassificationResult;
+  }
+]);

@@ -88,8 +88,10 @@ oppia.factory('baseInteractionValidationService', [
       },
       getAllOutcomeWarnings: function(answerGroups, defaultOutcome, stateName) {
         return (
-          this.getAnswerGroupWarnings(answerGroups, stateName).concat(
-            this.getDefaultOutcomeWarnings(defaultOutcome, stateName)));
+          this.getAnswerGroupWarnings(answerGroups, stateName)
+            .concat(
+              this.getDefaultOutcomeWarnings(defaultOutcome, stateName)));
       }
     };
-  }]);
+  }
+]);

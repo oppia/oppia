@@ -211,16 +211,19 @@ oppia.factory('StoryUpdateService', [
        */
       setInitialNodeId: function(story, newInitialNodeId) {
         var oldInitialNodeId =
-          angular.copy(story.getStoryContents().getInitialNodeId());
+          angular.copy(story.getStoryContents()
+            .getInitialNodeId());
         _applyStoryContentsPropertyChange(
           story, INITIAL_NODE_ID, oldInitialNodeId,
           newInitialNodeId,
           function(changeDict, story) {
             // Apply.
-            story.getStoryContents().setInitialNodeId(newInitialNodeId);
+            story.getStoryContents()
+              .setInitialNodeId(newInitialNodeId);
           }, function(changeDict, story) {
             // Undo.
-            story.getStoryContents().setInitialNodeId(oldInitialNodeId);
+            story.getStoryContents()
+              .setInitialNodeId(oldInitialNodeId);
           });
       },
 
@@ -229,17 +232,20 @@ oppia.factory('StoryUpdateService', [
        * the undo/redo service.
        */
       addStoryNode: function(story, nodeTitle) {
-        var nextNodeId = story.getStoryContents().getNextNodeId();
+        var nextNodeId = story.getStoryContents()
+          .getNextNodeId();
         _applyChange(story, CMD_ADD_STORY_NODE, {
           node_id: nextNodeId,
           title: nodeTitle
         }, function(changeDict, story) {
           // Apply.
-          story.getStoryContents().addNode(nodeTitle);
+          story.getStoryContents()
+            .addNode(nodeTitle);
         }, function(changeDict, story) {
           // Undo.
           var nodeId = _getNodeIdFromChangeDict(changeDict);
-          story.getStoryContents().deleteNode(nodeId);
+          story.getStoryContents()
+            .deleteNode(nodeId);
         });
       },
 
@@ -247,16 +253,17 @@ oppia.factory('StoryUpdateService', [
        * Removes a story node, and records the change in the undo/redo service.
        */
       deleteStoryNode: function(story, nodeId) {
-        var nodeIndex = story.getStoryContents().getNodeIndex(nodeId);
-        _applyChange(story, CMD_DELETE_STORY_NODE, {
-          node_id: nodeId
-        }, function(changeDict, story) {
+        var nodeIndex = story.getStoryContents()
+          .getNodeIndex(nodeId);
+        _applyChange(story, CMD_DELETE_STORY_NODE,
+          {node_id: nodeId}, function(changeDict, story) {
           // Apply.
-          story.getStoryContents().deleteNode(nodeId);
-        }, function(changeDict, story) {
+            story.getStoryContents()
+              .deleteNode(nodeId);
+          }, function(changeDict, story) {
           // Undo.
-          throw Error('A deleted story node cannot be restored.');
-        });
+            throw Error('A deleted story node cannot be restored.');
+          });
       },
 
       /**
@@ -274,10 +281,12 @@ oppia.factory('StoryUpdateService', [
           new_value: true
         }, function(changeDict, story) {
           // Apply.
-          story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
+          story.getStoryContents()
+            .markNodeOutlineAsFinalized(nodeId);
         }, function(changeDict, story) {
           // Undo.
-          story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
+          story.getStoryContents()
+            .markNodeOutlineAsNotFinalized(nodeId);
         });
       },
 
@@ -296,10 +305,12 @@ oppia.factory('StoryUpdateService', [
           new_value: false
         }, function(changeDict, story) {
           // Apply.
-          story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
+          story.getStoryContents()
+            .markNodeOutlineAsNotFinalized(nodeId);
         }, function(changeDict, story) {
           // Undo.
-          story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
+          story.getStoryContents()
+            .markNodeOutlineAsFinalized(nodeId);
         });
       },
 
@@ -316,11 +327,13 @@ oppia.factory('StoryUpdateService', [
           oldOutline, newOutline,
           function(changeDict, story) {
             // Apply.
-            story.getStoryContents().setNodeOutline(nodeId, newOutline);
+            story.getStoryContents()
+              .setNodeOutline(nodeId, newOutline);
           }, function(changeDict, story) {
             // Undo.
-            story.getStoryContents().setNodeOutline(
-              nodeId, oldOutline);
+            story.getStoryContents()
+              .setNodeOutline(
+                nodeId, oldOutline);
           });
       },
 
@@ -337,10 +350,12 @@ oppia.factory('StoryUpdateService', [
           oldTitle, newTitle,
           function(changeDict, story) {
             // Apply.
-            story.getStoryContents().setNodeTitle(nodeId, newTitle);
+            story.getStoryContents()
+              .setNodeTitle(nodeId, newTitle);
           }, function(changeDict, story) {
             // Undo.
-            story.getStoryContents().setNodeTitle(nodeId, oldTitle);
+            story.getStoryContents()
+              .setNodeTitle(nodeId, oldTitle);
           });
       },
 
@@ -357,12 +372,14 @@ oppia.factory('StoryUpdateService', [
           oldExplorationId, newExplorationId,
           function(changeDict, story) {
             // Apply.
-            story.getStoryContents().setNodeExplorationId(
-              nodeId, newExplorationId);
+            story.getStoryContents()
+              .setNodeExplorationId(
+                nodeId, newExplorationId);
           }, function(changeDict, story) {
             // Undo.
-            story.getStoryContents().setNodeExplorationId(
-              nodeId, oldExplorationId);
+            story.getStoryContents()
+              .setNodeExplorationId(
+                nodeId, oldExplorationId);
           });
       },
 
@@ -382,12 +399,14 @@ oppia.factory('StoryUpdateService', [
           oldDestinationNodeIds, newDestinationNodeIds,
           function(changeDict, story) {
             // Apply.
-            story.getStoryContents().addDestinationNodeIdToNode(
-              nodeId, destinationNodeId);
+            story.getStoryContents()
+              .addDestinationNodeIdToNode(
+                nodeId, destinationNodeId);
           }, function(changeDict, story) {
             // Undo.
-            story.getStoryContents().removeDestinationNodeIdFromNode(
-              nodeId, destinationNodeId);
+            story.getStoryContents()
+              .removeDestinationNodeIdFromNode(
+                nodeId, destinationNodeId);
           });
       },
 
@@ -412,12 +431,14 @@ oppia.factory('StoryUpdateService', [
           oldDestinationNodeIds, newDestinationNodeIds,
           function(changeDict, story) {
             // Apply.
-            story.getStoryContents().removeDestinationNodeIdFromNode(
-              nodeId, destinationNodeId);
+            story.getStoryContents()
+              .removeDestinationNodeIdFromNode(
+                nodeId, destinationNodeId);
           }, function(changeDict, story) {
             // Undo.
-            story.getStoryContents().addDestinationNodeIdToNode(
-              nodeId, destinationNodeId);
+            story.getStoryContents()
+              .addDestinationNodeIdToNode(
+                nodeId, destinationNodeId);
           });
       },
 
@@ -436,12 +457,14 @@ oppia.factory('StoryUpdateService', [
           oldPrerequisiteSkillIds, newPrerequisiteSkillIds,
           function(changeDict, story) {
             // Apply.
-            story.getStoryContents().addPrerequisiteSkillIdToNode(
-              nodeId, skillId);
+            story.getStoryContents()
+              .addPrerequisiteSkillIdToNode(
+                nodeId, skillId);
           }, function(changeDict, story) {
             // Undo.
-            story.getStoryContents().removePrerequisiteSkillIdFromNode(
-              nodeId, skillId);
+            story.getStoryContents()
+              .removePrerequisiteSkillIdFromNode(
+                nodeId, skillId);
           });
       },
 
@@ -465,12 +488,14 @@ oppia.factory('StoryUpdateService', [
           oldPrerequisiteSkillIds, newPrerequisiteSkillIds,
           function(changeDict, story) {
             // Apply.
-            story.getStoryContents().removePrerequisiteSkillIdFromNode(
-              nodeId, skillId);
+            story.getStoryContents()
+              .removePrerequisiteSkillIdFromNode(
+                nodeId, skillId);
           }, function(changeDict, story) {
             // Undo.
-            story.getStoryContents().addPrerequisiteSkillIdToNode(
-              nodeId, skillId);
+            story.getStoryContents()
+              .addPrerequisiteSkillIdToNode(
+                nodeId, skillId);
           });
       },
 
@@ -490,12 +515,14 @@ oppia.factory('StoryUpdateService', [
           oldAcquiredSkillIds, newAcquiredSkillIds,
           function(changeDict, story) {
             // Apply.
-            story.getStoryContents().addAcquiredSkillIdToNode(
-              nodeId, skillId);
+            story.getStoryContents()
+              .addAcquiredSkillIdToNode(
+                nodeId, skillId);
           }, function(changeDict, story) {
             // Undo.
-            story.getStoryContents().removeAcquiredSkillIdFromNode(
-              nodeId, skillId);
+            story.getStoryContents()
+              .removeAcquiredSkillIdFromNode(
+                nodeId, skillId);
           });
       },
 
@@ -519,13 +546,16 @@ oppia.factory('StoryUpdateService', [
           oldAcquiredSkillIds, newAcquiredSkillIds,
           function(changeDict, story) {
             // Apply.
-            story.getStoryContents().removeAcquiredSkillIdFromNode(
-              nodeId, skillId);
+            story.getStoryContents()
+              .removeAcquiredSkillIdFromNode(
+                nodeId, skillId);
           }, function(changeDict, story) {
             // Undo.
-            story.getStoryContents().addAcquiredSkillIdToNode(
-              nodeId, skillId);
+            story.getStoryContents()
+              .addAcquiredSkillIdToNode(
+                nodeId, skillId);
           });
       }
     };
-  }]);
+  }
+]);

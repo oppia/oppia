@@ -27,34 +27,35 @@ oppia.directive('setOfHtmlStringEditor', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/set_of_html_string_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'html'
-          }
-        };
+      controller: [
+        '$scope', function($scope) {
+          $scope.SCHEMA = {
+            type: 'list',
+            items: {type: 'html'}
+          };
 
-        if (!$scope.value) {
-          $scope.value = [];
+          if (!$scope.value) {
+            $scope.value = [];
+          }
+          $scope.initArgs = $scope.getInitArgs();
+          $scope.choices = $scope.initArgs.choices;
+          $scope.selections = $scope.choices.map(function(choice) {
+            return $scope.value.indexOf(choice.id) !== -1;
+          });
+
+          // The following function is necessary to insert elements into the
+          // answer groups for the Item Selection Widget.
+          $scope.toggleSelection = function(choiceListIndex) {
+            var choiceHtml = $scope.choices[choiceListIndex].id;
+            var selectedChoicesIndex = $scope.value.indexOf(choiceHtml);
+            if (selectedChoicesIndex > -1) {
+              $scope.value.splice(selectedChoicesIndex, 1);
+            } else {
+              $scope.value.push(choiceHtml);
+            }
+          };
         }
-        $scope.initArgs = $scope.getInitArgs();
-        $scope.choices = $scope.initArgs.choices;
-        $scope.selections = $scope.choices.map(function(choice) {
-          return $scope.value.indexOf(choice.id) !== -1;
-        });
-
-        // The following function is necessary to insert elements into the
-        // answer groups for the Item Selection Widget.
-        $scope.toggleSelection = function(choiceListIndex) {
-          var choiceHtml = $scope.choices[choiceListIndex].id;
-          var selectedChoicesIndex = $scope.value.indexOf(choiceHtml);
-          if (selectedChoicesIndex > -1) {
-            $scope.value.splice(selectedChoicesIndex, 1);
-          } else {
-            $scope.value.push(choiceHtml);
-          }
-        };
-      }]
+      ]
     };
-  }]);
+  }
+]);

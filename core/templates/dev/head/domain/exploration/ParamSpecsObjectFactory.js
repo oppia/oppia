@@ -74,9 +74,10 @@ oppia.factory('ParamSpecsObjectFactory', [
      */
     ParamSpecs.prototype.forEach = function(callback) {
       var that = this;
-      this.getParamNames().forEach(function(paramName) {
-        callback(paramName, that.getParamSpec(paramName));
-      });
+      this.getParamNames()
+        .forEach(function(paramName) {
+          callback(paramName, that.getParamSpec(paramName));
+        });
     };
 
     /**
@@ -99,10 +100,11 @@ oppia.factory('ParamSpecsObjectFactory', [
      */
     ParamSpecs.createFromBackendDict = function(paramSpecsBackendDict) {
       var paramDict = {};
-      Object.keys(paramSpecsBackendDict).forEach(function(paramName) {
-        paramDict[paramName] = ParamSpecObjectFactory.createFromBackendDict(
-          paramSpecsBackendDict[paramName]);
-      });
+      Object.keys(paramSpecsBackendDict)
+        .forEach(function(paramName) {
+          paramDict[paramName] = ParamSpecObjectFactory.createFromBackendDict(
+            paramSpecsBackendDict[paramName]);
+        });
       return new ParamSpecs(paramDict);
     };
 

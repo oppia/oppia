@@ -108,4 +108,5 @@ oppia.factory('LearnerPlaylistService', [
       addToLearnerPlaylist: _addToLearnerPlaylist,
       removeFromLearnerPlaylist: _removeFromLearnerPlaylist
     };
-  }]);
+  }
+]);

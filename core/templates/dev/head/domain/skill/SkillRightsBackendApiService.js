@@ -27,48 +27,45 @@ oppia.factory('SkillRightsBackendApiService', [
     var _fetchSkillRights = function(skillId, successCallback,
         errorCallback) {
       var skillRightsUrl = UrlInterpolationService.interpolateUrl(
-        SKILL_RIGHTS_URL_TEMPLATE, {
-          skill_id: skillId
-        });
+        SKILL_RIGHTS_URL_TEMPLATE, {skill_id: skillId});
 
-      $http.get(skillRightsUrl).then(function(response) {
-        var responseData = response.data;
-        if (successCallback) {
-          successCallback({
-            skill_id: responseData.skill_id,
-            creator_id: responseData.creator_id,
-            can_edit_skill_description: responseData.can_edit_skill_description,
-            skill_is_private: responseData.skill_is_private
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(skillRightsUrl)
+        .then(function(response) {
+          var responseData = response.data;
+          if (successCallback) {
+            successCallback({
+              skill_id: responseData.skill_id,
+              creator_id: responseData.creator_id,
+              can_edit_skill_description:
+               responseData.can_edit_skill_description,
+              skill_is_private: responseData.skill_is_private
+            });
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _setSkillPublic = function(
         skillId, skillVersion, successCallback, errorCallback) {
       var skillRightsPublishUrl = UrlInterpolationService.interpolateUrl(
-        SKILL_PUBLISH_URL_TEMPLATE, {
-          skill_id: skillId
+        SKILL_PUBLISH_URL_TEMPLATE, {skill_id: skillId});
+
+      var putParams = {version: skillVersion};
+
+      $http.put(skillRightsPublishUrl, putParams)
+        .then(function(response) {
+          skillRightsCache[skillId] = response.data;
+          if (successCallback) {
+            successCallback(response.data);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
         });
-
-      var putParams = {
-        version: skillVersion
-      };
-
-      $http.put(skillRightsPublishUrl, putParams).then(function(response) {
-        skillRightsCache[skillId] = response.data;
-        if (successCallback) {
-          successCallback(response.data);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
     };
 
     var _isCached = function(skillId) {

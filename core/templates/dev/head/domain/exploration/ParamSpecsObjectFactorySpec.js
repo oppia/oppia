@@ -23,11 +23,11 @@ describe('ParamSpecs', function() {
   var paramName = 'x';
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     ParamSpecsObjectFactory = $injector.get('ParamSpecsObjectFactory');
     ParamSpecObjectFactory = $injector.get('ParamSpecObjectFactory');
     emptyParamSpecs = ParamSpecsObjectFactory.createFromBackendDict({});
-  }));
+  }]);
 
   it('should be undefined for missing param names', function() {
     expect(emptyParamSpecs.getParamDict()[paramName]).not.toBeDefined();
@@ -36,20 +36,26 @@ describe('ParamSpecs', function() {
   it('should add param when missing', function() {
     var paramSpec = ParamSpecObjectFactory.createDefault();
 
-    expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBe(true);
+    expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec))
+      .toBe(true);
     // No longer empty.
-    expect(emptyParamSpecs.getParamDict()[paramName]).toBe(paramSpec);
+    expect(emptyParamSpecs.getParamDict()[paramName])
+      .toBe(paramSpec);
   });
 
   it('should not overwrite existing params', function() {
     var oldParamSpec = ParamSpecObjectFactory.createDefault();
-    expect(emptyParamSpecs.addParamIfNew(paramName, oldParamSpec)).toBe(true);
+    expect(emptyParamSpecs.addParamIfNew(paramName, oldParamSpec))
+      .toBe(true);
     // No longer empty.
-    expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
+    expect(emptyParamSpecs.getParamDict()[paramName])
+      .toBe(oldParamSpec);
 
     var newParamSpec = ParamSpecObjectFactory.createDefault();
-    expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec)).toBe(false);
+    expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec))
+      .toBe(false);
     expect(emptyParamSpecs.getParamDict()[paramName]).not.toBe(newParamSpec);
-    expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
+    expect(emptyParamSpecs.getParamDict()[paramName])
+      .toBe(oldParamSpec);
   });
 });

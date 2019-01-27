@@ -17,7 +17,8 @@
  *     Issue domain objects.
  */
 
-oppia.factory('PlaythroughIssueObjectFactory', [function() {
+oppia.factory('PlaythroughIssueObjectFactory', [
+  function() {
   /**
    * @constructor
    * @param {string} issueType - type of an issue.
@@ -27,22 +28,22 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
    * @param {number} schemaVersion - schema version of the class instance.
    * @param {boolean} isValid - whether the issue is valid.
    */
-  var ExplorationIssue = function(
-      issueType, issueCustomizationArgs, playthroughIds, schemaVersion,
-      isValid) {
+    var ExplorationIssue = function(
+        issueType, issueCustomizationArgs, playthroughIds, schemaVersion,
+        isValid) {
     /** @type {string} */
-    this.issueType = issueType;
-    /** @type {Object.<string, *>} */
-    this.issueCustomizationArgs = issueCustomizationArgs;
-    /** @type {string[]} */
-    this.playthroughIds = playthroughIds;
-    /** @type {number} */
-    this.schemaVersion = schemaVersion;
-    /** @type {boolean} */
-    this.isValid = isValid;
-  };
+      this.issueType = issueType;
+      /** @type {Object.<string, *>} */
+      this.issueCustomizationArgs = issueCustomizationArgs;
+      /** @type {string[]} */
+      this.playthroughIds = playthroughIds;
+      /** @type {number} */
+      this.schemaVersion = schemaVersion;
+      /** @type {boolean} */
+      this.isValid = isValid;
+    };
 
-  /**
+    /**
    * @typedef ExplorationIssueBackendDict
    * @property {string} issueType - type of an issue.
    * @property {Object.<string, *>} issueCustomizationArgs - customization dict
@@ -51,32 +52,33 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
    * @property {number} schemaVersion - schema version of the class instance.
    * @property {boolean} isValid - whether the issue is valid.
    */
-  /**
+    /**
    * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
    * @returns {ExplorationIssue}
    */
-  ExplorationIssue.createFromBackendDict = function(
-      explorationIssueBackendDict) {
-    return new ExplorationIssue(
-      explorationIssueBackendDict.issue_type,
-      explorationIssueBackendDict.issue_customization_args,
-      explorationIssueBackendDict.playthrough_ids,
-      explorationIssueBackendDict.schema_version,
-      explorationIssueBackendDict.is_valid);
-  };
+    ExplorationIssue.createFromBackendDict = function(
+        explorationIssueBackendDict) {
+      return new ExplorationIssue(
+        explorationIssueBackendDict.issue_type,
+        explorationIssueBackendDict.issue_customization_args,
+        explorationIssueBackendDict.playthrough_ids,
+        explorationIssueBackendDict.schema_version,
+        explorationIssueBackendDict.is_valid);
+    };
 
-  /**
+    /**
    * @returns {ExplorationIssueBackendDict}
    */
-  ExplorationIssue.prototype.toBackendDict = function() {
-    return {
-      issue_type: this.issueType,
-      issue_customization_args: this.issueCustomizationArgs,
-      playthrough_ids: this.playthroughIds,
-      schema_version: this.schemaVersion,
-      is_valid: this.isValid
+    ExplorationIssue.prototype.toBackendDict = function() {
+      return {
+        issue_type: this.issueType,
+        issue_customization_args: this.issueCustomizationArgs,
+        playthrough_ids: this.playthroughIds,
+        schema_version: this.schemaVersion,
+        is_valid: this.isValid
+      };
     };
-  };
 
-  return ExplorationIssue;
-}]);
+    return ExplorationIssue;
+  }
+]);

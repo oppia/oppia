@@ -19,17 +19,18 @@
 oppia.directive('schemaBasedPrimitiveViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
-        localValue: '='
-      },
+      scope: {localValue: '='},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_viewers/' +
         'schema_based_primitive_viewer_directive.html'),
       restrict: 'E',
-      controller: ['$scope', function($scope) {
-        $scope.isExpression = function(value) {
-          return angular.isString(value);
-        };
-      }]
+      controller: [
+        '$scope', function($scope) {
+          $scope.isExpression = function(value) {
+            return angular.isString(value);
+          };
+        }
+      ]
     };
-  }]);
+  }
+]);

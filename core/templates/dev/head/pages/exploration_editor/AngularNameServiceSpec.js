@@ -22,13 +22,14 @@ describe('Angular names service', function() {
   describe('angular name service', function() {
     var ans = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       ans = $injector.get('AngularNameService');
-    }));
+    }]);
 
     it('should map interaction ID to correct RulesService', function() {
-      expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(
-        'textInputRulesService');
+      expect(ans.getNameOfInteractionRulesService('TextInput'))
+        .toEqual(
+          'textInputRulesService');
     });
   });
 });

@@ -70,14 +70,17 @@ var ExplorationEditorSettingsTab = function() {
     addParamButton.click();
 
     var editorRowElem = element.all(by.css(
-      '.protractor-test-param-changes-list')).last();
+      '.protractor-test-param-changes-list'))
+      .last();
 
-    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
+    forms.AutocompleteDropdownEditor(editorRowElem)
+      .setValue(paramName);
 
     /* Setting parameter value is difficult via css since input fields
       are dynamically generated. We isolate it as the last input in the
       current parameter changes UI. */
-    var item = editorRowElem.all(by.tagName('input')).last();
+    var item = editorRowElem.all(by.tagName('input'))
+      .last();
     item.clear();
     item.sendKeys(paramValue);
 
@@ -102,36 +105,44 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.expectAvailableFirstStatesToBe = function(names) {
-    initialStateSelect.all(by.tagName('option')).map(function(elem) {
-      return elem.getText();
-    }).then(function(options) {
-      expect(options.sort()).toEqual(names.sort());
-    });
+    initialStateSelect.all(by.tagName('option'))
+      .map(function(elem) {
+        return elem.getText();
+      })
+      .then(function(options) {
+        expect(options.sort())
+          .toEqual(names.sort());
+      });
   };
 
   this.openAndClosePreviewSummaryTile = function() {
     openPreviewSummaryButton.click();
     waitFor.visibilityOf(explorationSummaryTile,
       'Summary Tile takes too long to appear');
-    expect(explorationSummaryTile.isPresent()).toBeTruthy();
+    expect(explorationSummaryTile.isPresent())
+      .toBeTruthy();
     closePreviewSummaryButton.click();
     waitFor.invisibilityOf(explorationSummaryTile,
       'Summary Tile takes too long to disappear');
-    expect((explorationSummaryTile.isPresent())).toBeFalsy();
+    expect((explorationSummaryTile.isPresent()))
+      .toBeFalsy();
   };
 
   this.setCategory = function(category) {
-    forms.AutocompleteDropdownEditor(explorationCategoryInput).setValue(
-      category);
+    forms.AutocompleteDropdownEditor(explorationCategoryInput)
+      .setValue(
+        category);
   };
 
   this.setFirstState = function(stateName) {
-    initialStateSelectOption(stateName).click();
+    initialStateSelectOption(stateName)
+      .click();
   };
 
   this.setLanguage = function(language) {
     element(by.css('.protractor-test-exploration-language-select')).
-      element(by.cssContainingText('option', language)).click();
+      element(by.cssContainingText('option', language))
+      .click();
   };
 
   this.setObjective = function(objective) {

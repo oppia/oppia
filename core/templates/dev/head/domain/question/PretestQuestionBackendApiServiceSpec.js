@@ -26,7 +26,7 @@ describe('Pretest question backend API service', function() {
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     PretestQuestionBackendApiService = $injector.get(
       'PretestQuestionBackendApiService');
     $rootScope = $injector.get('$rootScope');
@@ -35,49 +35,39 @@ describe('Pretest question backend API service', function() {
 
     // Sample question object returnable from the backend
     sampleDataResults = {
-      pretest_question_dicts: [{
-        id: '0',
-        question_state_data: {
-          content: {
-            html: 'Question 1'
-          },
-          content_ids_to_audio_translations: {},
-          interaction: {
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {},
-            default_outcome: {
-              dest: null,
-              feedback: {
-                html: 'Correct Answer'
+      pretest_question_dicts: [
+        {
+          id: '0',
+          question_state_data: {
+            content: {html: 'Question 1'},
+            content_ids_to_audio_translations: {},
+            interaction: {
+              answer_groups: [],
+              confirmed_unclassified_answers: [],
+              customization_args: {},
+              default_outcome: {
+                dest: null,
+                feedback: {html: 'Correct Answer'},
+                param_changes: [],
+                labelled_as_correct: true
               },
-              param_changes: [],
-              labelled_as_correct: true
+              hints: [{hint_content: {html: 'Hint 1'}}],
+              solution: {
+                correct_answer: 'This is the correct answer',
+                answer_is_exclusive: false,
+                explanation: {html: 'Solution explanation'}
+              },
+              id: 'TextInput'
             },
-            hints: [
-              {
-                hint_content: {
-                  html: 'Hint 1'
-                }
-              }
-            ],
-            solution: {
-              correct_answer: 'This is the correct answer',
-              answer_is_exclusive: false,
-              explanation: {
-                html: 'Solution explanation'
-              }
-            },
-            id: 'TextInput'
+            param_changes: []
           },
-          param_changes: []
-        },
-        language_code: 'en',
-        version: 1
-      }],
+          language_code: 'en',
+          version: 1
+        }
+      ],
       next_start_cursor: null
     };
-  }));
+  }]);
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
@@ -90,14 +80,17 @@ describe('Pretest question backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect(
-        'GET', '/pretest_handler/expId?story_id=storyId&cursor=').respond(
-        sampleDataResults);
+        'GET', '/pretest_handler/expId?story_id=storyId&cursor=')
+        .respond(
+          sampleDataResults);
       PretestQuestionBackendApiService.fetchPretestQuestions(
-        'expId', 'storyId').then(successHandler, failHandler);
+        'expId', 'storyId')
+        .then(successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResults.pretest_question_dicts);
+      expect(successHandler)
+        .toHaveBeenCalledWith(
+          sampleDataResults.pretest_question_dicts);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
@@ -108,15 +101,18 @@ describe('Pretest question backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect(
-        'GET', '/pretest_handler/expId?story_id=storyId&cursor=').respond(
-        500, 'Error loading pretest questions.');
+        'GET', '/pretest_handler/expId?story_id=storyId&cursor=')
+        .respond(
+          500, 'Error loading pretest questions.');
       PretestQuestionBackendApiService.fetchPretestQuestions(
-        'expId', 'storyId').then(successHandler, failHandler);
+        'expId', 'storyId')
+        .then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'Error loading pretest questions.');
+      expect(failHandler)
+        .toHaveBeenCalledWith(
+          'Error loading pretest questions.');
     }
   );
 });

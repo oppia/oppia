@@ -41,11 +41,12 @@ oppia.factory('ExplorationWarningsService', [
 
       var states = ExplorationStatesService.getStates();
 
-      states.getStateNames().forEach(function(stateName) {
-        if (!states.getState(stateName).interaction.id) {
-          statesWithoutInteractionIds.push(stateName);
-        }
-      });
+      states.getStateNames()
+        .forEach(function(stateName) {
+          if (!states.getState(stateName).interaction.id) {
+            statesWithoutInteractionIds.push(stateName);
+          }
+        });
 
       return statesWithoutInteractionIds;
     };
@@ -54,12 +55,13 @@ oppia.factory('ExplorationWarningsService', [
       var statesWithIncorrectSolution = [];
 
       var states = ExplorationStatesService.getStates();
-      states.getStateNames().forEach(function(stateName) {
-        if (states.getState(stateName).interaction.solution &&
+      states.getStateNames()
+        .forEach(function(stateName) {
+          if (states.getState(stateName).interaction.solution &&
             !SolutionValidityService.isSolutionValid(stateName)) {
-          statesWithIncorrectSolution.push(stateName);
-        }
-      });
+            statesWithIncorrectSolution.push(stateName);
+          }
+        });
       return statesWithIncorrectSolution;
     };
 
@@ -164,16 +166,17 @@ oppia.factory('ExplorationWarningsService', [
 
       var states = ExplorationStatesService.getStates();
 
-      states.getStateNames().forEach(function(stateName) {
-        var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
-          states.getState(stateName));
-        if (groupIndexes.length > 0) {
-          results.push({
-            groupIndexes: groupIndexes,
-            stateName: stateName
-          });
-        }
-      });
+      states.getStateNames()
+        .forEach(function(stateName) {
+          var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
+            states.getState(stateName));
+          if (groupIndexes.length > 0) {
+            results.push({
+              groupIndexes: groupIndexes,
+              stateName: stateName
+            });
+          }
+        });
 
       return results;
     };
@@ -181,16 +184,18 @@ oppia.factory('ExplorationWarningsService', [
     var _getStatesWithAnswersThatMustBeResolved = function() {
       var stass = StateTopAnswersStatsService;
       var states = ExplorationStatesService.getStates();
-      return stass.getStateNamesWithStats().filter(function(stateName) {
-        var mustResolveState =
+      return stass.getStateNamesWithStats()
+        .filter(function(stateName) {
+          var mustResolveState =
           ImprovementsService
             .isStateForcedToResolveOutstandingUnaddressedAnswers(
               states.getState(stateName));
-        return mustResolveState &&
-          stass.getUnresolvedStateStats(stateName).some(function(answer) {
-            return answer.frequency >= UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
-          });
-      });
+          return mustResolveState &&
+          stass.getUnresolvedStateStats(stateName)
+            .some(function(answer) {
+              return answer.frequency >= UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
+            });
+        });
     };
 
     var _updateWarningsList = function() {
@@ -210,25 +215,26 @@ oppia.factory('ExplorationWarningsService', [
       var _graphData = GraphDataService.getGraphData();
 
       var _states = ExplorationStatesService.getStates();
-      _states.getStateNames().forEach(function(stateName) {
-        var interaction = _states.getState(stateName).interaction;
-        if (interaction.id) {
-          var validatorServiceName =
+      _states.getStateNames()
+        .forEach(function(stateName) {
+          var interaction = _states.getState(stateName).interaction;
+          if (interaction.id) {
+            var validatorServiceName =
             _states.getState(stateName).interaction.id + 'ValidationService';
-          var validatorService = $injector.get(validatorServiceName);
-          var interactionWarnings = validatorService.getAllWarnings(
-            stateName, interaction.customizationArgs,
-            interaction.answerGroups, interaction.defaultOutcome);
+            var validatorService = $injector.get(validatorServiceName);
+            var interactionWarnings = validatorService.getAllWarnings(
+              stateName, interaction.customizationArgs,
+              interaction.answerGroups, interaction.defaultOutcome);
 
-          for (var j = 0; j < interactionWarnings.length; j++) {
-            _extendStateWarnings(stateName, interactionWarnings[j].message);
+            for (var j = 0; j < interactionWarnings.length; j++) {
+              _extendStateWarnings(stateName, interactionWarnings[j].message);
 
-            if (interactionWarnings[j].type === WARNING_TYPES.CRITICAL) {
-              hasCriticalStateWarning = true;
+              if (interactionWarnings[j].type === WARNING_TYPES.CRITICAL) {
+                hasCriticalStateWarning = true;
+              }
             }
           }
-        }
-      });
+        });
 
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
       angular.forEach(
@@ -271,8 +277,8 @@ oppia.factory('ExplorationWarningsService', [
           }
         }
 
-        _warningsList = _warningsList.concat(_verifyParameters([
-          _graphData.initStateId]));
+        _warningsList = _warningsList
+          .concat(_verifyParameters([_graphData.initStateId]));
       }
 
       if (Object.keys(stateWarnings).length) {
@@ -282,7 +288,8 @@ oppia.factory('ExplorationWarningsService', [
           type: WARNING_TYPES.ERROR,
           message: (
             'The following ' + errorString + ' errors: ' +
-            Object.keys(stateWarnings).join(', ') + '.')
+            Object.keys(stateWarnings)
+              .join(', ') + '.')
         });
       }
 

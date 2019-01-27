@@ -48,7 +48,8 @@ oppia.factory('FractionInputValidationService', [
           this.getCustomizationArgsWarnings(customizationArgs));
 
         var toFloat = function(fraction) {
-          return FractionObjectFactory.fromDict(fraction).toFloat();
+          return FractionObjectFactory.fromDict(fraction)
+            .toFloat();
         };
         /**
          * Store an answer range for every rule, then check for redundant
@@ -121,7 +122,8 @@ oppia.factory('FractionInputValidationService', [
                 if (shouldBeInSimplestForm) {
                   var fraction = rule.inputs.f;
                   var fractionInSimplestForm = FractionObjectFactory.fromDict(
-                    fraction).convertToSimplestForm();
+                    fraction)
+                    .convertToSimplestForm();
                   if (!angular.equals(fraction, fractionInSimplestForm)) {
                     warningsList.push({
                       type: WARNING_TYPES.ERROR,

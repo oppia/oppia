@@ -20,9 +20,9 @@ describe('Rating computation service', function() {
   var RatingComputationService;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     RatingComputationService = $injector.get('RatingComputationService');
-  }));
+  }]);
 
   it(
     'should show an average rating only if there are enough individual ones',
@@ -34,7 +34,8 @@ describe('Rating computation service', function() {
         3: 0,
         4: 0,
         5: 0
-      })).toBe(undefined);
+      }))
+        .toBe(undefined);
 
       // Show an average rating once the minimum is reached.
       expect(RatingComputationService.computeAverageRating({
@@ -43,7 +44,8 @@ describe('Rating computation service', function() {
         3: 0,
         4: 0,
         5: 0
-      })).toBe(1.0);
+      }))
+        .toBe(1.0);
 
       // Continue showing an average rating if additional ratings are added.
       expect(RatingComputationService.computeAverageRating({
@@ -52,7 +54,8 @@ describe('Rating computation service', function() {
         3: 0,
         4: 0,
         5: 1
-      })).toBe(3.0);
+      }))
+        .toBe(3.0);
     }
   );
 
@@ -63,6 +66,7 @@ describe('Rating computation service', function() {
       3: 8,
       4: 12,
       5: 11
-    })).toBe(3.475);
+    }))
+      .toBe(3.475);
   });
 });

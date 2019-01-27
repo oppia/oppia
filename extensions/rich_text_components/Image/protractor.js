@@ -20,7 +20,8 @@
 var objects = require('../../objects/protractor.js');
 
 var customizeComponent = function(modal, filepath, name) {
-  modal.element(by.tagName('button')).click();
+  modal.element(by.tagName('button'))
+    .click();
   var filepathEditor = objects.FilepathEditor(
     modal.element(by.tagName('filepath-editor')));
   filepathEditor.upload(filepath);
@@ -29,7 +30,8 @@ var customizeComponent = function(modal, filepath, name) {
 
 var expectComponentDetailsToMatch = function(elem, name) {
   // The original filepath is not recorded and so cannot be checked.
-  expect(elem.getAttribute('filepath-with-value')).toMatch(name);
+  expect(elem.getAttribute('filepath-with-value'))
+    .toMatch(name);
 };
 
 exports.customizeComponent = customizeComponent;

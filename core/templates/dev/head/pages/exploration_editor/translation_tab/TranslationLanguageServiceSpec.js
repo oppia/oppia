@@ -28,21 +28,24 @@ describe('Translation language service', function() {
   describe('Translation language service', function() {
     var tls = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       tls = $injector.get('TranslationLanguageService');
-    }));
+    }]);
 
     it('should correctly set and get state names', function() {
       tls.setActiveLanguageCode('en');
-      expect(tls.getActiveLanguageCode()).toBe('en');
+      expect(tls.getActiveLanguageCode())
+        .toBe('en');
     });
 
     it('should not allow invalid state names to be set', function() {
       tls.setActiveLanguageCode('eng');
-      expect(tls.getActiveLanguageCode()).toBeNull();
+      expect(tls.getActiveLanguageCode())
+        .toBeNull();
 
       tls.setActiveLanguageCode(null);
-      expect(tls.getActiveLanguageCode()).toBeNull();
+      expect(tls.getActiveLanguageCode())
+        .toBeNull();
     });
   });
 });

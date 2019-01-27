@@ -19,39 +19,40 @@
 
 var logicProofConversion = (function() {
   // NOTE: the 'old' values must all be single characters
-  var REPLACEMENT_PAIRS = [{
-    old: '&',
-    // eslint-disable quote-props
-    'new': '\u2227'
-  }, {
-    old: '|',
-    'new': '\u2228'
-  }, {
-    old: '@',
-    'new': '\u2200'
-  }, {
-    old: '$',
-    'new': '\u2203'
-  }, {
-    old: '^',
-    'new': '\u2227'
-  }, {
-    old: '\u0009',
-    'new': '  '
+  var REPLACEMENT_PAIRS = [
+    {
+      old: '&',
+      // eslint-disable quote-props
+      'new': '\u2227'
+    }, {
+      old: '|',
+      'new': '\u2228'
+    }, {
+      old: '@',
+      'new': '\u2200'
+    }, {
+      old: '$',
+      'new': '\u2203'
+    }, {
+      old: '^',
+      'new': '\u2227'
+    }, {
+      old: '\u0009',
+      'new': '  '
     // eslint-enable quote-props
-  }];
+    }
+  ];
 
   var convertToLogicCharacters = function(oldString) {
     var replacedString = oldString;
     for (var i = 0; i < REPLACEMENT_PAIRS.length; i++) {
       // We don't use .replace() as it only affects the first instance
       replacedString = replacedString.split(
-        REPLACEMENT_PAIRS[i].old).join(REPLACEMENT_PAIRS[i]['new']);
+        REPLACEMENT_PAIRS[i].old)
+        .join(REPLACEMENT_PAIRS[i]['new']);
     }
     return replacedString;
   };
 
-  return {
-    convertToLogicCharacters: convertToLogicCharacters
-  };
+  return {convertToLogicCharacters: convertToLogicCharacters};
 }());

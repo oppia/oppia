@@ -202,9 +202,8 @@ oppia.factory('PretestEngineService', [
           newState = oldState;
         }
 
-        var questionHtml = makeQuestion(newState, [oldParams, {
-          answer: 'answer'
-        }]);
+        var questionHtml = makeQuestion(newState,
+          [oldParams, {answer: 'answer'}]);
         if (questionHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');

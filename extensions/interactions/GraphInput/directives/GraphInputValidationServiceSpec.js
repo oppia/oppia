@@ -20,7 +20,7 @@ describe('GraphInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     validatorService = $injector.get('GraphInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');
@@ -47,49 +47,41 @@ describe('GraphInputValidationService', function() {
           isLabeled: false
         }
       },
-      canEditEdgeWeight: {
-        value: false
-      },
-      canEditVertexLabel: {
-        value: false
-      }
+      canEditEdgeWeight: {value: false},
+      canEditVertexLabel: {value: false}
     };
 
     var answerGroup = agof.createNew(
-      [rof.createFromBackendDict({
-        inputs: {
-          g: {
-            vertices: new Array(10)
-          }
-        },
-        rule_type: 'IsIsomorphicTo'
-      }), rof.createFromBackendDict({
-        inputs: {
-          g: {
-            vertices: new Array(10)
-          }
-        },
-        rule_type: 'IsIsomorphicTo'
-      })],
+      [
+        rof.createFromBackendDict({
+          inputs: {g: {vertices: new Array(10)}},
+          rule_type: 'IsIsomorphicTo'
+        }), rof.createFromBackendDict({
+          inputs: {g: {vertices: new Array(10)}},
+          rule_type: 'IsIsomorphicTo'
+        })
+      ],
       goodDefaultOutcome,
       false,
       null
     );
     answerGroups = [answerGroup, angular.copy(answerGroup)];
-  }));
+  }]);
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 
   it('should expect graph and edit customization arguments', function() {
     expect(function() {
       validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
-    }).toThrow('Expected customization arguments to have properties: ' +
+    })
+      .toThrow('Expected customization arguments to have properties: ' +
       'graph, canEditEdgeWeight, canEditVertexLabel');
   });
 
@@ -100,11 +92,14 @@ describe('GraphInputValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'The graph used in customization exceeds supported maximum ' +
-          'number of vertices of 50.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'The graph used in customization exceeds supported' +
+          ' maximum number of vertices of 50.'
+        }
+      ]);
   });
 
   it('The graph used in the rule x in group y exceeds supported maximum ' +
@@ -116,19 +111,22 @@ describe('GraphInputValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'The graph used in the rule 1 in group 1 exceeds supported ' +
-          'maximum number of vertices of 10 for isomorphism check.'
-    }, {
-      type: WARNING_TYPES.CRITICAL,
-      message: 'The graph used in the rule 2 in group 1 exceeds supported ' +
-          'maximum number of vertices of 10 for isomorphism check.'
-    }, {
-      type: WARNING_TYPES.CRITICAL,
-      message: 'The graph used in the rule 1 in group 2 exceeds supported ' +
-          'maximum number of vertices of 10 for isomorphism check.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'The graph used in the rule 1 in group 1 exceeds' +
+          ' supported maximum number of vertices of 10 for isomorphism check.'
+        }, {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'The graph used in the rule 2 in group 1 exceeds' +
+          ' supported maximum number of vertices of 10 for isomorphism check.'
+        }, {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'The graph used in the rule 1 in group 2 exceeds' +
+          ' supported maximum number of vertices of 10 for isomorphism check.'
+        }
+      ]);
   });
 
   it('should verify edge weight edit permissions make sense', function() {
@@ -137,11 +135,14 @@ describe('GraphInputValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: (
-        'The learner cannot edit edge weights for an unweighted graph.')
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: (
+            'The learner cannot edit edge weights for an unweighted graph.')
+        }
+      ]);
   });
 
   it('should verify vertex label edit permissions make sense', function() {
@@ -150,10 +151,13 @@ describe('GraphInputValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: (
-        'The learner cannot edit vertex labels for an unlabeled graph.')
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: (
+            'The learner cannot edit vertex labels for an unlabeled graph.')
+        }
+      ]);
   });
 });

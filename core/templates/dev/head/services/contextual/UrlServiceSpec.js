@@ -28,13 +28,14 @@ describe('Url Service', function() {
   };
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     UrlService = $injector.get('UrlService');
     spyOn(UrlService, 'getCurrentLocation').and.returnValue(mockLocation);
-  }));
+  }]);
 
   it('should return correct query value list for each query field', function() {
-    expect(UrlService.getQueryFieldValuesAsList('field1')).toEqual([]);
+    expect(UrlService.getQueryFieldValuesAsList('field1'))
+      .toEqual([]);
 
     mockLocation.search = '?field1=value1&' +
       'field2=value2&field1=value3&field1=value4&field2=value5&' +
@@ -42,9 +43,11 @@ describe('Url Service', function() {
     var expectedList1 = ['value1', 'value3', 'value4', 'value6', 'value?= &6'];
     var expectedList2 = ['value2', 'value5'];
     expect(
-      UrlService.getQueryFieldValuesAsList('field1')).toEqual(expectedList1);
+      UrlService.getQueryFieldValuesAsList('field1'))
+      .toEqual(expectedList1);
     expect(
-      UrlService.getQueryFieldValuesAsList('field2')).toEqual(expectedList2);
+      UrlService.getQueryFieldValuesAsList('field2'))
+      .toEqual(expectedList2);
   });
 
   it('should correctly decode special characters in query value in url',
@@ -54,7 +57,8 @@ describe('Url Service', function() {
         field2: '?value&1'
       };
       mockLocation.search = '?field1=%3Fvalue%3D1&field2=%3Fvalue%261';
-      expect(UrlService.getUrlParams()).toEqual(expectedObject);
+      expect(UrlService.getUrlParams())
+        .toEqual(expectedObject);
     });
 
   it('should correctly encode and add query field and value to url',
@@ -64,111 +68,132 @@ describe('Url Service', function() {
       var baseUrl = '/sample';
       var expectedUrl1 = baseUrl + '?field%201=%26value%3D1%3F';
       expect(
-        UrlService.addField(baseUrl, queryField, queryValue)).toBe(
-        expectedUrl1);
+        UrlService.addField(baseUrl, queryField, queryValue))
+        .toBe(
+          expectedUrl1);
 
       baseUrl = '/sample?field=value';
       var expectedUrl2 = baseUrl + '&field%201=%26value%3D1%3F';
       expect(
-        UrlService.addField(baseUrl, queryField, queryValue)).toBe(
-        expectedUrl2);
+        UrlService.addField(baseUrl, queryField, queryValue))
+        .toBe(
+          expectedUrl2);
     });
 
   it('should correctly return true if embed present in pathname', function() {
-    expect(UrlService.isIframed()).toBe(true);
+    expect(UrlService.isIframed())
+      .toBe(true);
   });
 
   it('should correctly return false if embed not in pathname', function() {
     mockLocation.pathname = '/sample.com';
-    expect(UrlService.isIframed()).toBe(false);
+    expect(UrlService.isIframed())
+      .toBe(false);
   });
 
   it('should correctly return hash value of window.location', function() {
-    expect(UrlService.getHash()).toBe(sampleHash);
+    expect(UrlService.getHash())
+      .toBe(sampleHash);
   });
 
   it('should correctly retrieve topic id from url', function() {
     mockLocation.pathname = '/topic_editor/abcdefgijklm';
     expect(
       UrlService.getTopicIdFromUrl()
-    ).toBe('abcdefgijklm');
+    )
+      .toBe('abcdefgijklm');
     mockLocation.pathname = '/topic_editor/abcdefgij';
     expect(function() {
       UrlService.getTopicIdFromUrl();
-    }).toThrow();
+    })
+      .toThrow();
 
     mockLocation.pathname = '/topiceditor/abcdefgijklm';
     expect(function() {
       UrlService.getTopicIdFromUrl();
-    }).toThrow();
+    })
+      .toThrow();
 
     mockLocation.pathname = '/topic_editor';
     expect(function() {
       UrlService.getTopicIdFromUrl();
-    }).toThrow();
+    })
+      .toThrow();
   });
 
   it('should correctly retrieve topic name from url', function() {
     mockLocation.pathname = '/topic/abcdefgijklm';
     expect(
       UrlService.getTopicNameFromLearnerUrl()
-    ).toBe('abcdefgijklm');
+    )
+      .toBe('abcdefgijklm');
     mockLocation.pathname = '/topic/topic%20name';
     expect(
       UrlService.getTopicNameFromLearnerUrl()
-    ).toBe('topic name');
+    )
+      .toBe('topic name');
     mockLocation.pathname = '/topc/abcdefgijklm';
     expect(function() {
       UrlService.getTopicNameFromLearnerUrl();
-    }).toThrowError('Invalid URL for topic');
+    })
+      .toThrowError('Invalid URL for topic');
   });
 
   it('should correctly retrieve story id from url', function() {
     mockLocation.pathname = '/story_editor/abcdefgijklm';
     expect(function() {
       UrlService.getStoryIdFromUrl();
-    }).toThrow();
+    })
+      .toThrow();
 
     mockLocation.pathname = '/storyeditor/abcdefgijklm/012345678901';
     expect(function() {
       UrlService.getStoryIdFromUrl();
-    }).toThrow();
+    })
+      .toThrow();
 
     mockLocation.pathname = '/story_editor/abcdefgijlm/012345678901';
     expect(function() {
       UrlService.getStoryIdFromUrl();
-    }).toThrow();
+    })
+      .toThrow();
 
     mockLocation.pathname = '/story_editor/abcdefgijklm/01234578901';
     expect(function() {
       UrlService.getStoryIdFromUrl();
-    }).toThrow();
+    })
+      .toThrow();
 
     mockLocation.pathname = '/story_editor/abcdefgijklm/012345678901';
     expect(
       UrlService.getStoryIdFromUrl()
-    ).toEqual('012345678901');
+    )
+      .toEqual('012345678901');
   });
 
   it('should correctly retrieve skill id from url', function() {
     mockLocation.pathname = '/skill_editor/abcdefghijkl';
     expect(
       UrlService.getSkillIdFromUrl()
-    ).toBe('abcdefghijkl');
+    )
+      .toBe('abcdefghijkl');
     mockLocation.pathname = '/skill_editor/abcdefghijk';
     expect(function() {
       UrlService.getSkillIdFromUrl();
-    }).toThrow();
+    })
+      .toThrow();
   });
 
   it('should correctly retrieve story id from url in player', function() {
     mockLocation.search = '?story_id=mnopqrstuvwx';
     expect(
       UrlService.getStoryIdInPlayer()
-    ).toBe('mnopqrstuvwx');
+    )
+      .toBe('mnopqrstuvwx');
     mockLocation.search = '?story=mnopqrstuvwx';
     expect(
       UrlService.getStoryIdInPlayer()
-    ).toBe(null);
+    )
+      .toBe(null);
   });
 });

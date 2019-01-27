@@ -21,22 +21,21 @@ oppia.directive('intEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/int_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.SCHEMA = {
-          type: 'int',
-          validators: [{
-            id: 'is_integer'
-          }]
-        };
+      controller: [
+        '$scope', function($scope) {
+          $scope.SCHEMA = {
+            type: 'int',
+            validators: [{id: 'is_integer'}]
+          };
 
-        if (!$scope.value) {
-          $scope.value = 0;
+          if (!$scope.value) {
+            $scope.value = 0;
+          }
         }
-      }]
+      ]
     };
-  }]);
+  }
+]);

@@ -32,12 +32,19 @@ oppia.controller('Teach', [
     var visibleContent = 'oppia-about-visible-content';
 
     var activateTab = function(tabName) {
-      $("a[id='" + tabName + "']").parent().addClass(
-        activeTabClass
-      ).siblings().removeClass(activeTabClass);
-      $('.' + tabName).addClass(visibleContent).siblings().removeClass(
-        visibleContent
-      );
+      $("a[id='" + tabName + "']")
+        .parent()
+        .addClass(
+          activeTabClass
+        )
+        .siblings()
+        .removeClass(activeTabClass);
+      $('.' + tabName)
+        .addClass(visibleContent)
+        .siblings()
+        .removeClass(
+          visibleContent
+        );
     };
 
     if (hash === $scope.TAB_ID_TEACH) {

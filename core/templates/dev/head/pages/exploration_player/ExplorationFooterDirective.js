@@ -21,9 +21,7 @@ oppia.directive('explorationFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        twitterText: '@'
-      },
+      scope: {twitterText: '@'},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/exploration_footer_directive.html'),
       controller: [
@@ -50,17 +48,19 @@ oppia.directive('explorationFooter', [
               if (summaries.length > 0) {
                 var contributorSummary = (
                   summaries[0].human_readable_contributors_summary);
-                $scope.contributorNames = Object.keys(contributorSummary).sort(
-                  function(contributorUsername1, contributorUsername2) {
-                    var commitsOfContributor1 = contributorSummary[
-                      contributorUsername1].num_commits;
-                    var commitsOfContributor2 = contributorSummary[
-                      contributorUsername2].num_commits;
-                    return commitsOfContributor2 - commitsOfContributor1;
-                  });
+                $scope.contributorNames = Object.keys(contributorSummary)
+                  .sort(
+                    function(contributorUsername1, contributorUsername2) {
+                      var commitsOfContributor1 = contributorSummary[
+                        contributorUsername1].num_commits;
+                      var commitsOfContributor2 = contributorSummary[
+                        contributorUsername2].num_commits;
+                      return commitsOfContributor2 - commitsOfContributor1;
+                    });
               }
             });
         }
       ]
     };
-  }]);
+  }
+]);

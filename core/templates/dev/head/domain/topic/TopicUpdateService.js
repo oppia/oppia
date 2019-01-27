@@ -412,35 +412,41 @@ oppia.factory('TopicUpdateService', [
       setSubtopicPageContentsHtml: function(
           subtopicPage, subtopicId, newSubtitledHtml) {
         var oldSubtitledHtml = angular.copy(
-          subtopicPage.getPageContents().getSubtitledHtml());
+          subtopicPage.getPageContents()
+            .getSubtitledHtml());
         _applySubtopicPagePropertyChange(
           subtopicPage, SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML, subtopicId,
           newSubtitledHtml.toBackendDict(), oldSubtitledHtml.toBackendDict(),
           function(changeDict, subtopicPage) {
             // Apply.
-            subtopicPage.getPageContents().setSubtitledHtml(newSubtitledHtml);
+            subtopicPage.getPageContents()
+              .setSubtitledHtml(newSubtitledHtml);
           }, function(changeDict, subtopicPage) {
             // Undo.
-            subtopicPage.getPageContents().setSubtitledHtml(oldSubtitledHtml);
+            subtopicPage.getPageContents()
+              .setSubtitledHtml(oldSubtitledHtml);
           });
       },
 
       setSubtopicPageContentsAudio: function(subtopicPage, subtopicId,
           newContentIdsToAudioTranslations) {
         var oldContentIdsToAudioTranslations = angular.copy(
-          subtopicPage.getPageContents().getContentIdsToAudioTranslations());
+          subtopicPage.getPageContents()
+            .getContentIdsToAudioTranslations());
         _applySubtopicPagePropertyChange(
           subtopicPage, SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO, subtopicId,
           newContentIdsToAudioTranslations.toBackendDict(),
           oldContentIdsToAudioTranslations.toBackendDict(),
           function(changeDict, subtopicPage) {
             // Apply.
-            subtopicPage.getPageContents().setContentIdsToAudioTranslations(
-              newContentIdsToAudioTranslations);
+            subtopicPage.getPageContents()
+              .setContentIdsToAudioTranslations(
+                newContentIdsToAudioTranslations);
           }, function(changeDict, subtopicPage) {
             // Undo.
-            subtopicPage.getPageContents().setContentIdsToAudioTranslations(
-              oldContentIdsToAudioTranslations);
+            subtopicPage.getPageContents()
+              .setContentIdsToAudioTranslations(
+                oldContentIdsToAudioTranslations);
           });
       },
 
@@ -582,4 +588,5 @@ oppia.factory('TopicUpdateService', [
         });
       }
     };
-  }]);
+  }
+]);

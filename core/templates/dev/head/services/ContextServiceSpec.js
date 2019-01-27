@@ -35,21 +35,24 @@ describe('Context service', function() {
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       ecs = $injector.get('ContextService');
-    }));
+    }]);
 
     it('should correctly set editor context to exploration editor', function() {
       ecs.init('exploration_editor');
-      expect(ecs.getEditorContext()).toBe('exploration_editor');
+      expect(ecs.getEditorContext())
+        .toBe('exploration_editor');
     });
 
     it('should correctly retrieve the exploration id', function() {
-      expect(ecs.getExplorationId()).toBe('123');
+      expect(ecs.getExplorationId())
+        .toBe('123');
     });
 
     it('should correctly retrieve the page context', function() {
-      expect(ecs.getPageContext()).toBe('learner');
+      expect(ecs.getPageContext())
+        .toBe('learner');
     });
   });
 
@@ -69,20 +72,23 @@ describe('Context service', function() {
       });
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       ecs = $injector.get('ContextService');
-    }));
+    }]);
 
     it('should correctly retrieve the exploration id', function() {
-      expect(ecs.getExplorationId()).toBe('123');
+      expect(ecs.getExplorationId())
+        .toBe('123');
     });
 
     it('should correctly retrieve the page context', function() {
-      expect(ecs.getPageContext()).toBe('editor');
+      expect(ecs.getPageContext())
+        .toBe('editor');
     });
 
     it('should correctly retrieve exploration editor mode', function() {
-      expect(ecs.isInExplorationEditorMode()).toBe(true);
+      expect(ecs.isInExplorationEditorMode())
+        .toBe(true);
     });
   });
 
@@ -99,25 +105,29 @@ describe('Context service', function() {
       });
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       ecs = $injector.get('ContextService');
-    }));
+    }]);
 
     it('should correctly set editor context to question editor', function() {
       ecs.init('question_editor');
-      expect(ecs.getEditorContext()).toBe('question_editor');
+      expect(ecs.getEditorContext())
+        .toBe('question_editor');
     });
 
     it('should correctly retrieve the question id', function() {
-      expect(ecs.getQuestionId()).toBe('123');
+      expect(ecs.getQuestionId())
+        .toBe('123');
     });
 
     it('should correctly retrieve the page context', function() {
-      expect(ecs.getPageContext()).toBe('question_editor');
+      expect(ecs.getPageContext())
+        .toBe('question_editor');
     });
 
     it('should correctly tell the question editor context', function() {
-      expect(ecs.isInQuestionContext()).toBe(true);
+      expect(ecs.isInQuestionContext())
+        .toBe(true);
     });
   });
 
@@ -134,25 +144,28 @@ describe('Context service', function() {
       });
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       ecs = $injector.get('ContextService');
-    }));
+    }]);
 
     it('should throw an error when trying to retrieve the exploration id',
       function() {
-        expect(ecs.getExplorationId).toThrow();
+        expect(ecs.getExplorationId)
+          .toThrow();
       }
     );
 
     it('should throw an error when trying to retrieve the question id',
       function() {
-        expect(ecs.getQuestionId).toThrow();
+        expect(ecs.getQuestionId)
+          .toThrow();
       }
     );
 
     it('should retrieve other as page context',
       function() {
-        expect(ecs.getPageContext()).toBe('other');
+        expect(ecs.getPageContext())
+          .toBe('other');
       }
     );
   });

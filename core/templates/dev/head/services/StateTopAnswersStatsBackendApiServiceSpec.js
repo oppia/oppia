@@ -19,11 +19,11 @@
 describe('StateTopAnswersStatsBackendApiService', function() {
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     this.StateTopAnswersStatsBackendApiService =
       $injector.get('StateTopAnswersStatsBackendApiService');
     this.$httpBackend = $injector.get('$httpBackend');
-  }));
+  }]);
 
   afterEach(function() {
     this.$httpBackend.verifyNoOutstandingExpectation();
@@ -45,13 +45,16 @@ describe('StateTopAnswersStatsBackendApiService', function() {
       var failureHandler = jasmine.createSpy('failure');
       this.$httpBackend.expectGET(
         '/createhandler/state_answer_stats/7'
-      ).respond(backendDict);
+      )
+        .respond(backendDict);
 
-      this.StateTopAnswersStatsBackendApiService.fetchStats('7').then(
-        successHandler, failureHandler);
+      this.StateTopAnswersStatsBackendApiService.fetchStats('7')
+        .then(
+          successHandler, failureHandler);
       this.$httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(backendDict);
+      expect(successHandler)
+        .toHaveBeenCalledWith(backendDict);
       expect(failureHandler).not.toHaveBeenCalled();
     });
   });

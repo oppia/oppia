@@ -79,4 +79,5 @@ oppia.directive('responseHeader', [
         }
       ]
     };
-  }]);
+  }
+]);

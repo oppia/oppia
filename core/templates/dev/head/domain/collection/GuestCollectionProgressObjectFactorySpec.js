@@ -21,7 +21,7 @@ describe('Guest collection progress object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     GuestCollectionProgressObjectFactory = (
       $injector.get('GuestCollectionProgressObjectFactory'));
 
@@ -29,7 +29,7 @@ describe('Guest collection progress object factory', function() {
     _collectionId1 = 'collection_id1';
     _expId0 = 'exploration_id0';
     _expId1 = 'exploration_id1';
-  }));
+  }]);
 
   var _createEmptyProgressObject = function() {
     return GuestCollectionProgressObjectFactory.createFromJson(null);
@@ -39,7 +39,8 @@ describe('Guest collection progress object factory', function() {
     it('should initially have no progress', function() {
       var guestCollectionProgress = _createEmptyProgressObject();
       expect(guestCollectionProgress.hasCompletionProgress(
-        _collectionId0)).toBe(false);
+        _collectionId0))
+        .toBe(false);
     });
 
     it('should have progress after recording an exploration', function() {
@@ -47,7 +48,8 @@ describe('Guest collection progress object factory', function() {
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
       expect(guestCollectionProgress.hasCompletionProgress(
-        _collectionId0)).toBe(true);
+        _collectionId0))
+        .toBe(true);
     });
 
     it('should have no progress for an unknown exploration', function() {
@@ -55,7 +57,8 @@ describe('Guest collection progress object factory', function() {
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId1, _expId0);
       expect(guestCollectionProgress.hasCompletionProgress(
-        _collectionId0)).toBe(false);
+        _collectionId0))
+        .toBe(false);
     });
   });
 
@@ -63,7 +66,8 @@ describe('Guest collection progress object factory', function() {
     it('should initially have no completed exploration IDs', function() {
       var guestCollectionProgress = _createEmptyProgressObject();
       expect(guestCollectionProgress.getCompletedExplorationIds(
-        _collectionId0)).toEqual([]);
+        _collectionId0))
+        .toEqual([]);
     });
 
     it('should provide completed exploration ID', function() {
@@ -71,7 +75,8 @@ describe('Guest collection progress object factory', function() {
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
       expect(guestCollectionProgress.getCompletedExplorationIds(
-        _collectionId0)).toEqual([_expId0]);
+        _collectionId0))
+        .toEqual([_expId0]);
     });
 
     it('should not provide completed exp ID for other collection', function() {
@@ -79,7 +84,8 @@ describe('Guest collection progress object factory', function() {
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId1, _expId0);
       expect(guestCollectionProgress.getCompletedExplorationIds(
-        _collectionId0)).toEqual([]);
+        _collectionId0))
+        .toEqual([]);
     });
 
     it('should provide all completed exploration IDs in order', function() {
@@ -91,7 +97,8 @@ describe('Guest collection progress object factory', function() {
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
       expect(guestCollectionProgress.getCompletedExplorationIds(
-        _collectionId0)).toEqual([_expId1, _expId0]);
+        _collectionId0))
+        .toEqual([_expId1, _expId0]);
     });
   });
 
@@ -99,7 +106,8 @@ describe('Guest collection progress object factory', function() {
     it('should successfully add exploration to empty collection', function() {
       var guestCollectionProgress = _createEmptyProgressObject();
       expect(guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId0)).toBe(true);
+        _collectionId0, _expId0))
+        .toBe(true);
     });
 
     it('should fail to re-add exploration to collection', function() {
@@ -107,7 +115,8 @@ describe('Guest collection progress object factory', function() {
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
       expect(guestCollectionProgress.addCompletedExplorationId(
-        _collectionId0, _expId0)).toBe(false);
+        _collectionId0, _expId0))
+        .toBe(false);
     });
 
     it('should successfully add exploration to second collection', function() {
@@ -115,13 +124,16 @@ describe('Guest collection progress object factory', function() {
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
       expect(guestCollectionProgress.addCompletedExplorationId(
-        _collectionId1, _expId0)).toBe(true);
+        _collectionId1, _expId0))
+        .toBe(true);
     });
   });
 
   describe('toJson', function() {
     it('should convert an empty progress object to simple JSON', function() {
-      expect(_createEmptyProgressObject().toJson()).toEqual('{}');
+      expect(_createEmptyProgressObject()
+        .toJson())
+        .toEqual('{}');
     });
 
     it('should convert progress for one collection to JSON', function() {
@@ -129,8 +141,9 @@ describe('Guest collection progress object factory', function() {
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId0, _expId0);
 
-      expect(guestCollectionProgress.toJson()).toEqual(
-        '{"collection_id0":["exploration_id0"]}');
+      expect(guestCollectionProgress.toJson())
+        .toEqual(
+          '{"collection_id0":["exploration_id0"]}');
     });
 
     it('should convert progress for multiple collections to JSON', function() {
@@ -142,8 +155,9 @@ describe('Guest collection progress object factory', function() {
       guestCollectionProgress.addCompletedExplorationId(
         _collectionId1, _expId0);
 
-      expect(guestCollectionProgress.toJson()).toEqual(
-        '{"collection_id1":["exploration_id1","exploration_id0"],' +
+      expect(guestCollectionProgress.toJson())
+        .toEqual(
+          '{"collection_id1":["exploration_id1","exploration_id0"],' +
         '"collection_id0":["exploration_id1"]}');
     });
   });
@@ -152,7 +166,8 @@ describe('Guest collection progress object factory', function() {
     it('should create a new empty progress object from JSON', function() {
       var guestCollectionProgress = (
         GuestCollectionProgressObjectFactory.createFromJson('{}'));
-      expect(guestCollectionProgress).toEqual(_createEmptyProgressObject());
+      expect(guestCollectionProgress)
+        .toEqual(_createEmptyProgressObject());
     });
 
     it('should create a progress object from some progress JSON', function() {
@@ -164,7 +179,8 @@ describe('Guest collection progress object factory', function() {
         GuestCollectionProgressObjectFactory.createFromJson(
           '{"collection_id0": ["exploration_id0"]}'));
 
-      expect(guestCollectionProgress).toEqual(expectedCollectionProgress);
+      expect(guestCollectionProgress)
+        .toEqual(expectedCollectionProgress);
     });
 
     it('should create a progress object for multiple collections', function() {
@@ -181,7 +197,8 @@ describe('Guest collection progress object factory', function() {
           '{"collection_id1": ["exploration_id1", "exploration_id0"], ' +
           '"collection_id0": ["exploration_id1"]}'));
 
-      expect(guestCollectionProgress).toEqual(expectedCollectionProgress);
+      expect(guestCollectionProgress)
+        .toEqual(expectedCollectionProgress);
     });
   });
 });

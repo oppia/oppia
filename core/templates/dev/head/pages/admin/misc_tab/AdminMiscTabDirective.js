@@ -24,96 +24,97 @@ oppia.directive('adminMiscTab', [
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        setStatusMessage: '='
-      },
+      scope: {setStatusMessage: '='},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/misc_tab/' +
         'admin_misc_tab_directive.html'),
-      controller: ['$scope', function($scope) {
-        var DATA_EXTRACTION_QUERY_HANDLER_URL = (
-          '/explorationdataextractionhandler');
+      controller: [
+        '$scope', function($scope) {
+          var DATA_EXTRACTION_QUERY_HANDLER_URL = (
+            '/explorationdataextractionhandler');
 
-        $scope.clearSearchIndex = function() {
-          if (AdminTaskManagerService.isTaskRunning()) {
-            return;
-          }
-          if (!confirm('This action is irreversible. Are you sure?')) {
-            return;
-          }
+          $scope.clearSearchIndex = function() {
+            if (AdminTaskManagerService.isTaskRunning()) {
+              return;
+            }
+            if (!confirm('This action is irreversible. Are you sure?')) {
+              return;
+            }
 
-          $scope.setStatusMessage('Clearing search index...');
+            $scope.setStatusMessage('Clearing search index...');
 
-          AdminTaskManagerService.startTask();
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'clear_search_index'
-          }).then(function() {
-            $scope.setStatusMessage('Index successfully cleared.');
-            AdminTaskManagerService.finishTask();
-          }, function(errorResponse) {
-            $scope.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
-            AdminTaskManagerService.finishTask();
-          });
-        };
-
-        $scope.uploadTopicSimilaritiesFile = function() {
-          var file = document.getElementById('topicSimilaritiesFile').files[0];
-          var reader = new FileReader();
-          reader.onload = function(e) {
-            var data = e.target.result;
-            $http.post(ADMIN_HANDLER_URL, {
-              action: 'upload_topic_similarities',
-              data: data
-            }).then(function() {
-              $scope.setStatusMessage(
-                'Topic similarities uploaded successfully.');
-            }, function(errorResponse) {
-              $scope.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            });
+            AdminTaskManagerService.startTask();
+            $http.post(ADMIN_HANDLER_URL, {action: 'clear_search_index'})
+              .then(function() {
+                $scope.setStatusMessage('Index successfully cleared.');
+                AdminTaskManagerService.finishTask();
+              }, function(errorResponse) {
+                $scope.setStatusMessage(
+                  'Server error: ' + errorResponse.data.error);
+                AdminTaskManagerService.finishTask();
+              });
           };
-          reader.readAsText(file);
-        };
 
-        $scope.downloadTopicSimilaritiesFile = function() {
-          $window.location.href = ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL;
-        };
+          $scope.uploadTopicSimilaritiesFile = function() {
+            var file = document.getElementById('topicSimilaritiesFile')
+              .files[0];
+            var reader = new FileReader();
+            reader.onload = function(e) {
+              var data = e.target.result;
+              $http.post(ADMIN_HANDLER_URL, {
+                action: 'upload_topic_similarities',
+                data: data
+              })
+                .then(function() {
+                  $scope.setStatusMessage(
+                    'Topic similarities uploaded successfully.');
+                }, function(errorResponse) {
+                  $scope.setStatusMessage(
+                    'Server error: ' + errorResponse.data.error);
+                });
+            };
+            reader.readAsText(file);
+          };
 
-        var setDataExtractionQueryStatusMessage = function(message) {
-          $scope.showDataExtractionQueryStatus = true;
-          $scope.dataExtractionQueryStatusMessage = message;
-        };
+          $scope.downloadTopicSimilaritiesFile = function() {
+            $window.location.href = ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL;
+          };
 
-        $scope.submitQuery = function() {
-          var STATUS_PENDING = (
-            'Data extraction query has been submitted. Please wait.');
-          var STATUS_FINISHED = 'Loading the extracted data ...';
-          var STATUS_FAILED = 'Error, ';
+          var setDataExtractionQueryStatusMessage = function(message) {
+            $scope.showDataExtractionQueryStatus = true;
+            $scope.dataExtractionQueryStatusMessage = message;
+          };
 
-          setDataExtractionQueryStatusMessage(STATUS_PENDING);
+          $scope.submitQuery = function() {
+            var STATUS_PENDING = (
+              'Data extraction query has been submitted. Please wait.');
+            var STATUS_FINISHED = 'Loading the extracted data ...';
+            var STATUS_FAILED = 'Error, ';
 
-          var downloadUrl = DATA_EXTRACTION_QUERY_HANDLER_URL + '?';
+            setDataExtractionQueryStatusMessage(STATUS_PENDING);
 
-          downloadUrl += 'exp_id=' + encodeURIComponent($scope.expId);
-          downloadUrl += '&exp_version=' + encodeURIComponent(
-            $scope.expVersion);
-          downloadUrl += '&state_name=' + encodeURIComponent(
-            $scope.stateName);
-          downloadUrl += '&num_answers=' + encodeURIComponent(
-            $scope.numAnswers);
+            var downloadUrl = DATA_EXTRACTION_QUERY_HANDLER_URL + '?';
 
-          $window.open(downloadUrl);
-        };
+            downloadUrl += 'exp_id=' + encodeURIComponent($scope.expId);
+            downloadUrl += '&exp_version=' + encodeURIComponent(
+              $scope.expVersion);
+            downloadUrl += '&state_name=' + encodeURIComponent(
+              $scope.stateName);
+            downloadUrl += '&num_answers=' + encodeURIComponent(
+              $scope.numAnswers);
 
-        $scope.resetForm = function() {
-          $scope.expId = '';
-          $scope.expVersion = 0;
-          $scope.stateName = '';
-          $scope.numAnswers = 0;
-          $scope.showDataExtractionQueryStatus = false;
-        };
-      }]
+            $window.open(downloadUrl);
+          };
+
+          $scope.resetForm = function() {
+            $scope.expId = '';
+            $scope.expVersion = 0;
+            $scope.stateName = '';
+            $scope.numAnswers = 0;
+            $scope.showDataExtractionQueryStatus = false;
+          };
+        }
+      ]
     };
   }
 ]);

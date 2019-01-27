@@ -22,78 +22,83 @@ oppia.directive('adminConfigTab', [
       ADMIN_HANDLER_URL, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        setStatusMessage: '='
-      },
+      scope: {setStatusMessage: '='},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/config_tab/' +
         'admin_config_tab_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.configProperties = {};
+      controller: [
+        '$scope', function($scope) {
+          $scope.configProperties = {};
 
-        $scope.isNonemptyObject = function(object) {
-          var hasAtLeastOneElement = false;
-          for (var property in object) {
-            hasAtLeastOneElement = true;
-          }
-          return hasAtLeastOneElement;
-        };
+          $scope.isNonemptyObject = function(object) {
+            var hasAtLeastOneElement = false;
+            for (var property in object) {
+              hasAtLeastOneElement = true;
+            }
+            return hasAtLeastOneElement;
+          };
 
-        $scope.reloadConfigProperties = function() {
-          $http.get(ADMIN_HANDLER_URL).then(function(response) {
-            $scope.configProperties = response.data.config_properties;
-          });
-        };
+          $scope.reloadConfigProperties = function() {
+            $http.get(ADMIN_HANDLER_URL)
+              .then(function(response) {
+                $scope.configProperties = response.data.config_properties;
+              });
+          };
 
-        $scope.revertToDefaultConfigPropertyValue = function(configPropertyId) {
-          if (!confirm('This action is irreversible. Are you sure?')) {
-            return;
-          }
+          $scope.revertToDefaultConfigPropertyValue =
+          function(configPropertyId) {
+            if (!confirm('This action is irreversible. Are you sure?')) {
+              return;
+            }
 
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'revert_config_property',
-            config_property_id: configPropertyId
-          }).then(function() {
-            $scope.setStatusMessage('Config property reverted successfully.');
-            $scope.reloadConfigProperties();
-          }, function(errorResponse) {
-            $scope.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
-          });
-        };
+            $http.post(ADMIN_HANDLER_URL, {
+              action: 'revert_config_property',
+              config_property_id: configPropertyId
+            })
+              .then(function() {
+                $scope.setStatusMessage('Config property reverted ' +
+                'successfully.');
+                $scope.reloadConfigProperties();
+              }, function(errorResponse) {
+                $scope.setStatusMessage(
+                  'Server error: ' + errorResponse.data.error);
+              });
+          };
 
-        $scope.saveConfigProperties = function() {
-          if (AdminTaskManagerService.isTaskRunning()) {
-            return;
-          }
-          if (!confirm('This action is irreversible. Are you sure?')) {
-            return;
-          }
+          $scope.saveConfigProperties = function() {
+            if (AdminTaskManagerService.isTaskRunning()) {
+              return;
+            }
+            if (!confirm('This action is irreversible. Are you sure?')) {
+              return;
+            }
 
-          $scope.setStatusMessage('Saving...');
+            $scope.setStatusMessage('Saving...');
 
-          AdminTaskManagerService.startTask();
-          var newConfigPropertyValues = {};
-          for (var property in $scope.configProperties) {
-            newConfigPropertyValues[property] = (
-              $scope.configProperties[property].value);
-          }
+            AdminTaskManagerService.startTask();
+            var newConfigPropertyValues = {};
+            for (var property in $scope.configProperties) {
+              newConfigPropertyValues[property] = (
+                $scope.configProperties[property].value);
+            }
 
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'save_config_properties',
-            new_config_property_values: newConfigPropertyValues
-          }).then(function() {
-            $scope.setStatusMessage('Data saved successfully.');
-            AdminTaskManagerService.finishTask();
-          }, function(errorResponse) {
-            $scope.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
-            AdminTaskManagerService.finishTask();
-          });
-        };
+            $http.post(ADMIN_HANDLER_URL, {
+              action: 'save_config_properties',
+              new_config_property_values: newConfigPropertyValues
+            })
+              .then(function() {
+                $scope.setStatusMessage('Data saved successfully.');
+                AdminTaskManagerService.finishTask();
+              }, function(errorResponse) {
+                $scope.setStatusMessage(
+                  'Server error: ' + errorResponse.data.error);
+                AdminTaskManagerService.finishTask();
+              });
+          };
 
-        $scope.reloadConfigProperties();
-      }]
+          $scope.reloadConfigProperties();
+        }
+      ]
     };
   }
 ]);

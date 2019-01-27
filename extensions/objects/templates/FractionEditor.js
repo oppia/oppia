@@ -21,34 +21,33 @@ oppia.directive('fractionEditor', [
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/fraction_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        var errorMessage = '';
-        var fractionString = '0';
-        if ($scope.value !== null) {
-          var defaultFraction = FractionObjectFactory.fromDict($scope.value);
-          fractionString = defaultFraction.toString();
-        }
-        $scope.localValue = {
-          label: fractionString
-        };
-
-        $scope.$watch('localValue.label', function(newValue) {
-          try {
-            $scope.value = FractionObjectFactory.fromRawInputString(newValue);
-            errorMessage = '';
-          } catch (parsingError) {
-            errorMessage = parsingError.message;
+      controller: [
+        '$scope', function($scope) {
+          var errorMessage = '';
+          var fractionString = '0';
+          if ($scope.value !== null) {
+            var defaultFraction = FractionObjectFactory.fromDict($scope.value);
+            fractionString = defaultFraction.toString();
           }
-        });
+          $scope.localValue = {label: fractionString};
 
-        $scope.getWarningText = function() {
-          return errorMessage;
-        };
-      }]
+          $scope.$watch('localValue.label', function(newValue) {
+            try {
+              $scope.value = FractionObjectFactory.fromRawInputString(newValue);
+              errorMessage = '';
+            } catch (parsingError) {
+              errorMessage = parsingError.message;
+            }
+          });
+
+          $scope.getWarningText = function() {
+            return errorMessage;
+          };
+        }
+      ]
     };
-  }]);
+  }
+]);

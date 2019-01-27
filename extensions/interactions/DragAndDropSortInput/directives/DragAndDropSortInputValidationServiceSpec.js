@@ -26,7 +26,7 @@ describe('DragAndDropSortInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     validatorService = $injector.get('DragAndDropSortInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');
     agof = $injector.get('AnswerGroupObjectFactory');
@@ -46,38 +46,26 @@ describe('DragAndDropSortInputValidationService', function() {
       refresher_exploration_id: null
     });
 
-    customizationArgs = {
-      choices: {
-        value: ['Item 1', 'Item 2', 'Item 3']
-      }
-    };
+    customizationArgs = {choices: {value: ['Item 1', 'Item 2', 'Item 3']}};
 
     equalsListWithAllowedValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
-      inputs: {
-        x: [['a', 'b'], ['d'], ['c']]
-      }
+      inputs: {x: [['a', 'b'], ['d'], ['c']]}
     });
 
     equalsListWithValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-      inputs: {
-        x: [['a'], ['d'], ['c'], ['b']]
-      }
+      inputs: {x: [['a'], ['d'], ['c'], ['b']]}
     });
 
     equalsListWithEmptyValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
-      inputs: {
-        x: [['a', ''], [], ['c']]
-      }
+      inputs: {x: [['a', ''], [], ['c']]}
     });
 
     equalsListWithDuplicatesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-      inputs: {
-        x: [['a', 'b'], ['b'], ['c', 'a']]
-      }
+      inputs: {x: [['a', 'b'], ['b'], ['c', 'a']]}
     });
 
     hasXBeforeYRule = rof.createFromBackendDict({
@@ -88,17 +76,20 @@ describe('DragAndDropSortInputValidationService', function() {
       }
     });
 
-    answerGroups = [agof.createNew(
-      [equalsListWithAllowedValuesRule],
-      goodDefaultOutcome,
-      false
-    )];
-  }));
+    answerGroups = [
+      agof.createNew(
+        [equalsListWithAllowedValuesRule],
+        goodDefaultOutcome,
+        false
+      )
+    ];
+  }]);
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 
   it('should expect all items to be nonempty', function() {
@@ -107,10 +98,13 @@ describe('DragAndDropSortInputValidationService', function() {
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Please ensure the items are nonempty.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message: 'Please ensure the items are nonempty.'
+        }
+      ]);
   });
 
   it('should expect all items to be unique', function() {
@@ -119,10 +113,13 @@ describe('DragAndDropSortInputValidationService', function() {
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Please ensure the items are unique.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message: 'Please ensure the items are unique.'
+        }
+      ]);
   });
 
   it('should expect at least two choices', function() {
@@ -130,10 +127,13 @@ describe('DragAndDropSortInputValidationService', function() {
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please enter at least two choices.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please enter at least two choices.'
+        }
+      ]);
   });
 
   it('should expect all choices to be nonempty', function() {
@@ -142,10 +142,13 @@ describe('DragAndDropSortInputValidationService', function() {
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please ensure that the choices are nonempty.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure that the choices are nonempty.'
+        }
+      ]);
   });
 
   it('should expect all choices to be unique', function() {
@@ -154,23 +157,31 @@ describe('DragAndDropSortInputValidationService', function() {
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please ensure that the choices are unique.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure that the choices are unique.'
+        }
+      ]);
   });
 
   it('should catch redundancy of rules', function() {
-    answerGroups[0].rules = [equalsListWithValuesRule,
-      equalsListWithAllowedValuesRule];
+    answerGroups[0].rules = [
+      equalsListWithValuesRule,
+      equalsListWithAllowedValuesRule
+    ];
 
     var warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message: 'Rule 2 from answer group 1 will never be matched ' +
           'because it is made redundant by rule 1 from answer group 1.'
-    }]);
+        }
+      ]);
   });
 
   it('should catch non-distinct selected choices', function() {
@@ -178,10 +189,13 @@ describe('DragAndDropSortInputValidationService', function() {
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 will never be matched ' +
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message: 'Rule 1 from answer group 1 will never be matched ' +
           'because both the selected elements are same.'
-    }]);
+        }
+      ]);
   });
 });

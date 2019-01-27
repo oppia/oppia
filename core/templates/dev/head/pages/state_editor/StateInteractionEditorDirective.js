@@ -286,9 +286,7 @@ oppia.directive('stateInteractionEditor', [
                       } else {
                         $scope.customizationArgSpecs.forEach(function(caSpec) {
                           StateCustomizationArgsService.displayed[caSpec.name] =
-                            {
-                              value: angular.copy(caSpec.default_value)
-                            };
+                            {value: angular.copy(caSpec.default_value)};
                         });
                       }
 
@@ -427,4 +425,5 @@ oppia.directive('stateInteractionEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

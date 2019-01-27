@@ -24,9 +24,11 @@ var forms = require('../../../core/tests/protractor_utils/forms.js');
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
 var customizeInteraction = function(elem, richTextInstructionsArray) {
-  forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
+  forms.ListEditor(elem)
+    .setLength(richTextInstructionsArray.length);
   for (var i = 0; i < richTextInstructionsArray.length; i++) {
-    var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
+    var richTextEditor = forms.ListEditor(elem)
+      .editItem(i, 'RichText');
     richTextEditor.clear();
     richTextInstructionsArray[i](richTextEditor);
   }
@@ -38,11 +40,13 @@ var expectInteractionDetailsToMatch = function(
     elem, richTextInstructionsArray) {
   elem.all(by.repeater('choice in choices track by $index'))
     .then(function(optionElements) {
-      expect(optionElements.length).toEqual(richTextInstructionsArray.length);
+      expect(optionElements.length)
+        .toEqual(richTextInstructionsArray.length);
       for (var i = 0; i < optionElements.length; i++) {
         forms.expectRichText(optionElements[i].element(by.css(
           '.protractor-test-multiple-choice-option'
-        ))).toMatch(richTextInstructionsArray[i]);
+        )))
+          .toMatch(richTextInstructionsArray[i]);
       }
     });
 };
@@ -51,26 +55,37 @@ var expectInteractionDetailsToMatch = function(
 // 'answer' {String} is the text on the multiple-choice item to select.
 var submitAnswer = function(elem, answer) {
   elem.element(by.tagName('oppia-interactive-multiple-choice-input')).
-    element(by.buttonText(answer)).click();
+    element(by.buttonText(answer))
+    .click();
 };
 
 var answerObjectType = 'NonnegativeInt';
 
-var testSuite = [{
-  interactionArguments: [[function(editor) {
-    editor.appendBoldText('right');
-  }, function(editor) {
-    editor.appendItalicText('wrong');
-  }]],
-  ruleArguments: ['Equals', ['right']],
-  expectedInteractionDetails: [[function(checker) {
-    checker.readBoldText('right');
-  }, function(checker) {
-    checker.readItalicText('wrong');
-  }]],
-  wrongAnswers: ['wrong'],
-  correctAnswers: ['right']
-}];
+var testSuite = [
+  {
+    interactionArguments: [
+      [
+        function(editor) {
+          editor.appendBoldText('right');
+        }, function(editor) {
+          editor.appendItalicText('wrong');
+        }
+      ]
+    ],
+    ruleArguments: ['Equals', ['right']],
+    expectedInteractionDetails: [
+      [
+        function(checker) {
+          checker.readBoldText('right');
+        }, function(checker) {
+          checker.readItalicText('wrong');
+        }
+      ]
+    ],
+    wrongAnswers: ['wrong'],
+    correctAnswers: ['right']
+  }
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

@@ -17,7 +17,8 @@
  *     result domain objects.
  */
 
-oppia.factory('PredictionResultOjectFactory', [function() {
+oppia.factory('PredictionResultOjectFactory', [
+  function() {
   /**
    * Stores the prediction result for an answer as returned by the
    * various prediction services used in Oppia for Machine Learning based
@@ -29,22 +30,23 @@ oppia.factory('PredictionResultOjectFactory', [function() {
    *   its prediction label. The value is probability (between 0 and 1) that
    *   answer belongs to predicted answer group.
    */
-  var predictionResult = function(label, confidence) {
-    this.predictionLabel = label;
-    this.predictionConfidence = confidence;
-  };
+    var predictionResult = function(label, confidence) {
+      this.predictionLabel = label;
+      this.predictionConfidence = confidence;
+    };
 
-  predictionResult.createNew = function(label, confidence) {
-    return new predictionResult(label, confidence);
-  };
+    predictionResult.createNew = function(label, confidence) {
+      return new predictionResult(label, confidence);
+    };
 
-  predictionResult.getLabel = function() {
-    return this.predictionLabel;
-  };
+    predictionResult.getLabel = function() {
+      return this.predictionLabel;
+    };
 
-  predictionResult.getConfidence = function() {
-    return this.predictionConfidence;
-  };
+    predictionResult.getConfidence = function() {
+      return this.predictionConfidence;
+    };
 
-  return predictionResult;
-}]);
+    return predictionResult;
+  }
+]);

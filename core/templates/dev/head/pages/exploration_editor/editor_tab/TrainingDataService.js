@@ -142,15 +142,14 @@ oppia.factory('TrainingDataService', [
 
         // Train the rule to include this answer.
         answerGroup.trainingData.push(answer);
-        ResponsesService.updateAnswerGroup(answerGroupIndex, {
-          trainingData: answerGroup.trainingData
-        }, function(newAnswerGroups) {
-          ExplorationStatesService.saveInteractionAnswerGroups(
-            StateEditorService.getActiveStateName(),
-            angular.copy(newAnswerGroups));
+        ResponsesService.updateAnswerGroup(answerGroupIndex,
+          {trainingData: answerGroup.trainingData}, function(newAnswerGroups) {
+            ExplorationStatesService.saveInteractionAnswerGroups(
+              StateEditorService.getActiveStateName(),
+              angular.copy(newAnswerGroups));
 
-          GraphDataService.recompute();
-        });
+            GraphDataService.recompute();
+          });
       },
 
       associateWithDefaultResponse: function(answer) {
@@ -182,15 +181,14 @@ oppia.factory('TrainingDataService', [
         var answerGroups = ResponsesService.getAnswerGroups();
         answerGroups[answerGroupIndex].trainingData = trainingData;
 
-        ResponsesService.updateAnswerGroup(answerGroupIndex, {
-          trainingData: trainingData
-        }, function(newAnswerGroups) {
-          ExplorationStatesService.saveInteractionAnswerGroups(
-            StateEditorService.getActiveStateName(),
-            angular.copy(newAnswerGroups));
+        ResponsesService.updateAnswerGroup(answerGroupIndex,
+          {trainingData: trainingData}, function(newAnswerGroups) {
+            ExplorationStatesService.saveInteractionAnswerGroups(
+              StateEditorService.getActiveStateName(),
+              angular.copy(newAnswerGroups));
 
-          GraphDataService.recompute();
-        });
+            GraphDataService.recompute();
+          });
       }
     };
   }

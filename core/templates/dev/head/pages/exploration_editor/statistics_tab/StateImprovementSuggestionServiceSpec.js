@@ -42,24 +42,26 @@ describe('StateImprovementSuggestionService', function() {
         },
         interaction: {
           id: 'RuleTest',
-          answer_groups: [{
-            outcome: {
-              dest: 'unused',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'unused',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
-          }],
+              rule_specs: [
+                {
+                  inputs: {x: 10},
+                  rule_type: 'Equals'
+                }
+              ],
+            }
+          ],
           default_outcome: {
             dest: 'state',
             feedback: {
@@ -88,24 +90,26 @@ describe('StateImprovementSuggestionService', function() {
         },
         interaction: {
           id: 'RuleTest',
-          answer_groups: [{
-            outcome: {
-              dest: 'unused',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'unused',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }]
-          }],
+              rule_specs: [
+                {
+                  inputs: {x: 10},
+                  rule_type: 'Equals'
+                }
+              ]
+            }
+          ],
           default_outcome: {
             dest: 'end',
             feedback: {
@@ -130,24 +134,26 @@ describe('StateImprovementSuggestionService', function() {
         },
         interaction: {
           id: 'RuleTest',
-          answer_groups: [{
-            outcome: {
-              dest: 'unused',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'unused',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }]
-          }],
+              rule_specs: [
+                {
+                  inputs: {x: 10},
+                  rule_type: 'Equals'
+                }
+              ]
+            }
+          ],
           default_outcome: {
             dest: null,
             feedback: {
@@ -176,24 +182,26 @@ describe('StateImprovementSuggestionService', function() {
         },
         interaction: {
           id: 'RuleTest',
-          answer_groups: [{
-            outcome: {
-              dest: 'next state',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'next state',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }]
-          }],
+              rule_specs: [
+                {
+                  inputs: {x: 10},
+                  rule_type: 'Equals'
+                }
+              ]
+            }
+          ],
           default_outcome: {
             dest: 'State 1',
             feedback: {
@@ -218,24 +226,26 @@ describe('StateImprovementSuggestionService', function() {
         },
         interaction: {
           id: 'RuleTest',
-          answer_groups: [{
-            outcome: {
-              dest: 'next state',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'next state',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }]
-          }],
+              rule_specs: [
+                {
+                  inputs: {x: 10},
+                  rule_type: 'Equals'
+                }
+              ]
+            }
+          ],
           default_outcome: {
             dest: 'State 2',
             feedback: {
@@ -253,18 +263,10 @@ describe('StateImprovementSuggestionService', function() {
     var _createState = function(destStateName) {
       // Only a partial state definition is needed for these tests.
       if (destStateName) {
-        return {
-          interaction: {
-            default_outcome: {
-              dest: destStateName
-            }
-          }
-        };
+        return {interaction: {default_outcome: {dest: destStateName}}};
       } else {
         // Create an end state, which has no default_outcome.
-        return {
-          interaction: { }
-        };
+        return {interaction: { }};
       }
     };
 
@@ -286,10 +288,10 @@ describe('StateImprovementSuggestionService', function() {
       stateStats.total_entry_count++;
     };
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       siss = $injector.get('StateImprovementSuggestionService');
       ssof = $injector.get('StatesObjectFactory');
-    }));
+    }]);
 
     it('should not suggest improvements for non-default answers', function() {
       // Create a non-looping state for testing, similar to
@@ -306,7 +308,8 @@ describe('StateImprovementSuggestionService', function() {
 
       // No improvements should be suggested for this situation.
       var improvements = siss.getStateImprovements(states, stateStats);
-      expect(improvements).toEqual([]);
+      expect(improvements)
+        .toEqual([]);
     });
 
     it('should suggest incomplete improvements depending on unsubmitted ' +
@@ -316,9 +319,7 @@ describe('StateImprovementSuggestionService', function() {
 
       // These stats represent failing to answer something twice and hitting the
       // default outcome once.
-      var stateStats = {
-        state: _createDefaultStateStats(),
-      };
+      var stateStats = {state: _createDefaultStateStats(), };
       _answerIncorrectly(stateStats.state);
       _answerIncorrectly(stateStats.state);
       _answerDefaultOutcome(stateStats.state);
@@ -326,11 +327,14 @@ describe('StateImprovementSuggestionService', function() {
       // The result should be an improvement recommendation due to the state
       // being potentially confusing.
       var improvements = siss.getStateImprovements(states, stateStats);
-      expect(improvements).toEqual([{
-        rank: 2,
-        stateName: 'state',
-        type: IMPROVE_TYPE_INCOMPLETE
-      }]);
+      expect(improvements)
+        .toEqual([
+          {
+            rank: 2,
+            stateName: 'state',
+            type: IMPROVE_TYPE_INCOMPLETE
+          }
+        ]);
     });
   });
 });

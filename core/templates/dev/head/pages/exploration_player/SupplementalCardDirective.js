@@ -77,7 +77,8 @@ oppia.directive('supplementalCard', [
             if (helpCard.height() > maxHelpCardHeightSeen) {
               maxHelpCardHeightSeen = helpCard.height();
             }
-            return maxHelpCardHeightSeen > $(window).height() - 100;
+            return maxHelpCardHeightSeen > $(window)
+              .height() - 100;
           };
 
           $scope.getHelpCardBottomPosition = function() {

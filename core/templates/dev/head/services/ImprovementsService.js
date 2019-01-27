@@ -17,13 +17,15 @@
  * states based on statistics.
  */
 
-oppia.factory('ImprovementsService', [function() {
-  var INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
+oppia.factory('ImprovementsService', [
+  function() {
+    var INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 
-  return {
-    isStateForcedToResolveOutstandingUnaddressedAnswers: function(state) {
-      return !!state && INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
-        state.interaction.id) !== -1;
-    }
-  };
-}]);
+    return {
+      isStateForcedToResolveOutstandingUnaddressedAnswers: function(state) {
+        return !!state && INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED.indexOf(
+          state.interaction.id) !== -1;
+      }
+    };
+  }
+]);

@@ -26,10 +26,13 @@ oppia.directive('circularImage', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/circular_image_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.isLinkAvailable = function() {
-          return $scope.link() ? true : false;
-        };
-      }]
+      controller: [
+        '$scope', function($scope) {
+          $scope.isLinkAvailable = function() {
+            return $scope.link() ? true : false;
+          };
+        }
+      ]
     };
-  }]);
+  }
+]);

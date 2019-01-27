@@ -61,4 +61,5 @@ oppia.factory('ParamMetadataObjectFactory', [
     };
 
     return ParamMetadata;
-  }]);
+  }
+]);

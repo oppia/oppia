@@ -23,7 +23,7 @@ describe('Misconception object factory', function() {
     var MisconceptionObjectFactory;
     var misconceptionDict;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       misconceptionDict = {
         id: '1',
@@ -31,21 +31,26 @@ describe('Misconception object factory', function() {
         notes: 'test notes',
         feedback: 'test feedback'
       };
-    }));
+    }]);
 
     it('should create a new misconception', function() {
       var misconception =
         MisconceptionObjectFactory.createFromBackendDict(misconceptionDict);
-      expect(misconception.getId()).toEqual('1');
-      expect(misconception.getName()).toEqual('test name');
-      expect(misconception.getNotes()).toEqual('test notes');
-      expect(misconception.getFeedback()).toEqual('test feedback');
+      expect(misconception.getId())
+        .toEqual('1');
+      expect(misconception.getName())
+        .toEqual('test name');
+      expect(misconception.getNotes())
+        .toEqual('test notes');
+      expect(misconception.getFeedback())
+        .toEqual('test feedback');
     });
 
     it('should convert to a backend dictionary', function() {
       var misconception =
         MisconceptionObjectFactory.createFromBackendDict(misconceptionDict);
-      expect(misconception.toBackendDict()).toEqual(misconceptionDict);
+      expect(misconception.toBackendDict())
+        .toEqual(misconceptionDict);
     });
   });
 });

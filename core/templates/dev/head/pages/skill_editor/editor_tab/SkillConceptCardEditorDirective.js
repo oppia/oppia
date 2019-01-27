@@ -36,16 +36,17 @@ oppia.directive('skillConceptCardEditor', [
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
-          $scope.HTML_SCHEMA = {
-            type: 'html'
-          };
+          $scope.HTML_SCHEMA = {type: 'html'};
 
           var initBindableFieldsDict = function() {
             $scope.bindableFieldsDict = {
               displayedConceptCardExplanation:
-                $scope.skill.getConceptCard().getExplanation().getHtml(),
+                $scope.skill.getConceptCard()
+                  .getExplanation()
+                  .getHtml(),
               displayedWorkedExamples:
-                $scope.skill.getConceptCard().getWorkedExamples()
+                $scope.skill.getConceptCard()
+                  .getWorkedExamples()
             };
           };
 
@@ -115,7 +116,9 @@ oppia.directive('skillConceptCardEditor', [
                 COMPONENT_NAME_EXPLANATION));
             explanationMemento = null;
             $scope.displayedConceptCardExplanation =
-              $scope.skill.getConceptCard().getExplanation().getHtml();
+              $scope.skill.getConceptCard()
+                .getExplanation()
+                .getHtml();
           };
 
           $scope.deleteWorkedExample = function(index, evt) {
@@ -134,11 +137,13 @@ oppia.directive('skillConceptCardEditor', [
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
                   };
-                }]
+                }
+              ]
             }).result.then(function(result) {
               SkillUpdateService.deleteWorkedExample($scope.skill, index);
               $scope.bindableFieldsDict.displayedWorkedExamples =
-                $scope.skill.getConceptCard().getWorkedExamples();
+                $scope.skill.getConceptCard()
+                  .getWorkedExamples();
               $scope.activeWorkedExampleIndex = null;
             });
           };
@@ -164,7 +169,8 @@ oppia.directive('skillConceptCardEditor', [
                   $scope.tmpWorkedExampleHtml = '';
                   $scope.saveWorkedExample = function() {
                     $uibModalInstance.close({
-                      workedExampleHtml: $scope.tmpWorkedExampleHtml
+                      workedExampleHtml:
+                      $scope.tmpWorkedExampleHtml
                     });
                   };
 
@@ -179,16 +185,19 @@ oppia.directive('skillConceptCardEditor', [
                   result.workedExampleHtml,
                   GenerateContentIdService.getNextId(
                     $scope.skill.getConceptCard()
-                      .getContentIdsToAudioTranslations().getAllContentId(),
+                      .getContentIdsToAudioTranslations()
+                      .getAllContentId(),
                     COMPONENT_NAME_WORKED_EXAMPLE)));
               $scope.bindableFieldsDict.displayedWorkedExamples =
-                $scope.skill.getConceptCard().getWorkedExamples();
+                $scope.skill.getConceptCard()
+                  .getWorkedExamples();
             });
           };
 
           $scope.onWorkedExampleSaved = function() {
             $scope.bindableFieldsDict.displayedWorkedExamples =
-              $scope.skill.getConceptCard().getWorkedExamples();
+              $scope.skill.getConceptCard()
+                .getWorkedExamples();
           };
         }
       ]

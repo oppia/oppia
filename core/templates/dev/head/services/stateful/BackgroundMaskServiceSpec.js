@@ -20,17 +20,19 @@ describe('Background Mask Service', function() {
   var BackgroundMaskService;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     BackgroundMaskService = $injector.get('BackgroundMaskService');
-  }));
+  }]);
 
   it('should activate mask', function() {
     BackgroundMaskService.activateMask();
-    expect(BackgroundMaskService.isMaskActive()).toBe(true);
+    expect(BackgroundMaskService.isMaskActive())
+      .toBe(true);
   });
 
   it('should deactivate mask', function() {
     BackgroundMaskService.deactivateMask();
-    expect(BackgroundMaskService.isMaskActive()).toBe(false);
+    expect(BackgroundMaskService.isMaskActive())
+      .toBe(false);
   });
 });

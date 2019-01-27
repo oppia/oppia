@@ -109,10 +109,11 @@ oppia.factory('FractionObjectFactory', [
         rawInput = rawInput.substring(1);
       }
       // Filter result from split to remove empty strings.
-      var numbers = rawInput.split(/\/|\s/g).filter(function(token) {
+      var numbers = rawInput.split(/\/|\s/g)
+        .filter(function(token) {
         // The empty string will evaluate to false.
-        return Boolean(token);
-      });
+          return Boolean(token);
+        });
 
       if (numbers.length === 1) {
         wholeNumber = parseInt(numbers[0]);

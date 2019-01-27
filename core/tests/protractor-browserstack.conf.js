@@ -91,29 +91,17 @@ exports.config = {
       'protractor/subscriptionsFlow.js'
     ],
 
-    accessibility: [
-      'protractor/accessibility.js'
-    ],
+    accessibility: ['protractor/accessibility.js'],
 
-    learner: [
-      'protractor/learnerFlow.js'
-    ],
+    learner: ['protractor/learnerFlow.js'],
 
-    library: [
-      'protractor/libraryFlow.js'
-    ],
+    library: ['protractor/libraryFlow.js'],
 
-    navigation: [
-      'protractor_mobile/navigation.js'
-    ],
+    navigation: ['protractor_mobile/navigation.js'],
 
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
-    ],
+    profileMenu: ['protractor/profileMenuFlow.js'],
 
-    subscriptions: [
-      'protractor/subscriptionsFlow.js'
-    ]
+    subscriptions: ['protractor/subscriptionsFlow.js']
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
@@ -206,10 +194,11 @@ exports.config = {
     browser.isMobile = true;
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
-    jasmine.getEnv().addReporter(new SpecReporter({
-      displayStacktrace: 'all',
-      displaySpecDuration: true
-    }));
+    jasmine.getEnv()
+      .addReporter(new SpecReporter({
+        displayStacktrace: 'all',
+        displaySpecDuration: true
+      }));
   },
 
   // ----- The test framework -----

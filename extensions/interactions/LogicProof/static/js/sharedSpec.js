@@ -46,18 +46,24 @@ describe('Parse then display expressions', function() {
   };
 
   it('should parse examples correctly', function() {
-    expect(parseThenDisplay('p\u2227q')).toEqual('p\u2227q');
-    expect(parseThenDisplay('(p+q)=r')).toEqual('(p+q)=r');
-    expect(parseThenDisplay('p<(\u2200x.(2+2))')).toEqual('p<(\u2200x.(2+2))');
+    expect(parseThenDisplay('p\u2227q'))
+      .toEqual('p\u2227q');
+    expect(parseThenDisplay('(p+q)=r'))
+      .toEqual('(p+q)=r');
+    expect(parseThenDisplay('p<(\u2200x.(2+2))'))
+      .toEqual('p<(\u2200x.(2+2))');
     expect(
       parseThenDisplay('((x=2)\u2227(\u2203y.(y=6)))=>valid')
-    ).toEqual('((x=2)\u2227(\u2203y.(y=6)))=>valid');
+    )
+      .toEqual('((x=2)\u2227(\u2203y.(y=6)))=>valid');
     expect(
       parseThenDisplayControl('p\u2228(\u2200m\u2208S.A(m,S))')
-    ).toEqual('p\u2228(\u2200m\u2208S.A(m,S))');
+    )
+      .toEqual('p\u2228(\u2200m\u2208S.A(m,S))');
     expect(
       parseThenDisplayControl('min{a<b|p\u2228(q\u2227r)}')
-    ).toEqual('min{a<b | p\u2228(q\u2227r)}');
+    )
+      .toEqual('min{a<b | p\u2228(q\u2227r)}');
   });
 });
 
@@ -70,28 +76,34 @@ describe('Pre-parse lines', function() {
   it('should pre-parse examples correctly', function() {
     expect(
       preParse('from p and q we have p\u2227q', false)
-    ).toEqual(['from', 'p', 'and', 'q', 'we', 'have', 'p\u2227q']);
+    )
+      .toEqual(['from', 'p', 'and', 'q', 'we', 'have', 'p\u2227q']);
     expect(
       preParse('    from p \u2228 (q\u2227 r ) s we see \u2200 x. r', false)
-    ).toEqual(['from', 'p\u2228(q\u2227r)', 's', 'we', 'see', '\u2200x.r']);
+    )
+      .toEqual(['from', 'p\u2228(q\u2227r)', 's', 'we', 'see', '\u2200x.r']);
     expect(
       preParse('from p [ x -> a ] at {{ a | variable }} have q', true)
-    ).toEqual(['from', 'p[x->a]', 'at', '{{a|variable}}', 'have', 'q']);
+    )
+      .toEqual(['from', 'p[x->a]', 'at', '{{a|variable}}', 'have', 'q']);
     expect(
       preParse('from  ~R =>~S and  ~S =>~R we have ~R <=> ~S', true)
-    ).toEqual(['from', '~R=>~S', 'and', '~S=>~R', 'we', 'have', '~R<=>~S']);
+    )
+      .toEqual(['from', '~R=>~S', 'and', '~S=>~R', 'we', 'have', '~R<=>~S']);
   });
 
   it('should reject lines that are entirely whitespace', function() {
     expect(
       errorWrapper(preParse, '   ', false)
-    ).toThrowError('This line is blank.');
+    )
+      .toThrowError('This line is blank.');
   });
 
   it('should reject unknown symbols', function() {
     expect(
       errorWrapper(preParse, 'from p and p{q we see q', false)
-    ).toThrowError('The symbol { was not recognised.');
+    )
+      .toThrowError('The symbol { was not recognised.');
   });
 });
 
@@ -103,127 +115,143 @@ describe('Parse lines', function() {
   };
 
   it('should parse examples correctly', function() {
-    expect(parse('from p and q we have p\u2227q', false)).toEqual([[{
-      format: 'phrase',
-      content: 'from'
-    }, {
-      format: 'expression',
-      content: {
-        top_kind_name: 'variable',
-        top_operator_name: 'p',
-        arguments: [],
-        dummies: []
-      }
-    }, {
-      format: 'phrase',
-      content: 'and'
-    }, {
-      format: 'expression',
-      content: {
-        top_kind_name: 'variable',
-        top_operator_name: 'q',
-        arguments: [],
-        dummies: []
-      }
-    }, {
-      format: 'phrase',
-      content: 'have'
-    }, {
-      format: 'expression',
-      content: {
-        top_kind_name: 'binary_connective',
-        top_operator_name: 'and',
-        arguments: [{
-          top_kind_name: 'variable',
-          top_operator_name: 'p',
-          arguments: [],
-          dummies: []
-        }, {
-          top_kind_name: 'variable',
-          top_operator_name: 'q',
-          arguments: [],
-          dummies: []
-        }],
-        dummies: []
-      }
-    }]]);
+    expect(parse('from p and q we have p\u2227q', false))
+      .toEqual([
+        [
+          {
+            format: 'phrase',
+            content: 'from'
+          }, {
+            format: 'expression',
+            content: {
+              top_kind_name: 'variable',
+              top_operator_name: 'p',
+              arguments: [],
+              dummies: []
+            }
+          }, {
+            format: 'phrase',
+            content: 'and'
+          }, {
+            format: 'expression',
+            content: {
+              top_kind_name: 'variable',
+              top_operator_name: 'q',
+              arguments: [],
+              dummies: []
+            }
+          }, {
+            format: 'phrase',
+            content: 'have'
+          }, {
+            format: 'expression',
+            content: {
+              top_kind_name: 'binary_connective',
+              top_operator_name: 'and',
+              arguments: [
+                {
+                  top_kind_name: 'variable',
+                  top_operator_name: 'p',
+                  arguments: [],
+                  dummies: []
+                }, {
+                  top_kind_name: 'variable',
+                  top_operator_name: 'q',
+                  arguments: [],
+                  dummies: []
+                }
+              ],
+              dummies: []
+            }
+          }
+        ]
+      ]);
 
     expect(
       parse(
         'from p[x->a] we know hence a contradiction {{ a | element }}', true)
-    ).toEqual([[{
-      format: 'phrase',
-      content: 'from'
-    }, {
-      format: 'expression',
-      content: {
-        expression: {
-          top_kind_name: 'variable',
-          top_operator_name: 'p',
-          arguments: [],
-          dummies: []
-        },
-        substitutions: [{
-          x: {
-            top_kind_name: 'variable',
-            top_operator_name: 'a',
-            arguments: [],
-            dummies: []
+    )
+      .toEqual([
+        [
+          {
+            format: 'phrase',
+            content: 'from'
+          }, {
+            format: 'expression',
+            content: {
+              expression: {
+                top_kind_name: 'variable',
+                top_operator_name: 'p',
+                arguments: [],
+                dummies: []
+              },
+              substitutions: [
+                {
+                  x: {
+                    top_kind_name: 'variable',
+                    top_operator_name: 'a',
+                    arguments: [],
+                    dummies: []
+                  }
+                }
+              ],
+              type: 'boolean'
+            }
+          }, {
+            format: 'phrase',
+            content: 'have'
+          }, {
+            format: 'phrase',
+            content: 'hence'
+          }, {
+            format: 'expression',
+            content: {
+              expression: {
+                top_kind_name: 'variable',
+                top_operator_name: 'a',
+                arguments: [],
+                dummies: []
+              },
+              substitutions: [],
+              type: 'boolean'
+            }
+          }, {
+            format: 'phrase',
+            content: 'contradiction'
+          }, {
+            format: 'expression',
+            content: {
+              expression: {
+                top_kind_name: 'variable',
+                top_operator_name: 'a',
+                arguments: [],
+                dummies: []
+              },
+              substitutions: [],
+              type: 'element'
+            }
           }
-        }],
-        type: 'boolean'
-      }
-    }, {
-      format: 'phrase',
-      content: 'have'
-    }, {
-      format: 'phrase',
-      content: 'hence'
-    }, {
-      format: 'expression',
-      content: {
-        expression: {
-          top_kind_name: 'variable',
-          top_operator_name: 'a',
-          arguments: [],
-          dummies: []
-        },
-        substitutions: [],
-        type: 'boolean'
-      }
-    }, {
-      format: 'phrase',
-      content: 'contradiction'
-    }, {
-      format: 'expression',
-      content: {
-        expression: {
-          top_kind_name: 'variable',
-          top_operator_name: 'a',
-          arguments: [],
-          dummies: []
-        },
-        substitutions: [],
-        type: 'element'
-      }
-    }]]);
+        ]
+      ]);
   });
 
   it('should reject unknown phrases', function() {
     expect(
       errorWrapper(parse, 'from p we havw p\u2227q')
-    ).toThrowError(
-      'The phrase starting \'we\' could not be identified; ' +
+    )
+      .toThrowError(
+        'The phrase starting \'we\' could not be identified; ' +
       'please make sure you are only using phrases from the given list of ' +
       'vocabulary.'
-    );
+      );
   });
 
   it('should reject consecutive expressions', function() {
     expect(
       errorWrapper(parse, 'from A=>B B have B')
-    ).toThrowError(
-      'We could not identify \'B\'; please make sure you are using ' +
+    )
+      .toThrowError(
+        'We could not identify \'B\'; please make sure you are using ' +
       'vocabulary from the given list, and don\'t have two consecutive ' +
       'expressions.');
   });
@@ -231,14 +259,18 @@ describe('Parse lines', function() {
 
 describe('Instantiate types', function() {
   it('should instantiate examples correctly', function() {
-    expect(logicProofShared.instantiateTypingElementArray([{
-      type: 'boolean',
-      arbitrarily_many: false
-    }, {
-      type: 'element',
-      arbitrarily_many: true
-    }], 3)).toEqual(['boolean', 'element', 'element']);
-    expect(logicProofShared.instantiateTypingElementArray([], 0)).toEqual([]);
+    expect(logicProofShared.instantiateTypingElementArray([
+      {
+        type: 'boolean',
+        arbitrarily_many: false
+      }, {
+        type: 'element',
+        arbitrarily_many: true
+      }
+    ], 3))
+      .toEqual(['boolean', 'element', 'element']);
+    expect(logicProofShared.instantiateTypingElementArray([], 0))
+      .toEqual([]);
   });
 });
 
@@ -258,98 +290,114 @@ describe('Assign types to expressions', function() {
   };
 
   it('should assign types to examples correctly', function() {
-    expect(assignTypes('p', ['variable'])).toEqual({
-      top_operator_name: 'p',
-      top_kind_name: 'variable',
-      arguments: [],
-      dummies: [],
-      type: 'boolean'
-    });
-
-    expect(assignTypes('p\u2227x=y', ['variable'])).toEqual({
-      top_operator_name: 'and',
-      top_kind_name: 'binary_connective',
-      arguments: [{
+    expect(assignTypes('p', ['variable']))
+      .toEqual({
         top_operator_name: 'p',
         top_kind_name: 'variable',
         arguments: [],
         dummies: [],
         type: 'boolean'
-      }, {
-        top_operator_name: 'equals',
-        top_kind_name: 'binary_relation',
-        arguments: [{
-          top_operator_name: 'x',
-          top_kind_name: 'variable',
-          arguments: [],
-          dummies: [],
-          type: 'element'
-        }, {
-          top_operator_name: 'y',
-          top_kind_name: 'variable',
-          arguments: [],
-          dummies: [],
-          type: 'element'
-        }],
-        dummies: [],
-        type: 'boolean'
-      }],
-      dummies: [],
-      type: 'boolean'
-    });
+      });
 
-    expect(assignTypes('\u2203x.x=x', [])).toEqual({
-      top_operator_name: 'exists',
-      top_kind_name: 'quantifier',
-      arguments: [{
-        top_operator_name: 'equals',
-        top_kind_name: 'binary_relation',
-        arguments: [{
-          top_operator_name: 'x',
-          top_kind_name: 'variable',
-          arguments: [],
-          dummies: [],
-          type: 'element'
-        }, {
-          top_operator_name: 'x',
-          top_kind_name: 'variable',
-          arguments: [],
-          dummies: [],
-          type: 'element'
-        }],
+    expect(assignTypes('p\u2227x=y', ['variable']))
+      .toEqual({
+        top_operator_name: 'and',
+        top_kind_name: 'binary_connective',
+        arguments: [
+          {
+            top_operator_name: 'p',
+            top_kind_name: 'variable',
+            arguments: [],
+            dummies: [],
+            type: 'boolean'
+          }, {
+            top_operator_name: 'equals',
+            top_kind_name: 'binary_relation',
+            arguments: [
+              {
+                top_operator_name: 'x',
+                top_kind_name: 'variable',
+                arguments: [],
+                dummies: [],
+                type: 'element'
+              }, {
+                top_operator_name: 'y',
+                top_kind_name: 'variable',
+                arguments: [],
+                dummies: [],
+                type: 'element'
+              }
+            ],
+            dummies: [],
+            type: 'boolean'
+          }
+        ],
         dummies: [],
         type: 'boolean'
-      }],
-      dummies: [{
-        top_operator_name: 'x',
-        top_kind_name: 'variable',
-        arguments: [],
-        dummies: [],
-        type: 'element'
-      }],
-      type: 'boolean'
-    });
+      });
+
+    expect(assignTypes('\u2203x.x=x', []))
+      .toEqual({
+        top_operator_name: 'exists',
+        top_kind_name: 'quantifier',
+        arguments: [
+          {
+            top_operator_name: 'equals',
+            top_kind_name: 'binary_relation',
+            arguments: [
+              {
+                top_operator_name: 'x',
+                top_kind_name: 'variable',
+                arguments: [],
+                dummies: [],
+                type: 'element'
+              }, {
+                top_operator_name: 'x',
+                top_kind_name: 'variable',
+                arguments: [],
+                dummies: [],
+                type: 'element'
+              }
+            ],
+            dummies: [],
+            type: 'boolean'
+          }
+        ],
+        dummies: [
+          {
+            top_operator_name: 'x',
+            top_kind_name: 'variable',
+            arguments: [],
+            dummies: [],
+            type: 'element'
+          }
+        ],
+        type: 'boolean'
+      });
   });
 
   it('should reject type mismatches', function() {
     expect(
       errorWrapper(assignTypes, 'p<=>2+x', ['variable'])
-    ).toThrowError(
-      'addition yields a element but you are trying to use it to give a ' +
+    )
+      .toThrowError(
+        'addition yields a element but you are trying to use it to give a ' +
       'boolean.');
 
     expect(
       errorWrapper(
         assignTypes, 'x\u2227f(x)',
         ['variable', 'prefix_function', 'constant'])
-    ).toThrowError(
-      'x yields a boolean but you are trying to use it to give a element.');
+    )
+      .toThrowError(
+        'x yields a boolean but you are trying to use it to give a element.');
 
     expect(
       errorWrapper(
         assignTypesControl, '\'a\'=2', ['prefix_function', 'constant'])
-    ).toThrowError(
-      '2 yields a integer but you are trying to use it to give a string.');
+    )
+      .toThrowError(
+        '2 yields a integer but you are trying to use it to give a string.');
   });
 
   it('should forbid quantification over pre-existing variables', function() {
@@ -357,16 +405,18 @@ describe('Assign types to expressions', function() {
       errorWrapper(
         assignTypes, 'a\u2227\u2203a.f(2)',
         ['variable', 'prefix_function', 'constant'])
-    ).toThrowError(
-      'The name \'a\' is already in use and so cannot be quantified over in ' +
-      '\u2203a.f(2).');
+    )
+      .toThrowError(
+        'The name \'a\' is already in use and so cannot be quantified' +
+      ' over in \u2203a.f(2).');
   });
 
   it('should reject kind mismatches', function() {
     expect(
       errorWrapper(
         assignTypes, 'f(f)', ['variable', 'prefix_function', 'constant'])
-    ).toThrowError('f is supposed to be a prefix_function.');
+    )
+      .toThrowError('f is supposed to be a prefix_function.');
   });
 
   it('should reject unknown operators of an un-addable kind', function() {
@@ -374,11 +424,13 @@ describe('Assign types to expressions', function() {
       errorWrapper(
         assignTypes, '\u2200m<n.A(n)',
         ['variable', 'prefix_function', 'constant'])
-    ).toThrowError('The operator bounded_for_all could not be identified.');
+    )
+      .toThrowError('The operator bounded_for_all could not be identified.');
     expect(
       errorWrapper(
         assignTypes, '\u2203x.A(x)<=>x=2', ['prefix_function', 'constant'])
-    ).toThrowError('The operator x could not be identified.');
+    )
+      .toThrowError('The operator x could not be identified.');
   });
 });
 
@@ -388,7 +440,8 @@ describe('Check equality between expression constructs', function() {
       logicProofShared.checkExpressionsAreEqual(
         logicProofParser.parse('p\u2227r\u2228\u2200x.s', 'expression'),
         logicProofParser.parse('(p\u2227r)\u2228(\u2200x.s)', 'expression'))
-    ).toBe(true);
+    )
+      .toBe(true);
   });
 
   it('should recognise when expressions are not equal', function() {
@@ -396,7 +449,8 @@ describe('Check equality between expression constructs', function() {
       logicProofShared.checkExpressionsAreEqual(
         logicProofParser.parse('p\u2227r\u2228\u2200x.s', 'expression'),
         logicProofParser.parse('(p\u2227r)\u2228(\u2200y.s)', 'expression'))
-    ).toBe(false);
+    )
+      .toBe(false);
   });
 
   it('should recognise when an expression is not in a set', function() {
@@ -407,7 +461,8 @@ describe('Check equality between expression constructs', function() {
           logicProofParser.parse('A(x)', 'expression'),
           logicProofParser.parse('q\u2227p', 'expression')
         ])
-    ).toBe(false);
+    )
+      .toBe(false);
   });
 
   it('should recognise when sets of expressions are equal', function() {
@@ -420,7 +475,8 @@ describe('Check equality between expression constructs', function() {
         logicProofParser.parse('A(x)\u2228(x=2)', 'expression'),
         logicProofParser.parse('p', 'expression')
       ])
-    ).toBe(true);
+    )
+      .toBe(true);
   });
 });
 
@@ -429,25 +485,29 @@ describe('Get operators from expression', function() {
     expect(
       logicProofShared.getOperatorsFromExpression(
         logicProofParser.parse('f(x+2)=y+x\u2227p', 'expression'))
-    ).toEqual(['x', 2, 'addition', 'f', 'y', 'equals', 'p', 'and']);
+    )
+      .toEqual(['x', 2, 'addition', 'f', 'y', 'equals', 'p', 'and']);
   });
 
   it('should identify all operators of a given kind', function() {
     expect(
       logicProofShared.getOperatorsFromExpression(
         logicProofParser.parse('x+2=y+x', 'expression'),
-        ['variable'])).toEqual(['x', 'y']);
+        ['variable']))
+      .toEqual(['x', 'y']);
   });
 });
 
 describe('Check ordering in lex', function() {
   it('should identify when one array exceeds another', function() {
     expect(logicProofShared.greaterThanInLex(
-      [1, 2, 4, 4], [1, 2, 3, 5])).toBe(true);
+      [1, 2, 4, 4], [1, 2, 3, 5]))
+      .toBe(true);
   });
 
   it('should identify when one array does not exceed another', function() {
     expect(logicProofShared.greaterThanInLex(
-      [1, 2], [1, 2])).toBe(false);
+      [1, 2], [1, 2]))
+      .toBe(false);
   });
 });

@@ -28,9 +28,10 @@ oppia.factory('LogicProofValidationService', [
           stateName, customizationArgs, answerGroups, defaultOutcome) {
         // We do not require a default rule for this interaction, since the
         // feedback is mostly provided from within the interaction itself.
-        return this.getCustomizationArgsWarnings(customizationArgs).concat(
-          baseInteractionValidationService.getAnswerGroupWarnings(
-            answerGroups, stateName));
+        return this.getCustomizationArgsWarnings(customizationArgs)
+          .concat(
+            baseInteractionValidationService.getAnswerGroupWarnings(
+              answerGroups, stateName));
       }
     };
   }

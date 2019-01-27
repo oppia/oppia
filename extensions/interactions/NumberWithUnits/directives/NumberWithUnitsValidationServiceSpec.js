@@ -25,7 +25,7 @@ describe('NumberWithUnitsValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     validatorService = $injector.get('NumberWithUnitsValidationService');
     oof = $injector.get('OutcomeObjectFactory');
     agof = $injector.get('AnswerGroupObjectFactory');
@@ -68,8 +68,10 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2, createFractionDict(
-          false, 0, 0, 1), [{unit: 'kg', exponent: 1},
-          {unit: 'm', exponent: -2}])
+          false, 0, 0, 1), [
+          {unit: 'kg', exponent: 1},
+          {unit: 'm', exponent: -2}
+        ])
       }
     });
 
@@ -77,8 +79,10 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2000, createFractionDict(
-          false, 0, 0, 1), [{unit: 'g', exponent: 1},
-          {unit: 'm', exponent: -2}])
+          false, 0, 0, 1), [
+          {unit: 'g', exponent: 1},
+          {unit: 'm', exponent: -2}
+        ])
       }
     });
 
@@ -86,8 +90,10 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2, createFractionDict(
-          false, 0, 0, 1), [{unit: 'kg', exponent: 1},
-          {unit: 'm', exponent: -2}])
+          false, 0, 0, 1), [
+          {unit: 'kg', exponent: 1},
+          {unit: 'm', exponent: -2}
+        ])
       }
     });
 
@@ -95,8 +101,10 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
-          false, 0, 2, 3), [{unit: 'kg', exponent: 1},
-          {unit: 'm', exponent: -2}])
+          false, 0, 2, 3), [
+          {unit: 'kg', exponent: 1},
+          {unit: 'm', exponent: -2}
+        ])
       }
     });
 
@@ -104,33 +112,41 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
-          false, 0, 2000, 3), [{unit: 'g', exponent: 1},
-          {unit: 'm', exponent: -2}])
+          false, 0, 2000, 3), [
+          {unit: 'g', exponent: 1},
+          {unit: 'm', exponent: -2}
+        ])
       }
     });
 
-    answerGroups = [agof.createNew(
-      [equalsTwoRule, equalsTwoByThreeRule],
-      goodDefaultOutcome,
-      false
-    )];
-  }));
+    answerGroups = [
+      agof.createNew(
+        [equalsTwoRule, equalsTwoByThreeRule],
+        goodDefaultOutcome,
+        false
+      )
+    ];
+  }]);
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 
   it('should catch equals followed by equals same value', function() {
     answerGroups[0].rules = [equalsTwoRule, equalsTwoRule];
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message: 'Rule 2 from answer group 1 will never be matched ' +
         'because it is made redundant by rule 1 from answer group 1.'
-    }]);
+        }
+      ]);
   });
 
   it('should not catch equals followed by equals with unequal values',
@@ -138,7 +154,8 @@ describe('NumberWithUnitsValidationService', function() {
       answerGroups[0].rules = [equalsTwoRule, equalsTwoByThreeRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([]);
+      expect(warnings)
+        .toEqual([]);
     });
 
   it('should not catch equals followed by equivalent as redundant',
@@ -146,12 +163,14 @@ describe('NumberWithUnitsValidationService', function() {
       answerGroups[0].rules = [equalsTwoRule, equivalentToTwoThousandRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([]);
+      expect(warnings)
+        .toEqual([]);
 
       answerGroups[0].rules = [equalsTwoRule, equivalentToTwoRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([]);
+      expect(warnings)
+        .toEqual([]);
     });
 
   it('should catch equivalent followed by equals with equivalent values',
@@ -159,11 +178,14 @@ describe('NumberWithUnitsValidationService', function() {
       answerGroups[0].rules = [equivalentToTwoThousandRule, equalsTwoRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 will never be matched ' +
           'because it is made redundant by rule 1 from answer group 1.'
-      }]);
+          }
+        ]);
     });
 
   it('should not catch equivalent followed by equals with non-equivalent' +
@@ -171,28 +193,37 @@ describe('NumberWithUnitsValidationService', function() {
     answerGroups[0].rules = [equivalentToTwoThousandRule, equalsTwoByThreeRule];
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 
   it('should catch equivalent followed by equivalent with equivalent values',
     function() {
-      answerGroups[0].rules = [equivalentToTwoThousandRule,
-        equivalentToTwoRule];
+      answerGroups[0].rules = [
+        equivalentToTwoThousandRule,
+        equivalentToTwoRule
+      ];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.ERROR,
+            message: 'Rule 2 from answer group 1 will never be matched ' +
           'because it is made redundant by rule 1 from answer group 1.'
-      }]);
+          }
+        ]);
     });
 
   it('should not catch equivalent followed by equivalent with non-equivalent' +
     ' values', function() {
-    answerGroups[0].rules = [equivalentToTwoByThreeRule,
-      equivalentToTwoThousandRule];
+    answerGroups[0].rules = [
+      equivalentToTwoByThreeRule,
+      equivalentToTwoThousandRule
+    ];
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 });

@@ -20,15 +20,17 @@ describe('Alerts Service', function() {
   var AlertsService;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     AlertsService = $injector.get('AlertsService');
-  }));
+  }]);
 
   describe('Warnings', function() {
     it('should add a warning', function() {
-      expect(AlertsService.warnings.length).toBe(0);
+      expect(AlertsService.warnings.length)
+        .toBe(0);
       AlertsService.addWarning('Warning 1');
-      expect(AlertsService.warnings.length).toBe(1);
+      expect(AlertsService.warnings.length)
+        .toBe(1);
     });
 
     it('should delete a warning (no duplicates)', function() {
@@ -39,12 +41,14 @@ describe('Alerts Service', function() {
       AlertsService.addWarning('Warning 2');
       AlertsService.addWarning('Warning 3');
 
-      expect(AlertsService.warnings.length).toBe(3);
+      expect(AlertsService.warnings.length)
+        .toBe(3);
       AlertsService.deleteWarning({
         type: 'warning',
         content: warning
       });
-      expect(AlertsService.warnings.length).toBe(2);
+      expect(AlertsService.warnings.length)
+        .toBe(2);
 
       // Search for the deleted warning message
       var found = false;
@@ -53,9 +57,12 @@ describe('Alerts Service', function() {
           found = true;
         }
       }
-      expect(found).toBe(false);
-      expect(AlertsService.warnings[0].content).toBe('Warning 2');
-      expect(AlertsService.warnings[1].content).toBe('Warning 3');
+      expect(found)
+        .toBe(false);
+      expect(AlertsService.warnings[0].content)
+        .toBe('Warning 2');
+      expect(AlertsService.warnings[1].content)
+        .toBe('Warning 3');
     });
 
     it('should delete a warning (with duplicates)', function() {
@@ -67,12 +74,14 @@ describe('Alerts Service', function() {
       AlertsService.addWarning(warning);
       AlertsService.addWarning('Warning 3');
 
-      expect(AlertsService.warnings.length).toBe(4);
+      expect(AlertsService.warnings.length)
+        .toBe(4);
       AlertsService.deleteWarning({
         type: 'warning',
         content: warning
       });
-      expect(AlertsService.warnings.length).toBe(2);
+      expect(AlertsService.warnings.length)
+        .toBe(2);
 
       // Search for the deleted warning message
       var found = false;
@@ -81,9 +90,12 @@ describe('Alerts Service', function() {
           found = true;
         }
       }
-      expect(found).toBe(false);
-      expect(AlertsService.warnings[0].content).toBe('Warning 2');
-      expect(AlertsService.warnings[1].content).toBe('Warning 3');
+      expect(found)
+        .toBe(false);
+      expect(AlertsService.warnings[0].content)
+        .toBe('Warning 2');
+      expect(AlertsService.warnings[1].content)
+        .toBe('Warning 3');
     });
 
     it('should not add more than 10 warnings', function() {
@@ -91,7 +103,8 @@ describe('Alerts Service', function() {
       for (var i = 1; i < 15; i++) {
         AlertsService.addWarning(warning + i);
       }
-      expect(AlertsService.warnings.length).toBe(10);
+      expect(AlertsService.warnings.length)
+        .toBe(10);
     });
 
     it('should clear all the warning messages', function() {
@@ -99,28 +112,37 @@ describe('Alerts Service', function() {
       AlertsService.addWarning('Warning 2');
       AlertsService.addWarning('Warning 3');
       AlertsService.clearWarnings();
-      expect(AlertsService.warnings.length).toBe(0);
+      expect(AlertsService.warnings.length)
+        .toBe(0);
     });
   });
 
   describe('Messages', function() {
     it('should add an info message', function() {
       var message = 'Info 1';
-      expect(AlertsService.messages.length).toBe(0);
+      expect(AlertsService.messages.length)
+        .toBe(0);
       AlertsService.addInfoMessage(message);
-      expect(AlertsService.messages.length).toBe(1);
-      expect(AlertsService.messages[0].type).toBe('info');
-      expect(AlertsService.messages[0].content).toBe(message);
+      expect(AlertsService.messages.length)
+        .toBe(1);
+      expect(AlertsService.messages[0].type)
+        .toBe('info');
+      expect(AlertsService.messages[0].content)
+        .toBe(message);
     });
 
     it('should add a success message', function() {
       var message = 'Success 1';
-      expect(AlertsService.messages.length).toBe(0);
+      expect(AlertsService.messages.length)
+        .toBe(0);
       AlertsService.addSuccessMessage(message);
       AlertsService.addInfoMessage('Info 1');
-      expect(AlertsService.messages.length).toBe(2);
-      expect(AlertsService.messages[0].type).toBe('success');
-      expect(AlertsService.messages[0].content).toBe(message);
+      expect(AlertsService.messages.length)
+        .toBe(2);
+      expect(AlertsService.messages[0].type)
+        .toBe('success');
+      expect(AlertsService.messages[0].content)
+        .toBe(message);
     });
 
     it('should delete a message (no duplicates)', function() {
@@ -131,12 +153,14 @@ describe('Alerts Service', function() {
       AlertsService.addInfoMessage('Info 2');
       AlertsService.addSuccessMessage('Success 1');
 
-      expect(AlertsService.messages.length).toBe(3);
+      expect(AlertsService.messages.length)
+        .toBe(3);
       AlertsService.deleteMessage({
         type: 'info',
         content: message
       });
-      expect(AlertsService.messages.length).toBe(2);
+      expect(AlertsService.messages.length)
+        .toBe(2);
 
       // Search for the message
       var found = false;
@@ -146,9 +170,12 @@ describe('Alerts Service', function() {
           found = true;
         }
       }
-      expect(found).toBe(false);
-      expect(AlertsService.messages[0].content).toBe('Info 2');
-      expect(AlertsService.messages[1].content).toBe('Success 1');
+      expect(found)
+        .toBe(false);
+      expect(AlertsService.messages[0].content)
+        .toBe('Info 2');
+      expect(AlertsService.messages[1].content)
+        .toBe('Success 1');
     });
 
     it('should delete a message (with duplicates)', function() {
@@ -160,12 +187,14 @@ describe('Alerts Service', function() {
       AlertsService.addSuccessMessage('Success 1');
       AlertsService.addInfoMessage(message);
 
-      expect(AlertsService.messages.length).toBe(4);
+      expect(AlertsService.messages.length)
+        .toBe(4);
       AlertsService.deleteMessage({
         type: 'info',
         content: message
       });
-      expect(AlertsService.messages.length).toBe(2);
+      expect(AlertsService.messages.length)
+        .toBe(2);
 
       // Search for the message
       var found = false;
@@ -175,9 +204,12 @@ describe('Alerts Service', function() {
           found = true;
         }
       }
-      expect(found).toBe(false);
-      expect(AlertsService.messages[0].content).toBe('Info 2');
-      expect(AlertsService.messages[1].content).toBe('Success 1');
+      expect(found)
+        .toBe(false);
+      expect(AlertsService.messages[0].content)
+        .toBe('Info 2');
+      expect(AlertsService.messages[1].content)
+        .toBe('Success 1');
     });
 
     it('should not add more than 10 messages', function() {
@@ -186,7 +218,8 @@ describe('Alerts Service', function() {
         AlertsService.addInfoMessage(message + i);
       }
       AlertsService.addSuccessMessage('Success 1');
-      expect(AlertsService.messages.length).toBe(10);
+      expect(AlertsService.messages.length)
+        .toBe(10);
     });
 
     it('should clear all the messages', function() {
@@ -194,7 +227,8 @@ describe('Alerts Service', function() {
       AlertsService.addInfoMessage('Info 2');
       AlertsService.addSuccessMessage('Success 1');
       AlertsService.clearMessages();
-      expect(AlertsService.messages.length).toBe(0);
+      expect(AlertsService.messages.length)
+        .toBe(0);
     });
   });
 });

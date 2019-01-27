@@ -17,7 +17,8 @@
  * story node domain objects.
  */
 
-oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
+oppia.factory('StoryNodeObjectFactory', [
+  'NODE_ID_PREFIX',
   function(NODE_ID_PREFIX) {
     var StoryNode = function(
         id, title, destinationNodeIds, prerequisiteSkillIds, acquiredSkillIds,

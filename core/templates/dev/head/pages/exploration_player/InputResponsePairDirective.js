@@ -92,4 +92,5 @@ oppia.directive('inputResponsePair', [
         }
       ]
     };
-  }]);
+  }
+]);

@@ -21,9 +21,9 @@ describe('Python program tokenizer', function() {
 
   describe('Test python program tokenizer', function() {
     var tokenizer;
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       tokenizer = $injector.get('PythonProgramTokenizer');
-    }));
+    }]);
 
     it('should generate correct tokens for a program', function() {
       var program = (
@@ -45,11 +45,14 @@ describe('Python program tokenizer', function() {
         ['NUMBER', '7'], ['OP', '=='], ['NUMBER', '0'], ['NAME', 'or'],
         ['NAME', 'num'], ['OP', '%'], ['NUMBER', '5'], ['OP', '=='],
         ['NUMBER', '0'], ['OP', ':'], ['NAME', 's'], ['OP', '+='],
-        ['NAME', 'x'], ['NAME', 'print'], ['NAME', 's'], ['ENDMARKER', '']];
+        ['NAME', 'x'], ['NAME', 'print'], ['NAME', 's'], ['ENDMARKER', '']
+      ];
 
       var tokens = tokenizer.generateTokens(program.split('\n'));
-      expect(tokens.length).toEqual(expectedTokens.length);
-      expect(tokens).toEqual(expectedTokens);
+      expect(tokens.length)
+        .toEqual(expectedTokens.length);
+      expect(tokens)
+        .toEqual(expectedTokens);
     });
   });
 });

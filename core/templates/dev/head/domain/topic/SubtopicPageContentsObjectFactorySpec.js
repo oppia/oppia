@@ -24,9 +24,7 @@ describe('Subtopic page contents object factory', function() {
       html: '',
       content_id: 'content'
     },
-    content_ids_to_audio_translations: {
-      content: {}
-    }
+    content_ids_to_audio_translations: {content: {}}
   };
 
   var backendDict = {
@@ -47,25 +45,29 @@ describe('Subtopic page contents object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     SubtopicPageContentsObjectFactory =
       $injector.get('SubtopicPageContentsObjectFactory');
-  }));
+  }]);
 
   it('should be able to create a default object', function() {
     var defaultObject = SubtopicPageContentsObjectFactory.createDefault();
-    expect(defaultObject.toBackendDict()).toEqual(expectedDefaultObject);
+    expect(defaultObject.toBackendDict())
+      .toEqual(expectedDefaultObject);
   });
 
   it('should convert from a backend dictionary', function() {
     var sampleSubtopicPageContents =
       SubtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
-    expect(sampleSubtopicPageContents.getSubtitledHtml().getHtml())
+    expect(sampleSubtopicPageContents.getSubtitledHtml()
+      .getHtml())
       .toEqual('test content');
-    expect(sampleSubtopicPageContents.getSubtitledHtml().getContentId())
+    expect(sampleSubtopicPageContents.getSubtitledHtml()
+      .getContentId())
       .toEqual('content');
     expect(sampleSubtopicPageContents.getContentIdsToAudioTranslations()
-      .getAudioTranslation('content', 'en').toBackendDict())
+      .getAudioTranslation('content', 'en')
+      .toBackendDict())
       .toEqual({
         filename: 'test.mp3',
         file_size_bytes: 100,
@@ -76,6 +78,7 @@ describe('Subtopic page contents object factory', function() {
   it('should convert from a backend dictionary', function() {
     var sampleSubtopicPageContents =
       SubtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
-    expect(sampleSubtopicPageContents.toBackendDict()).toEqual(backendDict);
+    expect(sampleSubtopicPageContents.toBackendDict())
+      .toEqual(backendDict);
   });
 });

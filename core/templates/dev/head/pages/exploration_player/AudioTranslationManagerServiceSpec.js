@@ -22,7 +22,7 @@ describe('Audio translation manager service', function() {
   var atms;
   var testAudioTranslations;
   var testAudioTranslations2;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     atms = $injector.get('AudioTranslationManagerService');
     atof = $injector.get('AudioTranslationObjectFactory');
 
@@ -51,48 +51,51 @@ describe('Audio translation manager service', function() {
         needs_update: false
       })
     };
-  }));
+  }]);
 
   it('should properly set primary and secondary audio translations',
     function() {
       atms.setContentAudioTranslations(testAudioTranslations);
-      expect(atms.getCurrentAudioTranslations()).toEqual({
-        en: atof.createFromBackendDict({
-          filename: 'audio-en.mp3',
-          file_size_bytes: 0.5,
-          needs_update: false
-        }),
-        es: atof.createFromBackendDict({
-          filename: 'audio-es.mp3',
-          file_size_bytes: 0.5,
-          needs_update: false
-        })
-      });
+      expect(atms.getCurrentAudioTranslations())
+        .toEqual({
+          en: atof.createFromBackendDict({
+            filename: 'audio-en.mp3',
+            file_size_bytes: 0.5,
+            needs_update: false
+          }),
+          es: atof.createFromBackendDict({
+            filename: 'audio-es.mp3',
+            file_size_bytes: 0.5,
+            needs_update: false
+          })
+        });
       atms.setSecondaryAudioTranslations(testAudioTranslations2);
-      expect(atms.getCurrentAudioTranslations()).toEqual({
-        zh: atof.createFromBackendDict({
-          filename: 'audio-zh.mp3',
-          file_size_bytes: 0.5,
-          needs_update: false
-        }),
-        'hi-en': atof.createFromBackendDict({
-          filename: 'audio-hi-en.mp3',
-          file_size_bytes: 0.5,
-          needs_update: false
-        })
-      });
+      expect(atms.getCurrentAudioTranslations())
+        .toEqual({
+          zh: atof.createFromBackendDict({
+            filename: 'audio-zh.mp3',
+            file_size_bytes: 0.5,
+            needs_update: false
+          }),
+          'hi-en': atof.createFromBackendDict({
+            filename: 'audio-hi-en.mp3',
+            file_size_bytes: 0.5,
+            needs_update: false
+          })
+        });
       atms.clearSecondaryAudioTranslations();
-      expect(atms.getCurrentAudioTranslations()).toEqual({
-        en: atof.createFromBackendDict({
-          filename: 'audio-en.mp3',
-          file_size_bytes: 0.5,
-          needs_update: false
-        }),
-        es: atof.createFromBackendDict({
-          filename: 'audio-es.mp3',
-          file_size_bytes: 0.5,
-          needs_update: false
-        })
-      });
+      expect(atms.getCurrentAudioTranslations())
+        .toEqual({
+          en: atof.createFromBackendDict({
+            filename: 'audio-en.mp3',
+            file_size_bytes: 0.5,
+            needs_update: false
+          }),
+          es: atof.createFromBackendDict({
+            filename: 'audio-es.mp3',
+            file_size_bytes: 0.5,
+            needs_update: false
+          })
+        });
     });
 });

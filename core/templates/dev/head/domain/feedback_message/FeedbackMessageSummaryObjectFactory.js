@@ -17,41 +17,43 @@
    message domain objects.
  */
 
-oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
-  var FeedbackMessageSummary = function(
-      messageId, text, updatedStatus, suggestionHtml, currentContentHtml,
-      description, authorUsername, authorPictureDataUrl, createdOn) {
-    this.messageId = messageId;
-    this.text = text;
-    this.updatedStatus = updatedStatus;
-    this.suggestionHtml = suggestionHtml;
-    this.currentContentHtml = currentContentHtml;
-    this.description = description;
-    this.authorUsername = authorUsername;
-    this.authorPictureDataUrl = authorPictureDataUrl;
-    this.createdOn = createdOn;
-  };
+oppia.factory('FeedbackMessageSummaryObjectFactory', [
+  function() {
+    var FeedbackMessageSummary = function(
+        messageId, text, updatedStatus, suggestionHtml, currentContentHtml,
+        description, authorUsername, authorPictureDataUrl, createdOn) {
+      this.messageId = messageId;
+      this.text = text;
+      this.updatedStatus = updatedStatus;
+      this.suggestionHtml = suggestionHtml;
+      this.currentContentHtml = currentContentHtml;
+      this.description = description;
+      this.authorUsername = authorUsername;
+      this.authorPictureDataUrl = authorPictureDataUrl;
+      this.createdOn = createdOn;
+    };
 
-  FeedbackMessageSummary.createNewMessage = function(
-      newMessageId, newMessageText, authorUsername, authorPictureDataUrl) {
-    return new FeedbackMessageSummary(
-      newMessageId, newMessageText, null, null, null, null, authorUsername,
-      authorPictureDataUrl, new Date());
-  };
+    FeedbackMessageSummary.createNewMessage = function(
+        newMessageId, newMessageText, authorUsername, authorPictureDataUrl) {
+      return new FeedbackMessageSummary(
+        newMessageId, newMessageText, null, null, null, null, authorUsername,
+        authorPictureDataUrl, new Date());
+    };
 
-  FeedbackMessageSummary.createFromBackendDict = function(
-      feedbackMessageSummaryBackendDict) {
-    return new FeedbackMessageSummary(
-      feedbackMessageSummaryBackendDict.message_id,
-      feedbackMessageSummaryBackendDict.text,
-      feedbackMessageSummaryBackendDict.updated_status,
-      feedbackMessageSummaryBackendDict.suggestion_html,
-      feedbackMessageSummaryBackendDict.current_content_html,
-      feedbackMessageSummaryBackendDict.description,
-      feedbackMessageSummaryBackendDict.author_username,
-      feedbackMessageSummaryBackendDict.author_picture_data_url,
-      feedbackMessageSummaryBackendDict.created_on);
-  };
+    FeedbackMessageSummary.createFromBackendDict = function(
+        feedbackMessageSummaryBackendDict) {
+      return new FeedbackMessageSummary(
+        feedbackMessageSummaryBackendDict.message_id,
+        feedbackMessageSummaryBackendDict.text,
+        feedbackMessageSummaryBackendDict.updated_status,
+        feedbackMessageSummaryBackendDict.suggestion_html,
+        feedbackMessageSummaryBackendDict.current_content_html,
+        feedbackMessageSummaryBackendDict.description,
+        feedbackMessageSummaryBackendDict.author_username,
+        feedbackMessageSummaryBackendDict.author_picture_data_url,
+        feedbackMessageSummaryBackendDict.created_on);
+    };
 
-  return FeedbackMessageSummary;
-}]);
+    return FeedbackMessageSummary;
+  }
+]);

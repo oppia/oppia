@@ -22,7 +22,8 @@ oppia.constant(
 oppia.animation('.oppia-collection-animate-slide', function() {
   return {
     enter: function(element) {
-      element.hide().slideDown();
+      element.hide()
+        .slideDown();
     },
     leave: function(element) {
       element.slideUp();
@@ -107,7 +108,8 @@ oppia.controller('CollectionPlayer', [
       $scope.explorationCardIsShown = true;
       $scope.currentExplorationId = explorationId;
       $scope.summaryToPreview = $scope.getCollectionNodeForExplorationId(
-        explorationId).getExplorationSummaryObject();
+        explorationId)
+        .getExplorationSummaryObject();
     };
 
     // Calculates the SVG parameters required to draw the curved path.
@@ -210,64 +212,68 @@ oppia.controller('CollectionPlayer', [
         '/explore/' + explorationId + '?collection_id=' + $scope.collectionId);
     };
 
-    $http.get('/collectionsummarieshandler/data', {
-      params: {
-        stringified_collection_ids: JSON.stringify([$scope.collectionId])
-      }
-    }).then(
-      function(response) {
-        $scope.collectionSummary = response.data.summaries[0];
-      },
-      function() {
-        AlertsService.addWarning(
-          'There was an error while fetching the collection summary.');
-      }
-    );
+    $http.get('/collectionsummarieshandler/data',
+      {
+        params: {
+          stringified_collection_ids:
+         JSON.stringify([$scope.collectionId])
+        }
+      })
+      .then(
+        function(response) {
+          $scope.collectionSummary = response.data.summaries[0];
+        },
+        function() {
+          AlertsService.addWarning(
+            'There was an error while fetching the collection summary.');
+        }
+      );
 
     // Load the collection the learner wants to view.
     ReadOnlyCollectionBackendApiService.loadCollection(
-      $scope.collectionId).then(
-      function(collectionBackendObject) {
-        $scope.collection = CollectionObjectFactory.create(
-          collectionBackendObject);
+      $scope.collectionId)
+      .then(
+        function(collectionBackendObject) {
+          $scope.collection = CollectionObjectFactory.create(
+            collectionBackendObject);
 
-        // Load the user's current progress in the collection. If the user is a
-        // guest, then either the defaults from the server will be used or the
-        // user's local progress, if any has been made and the collection is
-        // whitelisted.
-        var collectionAllowsGuestProgress = (
-          $scope.whitelistedCollectionIdsForGuestProgress.indexOf(
-            $scope.collectionId) !== -1);
-        if (!$scope.isLoggedIn && collectionAllowsGuestProgress &&
+          // Load the user's current progress in the collection. If the user is a
+          // guest, then either the defaults from the server will be used or the
+          // user's local progress, if any has been made and the collection is
+          // whitelisted.
+          var collectionAllowsGuestProgress = (
+            $scope.whitelistedCollectionIdsForGuestProgress.indexOf(
+              $scope.collectionId) !== -1);
+          if (!$scope.isLoggedIn && collectionAllowsGuestProgress &&
             GuestCollectionProgressService.hasCompletedSomeExploration(
               $scope.collectionId)) {
-          var completedExplorationIds = (
-            GuestCollectionProgressService.getCompletedExplorationIds(
-              $scope.collection));
-          var nextExplorationId = (
-            GuestCollectionProgressService.getNextExplorationId(
-              $scope.collection, completedExplorationIds));
-          $scope.collectionPlaythrough = (
-            CollectionPlaythroughObjectFactory.create(
-              nextExplorationId, completedExplorationIds));
-        } else {
-          $scope.collectionPlaythrough = (
-            CollectionPlaythroughObjectFactory.createFromBackendObject(
-              collectionBackendObject.playthrough_dict));
-        }
+            var completedExplorationIds = (
+              GuestCollectionProgressService.getCompletedExplorationIds(
+                $scope.collection));
+            var nextExplorationId = (
+              GuestCollectionProgressService.getNextExplorationId(
+                $scope.collection, completedExplorationIds));
+            $scope.collectionPlaythrough = (
+              CollectionPlaythroughObjectFactory.create(
+                nextExplorationId, completedExplorationIds));
+          } else {
+            $scope.collectionPlaythrough = (
+              CollectionPlaythroughObjectFactory.createFromBackendObject(
+                collectionBackendObject.playthrough_dict));
+          }
 
-        $scope.nextExplorationId =
+          $scope.nextExplorationId =
           $scope.collectionPlaythrough.getNextExplorationId();
-      },
-      function() {
+        },
+        function() {
         // TODO(bhenning): Handle not being able to load the collection.
         // NOTE TO DEVELOPERS: Check the backend console for an indication as to
         // why this error occurred; sometimes the errors are noisy, so they are
         // not shown to the user.
-        AlertsService.addWarning(
-          'There was an error loading the collection.');
-      }
-    );
+          AlertsService.addWarning(
+            'There was an error loading the collection.');
+        }
+      );
 
     $scope.$watch('collection', function(newValue) {
       if (newValue !== null) {

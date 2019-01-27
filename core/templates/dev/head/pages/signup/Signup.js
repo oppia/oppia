@@ -31,15 +31,16 @@ oppia.controller('Signup', [
     $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS;
     $scope.submissionInProcess = false;
 
-    $http.get(_SIGNUP_DATA_URL).then(function(response) {
-      var data = response.data;
-      $rootScope.loadingMessage = '';
-      $scope.username = data.username;
-      $scope.hasEverRegistered = data.has_ever_registered;
-      $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
-      $scope.hasUsername = Boolean($scope.username);
-      FocusManagerService.setFocus('usernameInputField');
-    });
+    $http.get(_SIGNUP_DATA_URL)
+      .then(function(response) {
+        var data = response.data;
+        $rootScope.loadingMessage = '';
+        $scope.username = data.username;
+        $scope.hasEverRegistered = data.has_ever_registered;
+        $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
+        $scope.hasUsername = Boolean($scope.username);
+        FocusManagerService.setFocus('usernameInputField');
+      });
 
     $scope.blurredAtLeastOnce = false;
     $scope.canReceiveEmailUpdates = null;
@@ -77,13 +78,12 @@ oppia.controller('Signup', [
       $scope.blurredAtLeastOnce = true;
       $scope.updateWarningText(username);
       if (!$scope.warningI18nCode) {
-        $http.post('usernamehandler/data', {
-          username: $scope.username
-        }).then(function(response) {
-          if (response.data.username_is_taken) {
-            $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
-          }
-        });
+        $http.post('usernamehandler/data', {username: $scope.username})
+          .then(function(response) {
+            if (response.data.username_is_taken) {
+              $scope.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
+            }
+          });
       }
     };
 
@@ -170,12 +170,13 @@ oppia.controller('Signup', [
       SiteAnalyticsService.registerNewSignupEvent();
 
       $scope.submissionInProcess = true;
-      $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
-        window.location = window.decodeURIComponent(
-          UrlService.getUrlParams().return_url);
-      }, function() {
-        $scope.submissionInProcess = false;
-      });
+      $http.post(_SIGNUP_DATA_URL, requestParams)
+        .then(function() {
+          window.location = window.decodeURIComponent(
+            UrlService.getUrlParams().return_url);
+        }, function() {
+          $scope.submissionInProcess = false;
+        });
     };
   }
 ]);

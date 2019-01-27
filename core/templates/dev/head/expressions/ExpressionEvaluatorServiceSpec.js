@@ -19,12 +19,12 @@ describe('Expression evaluator service', function() {
   var eps = null;
   var ests = null;
   var isString = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     ees = $injector.get('ExpressionEvaluatorService');
     eps = $injector.get('ExpressionParserService');
     ests = $injector.get('ExpressionSyntaxTreeService');
     isString = $injector.get('UtilsService').isString;
-  }));
+  }]);
 
   var ENVS = [
     {
@@ -56,8 +56,10 @@ describe('Expression evaluator service', function() {
       ['100 < num100_001 && 1 > num100_001', ['num100_001']],
       ['boolTrue == boolFalse', ['boolFalse', 'boolTrue']],
       ['strNull != strXYZ', ['strNull', 'strXYZ']],
-      ['if boolFalse then boolTrue else numZero', [
-        'boolFalse', 'boolTrue', 'numZero']],
+      [
+        'if boolFalse then boolTrue else numZero',
+        ['boolFalse', 'boolTrue', 'numZero']
+      ],
       ['num100_001 / 0', ['num100_001']],
       ['abs(-3)', []],
       ['pow(num100_001, numZero)', ['num100_001', 'numZero']],
@@ -92,7 +94,8 @@ describe('Expression evaluator service', function() {
       } catch (e) {
         recordFailure(undefined, e);
       }
-      expect(failed).toBe(false);
+      expect(failed)
+        .toBe(false);
     });
   });
 
@@ -161,7 +164,8 @@ describe('Expression evaluator service', function() {
           recordFailure(undefined, e);
         }
       }
-      expect(failed).toBe(false);
+      expect(failed)
+        .toBe(false);
 
       if (typeof expression !== 'string') {
         return;
@@ -179,7 +183,8 @@ describe('Expression evaluator service', function() {
           recordFailure(undefined, e);
         }
       }
-      expect(failed).toBe(false);
+      expect(failed)
+        .toBe(false);
     });
   });
 });

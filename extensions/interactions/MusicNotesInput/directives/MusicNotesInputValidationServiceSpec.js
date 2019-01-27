@@ -23,7 +23,7 @@ describe('MusicNotesInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     validatorService = $injector.get('MusicNotesInputValidationService');
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');
@@ -44,11 +44,12 @@ describe('MusicNotesInputValidationService', function() {
       missing_prerequisite_skill_id: null
     });
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
-  }));
+  }]);
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 });

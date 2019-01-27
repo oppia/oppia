@@ -99,4 +99,5 @@ oppia.directive('topicMainEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

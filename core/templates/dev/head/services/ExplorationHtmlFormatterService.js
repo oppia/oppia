@@ -73,7 +73,9 @@ oppia.factory('ExplorationHtmlFormatterService', [
           el.attr('choices', HtmlEscaperService.objToEscapedJson(
             interactionChoices));
         }
-        return ($('<div>').append(el)).html();
+        return ($('<div>')
+          .append(el))
+          .html();
       },
 
       getShortAnswerHtml: function(
@@ -92,7 +94,9 @@ oppia.factory('ExplorationHtmlFormatterService', [
           el.attr('choices', HtmlEscaperService.objToEscapedJson(
             interactionChoices));
         }
-        return ($('<span>').append(el)).html();
+        return ($('<span>')
+          .append(el))
+          .html();
       }
     };
   }

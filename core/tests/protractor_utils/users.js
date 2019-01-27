@@ -30,18 +30,23 @@ var login = function(email, isSuperAdmin) {
   var driver = browser.driver;
   driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
 
-  driver.findElement(protractor.By.name('email')).clear();
-  driver.findElement(protractor.By.name('email')).sendKeys(email);
+  driver.findElement(protractor.By.name('email'))
+    .clear();
+  driver.findElement(protractor.By.name('email'))
+    .sendKeys(email);
   if (isSuperAdmin) {
-    driver.findElement(protractor.By.name('admin')).click();
+    driver.findElement(protractor.By.name('admin'))
+      .click();
   }
-  driver.findElement(protractor.By.id('submit-login')).click();
+  driver.findElement(protractor.By.id('submit-login'))
+    .click();
 };
 
 var logout = function() {
   var driver = browser.driver;
   driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
-  driver.findElement(protractor.By.id('submit-logout')).click();
+  driver.findElement(protractor.By.id('submit-logout'))
+    .click();
 };
 
 // The user needs to log in immediately before this method is called. Note

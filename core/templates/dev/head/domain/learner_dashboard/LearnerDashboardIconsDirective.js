@@ -53,13 +53,15 @@ oppia.directive('learnerDashboardIcons', [
             $scope.activityIsCurrentlyHoveredOver = $scope.activityActive;
           });
 
-          LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
-            function(response) {
-              $scope.learnerDashboardActivityIds = (
-                LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
-                  response.data.learner_dashboard_activity_ids));
-            }
-          );
+          LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds()
+            .then(
+              function(response) {
+                $scope.learnerDashboardActivityIds = (
+                  LearnerDashboardActivityIdsObjectFactory
+                    .createFromBackendDict(
+                      response.data.learner_dashboard_activity_ids));
+              }
+            );
 
           $scope.setHoverState = function(hoverState) {
             $scope.activityIsCurrentlyHoveredOver = hoverState;
@@ -161,4 +163,5 @@ oppia.directive('learnerDashboardIcons', [
         }
       ]
     };
-  }]);
+  }
+]);

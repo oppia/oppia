@@ -76,31 +76,34 @@ oppia.factory('SkillEditorStateService', [
       loadSkill: function(skillId) {
         _skillIsBeingLoaded = true;
         EditableSkillBackendApiService.fetchSkill(
-          skillId).then(
-          function(newBackendSkillObject) {
-            _updateSkill(newBackendSkillObject);
-            EditableSkillBackendApiService.fetchQuestions(
-              skillId, _nextCursorForQuestions).then(
-              function(returnObject) {
-                _setQuestionSummaries(returnObject.questionSummaries);
-                _setNextQuestionsCursor(returnObject.nextCursor);
-              }
-            );
+          skillId)
+          .then(
+            function(newBackendSkillObject) {
+              _updateSkill(newBackendSkillObject);
+              EditableSkillBackendApiService.fetchQuestions(
+                skillId, _nextCursorForQuestions)
+                .then(
+                  function(returnObject) {
+                    _setQuestionSummaries(returnObject.questionSummaries);
+                    _setNextQuestionsCursor(returnObject.nextCursor);
+                  }
+                );
+              _skillIsBeingLoaded = false;
+            }, function(error) {
+              AlertsService.addWarning();
+              _skillIsBeingLoaded = false;
+            });
+        SkillRightsBackendApiService.fetchSkillRights(
+          skillId)
+          .then(function(newBackendSkillRightsObject) {
+            _updateSkillRights(newBackendSkillRightsObject);
             _skillIsBeingLoaded = false;
           }, function(error) {
-            AlertsService.addWarning();
+            AlertsService.addWarning(
+              error ||
+            'There was an error when loading the skill rights.');
             _skillIsBeingLoaded = false;
           });
-        SkillRightsBackendApiService.fetchSkillRights(
-          skillId).then(function(newBackendSkillRightsObject) {
-          _updateSkillRights(newBackendSkillRightsObject);
-          _skillIsBeingLoaded = false;
-        }, function(error) {
-          AlertsService.addWarning(
-            error ||
-            'There was an error when loading the skill rights.');
-          _skillIsBeingLoaded = false;
-        });
       },
 
       isLoadingSkill: function() {
@@ -119,12 +122,13 @@ oppia.factory('SkillEditorStateService', [
           _nextCursorForQuestions = '';
         }
         EditableSkillBackendApiService.fetchQuestions(
-          skillId, _nextCursorForQuestions).then(
-          function(returnObject) {
-            _setQuestionSummaries(returnObject.questionSummaries);
-            _setNextQuestionsCursor(returnObject.nextCursor);
-          }
-        );
+          skillId, _nextCursorForQuestions)
+          .then(
+            function(returnObject) {
+              _setQuestionSummaries(returnObject.questionSummaries);
+              _setNextQuestionsCursor(returnObject.nextCursor);
+            }
+          );
       },
 
       getQuestionSummaries: function(index) {
@@ -154,19 +158,20 @@ oppia.factory('SkillEditorStateService', [
         _skillIsBeingSaved = true;
         EditableSkillBackendApiService.updateSkill(
           _skill.getId(), _skill.getVersion(), commitMessage,
-          UndoRedoService.getCommittableChangeList()).then(
-          function(skillBackendObject) {
-            _updateSkill(skillBackendObject);
-            UndoRedoService.clearChanges();
-            _skillIsBeingSaved = false;
-            if (successCallback) {
-              successCallback();
-            }
-          }, function(error) {
-            AlertsService.addWarning(
-              error || 'There was an error when saving the skill');
-            _skillIsBeingSaved = false;
-          });
+          UndoRedoService.getCommittableChangeList())
+          .then(
+            function(skillBackendObject) {
+              _updateSkill(skillBackendObject);
+              UndoRedoService.clearChanges();
+              _skillIsBeingSaved = false;
+              if (successCallback) {
+                successCallback();
+              }
+            }, function(error) {
+              AlertsService.addWarning(
+                error || 'There was an error when saving the skill');
+              _skillIsBeingSaved = false;
+            });
         return true;
       },
 
@@ -182,4 +187,5 @@ oppia.factory('SkillEditorStateService', [
         _setSkillRights(skillRights);
       }
     };
-  }]);
+  }
+]);

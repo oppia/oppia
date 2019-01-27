@@ -19,13 +19,13 @@
 describe('PlaythroughIssuesBackendApiService', function() {
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     this.PlaythroughIssuesBackendApiService =
       $injector.get('PlaythroughIssuesBackendApiService');
     this.$httpBackend = $injector.get('$httpBackend');
     this.piof = $injector.get('PlaythroughIssueObjectFactory');
     this.pof = $injector.get('PlaythroughObjectFactory');
-  }));
+  }]);
 
   afterEach(function() {
     this.$httpBackend.verifyNoOutstandingExpectation();
@@ -34,46 +34,43 @@ describe('PlaythroughIssuesBackendApiService', function() {
 
   describe('.fetch', function() {
     it('returns the issues data provided by the backend', function() {
-      var backendIssues = [{
-        issue_type: 'EarlyQuit',
-        issue_customization_args: {
-          state_name: {
-            value: 'state_name1'
+      var backendIssues = [
+        {
+          issue_type: 'EarlyQuit',
+          issue_customization_args: {
+            state_name: {value: 'state_name1'},
+            time_spent_in_exp_in_msecs: {value: 200}
           },
-          time_spent_in_exp_in_msecs: {
-            value: 200
-          }
-        },
-        playthrough_ids: ['playthrough_id1'],
-        schema_version: 1,
-        is_valid: true
-      }, {
-        issue_type: 'MultipleIncorrectSubmissions',
-        issue_customization_args: {
-          state_name: {
-            value: 'state_name1'
+          playthrough_ids: ['playthrough_id1'],
+          schema_version: 1,
+          is_valid: true
+        }, {
+          issue_type: 'MultipleIncorrectSubmissions',
+          issue_customization_args: {
+            state_name: {value: 'state_name1'},
+            num_times_answered_incorrectly: {value: 7}
           },
-          num_times_answered_incorrectly: {
-            value: 7
-          }
-        },
-        playthrough_ids: ['playthrough_id2'],
-        schema_version: 1,
-        is_valid: true
-      }];
+          playthrough_ids: ['playthrough_id2'],
+          schema_version: 1,
+          is_valid: true
+        }
+      ];
 
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
       this.$httpBackend.expectGET(
         '/issuesdatahandler/7?exp_version=1'
-      ).respond(backendIssues);
+      )
+        .respond(backendIssues);
 
-      this.PlaythroughIssuesBackendApiService.fetchIssues('7', 1).then(
-        successHandler, failureHandler);
+      this.PlaythroughIssuesBackendApiService.fetchIssues('7', 1)
+        .then(
+          successHandler, failureHandler);
       this.$httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        backendIssues.map(this.piof.createFromBackendDict));
+      expect(successHandler)
+        .toHaveBeenCalledWith(
+          backendIssues.map(this.piof.createFromBackendDict));
       expect(failureHandler).not.toHaveBeenCalled();
     });
 
@@ -83,36 +80,33 @@ describe('PlaythroughIssuesBackendApiService', function() {
         exp_version: 1,
         issue_type: 'EarlyQuit',
         issue_customization_args: {
-          state_name: {
-            value: 'state_name1'
-          },
-          time_spent_in_exp_in_msecs: {
-            value: 200
-          }
+          state_name: {value: 'state_name1'},
+          time_spent_in_exp_in_msecs: {value: 200}
         },
-        actions: [{
-          action_type: 'ExplorationStart',
-          action_customization_args: {
-            state_name: {
-              value: 'state_name1'
-            }
-          },
-          schema_version: 1
-        }]
+        actions: [
+          {
+            action_type: 'ExplorationStart',
+            action_customization_args: {state_name: {value: 'state_name1'}},
+            schema_version: 1
+          }
+        ]
       };
 
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
       this.$httpBackend.expectGET(
         '/playthroughdatahandler/7/1'
-      ).respond(backendPlaythrough);
+      )
+        .respond(backendPlaythrough);
 
-      this.PlaythroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
-        successHandler, failureHandler);
+      this.PlaythroughIssuesBackendApiService.fetchPlaythrough('7', '1')
+        .then(
+          successHandler, failureHandler);
       this.$httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        this.pof.createFromBackendDict(backendPlaythrough));
+      expect(successHandler)
+        .toHaveBeenCalledWith(
+          this.pof.createFromBackendDict(backendPlaythrough));
       expect(failureHandler).not.toHaveBeenCalled();
     });
   });

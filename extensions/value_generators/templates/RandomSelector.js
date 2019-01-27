@@ -12,34 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-oppia.directive('randomSelector', ['$compile', function($compile) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return '/value_generator_handler/' + scope.generatorId;
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: {
-      customizationArgs: '=',
-      getGeneratorId: '&'
-    },
-    template: '<div ng-include="getTemplateUrl()"></div>',
-    controller: function($scope) {
-      $scope.SCHEMA = {
-        type: 'list',
-        items: {
-          type: 'unicode'
-        },
-        ui_config: {
-          add_element_text: 'Add New Choice'
+oppia.directive('randomSelector', [
+  '$compile', function($compile) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return '/value_generator_handler/' + scope.generatorId;
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: {
+        customizationArgs: '=',
+        getGeneratorId: '&'
+      },
+      template: '<div ng-include="getTemplateUrl()"></div>',
+      controller: function($scope) {
+        $scope.SCHEMA = {
+          type: 'list',
+          items: {type: 'unicode'},
+          ui_config: {add_element_text: 'Add New Choice'}
+        };
+        $scope.generatorId = $scope.getGeneratorId();
+        if (!$scope.customizationArgs.list_of_values) {
+          $scope.customizationArgs.list_of_values = [];
         }
-      };
-      $scope.generatorId = $scope.getGeneratorId();
-      if (!$scope.customizationArgs.list_of_values) {
-        $scope.customizationArgs.list_of_values = [];
       }
-    }
-  };
-}]);
+    };
+  }
+]);

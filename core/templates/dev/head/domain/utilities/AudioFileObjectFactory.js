@@ -28,5 +28,6 @@ oppia.factory('AudioFileObjectFactory', [
     };
 
     return AudioFile;
-  }]
+  }
+]
 );

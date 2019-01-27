@@ -23,10 +23,11 @@ oppia.controller('Splash', [
       UrlInterpolationService, UserService) {
     $scope.userIsLoggedIn = null;
     $rootScope.loadingMessage = 'Loading';
-    UserService.getUserInfoAsync().then(function(userInfo) {
-      $scope.userIsLoggedIn = userInfo.isLoggedIn();
-      $rootScope.loadingMessage = '';
-    });
+    UserService.getUserInfoAsync()
+      .then(function(userInfo) {
+        $scope.userIsLoggedIn = userInfo.isLoggedIn();
+        $rootScope.loadingMessage = '';
+      });
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.getStaticSubjectImageUrl = function(subjectName) {
       return UrlInterpolationService.getStaticImageUrl('/subjects/' +

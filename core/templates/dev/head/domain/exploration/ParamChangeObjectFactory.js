@@ -17,54 +17,54 @@
  * domain objects.
  */
 
-oppia.factory('ParamChangeObjectFactory', [function() {
-  var ParamChange = function(customizationArgs, generatorId, name) {
-    this.customizationArgs = customizationArgs;
-    this.generatorId = generatorId;
-    this.name = name;
-  };
-
-  var DEFAULT_CUSTOMIZATION_ARGS = {
-    Copier: {
-      parse_with_jinja: true,
-      value: '5'
-    },
-    RandomSelector: {
-      list_of_values: ['sample value']
-    }
-  };
-
-  ParamChange.prototype.toBackendDict = function() {
-    return {
-      customization_args: this.customizationArgs,
-      generator_id: this.generatorId,
-      name: this.name
+oppia.factory('ParamChangeObjectFactory', [
+  function() {
+    var ParamChange = function(customizationArgs, generatorId, name) {
+      this.customizationArgs = customizationArgs;
+      this.generatorId = generatorId;
+      this.name = name;
     };
-  };
 
-  ParamChange.prototype.resetCustomizationArgs = function() {
-    this.customizationArgs = angular.copy(
-      DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
-  };
+    var DEFAULT_CUSTOMIZATION_ARGS = {
+      Copier: {
+        parse_with_jinja: true,
+        value: '5'
+      },
+      RandomSelector: {list_of_values: ['sample value']}
+    };
 
-  ParamChange.createFromBackendDict = function(paramChangeBackendDict) {
-    return new ParamChange(
-      paramChangeBackendDict.customization_args,
-      paramChangeBackendDict.generator_id,
-      paramChangeBackendDict.name);
-  };
+    ParamChange.prototype.toBackendDict = function() {
+      return {
+        customization_args: this.customizationArgs,
+        generator_id: this.generatorId,
+        name: this.name
+      };
+    };
 
-  ParamChange.createEmpty = function(paramName) {
-    return new ParamChange({
-      parse_with_jinja: true,
-      value: ''
-    }, 'Copier', paramName);
-  };
+    ParamChange.prototype.resetCustomizationArgs = function() {
+      this.customizationArgs = angular.copy(
+        DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
+    };
 
-  ParamChange.createDefault = function(paramName) {
-    return new ParamChange(
-      angular.copy(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
-  };
+    ParamChange.createFromBackendDict = function(paramChangeBackendDict) {
+      return new ParamChange(
+        paramChangeBackendDict.customization_args,
+        paramChangeBackendDict.generator_id,
+        paramChangeBackendDict.name);
+    };
 
-  return ParamChange;
-}]);
+    ParamChange.createEmpty = function(paramName) {
+      return new ParamChange({
+        parse_with_jinja: true,
+        value: ''
+      }, 'Copier', paramName);
+    };
+
+    ParamChange.createDefault = function(paramName) {
+      return new ParamChange(
+        angular.copy(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
+    };
+
+    return ParamChange;
+  }
+]);

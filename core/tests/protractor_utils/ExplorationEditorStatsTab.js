@@ -34,7 +34,8 @@ var ExplorationEditorStatsTab = function() {
   };
 
   var _getIssueText = function(issueIndex) {
-    return _getIssueElement(issueIndex).getText();
+    return _getIssueElement(issueIndex)
+      .getText();
   };
 
   var _getIssueTitle = function() {
@@ -46,16 +47,20 @@ var ExplorationEditorStatsTab = function() {
   };
 
   this.expectNumPassersbyToBe = function(numPassersby) {
-    expect(_getNumPassersby()).toMatch(numPassersby);
+    expect(_getNumPassersby())
+      .toMatch(numPassersby);
   };
 
   this.clickIssue = function(issueIndex, expectedIssueText) {
-    expect(_getIssueText(issueIndex)).toMatch(expectedIssueText);
-    _getIssueElement(issueIndex).click();
+    expect(_getIssueText(issueIndex))
+      .toMatch(expectedIssueText);
+    _getIssueElement(issueIndex)
+      .click();
   };
 
   this.expectIssueTitleToBe = function(issueTitle) {
-    expect(_getIssueTitle()).toMatch(issueTitle);
+    expect(_getIssueTitle())
+      .toMatch(issueTitle);
   };
 
   this.markResolved = function() {

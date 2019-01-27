@@ -21,7 +21,7 @@ describe('States object factory', function() {
 
   describe('StatesObjectFactory', function() {
     var scope, sof, statesDict, statesWithAudioDict, atof;
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       ssof = $injector.get('StatesObjectFactory');
       sof = $injector.get('StateObjectFactory');
       atof = $injector.get('AudioTranslationObjectFactory');
@@ -40,12 +40,8 @@ describe('States object factory', function() {
           answer_groups: [],
           confirmed_unclassified_answers: [],
           customization_args: {
-            rows: {
-              value: 1
-            },
-            placeholder: {
-              value: 'Type your answer here.'
-            }
+            rows: {value: 1},
+            placeholder: {value: 'Type your answer here.'}
           },
           default_outcome: {
             dest: '(untitled state)',
@@ -74,24 +70,26 @@ describe('States object factory', function() {
           },
           interaction: {
             id: 'RuleTest',
-            answer_groups: [{
-              outcome: {
-                dest: 'outcome 1',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
+            answer_groups: [
+              {
+                outcome: {
+                  dest: 'outcome 1',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ''
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null
                 },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
-              },
-              rule_specs: [{
-                inputs: {
-                  x: 10
-                },
-                rule_type: 'Equals'
-              }],
-            }],
+                rule_specs: [
+                  {
+                    inputs: {x: 10},
+                    rule_type: 'Equals'
+                  }
+                ],
+              }
+            ],
             default_outcome: {
               dest: 'default',
               feedback: {
@@ -167,24 +165,26 @@ describe('States object factory', function() {
             }
           },
           interaction: {
-            answer_groups: [{
-              outcome: {
-                dest: 'second state',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: '<p>Good.</p>'
+            answer_groups: [
+              {
+                outcome: {
+                  dest: 'second state',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: '<p>Good.</p>'
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null
                 },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
-              },
-              rule_specs: [{
-                inputs: {
-                  x: 20
-                },
-                rule_type: 'Equals'
-              }]
-            }],
+                rule_specs: [
+                  {
+                    inputs: {x: 20},
+                    rule_type: 'Equals'
+                  }
+                ]
+              }
+            ],
             confirmed_unclassified_answers: [],
             customization_args: {},
             default_outcome: {
@@ -196,17 +196,19 @@ describe('States object factory', function() {
               labelled_as_correct: false,
               param_changes: []
             },
-            hints: [{
-              hint_content: {
-                content_id: 'hint_1',
-                html: '<p>Here is a hint.</p>'
+            hints: [
+              {
+                hint_content: {
+                  content_id: 'hint_1',
+                  html: '<p>Here is a hint.</p>'
+                }
+              }, {
+                hint_content: {
+                  content_id: 'hint_2',
+                  html: '<p>Here is another hint.</p>'
+                }
               }
-            }, {
-              hint_content: {
-                content_id: 'hint_2',
-                html: '<p>Here is another hint.</p>'
-              }
-            }],
+            ],
             id: 'TextInput'
           },
           param_changes: []
@@ -260,46 +262,43 @@ describe('States object factory', function() {
           param_changes: []
         }
       };
-    }));
+    }]);
 
     it('should create a new state given a state name', function() {
       var newStates = ssof.createFromBackendDict(statesDict);
       newStates.addState('new state');
-      expect(newStates.getState('new state')).toEqual(
-        sof.createFromBackendDict('new state', {
-          classifier_model_id: null,
-          content: {
-            content_id: 'content',
-            html: ''
-          },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
-          },
-          interaction: {
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              rows: {
-                value: 1
-              },
-              placeholder: {
-                value: 'Type your answer here.'
-              }
+      expect(newStates.getState('new state'))
+        .toEqual(
+          sof.createFromBackendDict('new state', {
+            classifier_model_id: null,
+            content: {
+              content_id: 'content',
+              html: ''
             },
-            default_outcome: {
-              dest: 'new state',
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
-              },
-              param_changes: []
+            content_ids_to_audio_translations: {
+              content: {},
+              default_outcome: {}
             },
-            hints: [],
-            id: 'TextInput'
-          },
-          param_changes: []
-        }));
+            interaction: {
+              answer_groups: [],
+              confirmed_unclassified_answers: [],
+              customization_args: {
+                rows: {value: 1},
+                placeholder: {value: 'Type your answer here.'}
+              },
+              default_outcome: {
+                dest: 'new state',
+                feedback: {
+                  content_id: 'default_outcome',
+                  html: ''
+                },
+                param_changes: []
+              },
+              hints: [],
+              id: 'TextInput'
+            },
+            param_changes: []
+          }));
     });
 
     it('should correctly get all audio language codes in states', function() {
@@ -312,20 +311,24 @@ describe('States object factory', function() {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
       expect(statesWithAudio.getAllAudioTranslations('hi-en'))
         .toEqual({
-          'first state': [atof.createFromBackendDict({
-            filename: 'myfile3.mp3',
-            file_size_bytes: 0.8,
-            needs_update: false
-          }), atof.createFromBackendDict({
-            filename: 'myfile8.mp3',
-            file_size_bytes: 1.2,
-            needs_update: false
-          })],
-          'second state': [atof.createFromBackendDict({
-            filename: 'myfile2.mp3',
-            file_size_bytes: 0.8,
-            needs_update: false
-          })]
+          'first state': [
+            atof.createFromBackendDict({
+              filename: 'myfile3.mp3',
+              file_size_bytes: 0.8,
+              needs_update: false
+            }), atof.createFromBackendDict({
+              filename: 'myfile8.mp3',
+              file_size_bytes: 1.2,
+              needs_update: false
+            })
+          ],
+          'second state': [
+            atof.createFromBackendDict({
+              filename: 'myfile2.mp3',
+              file_size_bytes: 0.8,
+              needs_update: false
+            })
+          ]
         });
     });
   });

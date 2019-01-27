@@ -17,7 +17,8 @@
  * in the translation tab is currently active.
  */
 
-oppia.factory('TranslationLanguageService', ['$log', 'LanguageUtilService',
+oppia.factory('TranslationLanguageService', [
+  '$log', 'LanguageUtilService',
   function($log, LanguageUtilService) {
     var activeLanguageCode = null;
     var allAudioLanguageCodes = LanguageUtilService.getAllAudioLanguageCodes();
@@ -33,4 +34,5 @@ oppia.factory('TranslationLanguageService', ['$log', 'LanguageUtilService',
         activeLanguageCode = newActiveLanguageCode;
       }
     };
-  }]);
+  }
+]);

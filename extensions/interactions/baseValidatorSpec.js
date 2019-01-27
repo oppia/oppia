@@ -35,7 +35,7 @@ describe('Interaction validator', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector, $rootScope) {
+  beforeEach(inject[function($injector, $rootScope) {
     scope = $rootScope.$new();
     filter = $injector.get('$filter');
     bivs = $injector.get('baseInteractionValidationService');
@@ -84,14 +84,15 @@ describe('Interaction validator', function() {
       agof.createNew([], goodOutcomeFeedback, false, null)
     ];
     goodDefaultOutcome = goodOutcomeDest;
-  }));
+  }]);
 
   describe('baseValidator', function() {
     it('should have no warnings for good answer groups with no ' +
         'confusing outcomes', function() {
       var warnings = bivs.getAnswerGroupWarnings(
         goodAnswerGroups, currentState);
-      expect(warnings).toEqual([]);
+      expect(warnings)
+        .toEqual([]);
     });
 
     it('should have a warning for an answer group with a confusing outcome',
@@ -102,10 +103,13 @@ describe('Interaction validator', function() {
           agof.createNew([], goodOutcomeFeedback, false, null)
         ];
         var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
-        expect(warnings).toEqual([{
-          type: WARNING_TYPES.ERROR,
-          message: 'Please specify what Oppia should do in answer group 2.'
-        }]);
+        expect(warnings)
+          .toEqual([
+            {
+              type: WARNING_TYPES.ERROR,
+              message: 'Please specify what Oppia should do in answer group 2.'
+            }
+          ]);
       }
     );
 
@@ -113,27 +117,33 @@ describe('Interaction validator', function() {
       function() {
         var warnings = bivs.getDefaultOutcomeWarnings(
           goodOutcomeDest, currentState);
-        expect(warnings).toEqual([]);
+        expect(warnings)
+          .toEqual([]);
 
         warnings = bivs.getDefaultOutcomeWarnings(
           goodOutcomeFeedback, currentState);
-        expect(warnings).toEqual([]);
+        expect(warnings)
+          .toEqual([]);
       }
     );
 
     it('should have a warning for a confusing default outcome', function() {
       var warnings = bivs.getDefaultOutcomeWarnings(badOutcome, currentState);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Please add feedback for the user in the [All other ' +
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.ERROR,
+            message: 'Please add feedback for the user in the [All other ' +
           'answers] rule.'
-      }]);
+          }
+        ]);
     });
 
     it('should not have any warnings for no answer groups and a null default ' +
         'outcome.', function() {
       var warnings = bivs.getAllOutcomeWarnings([], null, currentState);
-      expect(warnings).toEqual([]);
+      expect(warnings)
+        .toEqual([]);
     });
 
     it('should be able to concatenate warnings for both answer groups and ' +
@@ -145,18 +155,21 @@ describe('Interaction validator', function() {
       ];
       var warnings = bivs.getAllOutcomeWarnings(
         badAnswerGroups, badOutcome, currentState);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Please specify what Oppia should do in answer group 2.'
-      }, {
-        type: WARNING_TYPES.ERROR,
-        message: 'Please specify what Oppia should do in answer group 3.'
-      }, {
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'Please add feedback for the user in the [All other answers] rule.')
-      }
-      ]);
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.ERROR,
+            message: 'Please specify what Oppia should do in answer group 2.'
+          }, {
+            type: WARNING_TYPES.ERROR,
+            message: 'Please specify what Oppia should do in answer group 3.'
+          }, {
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Please add feedback for the user in the [All other answers]' +
+              ' rule.')
+          }
+        ]);
     });
   });
 
@@ -168,7 +181,8 @@ describe('Interaction validator', function() {
     it('should throw a warning for a missing top-level field', function() {
       expect(function() {
         bivs.requireCustomizationArguments({}, ['levelone']);
-      }).toThrow('Expected customization arguments to have property: levelone');
+      })
+        .toThrow('Expected customization arguments to have property: levelone');
     });
 
     it('should throw warnings for multiple missing top-level fields',
@@ -176,8 +190,10 @@ describe('Interaction validator', function() {
         var expectedArgs = ['first', 'second'];
         expect(function() {
           bivs.requireCustomizationArguments({}, expectedArgs);
-        }).toThrow(
-          'Expected customization arguments to have properties: first, second');
+        })
+          .toThrow(
+            'Expected customization arguments to have properties: ' +
+            'first, second');
       }
     );
   });

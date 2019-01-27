@@ -23,7 +23,8 @@ var general = require('../../../core/tests/protractor_utils/general.js');
 var customizeComponent = function(modal, heading, contentInstructions) {
   forms.UnicodeEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
-  ).setValue(heading);
+  )
+    .setValue(heading);
   var richTextEditor = forms.RichTextEditor(
     modal.element(by.tagName('schema-based-html-editor')));
   richTextEditor.clear();
@@ -34,13 +35,16 @@ var expectComponentDetailsToMatch = function(
     elem, heading, contentInstructions) {
   var headerElement = elem.element(by.css(
     '.protractor-test-collapsible-heading'));
-  expect(headerElement.getText()).toMatch(heading);
+  expect(headerElement.getText())
+    .toMatch(heading);
   // Open the collapsible block so we can examine it.
   headerElement.click();
   forms.expectRichText(
-    elem.element(by.css('.panel-body')).element(by.css(
-      '.protractor-test-collapsible-content'))
-  ).toMatch(contentInstructions);
+    elem.element(by.css('.panel-body'))
+      .element(by.css(
+        '.protractor-test-collapsible-content'))
+  )
+    .toMatch(contentInstructions);
 };
 
 exports.customizeComponent = customizeComponent;

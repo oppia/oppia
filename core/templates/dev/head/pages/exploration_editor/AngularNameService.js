@@ -16,14 +16,17 @@
  * @fileoverview A service that maps IDs to Angular names.
  */
 
-oppia.factory('AngularNameService', [function() {
-  var angularName = null;
+oppia.factory('AngularNameService', [
+  function() {
+    var angularName = null;
 
-  return {
-    getNameOfInteractionRulesService: function(interactionId) {
-      angularName = interactionId.charAt(0).toLowerCase() +
+    return {
+      getNameOfInteractionRulesService: function(interactionId) {
+        angularName = interactionId.charAt(0)
+          .toLowerCase() +
         interactionId.slice(1) + 'RulesService';
-      return angularName;
-    }
-  };
-}]);
+        return angularName;
+      }
+    };
+  }
+]);

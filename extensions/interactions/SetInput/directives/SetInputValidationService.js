@@ -26,9 +26,10 @@ oppia.factory('SetInputValidationService', [
       },
       getAllWarnings: function(
           stateName, customizationArgs, answerGroups, defaultOutcome) {
-        return this.getCustomizationArgsWarnings(customizationArgs).concat(
-          baseInteractionValidationService.getAllOutcomeWarnings(
-            answerGroups, defaultOutcome, stateName));
+        return this.getCustomizationArgsWarnings(customizationArgs)
+          .concat(
+            baseInteractionValidationService.getAllOutcomeWarnings(
+              answerGroups, defaultOutcome, stateName));
       }
     };
   }

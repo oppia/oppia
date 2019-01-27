@@ -438,8 +438,10 @@ oppia.directive('stateResponses', [
 
           $scope.saveTaggedMisconception = function(misconceptionId) {
             ResponsesService.updateActiveAnswerGroup({
-              taggedMisconceptionId: misconceptionId
-            }, function(newAnswerGroups) {
+              taggedMisconceptionId:
+              misconceptionId
+            },
+            function(newAnswerGroups) {
               $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
               $scope.refreshWarnings()();
             });
@@ -447,8 +449,10 @@ oppia.directive('stateResponses', [
 
           $scope.saveActiveAnswerGroupFeedback = function(updatedOutcome) {
             ResponsesService.updateActiveAnswerGroup({
-              feedback: updatedOutcome.feedback
-            }, function(newAnswerGroups) {
+              feedback:
+               updatedOutcome.feedback
+            },
+            function(newAnswerGroups) {
               $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
               $scope.refreshWarnings()();
             });
@@ -469,26 +473,29 @@ oppia.directive('stateResponses', [
           $scope.saveActiveAnswerGroupCorrectnessLabel = function(
               updatedOutcome) {
             ResponsesService.updateActiveAnswerGroup({
-              labelledAsCorrect: updatedOutcome.labelledAsCorrect
-            }, function(newAnswerGroups) {
+              labelledAsCorrect:
+              updatedOutcome.labelledAsCorrect
+            },
+            function(newAnswerGroups) {
               $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
               $scope.refreshWarnings()();
             });
           };
 
           $scope.saveActiveAnswerGroupRules = function(updatedRules) {
-            ResponsesService.updateActiveAnswerGroup({
-              rules: updatedRules
-            }, function(newAnswerGroups) {
-              $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
-              $scope.refreshWarnings()();
-            });
+            ResponsesService.updateActiveAnswerGroup({rules: updatedRules},
+              function(newAnswerGroups) {
+                $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                $scope.refreshWarnings()();
+              });
           };
 
           $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {
             ResponsesService.updateDefaultOutcome({
-              feedback: updatedOutcome.feedback
-            }, function(newDefaultOutcome) {
+              feedback:
+              updatedOutcome.feedback
+            },
+            function(newDefaultOutcome) {
               $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
             });
           };
@@ -506,8 +513,10 @@ oppia.directive('stateResponses', [
 
           $scope.saveDefaultOutcomeCorrectnessLabel = function(updatedOutcome) {
             ResponsesService.updateDefaultOutcome({
-              labelledAsCorrect: updatedOutcome.labelledAsCorrect
-            }, function(newDefaultOutcome) {
+              labelledAsCorrect:
+              updatedOutcome.labelledAsCorrect
+            },
+            function(newDefaultOutcome) {
               $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
             });
           };
@@ -588,4 +597,5 @@ oppia.directive('stateResponses', [
         }
       ]
     };
-  }]);
+  }
+]);

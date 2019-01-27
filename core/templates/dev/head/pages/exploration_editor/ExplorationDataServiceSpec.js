@@ -44,13 +44,9 @@ describe('Exploration data service', function() {
     });
 
     beforeEach(function() {
-      mockUrlService = {
-        getPathname: function() {}
-      };
+      mockUrlService = {getPathname: function() {}};
 
-      mockBackendApiService = {
-        fetchApplyDraftExploration: function() {}
-      };
+      mockBackendApiService = {fetchApplyDraftExploration: function() {}};
 
       mockLocalStorageService = {
         getExplorationDraft: function() {},
@@ -59,15 +55,13 @@ describe('Exploration data service', function() {
       spyOn(mockUrlService, 'getPathname').and.returnValue('/create/exp_id');
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       eds = $injector.get('ExplorationDataService');
       $q = $injector.get('$q');
-    }));
+    }]);
 
     beforeEach(function() {
-      expDataResponse = {
-        draft_change_list_id: 3,
-      };
+      expDataResponse = {draft_change_list_id: 3, };
 
       responseWhenDraftChangesAreValid = {
         isValid: function() {
@@ -97,9 +91,11 @@ describe('Exploration data service', function() {
       errorCallback = function() {};
       spyOn(mockLocalStorageService, 'getExplorationDraft').
         and.returnValue(responseWhenDraftChangesAreValid);
-      eds.getData(errorCallback).then(function(data) {
-        expect(eds.autosaveChangeList()).toHaveBeenCalled();
-      });
+      eds.getData(errorCallback)
+        .then(function(data) {
+          expect(eds.autosaveChangeList())
+            .toHaveBeenCalled();
+        });
     });
 
     it('should call error callback when draft ids do not match', function() {
@@ -107,9 +103,11 @@ describe('Exploration data service', function() {
       spyOn(mockLocalStorageService, 'getExplorationDraft').
         and.returnValue(responseWhenDraftChangesAreInvalid);
       spyOn(window, 'errorCallback');
-      eds.getData(errorCallback).then(function(data) {
-        expect(errorCallback()).toHaveBeenCalled();
-      });
+      eds.getData(errorCallback)
+        .then(function(data) {
+          expect(errorCallback())
+            .toHaveBeenCalled();
+        });
     });
   });
 });

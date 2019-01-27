@@ -16,12 +16,17 @@
  * @fileoverview Service for generating random IDs.
  */
 
-oppia.factory('IdGenerationService', [function() {
-  return {
-    generateNewId: function() {
+oppia.factory('IdGenerationService', [
+  function() {
+    return {
+      generateNewId: function() {
       // Generates random string using the last 10 digits of
       // the string for better entropy.
-      return Math.random().toString(36).slice(2).slice(-10);
-    }
-  };
-}]);
+        return Math.random()
+          .toString(36)
+          .slice(2)
+          .slice(-10);
+      }
+    };
+  }
+]);

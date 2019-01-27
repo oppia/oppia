@@ -97,4 +97,5 @@ oppia.directive('solutionExplanationEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

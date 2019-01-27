@@ -143,18 +143,22 @@ var ExplorationPlayerPage = function() {
   this.expectContentToMatch = function(richTextInstructions) {
     forms.expectRichText(
       conversationContent.last()
-    ).toMatch(richTextInstructions);
+    )
+      .toMatch(richTextInstructions);
   };
 
   this.expectExplorationToBeOver = function() {
     expect(
-      conversationContent.last().getText()
-    ).toEqual('Congratulations, you have finished!');
+      conversationContent.last()
+        .getText()
+    )
+      .toEqual('Congratulations, you have finished!');
   };
 
   this.expectExplorationToNotBeOver = function() {
     expect(
-      conversationContent.last().getText()
+      conversationContent.last()
+        .getText()
     ).not.toEqual('Congratulations, you have finished!');
   };
 
@@ -175,20 +179,24 @@ var ExplorationPlayerPage = function() {
   this.expectLatestFeedbackToMatch = function(richTextInstructions) {
     forms.expectRichText(
       conversationFeedback.last()
-    ).toMatch(richTextInstructions);
+    )
+      .toMatch(richTextInstructions);
   };
 
   this.expectExplorationNameToBe = function(name) {
     expect(
       explorationHeader.getText()
-    ).toBe(name);
+    )
+      .toBe(name);
   };
 
   this.expectExplorationRatingOnInformationCardToEqual = function(ratingValue) {
     explorationInfoIcon.click();
-    infoCardRating.getText().then(function(value) {
-      expect(value).toBe(ratingValue);
-    });
+    infoCardRating.getText()
+      .then(function(value) {
+        expect(value)
+          .toBe(ratingValue);
+      });
   };
 
   this.rateExploration = function(ratingValue) {
@@ -212,8 +220,9 @@ var ExplorationPlayerPage = function() {
   this.submitAnswer = function(interactionId, answerData) {
     // The .first() targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
-    interactions.getInteraction(interactionId).submitAnswer(
-      conversationInput, answerData);
+    interactions.getInteraction(interactionId)
+      .submitAnswer(
+        conversationInput, answerData);
     waitFor.invisibilityOf(
       waitingForResponseElem, 'Response takes too long to appear');
   };
@@ -235,7 +244,8 @@ var ExplorationPlayerPage = function() {
     waitFor.elementToBeClickable(
       suggestionPopupLink, 'Suggestion Popup link takes too long to appear');
     suggestionPopupLink.click();
-    forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
+    forms.RichTextEditor(explorationSuggestionModal)
+      .setPlainText(suggestion);
     suggestionDescriptionInput.sendKeys(description);
     waitFor.elementToBeClickable(
       suggestionSubmitButton,

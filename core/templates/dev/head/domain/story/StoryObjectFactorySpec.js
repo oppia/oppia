@@ -22,7 +22,7 @@ describe('Story object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     StoryObjectFactory = $injector.get('StoryObjectFactory');
 
     var sampleStoryBackendDict = {
@@ -33,43 +33,51 @@ describe('Story object factory', function() {
       version: 1,
       story_contents: {
         initial_node_id: 'node_1',
-        nodes: [{
-          id: 'node_1',
-          title: 'Title 1',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: [],
-          destination_node_ids: [],
-          outline: 'Outline',
-          exploration_id: null,
-          outline_is_finalized: false
-        }],
+        nodes: [
+          {
+            id: 'node_1',
+            title: 'Title 1',
+            prerequisite_skill_ids: [],
+            acquired_skill_ids: [],
+            destination_node_ids: [],
+            outline: 'Outline',
+            exploration_id: null,
+            outline_is_finalized: false
+          }
+        ],
         next_node_id: 'node_3'
       },
       language_code: 'en'
     };
     _sampleStory = StoryObjectFactory.createFromBackendDict(
       sampleStoryBackendDict);
-  }));
+  }]);
 
   it('should be able to create an interstitial story object', function() {
     var story = StoryObjectFactory.createInterstitialStory();
-    expect(story.getId()).toEqual(null);
-    expect(story.getTitle()).toEqual('Story title loading');
-    expect(story.getDescription()).toEqual('Story description loading');
-    expect(story.getLanguageCode()).toBe('en');
-    expect(story.getStoryContents()).toEqual(null);
-    expect(story.getNotes()).toEqual('Story notes loading');
+    expect(story.getId())
+      .toEqual(null);
+    expect(story.getTitle())
+      .toEqual('Story title loading');
+    expect(story.getDescription())
+      .toEqual('Story description loading');
+    expect(story.getLanguageCode())
+      .toBe('en');
+    expect(story.getStoryContents())
+      .toEqual(null);
+    expect(story.getNotes())
+      .toEqual('Story notes loading');
   });
 
   it('should correctly validate a valid story', function() {
-    expect(_sampleStory.validate()).toEqual([]);
+    expect(_sampleStory.validate())
+      .toEqual([]);
   });
 
   it('should correctly validate a story', function() {
     _sampleStory.setTitle('');
-    expect(_sampleStory.validate()).toEqual([
-      'Story title should not be empty'
-    ]);
+    expect(_sampleStory.validate())
+      .toEqual(['Story title should not be empty']);
   });
 
   it('should be able to copy from another story', function() {
@@ -81,16 +89,18 @@ describe('Story object factory', function() {
       version: 1,
       story_contents: {
         initial_node_id: 'node_2',
-        nodes: [{
-          id: 'node_2',
-          title: 'Title 2',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: [],
-          destination_node_ids: [],
-          outline: 'Outline',
-          exploration_id: null,
-          outline_is_finalized: false
-        }],
+        nodes: [
+          {
+            id: 'node_2',
+            title: 'Title 2',
+            prerequisite_skill_ids: [],
+            acquired_skill_ids: [],
+            destination_node_ids: [],
+            outline: 'Outline',
+            exploration_id: null,
+            outline_is_finalized: false
+          }
+        ],
         next_node_id: 'node_3'
       },
       language_code: 'en'
@@ -101,6 +111,7 @@ describe('Story object factory', function() {
 
     _sampleStory.copyFromStory(secondStory);
     expect(_sampleStory).not.toBe(secondStory);
-    expect(_sampleStory).toEqual(secondStory);
+    expect(_sampleStory)
+      .toEqual(secondStory);
   });
 });

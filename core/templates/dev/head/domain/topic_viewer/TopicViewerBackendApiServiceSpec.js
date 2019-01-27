@@ -26,7 +26,7 @@ describe('Topic viewer backend API service', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     TopicViewerBackendApiService = $injector.get(
       'TopicViewerBackendApiService');
     $rootScope = $injector.get('$rootScope');
@@ -47,7 +47,7 @@ describe('Topic viewer backend API service', function() {
         description: 'Story Description',
       }
     };
-  }));
+  }]);
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
@@ -59,13 +59,16 @@ describe('Topic viewer backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/topic_data_handler/0').respond(
-        sampleDataResults);
-      TopicViewerBackendApiService.fetchTopicData('0').then(
-        successHandler, failHandler);
+      $httpBackend.expect('GET', '/topic_data_handler/0')
+        .respond(
+          sampleDataResults);
+      TopicViewerBackendApiService.fetchTopicData('0')
+        .then(
+          successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler)
+        .toHaveBeenCalledWith(sampleDataResults);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );

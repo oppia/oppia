@@ -29,12 +29,8 @@ oppia.factory('PredictionAlgorithmRegistryService', [
      * }
      */
     var algorithmIdPredictionServiceMapping = {
-      CodeClassifier: {
-        v1: 'CodeReplPredictionService'
-      },
-      TextClassifier: {
-        v1: 'TextInputPredictionService'
-      }
+      CodeClassifier: {v1: 'CodeReplPredictionService'},
+      TextClassifier: {v1: 'TextInputPredictionService'}
 
     };
 
@@ -58,4 +54,5 @@ oppia.factory('PredictionAlgorithmRegistryService', [
           newAlgorithmIdPredictionServiceMapping);
       }
     };
-  }]);
+  }
+]);

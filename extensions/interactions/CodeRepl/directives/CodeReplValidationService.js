@@ -27,7 +27,8 @@ oppia.factory('CodeReplValidationService', [
             'language',
             'placeholder',
             'preCode',
-            'postCode']);
+            'postCode'
+          ]);
 
         var language = customizationArgs.language.value;
         if (!angular.isString(language)) {
@@ -64,9 +65,11 @@ oppia.factory('CodeReplValidationService', [
       },
       getAllWarnings: function(stateName, customizationArgs, answerGroups,
           defaultOutcome) {
-        return this.getCustomizationArgsWarnings(customizationArgs).concat(
-          baseInteractionValidationService.getAllOutcomeWarnings(
-            answerGroups, defaultOutcome, stateName));
+        return this.getCustomizationArgsWarnings(customizationArgs)
+          .concat(
+            baseInteractionValidationService.getAllOutcomeWarnings(
+              answerGroups, defaultOutcome, stateName));
       }
     };
-  }]);
+  }
+]);

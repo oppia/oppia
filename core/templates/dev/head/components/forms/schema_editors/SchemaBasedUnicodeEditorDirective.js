@@ -46,11 +46,14 @@ oppia.directive('schemaBasedUnicodeEditor', [
               // Convert tabs to spaces.
               extraKeys: {
                 Tab: function(cm) {
-                  var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+                  var spaces = Array(cm.getOption('indentUnit') + 1)
+                    .join(' ');
                   cm.replaceSelection(spaces);
                   // Move the cursor to the end of the selection.
-                  var endSelectionPos = cm.getDoc().getCursor('head');
-                  cm.getDoc().setCursor(endSelectionPos);
+                  var endSelectionPos = cm.getDoc()
+                    .getCursor('head');
+                  cm.getDoc()
+                    .setCursor(endSelectionPos);
                 }
               },
               indentWithTabs: false,

@@ -179,4 +179,5 @@ oppia.directive('questionEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

@@ -45,7 +45,8 @@ oppia.factory('CodeReplPredictionService', [
       'and', 'as', 'assert', 'break', 'class', 'continue', 'def', 'del',
       'elif', 'else', 'except', 'exec', 'finally', 'for', 'from', 'global',
       'if', 'import', 'in', 'is', 'lambda', 'not', 'or', 'pass', 'print',
-      'raise', 'return', 'try', 'while', 'with', 'yield'];
+      'raise', 'return', 'try', 'while', 'with', 'yield'
+    ];
 
     var predictionService = {
       getTokenizedProgram: function(programTokens, tokenToId) {
@@ -206,12 +207,13 @@ oppia.factory('CodeReplPredictionService', [
         // Calculte similarity of the input program with every program in
         // classifier data for k nearest neighbor classification.
         similarityList = [];
-        Object.keys(fingerprintData).forEach(function(index) {
-          var fingerprintA = fingerprintData[index].fingerprint;
-          var similarity = predictionService.getProgramSimilarity(
-            fingerprintA, programFingerprint);
-          similarityList.push([parseInt(index), similarity]);
-        });
+        Object.keys(fingerprintData)
+          .forEach(function(index) {
+            var fingerprintA = fingerprintData[index].fingerprint;
+            var similarity = predictionService.getProgramSimilarity(
+              fingerprintA, programFingerprint);
+            similarityList.push([parseInt(index), similarity]);
+          });
 
         // Sort the programs according to their similairy with the
         // input program.
@@ -260,9 +262,10 @@ oppia.factory('CodeReplPredictionService', [
 
         // Find the winning class.
         var classCountArray = [];
-        Object.keys(classCount).forEach(function(k) {
-          classCountArray.push([parseInt(k), classCount[k]]);
-        });
+        Object.keys(classCount)
+          .forEach(function(k) {
+            classCountArray.push([parseInt(k), classCount[k]]);
+          });
 
         classCountArray.sort(function(x, y) {
           return x[1] > y[1] ? -1 : 1;
@@ -314,4 +317,5 @@ oppia.factory('CodeReplPredictionService', [
     };
 
     return predictionService;
-  }]);
+  }
+]);

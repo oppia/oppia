@@ -55,30 +55,42 @@ oppia.directive('explorationSummaryTile', [
         '/components/summary_tile/' +
         'exploration_summary_tile_directive.html'),
       link: function(scope, element) {
-        element.find('.exploration-summary-avatars').on('mouseenter',
-          function() {
-            element.find('.mask').attr('class',
-              'exploration-summary-tile-mask mask');
-            // As animation duration time may be 400ms, .stop(true) is used to
-            // prevent the effects queue falling behind the mouse movement.
-            // .hide(1) and .show(1) used to place the animation in the effects
-            // queue.
-            element.find('.avatars-num-minus-one').stop(true).hide(1,
-              function() {
-                element.find('.all-avatars').stop(true).slideDown();
-              }
-            );
-          }
-        );
+        element.find('.exploration-summary-avatars')
+          .on('mouseenter',
+            function() {
+              element.find('.mask')
+                .attr('class',
+                  'exploration-summary-tile-mask mask');
+              // As animation duration time may be 400ms, .stop(true) is used to
+              // prevent the effects queue falling behind the mouse movement.
+              // .hide(1) and .show(1) used to place the animation in the effects
+              // queue.
+              element.find('.avatars-num-minus-one')
+                .stop(true)
+                .hide(1,
+                  function() {
+                    element.find('.all-avatars')
+                      .stop(true)
+                      .slideDown();
+                  }
+                );
+            }
+          );
 
-        element.find('.exploration-summary-avatars').on('mouseleave',
-          function() {
-            element.find('.mask').attr('class', 'top-section-mask mask');
-            element.find('.all-avatars').stop(true).slideUp(400, function() {
-              element.find('.avatars-num-minus-one').stop(true).show(1);
-            });
-          }
-        );
+        element.find('.exploration-summary-avatars')
+          .on('mouseleave',
+            function() {
+              element.find('.mask')
+                .attr('class', 'top-section-mask mask');
+              element.find('.all-avatars')
+                .stop(true)
+                .slideUp(400, function() {
+                  element.find('.avatars-num-minus-one')
+                    .stop(true)
+                    .show(1);
+                });
+            }
+          );
       },
       controller: [
         '$scope', '$http', '$window', 'DateTimeFormatService',
@@ -89,22 +101,24 @@ oppia.directive('explorationSummaryTile', [
             RatingComputationService, UrlService, UserService,
             WindowDimensionsService) {
           $scope.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
-          });
+          UserService.getUserInfoAsync()
+            .then(function(userInfo) {
+              $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            });
           $scope.ACTIVITY_TYPE_EXPLORATION = (
             constants.ACTIVITY_TYPE_EXPLORATION);
           var contributorsSummary = $scope.getContributorsSummary() || {};
           $scope.contributors = Object.keys(
-            contributorsSummary).sort(
-            function(contributorUsername1, contributorUsername2) {
-              var commitsOfContributor1 = contributorsSummary[
-                contributorUsername1].num_commits;
-              var commitsOfContributor2 = contributorsSummary[
-                contributorUsername2].num_commits;
-              return commitsOfContributor2 - commitsOfContributor1;
-            }
-          );
+            contributorsSummary)
+            .sort(
+              function(contributorUsername1, contributorUsername2) {
+                var commitsOfContributor1 = contributorsSummary[
+                  contributorUsername1].num_commits;
+                var commitsOfContributor2 = contributorsSummary[
+                  contributorUsername2].num_commits;
+                return commitsOfContributor2 - commitsOfContributor1;
+              }
+            );
 
           $scope.isRefresherExploration = false;
           if ($scope.getParentExplorationIds()) {
@@ -189,4 +203,5 @@ oppia.directive('explorationSummaryTile', [
         }
       ]
     };
-  }]);
+  }
+]);

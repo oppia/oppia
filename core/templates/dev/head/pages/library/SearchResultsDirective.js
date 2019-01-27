@@ -44,9 +44,10 @@ oppia.directive('searchResults', [
             }
           );
 
-          $q.all([userInfoPromise, searchResultsPromise]).then(function() {
-            $rootScope.loadingMessage = '';
-          });
+          $q.all([userInfoPromise, searchResultsPromise])
+            .then(function() {
+              $rootScope.loadingMessage = '';
+            });
 
           $scope.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent('noSearchResults');
@@ -62,4 +63,5 @@ oppia.directive('searchResults', [
         }
       ]
     };
-  }]);
+  }
+]);

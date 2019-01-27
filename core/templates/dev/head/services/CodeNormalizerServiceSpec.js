@@ -20,18 +20,19 @@ describe('Code Normalization', function() {
   beforeEach(module('oppia'));
 
   var cns = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     cns = $injector.get('CodeNormalizerService');
-  }));
+  }]);
 
   it('should not modify contents of code', function() {
     expect(cns.getNormalizedCode(
       'def x():\n' +
       '    y = 345'
-    )).toBe(
-      'def x():\n' +
+    ))
+      .toBe(
+        'def x():\n' +
       '    y = 345'
-    );
+      );
   });
 
   it('should convert indentation to 4 spaces, remove trailing whitespace ' +
@@ -42,10 +43,11 @@ describe('Code Normalization', function() {
       '  y = 345\n' +
       '            \n' +
       '       '
-    )).toBe(
-      'def x():\n' +
+    ))
+      .toBe(
+        'def x():\n' +
       '    y = 345'
-    );
+      );
   });
 
   it('should remove full-line comments, but not comments in the middle ' +
@@ -55,10 +57,11 @@ describe('Code Normalization', function() {
       '  # This is a comment with some spaces before it.\n' +
       'def x():   # And a comment with some code before it.\n' +
       '  y = \'#string with hashes#\''
-    )).toBe(
-      'def x(): # And a comment with some code before it.\n' +
+    ))
+      .toBe(
+        'def x(): # And a comment with some code before it.\n' +
       '    y = \'#string with hashes#\''
-    );
+      );
   });
 
   it('should handle complex indentation', function() {
@@ -74,8 +77,9 @@ describe('Code Normalization', function() {
       '              xxxxx\n' +
       '  y\n' +
       ' z'
-    )).toBe(
-      'abcdefg\n' +
+    ))
+      .toBe(
+        'abcdefg\n' +
       '    hij\n' +
       '        ppppp\n' +
       'x\n' +
@@ -86,7 +90,7 @@ describe('Code Normalization', function() {
       '        xxxxx\n' +
       '    y\n' +
       'z'
-    );
+      );
   });
 
   it('should handle shortfall lines', function() {
@@ -98,15 +102,16 @@ describe('Code Normalization', function() {
       '  abc\n' +
       '    bcd\n' +
       '  cde'
-    )).toBe(
-      'abcdefg\n' +
+    ))
+      .toBe(
+        'abcdefg\n' +
       '    hij\n' +
       '        ppppp\n' +
       '    x\n' +
       'abc\n' +
       '    bcd\n' +
       'cde'
-    );
+      );
   });
 
   it('should normalize multiple spaces within a line', function() {
@@ -114,10 +119,11 @@ describe('Code Normalization', function() {
       'abcdefg\n' +
       '    hij    klm\n' +
       '    ab "cde fgh"\n'
-    )).toBe(
-      'abcdefg\n' +
+    ))
+      .toBe(
+        'abcdefg\n' +
       '    hij klm\n' +
       '    ab "cde fgh"'
-    );
+      );
   });
 });

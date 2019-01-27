@@ -44,7 +44,8 @@ oppia.factory('SkillObjectFactory', [
 
     Skill.prototype.getValidationIssues = function() {
       var issues = [];
-      if (this.getConceptCard().getExplanation() === '') {
+      if (this.getConceptCard()
+        .getExplanation() === '') {
         issues.push(
           'There should be review material in the concept card.');
       }

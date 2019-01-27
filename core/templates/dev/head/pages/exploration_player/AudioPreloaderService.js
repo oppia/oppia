@@ -58,24 +58,25 @@ oppia.factory('AudioPreloaderService', [
     var _loadAudio = function(audioFilename) {
       AssetsBackendApiService.loadAudio(
         ContextService.getExplorationId(), audioFilename
-      ).then(function(loadedAudio) {
-        for (var i = 0;
-          i < _filenamesOfAudioCurrentlyDownloading.length; i++) {
-          if (_filenamesOfAudioCurrentlyDownloading[i] ===
+      )
+        .then(function(loadedAudio) {
+          for (var i = 0;
+            i < _filenamesOfAudioCurrentlyDownloading.length; i++) {
+            if (_filenamesOfAudioCurrentlyDownloading[i] ===
               loadedAudio.filename) {
-            _filenamesOfAudioCurrentlyDownloading.splice(i, 1);
-            break;
+              _filenamesOfAudioCurrentlyDownloading.splice(i, 1);
+              break;
+            }
           }
-        }
-        if (_filenamesOfAudioToBeDownloaded.length > 0) {
-          var nextAudioFilename = _filenamesOfAudioToBeDownloaded.shift();
-          _filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
-          _loadAudio(nextAudioFilename);
-        }
-        if (_audioLoadedCallback) {
-          _audioLoadedCallback(loadedAudio.filename);
-        }
-      });
+          if (_filenamesOfAudioToBeDownloaded.length > 0) {
+            var nextAudioFilename = _filenamesOfAudioToBeDownloaded.shift();
+            _filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
+            _loadAudio(nextAudioFilename);
+          }
+          if (_audioLoadedCallback) {
+            _audioLoadedCallback(loadedAudio.filename);
+          }
+        });
     };
 
     var _kickOffAudioPreloader = function(sourceStateName) {

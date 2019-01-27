@@ -64,9 +64,7 @@ oppia.factory('TopicCreationService', [
             .then(function(response) {
               $timeout(function() {
                 $window.location = UrlInterpolationService.interpolateUrl(
-                  TOPIC_EDITOR_URL_TEMPLATE, {
-                    topic_id: response.data.topicId
-                  }
+                  TOPIC_EDITOR_URL_TEMPLATE, {topic_id: response.data.topicId}
                 );
               }, 150);
             }, function() {

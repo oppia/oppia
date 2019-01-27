@@ -91,4 +91,5 @@ oppia.factory('StateEditorService', [
         SolutionValidityService.deleteSolutionValidity(activeStateName);
       }
     };
-  }]);
+  }
+]);

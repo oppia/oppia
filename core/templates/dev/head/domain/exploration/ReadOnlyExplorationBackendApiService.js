@@ -28,16 +28,17 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
         explorationId, version, successCallback, errorCallback) {
       var explorationDataUrl = _getExplorationUrl(explorationId, version);
 
-      $http.get(explorationDataUrl).then(function(response) {
-        var exploration = angular.copy(response.data);
-        if (successCallback) {
-          successCallback(exploration);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(explorationDataUrl)
+        .then(function(response) {
+          var exploration = angular.copy(response.data);
+          if (successCallback) {
+            successCallback(exploration);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _isCached = function(explorationId) {
@@ -53,9 +54,7 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
           });
       }
       return UrlInterpolationService.interpolateUrl(
-        EXPLORATION_DATA_URL_TEMPLATE, {
-          exploration_id: explorationId
-        }
+        EXPLORATION_DATA_URL_TEMPLATE, {exploration_id: explorationId}
       );
     };
 

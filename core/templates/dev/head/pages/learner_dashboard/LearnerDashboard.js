@@ -99,9 +99,10 @@ oppia.controller('LearnerDashboard', [
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.PAGE_SIZE = 8;
     $scope.Math = window.Math;
-    UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-      $scope.profilePictureDataUrl = dataUrl;
-    });
+    UserService.getProfileImageDataUrlAsync()
+      .then(function(dataUrl) {
+        $scope.profilePictureDataUrl = dataUrl;
+      });
 
     $rootScope.loadingMessage = 'Loading';
     $scope.username = '';
@@ -197,16 +198,15 @@ oppia.controller('LearnerDashboard', [
       }
     );
 
-    $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
-      $rootScope.loadingMessage = '';
-    });
+    $q.all([userInfoPromise, dashboardDataPromise])
+      .then(function() {
+        $rootScope.loadingMessage = '';
+      });
 
     $scope.loadingFeedbacks = false;
     var threadIndex = null;
 
-    $scope.newMessage = {
-      text: ''
-    };
+    $scope.newMessage = {text: ''};
 
     $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (
@@ -373,7 +373,10 @@ oppia.controller('LearnerDashboard', [
           // Reset the position of the window on scrolling. This keeps the mouse
           // position and elements in sync.
           ui.helper.css(
-            {'top': ui.position.top + $(window).scrollTop() + 'px'});
+            {
+              'top': ui.position.top + $(window)
+                .scrollTop() + 'px'
+            });
           /* eslint-enable quote-props */
         },
         update: function(e, ui) {
@@ -385,9 +388,8 @@ oppia.controller('LearnerDashboard', [
                   $scope.explorationPlaylist[ui.item.sortable.index].id)
               }));
 
-          $http.post(insertExpInLearnerPlaylistUrl, {
-            index: ui.item.sortable.dropindex
-          });
+          $http.post(insertExpInLearnerPlaylistUrl,
+            {index: ui.item.sortable.dropindex});
           $scope.$apply();
         },
         stop: function(e, ui) {
@@ -406,9 +408,7 @@ oppia.controller('LearnerDashboard', [
         threadStatus, explorationId, threadId, explorationTitle) {
       $scope.loadingFeedbacks = true;
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
-        '/learnerdashboardthreadhandler/<threadId>', {
-          threadId: threadId
-        });
+        '/learnerdashboardthreadhandler/<threadId>', {threadId: threadId});
       $scope.explorationTitle = explorationTitle;
       $scope.feedbackThreadActive = true;
       $scope.threadStatus = threadStatus;
@@ -426,16 +426,17 @@ oppia.controller('LearnerDashboard', [
         }
       }
 
-      $http.get(threadDataUrl).then(function(response) {
-        var messageSummaryDicts = response.data.message_summary_list;
-        $scope.messageSummaries = [];
-        for (index = 0; index < messageSummaryDicts.length; index++) {
-          $scope.messageSummaries.push(
-            FeedbackMessageSummaryObjectFactory.createFromBackendDict(
-              messageSummaryDicts[index]));
-        }
-        $scope.loadingFeedbacks = false;
-      });
+      $http.get(threadDataUrl)
+        .then(function(response) {
+          var messageSummaryDicts = response.data.message_summary_list;
+          $scope.messageSummaries = [];
+          for (index = 0; index < messageSummaryDicts.length; index++) {
+            $scope.messageSummaries.push(
+              FeedbackMessageSummaryObjectFactory.createFromBackendDict(
+                messageSummaryDicts[index]));
+          }
+          $scope.loadingFeedbacks = false;
+        });
     };
 
     $scope.showAllThreads = function() {
@@ -445,27 +446,27 @@ oppia.controller('LearnerDashboard', [
 
     $scope.addNewMessage = function(threadId, newMessage) {
       var url = UrlInterpolationService.interpolateUrl(
-        '/threadhandler/<threadId>', {
-          threadId: threadId
-        });
+        '/threadhandler/<threadId>', {threadId: threadId});
       var payload = {
         updated_status: null,
         updated_subject: null,
         text: newMessage
       };
       $scope.messageSendingInProgress = true;
-      $http.post(url, payload).success(function() {
-        $scope.threadSummary = $scope.threadSummaries[threadIndex];
-        $scope.threadSummary.appendNewMessage(
-          newMessage, $scope.username);
-        $scope.messageSendingInProgress = false;
-        $scope.newMessage.text = null;
-        var newMessageSummary = (
-          FeedbackMessageSummaryObjectFactory.createNewMessage(
-            $scope.threadSummary.totalMessageCount, newMessage, $scope.username,
-            $scope.profilePictureDataUrl));
-        $scope.messageSummaries.push(newMessageSummary);
-      });
+      $http.post(url, payload)
+        .success(function() {
+          $scope.threadSummary = $scope.threadSummaries[threadIndex];
+          $scope.threadSummary.appendNewMessage(
+            newMessage, $scope.username);
+          $scope.messageSendingInProgress = false;
+          $scope.newMessage.text = null;
+          var newMessageSummary = (
+            FeedbackMessageSummaryObjectFactory.createNewMessage(
+              $scope.threadSummary.totalMessageCount,
+              newMessage, $scope.username,
+              $scope.profilePictureDataUrl));
+          $scope.messageSummaries.push(newMessageSummary);
+        });
     };
 
     $scope.showSuggestionModal = function(newContent, oldContent, description) {
@@ -602,18 +603,20 @@ oppia.controller('LearnerDashboard', [
       });
     };
   }
-]).animation('.menu-sub-section', function() {
-  var NG_HIDE_CLASS = 'ng-hide';
-  return {
-    beforeAddClass: function(element, className, done) {
-      if (className === NG_HIDE_CLASS) {
-        element.slideUp(done);
+])
+  .animation('.menu-sub-section', function() {
+    var NG_HIDE_CLASS = 'ng-hide';
+    return {
+      beforeAddClass: function(element, className, done) {
+        if (className === NG_HIDE_CLASS) {
+          element.slideUp(done);
+        }
+      },
+      removeClass: function(element, className, done) {
+        if (className === NG_HIDE_CLASS) {
+          element.hide()
+            .slideDown(done);
+        }
       }
-    },
-    removeClass: function(element, className, done) {
-      if (className === NG_HIDE_CLASS) {
-        element.hide().slideDown(done);
-      }
-    }
-  };
-});
+    };
+  });

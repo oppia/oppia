@@ -116,21 +116,25 @@ oppia.factory('SkillUpdateService', [
       },
 
       setConceptCardExplanation: function(skill, newExplanation) {
-        var oldExplanation = skill.getConceptCard().getExplanation();
+        var oldExplanation = skill.getConceptCard()
+          .getExplanation();
         _applySkillContentsPropertyChange(
           skill, SKILL_CONTENTS_PROPERTY_EXPLANATION,
           newExplanation.toBackendDict(), oldExplanation.toBackendDict(),
           function(changeDict, skill) {
             var explanation = newExplanation;
-            skill.getConceptCard().setExplanation(explanation);
+            skill.getConceptCard()
+              .setExplanation(explanation);
           }, function(changeDict, skill) {
-            skill.getConceptCard().setExplanation(oldExplanation);
+            skill.getConceptCard()
+              .setExplanation(oldExplanation);
           });
       },
 
       addWorkedExample: function(skill, newWorkedExample) {
         var oldWorkedExamples = angular.copy(
-          skill.getConceptCard().getWorkedExamples());
+          skill.getConceptCard()
+            .getWorkedExamples());
         var newWorkedExamples = angular.copy(oldWorkedExamples);
         newWorkedExamples.push(newWorkedExample);
         _applySkillContentsPropertyChange(
@@ -141,15 +145,18 @@ oppia.factory('SkillUpdateService', [
             return workedExample.toBackendDict();
           }),
           function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+            skill.getConceptCard()
+              .setWorkedExamples(newWorkedExamples);
           }, function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+            skill.getConceptCard()
+              .setWorkedExamples(oldWorkedExamples);
           });
       },
 
       deleteWorkedExample: function(skill, index) {
         var oldWorkedExamples = angular.copy(
-          skill.getConceptCard().getWorkedExamples());
+          skill.getConceptCard()
+            .getWorkedExamples());
         var newWorkedExamples = angular.copy(oldWorkedExamples);
         newWorkedExamples.splice(index, 1);
         _applySkillContentsPropertyChange(
@@ -160,16 +167,19 @@ oppia.factory('SkillUpdateService', [
             return workedExample.toBackendDict();
           }),
           function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+            skill.getConceptCard()
+              .setWorkedExamples(newWorkedExamples);
           }, function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+            skill.getConceptCard()
+              .setWorkedExamples(oldWorkedExamples);
           });
       },
 
       updateWorkedExample: function(
           skill, workedExampleIndex, newWorkedExampleHtml) {
         var oldWorkedExamples = angular.copy(
-          skill.getConceptCard().getWorkedExamples());
+          skill.getConceptCard()
+            .getWorkedExamples());
         var newWorkedExamples = angular.copy(oldWorkedExamples);
         newWorkedExamples[workedExampleIndex].setHtml(newWorkedExampleHtml);
         _applySkillContentsPropertyChange(
@@ -180,14 +190,17 @@ oppia.factory('SkillUpdateService', [
             return workedExample.toBackendDict();
           }),
           function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+            skill.getConceptCard()
+              .setWorkedExamples(newWorkedExamples);
           }, function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+            skill.getConceptCard()
+              .setWorkedExamples(oldWorkedExamples);
           });
       },
 
       updateWorkedExamples: function(skill, newWorkedExamples) {
-        var oldWorkedExamples = skill.getConceptCard().getWorkedExamples();
+        var oldWorkedExamples = skill.getConceptCard()
+          .getWorkedExamples();
         _applySkillContentsPropertyChange(
           skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
           newWorkedExamples.map(function(workedExample) {
@@ -198,16 +211,16 @@ oppia.factory('SkillUpdateService', [
           function(changeDict, skill) {
             var newWorkedExamples =
               _getNewPropertyValueFromChangeDict(changeDict);
-            skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+            skill.getConceptCard()
+              .setWorkedExamples(newWorkedExamples);
           }, function(changeDict, skill) {
-            skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+            skill.getConceptCard()
+              .setWorkedExamples(oldWorkedExamples);
           });
       },
 
       addMisconception: function(skill, newMisconception) {
-        var params = {
-          new_misconception_dict: newMisconception.toBackendDict()
-        };
+        var params = {new_misconception_dict: newMisconception.toBackendDict()};
         var misconceptionId = newMisconception.getId();
         _applyChange(
           skill, CMD_ADD_SKILL_MISCONCEPTION, params,
@@ -219,9 +232,7 @@ oppia.factory('SkillUpdateService', [
       },
 
       deleteMisconception: function(skill, misconceptionId) {
-        var params = {
-          id: misconceptionId
-        };
+        var params = {id: misconceptionId};
         var oldMisconception = skill.findMisconceptionById(misconceptionId);
         _applyChange(
           skill, CMD_DELETE_SKILL_MISCONCEPTION, params,

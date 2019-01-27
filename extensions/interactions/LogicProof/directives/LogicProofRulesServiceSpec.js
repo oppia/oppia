@@ -20,9 +20,9 @@ describe('Logic Proof rules service', function() {
   beforeEach(module('oppia'));
 
   var lprs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     lprs = $injector.get('logicProofRulesService');
-  }));
+  }]);
 
   var CORRECT_EXAMPLE = {
     assumptions_string: 'p',
@@ -52,25 +52,32 @@ describe('Logic Proof rules service', function() {
   };
 
   it('should have a correct \'correct\' rule', function() {
-    expect(lprs.Correct(CORRECT_EXAMPLE, null)).toBe(true);
-    expect(lprs.Correct(INCORRECT_EXAMPLE_PARSING, null)).toBe(false);
-    expect(lprs.Correct(INCORRECT_EXAMPLE_TYPING, null)).toBe(false);
+    expect(lprs.Correct(CORRECT_EXAMPLE, null))
+      .toBe(true);
+    expect(lprs.Correct(INCORRECT_EXAMPLE_PARSING, null))
+      .toBe(false);
+    expect(lprs.Correct(INCORRECT_EXAMPLE_TYPING, null))
+      .toBe(false);
   });
 
   it('should have a correct \'not correct\' rule', function() {
-    expect(lprs.NotCorrect(CORRECT_EXAMPLE, null)).toBe(false);
-    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_PARSING, null)).toBe(true);
-    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_TYPING, null)).toBe(true);
+    expect(lprs.NotCorrect(CORRECT_EXAMPLE, null))
+      .toBe(false);
+    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_PARSING, null))
+      .toBe(true);
+    expect(lprs.NotCorrect(INCORRECT_EXAMPLE_TYPING, null))
+      .toBe(true);
   });
 
   it('should have a correct \'not correct by category\' rule', function() {
-    var RULE_INPUT = {
-      c: 'typing'
-    };
-    expect(lprs.NotCorrectByCategory(CORRECT_EXAMPLE, RULE_INPUT)).toBe(false);
+    var RULE_INPUT = {c: 'typing'};
+    expect(lprs.NotCorrectByCategory(CORRECT_EXAMPLE, RULE_INPUT))
+      .toBe(false);
     expect(lprs.NotCorrectByCategory(
-      INCORRECT_EXAMPLE_PARSING, RULE_INPUT)).toBe(false);
+      INCORRECT_EXAMPLE_PARSING, RULE_INPUT))
+      .toBe(false);
     expect(lprs.NotCorrectByCategory(
-      INCORRECT_EXAMPLE_TYPING, RULE_INPUT)).toBe(true);
+      INCORRECT_EXAMPLE_TYPING, RULE_INPUT))
+      .toBe(true);
   });
 });

@@ -20,14 +20,16 @@ describe('Constants Generating', function() {
   beforeEach(module('oppia'));
 
   var $injector = null;
-  beforeEach(inject(function(_$injector_) {
+  beforeEach(inject[function(_$injector_) {
     $injector = _$injector_.get('$injector');
-  }));
+  }]);
 
   it('should transform all key value pairs to angular constants', function() {
     for (var constantName in constants) {
-      expect($injector.has(constantName)).toBe(true);
-      expect($injector.get(constantName)).toBe(constants[constantName]);
+      expect($injector.has(constantName))
+        .toBe(true);
+      expect($injector.get(constantName))
+        .toBe(constants[constantName]);
     }
   });
 });

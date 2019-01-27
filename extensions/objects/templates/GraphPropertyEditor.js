@@ -22,40 +22,41 @@ oppia.directive('graphPropertyEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/graph_property_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = true;
+      controller: [
+        '$scope', function($scope) {
+          $scope.alwaysEditable = true;
 
-        $scope.graphProperties = [{
-          name: 'regular',
-          humanReadableName: 'regular'
-        }, {
-          name: 'acyclic',
-          humanReadableName: 'acyclic'
-        }, {
-          name: 'strongly_connected',
-          humanReadableName: 'strongly connected'
-        }, {
-          name: 'weakly_connected',
-          humanReadableName: 'weakly connected'
-        }];
-        $scope.localValue = {
-          property: $scope.graphProperties[0]
-        };
+          $scope.graphProperties = [
+            {
+              name: 'regular',
+              humanReadableName: 'regular'
+            }, {
+              name: 'acyclic',
+              humanReadableName: 'acyclic'
+            }, {
+              name: 'strongly_connected',
+              humanReadableName: 'strongly connected'
+            }, {
+              name: 'weakly_connected',
+              humanReadableName: 'weakly connected'
+            }
+          ];
+          $scope.localValue = {property: $scope.graphProperties[0]};
 
-        for (var i = 0; i < $scope.graphProperties.length; i++) {
-          if ($scope.graphProperties[i].name === $scope.value) {
-            $scope.localValue.property = $scope.graphProperties[i];
+          for (var i = 0; i < $scope.graphProperties.length; i++) {
+            if ($scope.graphProperties[i].name === $scope.value) {
+              $scope.localValue.property = $scope.graphProperties[i];
+            }
           }
-        }
 
-        $scope.$watch('localValue.property', function() {
-          $scope.value = $scope.localValue.property.name;
-        });
-      }]
+          $scope.$watch('localValue.property', function() {
+            $scope.value = $scope.localValue.property.name;
+          });
+        }
+      ]
     };
-  }]);
+  }
+]);

@@ -26,13 +26,13 @@ describe('Collection rights backend API service', function() {
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     CollectionRightsBackendApiService = $injector.get(
       'CollectionRightsBackendApiService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
-  }));
+  }]);
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
@@ -47,13 +47,16 @@ describe('Collection rights backend API service', function() {
     // PUT request. The typical expect() syntax with a passed-in object payload
     // does not seem to be working correctly.
     $httpBackend.expect(
-      'PUT', '/collection_editor_handler/publish/0').respond(200);
-    CollectionRightsBackendApiService.setCollectionPublic('0', 1).then(
-      successHandler, failHandler);
+      'PUT', '/collection_editor_handler/publish/0')
+      .respond(200);
+    CollectionRightsBackendApiService.setCollectionPublic('0', 1)
+      .then(
+        successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
 
-    expect(successHandler).toHaveBeenCalled();
+    expect(successHandler)
+      .toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   });
 
@@ -62,15 +65,18 @@ describe('Collection rights backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expect(
-      'PUT', '/collection_editor_handler/publish/0').respond(
-      500, 'Error loading collection 0.');
-    CollectionRightsBackendApiService.setCollectionPublic('0', 1).then(
-      successHandler, failHandler);
+      'PUT', '/collection_editor_handler/publish/0')
+      .respond(
+        500, 'Error loading collection 0.');
+    CollectionRightsBackendApiService.setCollectionPublic('0', 1)
+      .then(
+        successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
+    expect(failHandler)
+      .toHaveBeenCalled();
   });
 
   it('should report a cached collection rights after caching it', function() {
@@ -78,7 +84,8 @@ describe('Collection rights backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     // The collection should not currently be cached.
-    expect(CollectionRightsBackendApiService.isCached('0')).toBe(false);
+    expect(CollectionRightsBackendApiService.isCached('0'))
+      .toBe(false);
 
     // Cache a collection.
     CollectionRightsBackendApiService.cacheCollectionRights('0', {
@@ -90,24 +97,27 @@ describe('Collection rights backend API service', function() {
     });
 
     // It should now be cached.
-    expect(CollectionRightsBackendApiService.isCached('0')).toBe(true);
+    expect(CollectionRightsBackendApiService.isCached('0'))
+      .toBe(true);
 
     // A new collection should not have been fetched from the backend. Also,
     // the returned collection should match the expected collection object.
-    CollectionRightsBackendApiService.loadCollectionRights('0').then(
-      successHandler, failHandler);
+    CollectionRightsBackendApiService.loadCollectionRights('0')
+      .then(
+        successHandler, failHandler);
 
     // http://brianmcd.com/2014/03/27/
     // a-tip-for-angular-unit-tests-with-promises.html
     $rootScope.$digest();
 
-    expect(successHandler).toHaveBeenCalledWith({
-      collection_id: 0,
-      can_edit: true,
-      can_unpublish: false,
-      is_private: true,
-      owner_names: ['A']
-    });
+    expect(successHandler)
+      .toHaveBeenCalledWith({
+        collection_id: 0,
+        can_edit: true,
+        can_unpublish: false,
+        is_private: true,
+        owner_names: ['A']
+      });
     expect(failHandler).not.toHaveBeenCalled();
   });
 });

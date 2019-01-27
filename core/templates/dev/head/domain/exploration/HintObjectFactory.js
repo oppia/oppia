@@ -25,9 +25,7 @@ oppia.factory('HintObjectFactory', [
     };
 
     Hint.prototype.toBackendDict = function() {
-      return {
-        hint_content: this.hintContent.toBackendDict()
-      };
+      return {hint_content: this.hintContent.toBackendDict()};
     };
 
     Hint.createFromBackendDict = function(hintBackendDict) {

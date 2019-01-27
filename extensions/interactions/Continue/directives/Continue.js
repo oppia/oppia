@@ -101,6 +101,8 @@ oppia.directive('oppiaShortResponseContinue', [
   }
 ]);
 
-oppia.factory('continueRulesService', [function() {
-  return {};
-}]);
+oppia.factory('continueRulesService', [
+  function() {
+    return {};
+  }
+]);

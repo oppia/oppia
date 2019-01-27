@@ -27,42 +27,38 @@ oppia.factory('TopicRightsBackendApiService', [
     var _fetchTopicRights = function(topicId, successCallback,
         errorCallback) {
       var topicRightsUrl = UrlInterpolationService.interpolateUrl(
-        TOPIC_RIGHTS_URL_TEMPLATE, {
-          topic_id: topicId
-        });
+        TOPIC_RIGHTS_URL_TEMPLATE, {topic_id: topicId});
 
-      $http.get(topicRightsUrl).then(function(response) {
-        if (successCallback) {
-          successCallback(response.data);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(topicRightsUrl)
+        .then(function(response) {
+          if (successCallback) {
+            successCallback(response.data);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _setTopicStatus = function(
         topicId, publishStatus, successCallback, errorCallback) {
       var changeTopicStatusUrl = UrlInterpolationService.interpolateUrl(
-        '/rightshandler/change_topic_status/<topic_id>', {
-          topic_id: topicId
+        '/rightshandler/change_topic_status/<topic_id>', {topic_id: topicId});
+
+      var putParams = {publish_status: publishStatus};
+
+      $http.put(changeTopicStatusUrl, putParams)
+        .then(function(response) {
+          topicRightsCache[topicId] = response.data;
+          if (successCallback) {
+            successCallback(response.data);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
         });
-
-      var putParams = {
-        publish_status: publishStatus
-      };
-
-      $http.put(changeTopicStatusUrl, putParams).then(function(response) {
-        topicRightsCache[topicId] = response.data;
-        if (successCallback) {
-          successCallback(response.data);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
     };
 
     var _isCached = function(topicId) {

@@ -76,21 +76,16 @@ oppia.factory('ExplorationPlayerStateService', [
 
     var initExplorationPreviewPlayer = function(callback) {
       setExplorationMode();
-      Promise.all([
-        EditableExplorationBackendApiService.fetchApplyDraftExploration(
-          explorationId),
-        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
-          explorationId),
-      ]).then(function(combinedData) {
-        var explorationData = combinedData[0];
-        var featuresData = combinedData[1];
-        ExplorationFeaturesService.init(explorationData, featuresData);
-        ExplorationEngineService.init(
-          explorationData, null, null, null, callback);
-        PlayerCorrectnessFeedbackEnabledService.init(
-          explorationData.correctness_feedback_enabled);
-        NumberAttemptsService.reset();
-      });
+      EditableExplorationBackendApiService.fetchApplyDraftExploration(
+        explorationId
+      )
+        .then(function(explorationData) {
+          ExplorationEngineService.init(
+            explorationData, null, null, null, callback);
+          PlayerCorrectnessFeedbackEnabledService.init(
+            explorationData.correctness_feedback_enabled);
+          NumberAttemptsService.reset();
+        });
     };
 
     var initExplorationPlayer = function(callback) {
@@ -103,22 +98,19 @@ oppia.factory('ExplorationPlayerStateService', [
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
           explorationId, storyId),
-        ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
-          explorationId),
-      ]).then(function(combinedData) {
-        var explorationData = combinedData[0];
-        var pretestQuestionsData = combinedData[1];
-        var featuresData = combinedData[2];
-        ExplorationFeaturesService.init(explorationData, featuresData);
-        if (pretestQuestionsData.length > 0) {
-          setPretestMode();
-          initializeExplorationServices(explorationData, true, callback);
-          initializePretestServices(pretestQuestionsData, callback);
-        } else {
-          setExplorationMode();
-          initializeExplorationServices(explorationData, false, callback);
-        }
-      });
+      ])
+        .then(function(combinedData) {
+          var explorationData = combinedData[0];
+          var pretestQuestionsData = combinedData[1];
+          if (pretestQuestionsData.length > 0) {
+            setPretestMode();
+            initializeExplorationServices(explorationData, true, callback);
+            initializePretestServices(pretestQuestionsData, callback);
+          } else {
+            setExplorationMode();
+            initializeExplorationServices(explorationData, false, callback);
+          }
+        });
     };
 
     return {
@@ -150,4 +142,5 @@ oppia.factory('ExplorationPlayerStateService', [
         return currentEngineService.recordNewCardAdded();
       },
     };
-  }]);
+  }
+]);

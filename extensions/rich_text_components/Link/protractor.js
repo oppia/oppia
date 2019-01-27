@@ -22,13 +22,18 @@ var objects = require('../../objects/protractor.js');
 var customizeComponent = function(modal, url) {
   objects.SanitizedUrlEditor(
     modal.element(by.tagName('sanitized-url-editor'))
-  ).setValue(url);
+  )
+    .setValue(url);
 };
 
 var expectComponentDetailsToMatch = function(elem, url) {
-  expect(elem.element(by.tagName('a')).getAttribute('href')).toBe(url);
+  expect(elem.element(by.tagName('a'))
+    .getAttribute('href'))
+    .toBe(url);
   expect(
-    elem.element(by.tagName('a')).getAttribute('target')).toBe('_blank');
+    elem.element(by.tagName('a'))
+      .getAttribute('target'))
+    .toBe('_blank');
 };
 
 exports.customizeComponent = customizeComponent;

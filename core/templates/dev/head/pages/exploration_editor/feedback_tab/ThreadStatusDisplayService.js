@@ -17,42 +17,46 @@
  * status label for a thread in the feedback tab of the exploration editor.
  */
 
-oppia.factory('ThreadStatusDisplayService', [function() {
-  var _STATUS_CHOICES = [{
-    id: 'open',
-    text: 'Open'
-  }, {
-    id: 'fixed',
-    text: 'Fixed'
-  }, {
-    id: 'ignored',
-    text: 'Ignored'
-  }, {
-    id: 'compliment',
-    text: 'Compliment'
-  }, {
-    id: 'not_actionable',
-    text: 'Not Actionable'
-  }];
+oppia.factory('ThreadStatusDisplayService', [
+  function() {
+    var _STATUS_CHOICES = [
+      {
+        id: 'open',
+        text: 'Open'
+      }, {
+        id: 'fixed',
+        text: 'Fixed'
+      }, {
+        id: 'ignored',
+        text: 'Ignored'
+      }, {
+        id: 'compliment',
+        text: 'Compliment'
+      }, {
+        id: 'not_actionable',
+        text: 'Not Actionable'
+      }
+    ];
 
-  return {
-    STATUS_CHOICES: angular.copy(_STATUS_CHOICES),
-    getLabelClass: function(status) {
-      if (status === 'open') {
-        return 'label label-info';
-      } else if (status === 'compliment') {
-        return 'label label-success';
-      } else {
-        return 'label label-default';
-      }
-    },
-    getHumanReadableStatus: function(status) {
-      for (var i = 0; i < _STATUS_CHOICES.length; i++) {
-        if (_STATUS_CHOICES[i].id === status) {
-          return _STATUS_CHOICES[i].text;
+    return {
+      STATUS_CHOICES: angular.copy(_STATUS_CHOICES),
+      getLabelClass: function(status) {
+        if (status === 'open') {
+          return 'label label-info';
+        } else if (status === 'compliment') {
+          return 'label label-success';
+        } else {
+          return 'label label-default';
         }
+      },
+      getHumanReadableStatus: function(status) {
+        for (var i = 0; i < _STATUS_CHOICES.length; i++) {
+          if (_STATUS_CHOICES[i].id === status) {
+            return _STATUS_CHOICES[i].text;
+          }
+        }
+        return '';
       }
-      return '';
-    }
-  };
-}]);
+    };
+  }
+]);

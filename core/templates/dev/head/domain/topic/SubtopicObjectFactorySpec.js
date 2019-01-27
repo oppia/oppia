@@ -22,7 +22,7 @@ describe('Subtopic object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
 
     var sampleSubtopicBackendObject = {
@@ -36,10 +36,11 @@ describe('Subtopic object factory', function() {
     };
     _sampleSubtopic = SubtopicObjectFactory.create(
       sampleSubtopicBackendObject, sampleSkillIdToDesriptionMap);
-  }));
+  }]);
 
   it('should not find issues with a valid subtopic', function() {
-    expect(_sampleSubtopic.validate()).toEqual([]);
+    expect(_sampleSubtopic.validate())
+      .toEqual([]);
   });
 
   it('should validate the subtopic', function() {
@@ -47,27 +48,35 @@ describe('Subtopic object factory', function() {
 
     expect(
       _sampleSubtopic.validate()
-    ).toEqual(['Subtopic title should not be empty']);
+    )
+      .toEqual(['Subtopic title should not be empty']);
   });
 
   it('should be able to create a subtopic object with given title and id',
     function() {
       var subtopic = SubtopicObjectFactory.createFromTitle(2, 'Title2');
-      expect(subtopic.getId()).toBe(2);
-      expect(subtopic.getTitle()).toBe('Title2');
-      expect(subtopic.getSkillSummaries()).toEqual([]);
+      expect(subtopic.getId())
+        .toBe(2);
+      expect(subtopic.getTitle())
+        .toBe('Title2');
+      expect(subtopic.getSkillSummaries())
+        .toEqual([]);
     });
 
   it('should not add duplicate elements to skill ids list', function() {
-    expect(_sampleSubtopic.addSkill('skill_1', 'Description 1')).toEqual(false);
+    expect(_sampleSubtopic.addSkill('skill_1', 'Description 1'))
+      .toEqual(false);
   });
 
   it('should correctly remove a skill id', function() {
     _sampleSubtopic.removeSkill('skill_1');
-    expect(_sampleSubtopic.getSkillSummaries().length).toEqual(1);
-    expect(_sampleSubtopic.getSkillSummaries()[0].getId()).toEqual('skill_2');
+    expect(_sampleSubtopic.getSkillSummaries().length)
+      .toEqual(1);
+    expect(_sampleSubtopic.getSkillSummaries()[0].getId())
+      .toEqual('skill_2');
     expect(
       _sampleSubtopic.getSkillSummaries()[0].getDescription()
-    ).toEqual('Description 2');
+    )
+      .toEqual('Description 2');
   });
 });

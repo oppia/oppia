@@ -17,34 +17,36 @@
  * learner.
  */
 
-oppia.factory('LearnerParamsService', [function() {
-  var _paramDict = {};
+oppia.factory('LearnerParamsService', [
+  function() {
+    var _paramDict = {};
 
-  return {
+    return {
     // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
-    init: function(initParamSpecs) {
+      init: function(initParamSpecs) {
       // The initParamSpecs arg is a dict mapping the parameter names used in
       // the exploration to their default values.
-      _paramDict = angular.copy(initParamSpecs);
-    },
-    getValue: function(paramName) {
-      if (!_paramDict.hasOwnProperty(paramName)) {
-        throw 'Invalid parameter name: ' + paramName;
-      } else {
-        return angular.copy(_paramDict[paramName]);
-      }
-    },
-    setValue: function(paramName, newParamValue) {
+        _paramDict = angular.copy(initParamSpecs);
+      },
+      getValue: function(paramName) {
+        if (!_paramDict.hasOwnProperty(paramName)) {
+          throw 'Invalid parameter name: ' + paramName;
+        } else {
+          return angular.copy(_paramDict[paramName]);
+        }
+      },
+      setValue: function(paramName, newParamValue) {
       // TODO(sll): Currently, all parameters are strings. In the future, we
       // will need to maintain information about parameter types.
-      if (!_paramDict.hasOwnProperty(paramName)) {
-        throw 'Cannot set unknown parameter: ' + paramName;
-      } else {
-        _paramDict[paramName] = String(newParamValue);
+        if (!_paramDict.hasOwnProperty(paramName)) {
+          throw 'Cannot set unknown parameter: ' + paramName;
+        } else {
+          _paramDict[paramName] = String(newParamValue);
+        }
+      },
+      getAllParams: function() {
+        return angular.copy(_paramDict);
       }
-    },
-    getAllParams: function() {
-      return angular.copy(_paramDict);
-    }
-  };
-}]);
+    };
+  }
+]);

@@ -20,9 +20,9 @@ describe('Pencil Code Editor rules service', function() {
   beforeEach(module('oppia'));
 
   var pcers = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     pcers = $injector.get('pencilCodeEditorRulesService');
-  }));
+  }]);
 
   describe('\'equals\' rule', function() {
     var RULE_INPUT = {
@@ -40,7 +40,8 @@ describe('Pencil Code Editor rules service', function() {
           '    y = \'ab    c\'\n' +
           '    return x'
         )
-      }, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT))
+        .toBe(true);
     });
 
     it('should remove extra newlines and trailing whitespace', function() {
@@ -52,7 +53,8 @@ describe('Pencil Code Editor rules service', function() {
           '    \n' +
           '    return x'
         )
-      }, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT))
+        .toBe(true);
 
       // Extra trailing whitespace on first line
       expect(pcers.CodeEquals({
@@ -61,7 +63,8 @@ describe('Pencil Code Editor rules service', function() {
           '    y = \'ab    c\'\n' +
           '    return x'
         )
-      }, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT))
+        .toBe(true);
 
       // Tab character
       expect(pcers.CodeEquals({
@@ -70,7 +73,8 @@ describe('Pencil Code Editor rules service', function() {
           '    y = \'ab    c\'\n' +
           '    return x\n\n\n'
         )
-      }, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT))
+        .toBe(true);
     });
 
     it('should not change spaces at the start of a line', function() {
@@ -80,7 +84,8 @@ describe('Pencil Code Editor rules service', function() {
           '  y = \'ab    c\'\n' +
           '    return x'
         )
-      }, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT))
+        .toBe(false);
     });
 
     it('should detect missing newlines', function() {
@@ -90,7 +95,8 @@ describe('Pencil Code Editor rules service', function() {
           '    y = \'ab    c\'\n' +
           '    return x'
         )
-      }, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT))
+        .toBe(false);
     });
 
     it('should compare spaces inside quotes', function() {
@@ -100,14 +106,13 @@ describe('Pencil Code Editor rules service', function() {
           '    y = \'ab c\'\n' +
           '    return x'
         )
-      }, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT))
+        .toBe(false);
     });
   });
 
   describe('\'code contains\' rule', function() {
-    var RULE_INPUT = {
-      x: 'def x():'
-    };
+    var RULE_INPUT = {x: 'def x():'};
 
     it('should check if answer contains some code', function() {
       expect(pcers.CodeContains({
@@ -116,20 +121,17 @@ describe('Pencil Code Editor rules service', function() {
           '    y = \'ab c\'\n' +
           '    return x'
         )
-      }, RULE_INPUT)).toBe(true);
-      expect(pcers.CodeContains({
-        code: '    def x():\n'
-      }, RULE_INPUT)).toBe(true);
-      expect(pcers.CodeContains({
-        code: 'print 0'
-      }, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT))
+        .toBe(true);
+      expect(pcers.CodeContains({code: '    def x():\n'}, RULE_INPUT))
+        .toBe(true);
+      expect(pcers.CodeContains({code: 'print 0'}, RULE_INPUT))
+        .toBe(false);
     });
   });
 
   describe('\'code does not contain\' rule', function() {
-    var RULE_INPUT = {
-      x: 'def x():'
-    };
+    var RULE_INPUT = {x: 'def x():'};
 
     it('should check if answer contains some code', function() {
       expect(pcers.CodeDoesNotContain({
@@ -138,65 +140,51 @@ describe('Pencil Code Editor rules service', function() {
           '    y = \'ab c\'\n' +
           '    return x'
         )
-      }, RULE_INPUT)).toBe(false);
-      expect(pcers.CodeDoesNotContain({
-        code: '    def x():\n'
-      }, RULE_INPUT)).toBe(false);
-      expect(pcers.CodeDoesNotContain({
-        code: 'print 0'
-      }, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT))
+        .toBe(false);
+      expect(pcers.CodeDoesNotContain({code: '    def x():\n'}, RULE_INPUT))
+        .toBe(false);
+      expect(pcers.CodeDoesNotContain({code: 'print 0'}, RULE_INPUT))
+        .toBe(true);
     });
   });
 
   describe('\'output equals\' rule', function() {
-    var RULE_INPUT = {
-      x: '1'
-    };
+    var RULE_INPUT = {x: '1'};
 
     it('should compare normalized output', function() {
-      expect(pcers.OutputEquals({
-        output: '1'
-      }, RULE_INPUT)).toBe(true);
-      expect(pcers.OutputEquals({
-        output: '\n1\n'
-      }, RULE_INPUT)).toBe(true);
-      expect(pcers.OutputEquals({
-        output: ''
-      }, RULE_INPUT)).toBe(false);
-      expect(pcers.OutputEquals({
-        output: 'bad output'
-      }, RULE_INPUT)).toBe(false);
+      expect(pcers.OutputEquals({output: '1'}, RULE_INPUT))
+        .toBe(true);
+      expect(pcers.OutputEquals({output: '\n1\n'}, RULE_INPUT))
+        .toBe(true);
+      expect(pcers.OutputEquals({output: ''}, RULE_INPUT))
+        .toBe(false);
+      expect(pcers.OutputEquals({output: 'bad output'}, RULE_INPUT))
+        .toBe(false);
     });
   });
 
   describe('\'output roughly equals\' rule', function() {
-    var RULE_INPUT = {
-      x: '1\n      a W ? b\n'
-    };
+    var RULE_INPUT = {x: '1\n      a W ? b\n'};
 
     it('should compare normalized output', function() {
-      expect(pcers.OutputRoughlyEquals({
-        output: '1\n   a   W ?   b'
-      }, RULE_INPUT)).toBe(true);
-      expect(pcers.OutputRoughlyEquals({
-        output: '\n1\na  w?B'
-      }, RULE_INPUT)).toBe(true);
-      expect(pcers.OutputRoughlyEquals({
-        output: '   1\n\na w?b    \n\n\n'
-      }, RULE_INPUT)).toBe(true);
+      expect(pcers.OutputRoughlyEquals({output: '1\n   a   W ?   b'},
+        RULE_INPUT))
+        .toBe(true);
+      expect(pcers.OutputRoughlyEquals({output: '\n1\na  w?B'}, RULE_INPUT))
+        .toBe(true);
+      expect(pcers.OutputRoughlyEquals({output: '   1\n\na w?b    \n\n\n'},
+        RULE_INPUT))
+        .toBe(true);
 
-      expect(pcers.OutputRoughlyEquals({
-        output: '1 a w ? b'
-      }, RULE_INPUT)).toBe(false);
-      expect(pcers.OutputRoughlyEquals({
-        output: '1 \n a w b'
-      }, RULE_INPUT)).toBe(false);
-      expect(pcers.OutputRoughlyEquals({
-        output: 'b ? w a \n 1'
-      }, RULE_INPUT)).toBe(false);
-      expect(pcers.OutputRoughlyEquals({
-        output: 'bad output'
-      }, RULE_INPUT)).toBe(false);
+      expect(pcers.OutputRoughlyEquals({output: '1 a w ? b'}, RULE_INPUT))
+        .toBe(false);
+      expect(pcers.OutputRoughlyEquals({output: '1 \n a w b'}, RULE_INPUT))
+        .toBe(false);
+      expect(pcers.OutputRoughlyEquals({output: 'b ? w a \n 1'}, RULE_INPUT))
+        .toBe(false);
+      expect(pcers.OutputRoughlyEquals({output: 'bad output'}, RULE_INPUT))
+        .toBe(false);
     });
   });
 
@@ -204,42 +192,31 @@ describe('Pencil Code Editor rules service', function() {
     var RULE_INPUT = null;
 
     it('should check if error is not empty', function() {
-      expect(pcers.ResultsInError({
-        error: ''
-      }, RULE_INPUT)).toBe(false);
-      expect(pcers.ResultsInError({
-        error: ' \t\n'
-      }, RULE_INPUT)).toBe(false);
-      expect(pcers.ResultsInError({
-        error: 'bad output'
-      }, RULE_INPUT)).toBe(true);
+      expect(pcers.ResultsInError({error: ''}, RULE_INPUT))
+        .toBe(false);
+      expect(pcers.ResultsInError({error: ' \t\n'}, RULE_INPUT))
+        .toBe(false);
+      expect(pcers.ResultsInError({error: 'bad output'}, RULE_INPUT))
+        .toBe(true);
     });
   });
 
   describe('\'error contains\' rule', function() {
-    var RULE_INPUT = {
-      x: 'bad'
-    };
+    var RULE_INPUT = {x: 'bad'};
 
     it('should check if error message appears', function() {
-      expect(pcers.ErrorContains({
-        error: 'bad'
-      }, RULE_INPUT)).toBe(true);
-      expect(pcers.ErrorContains({
-        error: '  bad  '
-      }, RULE_INPUT)).toBe(true);
-      expect(pcers.ErrorContains({
-        error: 'not bad'
-      }, RULE_INPUT)).toBe(true);
-      expect(pcers.ErrorContains({
-        error: 'error'
-      }, RULE_INPUT)).toBe(false);
-      expect(pcers.ErrorContains({
-        error: 'b a d'
-      }, RULE_INPUT)).toBe(false);
-      expect(pcers.ErrorContains({
-        error: ''
-      }, RULE_INPUT)).toBe(false);
+      expect(pcers.ErrorContains({error: 'bad'}, RULE_INPUT))
+        .toBe(true);
+      expect(pcers.ErrorContains({error: '  bad  '}, RULE_INPUT))
+        .toBe(true);
+      expect(pcers.ErrorContains({error: 'not bad'}, RULE_INPUT))
+        .toBe(true);
+      expect(pcers.ErrorContains({error: 'error'}, RULE_INPUT))
+        .toBe(false);
+      expect(pcers.ErrorContains({error: 'b a d'}, RULE_INPUT))
+        .toBe(false);
+      expect(pcers.ErrorContains({error: ''}, RULE_INPUT))
+        .toBe(false);
     });
   });
 });

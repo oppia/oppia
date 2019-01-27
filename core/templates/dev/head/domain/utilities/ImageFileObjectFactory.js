@@ -16,15 +16,17 @@
  * @fileoverview Object factory for creating image files.
  */
 
-oppia.factory('ImageFileObjectFactory', [function() {
-  var ImageFile = function(filename, data) {
-    this.filename = filename;
-    this.data = data;
-  };
+oppia.factory('ImageFileObjectFactory', [
+  function() {
+    var ImageFile = function(filename, data) {
+      this.filename = filename;
+      this.data = data;
+    };
 
-  ImageFile.createNew = function(filename, data) {
-    return new ImageFile(filename, data);
-  };
+    ImageFile.createNew = function(filename, data) {
+      return new ImageFile(filename, data);
+    };
 
-  return ImageFile;
-}]);
+    return ImageFile;
+  }
+]);

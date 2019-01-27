@@ -22,9 +22,9 @@ describe('Current Interaction Service', function() {
   var DUMMY_ANSWER = 'dummy_answer';
 
   var CurrentInteractionService;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     CurrentInteractionService = $injector.get('CurrentInteractionService');
-  }));
+  }]);
 
   it('should properly register onSubmitFn and submitAnswerFn', function() {
     var answerState = null;
@@ -34,7 +34,8 @@ describe('Current Interaction Service', function() {
 
     CurrentInteractionService.setOnSubmitFn(dummyOnSubmitFn);
     CurrentInteractionService.onSubmit(DUMMY_ANSWER, null);
-    expect(answerState).toEqual(DUMMY_ANSWER);
+    expect(answerState)
+      .toEqual(DUMMY_ANSWER);
 
     answerState = null;
     var dummySubmitAnswerFn = function() {
@@ -43,7 +44,8 @@ describe('Current Interaction Service', function() {
     CurrentInteractionService.registerCurrentInteraction(
       dummySubmitAnswerFn, null);
     CurrentInteractionService.submitAnswer();
-    expect(answerState).toEqual(DUMMY_ANSWER);
+    expect(answerState)
+      .toEqual(DUMMY_ANSWER);
   });
 
   it('should properly register validityCheckFn', function() {
@@ -52,13 +54,15 @@ describe('Current Interaction Service', function() {
     };
     CurrentInteractionService.registerCurrentInteraction(
       null, dummyValidityCheckFn);
-    expect(CurrentInteractionService.isSubmitButtonDisabled()).toBe(
-      !dummyValidityCheckFn());
+    expect(CurrentInteractionService.isSubmitButtonDisabled())
+      .toBe(
+        !dummyValidityCheckFn());
   });
 
   it('should handle case where validityCheckFn is null', function() {
     CurrentInteractionService.registerCurrentInteraction(null, null);
-    expect(CurrentInteractionService.isSubmitButtonDisabled()).toBe(false);
+    expect(CurrentInteractionService.isSubmitButtonDisabled())
+      .toBe(false);
   });
 
   it('should properly register and clear presubmit hooks', function() {
@@ -77,13 +81,17 @@ describe('Current Interaction Service', function() {
     CurrentInteractionService.setOnSubmitFn(function() {});
     CurrentInteractionService.onSubmit(null, null);
 
-    expect(hookStateA).toEqual(1);
-    expect(hookStateB).toEqual(3);
+    expect(hookStateA)
+      .toEqual(1);
+    expect(hookStateB)
+      .toEqual(3);
 
     CurrentInteractionService.clearPresubmitHooks();
     CurrentInteractionService.onSubmit(null, null);
 
-    expect(hookStateA).toEqual(1);
-    expect(hookStateB).toEqual(3);
+    expect(hookStateA)
+      .toEqual(1);
+    expect(hookStateB)
+      .toEqual(3);
   });
 });

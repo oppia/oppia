@@ -26,9 +26,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
       HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
-      scope: {
-        getLastAnswer: '&lastAnswer'
-      },
+      scope: {getLastAnswer: '&lastAnswer'},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/PencilCodeEditor/directives/' +
         'pencil_code_editor_interaction_directive.html'),
@@ -45,7 +43,8 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
             $scope.getLastAnswer().code;
 
-          var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
+          var iframeDiv = $element.find('.pencil-code-editor-iframe')
+            .get(0);
           var pce = new PencilCodeEmbed(iframeDiv);
           pce.beginLoad($scope.initialCode);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
@@ -59,24 +58,26 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             // from showing up even if the code has an error. Also, hides the
             // turtle, and redefines say() to also write the text on the
             // screen.
-            pce.setupScript([{
-              code: [
-                'window.onerror = function() {',
-                '  return true;',
-                '};',
-                'debug.hide();',
-                'window.removeEventListener("error", debug)',
-                '',
-                'ht();',
-                '',
-                'oldsay = window.say',
-                'say = function(x) {',
-                '  write(x);',
-                '  oldsay(x);',
-                '};'
-              ].join('\n'),
-              type: 'text/javascript'
-            }]);
+            pce.setupScript([
+              {
+                code: [
+                  'window.onerror = function() {',
+                  '  return true;',
+                  '};',
+                  'debug.hide();',
+                  'window.removeEventListener("error", debug)',
+                  '',
+                  'ht();',
+                  '',
+                  'oldsay = window.say',
+                  'say = function(x) {',
+                  '  write(x);',
+                  '  oldsay(x);',
+                  '};'
+                ].join('\n'),
+                type: 'text/javascript'
+              }
+            ]);
 
             pce.showEditor();
             pce.hideToggleButton();
@@ -109,7 +110,8 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
                   $scope.resetCode = function() {
                     $uibModalInstance.close();
                   };
-                }]
+                }
+              ]
             }).result.then(function() {
               pce.setCode($scope.initialCode);
             });
@@ -117,7 +119,8 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
 
           var getNormalizedCode = function() {
             // Converts tabs to spaces.
-            return pce.getCode().replace(/\t/g, '  ');
+            return pce.getCode()
+              .replace(/\t/g, '  ');
           };
 
           var errorIsHappening = false;
@@ -137,9 +140,12 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
 
               // Get all the divs, and extract their textual content.
               var output = $.map(
-                $(pencilCodeHtml).filter('div'), function(elem) {
-                  return $(elem).text();
-                }).join('\n');
+                $(pencilCodeHtml)
+                  .filter('div'), function(elem) {
+                  return $(elem)
+                    .text();
+                })
+                .join('\n');
 
               hasSubmittedAnswer = true;
               CurrentInteractionService.onSubmit({
@@ -174,7 +180,8 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
           });
 
           CurrentInteractionService.registerCurrentInteraction(null, null);
-        }]
+        }
+      ]
     };
   }
 ]);
@@ -188,10 +195,12 @@ oppia.directive('oppiaResponsePencilCodeEditor', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/PencilCodeEditor/directives/' +
         'pencil_code_editor_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answerCode = HtmlEscaperService.escapedJsonToObj(
-          $attrs.answer).code;
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.answerCode = HtmlEscaperService.escapedJsonToObj(
+            $attrs.answer).code;
+        }
+      ]
     };
   }
 ]);
@@ -205,10 +214,12 @@ oppia.directive('oppiaShortResponsePencilCodeEditor', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/PencilCodeEditor/directives/' +
         'pencil_code_editor_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answerCode = HtmlEscaperService.escapedJsonToObj(
-          $attrs.answer).code;
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.answerCode = HtmlEscaperService.escapedJsonToObj(
+            $attrs.answer).code;
+        }
+      ]
     };
   }
 ]);
@@ -260,4 +271,5 @@ oppia.factory('pencilCodeEditorRulesService', [
         return normalizedError.indexOf(normalizedSnippet) !== -1;
       }
     };
-  }]);
+  }
+]);

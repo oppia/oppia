@@ -21,9 +21,7 @@ oppia.directive('ckEditorRte', [
   function(RteHelperService, ContextService, PAGE_CONTEXT) {
     return {
       restrict: 'E',
-      scope: {
-        uiConfig: '&'
-      },
+      scope: {uiConfig: '&'},
       template: '<div><div></div>' +
                 '<div contenteditable="true" class="oppia-rte">' +
                 '</div></div>',
@@ -54,7 +52,8 @@ oppia.directive('ckEditorRte', [
         // Whitelist the component tags with any attributes and classes.
         var componentRule = names.map(function(name) {
           return 'oppia-noninteractive-' + name;
-        }).join(' ') + '(*)[*];';
+        })
+          .join(' ') + '(*)[*];';
         // Whitelist the inline component wrapper, which is a
         // span with a "type" attribute.
         var inlineWrapperRule = ' span[type];';
@@ -72,7 +71,8 @@ oppia.directive('ckEditorRte', [
 
         var pluginNames = names.map(function(name) {
           return 'oppia' + name;
-        }).join(',');
+        })
+          .join(',');
         var buttonNames = [];
         names.forEach(function(name) {
           buttonNames.push('Oppia' + name);
@@ -80,8 +80,10 @@ oppia.directive('ckEditorRte', [
         });
         buttonNames.pop();
         // All icons on the toolbar except the Rich Text components.
-        var allIcons = ['undo', 'redo', 'bold', 'Italic', 'numberedList',
-          'bulletedList', 'pre', 'indent', 'outdent'];
+        var allIcons = [
+          'undo', 'redo', 'bold', 'Italic', 'numberedList',
+          'bulletedList', 'pre', 'indent', 'outdent'
+        ];
 
         // Add external plugins.
         CKEDITOR.plugins.addExternal(
@@ -106,9 +108,7 @@ oppia.directive('ckEditorRte', [
           title: false,
           floatSpaceDockedOffsetY: 15,
           extraAllowedContent: extraAllowedContentRules,
-          sharedSpaces: {
-            top: el[0].children[0].children[0]
-          },
+          sharedSpaces: {top: el[0].children[0].children[0]},
           skin: 'bootstrapck,/third_party/static/ckeditor-bootstrapck-1.0/',
           toolbar: [
             {
@@ -167,7 +167,8 @@ oppia.directive('ckEditorRte', [
           // Set the css and icons for each toolbar button.
           names.forEach(function(name, index) {
             var icon = icons[index];
-            var upperCasedName = name.charAt(0).toUpperCase() + name.slice(1);
+            var upperCasedName = name.charAt(0)
+              .toUpperCase() + name.slice(1);
             $('.cke_button__oppia' + name)
               .css('background-image', 'url("/extensions' + icon + '")')
               .css('background-position', 'center')

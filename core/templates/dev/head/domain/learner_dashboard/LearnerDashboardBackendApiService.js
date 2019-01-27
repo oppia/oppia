@@ -17,12 +17,12 @@
  * backend.
  */
 
-oppia.factory('LearnerDashboardBackendApiService', ['$http', function($http) {
-  var _fetchLearnerDashboardData = function() {
-    return $http.get('/learnerdashboardhandler/data');
-  };
+oppia.factory('LearnerDashboardBackendApiService', [
+  '$http', function($http) {
+    var _fetchLearnerDashboardData = function() {
+      return $http.get('/learnerdashboardhandler/data');
+    };
 
-  return {
-    fetchLearnerDashboardData: _fetchLearnerDashboardData
-  };
-}]);
+    return {fetchLearnerDashboardData: _fetchLearnerDashboardData};
+  }
+]);

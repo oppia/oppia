@@ -32,5 +32,6 @@ oppia.factory('AudioLanguageObjectFactory', [
     };
 
     return AudioLanguage;
-  }]
+  }
+]
 );

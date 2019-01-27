@@ -31,13 +31,12 @@ oppia.factory('NestedDirectivesRecursionTimeoutPreventionService', [
       compile: function(element, link) {
         // Normalize the link parameter
         if (angular.isFunction(link)) {
-          link = {
-            post: link
-          };
+          link = {post: link};
         }
 
         // Break the recursion loop by removing the contents,
-        var contents = element.contents().remove();
+        var contents = element.contents()
+          .remove();
         var compiledContents;
         return {
           pre: (link && link.pre) ? link.pre : null,
@@ -59,4 +58,5 @@ oppia.factory('NestedDirectivesRecursionTimeoutPreventionService', [
         };
       }
     };
-  }]);
+  }
+]);

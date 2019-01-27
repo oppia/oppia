@@ -25,24 +25,29 @@ var customizeInteraction = function() {
 
 var expectInteractionDetailsToMatch = function(elem) {
   expect(
-    elem.element(by.tagName('oppia-interactive-number-with-units')).isPresent()
-  ).toBe(true);
+    elem.element(by.tagName('oppia-interactive-number-with-units'))
+      .isPresent()
+  )
+    .toBe(true);
 };
 
 var submitAnswer = function(elem, answer) {
   elem.element(by.tagName('oppia-interactive-number-with-units')).
-    element(by.tagName('input')).sendKeys(answer + '\n');
+    element(by.tagName('input'))
+    .sendKeys(answer + '\n');
 };
 
 var answerObjectType = 'NumberWithUnits';
 
-var testSuite = [{
-  interactionArguments: [],
-  ruleArguments: ['IsEquivalentTo', '2 km / hr'],
-  expectedInteractionDetails: [],
-  wrongAnswers: ['2 m / s'],
-  correctAnswers: ['2000 m / hr']
-}];
+var testSuite = [
+  {
+    interactionArguments: [],
+    ruleArguments: ['IsEquivalentTo', '2 km / hr'],
+    expectedInteractionDetails: [],
+    wrongAnswers: ['2 m / s'],
+    correctAnswers: ['2000 m / hr']
+  }
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

@@ -36,69 +36,64 @@ oppia.factory('EditableQuestionBackendApiService', [
     var _createQuestion = function(
         skillId, questionDict, successCallback, errorCallback) {
       var questionCreationUrl = UrlInterpolationService.interpolateUrl(
-        QUESTION_CREATION_URL, {
-          skill_id: skillId
+        QUESTION_CREATION_URL, {skill_id: skillId});
+      var postData = {question_dict: questionDict};
+      $http.post(questionCreationUrl, postData)
+        .then(function(response) {
+          if (successCallback) {
+            successCallback();
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
         });
-      var postData = {
-        question_dict: questionDict
-      };
-      $http.post(questionCreationUrl, postData).then(function(response) {
-        if (successCallback) {
-          successCallback();
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
     };
 
     var _fetchQuestion = function(questionId, successCallback, errorCallback) {
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_QUESTION_DATA_URL_TEMPLATE, {
-          question_id: questionId
-        });
+        EDITABLE_QUESTION_DATA_URL_TEMPLATE, {question_id: questionId});
 
-      $http.get(questionDataUrl).then(function(response) {
-        var data = angular.copy(response.data);
-        if (successCallback) {
-          successCallback({
-            question_dict: data.question_dict,
-            associated_skill_dicts: data.associated_skill_dicts
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(questionDataUrl)
+        .then(function(response) {
+          var data = angular.copy(response.data);
+          if (successCallback) {
+            successCallback({
+              question_dict: data.question_dict,
+              associated_skill_dicts: data.associated_skill_dicts
+            });
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _updateQuestion = function(
         questionId, questionVersion, commitMessage, changeList,
         successCallback, errorCallback) {
       var editableQuestionDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_QUESTION_DATA_URL_TEMPLATE, {
-          question_id: questionId
-        });
+        EDITABLE_QUESTION_DATA_URL_TEMPLATE, {question_id: questionId});
 
       var putData = {
         version: questionVersion,
         commit_message: commitMessage,
         change_list: changeList
       };
-      $http.put(editableQuestionDataUrl, putData).then(function(response) {
+      $http.put(editableQuestionDataUrl, putData)
+        .then(function(response) {
         // The returned data is an updated question dict.
-        var questionDict = angular.copy(response.data.question_dict);
+          var questionDict = angular.copy(response.data.question_dict);
 
-        if (successCallback) {
-          successCallback(questionDict);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+          if (successCallback) {
+            successCallback(questionDict);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     return {

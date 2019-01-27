@@ -17,42 +17,44 @@
  *               the exploration editor.
  */
 
-oppia.factory('ExplorationFeaturesService', [function() {
-  var settings = {
-    areParametersEnabled: false,
-    isImprovementsTabEnabled: false,
-    isPlaythroughRecordingEnabled: false,
-  };
+oppia.factory('ExplorationFeaturesService', [
+  function() {
+    var settings = {
+      areParametersEnabled: false,
+      isImprovementsTabEnabled: false,
+      isPlaythroughRecordingEnabled: false,
+    };
 
-  return {
-    init: function(explorationData, featuresData) {
-      settings.isImprovementsTabEnabled =
+    return {
+      init: function(explorationData, featuresData) {
+        settings.isImprovementsTabEnabled =
         featuresData.is_improvements_tab_enabled;
-      settings.isPlaythroughRecordingEnabled =
+        settings.isPlaythroughRecordingEnabled =
         featuresData.is_playthrough_recording_enabled;
-      if (explorationData.param_changes &&
+        if (explorationData.param_changes &&
           explorationData.param_changes.length > 0) {
-        this.enableParameters();
-      } else {
-        for (var state in explorationData.states) {
-          if (explorationData.states[state].param_changes.length > 0) {
-            this.enableParameters();
-            break;
+          this.enableParameters();
+        } else {
+          for (var state in explorationData.states) {
+            if (explorationData.states[state].param_changes.length > 0) {
+              this.enableParameters();
+              break;
+            }
           }
         }
-      }
-    },
-    areParametersEnabled: function() {
-      return settings.areParametersEnabled;
-    },
-    isImprovementsTabEnabled: function() {
-      return settings.isImprovementsTabEnabled;
-    },
-    isPlaythroughRecordingEnabled: function() {
-      return settings.isPlaythroughRecordingEnabled;
-    },
-    enableParameters: function() {
-      settings.areParametersEnabled = true;
-    },
-  };
-}]);
+      },
+      areParametersEnabled: function() {
+        return settings.areParametersEnabled;
+      },
+      isImprovementsTabEnabled: function() {
+        return settings.isImprovementsTabEnabled;
+      },
+      isPlaythroughRecordingEnabled: function() {
+        return settings.isPlaythroughRecordingEnabled;
+      },
+      enableParameters: function() {
+        settings.areParametersEnabled = true;
+      },
+    };
+  }
+]);

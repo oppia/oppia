@@ -62,30 +62,33 @@ oppia.directive('audioFileUploader', [
           'audio-file-uploader-input' + IdGenerationService.generateNewId());
         scope.inputFieldFormId = (
           'audio-file-uploader-form' + IdGenerationService.generateNewId());
-        angular.element(document).on(
-          'change', '.' + scope.inputFieldClassName, function(evt) {
-            var file = evt.currentTarget.files[0];
-            if (!file) {
-              scope.onFileCleared();
-              return;
-            }
+        angular.element(document)
+          .on(
+            'change', '.' + scope.inputFieldClassName, function(evt) {
+              var file = evt.currentTarget.files[0];
+              if (!file) {
+                scope.onFileCleared();
+                return;
+              }
 
-            scope.errorMessage = validateUploadedFile(file);
-            if (!scope.errorMessage) {
+              scope.errorMessage = validateUploadedFile(file);
+              if (!scope.errorMessage) {
               // Only fire this event if validations pass.
-              scope.onFileChanged(file);
-            } else {
-              document.getElementById(scope.inputFieldFormId).reset();
-              scope.onFileCleared();
+                scope.onFileChanged(file);
+              } else {
+                document.getElementById(scope.inputFieldFormId)
+                  .reset();
+                scope.onFileCleared();
+              }
+              scope.$apply();
             }
-            scope.$apply();
-          }
-        );
+          );
         if (scope.droppedFile) {
           if (scope.droppedFile.length === 1) {
-            angular.element(document).ready(function() {
-              $('.' + scope.inputFieldClassName)[0].files = scope.droppedFile;
-            });
+            angular.element(document)
+              .ready(function() {
+                $('.' + scope.inputFieldClassName)[0].files = scope.droppedFile;
+              });
           } else {
             scope.errorMessage = 'Please drop one file at a time.';
           }

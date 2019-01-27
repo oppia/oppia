@@ -16,25 +16,28 @@
  * @fileoverview Service for computing the window dimensions.
  */
 
-oppia.factory('WindowDimensionsService', ['$window', function($window) {
-  var onResizeHooks = [];
-  angular.element($window).bind('resize', function() {
-    onResizeHooks.forEach(function(hookFn) {
-      hookFn();
-    });
-  });
-  return {
-    getWidth: function() {
-      return (
-        $window.innerWidth || document.documentElement.clientWidth ||
+oppia.factory('WindowDimensionsService', [
+  '$window', function($window) {
+    var onResizeHooks = [];
+    angular.element($window)
+      .bind('resize', function() {
+        onResizeHooks.forEach(function(hookFn) {
+          hookFn();
+        });
+      });
+    return {
+      getWidth: function() {
+        return (
+          $window.innerWidth || document.documentElement.clientWidth ||
         document.body.clientWidth);
-    },
-    registerOnResizeHook: function(hookFn) {
-      onResizeHooks.push(hookFn);
-    },
-    isWindowNarrow: function() {
-      var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
-      return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
-    }
-  };
-}]);
+      },
+      registerOnResizeHook: function(hookFn) {
+        onResizeHooks.push(hookFn);
+      },
+      isWindowNarrow: function() {
+        var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
+        return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
+      }
+    };
+  }
+]);

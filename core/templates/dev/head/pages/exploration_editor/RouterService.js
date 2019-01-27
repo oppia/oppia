@@ -79,9 +79,7 @@ oppia.factory('RouterService', [
         activeTabName = TABS.IMPROVEMENTS.name;
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
-        $rootScope.$broadcast('refreshVersionHistory', {
-          forceRefresh: false
-        });
+        $rootScope.$broadcast('refreshVersionHistory', {forceRefresh: false});
         activeTabName = TABS.HISTORY.name;
       } else if (newPath === TABS.FEEDBACK.path) {
         activeTabName = TABS.FEEDBACK.name;
@@ -132,8 +130,10 @@ oppia.factory('RouterService', [
     };
 
     var _getCurrentStateFromLocationPath = function() {
-      if ($location.path().indexOf('/gui/') !== -1) {
-        return $location.path().substring('/gui/'.length);
+      if ($location.path()
+        .indexOf('/gui/') !== -1) {
+        return $location.path()
+          .substring('/gui/'.length);
       } else {
         return null;
       }
@@ -180,20 +180,22 @@ oppia.factory('RouterService', [
         }
 
         if (activeTabName === TABS.MAIN.name) {
-          $('.oppia-editor-cards-container').fadeOut(function() {
-            _actuallyNavigate(SLUG_GUI, stateName);
-            // We need to use $apply to update all our bindings. However we
-            // can't directly use $apply, as there is already another $apply in
-            // progress, the one which angular itself has called at the start.
-            // So we use $applyAsync to ensure that this $apply is called just
-            // after the previous $apply is finished executing. Refer to this
-            // link for more information -
-            // http://blog.theodybrothers.com/2015/08/getting-inside-angular-scopeapplyasync.html
-            $rootScope.$applyAsync();
-            $timeout(function() {
-              $('.oppia-editor-cards-container').fadeIn();
-            }, 150);
-          });
+          $('.oppia-editor-cards-container')
+            .fadeOut(function() {
+              _actuallyNavigate(SLUG_GUI, stateName);
+              // We need to use $apply to update all our bindings. However we
+              // can't directly use $apply, as there is already another $apply in
+              // progress, the one which angular itself has called at the start.
+              // So we use $applyAsync to ensure that this $apply is called just
+              // after the previous $apply is finished executing. Refer to this
+              // link for more information -
+              // http://blog.theodybrothers.com/2015/08/getting-inside-angular-scopeapplyasync.html
+              $rootScope.$applyAsync();
+              $timeout(function() {
+                $('.oppia-editor-cards-container')
+                  .fadeIn();
+              }, 150);
+            });
         } else {
           _actuallyNavigate(SLUG_GUI, stateName);
         }

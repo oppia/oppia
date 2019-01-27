@@ -45,7 +45,8 @@ oppia.directive('skillsList', [
             EditableSkillBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           $scope.SKILL_HEADINGS = [
-            'description', 'worked_examples_count', 'misconception_count'
+            'description', 'worked_examples_count',
+            'misconception_count'
           ];
 
           $scope.highlightedIndex = null;
@@ -81,16 +82,18 @@ oppia.directive('skillsList', [
             });
 
             modalInstance.result.then(function() {
-              EditableSkillBackendApiService.deleteSkill(skillId).then(
-                function(status) {
-                  $rootScope.$broadcast(
-                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
-                }
-              );
-            }).then(function() {
-              var successToast = 'The skill has been deleted.';
-              AlertsService.addSuccessMessage(successToast, 1000);
-            });
+              EditableSkillBackendApiService.deleteSkill(skillId)
+                .then(
+                  function(status) {
+                    $rootScope.$broadcast(
+                      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                  }
+                );
+            })
+              .then(function() {
+                var successToast = 'The skill has been deleted.';
+                AlertsService.addSuccessMessage(successToast, 1000);
+              });
           };
 
           $scope.assignSkillToTopic = function(skillId) {
@@ -116,11 +119,13 @@ oppia.directive('skillsList', [
             });
 
             modalInstance.result.then(function(topicIds) {
-              var changeList = [{
-                cmd: 'add_uncategorized_skill_id',
-                new_uncategorized_skill_id: skillId,
-                change_affects_subtopic_page: false
-              }];
+              var changeList = [
+                {
+                  cmd: 'add_uncategorized_skill_id',
+                  new_uncategorized_skill_id: skillId,
+                  change_affects_subtopic_page: false
+                }
+              ];
               var topicSummaries = $scope.getEditableTopicSummaries();
               for (var i = 0; i < topicIds.length; i++) {
                 var version = null;
@@ -130,14 +135,16 @@ oppia.directive('skillsList', [
                       topicIds[i], topicSummaries[j].version,
                       'Added skill with id ' + skillId + ' to topic.',
                       changeList
-                    ).then(function() {
-                      $rootScope.$broadcast(
-                        EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
-                    }).then(function() {
-                      var successToast = (
-                        'The skill has been assigned to the topic.');
-                      AlertsService.addSuccessMessage(successToast, 1000);
-                    });
+                    )
+                      .then(function() {
+                        $rootScope.$broadcast(
+                          EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                      })
+                      .then(function() {
+                        var successToast = (
+                          'The skill has been assigned to the topic.');
+                        AlertsService.addSuccessMessage(successToast, 1000);
+                      });
                   }
                 }
               }
@@ -162,7 +169,8 @@ oppia.directive('skillsList', [
                   $scope.selectedSkill = {};
                   $scope.done = function() {
                     $uibModalInstance.close(
-                      {skill: skill,
+                      {
+                        skill: skill,
                         supersedingSkillId: $scope.selectedSkill.id
                       });
                   };
@@ -176,34 +184,38 @@ oppia.directive('skillsList', [
             modalInstance.result.then(function(result) {
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;
-              var changeList = [{
-                cmd: 'update_skill_property',
-                property_name: 'superseding_skill_id',
-                old_value: '',
-                new_value: supersedingSkillId
-              }];
+              var changeList = [
+                {
+                  cmd: 'update_skill_property',
+                  property_name: 'superseding_skill_id',
+                  old_value: '',
+                  new_value: supersedingSkillId
+                }
+              ];
               EditableSkillBackendApiService.updateSkill(
                 skill.id, skill.version,
                 'Added superseding skill id ' +
                  supersedingSkillId + ' to skill.',
                 changeList
-              ).then(function() {
+              )
+                .then(function() {
                 // Broadcast will update the skills so it will get the skill
                 // with updated superseding skill id
-                $rootScope.$broadcast(
-                  EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
-                // Start the transfer of questions from the old skill to
-                // the new one.
-                var mergeSkillUrl = MERGE_SKILL_URL;
-                var mergeSkillData = {
-                  old_skill_id: skill.id,
-                  new_skill_id: supersedingSkillId
-                };
-                $http.post(mergeSkillUrl, mergeSkillData);
-              });
+                  $rootScope.$broadcast(
+                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                  // Start the transfer of questions from the old skill to
+                  // the new one.
+                  var mergeSkillUrl = MERGE_SKILL_URL;
+                  var mergeSkillData = {
+                    old_skill_id: skill.id,
+                    new_skill_id: supersedingSkillId
+                  };
+                  $http.post(mergeSkillUrl, mergeSkillData);
+                });
             });
           };
         }
       ]
     };
-  }]);
+  }
+]);

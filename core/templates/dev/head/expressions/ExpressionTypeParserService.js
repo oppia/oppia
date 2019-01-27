@@ -46,13 +46,15 @@ oppia.factory('ExpressionTypeParserService', [
         }
 
         // Get the types of the arguments.
-        var args = parsed.slice(1).map(function(item) {
-          return getType(item, envs);
-        });
+        var args = parsed.slice(1)
+          .map(function(item) {
+            return getType(item, envs);
+          });
 
         // The first element should be a function name.
         return ExpressionSyntaxTreeService.lookupEnvs(
-          parsed[0], envs).getType(args);
+          parsed[0], envs)
+          .getType(args);
       }
 
       // If 'parsed' is not an array, it should be a terminal node with the

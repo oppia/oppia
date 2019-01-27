@@ -78,9 +78,7 @@ oppia.directive('subtopicsListTab', [
                   });
                   $scope.SUBTOPIC_PAGE_SCHEMA = {
                     type: 'html',
-                    ui_config: {
-                      rows: 100
-                    }
+                    ui_config: {rows: 100}
                   };
 
                   $scope.updateSubtopicTitle = function(title) {
@@ -100,7 +98,8 @@ oppia.directive('subtopicsListTab', [
                   };
 
                   $scope.updateHtmlData = function(htmlData) {
-                    $scope.subtopicPage.getPageContents().setHtml(htmlData);
+                    $scope.subtopicPage.getPageContents()
+                      .setHtml(htmlData);
                     $scope.openPreviewSubtopicPage(htmlData);
                   };
 
@@ -128,9 +127,11 @@ oppia.directive('subtopicsListTab', [
                   $scope.topic, subtopic.getId(), newTitle);
               }
               if (newHtmlData !==
-                    $scope.subtopicPage.getPageContents().getHtml()) {
+                    $scope.subtopicPage.getPageContents()
+                      .getHtml()) {
                 var subtitledHtml = angular.copy(
-                  $scope.subtopicPage.getPageContents().getSubtitledHtml());
+                  $scope.subtopicPage.getPageContents()
+                    .getSubtitledHtml());
                 subtitledHtml.setHtml(newHtmlData);
                 TopicUpdateService.setSubtopicPageContentsHtml(
                   $scope.subtopicPage, subtopic.getId(), subtitledHtml);
@@ -145,9 +146,7 @@ oppia.directive('subtopicsListTab', [
 
           $scope.getSkillEditorUrl = function(skillId) {
             return UrlInterpolationService.interpolateUrl(
-              SKILL_EDITOR_URL_TEMPLATE, {
-                skillId: skillId
-              }
+              SKILL_EDITOR_URL_TEMPLATE, {skillId: skillId}
             );
           };
 
@@ -248,4 +247,5 @@ oppia.directive('subtopicsListTab', [
         }
       ]
     };
-  }]);
+  }
+]);

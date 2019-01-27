@@ -23,7 +23,7 @@ describe('EndExplorationValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     validatorService = $injector.get('EndExplorationValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
@@ -43,55 +43,63 @@ describe('EndExplorationValidationService', function() {
 
     customizationArguments = {
       recommendedExplorationIds: {
-        value: ['ExpID0', 'ExpID1', 'ExpID2']
+        value:
+      ['ExpID0', 'ExpID1', 'ExpID2']
       }
     };
 
-    goodAnswerGroups = [{
-      rules: [],
-      outcome: {
-        dest: 'Second State',
-        feedback: {
-          html: '',
-          audio_translations: {}
-        },
-        labelled_as_correct: false,
-        param_changes: [],
-        refresher_exploration_id: null,
-        missing_prerequisite_skill_id: null
+    goodAnswerGroups = [
+      {
+        rules: [],
+        outcome: {
+          dest: 'Second State',
+          feedback: {
+            html: '',
+            audio_translations: {}
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        }
       }
-    }];
-  }));
+    ];
+  }]);
 
   it('should not have warnings for no answer groups or no default outcome',
     function() {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([]);
+      expect(warnings)
+        .toEqual([]);
     });
 
   it('should have warnings for any answer groups or default outcome',
     function() {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, badOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'Please make sure end exploration interactions do not ' +
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Please make sure end exploration interactions do not ' +
           'have any answer groups.')
-      }, {
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'Please make sure end exploration interactions do not ' +
+          }, {
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Please make sure end exploration interactions do not ' +
           'have a default outcome.')
-      }]);
+          }
+        ]);
     });
 
   it('should throw for missing recommendations argument', function() {
     expect(function() {
       validatorService.getAllWarnings(currentState, {}, [], null);
-    }).toThrow(
-      'Expected customization arguments to have property: ' +
+    })
+      .toThrow(
+        'Expected customization arguments to have property: ' +
       'recommendedExplorationIds');
   });
 
@@ -99,7 +107,8 @@ describe('EndExplorationValidationService', function() {
     customizationArguments.recommendedExplorationIds.value = [];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
 
     customizationArguments.recommendedExplorationIds.value = [
       'ExpID0', 'ExpID1', 'ExpID2', 'ExpID3',
@@ -107,7 +116,8 @@ describe('EndExplorationValidationService', function() {
     ];
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 
   it('should catch non-string value for recommended exploration ID',
@@ -115,10 +125,13 @@ describe('EndExplorationValidationService', function() {
       customizationArguments.recommendedExplorationIds.value = [1];
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Recommended exploration ID must be a string.'
-      }]);
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.ERROR,
+            message: 'Recommended exploration ID must be a string.'
+          }
+        ]);
     });
 
   it('should have warnings for non-list format of recommended exploration IDs',
@@ -126,9 +139,12 @@ describe('EndExplorationValidationService', function() {
       customizationArguments.recommendedExplorationIds.value = 'ExpID0';
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Set of recommended exploration IDs must be list.'
-      }]);
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.ERROR,
+            message: 'Set of recommended exploration IDs must be list.'
+          }
+        ]);
     });
 });

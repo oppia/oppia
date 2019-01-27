@@ -26,36 +26,37 @@ oppia.directive('sanitizedUrlEditor', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/unicode_string_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.initArgs = $scope.getInitArgs();
-        $scope.$watch('initArgs', function(newValue) {
-          $scope.largeInput = false;
-          if (newValue && newValue.largeInput) {
-            $scope.largeInput = newValue.largeInput;
-          }
-        });
+      controller: [
+        '$scope', function($scope) {
+          $scope.initArgs = $scope.getInitArgs();
+          $scope.$watch('initArgs', function(newValue) {
+            $scope.largeInput = false;
+            if (newValue && newValue.largeInput) {
+              $scope.largeInput = newValue.largeInput;
+            }
+          });
 
-        $scope.$watch('value', function(newValue) {
-          $scope.localValue = {
-            label: String(newValue) || ''
-          };
-        }, true);
+          $scope.$watch('value', function(newValue) {
+            $scope.localValue = {label: String(newValue) || ''};
+          }, true);
 
-        $scope.alwaysEditable = true;
+          $scope.alwaysEditable = true;
 
-        $scope.$watch('localValue.label', function(newValue) {
-          $scope.value = newValue;
-        });
+          $scope.$watch('localValue.label', function(newValue) {
+            $scope.value = newValue;
+          });
 
-        $scope.$on('externalSave', function() {
-          var currentValue = String($scope.localValue.label);
-          if ($scope.active) {
-            $scope.replaceValue(currentValue);
-            // The $scope.$apply() call is needed to propagate the replaced
-            // value.
-            $scope.$apply();
-          }
-        });
-      }]
+          $scope.$on('externalSave', function() {
+            var currentValue = String($scope.localValue.label);
+            if ($scope.active) {
+              $scope.replaceValue(currentValue);
+              // The $scope.$apply() call is needed to propagate the replaced
+              // value.
+              $scope.$apply();
+            }
+          });
+        }
+      ]
     };
-  }]);
+  }
+]);

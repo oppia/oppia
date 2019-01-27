@@ -38,52 +38,50 @@ oppia.factory('EditableCollectionBackendApiService', [
     var _fetchCollection = function(
         collectionId, successCallback, errorCallback) {
       var collectionDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
-          collection_id: collectionId
-        });
+        EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {collection_id: collectionId});
 
-      $http.get(collectionDataUrl).then(function(response) {
-        var collection = angular.copy(response.data.collection);
-        if (successCallback) {
-          successCallback(collection);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(collectionDataUrl)
+        .then(function(response) {
+          var collection = angular.copy(response.data.collection);
+          if (successCallback) {
+            successCallback(collection);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _updateCollection = function(
         collectionId, collectionVersion, commitMessage, changeList,
         successCallback, errorCallback) {
       var editableCollectionDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
-          collection_id: collectionId
-        });
+        EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {collection_id: collectionId});
 
       var putData = {
         version: collectionVersion,
         commit_message: commitMessage,
         change_list: changeList
       };
-      $http.put(editableCollectionDataUrl, putData).then(function(response) {
+      $http.put(editableCollectionDataUrl, putData)
+        .then(function(response) {
         // The returned data is an updated collection dict.
-        var collection = angular.copy(response.data.collection);
+          var collection = angular.copy(response.data.collection);
 
-        // Update the ReadOnlyCollectionBackendApiService's cache with the new
-        // collection.
-        ReadOnlyCollectionBackendApiService.cacheCollection(
-          collectionId, collection);
+          // Update the ReadOnlyCollectionBackendApiService's cache with the new
+          // collection.
+          ReadOnlyCollectionBackendApiService.cacheCollection(
+            collectionId, collection);
 
-        if (successCallback) {
-          successCallback(collection);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+          if (successCallback) {
+            successCallback(collection);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     return {

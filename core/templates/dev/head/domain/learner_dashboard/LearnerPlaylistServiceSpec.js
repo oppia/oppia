@@ -31,7 +31,7 @@ describe('Learner playlist service factory', function() {
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     $httpBackend = $injector.get('$httpBackend');
     LearnerPlaylistService = $injector.get(
       'LearnerPlaylistService');
@@ -40,7 +40,7 @@ describe('Learner playlist service factory', function() {
     AlertsService = $injector.get('AlertsService');
     spyOn(AlertsService, 'addInfoMessage').and.callThrough();
     spyOn(AlertsService, 'addSuccessMessage').and.callThrough();
-  }));
+  }]);
 
   beforeEach(function() {
     addToLearnerPlaylistUrl = (
@@ -61,14 +61,16 @@ describe('Learner playlist service factory', function() {
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
+    $httpBackend.expectPOST(addToLearnerPlaylistUrl)
+      .respond(
+        JSON.stringify(response));
     LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
 
     $httpBackend.flush();
     $rootScope.$digest();
-    expect(AlertsService.addSuccessMessage).toHaveBeenCalledWith(
-      'Successfully added to your \'Play Later\' list.');
+    expect(AlertsService.addSuccessMessage)
+      .toHaveBeenCalledWith(
+        'Successfully added to your \'Play Later\' list.');
     expect(AlertsService.addInfoMessage).not.toHaveBeenCalled();
   });
 
@@ -79,14 +81,16 @@ describe('Learner playlist service factory', function() {
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
+    $httpBackend.expectPOST(addToLearnerPlaylistUrl)
+      .respond(
+        JSON.stringify(response));
     LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
 
     $httpBackend.flush();
     $rootScope.$digest();
-    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
-      'You have already completed or are completing this activity.');
+    expect(AlertsService.addInfoMessage)
+      .toHaveBeenCalledWith(
+        'You have already completed or are completing this activity.');
     expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
   });
 
@@ -97,14 +101,16 @@ describe('Learner playlist service factory', function() {
       belongs_to_subscribed_activities: true,
       playlist_limit_exceeded: false
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
+    $httpBackend.expectPOST(addToLearnerPlaylistUrl)
+      .respond(
+        JSON.stringify(response));
     LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
 
     $httpBackend.flush();
     $rootScope.$digest();
-    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
-      'This is present in your creator dashboard');
+    expect(AlertsService.addInfoMessage)
+      .toHaveBeenCalledWith(
+        'This is present in your creator dashboard');
     expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
   });
 
@@ -115,14 +121,16 @@ describe('Learner playlist service factory', function() {
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: true
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
+    $httpBackend.expectPOST(addToLearnerPlaylistUrl)
+      .respond(
+        JSON.stringify(response));
     LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
 
     $httpBackend.flush();
     $rootScope.$digest();
-    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
-      'Your \'Play Later\' list is full!  Either you can ' +
+    expect(AlertsService.addInfoMessage)
+      .toHaveBeenCalledWith(
+        'Your \'Play Later\' list is full!  Either you can ' +
       'complete some or you can head to the learner dashboard ' +
       'and remove some.');
     expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();

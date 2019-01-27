@@ -17,26 +17,28 @@
  * domain objects.
  */
 
-oppia.factory('RuleObjectFactory', [function() {
-  var Rule = function(type, inputs) {
-    this.type = type;
-    this.inputs = inputs;
-  };
-
-  Rule.prototype.toBackendDict = function() {
-    return {
-      rule_type: this.type,
-      inputs: this.inputs
+oppia.factory('RuleObjectFactory', [
+  function() {
+    var Rule = function(type, inputs) {
+      this.type = type;
+      this.inputs = inputs;
     };
-  };
 
-  Rule.createNew = function(type, inputs) {
-    return new Rule(type, inputs);
-  };
+    Rule.prototype.toBackendDict = function() {
+      return {
+        rule_type: this.type,
+        inputs: this.inputs
+      };
+    };
 
-  Rule.createFromBackendDict = function(ruleDict) {
-    return new Rule(ruleDict.rule_type, ruleDict.inputs);
-  };
+    Rule.createNew = function(type, inputs) {
+      return new Rule(type, inputs);
+    };
 
-  return Rule;
-}]);
+    Rule.createFromBackendDict = function(ruleDict) {
+      return new Rule(ruleDict.rule_type, ruleDict.inputs);
+    };
+
+    return Rule;
+  }
+]);

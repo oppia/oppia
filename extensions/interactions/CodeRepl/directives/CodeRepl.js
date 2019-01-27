@@ -27,9 +27,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
       EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
-      scope: {
-        getLastAnswer: '&lastAnswer',
-      },
+      scope: {getLastAnswer: '&lastAnswer', },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/CodeRepl/directives/' +
         'code_repl_interaction_directive.html'),
@@ -87,11 +85,14 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             editor.setOption('mode', 'python');
             editor.setOption('extraKeys', {
               Tab: function(cm) {
-                var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+                var spaces = Array(cm.getOption('indentUnit') + 1)
+                  .join(' ');
                 cm.replaceSelection(spaces);
                 // Move the cursor to the end of the selection.
-                var endSelectionPos = cm.getDoc().getCursor('head');
-                cm.getDoc().setCursor(endSelectionPos);
+                var endSelectionPos = cm.getDoc()
+                  .getCursor('head');
+                cm.getDoc()
+                  .setCursor(endSelectionPos);
               }
             });
             editor.setOption('theme', 'preview default');
@@ -157,24 +158,25 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             // Evaluate the program asynchronously using Skulpt.
             Sk.misceval.asyncToPromise(function() {
               Sk.importMainWithBody('<stdin>', false, codeInput, true);
-            }).then(function() {
+            })
+              .then(function() {
               // Finished evaluating.
-              $scope.evaluation = '';
-              $scope.fullError = '';
-
-              if (onFinishRunCallback) {
-                onFinishRunCallback('', '');
-              }
-            }, function(err) {
-              if (!(err instanceof Sk.builtin.TimeLimitError)) {
                 $scope.evaluation = '';
-                $scope.fullError = String(err);
+                $scope.fullError = '';
 
                 if (onFinishRunCallback) {
-                  onFinishRunCallback('', String(err));
+                  onFinishRunCallback('', '');
                 }
-              }
-            });
+              }, function(err) {
+                if (!(err instanceof Sk.builtin.TimeLimitError)) {
+                  $scope.evaluation = '';
+                  $scope.fullError = String(err);
+
+                  if (onFinishRunCallback) {
+                    onFinishRunCallback('', String(err));
+                  }
+                }
+              });
           };
 
           var initMarkers = function(editor) {
@@ -205,9 +207,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                   line: preCodeNumLines,
                   ch: 0
                 },
-                angular.extend({}, markOptions, {
-                  inclusiveRight: false
-                }));
+                angular.extend({}, markOptions, {inclusiveRight: false}));
 
               for (var i = 0; i < preCodeNumLines; i++) {
                 editor.addLineClass(i, 'text', 'code-repl-noneditable-line');
@@ -289,9 +289,11 @@ oppia.directive('oppiaShortResponseCodeRepl', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/CodeRepl/directives/' +
         'code_repl_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        }
+      ]
     };
   }
 ]);

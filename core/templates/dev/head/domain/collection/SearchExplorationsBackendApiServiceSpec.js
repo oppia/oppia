@@ -25,13 +25,13 @@ describe('Exploration search backend API service', function() {
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     SearchExplorationsBackendApiService = $injector.get(
       'SearchExplorationsBackendApiService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
-  }));
+  }]);
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
@@ -50,7 +50,8 @@ describe('Exploration search backend API service', function() {
     $httpBackend.flush();
     $rootScope.$digest();
 
-    expect(successHandler).toHaveBeenCalled();
+    expect(successHandler)
+      .toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   });
 
@@ -61,17 +62,19 @@ describe('Exploration search backend API service', function() {
 
     // Search result object returnable from the backend
     searchResults = {
-      collection_node_metadata_list: [{
-        id: '12',
-        objective:
+      collection_node_metadata_list: [
+        {
+          id: '12',
+          objective:
         'learn how to count permutations accurately and systematically',
-        title: 'Protractor Test'
-      }, {
-        id: '4',
-        objective:
+          title: 'Protractor Test'
+        }, {
+          id: '4',
+          objective:
         'learn how to count permutations accurately and systematically',
-        title: 'Three Balls'
-      }]
+          title: 'Three Balls'
+        }
+      ]
     };
 
     $httpBackend
@@ -82,7 +85,8 @@ describe('Exploration search backend API service', function() {
     $httpBackend.flush();
     $rootScope.$digest();
 
-    expect(successHandler).toHaveBeenCalledWith(searchResults);
+    expect(successHandler)
+      .toHaveBeenCalledWith(searchResults);
     expect(failHandler).not.toHaveBeenCalled();
   });
 
@@ -92,13 +96,15 @@ describe('Exploration search backend API service', function() {
     var query = escape(btoa('oppia'));
 
     $httpBackend
-      .expect('GET', '/exploration/metadata_search?q=' + query).respond(500);
+      .expect('GET', '/exploration/metadata_search?q=' + query)
+      .respond(500);
     SearchExplorationsBackendApiService.fetchExplorations('oppia')
       .then(successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
+    expect(failHandler)
+      .toHaveBeenCalled();
   });
 });

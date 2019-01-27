@@ -20,7 +20,7 @@ describe('AudioLanguage object factory', function() {
   var audioLanguage = null;
   var alof = null;
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     alof = $injector.get('AudioLanguageObjectFactory');
 
     audioLanguage = alof.createFromDict({
@@ -28,11 +28,14 @@ describe('AudioLanguage object factory', function() {
       description: 'a description',
       related_languages: 'English',
     });
-  }));
+  }]);
 
   it('should set attributes correctly', function() {
-    expect(audioLanguage.id).toEqual('a');
-    expect(audioLanguage.description).toEqual('a description');
-    expect(audioLanguage.relatedLanguages).toEqual('English');
+    expect(audioLanguage.id)
+      .toEqual('a');
+    expect(audioLanguage.description)
+      .toEqual('a description');
+    expect(audioLanguage.relatedLanguages)
+      .toEqual('English');
   });
 });

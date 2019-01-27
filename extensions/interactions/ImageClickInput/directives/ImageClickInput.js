@@ -34,9 +34,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
       LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
-      scope: {
-        getLastAnswer: '&lastAnswer'
-      },
+      scope: {getLastAnswer: '&lastAnswer'},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ImageClickInput/directives/' +
         'image_click_input_interaction_directive.html'),
@@ -62,7 +60,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             var loadingIndicatorSize = (
               ($scope.dimensions.height < 124) ? 24 : 120);
             $scope.imageContainerStyle = {
-              height: $scope.dimensions.height + 'px'
+              height: $scope.dimensions.height +
+              'px'
             };
             $scope.loadingIndicatorStyle = {
               height: loadingIndicatorSize + 'px',
@@ -121,11 +120,14 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             $scope.updateCurrentlyHoveredRegions();
           }
           $scope.getRegionDimensions = function(index) {
-            var image = $($element).find('.oppia-image-click-img');
+            var image = $($element)
+              .find('.oppia-image-click-img');
             var labeledRegion = imageAndRegions.labeledRegions[index];
             var regionArea = labeledRegion.region.area;
-            var leftDelta = image.offset().left - image.parent().offset().left;
-            var topDelta = image.offset().top - image.parent().offset().top;
+            var leftDelta = image.offset().left - image.parent()
+              .offset().left;
+            var topDelta = image.offset().top - image.parent()
+              .offset().top;
             return {
               left: regionArea[0][0] * image.width() + leftDelta,
               top: regionArea[0][1] * image.height() + topDelta,
@@ -149,12 +151,11 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           };
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
-            $scope.lastAnswer = {
-              clickPosition: [$scope.mouseX, $scope.mouseY]
-            };
+            $scope.lastAnswer = {clickPosition: [$scope.mouseX, $scope.mouseY]};
           });
           $scope.getDotLocation = function() {
-            var image = $($element).find('.oppia-image-click-img');
+            var image = $($element)
+              .find('.oppia-image-click-img');
             var dotLocation = {
               left: null,
               top: null
@@ -163,11 +164,13 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               dotLocation.left =
                 $scope.lastAnswer.clickPosition[0] * image.width() +
                 image.offset().left -
-                image.parent().offset().left - 5;
+                image.parent()
+                  .offset().left - 5;
               dotLocation.top =
                 $scope.lastAnswer.clickPosition[1] * image.height() +
                 image.offset().top -
-                image.parent().offset().top - 5;
+                image.parent()
+                  .offset().top - 5;
             }
             return dotLocation;
           };
@@ -175,7 +178,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             if (!$scope.interactionIsActive) {
               return;
             }
-            var image = $($element).find('.oppia-image-click-img');
+            var image = $($element)
+              .find('.oppia-image-click-img');
             $scope.mouseX =
               (event.pageX - image.offset().left) / image.width();
             $scope.mouseY =
@@ -229,20 +233,24 @@ oppia.directive('oppiaShortResponseImageClickInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ImageClickInput/directives/' +
         'image_click_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.clickRegionLabel = (
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          $scope.clickRegionLabel = (
           _answer.clickedRegions.length > 0 ? _answer.clickedRegions[0] :
           'Clicked on image');
-      }]
+        }
+      ]
     };
   }
 ]);
 
-oppia.factory('imageClickInputRulesService', [function() {
-  return {
-    IsInRegion: function(answer, inputs) {
-      return answer.clickedRegions.indexOf(inputs.x) !== -1;
-    }
-  };
-}]);
+oppia.factory('imageClickInputRulesService', [
+  function() {
+    return {
+      IsInRegion: function(answer, inputs) {
+        return answer.clickedRegions.indexOf(inputs.x) !== -1;
+      }
+    };
+  }
+]);

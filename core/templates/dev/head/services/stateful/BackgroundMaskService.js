@@ -32,5 +32,6 @@ oppia.factory('BackgroundMaskService', [
         maskIsActive = false;
       }
     };
-  }]
+  }
+]
 );

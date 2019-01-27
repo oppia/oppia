@@ -44,7 +44,8 @@ oppia.directive('audioBar', [
           $scope.languagesInExploration =
             AudioTranslationLanguageService.getLanguageOptionsForDropdown();
           $scope.selectedLanguage = {
-            value: AudioTranslationLanguageService.getCurrentAudioLanguageCode()
+            value:
+             AudioTranslationLanguageService.getCurrentAudioLanguageCode()
           };
 
           $scope.$on(EVENT_AUTOPLAY_AUDIO, function(e, params) {
@@ -101,14 +102,16 @@ oppia.directive('audioBar', [
 
           var lastScrollTop = 0;
 
-          $(window).scroll(function(event) {
-            if (WindowDimensionsService.isWindowNarrow()) {
-              updateAudioHeaderPosition();
-            }
-          });
+          $(window)
+            .scroll(function(event) {
+              if (WindowDimensionsService.isWindowNarrow()) {
+                updateAudioHeaderPosition();
+              }
+            });
 
           var updateAudioHeaderPosition = function() {
-            var scrollTop = $(this).scrollTop();
+            var scrollTop = $(this)
+              .scrollTop();
             var audioHeader = angular.element($('.audio-header:first'));
             if (scrollTop > lastScrollTop) {
               audioHeader.addClass('audio-bar-nav-up');
@@ -116,7 +119,9 @@ oppia.directive('audioBar', [
                 audioHeader.addClass('audio-bar-nav-hidden');
               }
             } else if (scrollTop === 0 ||
-                       scrollTop + $(window).height() < $(document).height()) {
+                       scrollTop + $(window)
+                         .height() < $(document)
+                         .height()) {
               audioHeader.removeClass('audio-bar-nav-up');
               audioHeader.removeClass('audio-bar-nav-hidden');
             }
@@ -279,7 +284,8 @@ oppia.directive('audioBar', [
               }
             }
           };
-        }]
+        }
+      ]
     };
   }
 ]);

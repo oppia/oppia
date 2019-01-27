@@ -128,21 +128,20 @@ oppia.factory('CollectionUpdateService', [
           explorationSummaryBackendObject) {
         var oldSummaryBackendObject = angular.copy(
           explorationSummaryBackendObject);
-        _applyChange(collection, CMD_ADD_COLLECTION_NODE, {
-          exploration_id: explorationId
-        }, function(changeDict, collection) {
+        _applyChange(collection, CMD_ADD_COLLECTION_NODE,
+          {exploration_id: explorationId}, function(changeDict, collection) {
           // Apply.
-          var explorationId = _getExplorationIdFromChangeDict(changeDict);
-          var collectionNode = (
-            CollectionNodeObjectFactory.createFromExplorationId(
-              explorationId));
-          collectionNode.setExplorationSummaryObject(oldSummaryBackendObject);
-          collection.addCollectionNode(collectionNode);
-        }, function(changeDict, collection) {
+            var explorationId = _getExplorationIdFromChangeDict(changeDict);
+            var collectionNode = (
+              CollectionNodeObjectFactory.createFromExplorationId(
+                explorationId));
+            collectionNode.setExplorationSummaryObject(oldSummaryBackendObject);
+            collection.addCollectionNode(collectionNode);
+          }, function(changeDict, collection) {
           // Undo.
-          var explorationId = _getExplorationIdFromChangeDict(changeDict);
-          collection.deleteCollectionNode(explorationId);
-        });
+            var explorationId = _getExplorationIdFromChangeDict(changeDict);
+            collection.deleteCollectionNode(explorationId);
+          });
       },
 
       swapNodes: function(collection, firstIndex, secondIndex) {
@@ -171,16 +170,15 @@ oppia.factory('CollectionUpdateService', [
       deleteCollectionNode: function(collection, explorationId) {
         var oldCollectionNode = angular.copy(
           collection.getCollectionNodeByExplorationId(explorationId));
-        _applyChange(collection, CMD_DELETE_COLLECTION_NODE, {
-          exploration_id: explorationId
-        }, function(changeDict, collection) {
+        _applyChange(collection, CMD_DELETE_COLLECTION_NODE,
+          {exploration_id: explorationId}, function(changeDict, collection) {
           // Apply.
-          var explorationId = _getExplorationIdFromChangeDict(changeDict);
-          collection.deleteCollectionNode(explorationId);
-        }, function(changeDict, collection) {
+            var explorationId = _getExplorationIdFromChangeDict(changeDict);
+            collection.deleteCollectionNode(explorationId);
+          }, function(changeDict, collection) {
           // Undo.
-          collection.addCollectionNode(oldCollectionNode);
-        });
+            collection.addCollectionNode(oldCollectionNode);
+          });
       },
 
       /**
@@ -294,4 +292,5 @@ oppia.factory('CollectionUpdateService', [
           changeObject.getBackendChangeObject());
       }
     };
-  }]);
+  }
+]);

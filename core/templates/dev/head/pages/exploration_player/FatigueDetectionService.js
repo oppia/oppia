@@ -26,7 +26,8 @@ oppia.factory('FatigueDetectionService', [
 
     return {
       recordSubmissionTimestamp: function() {
-        submissionTimesMsec.push((new Date()).getTime());
+        submissionTimesMsec.push((new Date())
+          .getTime());
       },
       isSubmittingTooFast: function() {
         if (submissionTimesMsec.length >= SPAM_COUNT_THRESHOLD) {
@@ -51,11 +52,13 @@ oppia.factory('FatigueDetectionService', [
               $scope.okay = function() {
                 $uibModalInstance.close('okay');
               };
-            }]
+            }
+          ]
         });
       },
       reset: function() {
         submissionTimesMsec = [];
       }
     };
-  }]);
+  }
+]);

@@ -24,16 +24,15 @@ oppia.factory('LearnerViewRatingService', [
     var userRating;
     return {
       init: function(successCallback) {
-        $http.get(ratingsUrl).then(function(response) {
-          successCallback(response.data.user_rating);
-          userRating = response.data.user_rating;
-          $rootScope.$broadcast('ratingServiceInitialized');
-        });
+        $http.get(ratingsUrl)
+          .then(function(response) {
+            successCallback(response.data.user_rating);
+            userRating = response.data.user_rating;
+            $rootScope.$broadcast('ratingServiceInitialized');
+          });
       },
       submitUserRating: function(ratingValue) {
-        $http.put(ratingsUrl, {
-          user_rating: ratingValue
-        });
+        $http.put(ratingsUrl, {user_rating: ratingValue});
         userRating = ratingValue;
         $rootScope.$broadcast('ratingUpdated');
       },

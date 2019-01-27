@@ -32,20 +32,21 @@ oppia.factory('EditableStoryBackendApiService', [
           story_id: storyId
         });
 
-      $http.get(storyDataUrl).then(function(response) {
-        var story = angular.copy(response.data.story);
-        var topicName = angular.copy(response.data.topic_name);
-        if (successCallback) {
-          successCallback({
-            story: story,
-            topicName: topicName
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(storyDataUrl)
+        .then(function(response) {
+          var story = angular.copy(response.data.story);
+          var topicName = angular.copy(response.data.topic_name);
+          if (successCallback) {
+            successCallback({
+              story: story,
+              topicName: topicName
+            });
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _updateStory = function(
@@ -62,18 +63,19 @@ oppia.factory('EditableStoryBackendApiService', [
         commit_message: commitMessage,
         change_dicts: changeList
       };
-      $http.put(editableStoryDataUrl, putData).then(function(response) {
+      $http.put(editableStoryDataUrl, putData)
+        .then(function(response) {
         // The returned data is an updated story dict.
-        var story = angular.copy(response.data.story);
+          var story = angular.copy(response.data.story);
 
-        if (successCallback) {
-          successCallback(story);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+          if (successCallback) {
+            successCallback(story);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _deleteStory = function(
@@ -83,15 +85,16 @@ oppia.factory('EditableStoryBackendApiService', [
           topic_id: topicId,
           story_id: storyId
         });
-      $http['delete'](storyDataUrl).then(function(response) {
-        if (successCallback) {
-          successCallback(response.status);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http['delete'](storyDataUrl)
+        .then(function(response) {
+          if (successCallback) {
+            successCallback(response.status);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     return {

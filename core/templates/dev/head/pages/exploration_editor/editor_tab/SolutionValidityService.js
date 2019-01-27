@@ -43,4 +43,5 @@ oppia.factory('SolutionValidityService', [
         return this.solutionValidities;
       }
     };
-  }]);
+  }
+]);

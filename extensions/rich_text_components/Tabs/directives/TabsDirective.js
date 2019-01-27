@@ -27,10 +27,12 @@ oppia.directive('oppiaNoninteractiveTabs', [
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Tabs/directives/tabs_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.tabContents = HtmlEscaperService.escapedJsonToObj(
-          $attrs.tabContentsWithValue);
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.tabContents = HtmlEscaperService.escapedJsonToObj(
+            $attrs.tabContentsWithValue);
+        }
+      ]
     };
   }
 ]);

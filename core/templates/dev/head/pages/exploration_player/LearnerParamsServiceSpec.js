@@ -22,45 +22,41 @@ describe('Learner parameters service', function() {
   describe('learner params service', function() {
     var LearnerParamsService = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       LearnerParamsService = $injector.get('LearnerParamsService');
-    }));
+    }]);
 
     it('should correctly initialize parameters', function() {
-      expect(LearnerParamsService.getAllParams()).toEqual({});
-      LearnerParamsService.init({
-        a: 'b'
-      });
-      expect(LearnerParamsService.getAllParams()).toEqual({
-        a: 'b'
-      });
+      expect(LearnerParamsService.getAllParams())
+        .toEqual({});
+      LearnerParamsService.init({a: 'b'});
+      expect(LearnerParamsService.getAllParams())
+        .toEqual({a: 'b'});
     });
 
     it('should correctly get and set parameters', function() {
-      LearnerParamsService.init({
-        a: 'b'
-      });
-      expect(LearnerParamsService.getValue('a')).toEqual('b');
+      LearnerParamsService.init({a: 'b'});
+      expect(LearnerParamsService.getValue('a'))
+        .toEqual('b');
       LearnerParamsService.setValue('a', 'c');
-      expect(LearnerParamsService.getValue('a')).toEqual('c');
+      expect(LearnerParamsService.getValue('a'))
+        .toEqual('c');
     });
 
     it('should not get an invalid parameter', function() {
-      LearnerParamsService.init({
-        a: 'b'
-      });
+      LearnerParamsService.init({a: 'b'});
       expect(function() {
         LearnerParamsService.getValue('b');
-      }).toThrow('Invalid parameter name: b');
+      })
+        .toThrow('Invalid parameter name: b');
     });
 
     it('should not set an invalid parameter', function() {
-      LearnerParamsService.init({
-        a: 'b'
-      });
+      LearnerParamsService.init({a: 'b'});
       expect(function() {
         LearnerParamsService.setValue('b', 'c');
-      }).toThrow('Cannot set unknown parameter: b');
+      })
+        .toThrow('Cannot set unknown parameter: b');
     });
   });
 });

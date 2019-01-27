@@ -23,17 +23,15 @@ describe('retrieving threads service', function() {
   beforeEach(function() {
     module('oppia');
     module(function($provide) {
-      $provide.value('ExplorationDataService', {
-        explorationId: expId
-      });
+      $provide.value('ExplorationDataService', {explorationId: expId});
     });
   });
 
   var ThreadDataService, httpBackend;
-  beforeEach(inject(function($httpBackend, _ThreadDataService_) {
+  beforeEach(inject[function($httpBackend, _ThreadDataService_) {
     ThreadDataService = _ThreadDataService_;
     httpBackend = $httpBackend;
-  }));
+  }]);
 
   it('should retrieve feedback threads', function() {
     var mockFeedbackThreads = [
@@ -95,25 +93,28 @@ describe('retrieving threads service', function() {
         thread_id: 'exp_1.1234'
       }
     ];
-    httpBackend.whenGET('/threadlisthandler/' + expId).respond({
-      threads: mockFeedbackThreads.join(feedbackThreadsForSuggestionThreads)
-    });
+    httpBackend.whenGET('/threadlisthandler/' + expId)
+      .respond({
+        threads: mockFeedbackThreads
+          .join(feedbackThreadsForSuggestionThreads)
+      });
 
     httpBackend.whenGET(
       '/generalsuggestionlisthandler?target_type=exploration' +
-      '&target_id=' + expId).respond({
-      suggestions: mockGeneralSuggestionThreads
-    });
+      '&target_id=' + expId)
+      .respond({suggestions: mockGeneralSuggestionThreads});
 
     ThreadDataService.fetchThreads(function() {
       for (var i = 0; i < mockFeedbackThreads.length; i++) {
-        expect(ThreadDataService.data.feedbackThreads).toContain(
-          mockFeedbackThreads[i]);
+        expect(ThreadDataService.data.feedbackThreads)
+          .toContain(
+            mockFeedbackThreads[i]);
       }
 
       for (var i = 0; i < mockGeneralSuggestionThreads.length; i++) {
-        expect(ThreadDataService.data.suggestionThreads).toContain(
-          mockGeneralSuggestionThreads[i]);
+        expect(ThreadDataService.data.suggestionThreads)
+          .toContain(
+            mockGeneralSuggestionThreads[i]);
       }
     });
     httpBackend.flush();

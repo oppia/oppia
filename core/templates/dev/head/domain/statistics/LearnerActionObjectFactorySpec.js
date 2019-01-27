@@ -19,38 +19,20 @@
 describe('Learner Action Object Factory', function() {
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
-    this.LearnerActionObjectFactory =
-        $injector.get('LearnerActionObjectFactory');
-    this.LEARNER_ACTION_SCHEMA_LATEST_VERSION =
-      $injector.get('LEARNER_ACTION_SCHEMA_LATEST_VERSION');
-  }));
+  beforeEach(inject[function($injector) {
+    this.laof = $injector.get('LearnerActionObjectFactory');
+  }]);
 
   it('should create a new learner action', function() {
     var learnerActionObject =
         this.LearnerActionObjectFactory.createNew('AnswerSubmit', {});
 
-    expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
-    expect(learnerActionObject.actionCustomizationArgs).toEqual({});
+    expect(learnerActionObject.actionType)
+      .toEqual('AnswerSubmit');
+    expect(learnerActionObject.actionCustomizationArgs)
+      .toEqual({});
     expect(learnerActionObject.schemaVersion)
-      .toEqual(this.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
-  });
-
-  it('should throw if the schema version is not a positive int', function() {
-    var LearnerActionObjectFactoryLocalReference =
-        this.LearnerActionObjectFactory;
-
-    expect(function() {
-      return LearnerActionObjectFactoryLocalReference.createNew(
-        'AnswerSubmit', {}, -1);
-    }).toThrow(new Error('given invalid schema version'));
-  });
-
-  it('should use a specific schema version if provided', function() {
-    var learnerActionObject =
-        this.LearnerActionObjectFactory.createNew('AnswerSubmit', {}, 99);
-
-    expect(learnerActionObject.schemaVersion).toEqual(99);
+      .toEqual(1);
   });
 
   it('should create a new learner action from a backend dict', function() {
@@ -61,9 +43,12 @@ describe('Learner Action Object Factory', function() {
           schema_version: 1
         });
 
-    expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
-    expect(learnerActionObject.actionCustomizationArgs).toEqual({});
-    expect(learnerActionObject.schemaVersion).toEqual(1);
+    expect(learnerActionObject.actionType)
+      .toEqual('AnswerSubmit');
+    expect(learnerActionObject.actionCustomizationArgs)
+      .toEqual({});
+    expect(learnerActionObject.schemaVersion)
+      .toEqual(1);
   });
 
   it('should convert a learner action to a backend dict', function() {
@@ -71,10 +56,11 @@ describe('Learner Action Object Factory', function() {
         this.LearnerActionObjectFactory.createNew('AnswerSubmit', {}, 1);
 
     var learnerActionDict = learnerActionObject.toBackendDict();
-    expect(learnerActionDict).toEqual({
-      action_type: 'AnswerSubmit',
-      action_customization_args: {},
-      schema_version: 1
-    });
+    expect(learnerActionDict)
+      .toEqual({
+        action_type: 'AnswerSubmit',
+        action_customization_args: {},
+        schema_version: 1
+      });
   });
 });

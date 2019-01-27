@@ -25,15 +25,12 @@ describe('Question object factory', function() {
 
   beforeEach(function() {
     module(function($provide) {
-      $provide.constant('INTERACTION_SPECS', {
-        TextInput: {
-          can_have_solution: true
-        }
-      });
+      $provide.constant('INTERACTION_SPECS',
+        {TextInput: {can_have_solution: true}});
     });
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
@@ -45,24 +42,26 @@ describe('Question object factory', function() {
           content_id: 'content_1'
         },
         interaction: {
-          answer_groups: [{
-            outcome: {
-              dest: 'outcome 1',
-              feedback: {
-                content_id: 'content_5',
-                html: ''
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'outcome 1',
+                feedback: {
+                  content_id: 'content_5',
+                  html: ''
+                },
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null
               },
-              labelled_as_correct: true,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
-          }],
+              rule_specs: [
+                {
+                  inputs: {x: 10},
+                  rule_type: 'Equals'
+                }
+              ],
+            }
+          ],
           confirmed_unclassified_answers: [],
           customization_args: {},
           default_outcome: {
@@ -106,33 +105,46 @@ describe('Question object factory', function() {
     };
     _sampleQuestion = QuestionObjectFactory.createFromBackendDict(
       _sampleQuestionBackendDict);
-  }));
+  }]);
 
   it('should correctly get various fields of the question', function() {
-    expect(_sampleQuestion.getId()).toEqual('question_id');
-    expect(_sampleQuestion.getLanguageCode()).toEqual('en');
+    expect(_sampleQuestion.getId())
+      .toEqual('question_id');
+    expect(_sampleQuestion.getLanguageCode())
+      .toEqual('en');
     var stateData = _sampleQuestion.getStateData();
-    expect(stateData.name).toEqual('question');
-    expect(stateData.content.getHtml()).toEqual('Question 1');
+    expect(stateData.name)
+      .toEqual('question');
+    expect(stateData.content.getHtml())
+      .toEqual('Question 1');
     var interaction = stateData.interaction;
-    expect(interaction.id).toEqual('TextInput');
-    expect(interaction.hints[0].hintContent.getHtml()).toEqual('Hint 1');
-    expect(interaction.solution.explanation.getHtml()).toEqual(
-      'Solution explanation');
-    expect(interaction.solution.correctAnswer).toEqual(
-      'This is the correct answer');
+    expect(interaction.id)
+      .toEqual('TextInput');
+    expect(interaction.hints[0].hintContent.getHtml())
+      .toEqual('Hint 1');
+    expect(interaction.solution.explanation.getHtml())
+      .toEqual(
+        'Solution explanation');
+    expect(interaction.solution.correctAnswer)
+      .toEqual(
+        'This is the correct answer');
     var defaultOutcome = interaction.defaultOutcome;
-    expect(defaultOutcome.labelledAsCorrect).toEqual(false);
-    expect(defaultOutcome.feedback.getHtml()).toEqual('Correct Answer');
+    expect(defaultOutcome.labelledAsCorrect)
+      .toEqual(false);
+    expect(defaultOutcome.feedback.getHtml())
+      .toEqual('Correct Answer');
   });
 
   it('should correctly get backend dict', function() {
     expect(
       _sampleQuestion.toBackendDict(true).question_state_schema_version
-    ).toEqual(25);
+    )
+      .toEqual(25);
 
-    expect(_sampleQuestion.toBackendDict(true, 25).id).toEqual(null);
-    expect(_sampleQuestion.toBackendDict(false).id).toEqual('question_id');
+    expect(_sampleQuestion.toBackendDict(true, 25).id)
+      .toEqual(null);
+    expect(_sampleQuestion.toBackendDict(false).id)
+      .toEqual('question_id');
   });
 
   it('should correctly validate question', function() {
@@ -141,19 +153,23 @@ describe('Question object factory', function() {
       'id', 'name', 'notes', 'feedback');
     var misconception2 = MisconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
-    expect(_sampleQuestion.validate([misconception1, misconception2])).toEqual(
-      'The following misconceptions should also be caught: name, name_2');
+    expect(_sampleQuestion.validate([misconception1, misconception2]))
+      .toEqual(
+        'The following misconceptions should also be caught: name, name_2');
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
-    expect(_sampleQuestion.validate([])).toEqual(
-      'At least one answer should be marked correct');
+    expect(_sampleQuestion.validate([]))
+      .toEqual(
+        'At least one answer should be marked correct');
 
     interaction.solution = null;
-    expect(_sampleQuestion.validate([])).toEqual(
-      'A solution must be specified');
+    expect(_sampleQuestion.validate([]))
+      .toEqual(
+        'A solution must be specified');
 
     interaction.hints = [];
-    expect(_sampleQuestion.validate([])).toEqual(
-      'At least 1 hint should be specfied');
+    expect(_sampleQuestion.validate([]))
+      .toEqual(
+        'At least 1 hint should be specfied');
   });
 });

@@ -30,28 +30,32 @@ describe('ExplorationDraftObjectFactory', function() {
     };
     var draft = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       ExplorationDraftObjectFactory = $injector.get(
         'ExplorationDraftObjectFactory');
       draft = (
         ExplorationDraftObjectFactory.createFromLocalStorageDict(
           draftDict));
-    }));
+    }]);
 
     it('should determine if the draft is valid', function() {
       expect(draft.isValid(
-        draftChangeListId)).toBeTruthy();
+        draftChangeListId))
+        .toBeTruthy();
       expect(draft.isValid(
-        draftChangeListId + 1)).toBeFalsy();
+        draftChangeListId + 1))
+        .toBeFalsy();
     });
 
     it('should return the correct changeList', function() {
-      expect(draft.getChanges()).toEqual(changeList);
+      expect(draft.getChanges())
+        .toEqual(changeList);
     });
 
     it('should create a valid local storage dict', function() {
       expect(ExplorationDraftObjectFactory.toLocalStorageDict(
-        changeList, draftChangeListId)).toEqual(draftDict);
+        changeList, draftChangeListId))
+        .toEqual(draftDict);
     });
   });
 });

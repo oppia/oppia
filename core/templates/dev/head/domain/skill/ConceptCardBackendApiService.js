@@ -28,20 +28,19 @@ oppia.factory('ConceptCardBackendApiService', [
     var _fetchConceptCard = function(
         skillId, successCallback, errorCallback) {
       var conceptCardDataUrl = UrlInterpolationService.interpolateUrl(
-        CONCEPT_CARD_DATA_URL_TEMPLATE, {
-          skill_id: skillId
-        });
+        CONCEPT_CARD_DATA_URL_TEMPLATE, {skill_id: skillId});
 
-      $http.get(conceptCardDataUrl).then(function(response) {
-        var conceptCard = angular.copy(response.data.concept_card_dict);
-        if (successCallback) {
-          successCallback(conceptCard);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(conceptCardDataUrl)
+        .then(function(response) {
+          var conceptCard = angular.copy(response.data.concept_card_dict);
+          if (successCallback) {
+            successCallback(conceptCard);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _isCached = function(conceptCardId) {

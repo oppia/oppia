@@ -19,9 +19,9 @@ describe('AutoplayedVideosService', function() {
   var AutoplayedVideosService = null;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     AutoplayedVideosService = $injector.get('AutoplayedVideosService');
-  }));
+  }]);
 
   it('should add video to a list of autoplayed videos', function() {
     AutoplayedVideosService.addAutoplayedVideo('Ntcw0H0hwPU');

@@ -16,58 +16,57 @@
  * @fileoverview Directive for bar chart visualization.
  */
 
-oppia.directive('barChart', [function() {
-  return {
-    restrict: 'E',
-    scope: {
+oppia.directive('barChart', [
+  function() {
+    return {
+      restrict: 'E',
+      scope: {
       // A read-only array representing the table of chart data.
-      data: '&',
-      // A read-only object containing several chart options. This object
-      // should have the following keys: chartAreaWidth, colors, height,
-      // legendPosition and width.
-      options: '&'
-    },
-    controller: ['$scope', '$element', function($scope, $element) {
-      if (!$.isArray($scope.data())) {
-        return;
-      }
-      var options = $scope.options();
-      var chart = null;
-
-      var redrawChart = function() {
-        if (!chart) {
-          try {
-            // Occasionally, we run into the following error:
-            // "TypeError: google.visualization.BarChart is not a constructor".
-            // This ignores the above error since the bar chart directive is to
-            // be deprecated soon.
-            chart = new google.visualization.BarChart($element[0]);
-          } catch (e) {
+        data: '&',
+        // A read-only object containing several chart options. This object
+        // should have the following keys: chartAreaWidth, colors, height,
+        // legendPosition and width.
+        options: '&'
+      },
+      controller: [
+        '$scope', '$element', function($scope, $element) {
+          if (!$.isArray($scope.data())) {
             return;
           }
-        }
-        chart.draw(google.visualization.arrayToDataTable($scope.data()), {
-          chartArea: {
-            left: 0,
-            width: options.chartAreaWidth
-          },
-          colors: options.colors,
-          hAxis: {
-            gridlines: {
-              color: 'transparent'
-            }
-          },
-          height: options.height,
-          isStacked: true,
-          legend: {
-            position: options.legendPosition || 'none'
-          },
-          width: options.width
-        });
-      };
+          var options = $scope.options();
+          var chart = null;
 
-      $scope.$watch('data()', redrawChart);
-      $(window).resize(redrawChart);
-    }]
-  };
-}]);
+          var redrawChart = function() {
+            if (!chart) {
+              try {
+                // Occasionally, we run into the following error:
+                // "TypeError: google.visualization.BarChart is not a constructor".
+                // This ignores the above error since the bar chart directive is to
+                // be deprecated soon.
+                chart = new google.visualization.BarChart($element[0]);
+              } catch (e) {
+                return;
+              }
+            }
+            chart.draw(google.visualization.arrayToDataTable($scope.data()), {
+              chartArea: {
+                left: 0,
+                width: options.chartAreaWidth
+              },
+              colors: options.colors,
+              hAxis: {gridlines: {color: 'transparent'}},
+              height: options.height,
+              isStacked: true,
+              legend: {position: options.legendPosition || 'none'},
+              width: options.width
+            });
+          };
+
+          $scope.$watch('data()', redrawChart);
+          $(window)
+            .resize(redrawChart);
+        }
+      ]
+    };
+  }
+]);

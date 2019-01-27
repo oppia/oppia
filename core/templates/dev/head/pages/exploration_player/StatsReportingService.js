@@ -96,9 +96,7 @@ oppia.factory('StatsReportingService', [
 
     var getFullStatsUrl = function(urlIdentifier) {
       return UrlInterpolationService.interpolateUrl(
-        STATS_REPORTING_URLS[urlIdentifier], {
-          exploration_id: explorationId
-        });
+        STATS_REPORTING_URLS[urlIdentifier], {exploration_id: explorationId});
     };
 
     if (!_editorPreviewMode) {

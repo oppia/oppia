@@ -68,5 +68,6 @@ oppia.factory('AudioTranslationManagerService', [
         return _currentPrimaryComponentName;
       }
     };
-  }]
+  }
+]
 );

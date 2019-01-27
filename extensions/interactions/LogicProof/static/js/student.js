@@ -534,9 +534,7 @@ var logicProofStudent = (function() {
         kinds: logicProofData.BASE_CONTROL_LANGUAGE.kinds,
         operators: controlOperators
       },
-      control_model: {
-        evaluation_rules: evaluationRules
-      }
+      control_model: {evaluation_rules: evaluationRules}
     };
   };
 
@@ -859,7 +857,8 @@ var logicProofStudent = (function() {
         lineString.trim(), language.operators, vocabulary, false);
     } catch (err) {
       throw {
-        message: logicProofShared.renderError(err, generalMessages, language)
+        message: logicProofShared.renderError(err,
+          generalMessages, language)
       };
     }
 
@@ -879,9 +878,7 @@ var logicProofStudent = (function() {
       }
     }
     if (!lineIdentified) {
-      throw {
-        message: errorMessage
-      };
+      throw {message: errorMessage};
     }
   };
 
@@ -903,7 +900,8 @@ var logicProofStudent = (function() {
     }
     var lineStrings = proofString.split('\n');
     for (var i = 0; i < lineStrings.length; i++) {
-      if (lineStrings[i].split(' ').join('').length !== 0) {
+      if (lineStrings[i].split(' ')
+        .join('').length !== 0) {
         try {
           requireIdentifiableLine(lineStrings[i],
             questionInstance.line_templates, questionInstance.language,
@@ -1048,9 +1046,7 @@ var logicProofStudent = (function() {
         };
       }
     }
-    return {
-      lines: builtLines
-    };
+    return {lines: builtLines};
   };
 
   // CHECK PROOF
@@ -1163,9 +1159,8 @@ var logicProofStudent = (function() {
           if (message[j].format === 'string') {
             renderedMessage += message[j].content;
           } else {
-            var rawResult = evaluate(message[j].content, {
-              n: lineNumber + 1
-            }, model, parameters, {});
+            var rawResult = evaluate(message[j].content,
+              {n: lineNumber + 1}, model, parameters, {});
             renderedMessage += (message[j].content.type === 'set_of_formulas') ?
               logicProofShared.displayExpressionArray(rawResult, operators) :
               (message[j].content.type === 'formula') ?
@@ -1222,9 +1217,8 @@ var logicProofStudent = (function() {
           // it implicit that n>1.
           var check = false;
           try {
-            check = evaluate(mistake.occurs, {
-              n: lineNumber + 1
-            }, questionInstance.control_model, parameters, evaluationCache);
+            check = evaluate(mistake.occurs, {n: lineNumber + 1},
+              questionInstance.control_model, parameters, evaluationCache);
           } catch (err) {
             if (err.message !== 'evaluation failed') {
               throw err;

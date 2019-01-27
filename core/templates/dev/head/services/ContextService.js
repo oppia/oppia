@@ -70,7 +70,8 @@ oppia.factory('ContextService', [
         if (pageContext) {
           return pageContext;
         } else {
-          var pathnameArray = UrlService.getPathname().split('/');
+          var pathnameArray = UrlService.getPathname()
+            .split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
             if (pathnameArray[i] === 'explore' ||
                 (pathnameArray[i] === 'embed' &&
@@ -107,7 +108,8 @@ oppia.factory('ContextService', [
         } else {
           // The pathname should be one of /explore/{exploration_id} or
           // /create/{exploration_id} or /embed/exploration/{exploration_id}.
-          var pathnameArray = UrlService.getPathname().split('/');
+          var pathnameArray = UrlService.getPathname()
+            .split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
             if (pathnameArray[i] === 'explore' ||
                 pathnameArray[i] === 'create') {
@@ -133,7 +135,8 @@ oppia.factory('ContextService', [
           return questionId;
         } else {
           // The pathname should /question_editor/{question_id}.
-          var pathnameArray = UrlService.getPathname().split('/');
+          var pathnameArray = UrlService.getPathname()
+            .split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
             if (pathnameArray[i] === 'question_editor') {
               questionId = pathnameArray[i + 1];

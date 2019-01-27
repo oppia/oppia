@@ -176,7 +176,8 @@ oppia.directive('answerGroupEditor', [
               case 'CoordTwoDim':
                 return [
                   getDefaultInputValue('Real'),
-                  getDefaultInputValue('Real')];
+                  getDefaultInputValue('Real')
+                ];
               case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
               case 'SetOfUnicodeString':
@@ -209,7 +210,8 @@ oppia.directive('answerGroupEditor', [
               case 'NormalizedRectangle2D':
                 return [
                   [getDefaultInputValue('Real'), getDefaultInputValue('Real')],
-                  [getDefaultInputValue('Real'), getDefaultInputValue('Real')]];
+                  [getDefaultInputValue('Real'), getDefaultInputValue('Real')]
+                ];
               case 'ImageRegion':
                 return {
                   area: getDefaultInputValue('NormalizedRectangle2D'),
@@ -223,7 +225,9 @@ oppia.directive('answerGroupEditor', [
               case 'ClickOnImage':
                 return {
                   clickPosition: [
-                    getDefaultInputValue('Real'), getDefaultInputValue('Real')],
+                    getDefaultInputValue('Real'),
+                    getDefaultInputValue('Real')
+                  ],
                   clickedRegions: []
                 };
             }
@@ -333,4 +337,5 @@ oppia.directive('answerGroupEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

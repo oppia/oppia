@@ -126,4 +126,5 @@ oppia.directive('hintAndSolutionButtons', [
         }
       ]
     };
-  }]);
+  }
+]);

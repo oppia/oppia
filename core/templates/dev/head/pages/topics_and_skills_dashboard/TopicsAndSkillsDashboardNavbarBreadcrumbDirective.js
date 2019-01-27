@@ -23,8 +23,7 @@ oppia.directive('topicsAndSkillsDashboardNavbarBreadcrumb', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/' +
         'topics_and_skills_dashboard_navbar_breadcrumb_directive.html'),
-      controller: [
-        function() {}
-      ]
+      controller: [function() {}]
     };
-  }]);
+  }
+]);

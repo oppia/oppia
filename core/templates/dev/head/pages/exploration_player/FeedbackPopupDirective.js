@@ -47,14 +47,17 @@ oppia.directive('feedbackPopup', [
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
           $scope.isLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.isLoggedIn = userInfo.isLoggedIn();
-          });
+          UserService.getUserInfoAsync()
+            .then(function(userInfo) {
+              $scope.isLoggedIn = userInfo.isLoggedIn();
+            });
           $scope.feedbackSubmitted = false;
           // We generate a random id since there may be multiple popover
           // elements on the same page.
           $scope.feedbackPopoverId = (
-            'feedbackPopover' + Math.random().toString(36).slice(2));
+            'feedbackPopover' + Math.random()
+              .toString(36)
+              .slice(2));
 
           if (WindowDimensionsService.isWindowNarrow()) {
             BackgroundMaskService.activateMask();
@@ -138,7 +141,8 @@ oppia.directive('feedbackPopup', [
             // the subsequent digest cycle. Otherwise, an "$apply already
             // in progress" error is raised.
             $timeout(function() {
-              getTriggerElt().trigger('click');
+              getTriggerElt()
+                .trigger('click');
             });
             BackgroundMaskService.deactivateMask();
           };

@@ -74,4 +74,5 @@ oppia.factory('InteractiveMapValidationService', [
         return warningsList;
       }
     };
-  }]);
+  }
+]);

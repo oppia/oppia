@@ -36,4 +36,5 @@ oppia.directive('stateParamChangesEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

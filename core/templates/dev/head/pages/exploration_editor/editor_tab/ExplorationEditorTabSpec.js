@@ -21,7 +21,7 @@ describe('Exploration editor tab controller', function() {
     var scope, ecs, ess, scs;
 
     beforeEach(module('oppia'));
-    beforeEach(inject(function($controller, $injector, $rootScope) {
+    beforeEach(inject[function($controller, $injector, $rootScope) {
       scope = $rootScope.$new();
       rootScope = $injector.get('$rootScope');
       spyOn(rootScope, '$broadcast');
@@ -42,19 +42,21 @@ describe('Exploration editor tab controller', function() {
           },
           interaction: {
             id: 'TextInput',
-            answer_groups: [{
-              rule_specs: [],
-              outcome: {
-                dest: 'unused',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
+            answer_groups: [
+              {
+                rule_specs: [],
+                outcome: {
+                  dest: 'unused',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ''
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null
+                }
               }
-            }],
+            ],
             default_outcome: {
               dest: 'default',
               feedback: {
@@ -81,19 +83,21 @@ describe('Exploration editor tab controller', function() {
           },
           interaction: {
             id: 'TextInput',
-            answer_groups: [{
-              rule_specs: [],
-              outcome: {
-                dest: 'unused',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
+            answer_groups: [
+              {
+                rule_specs: [],
+                outcome: {
+                  dest: 'unused',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ''
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null
+                }
               }
-            }],
+            ],
             default_outcome: {
               dest: 'default',
               feedback: {
@@ -120,19 +124,21 @@ describe('Exploration editor tab controller', function() {
           },
           interaction: {
             id: 'TextInput',
-            answer_groups: [{
-              rule_specs: [],
-              outcome: {
-                dest: 'unused',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
+            answer_groups: [
+              {
+                rule_specs: [],
+                outcome: {
+                  dest: 'unused',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ''
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null
+                }
               }
-            }],
+            ],
             default_outcome: {
               dest: 'default',
               feedback: {
@@ -145,14 +151,16 @@ describe('Exploration editor tab controller', function() {
             },
             hints: []
           },
-          param_changes: [{
-            name: 'comparison',
-            generator_id: 'Copier',
-            customization_args: {
-              value: 'something clever',
-              parse_with_jinja: false
+          param_changes: [
+            {
+              name: 'comparison',
+              generator_id: 'Copier',
+              customization_args: {
+                value: 'something clever',
+                parse_with_jinja: false
+              }
             }
-          }]
+          ]
         }
       });
 
@@ -160,7 +168,7 @@ describe('Exploration editor tab controller', function() {
         $scope: scope,
         ExplorationStatesService: ess
       });
-    }));
+    }]);
 
     it('should correctly broadcast the stateEditorInitialized flag with ' +
        'the state data', function() {
@@ -168,9 +176,10 @@ describe('Exploration editor tab controller', function() {
       scope.initStateEditor();
       expect(
         rootScope.$broadcast
-      ).toHaveBeenCalledWith(
-        'stateEditorInitialized', ess.getState('Third State')
-      );
+      )
+        .toHaveBeenCalledWith(
+          'stateEditorInitialized', ess.getState('Third State')
+        );
     });
   });
 });

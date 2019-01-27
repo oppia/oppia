@@ -126,22 +126,20 @@ oppia.directive('unresolvedAnswersOverview', [
                     var unresolvedAnswersUrl = (
                       UrlInterpolationService.interpolateUrl(
                         '/createhandler/get_top_unresolved_answers/' +
-                        '<exploration_id>', {
-                          exploration_id: expId
-                        }));
-                    $http.get(unresolvedAnswersUrl, {
-                      params: {
-                        state_name: stateName
-                      }
-                    }).success(function(response) {
-                      $scope.showUnresolvedAnswers(response.unresolved_answers);
-                    }).error(function(response) {
-                      $log.error(
-                        'Error occurred while fetching unresolved answers ' +
+                        '<exploration_id>', {exploration_id: expId}));
+                    $http.get(unresolvedAnswersUrl,
+                      {params: {state_name: stateName}})
+                      .success(function(response) {
+                        $scope.showUnresolvedAnswers(response.
+                          unresolved_answers);
+                      })
+                      .error(function(response) {
+                        $log.error(
+                          'Error occurred while fetching unresolved answers ' +
                         'for exploration ' + _explorationId + 'state ' +
                         _stateName + ': ' + response);
-                      $scope.showUnresolvedAnswers([]);
-                    });
+                        $scope.showUnresolvedAnswers([]);
+                      });
                   };
 
                   $scope.showUnresolvedAnswers = function(unresolvedAnswers) {
@@ -233,7 +231,8 @@ oppia.directive('unresolvedAnswersOverview', [
 
                   $scope.loadingDotsAreShown = true;
                   fetchAndShowUnresolvedAnswers(_explorationId, _stateName);
-                }]
+                }
+              ]
             });
           };
 
@@ -244,4 +243,5 @@ oppia.directive('unresolvedAnswersOverview', [
         }
       ]
     };
-  }]);
+  }
+]);

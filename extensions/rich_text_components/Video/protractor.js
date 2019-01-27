@@ -23,25 +23,36 @@ var customizeComponent = function(
     modal, youtubeId, startTime, endTime, ifAutoplay) {
   objects.UnicodeStringEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
-  ).setValue(youtubeId);
+  )
+    .setValue(youtubeId);
   objects.IntEditor(
-    modal.all(by.tagName('schema-based-int-editor')).first()
-  ).setValue(startTime);
+    modal.all(by.tagName('schema-based-int-editor'))
+      .first()
+  )
+    .setValue(startTime);
   objects.IntEditor(
-    modal.all(by.tagName('schema-based-int-editor')).last()
-  ).setValue(endTime);
+    modal.all(by.tagName('schema-based-int-editor'))
+      .last()
+  )
+    .setValue(endTime);
   objects.BooleanEditor(
     modal.element(by.tagName('schema-based-bool-editor'))
-  ).setValue(ifAutoplay);
+  )
+    .setValue(ifAutoplay);
 };
 
 var expectComponentDetailsToMatch = function(
     elem, youtubeId, startTime, endTime, ifAutoplay) {
-  var videoInfo = elem.element(by.tagName('iframe')).getAttribute('src');
-  expect(videoInfo).toMatch(youtubeId);
-  expect(videoInfo).toMatch('start=' + startTime);
-  expect(videoInfo).toMatch('end=' + endTime);
-  expect(videoInfo).toMatch('autoplay=' + (ifAutoplay ? 1 : 0));
+  var videoInfo = elem.element(by.tagName('iframe'))
+    .getAttribute('src');
+  expect(videoInfo)
+    .toMatch(youtubeId);
+  expect(videoInfo)
+    .toMatch('start=' + startTime);
+  expect(videoInfo)
+    .toMatch('end=' + endTime);
+  expect(videoInfo)
+    .toMatch('autoplay=' + (ifAutoplay ? 1 : 0));
 };
 
 exports.customizeComponent = customizeComponent;

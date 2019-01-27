@@ -63,7 +63,8 @@ var AdminPage = function() {
 
     this.reloadCollection = function(collectionId) {
       this.get();
-      reloadCollectionButtons.get(collectionId).click();
+      reloadCollectionButtons.get(collectionId)
+        .click();
       general.acceptAlert();
       // Time is needed for the reloading to complete.
       waitFor.textToBePresentInElement(
@@ -78,10 +79,12 @@ var AdminPage = function() {
       this.get();
       explorationElements.map(function(explorationElement) {
         getExplorationTitleElement(explorationElement)
-          .getText().then(function(title) {
+          .getText()
+          .then(function(title) {
           // We use match here in case there is whitespace around the name
             if (title.match(name)) {
-              getExplorationElementReloadButton(explorationElement).click();
+              getExplorationElementReloadButton(explorationElement)
+                .click();
               general.acceptAlert();
               // Time is needed for the reloading to complete.
               waitFor.textToBePresentInElement(
@@ -124,15 +127,16 @@ var AdminPage = function() {
     configProperties.map(function(x) {
       return saveConfigProperty(
         x, propertyName, objectType, editingInstructions);
-    }).then(function(results) {
-      var success = false;
-      for (var i = 0; i < results.length; i++) {
-        success = success || results[i];
-      }
-      if (!success) {
-        throw Error('Could not find config property: ' + propertyName);
-      }
-    });
+    })
+      .then(function(results) {
+        var success = false;
+        for (var i = 0; i < results.length; i++) {
+          success = success || results[i];
+        }
+        if (!success) {
+          throw Error('Could not find config property: ' + propertyName);
+        }
+      });
   };
 
   this.updateRole = function(name, newRole) {

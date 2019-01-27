@@ -44,9 +44,11 @@ oppia.factory('NumberWithUnitsValidationService', [
           inputsString = inputs.toMathjsCompatibleString();
 
           answerList = NumberWithUnitsObjectFactory.fromRawInputString(
-            answerString).toDict();
+            answerString)
+            .toDict();
           inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
-            inputsString).toDict();
+            inputsString)
+            .toDict();
           return angular.equals(answerList, inputsList);
         };
 
@@ -65,8 +67,9 @@ oppia.factory('NumberWithUnitsValidationService', [
           }
           earlierInputString = earlierInput.toMathjsCompatibleString();
           laterInputString = laterInput.toMathjsCompatibleString();
-          return math.unit(laterInputString).equals(math.unit(
-            earlierInputString));
+          return math.unit(laterInputString)
+            .equals(math.unit(
+              earlierInputString));
         };
 
         var ranges = [];

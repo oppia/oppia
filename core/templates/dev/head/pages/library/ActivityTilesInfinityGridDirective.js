@@ -65,4 +65,5 @@ oppia.directive('activityTilesInfinityGrid', [
         }
       ]
     };
-  }]);
+  }
+]);

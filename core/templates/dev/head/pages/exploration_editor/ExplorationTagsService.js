@@ -21,7 +21,8 @@ oppia.factory('ExplorationTagsService', [
     child.propertyName = 'tags';
     child._normalize = function(value) {
       for (var i = 0; i < value.length; i++) {
-        value[i] = value[i].trim().replace(/\s+/g, ' ');
+        value[i] = value[i].trim()
+          .replace(/\s+/g, ' ');
       }
       // TODO(sll): Prevent duplicate tags from being added.
       return value;

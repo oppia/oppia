@@ -16,38 +16,40 @@
  * @fileoverview Directive for Alert Messages
  */
 
-oppia.directive('alertMessage', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      getMessage: '&messageObject',
-      getMessageIndex: '&messageIndex'
-    },
-    template: '<div class="oppia-alert-message"></div>',
-    controller: [
-      '$scope', 'AlertsService', 'toastr',
-      function($scope, AlertsService, toastr) {
-        $scope.AlertsService = AlertsService;
-        $scope.toastr = toastr;
+oppia.directive('alertMessage', [
+  function() {
+    return {
+      restrict: 'E',
+      scope: {
+        getMessage: '&messageObject',
+        getMessageIndex: '&messageIndex'
+      },
+      template: '<div class="oppia-alert-message"></div>',
+      controller: [
+        '$scope', 'AlertsService', 'toastr',
+        function($scope, AlertsService, toastr) {
+          $scope.AlertsService = AlertsService;
+          $scope.toastr = toastr;
+        }
+      ],
+      link: function(scope) {
+        var message = scope.getMessage();
+        if (message.type === 'info') {
+          scope.toastr.info(message.content, {
+            timeOut: message.timeout,
+            onHidden: function() {
+              scope.AlertsService.deleteMessage(message);
+            }
+          });
+        } else if (message.type === 'success') {
+          scope.toastr.success(message.content, {
+            timeOut: message.timeout,
+            onHidden: function() {
+              scope.AlertsService.deleteMessage(message);
+            }
+          });
+        }
       }
-    ],
-    link: function(scope) {
-      var message = scope.getMessage();
-      if (message.type === 'info') {
-        scope.toastr.info(message.content, {
-          timeOut: message.timeout,
-          onHidden: function() {
-            scope.AlertsService.deleteMessage(message);
-          }
-        });
-      } else if (message.type === 'success') {
-        scope.toastr.success(message.content, {
-          timeOut: message.timeout,
-          onHidden: function() {
-            scope.AlertsService.deleteMessage(message);
-          }
-        });
-      }
-    }
-  };
-}]);
+    };
+  }
+]);

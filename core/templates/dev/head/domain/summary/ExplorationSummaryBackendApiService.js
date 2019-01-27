@@ -44,16 +44,17 @@ oppia.factory('ExplorationSummaryBackendApiService', [
           include_private_explorations: JSON.stringify(
             includePrivateExplorations)
         }
-      }).then(function(response) {
-        var summaries = angular.copy(response.data.summaries);
-        if (successCallback) {
-          successCallback(summaries);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      })
+        .then(function(response) {
+          var summaries = angular.copy(response.data.summaries);
+          if (successCallback) {
+            successCallback(summaries);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     return {

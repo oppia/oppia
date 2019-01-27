@@ -360,9 +360,7 @@ oppia.factory('ResponsesService', [
               }
             });
 
-            _updateAnswerGroup(answerGroupIndex, {
-              rules: newRules
-            }, callback);
+            _updateAnswerGroup(answerGroupIndex, {rules: newRules}, callback);
           });
         }
 
@@ -423,9 +421,7 @@ oppia.factory('ResponsesService', [
                 }
               });
 
-              _updateAnswerGroup(answerGroupIndex, {
-                rules: newRules
-              }, callback);
+              _updateAnswerGroup(answerGroupIndex, {rules: newRules}, callback);
             });
           }
         }

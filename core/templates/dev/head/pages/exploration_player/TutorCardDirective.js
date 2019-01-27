@@ -23,7 +23,8 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
         done();
         return;
       }
-      element.hide().slideDown(400, done);
+      element.hide()
+        .slideDown(400, done);
     },
     addClass: function(element, className, done) {
       if (className !== 'ng-hide') {
@@ -79,9 +80,11 @@ oppia.directive('tutorCard', [
             $scope.arePreviousResponsesShown = false;
             $scope.lastAnswer = null;
             $scope.conceptCardIsBeingShown = Boolean(
-              !$scope.getDisplayedCard().getInteraction());
+              !$scope.getDisplayedCard()
+                .getInteraction());
             $scope.interactionIsActive =
-              !$scope.getDisplayedCard().isCompleted();
+              !$scope.getDisplayedCard()
+                .isCompleted();
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
               $scope.interactionIsActive = false;
             });
@@ -89,17 +92,21 @@ oppia.directive('tutorCard', [
               $scope.waitingForOppiaFeedback = true;
             });
             if (!$scope.interactionIsActive) {
-              $scope.lastAnswer = $scope.getDisplayedCard().getLastAnswer();
+              $scope.lastAnswer = $scope.getDisplayedCard()
+                .getLastAnswer();
             }
             if (!$scope.conceptCardIsBeingShown) {
               $scope.interactionInstructions = (
-                $scope.getDisplayedCard().getInteractionInstructions());
+                $scope.getDisplayedCard()
+                  .getInteractionInstructions());
               $scope.contentAudioTranslations = (
-                $scope.getDisplayedCard().getAudioTranslations());
+                $scope.getDisplayedCard()
+                  .getAudioTranslations());
               AudioTranslationManagerService.clearSecondaryAudioTranslations();
               AudioTranslationManagerService.setContentAudioTranslations(
                 angular.copy($scope.contentAudioTranslations),
-                $scope.getDisplayedCard().getContentHtml(),
+                $scope.getDisplayedCard()
+                  .getContentHtml(),
                 COMPONENT_NAME_CONTENT);
               AudioPlayerService.stop();
               AudioPreloaderService.clearMostRecentlyRequestedAudioFilename();
@@ -111,7 +118,8 @@ oppia.directive('tutorCard', [
             if ($scope.conceptCardIsBeingShown) {
               return true;
             }
-            return $scope.getDisplayedCard().isInteractionInline();
+            return $scope.getDisplayedCard()
+              .isInteractionInline();
           };
 
           $scope.getContentAudioHighlightClass = function() {
@@ -178,16 +186,19 @@ oppia.directive('tutorCard', [
               return false;
             }
             return (
-              $scope.getDisplayedCard().isContentAudioTranslationAvailable());
+              $scope.getDisplayedCard()
+                .isContentAudioTranslationAvailable());
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
-            return !$scope.getDisplayedCard().isCompleted();
+            return !$scope.getDisplayedCard()
+              .isCompleted();
           };
 
           $scope.isOnTerminalCard = function() {
             return (
-              $scope.getDisplayedCard().isTerminal());
+              $scope.getDisplayedCard()
+                .isTerminal());
           };
 
           $scope.getInputResponsePairId = function(index) {
@@ -204,7 +215,8 @@ oppia.directive('tutorCard', [
             // Auto scroll to the new feedback on mobile device.
             if (DeviceInfoService.isMobileDevice()) {
               var latestFeedbackIndex = (
-                $scope.getDisplayedCard().getInputResponsePairs().length - 1);
+                $scope.getDisplayedCard()
+                  .getInputResponsePairs().length - 1);
               /* Reference: https://stackoverflow.com/questions/40134381
                  $anchorScroll() without changing actual hash value of url works
                  only when written inside a timeout of 0 ms. */

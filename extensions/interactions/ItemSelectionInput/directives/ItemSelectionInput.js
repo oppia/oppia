@@ -66,11 +66,12 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
 
           $scope.onToggleCheckbox = function() {
             $scope.newQuestion = false;
-            $scope.selectionCount = Object.keys($scope.userSelections).filter(
-              function(obj) {
-                return $scope.userSelections[obj];
-              }
-            ).length;
+            $scope.selectionCount = Object.keys($scope.userSelections)
+              .filter(
+                function(obj) {
+                  return $scope.userSelections[obj];
+                }
+              ).length;
             $scope.preventAdditionalSelections = (
               $scope.selectionCount >= $scope.maxAllowableSelectionCount);
             $scope.notEnoughSelections = (
@@ -83,11 +84,12 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
           };
 
           $scope.submitAnswer = function() {
-            var answers = Object.keys($scope.userSelections).filter(
-              function(obj) {
-                return $scope.userSelections[obj];
-              }
-            );
+            var answers = Object.keys($scope.userSelections)
+              .filter(
+                function(obj) {
+                  return $scope.userSelections[obj];
+                }
+              );
 
             CurrentInteractionService.onSubmit(
               answers, itemSelectionInputRulesService);
@@ -113,9 +115,11 @@ oppia.directive('oppiaResponseItemSelectionInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ItemSelectionInput/directives/' +
         'item_selection_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        }
+      ]
     };
   }
 ]);
@@ -129,38 +133,42 @@ oppia.directive('oppiaShortResponseItemSelectionInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ItemSelectionInput/directives/' +
         'item_selection_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        }
+      ]
     };
   }
 ]);
 
-oppia.factory('itemSelectionInputRulesService', ['$filter', function($filter) {
-  return {
-    Equals: function(answer, inputs) {
-      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
-      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
-      return normalizedAnswer.length === normalizedInput.length &&
+oppia.factory('itemSelectionInputRulesService', [
+  '$filter', function($filter) {
+    return {
+      Equals: function(answer, inputs) {
+        var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+        var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+        return normalizedAnswer.length === normalizedInput.length &&
           normalizedAnswer.every(function(val) {
             return normalizedInput.indexOf(val) !== -1;
           });
-    },
-    ContainsAtLeastOneOf: function(answer, inputs) {
-      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
-      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
-      return normalizedAnswer.some(function(val) {
-        return normalizedInput.indexOf(val) !== -1;
-      });
-    },
-    // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping in
-    // sync with the backend migration of the same rule.
-    DoesNotContainAtLeastOneOf: function(answer, inputs) {
-      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
-      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
-      return normalizedInput.some(function(val) {
-        return normalizedAnswer.indexOf(val) === -1;
-      });
-    }
-  };
-}]);
+      },
+      ContainsAtLeastOneOf: function(answer, inputs) {
+        var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+        var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+        return normalizedAnswer.some(function(val) {
+          return normalizedInput.indexOf(val) !== -1;
+        });
+      },
+      // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping in
+      // sync with the backend migration of the same rule.
+      DoesNotContainAtLeastOneOf: function(answer, inputs) {
+        var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+        var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+        return normalizedInput.some(function(val) {
+          return normalizedAnswer.indexOf(val) === -1;
+        });
+      }
+    };
+  }
+]);

@@ -19,9 +19,9 @@
 describe('Outcome object factory', function() {
   var oof;
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     oof = $injector.get('OutcomeObjectFactory');
-  }));
+  }]);
 
   it(
     'should correctly determine if an outcome is confusing given a ' +
@@ -33,11 +33,16 @@ describe('Outcome object factory', function() {
       var testOutcome3 = oof.createNew('A', 'feedback_3', 'feedback', []);
       var testOutcome4 = oof.createNew('A', 'feedback_4', '', []);
       var testOutcome5 = oof.createNew('A', 'feedback_5', '   ', []);
-      expect(testOutcome1.isConfusing(currentState)).toBe(false);
-      expect(testOutcome2.isConfusing(currentState)).toBe(false);
-      expect(testOutcome3.isConfusing(currentState)).toBe(false);
-      expect(testOutcome4.isConfusing(currentState)).toBe(true);
-      expect(testOutcome5.isConfusing(currentState)).toBe(true);
+      expect(testOutcome1.isConfusing(currentState))
+        .toBe(false);
+      expect(testOutcome2.isConfusing(currentState))
+        .toBe(false);
+      expect(testOutcome3.isConfusing(currentState))
+        .toBe(false);
+      expect(testOutcome4.isConfusing(currentState))
+        .toBe(true);
+      expect(testOutcome5.isConfusing(currentState))
+        .toBe(true);
     }
   );
 
@@ -46,9 +51,12 @@ describe('Outcome object factory', function() {
       var testOutcome1 = oof.createNew('A', 'feedback_1', 'feedback', []);
       var testOutcome2 = oof.createNew('A', 'feedback_2', '', []);
       var testOutcome3 = oof.createNew('A', 'feedback_3', '   ', []);
-      expect(testOutcome1.hasNonemptyFeedback()).toBe(true);
-      expect(testOutcome2.hasNonemptyFeedback()).toBe(false);
-      expect(testOutcome3.hasNonemptyFeedback()).toBe(false);
+      expect(testOutcome1.hasNonemptyFeedback())
+        .toBe(true);
+      expect(testOutcome2.hasNonemptyFeedback())
+        .toBe(false);
+      expect(testOutcome3.hasNonemptyFeedback())
+        .toBe(false);
     }
   );
 
@@ -56,7 +64,8 @@ describe('Outcome object factory', function() {
     function() {
       var testOutcome = oof.createNew('A', 'feedback_1', 'feedback', []);
       testOutcome.setDestination('B');
-      expect(testOutcome.dest).toEqual('B');
+      expect(testOutcome.dest)
+        .toEqual('B');
     }
   );
 });

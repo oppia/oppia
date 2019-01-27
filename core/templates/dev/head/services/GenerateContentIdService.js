@@ -53,4 +53,5 @@ oppia.factory('GenerateContentIdService', [
         return _getNextId(existingComponentIds, componentName);
       }
     };
-  }]);
+  }
+]);

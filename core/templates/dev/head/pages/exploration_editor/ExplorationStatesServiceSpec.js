@@ -19,12 +19,12 @@
 describe('ExplorationStatesService', function() {
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     this.ess = $injector.get('ExplorationStatesService');
 
     spyOn($injector.get('ContextService'), 'getExplorationId')
       .and.returnValue('7');
-  }));
+  }]);
 
   describe('Callback Registration', function() {
     beforeEach(function() {
@@ -33,14 +33,16 @@ describe('ExplorationStatesService', function() {
           content: '',
           param_changes: [],
           interaction: {
-            answer_groups: [{
-              rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
-              outcome: {
-                dest: 'Me Llamo',
-                feedback: {html: 'buen trabajo!'},
-                labelled_as_correct: true
+            answer_groups: [
+              {
+                rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
+                outcome: {
+                  dest: 'Me Llamo',
+                  feedback: {html: 'buen trabajo!'},
+                  labelled_as_correct: true
+                }
               }
-            }],
+            ],
             default_outcome: {
               dest: 'Hola',
               feedback: {html: 'try again!'},
@@ -54,11 +56,11 @@ describe('ExplorationStatesService', function() {
         }
       });
     });
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       // ChangeListService will need its calls mocked out since it isn't
       // configured correctly in, or interesting to, the tests of this block.
       this.cls = $injector.get('ChangeListService');
-    }));
+    }]);
 
     describe('.registerOnStateAddedCallback', function() {
       beforeEach(function() {
@@ -71,14 +73,15 @@ describe('ExplorationStatesService', function() {
         this.ess.registerOnStateAddedCallback(callbackSpy);
         this.ess.addState('Me Llamo');
 
-        expect(callbackSpy).toHaveBeenCalledWith('Me Llamo');
+        expect(callbackSpy)
+          .toHaveBeenCalledWith('Me Llamo');
       });
     });
 
     describe('.registerOnStateDeletedCallback', function() {
       var STATE_NAME = 'Hola';
 
-      beforeEach(inject(function($injector) {
+      beforeEach(inject[function($injector) {
         spyOn(this.cls, 'deleteState');
 
         var modalArgs = {
@@ -93,22 +96,22 @@ describe('ExplorationStatesService', function() {
         // modal, have it immediately confirm.
         spyOn($injector.get('$uibModal'), 'open').and.callFake(
           function(modalArgs) {
-            return {
-              result: Promise.resolve(STATE_NAME)
-            };
+            return {result: Promise.resolve(STATE_NAME)};
           }
         );
-      }));
+      }]);
 
       it('callsback when a state is deleted', function(done) {
         var callbackSpy = jasmine.createSpy('callback');
 
         this.ess.registerOnStateDeletedCallback(callbackSpy);
 
-        this.ess.deleteState(STATE_NAME).then(function() {
-          expect(callbackSpy).toHaveBeenCalledWith(STATE_NAME);
-          done();
-        });
+        this.ess.deleteState(STATE_NAME)
+          .then(function() {
+            expect(callbackSpy)
+              .toHaveBeenCalledWith(STATE_NAME);
+            done();
+          });
       });
     });
 
@@ -123,7 +126,8 @@ describe('ExplorationStatesService', function() {
         this.ess.registerOnStateRenamedCallback(callbackSpy);
         this.ess.renameState('Hola', 'Bonjour');
 
-        expect(callbackSpy).toHaveBeenCalledWith('Hola', 'Bonjour');
+        expect(callbackSpy)
+          .toHaveBeenCalledWith('Hola', 'Bonjour');
       });
     });
 
@@ -138,7 +142,8 @@ describe('ExplorationStatesService', function() {
         this.ess.registerOnStateAnswerGroupsSavedCallback(callbackSpy);
         this.ess.saveInteractionAnswerGroups('Hola', []);
 
-        expect(callbackSpy).toHaveBeenCalledWith('Hola');
+        expect(callbackSpy)
+          .toHaveBeenCalledWith('Hola');
       });
     });
   });

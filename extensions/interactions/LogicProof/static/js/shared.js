@@ -285,9 +285,7 @@ var logicProofShared = (function() {
     var strippedString = '';
     for (var i = 0; i < inputString.length; i++) {
       if (!_isLegalCharacter(inputString[i])) {
-        throw new UserError('illegal_symbol', {
-          symbol: inputString[i]
-        });
+        throw new UserError('illegal_symbol', {symbol: inputString[i]});
       }
       // We keep all non-spaces, and all spaces that are absorbed neither by
       // characters to their left nor their right.
@@ -303,7 +301,8 @@ var logicProofShared = (function() {
     if (strippedString.replace(/ /g, '') === '') {
       throw new UserError('blank_line', {});
     }
-    return strippedString.trim().split(' ');
+    return strippedString.trim()
+      .split(' ');
   };
 
   /**
@@ -360,16 +359,20 @@ var logicProofShared = (function() {
       for (var j = i + 1; j <= unparsedArray.length; j++) {
         for (var key in vocabulary) {
           for (var k = 0; k < vocabulary[key].length; k++) {
-            if (unparsedArray.slice(i, j).join(' ').toLowerCase() ===
+            if (unparsedArray.slice(i, j)
+              .join(' ')
+              .toLowerCase() ===
                 vocabulary[key][k]) {
               // We have identified the next (j-i)-many words together form a
               // phrase in the vocabulary dictionary.
               for (var l = 0; l < partiallyParsedArrays[i].length; l++) {
                 partiallyParsedArrays[j].push(
-                  partiallyParsedArrays[i][l].concat([{
-                    format: 'phrase',
-                    content: key
-                  }])
+                  partiallyParsedArrays[i][l].concat([
+                    {
+                      format: 'phrase',
+                      content: key
+                    }
+                  ])
                 );
               }
             }
@@ -400,10 +403,12 @@ var logicProofShared = (function() {
                   partiallyParsedArrays[i][j].length - 1
                 ].format === 'phrase') {
               partiallyParsedArrays[i + 1].push(
-                partiallyParsedArrays[i][j].concat([{
-                  format: 'expression',
-                  content: expression
-                }])
+                partiallyParsedArrays[i][j].concat([
+                  {
+                    format: 'expression',
+                    content: expression
+                  }
+                ])
               );
             }
           }
@@ -434,41 +439,27 @@ var logicProofShared = (function() {
           bestAttempt[bestAttempt.length - 1].format === 'phrase') {
         var word = unparsedArray[numEntriesMatched];
         throw (vocabularyWords.indexOf(word) !== -1) ?
-          new UserError('unidentified_phrase_starting_at', {
-            word: word
-          }) :
-          new UserError('unidentified_word', {
-            word: word
-          });
+          new UserError('unidentified_phrase_starting_at', {word: word}) :
+          new UserError('unidentified_word', {word: word});
       } else {
         var word1 = unparsedArray[numEntriesMatched - 1];
         var word2 = unparsedArray[numEntriesMatched];
         if (vocabularyWords.indexOf(word1) !== -1) {
-          throw new UserError('unidentified_phrase_starting_at', {
-            word: word1
-          });
+          throw new UserError('unidentified_phrase_starting_at', {word: word1});
         } else if (containsLogicalCharacter(word1, operators, isTemplate)) {
           throw (vocabularyWords.indexOf(word2) !== -1) ?
-            new UserError('unidentified_phrase_starting_at', {
-              word: word2
-            }) :
+            new UserError('unidentified_phrase_starting_at', {word: word2}) :
             containsLogicalCharacter(word2, operators, isTemplate) ?
               new UserError('consecutive_expressions', {
                 word1: word1,
                 word2: word2
               }) :
-              new UserError('unidentified_word', {
-                word: word2
-              });
+              new UserError('unidentified_word', {word: word2});
         } else {
           throw (vocabularyWords.indexOf(word2) !== -1) ?
-            new UserError('unidentified_phrase_starting_at', {
-              word: word2
-            }) :
+            new UserError('unidentified_phrase_starting_at', {word: word2}) :
             containsLogicalCharacter(word2, operators, isTemplate) ?
-              new UserError('unidentified_word', {
-                word: word1
-              }) :
+              new UserError('unidentified_word', {word: word1}) :
               new UserError('unidentified_words', {
                 word1: word1,
                 word2: word2
@@ -507,9 +498,7 @@ var logicProofShared = (function() {
       if (types.length === desiredLength) {
         return listOfTypes;
       } else {
-        throw new UserError('wrong_num_inputs', {
-          num_needed: desiredLength
-        });
+        throw new UserError('wrong_num_inputs', {num_needed: desiredLength});
       }
     } else {
       var output = [];
@@ -525,9 +514,7 @@ var logicProofShared = (function() {
         }
         return output;
       } else {
-        throw new UserError('not_enough_inputs', {
-          num_needed: desiredLength
-        });
+        throw new UserError('not_enough_inputs', {num_needed: desiredLength});
       }
     }
   };
@@ -652,11 +639,13 @@ var logicProofShared = (function() {
 
         updatedOperators[untypedExpression.top_operator_name] = {
           kind: untypedExpression.top_kind_name,
-          typing: [{
-            arguments: _decorateTypes(argumentTypes),
-            dummies: _decorateTypes(dummyTypes),
-            output: topType
-          }]
+          typing: [
+            {
+              arguments: _decorateTypes(argumentTypes),
+              dummies: _decorateTypes(dummyTypes),
+              output: topType
+            }
+          ]
         };
       }
 
@@ -810,8 +799,8 @@ var logicProofShared = (function() {
             }, newKindsPermittedHere, isTemplate);
           for (var k = 0; k < newResults.length; k++) {
             partiallyTypedArrays[i + 1].push(
-              partiallyTypedArrays[i][j].concat([
-                newResults[k].typedExpression]));
+              partiallyTypedArrays[i][j]
+                .concat([newResults[k].typedExpression]));
             partiallyUpdatedOperators[i + 1].push(newResults[k].operators);
           }
         } catch (err) {
@@ -936,9 +925,7 @@ var logicProofShared = (function() {
         return seekTypeInExpression(array[i], operator);
       } catch (err) {}
     }
-    throw UserError('unknown_typing_error', {
-      expression: expression
-    });
+    throw UserError('unknown_typing_error', {expression: expression});
   };
 
   // Returns whether LHS is larger than RHS in lexicographic ordering

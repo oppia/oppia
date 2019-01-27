@@ -21,10 +21,10 @@ describe('Speech Synthesis Chunker Service', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     SpeechSynthesisChunkerService = $injector.get(
       'SpeechSynthesisChunkerService');
-  }));
+  }]);
 
   it('Should properly convert subtraction in LaTeX to speakable text',
     function() {
@@ -34,8 +34,10 @@ describe('Speech Synthesis Chunker Service', function() {
         SpeechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
       var speakableLatex2 =
         SpeechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
-      expect(speakableLatex1).toEqual('5 minus 3');
-      expect(speakableLatex2).toEqual('i minus j');
+      expect(speakableLatex1)
+        .toEqual('5 minus 3');
+      expect(speakableLatex2)
+        .toEqual('i minus j');
     }
   );
 
@@ -53,10 +55,14 @@ describe('Speech Synthesis Chunker Service', function() {
         SpeechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
       var speakableLatex4 =
         SpeechSynthesisChunkerService.formatLatexToSpeakableText(latex4);
-      expect(speakableLatex1).toEqual('2/3');
-      expect(speakableLatex2).toEqual('a b c over x y z');
-      expect(speakableLatex3).toEqual('3n over 5');
-      expect(speakableLatex4).toEqual('i j k over 5x y');
+      expect(speakableLatex1)
+        .toEqual('2/3');
+      expect(speakableLatex2)
+        .toEqual('a b c over x y z');
+      expect(speakableLatex3)
+        .toEqual('3n over 5');
+      expect(speakableLatex4)
+        .toEqual('i j k over 5x y');
     }
   );
 
@@ -68,8 +74,10 @@ describe('Speech Synthesis Chunker Service', function() {
         SpeechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
       var speakableLatex2 =
         SpeechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
-      expect(speakableLatex1).toEqual('the square root of 3');
-      expect(speakableLatex2).toEqual('the square root of x y');
+      expect(speakableLatex1)
+        .toEqual('the square root of 3');
+      expect(speakableLatex2)
+        .toEqual('the square root of x y');
     }
   );
 
@@ -87,10 +95,14 @@ describe('Speech Synthesis Chunker Service', function() {
         SpeechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
       var speakableLatex4 =
         SpeechSynthesisChunkerService.formatLatexToSpeakableText(latex4);
-      expect(speakableLatex1).toEqual('x^2');
-      expect(speakableLatex2).toEqual('42 to the power of 4');
-      expect(speakableLatex3).toEqual('x to the power of 62');
-      expect(speakableLatex4).toEqual('3n to the power of 4x');
+      expect(speakableLatex1)
+        .toEqual('x^2');
+      expect(speakableLatex2)
+        .toEqual('42 to the power of 4');
+      expect(speakableLatex3)
+        .toEqual('x to the power of 62');
+      expect(speakableLatex4)
+        .toEqual('3n to the power of 4x');
     }
   );
 
@@ -105,8 +117,11 @@ describe('Speech Synthesis Chunker Service', function() {
         SpeechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
     var speakableLatex3 =
         SpeechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
-    expect(speakableLatex1).toEqual('the sine of 90');
-    expect(speakableLatex2).toEqual('the cosine of 0');
-    expect(speakableLatex3).toEqual('the tangent of u v');
+    expect(speakableLatex1)
+      .toEqual('the sine of 90');
+    expect(speakableLatex2)
+      .toEqual('the cosine of 0');
+    expect(speakableLatex3)
+      .toEqual('the tangent of u v');
   });
 });

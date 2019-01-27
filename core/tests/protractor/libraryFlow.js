@@ -72,7 +72,8 @@ describe('Library pages tour', function() {
   it('visits the search page', function() {
     libraryPage.get();
     libraryPage.findExploration(SEARCH_TERM);
-    expect(browser.getCurrentUrl()).toContain('search/find?q=python');
+    expect(browser.getCurrentUrl())
+      .toContain('search/find?q=python');
   });
 
   it('visits the library index page', function() {
@@ -84,14 +85,17 @@ describe('Library pages tour', function() {
     // exploration has to be rated by the user.
     rateExploration();
     libraryPage.get();
-    element(by.css('.protractor-test-library-top-rated')).click();
+    element(by.css('.protractor-test-library-top-rated'))
+      .click();
     waitFor.pageToFullyLoad();
-    expect(browser.getCurrentUrl()).toContain('library/top_rated');
+    expect(browser.getCurrentUrl())
+      .toContain('library/top_rated');
   });
 
   it('visits the recent explorations page', function() {
     visitRecentlyPublishedPage();
-    expect(browser.getCurrentUrl()).toContain('library/recently_published');
+    expect(browser.getCurrentUrl())
+      .toContain('library/recently_published');
   });
 
   afterEach(function() {

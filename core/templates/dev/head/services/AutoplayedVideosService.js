@@ -25,15 +25,17 @@
 // component and use that id instead to determine whether to suppress
 // autoplaying.
 
-oppia.factory('AutoplayedVideosService', [function() {
-  var autoplayedVideosDict = {};
-  return {
-    addAutoplayedVideo: function(videoId) {
-      autoplayedVideosDict[videoId] = true;
-    },
+oppia.factory('AutoplayedVideosService', [
+  function() {
+    var autoplayedVideosDict = {};
+    return {
+      addAutoplayedVideo: function(videoId) {
+        autoplayedVideosDict[videoId] = true;
+      },
 
-    hasVideoBeenAutoplayed: function(videoId) {
-      return Boolean(autoplayedVideosDict[videoId]);
-    }
-  };
-}]);
+      hasVideoBeenAutoplayed: function(videoId) {
+        return Boolean(autoplayedVideosDict[videoId]);
+      }
+    };
+  }
+]);

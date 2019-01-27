@@ -52,4 +52,5 @@ oppia.factory('TextInputPredictionService', [
         return -1;
       }
     };
-  }]);
+  }
+]);

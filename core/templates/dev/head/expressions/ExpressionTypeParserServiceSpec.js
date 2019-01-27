@@ -19,12 +19,12 @@ describe('Expression type parser service', function() {
   var eps = null;
   var ests = null;
   var isString = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     etps = $injector.get('ExpressionTypeParserService');
     eps = $injector.get('ExpressionParserService');
     ests = $injector.get('ExpressionSyntaxTreeService');
     isString = $injector.get('UtilsService').isString;
-  }));
+  }]);
 
   var ENVS = [
     {
@@ -57,12 +57,16 @@ describe('Expression type parser service', function() {
       ['boolTrue == boolFalse', 'UnicodeString'],
       ['strNull != strXYZ', 'UnicodeString'],
       ['if boolFalse then 8 else numZero', 'Real'],
-      ['if boolFalse then 8 else strXYZ', ests.ExprWrongArgTypeError,
+      [
+        'if boolFalse then 8 else strXYZ', ests.ExprWrongArgTypeError,
         'ExprWrongArgTypeError: Type Real does not match expected type ' +
-       'UnicodeString'],
-      ['strXYZ * 2', ests.ExprWrongArgTypeError,
+       'UnicodeString'
+      ],
+      [
+        'strXYZ * 2', ests.ExprWrongArgTypeError,
         'ExprWrongArgTypeError: Type UnicodeString does not match expected ' +
-       'type Real'],
+       'type Real'
+      ],
       ['num100_001 / 0', 'Real'],
       ['abs(-3)', 'Real'],
       ['pow(num100_001, numZero)', 'Real'],
@@ -114,7 +118,8 @@ describe('Expression type parser service', function() {
           }
         }
       }
-      expect(failed).toBe(false);
+      expect(failed)
+        .toBe(false);
 
       if (typeof (expression) !== 'string') {
         return;
@@ -132,7 +137,8 @@ describe('Expression type parser service', function() {
           recordFailure(undefined, e);
         }
       }
-      expect(failed).toBe(false);
+      expect(failed)
+        .toBe(false);
     });
   });
 });

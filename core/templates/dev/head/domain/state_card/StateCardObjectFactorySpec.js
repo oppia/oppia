@@ -24,7 +24,7 @@ describe('State card object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     StateCardObjectFactory = $injector.get('StateCardObjectFactory');
     InteractionObjectFactory = $injector.get('InteractionObjectFactory');
     ContentIdsToAudioTranslationsObjectFactory =
@@ -36,12 +36,8 @@ describe('State card object factory', function() {
       answer_groups: [],
       confirmed_unclassified_answers: [],
       customization_args: {
-        rows: {
-          value: 1
-        },
-        placeholder: {
-          value: 'Type your answer here.'
-        }
+        rows: {value: 1},
+        placeholder: {value: 'Type your answer here.'}
       },
       default_outcome: {
         dest: '(untitled state)',
@@ -72,86 +68,97 @@ describe('State card object factory', function() {
         }
       }),
       'content');
-  }));
+  }]);
 
   it('should be able to get the various fields', function() {
-    expect(_sampleCard.getStateName()).toEqual('State 1');
-    expect(_sampleCard.getContentHtml()).toEqual('<p>Content</p>');
-    expect(_sampleCard.getInteraction().id).toEqual('TextInput');
-    expect(_sampleCard.getInteractionHtml()).toEqual(
-      '<interaction></interaction>');
-    expect(_sampleCard.getInputResponsePairs()).toEqual([]);
-    expect(_sampleCard.getLastInputResponsePair()).toEqual(null);
-    expect(_sampleCard.getLastOppiaResponse()).toEqual(null);
+    expect(_sampleCard.getStateName())
+      .toEqual('State 1');
+    expect(_sampleCard.getContentHtml())
+      .toEqual('<p>Content</p>');
+    expect(_sampleCard.getInteraction().id)
+      .toEqual('TextInput');
+    expect(_sampleCard.getInteractionHtml())
+      .toEqual(
+        '<interaction></interaction>');
+    expect(_sampleCard.getInputResponsePairs())
+      .toEqual([]);
+    expect(_sampleCard.getLastInputResponsePair())
+      .toEqual(null);
+    expect(_sampleCard.getLastOppiaResponse())
+      .toEqual(null);
     expect(
       _sampleCard.getContentIdsToAudioTranslations().
-        getBindableAudioTranslations('content')).toEqual({
-      en: AudioTranslationObjectFactory.createFromBackendDict({
-        filename: 'filename1.mp3',
-        file_size_bytes: 100000,
-        needs_update: false
-      }),
-      hi: AudioTranslationObjectFactory.createFromBackendDict({
-        filename: 'filename2.mp3',
-        file_size_bytes: 11000,
-        needs_update: false
-      })
-    });
-    expect(_sampleCard.getAudioTranslations()).toEqual({
-      en: AudioTranslationObjectFactory.createFromBackendDict({
-        filename: 'filename1.mp3',
-        file_size_bytes: 100000,
-        needs_update: false
-      }),
-      hi: AudioTranslationObjectFactory.createFromBackendDict({
-        filename: 'filename2.mp3',
-        file_size_bytes: 11000,
-        needs_update: false
-      })
-    });
+        getBindableAudioTranslations('content'))
+      .toEqual({
+        en: AudioTranslationObjectFactory.createFromBackendDict({
+          filename: 'filename1.mp3',
+          file_size_bytes: 100000,
+          needs_update: false
+        }),
+        hi: AudioTranslationObjectFactory.createFromBackendDict({
+          filename: 'filename2.mp3',
+          file_size_bytes: 11000,
+          needs_update: false
+        })
+      });
+    expect(_sampleCard.getAudioTranslations())
+      .toEqual({
+        en: AudioTranslationObjectFactory.createFromBackendDict({
+          filename: 'filename1.mp3',
+          file_size_bytes: 100000,
+          needs_update: false
+        }),
+        hi: AudioTranslationObjectFactory.createFromBackendDict({
+          filename: 'filename2.mp3',
+          file_size_bytes: 11000,
+          needs_update: false
+        })
+      });
 
-    expect(_sampleCard.getInteractionId()).toEqual('TextInput');
-    expect(_sampleCard.isTerminal()).toEqual(false);
-    expect(_sampleCard.isInteractionInline()).toEqual(true);
-    expect(_sampleCard.getInteractionInstructions()).toEqual(null);
-    expect(_sampleCard.getInteractionCustomizationArgs()).toEqual({
-      rows: {
-        value: 1
-      },
-      placeholder: {
-        value: 'Type your answer here.'
-      }
-    });
-    expect(_sampleCard.getInteractionHtml()).toEqual(
-      '<interaction></interaction>'
-    );
+    expect(_sampleCard.getInteractionId())
+      .toEqual('TextInput');
+    expect(_sampleCard.isTerminal())
+      .toEqual(false);
+    expect(_sampleCard.isInteractionInline())
+      .toEqual(true);
+    expect(_sampleCard.getInteractionInstructions())
+      .toEqual(null);
+    expect(_sampleCard.getInteractionCustomizationArgs())
+      .toEqual({
+        rows: {value: 1},
+        placeholder: {value: 'Type your answer here.'}
+      });
+    expect(_sampleCard.getInteractionHtml())
+      .toEqual(
+        '<interaction></interaction>'
+      );
 
-    _sampleCard.addInputResponsePair({
-      oppiaResponse: 'response'
-    });
+    _sampleCard.addInputResponsePair({oppiaResponse: 'response'});
 
-    expect(_sampleCard.getOppiaResponse(0)).toEqual('response');
-    expect(_sampleCard.getLastOppiaResponse()).toEqual('response');
-    expect(_sampleCard.getLastInputResponsePair()).toEqual({
-      oppiaResponse: 'response'
-    });
+    expect(_sampleCard.getOppiaResponse(0))
+      .toEqual('response');
+    expect(_sampleCard.getLastOppiaResponse())
+      .toEqual('response');
+    expect(_sampleCard.getLastInputResponsePair())
+      .toEqual({oppiaResponse: 'response'});
   });
 
   it('should add input response pair', function() {
     _sampleCard.addInputResponsePair('pair 1');
-    expect(_sampleCard.getInputResponsePairs()).toEqual(['pair 1']);
+    expect(_sampleCard.getInputResponsePairs())
+      .toEqual(['pair 1']);
   });
 
   it('should be able to set the various fields', function() {
     _sampleCard.setInteractionHtml('<interaction_2></interaction_2>');
-    expect(_sampleCard.getInteractionHtml()).toEqual(
-      '<interaction_2></interaction_2>');
+    expect(_sampleCard.getInteractionHtml())
+      .toEqual(
+        '<interaction_2></interaction_2>');
 
-    _sampleCard.addInputResponsePair({
-      oppiaResponse: 'response'
-    });
+    _sampleCard.addInputResponsePair({oppiaResponse: 'response'});
 
     _sampleCard.setLastOppiaResponse('response_3');
-    expect(_sampleCard.getLastOppiaResponse()).toEqual('response_3');
+    expect(_sampleCard.getLastOppiaResponse())
+      .toEqual('response_3');
   });
 });

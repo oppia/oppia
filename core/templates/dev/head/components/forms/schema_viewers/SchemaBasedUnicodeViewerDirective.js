@@ -19,9 +19,7 @@
 oppia.directive('schemaBasedUnicodeViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
-        localValue: '='
-      },
+      scope: {localValue: '='},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_viewers/' +
         'schema_based_unicode_viewer_directive.html'),
@@ -33,6 +31,8 @@ oppia.directive('schemaBasedUnicodeViewer', [
             return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
               $scope.localValue));
           };
-        }]
+        }
+      ]
     };
-  }]);
+  }
+]);

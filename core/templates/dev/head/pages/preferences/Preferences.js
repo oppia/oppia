@@ -59,9 +59,10 @@ oppia.controller('Preferences', [
       _forceSelect2Refresh();
     });
 
-    $q.all([userInfoPromise, preferencesPromise]).then(function() {
-      $rootScope.loadingMessage = '';
-    });
+    $q.all([userInfoPromise, preferencesPromise])
+      .then(function() {
+        $rootScope.loadingMessage = '';
+      });
 
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
@@ -183,21 +184,23 @@ oppia.controller('Preferences', [
             $scope.invalidImageWarningIsShown = false;
 
             $scope.onFileChanged = function(file) {
-              $('.oppia-profile-image-uploader').fadeOut(function() {
-                $scope.invalidImageWarningIsShown = false;
+              $('.oppia-profile-image-uploader')
+                .fadeOut(function() {
+                  $scope.invalidImageWarningIsShown = false;
 
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                  $scope.$apply(function() {
-                    $scope.uploadedImage = e.target.result;
-                  });
-                };
-                reader.readAsDataURL(file);
+                  var reader = new FileReader();
+                  reader.onload = function(e) {
+                    $scope.$apply(function() {
+                      $scope.uploadedImage = e.target.result;
+                    });
+                  };
+                  reader.readAsDataURL(file);
 
-                $timeout(function() {
-                  $('.oppia-profile-image-uploader').fadeIn();
-                }, 100);
-              });
+                  $timeout(function() {
+                    $('.oppia-profile-image-uploader')
+                      .fadeIn();
+                  }, 100);
+                });
             };
 
             $scope.reset = function() {

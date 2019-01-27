@@ -27,7 +27,7 @@ describe('Editable collection backend API service', function() {
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     EditableCollectionBackendApiService = $injector.get(
       'EditableCollectionBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');
@@ -43,14 +43,12 @@ describe('Editable collection backend API service', function() {
         category: 'Test',
         objective: 'To pass',
         version: '1',
-        nodes: [{
-          exploration_id: '0'
-        }],
+        nodes: [{exploration_id: '0'}],
         next_exploration_ids: [],
         completed_exploration_ids: []
       }
     };
-  }));
+  }]);
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
@@ -62,13 +60,16 @@ describe('Editable collection backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/collection_editor_handler/data/0').respond(
-        sampleDataResults);
-      EditableCollectionBackendApiService.fetchCollection('0').then(
-        successHandler, failHandler);
+      $httpBackend.expect('GET', '/collection_editor_handler/data/0')
+        .respond(
+          sampleDataResults);
+      EditableCollectionBackendApiService.fetchCollection('0')
+        .then(
+          successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+      expect(successHandler)
+        .toHaveBeenCalledWith(sampleDataResults.collection);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
@@ -79,14 +80,17 @@ describe('Editable collection backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       // Loading a collection the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/collection_editor_handler/data/1').respond(
-        500, 'Error loading collection 1.');
-      EditableCollectionBackendApiService.fetchCollection('1').then(
-        successHandler, failHandler);
+      $httpBackend.expect('GET', '/collection_editor_handler/data/1')
+        .respond(
+          500, 'Error loading collection 1.');
+      EditableCollectionBackendApiService.fetchCollection('1')
+        .then(
+          successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error loading collection 1.');
+      expect(failHandler)
+        .toHaveBeenCalledWith('Error loading collection 1.');
     }
   );
 
@@ -96,31 +100,34 @@ describe('Editable collection backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       // Loading a collection the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/collection_editor_handler/data/0').respond(
-        sampleDataResults);
+      $httpBackend.expect('GET', '/collection_editor_handler/data/0')
+        .respond(
+          sampleDataResults);
 
-      EditableCollectionBackendApiService.fetchCollection('0').then(
-        function(data) {
-          collection = data;
-        });
+      EditableCollectionBackendApiService.fetchCollection('0')
+        .then(
+          function(data) {
+            collection = data;
+          });
       $httpBackend.flush();
 
       collection.title = 'New Title';
       collection.version = '2';
-      var collectionWrapper = {
-        collection: collection
-      };
+      var collectionWrapper = {collection: collection};
 
-      $httpBackend.expect('PUT', '/collection_editor_handler/data/0').respond(
-        collectionWrapper);
+      $httpBackend.expect('PUT', '/collection_editor_handler/data/0')
+        .respond(
+          collectionWrapper);
 
       // Send a request to update collection
       EditableCollectionBackendApiService.updateCollection(
         collection.id, collection.version, collection.title, []
-      ).then(successHandler, failHandler);
+      )
+        .then(successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(collection);
+      expect(successHandler)
+        .toHaveBeenCalledWith(collection);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );

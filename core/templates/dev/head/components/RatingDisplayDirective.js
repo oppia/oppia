@@ -42,66 +42,68 @@ oppia.directive('ratingDisplay', [
           return scope;
         };
       },
-      controller: ['$scope', function($scope) {
-        var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
-        $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
-          return {
-            cssClass: 'fa-star-o',
-            value: starValue
-          };
-        });
+      controller: [
+        '$scope', function($scope) {
+          var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
+          $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
+            return {
+              cssClass: 'fa-star-o',
+              value: starValue
+            };
+          });
 
-        var STATUS_ACTIVE = 'active';
-        var STATUS_INACTIVE = 'inactive';
-        var STATUS_RATING_SET = 'rating_set';
-        $scope.status = STATUS_INACTIVE;
+          var STATUS_ACTIVE = 'active';
+          var STATUS_INACTIVE = 'inactive';
+          var STATUS_RATING_SET = 'rating_set';
+          $scope.status = STATUS_INACTIVE;
 
-        var displayValue = function(ratingValue) {
-          for (var i = 0; i < $scope.stars.length; i++) {
-            $scope.stars[i].cssClass = (
+          var displayValue = function(ratingValue) {
+            for (var i = 0; i < $scope.stars.length; i++) {
+              $scope.stars[i].cssClass = (
               ratingValue === undefined ? 'fa-star-o' :
               ratingValue < $scope.stars[i].value - 0.75 ? 'fa-star-o' :
               ratingValue < $scope.stars[i].value - 0.25 ? 'fa-star-half-o' :
               'fa-star');
 
-            if ($scope.status === STATUS_ACTIVE &&
+              if ($scope.status === STATUS_ACTIVE &&
                 ratingValue >= $scope.stars[i].value) {
-              $scope.stars[i].cssClass += ' oppia-rating-star-active';
+                $scope.stars[i].cssClass += ' oppia-rating-star-active';
+              }
             }
-          }
-        };
+          };
 
-        displayValue($scope.ratingValue);
-        $scope.$watch('ratingValue', function() {
           displayValue($scope.ratingValue);
-        });
+          $scope.$watch('ratingValue', function() {
+            displayValue($scope.ratingValue);
+          });
 
-        $scope.clickStar = function(starValue) {
-          if ($scope.isEditable && $scope.status === STATUS_ACTIVE) {
-            $scope.status = STATUS_RATING_SET;
-            $scope.ratingValue = starValue;
-            displayValue(starValue);
-            $scope.onEdit(starValue);
-          }
-        };
-        $scope.enterStar = function(starValue) {
-          var starsHaveNotBeenClicked = (
-            $scope.status === STATUS_ACTIVE ||
+          $scope.clickStar = function(starValue) {
+            if ($scope.isEditable && $scope.status === STATUS_ACTIVE) {
+              $scope.status = STATUS_RATING_SET;
+              $scope.ratingValue = starValue;
+              displayValue(starValue);
+              $scope.onEdit(starValue);
+            }
+          };
+          $scope.enterStar = function(starValue) {
+            var starsHaveNotBeenClicked = (
+              $scope.status === STATUS_ACTIVE ||
             $scope.status === STATUS_INACTIVE);
-          if ($scope.isEditable && starsHaveNotBeenClicked) {
-            $scope.status = STATUS_ACTIVE;
-            displayValue(starValue);
-          }
-        };
-        $scope.leaveArea = function() {
-          $scope.status = STATUS_INACTIVE;
-          displayValue($scope.ratingValue);
-        };
+            if ($scope.isEditable && starsHaveNotBeenClicked) {
+              $scope.status = STATUS_ACTIVE;
+              displayValue(starValue);
+            }
+          };
+          $scope.leaveArea = function() {
+            $scope.status = STATUS_INACTIVE;
+            displayValue($scope.ratingValue);
+          };
 
-        $scope.getCursorStyle = function() {
-          return 'cursor: ' + ($scope.isEditable ? 'pointer' : 'auto');
-        };
-      }]
+          $scope.getCursorStyle = function() {
+            return 'cursor: ' + ($scope.isEditable ? 'pointer' : 'auto');
+          };
+        }
+      ]
     };
   }
 ]);

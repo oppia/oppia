@@ -25,7 +25,7 @@ describe('HintsAndSolutionManager service', function() {
   var EVENT_NEW_CARD_AVAILABLE;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     $timeout = $injector.get('$timeout');
     $rootScope = $injector.get('$rootScope');
     hasms = $injector.get('HintsAndSolutionManagerService');
@@ -54,94 +54,137 @@ describe('HintsAndSolutionManager service', function() {
         audio_translations: {}
       }
     }));
-  }));
+  }]);
 
   it('should display hints at the right times', function() {
-    expect(hasms.isHintViewable(0)).toBe(false);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isHintViewable(0))
+      .toBe(false);
+    expect(hasms.isHintViewable(1))
+      .toBe(false);
+    expect(hasms.isSolutionViewable())
+      .toBe(false);
 
     $timeout.flush();
 
     // The first hint becomes viewable.
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isHintViewable(0))
+      .toBe(true);
+    expect(hasms.isHintViewable(1))
+      .toBe(false);
+    expect(hasms.isSolutionViewable())
+      .toBe(false);
 
     // No additional hints become viewable because the first hint has not been
     // consumed yet.
 
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isHintViewable(0))
+      .toBe(true);
+    expect(hasms.isHintViewable(1))
+      .toBe(false);
+    expect(hasms.isSolutionViewable())
+      .toBe(false);
 
     // The first hint is consumed, but a delay is needed for the second hint to
     // be viewable.
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.displayHint(0)
+      .getHtml())
+      .toBe('one');
+    expect(hasms.isHintViewable(0))
+      .toBe(true);
+    expect(hasms.isHintViewable(1))
+      .toBe(false);
+    expect(hasms.isSolutionViewable())
+      .toBe(false);
 
     $timeout.flush();
 
     // The second hint is now available, but has not been consumed yet.
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(true);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isHintViewable(0))
+      .toBe(true);
+    expect(hasms.isHintViewable(1))
+      .toBe(true);
+    expect(hasms.isSolutionViewable())
+      .toBe(false);
 
     // The second hint is consumed, but a delay is needed for the solution to
     // be viewable. Previous hints are still viewable, too.
-    expect(hasms.displayHint(1).getHtml()).toBe('two');
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(true);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.displayHint(1)
+      .getHtml())
+      .toBe('two');
+    expect(hasms.displayHint(0)
+      .getHtml())
+      .toBe('one');
+    expect(hasms.isHintViewable(0))
+      .toBe(true);
+    expect(hasms.isHintViewable(1))
+      .toBe(true);
+    expect(hasms.isSolutionViewable())
+      .toBe(false);
 
     $timeout.flush();
 
     // The solution is now viewable.
-    expect(hasms.isSolutionViewable()).toBe(true);
+    expect(hasms.isSolutionViewable())
+      .toBe(true);
   });
 
   it('should not continue to display hints after after a correct answer is' +
      'submitted', function() {
-    expect(hasms.isHintViewable(0)).toBe(false);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isHintViewable(0))
+      .toBe(false);
+    expect(hasms.isHintViewable(1))
+      .toBe(false);
+    expect(hasms.isSolutionViewable())
+      .toBe(false);
 
     $timeout.flush();
     // The first hint becomes viewable.
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isHintViewable(0))
+      .toBe(true);
+    expect(hasms.isHintViewable(1))
+      .toBe(false);
+    expect(hasms.isSolutionViewable())
+      .toBe(false);
 
     // The first hint is consumed, but a delay is needed for the second hint
     // to be viewable.
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.displayHint(0)
+      .getHtml())
+      .toBe('one');
+    expect(hasms.isHintViewable(0))
+      .toBe(true);
+    expect(hasms.isHintViewable(1))
+      .toBe(false);
+    expect(hasms.isSolutionViewable())
+      .toBe(false);
 
     $rootScope.$broadcast(EVENT_NEW_CARD_AVAILABLE);
     $timeout.flush();
 
     // Because a correct answer was submitted, the next hint should not be
     // available.
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isHintViewable(0))
+      .toBe(true);
+    expect(hasms.isHintViewable(1))
+      .toBe(false);
+    expect(hasms.isSolutionViewable())
+      .toBe(false);
 
     $timeout.verifyNoPendingTasks();
   });
 
   it('should show the correct number of hints', function() {
-    expect(hasms.getNumHints()).toBe(2);
+    expect(hasms.getNumHints())
+      .toBe(2);
   });
 
   it('should correctly retrieve the solution', function() {
-    expect(hasms.isSolutionConsumed()).toBe(false);
-    expect(hasms.displaySolution().correctAnswer).toBe(
-      'This is a correct answer!');
-    expect(hasms.isSolutionConsumed()).toBe(true);
+    expect(hasms.isSolutionConsumed())
+      .toBe(false);
+    expect(hasms.displaySolution().correctAnswer)
+      .toBe(
+        'This is a correct answer!');
+    expect(hasms.isSolutionConsumed())
+      .toBe(true);
   });
 });

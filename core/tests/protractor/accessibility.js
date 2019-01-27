@@ -31,13 +31,17 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   it('should skip to the main content element', function() {
     libraryPage.get();
-    browser.actions().sendKeys(protractor.Key.TAB).perform();
+    browser.actions()
+      .sendKeys(protractor.Key.TAB)
+      .perform();
     var skipLink = element(by.css('.protractor-test-skip-link'));
     waitFor.elementToBeClickable(skipLink, 'Could not click skip link');
     skipLink.click();
     var mainContent = element(by.css('.protractor-test-main-content'));
     expect(mainContent.getAttribute('id'))
-      .toEqual(browser.driver.switchTo().activeElement().getAttribute('id'));
+      .toEqual(browser.driver.switchTo()
+        .activeElement()
+        .getAttribute('id'));
   });
 
   afterEach(function() {
@@ -48,9 +52,7 @@ describe('screenreader and keyboard user accessibility features', function() {
 describe('Cache Slugs', function() {
   it('should check that errors get logged for missing resources', function() {
     browser.get('/console_errors');
-    var expectedErrors = [
-      'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
-    ];
+    var expectedErrors = ['http://localhost:9001/build/fail/logo/288x128_logo_white.png'];
     general.checkConsoleErrorsExist(expectedErrors);
   });
 });

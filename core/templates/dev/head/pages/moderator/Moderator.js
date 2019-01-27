@@ -46,18 +46,18 @@ oppia.controller('Moderator', [
       type: 'list',
       items: {
         type: 'dict',
-        properties: [{
-          name: 'type',
-          schema: {
-            type: 'unicode',
-            choices: ['exploration', 'collection']
+        properties: [
+          {
+            name: 'type',
+            schema: {
+              type: 'unicode',
+              choices: ['exploration', 'collection']
+            }
+          }, {
+            name: 'id',
+            schema: {type: 'unicode'}
           }
-        }, {
-          name: 'id',
-          schema: {
-            type: 'unicode'
-          }
-        }]
+        ]
       }
     };
 
@@ -65,31 +65,34 @@ oppia.controller('Moderator', [
       '/recentcommitshandler/recent_commits' +
       '?query_type=all_non_private_commits');
     // TODO(sll): Update this to also support collections.
-    $http.get(RECENT_COMMITS_URL).then(function(response) {
+    $http.get(RECENT_COMMITS_URL)
+      .then(function(response) {
       // Update the explorationData object with information about newly-
       // discovered explorations.
-      var data = response.data;
-      var explorationIdsToExplorationData = data.exp_ids_to_exp_data;
-      for (var expId in explorationIdsToExplorationData) {
-        if (!$scope.explorationData.hasOwnProperty(expId)) {
-          $scope.explorationData[expId] = (
-            explorationIdsToExplorationData[expId]);
+        var data = response.data;
+        var explorationIdsToExplorationData = data.exp_ids_to_exp_data;
+        for (var expId in explorationIdsToExplorationData) {
+          if (!$scope.explorationData.hasOwnProperty(expId)) {
+            $scope.explorationData[expId] = (
+              explorationIdsToExplorationData[expId]);
+          }
         }
-      }
-      $scope.allCommits = data.results;
-      $rootScope.loadingMessage = '';
-    });
+        $scope.allCommits = data.results;
+        $rootScope.loadingMessage = '';
+      });
 
-    $http.get('/recent_feedback_messages').then(function(response) {
-      $scope.allFeedbackMessages = response.data.results;
-    });
+    $http.get('/recent_feedback_messages')
+      .then(function(response) {
+        $scope.allFeedbackMessages = response.data.results;
+      });
 
-    $http.get('/moderatorhandler/featured').then(function(response) {
-      $scope.displayedFeaturedActivityReferences = (
-        response.data.featured_activity_references);
-      $scope.lastSavedFeaturedActivityReferences = angular.copy(
-        $scope.displayedFeaturedActivityReferences);
-    });
+    $http.get('/moderatorhandler/featured')
+      .then(function(response) {
+        $scope.displayedFeaturedActivityReferences = (
+          response.data.featured_activity_references);
+        $scope.lastSavedFeaturedActivityReferences = angular.copy(
+          $scope.displayedFeaturedActivityReferences);
+      });
 
     $scope.isSaveFeaturedActivitiesButtonDisabled = function() {
       return angular.equals(
@@ -102,12 +105,12 @@ oppia.controller('Moderator', [
 
       var activityReferencesToSave = angular.copy(
         $scope.displayedFeaturedActivityReferences);
-      $http.post('/moderatorhandler/featured', {
-        featured_activity_reference_dicts: activityReferencesToSave
-      }).then(function() {
-        $scope.lastSavedFeaturedActivityReferences = activityReferencesToSave;
-        AlertsService.addSuccessMessage('Featured activities saved.');
-      });
+      $http.post('/moderatorhandler/featured',
+        {featured_activity_reference_dicts: activityReferencesToSave})
+        .then(function() {
+          $scope.lastSavedFeaturedActivityReferences = activityReferencesToSave;
+          AlertsService.addSuccessMessage('Featured activities saved.');
+        });
     };
   }
 ]);

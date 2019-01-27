@@ -55,24 +55,30 @@ var ExplorationEditorTranslationTab = function() {
 
   var _selectLanguage = function(language) {
     element(by.css('.protractor-test-translation-language-selector')).
-      element(by.cssContainingText('option', language)).click();
+      element(by.cssContainingText('option', language))
+      .click();
   };
 
   this.expectContentTabContentToMatch = function(content) {
     waitFor.elementToBeClickable(
       contentTabButton, 'Content Tab button is not clickable');
     contentTabButton.click();
-    expect(contentTabText.getText()).toMatch(content);
+    expect(contentTabText.getText())
+      .toMatch(content);
   };
 
   this.expectFeedbackTabContentsToMatch = function(contents) {
     waitFor.elementToBeClickable(
       feedbackTabButton, 'Feedback Tab button is not clickable');
     feedbackTabButton.click();
-    expect(feedbackList.count()).toEqual(contents.length);
+    expect(feedbackList.count())
+      .toEqual(contents.length);
     for (index in contents) {
-      translationFeedback(index).click();
-      expect(translationFeedbackText(index).getText()).toMatch(contents[index]);
+      translationFeedback(index)
+        .click();
+      expect(translationFeedbackText(index)
+        .getText())
+        .toMatch(contents[index]);
     }
   };
 
@@ -81,8 +87,11 @@ var ExplorationEditorTranslationTab = function() {
       hintsTabButton, 'Hints Tab button is not clickable');
     hintsTabButton.click();
     for (index in contents) {
-      translationHint(index).click();
-      expect(translationHintText(index).getText()).toMatch(contents[index]);
+      translationHint(index)
+        .click();
+      expect(translationHintText(index)
+        .getText())
+        .toMatch(contents[index]);
     }
   };
 
@@ -90,11 +99,13 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.elementToBeClickable(
       solutionTabButton, 'Solution Tab button is not clickable');
     solutionTabButton.click();
-    expect(solutionTabText.getText()).toMatch(content);
+    expect(solutionTabText.getText())
+      .toMatch(content);
   };
 
   this.expectNumericalStatusToMatch = function(content) {
-    expect(numericalStatus.getText()).toMatch(content);
+    expect(numericalStatus.getText())
+      .toMatch(content);
   };
 
   this.changeTranslationLanguage = function(language) {
@@ -112,7 +123,8 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectFeedbackTabToBeActive = function() {
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
-    ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
+    )
+      .toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
   };
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;

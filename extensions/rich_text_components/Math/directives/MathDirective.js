@@ -27,10 +27,12 @@ oppia.directive('oppiaNoninteractiveMath', [
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Math/directives/math_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.rawLatex = HtmlEscaperService.escapedJsonToObj(
-          $attrs.rawLatexWithValue);
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.rawLatex = HtmlEscaperService.escapedJsonToObj(
+            $attrs.rawLatexWithValue);
+        }
+      ]
     };
   }
 ]);

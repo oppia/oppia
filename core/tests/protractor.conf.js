@@ -67,61 +67,34 @@ exports.config = {
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
-    accessibility: [
-      'protractor/accessibility.js'
-    ],
+    accessibility: ['protractor/accessibility.js'],
 
-    collections: [
-      'protractor_desktop/collections.js'
-    ],
+    collections: ['protractor_desktop/collections.js'],
 
-    editorAndPlayer: [
-      'protractor_desktop/editorAndPlayer.js',
-    ],
+    editorAndPlayer: ['protractor_desktop/editorAndPlayer.js'],
 
-    editorFeatures: [
-      'protractor_desktop/editorFeatures.js'
-    ],
+    editorFeatures: ['protractor_desktop/editorFeatures.js'],
 
-    embedding: [
-      'protractor_desktop/embedding.js'
-    ],
+    embedding: ['protractor_desktop/embedding.js'],
 
-    extensions: [
-      'protractor_desktop/extensions.js'
-    ],
+    extensions: ['protractor_desktop/extensions.js'],
 
-    learnerDashboardSubscriptionsAndFeedbackThreads: [
-      'protractor_desktop/learnerDashboardSubscriptionsAndFeedbackThreads.js'
-    ],
+    learnerDashboardSubscriptionsAndFeedbackThreads:
+    ['protractor_desktop/learnerDashboardSubscriptionsAndFeedbackThreads.js'],
 
-    learner: [
-      'protractor/learnerFlow.js'
-    ],
+    learner: ['protractor/learnerFlow.js'],
 
-    library: [
-      'protractor/libraryFlow.js'
-    ],
+    library: ['protractor/libraryFlow.js'],
 
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
-    ],
+    profileMenu: ['protractor/profileMenuFlow.js'],
 
-    publication: [
-      'protractor_desktop/publicationAndLibrary.js'
-    ],
+    publication: ['protractor_desktop/publicationAndLibrary.js'],
 
-    stateEditor: [
-      'protractor_desktop/stateEditor.js',
-    ],
+    stateEditor: ['protractor_desktop/stateEditor.js'],
 
-    subscriptions: [
-      'protractor/subscriptionsFlow.js'
-    ],
+    subscriptions: ['protractor/subscriptionsFlow.js'],
 
-    users: [
-      'protractor_desktop/userJourneys.js',
-    ],
+    users: ['protractor_desktop/userJourneys.js'],
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
@@ -132,14 +105,8 @@ exports.config = {
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
     browserName: 'chrome',
-    chromeOptions: {
-      args: ['--lang=en-EN', '--window-size=1285x1000']
-    },
-    prefs: {
-      intl: {
-        accept_languages: 'en-EN'
-      }
-    },
+    chromeOptions: {args: ['--lang=en-EN', '--window-size=1285x1000']},
+    prefs: {intl: {accept_languages: 'en-EN'}},
     loggingPrefs: {
       driver: 'INFO',
       browser: 'INFO'
@@ -182,26 +149,30 @@ exports.config = {
     if (_ADD_SCREENSHOT_REPORTER) {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-screenshot-reporter
-      jasmine.getEnv().addReporter(new ScreenShotReporter({
+      jasmine.getEnv()
+        .addReporter(new ScreenShotReporter({
         // Directory for screenshots
-        baseDirectory: '../protractor-screenshots',
-        // Function to build filenames of screenshots
-        pathBuilder: function(spec, descriptions, results, capabilities) {
-          return descriptions[1] + ' ' + descriptions[0];
-        },
-        takeScreenShotsOnlyForFailedSpecs: true
-      }));
+          baseDirectory: '../protractor-screenshots',
+          // Function to build filenames of screenshots
+          pathBuilder: function(spec, descriptions, results, capabilities) {
+            return descriptions[1] + ' ' + descriptions[0];
+          },
+          takeScreenShotsOnlyForFailedSpecs: true
+        }));
     }
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
-    jasmine.getEnv().addReporter(new SpecReporter({
-      displayStacktrace: 'all',
-      displaySpecDuration: true
-    }));
+    jasmine.getEnv()
+      .addReporter(new SpecReporter({
+        displayStacktrace: 'all',
+        displaySpecDuration: true
+      }));
 
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
-    browser.driver.manage().window().setSize(1285, 1000);
+    browser.driver.manage()
+      .window()
+      .setSize(1285, 1000);
   },
 
   // The params object will be passed directly to the protractor instance,

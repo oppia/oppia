@@ -49,15 +49,18 @@ oppia.directive('improvementsTab', [
             }
           };
 
-          $scope.openIssueData = [{
-            issue_description: ('I18N_IMPROVEMENTS_TAB_PLAYTHROUGH_ISSUES_' +
+          $scope.openIssueData = [
+            {
+              issue_description: ('I18N_IMPROVEMENTS_TAB_PLAYTHROUGH_ISSUES_' +
                                 'MULTIPLE_INCORRECT_ANSWERS_DESCRIPTION'),
-            issue_type: 'playthrough',
-          }, {
-            issue_description: 'I18N_IMPROVEMENTS_TAB_FEEDBACK_DESCRIPTION',
-            issue_type: 'feedback',
-          }];
+              issue_type: 'playthrough',
+            }, {
+              issue_description: 'I18N_IMPROVEMENTS_TAB_FEEDBACK_DESCRIPTION',
+              issue_type: 'feedback',
+            }
+          ];
         }
       ],
     };
-  }]);
+  }
+]);

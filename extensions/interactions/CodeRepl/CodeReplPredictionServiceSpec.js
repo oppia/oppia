@@ -21,35 +21,39 @@ describe('CodeRepl prediction service', function() {
 
   describe('CodeRepl prediction service test', function() {
     var service, tokenizer;
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       service = $injector.get('CodeReplPredictionService');
       tokenizer = $injector.get('PythonProgramTokenizer');
-    }));
+    }]);
 
     it('should calculate correct jaccard index', function() {
       var multisetA = [1, 2];
       var multisetB = [3, 4];
       var expectedValue = 0.0;
       var value = service.calcJaccardIndex(multisetA, multisetB);
-      expect(value).toEqual(expectedValue);
+      expect(value)
+        .toEqual(expectedValue);
 
       var multisetA = [1, 2];
       var multisetB = [2, 3];
       var expectedValue = 1.0 / 3;
       var value = service.calcJaccardIndex(multisetA, multisetB);
-      expect(value).toEqual(expectedValue);
+      expect(value)
+        .toEqual(expectedValue);
 
       var multisetA = [1, 2, 2, 4];
       var multisetB = [2, 3, 4];
       var expectedValue = 2.0 / 5;
       var value = service.calcJaccardIndex(multisetA, multisetB);
-      expect(value).toEqual(expectedValue);
+      expect(value)
+        .toEqual(expectedValue);
 
       var multisetA = [1, 2, 3];
       var multisetB = [3, 3, 5];
       var expectedValue = 1.0 / 5;
       var value = service.calcJaccardIndex(multisetA, multisetB);
-      expect(value).toEqual(expectedValue);
+      expect(value)
+        .toEqual(expectedValue);
     });
 
     it('should normalize python program tokens correctly.', function() {
@@ -58,18 +62,18 @@ describe('CodeRepl prediction service', function() {
         '\n    print "Hello"\nprint " World"');
 
       var programTokens = tokenizer.generateTokens(program.split('\n'));
-      var tokenToId = {
-        '=': 0, 15: 1, 'if': 2, '>': 3, 5: 4, print: 5, ':': 6
-      };
+      var tokenToId = {'=': 0, 15: 1, 'if': 2, '>': 3, 5: 4, print: 5, ':': 6};
 
       var expectedTokens = [
         'V', '=', '15', 'if', 'V', '>', '5', ':', 'print', 'UNK',
-        'print', 'UNK'];
+        'print', 'UNK'
+      ];
 
       var normalizedTokens = service.getTokenizedProgram(
         programTokens, tokenToId);
 
-      expect(normalizedTokens).toEqual(expectedTokens);
+      expect(normalizedTokens)
+        .toEqual(expectedTokens);
     });
 
     it('should produce program tokens for count vector correctly.', function() {
@@ -80,11 +84,13 @@ describe('CodeRepl prediction service', function() {
       var programTokens = tokenizer.generateTokens(program.split('\n'));
       var expectedTokens = [
         'V', '=', '15', 'if', 'V', '>', '5', ':', 'print', '"Hello"',
-        'print', '" World"'];
+        'print', '" World"'
+      ];
 
       var CVTokens = service.getTokenizedProgramForCV(programTokens);
 
-      expect(CVTokens).toEqual(expectedTokens);
+      expect(CVTokens)
+        .toEqual(expectedTokens);
     });
 
     it('should predict correct answer group for the answers', function() {
@@ -99,8 +105,9 @@ describe('CodeRepl prediction service', function() {
         for (var j = 0; j < testData[i].answers.length; j++) {
           predictedAnswerGroup = service.predict(
             classifierData, testData[i].answers[j]);
-          expect(predictedAnswerGroup).toEqual(
-            testData[i].answer_group_index);
+          expect(predictedAnswerGroup)
+            .toEqual(
+              testData[i].answer_group_index);
         }
       }
 
@@ -112,13 +119,9 @@ describe('CodeRepl prediction service', function() {
         for (var j = 0; j < testData[i].answers.length; j++) {
           predictedAnswerGroup = service.predict(
             classifierData, testData[i].answers[j]);
-          // Ignore the prediction if predicted answer group is -1 since
-          // -1 is returned when the prediction probability is less than the
-          // threshold in which case default answer is shown to the learner.
-          if (predictedAnswerGroup !== -1) {
-            expect(predictedAnswerGroup).toEqual(
+          expect(predictedAnswerGroup)
+            .toEqual(
               testData[i].answer_group_index);
-          }
         }
       }
     });

@@ -34,10 +34,12 @@ oppia.factory('StateEditorTutorialFirstTimeService', [
         if (_currentlyInFirstVisit) {
           $rootScope.$broadcast('enterEditorForTheFirstTime');
           EditorFirstTimeEventsService.initRegisterEvents(expId);
-          $http.post(STARTED_TUTORIAL_EVENT_URL + '/' + expId).error(
-            function() {
-              console.error('Warning: could not record tutorial start event.');
-            });
+          $http.post(STARTED_TUTORIAL_EVENT_URL + '/' + expId)
+            .error(
+              function() {
+                console.error('Warning: could not record tutorial ' +
+                'start event.');
+              });
         }
       },
       markTutorialFinished: function() {

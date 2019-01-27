@@ -53,7 +53,8 @@ describe('Navigation features on mobile', function() {
         aboutLink, 'Could not click about link');
       aboutLink.click();
       waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/about');
+      expect(browser.getCurrentUrl())
+        .toEqual('http://localhost:9001/about');
     });
 
   it('should navigate to Get Started page using the sidebar menu',
@@ -69,7 +70,8 @@ describe('Navigation features on mobile', function() {
         getStartedLink, 'Could not click get started link');
       getStartedLink.click();
       waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/get_started');
+      expect(browser.getCurrentUrl())
+        .toEqual('http://localhost:9001/get_started');
     });
 
   it('should navigate to Teach with Oppia page using the sidebar menu',
@@ -85,7 +87,8 @@ describe('Navigation features on mobile', function() {
         teachLink, 'Could not click teach link');
       teachLink.click();
       waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/teach');
+      expect(browser.getCurrentUrl())
+        .toEqual('http://localhost:9001/teach');
     });
 
   it('should navigate to Donate page using the sidebar menu',
@@ -101,7 +104,8 @@ describe('Navigation features on mobile', function() {
         donateLink, 'Could not click donate link');
       donateLink.click();
       waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/donate');
+      expect(browser.getCurrentUrl())
+        .toEqual('http://localhost:9001/donate');
     });
 
   it('should navigate to Contact page using the sidebar menu',
@@ -117,7 +121,8 @@ describe('Navigation features on mobile', function() {
         contactLink, 'Could not click contact link');
       contactLink.click();
       waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/contact');
+      expect(browser.getCurrentUrl())
+        .toEqual('http://localhost:9001/contact');
     });
 
   it('should navigate to Library page using the sidebar menu',
@@ -132,7 +137,8 @@ describe('Navigation features on mobile', function() {
         libraryLink, 'Could not click library link');
       libraryLink.click();
       waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/library');
+      expect(browser.getCurrentUrl())
+        .toEqual('http://localhost:9001/library');
     });
 
   it('should navigate to Splash page by clicking on the Oppia logo',
@@ -142,7 +148,8 @@ describe('Navigation features on mobile', function() {
         oppiaLogo, 'Could not click oppia logo');
       oppiaLogo.click();
       waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/splash');
+      expect(browser.getCurrentUrl())
+        .toEqual('http://localhost:9001/splash');
     });
 
   it('should navigate to the login page by clicking on the sign in button',
@@ -164,8 +171,9 @@ describe('Navigation features on mobile', function() {
       signInButton.click();
       // We should not wait for angular here since
       // the login page is non-angular.
-      expect(browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/_ah/login?continue=http%3A//localhost%3A9001/signup%3Freturn_url%3Dhttp%253A%252F%252Flocalhost%253A9001%252Flibrary');
+      expect(browser.getCurrentUrl())
+        .toEqual(
+          'http://localhost:9001/_ah/login?continue=http%3A//localhost%3A9001/signup%3Freturn_url%3Dhttp%253A%252F%252Flocalhost%253A9001%252Flibrary');
       // As soon as this page loads up, we are again
       // setting browser.ignoreSynchronization = false
       // to prevent any flakiness.

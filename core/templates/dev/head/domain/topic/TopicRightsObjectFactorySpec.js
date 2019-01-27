@@ -21,7 +21,7 @@ describe('Topic rights object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     TopicRightsObjectFactory = $injector.get('TopicRightsObjectFactory');
     var initialTopicRightsBackendObject = {
       published: false,
@@ -31,23 +31,27 @@ describe('Topic rights object factory', function() {
 
     sampleTopicRights = TopicRightsObjectFactory.createFromBackendDict(
       initialTopicRightsBackendObject);
-  }));
+  }]);
 
   it('should be able to publish and unpublish topic when user can edit it',
     function() {
-      expect(sampleTopicRights.isPublished()).toBe(false);
+      expect(sampleTopicRights.isPublished())
+        .toBe(false);
 
       sampleTopicRights.markTopicAsPublished();
-      expect(sampleTopicRights.isPublished()).toBe(true);
+      expect(sampleTopicRights.isPublished())
+        .toBe(true);
 
       sampleTopicRights.markTopicAsUnpublished();
-      expect(sampleTopicRights.isPublished()).toBe(false);
+      expect(sampleTopicRights.isPublished())
+        .toBe(false);
     });
 
   it('should throw error and not be able to publish or unpublish topic when ' +
     'user cannot edit topic',
   function() {
-    expect(sampleTopicRights.isPublished()).toBe(false);
+    expect(sampleTopicRights.isPublished())
+      .toBe(false);
 
     var exampleTopicRightsBackendObject = {
       is_published: false,
@@ -60,20 +64,25 @@ describe('Topic rights object factory', function() {
 
     expect(function() {
       exampleTopicRights.markTopicAsPublished();
-    }).toThrow(new Error('User is not allowed to publish this topic.'));
+    })
+      .toThrow(new Error('User is not allowed to publish this topic.'));
 
     expect(function() {
       exampleTopicRights.markTopicAsUnpublished();
-    }).toThrow(new Error('User is not allowed to unpublish this topic.'));
+    })
+      .toThrow(new Error('User is not allowed to unpublish this topic.'));
   });
 
   it('should create an empty topic rights object', function() {
     var emptyTopicRightsBackendObject = (
       TopicRightsObjectFactory.createInterstitialRights());
 
-    expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
-    expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(false);
-    expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(false);
+    expect(emptyTopicRightsBackendObject.isPublished())
+      .toEqual(false);
+    expect(emptyTopicRightsBackendObject.canEditTopic())
+      .toEqual(false);
+    expect(emptyTopicRightsBackendObject.canPublishTopic())
+      .toEqual(false);
   });
 
   it('should make a copy from another topic rights', function() {
@@ -82,9 +91,13 @@ describe('Topic rights object factory', function() {
 
     emptyTopicRightsBackendObject.copyFromTopicRights(sampleTopicRights);
 
-    expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
-    expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(true);
-    expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(true);
-    expect(emptyTopicRightsBackendObject.canEditName()).toEqual(true);
+    expect(emptyTopicRightsBackendObject.isPublished())
+      .toEqual(false);
+    expect(emptyTopicRightsBackendObject.canEditTopic())
+      .toEqual(true);
+    expect(emptyTopicRightsBackendObject.canPublishTopic())
+      .toEqual(true);
+    expect(emptyTopicRightsBackendObject.canEditName())
+      .toEqual(true);
   });
 });

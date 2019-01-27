@@ -27,8 +27,6 @@ oppia.factory('ParamChangesObjectFactory', [
       });
     };
 
-    return {
-      createFromBackendList: createFromBackendList
-    };
+    return {createFromBackendList: createFromBackendList};
   }
 ]);

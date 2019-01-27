@@ -37,22 +37,21 @@ oppia.factory('ExplorationCreationService', [
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating exploration';
 
-        $http.post('/contributehandler/create_new', {
-        }).then(function(response) {
-          SiteAnalyticsService.registerCreateNewExplorationEvent(
-            response.data.explorationId);
-          $timeout(function() {
-            $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: response.data.explorationId
-              }
-            );
-          }, 150);
-          return false;
-        }, function() {
-          $rootScope.loadingMessage = '';
-          explorationCreationInProgress = false;
-        });
+        $http.post('/contributehandler/create_new', {})
+          .then(function(response) {
+            SiteAnalyticsService.registerCreateNewExplorationEvent(
+              response.data.explorationId);
+            $timeout(function() {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_EXPLORATION_URL_TEMPLATE,
+                {exploration_id: response.data.explorationId}
+              );
+            }, 150);
+            return false;
+          }, function() {
+            $rootScope.loadingMessage = '';
+            explorationCreationInProgress = false;
+          });
       },
       showUploadExplorationModal: function() {
         AlertsService.clearWarnings();
@@ -103,20 +102,21 @@ oppia.factory('ExplorationCreationService', [
             processData: false,
             type: 'POST',
             url: 'contributehandler/upload'
-          }).done(function(data) {
-            $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: data.explorationId
-              }
-            );
-          }).fail(function(data) {
-            var transformedData = data.responseText.substring(5);
-            var parsedResponse = JSON.parse(transformedData);
-            AlertsService.addWarning(
-              parsedResponse.error || 'Error communicating with server.');
-            $rootScope.loadingMessage = '';
-            $scope.$apply();
-          });
+          })
+            .done(function(data) {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_EXPLORATION_URL_TEMPLATE,
+                {exploration_id: data.explorationId}
+              );
+            })
+            .fail(function(data) {
+              var transformedData = data.responseText.substring(5);
+              var parsedResponse = JSON.parse(transformedData);
+              AlertsService.addWarning(
+                parsedResponse.error || 'Error communicating with server.');
+              $rootScope.loadingMessage = '';
+              $scope.$apply();
+            });
         });
       }
     };

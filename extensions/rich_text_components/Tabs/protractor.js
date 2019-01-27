@@ -28,7 +28,8 @@ var customizeComponent = function(modal, tabArray) {
   listEditor.setLength(tabArray.length);
   for (var i = 0; i < tabArray.length; i++) {
     var dictionaryEditor = listEditor.editItem(i, 'Dictionary');
-    dictionaryEditor.editEntry(0, 'UnicodeString').setValue(tabArray[i].title);
+    dictionaryEditor.editEntry(0, 'UnicodeString')
+      .setValue(tabArray[i].title);
     var richTextEditor = dictionaryEditor.editEntry(1, 'RichText');
     richTextEditor.clear();
     tabArray[i].content(richTextEditor);
@@ -36,22 +37,28 @@ var customizeComponent = function(modal, tabArray) {
 };
 
 var expectComponentDetailsToMatch = function(elem, tabArray) {
-  elem.element(by.tagName('ul')).all(by.tagName('li')).then(
-    function(titleElems) {
-      expect(titleElems.length).toEqual(tabArray.length);
-      elem.element(by.css('.tab-content')).all(by.xpath('./*'))
-        .then(function(contentElems) {
-          for (var i = 0; i < tabArray.length; i++) {
+  elem.element(by.tagName('ul'))
+    .all(by.tagName('li'))
+    .then(
+      function(titleElems) {
+        expect(titleElems.length)
+          .toEqual(tabArray.length);
+        elem.element(by.css('.tab-content'))
+          .all(by.xpath('./*'))
+          .then(function(contentElems) {
+            for (var i = 0; i < tabArray.length; i++) {
             // Click on each tab in turn to check its contents
-            expect(titleElems[i].getText()).toMatch(tabArray[i].title);
-            titleElems[i].click();
-            forms.expectRichText(
-              contentElems[i].element(by.css('.protractor-test-tab-content'))
-            ).toMatch(tabArray[i].content);
-          }
-        });
-    }
-  );
+              expect(titleElems[i].getText())
+                .toMatch(tabArray[i].title);
+              titleElems[i].click();
+              forms.expectRichText(
+                contentElems[i].element(by.css('.protractor-test-tab-content'))
+              )
+                .toMatch(tabArray[i].content);
+            }
+          });
+      }
+    );
 };
 
 exports.customizeComponent = customizeComponent;

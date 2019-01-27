@@ -23,7 +23,7 @@ describe('LogicProofValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     validatorService = $injector.get('LogicProofValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
@@ -57,17 +57,19 @@ describe('LogicProofValidationService', function() {
     });
 
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
-  }));
+  }]);
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 
   it('should not have warnings for a confusing default outcome', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, [], badOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 });

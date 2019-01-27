@@ -119,11 +119,12 @@ oppia.factory('TopicObjectFactory', [
         }));
       for (var i = 0; i < subtopics.length; i++) {
         issues = issues.concat(subtopics[i].validate());
-        var skillIds = subtopics[i].getSkillSummaries().map(
-          function(skillSummary) {
-            return skillSummary.getId();
-          }
-        );
+        var skillIds = subtopics[i].getSkillSummaries()
+          .map(
+            function(skillSummary) {
+              return skillSummary.getId();
+            }
+          );
         for (var j = 0; j < skillIds.length; j++) {
           if (topicSkillIds.indexOf(skillIds[j]) === -1) {
             topicSkillIds.push(skillIds[j]);
@@ -276,7 +277,8 @@ oppia.factory('TopicObjectFactory', [
     Topic.prototype.removeUncategorizedSkill = function(skillId) {
       var index = this._uncategorizedSkillSummaries.map(function(skillSummary) {
         return skillSummary.getId();
-      }).indexOf(skillId);
+      })
+        .indexOf(skillId);
       if (index === -1) {
         throw Error('Given skillId is not an uncategorized skill.');
       }

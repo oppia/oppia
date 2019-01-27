@@ -24,7 +24,7 @@ describe('ImageClickInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     var filter = $injector.get('$filter');
     validatorService = $injector.get('ImageClickInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');
@@ -59,24 +59,22 @@ describe('ImageClickInputValidationService', function() {
       imageAndRegions: {
         value: {
           imagePath: '/path/to/image',
-          labeledRegions: [{
-            label: 'FirstLabel'
-          }, {
-            label: 'SecondLabel'
-          }]
+          labeledRegions: [{label: 'FirstLabel'}, {label: 'SecondLabel'}]
         }
       }
     };
-    goodAnswerGroups = [{
-      rules: [{
-        type: 'IsInRegion',
-        inputs: {
-          x: 'SecondLabel'
-        }
-      }],
-      outcome: goodDefaultOutcome
-    }];
-  }));
+    goodAnswerGroups = [
+      {
+        rules: [
+          {
+            type: 'IsInRegion',
+            inputs: {x: 'SecondLabel'}
+          }
+        ],
+        outcome: goodDefaultOutcome
+      }
+    ];
+  }]);
 
   it('should expect a customization argument for image and regions',
     function() {
@@ -84,24 +82,29 @@ describe('ImageClickInputValidationService', function() {
       expect(function() {
         validatorService.getAllWarnings(
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      }).toThrow(
-        'Expected customization arguments to have property: imageAndRegions');
+      })
+        .toThrow(
+          'Expected customization arguments to have property: imageAndRegions');
     });
 
   it('should expect an image path customization argument', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
 
     customizationArguments.imageAndRegions.value.imagePath = '';
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please add an image for the learner to click on.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please add an image for the learner to click on.'
+        }
+      ]);
   });
 
   it('should expect labeled regions with non-empty, unique, and ' +
@@ -112,38 +115,51 @@ describe('ImageClickInputValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please ensure the region labels are nonempty.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure the region labels are nonempty.'
+        }
+      ]);
 
     regions[0].label = 'SecondLabel';
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please ensure the region labels are unique.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure the region labels are unique.'
+        }
+      ]);
 
     regions[0].label = '@';
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'The region labels should consist of alphanumeric characters.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'The region labels should consist of ' +
+          'alphanumeric characters.'
+        }
+      ]);
 
     customizationArguments.imageAndRegions.value.labeledRegions = [];
     goodAnswerGroups[0].rules = [];
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Please specify at least one region in the image.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message: 'Please specify at least one region in the image.'
+        }
+      ]);
   });
 
   it('should expect rule types to reference valid region labels', function() {
@@ -151,28 +167,37 @@ describe('ImageClickInputValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'The region label \'FakeLabel\' in rule 1 in group 1 is ' +
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'The region label \'FakeLabel\' in rule 1 in group 1 is ' +
         'invalid.'
-    }]);
+        }
+      ]);
   });
 
   it('should expect a non-confusing and non-null default outcome',
     function() {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, null);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Please add a rule to cover what should happen if none of ' +
-          'the given regions are clicked.'
-      }]);
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.ERROR,
+            message: 'Please add a rule to cover what should happen if ' +
+          'none of the given regions are clicked.'
+          }
+        ]);
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, badOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Please add a rule to cover what should happen if none of ' +
-          'the given regions are clicked.'
-      }]);
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.ERROR,
+            message: 'Please add a rule to cover what should happen if' +
+          ' none of the given regions are clicked.'
+          }
+        ]);
     });
 });

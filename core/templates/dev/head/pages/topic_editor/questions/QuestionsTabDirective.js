@@ -99,57 +99,60 @@ oppia.directive('questionsTab', [
               EditableQuestionBackendApiService.createQuestion(
                 $scope.skillId,
                 $scope.question.toBackendDict(true)
-              ).then(function() {
-                TopicEditorStateService.fetchQuestionSummaries(
-                  $scope.topic.getId(), true
-                );
-                $scope.questionIsBeingSaved = false;
-                $scope.currentPage = 0;
-              });
+              )
+                .then(function() {
+                  TopicEditorStateService.fetchQuestionSummaries(
+                    $scope.topic.getId(), true
+                  );
+                  $scope.questionIsBeingSaved = false;
+                  $scope.currentPage = 0;
+                });
             } else {
               if (QuestionUndoRedoService.hasChanges()) {
                 $scope.questionIsBeingSaved = true;
                 // TODO(tjiang11): Allow user to specify a commit message.
                 EditableQuestionBackendApiService.updateQuestion(
                   $scope.questionId, $scope.question.getVersion(), 'blank',
-                  QuestionUndoRedoService.getCommittableChangeList()).then(
-                  function() {
-                    QuestionUndoRedoService.clearChanges();
-                    $scope.questionIsBeingSaved = false;
-                    TopicEditorStateService.fetchQuestionSummaries(
-                      $scope.topic.getId(), function() {
-                        _initTab();
-                      }
-                    );
-                  }, function(error) {
-                    AlertsService.addWarning(
-                      error || 'There was an error saving the question.');
-                    $scope.questionIsBeingSaved = false;
-                  });
+                  QuestionUndoRedoService.getCommittableChangeList())
+                  .then(
+                    function() {
+                      QuestionUndoRedoService.clearChanges();
+                      $scope.questionIsBeingSaved = false;
+                      TopicEditorStateService.fetchQuestionSummaries(
+                        $scope.topic.getId(), function() {
+                          _initTab();
+                        }
+                      );
+                    }, function(error) {
+                      AlertsService.addWarning(
+                        error || 'There was an error saving the question.');
+                      $scope.questionIsBeingSaved = false;
+                    });
               }
             }
           };
 
           $scope.editQuestion = function(questionSummary) {
             EditableQuestionBackendApiService.fetchQuestion(
-              questionSummary.id).then(function(response) {
-              response.associated_skill_dicts.forEach(function(skillDict) {
-                skillDict.misconceptions.forEach(function(misconception) {
-                  $scope.misconceptions.push(misconception);
+              questionSummary.id)
+              .then(function(response) {
+                response.associated_skill_dicts.forEach(function(skillDict) {
+                  skillDict.misconceptions.forEach(function(misconception) {
+                    $scope.misconceptions.append(misconception);
+                  });
                 });
-              });
-              $scope.question =
+                $scope.question =
                 QuestionObjectFactory.createFromBackendDict(
                   response.question_dict);
-              $scope.questionId = $scope.question.getId();
-              $scope.questionStateData = $scope.question.getStateData();
-              $scope.questionIsBeingUpdated = true;
+                $scope.questionId = $scope.question.getId();
+                $scope.questionStateData = $scope.question.getStateData();
+                $scope.questionIsBeingUpdated = true;
 
-              $scope.openQuestionEditor();
-            }, function(errorResponse) {
-              AlertsService.addWarning(
-                errorResponse.error || 'Failed to fetch question.');
-            });
+                $scope.openQuestionEditor();
+              }, function(errorResponse) {
+                AlertsService.addWarning(
+                  errorResponse.error || 'Failed to fetch question.');
+              });
           };
 
           $scope.createQuestion = function() {
@@ -198,22 +201,24 @@ oppia.directive('questionsTab', [
             modalInstance.result.then(function(skillId) {
               $scope.skillId = skillId;
               EditableSkillBackendApiService.fetchSkill(
-                skillId).then(
-                function(skillDict) {
-                  $scope.misconceptions = skillDict.misconceptions.map(function(
-                      misconceptionsBackendDict) {
-                    return MisconceptionObjectFactory.createFromBackendDict(
-                      misconceptionsBackendDict);
-                  });
-                  $scope.question =
+                skillId)
+                .then(
+                  function(skillDict) {
+                    $scope.misconceptions = skillDict.misconceptions
+                      .map(function(
+                          misconceptionsBackendDict) {
+                        return MisconceptionObjectFactory.createFromBackendDict(
+                          misconceptionsBackendDict);
+                      });
+                    $scope.question =
                     QuestionObjectFactory.createDefaultQuestion();
-                  $scope.questionId = $scope.question.getId();
-                  $scope.questionStateData = $scope.question.getStateData();
-                  $scope.questionIsBeingUpdated = false;
-                  $scope.openQuestionEditor();
-                }, function(error) {
-                  AlertsService.addWarning();
-                });
+                    $scope.questionId = $scope.question.getId();
+                    $scope.questionStateData = $scope.question.getStateData();
+                    $scope.questionIsBeingUpdated = false;
+                    $scope.openQuestionEditor();
+                  }, function(error) {
+                    AlertsService.addWarning();
+                  });
             });
           };
 
@@ -275,30 +280,30 @@ oppia.directive('questionsTab', [
             );
             var threadsPromise = $http.get(
               UrlInterpolationService.interpolateUrl(
-                '/threadlisthandlerfortopic/<topic_id>', {
-                  topic_id: UrlService.getTopicIdFromUrl()
-                }));
-            $q.all([suggestionsPromise, threadsPromise]).then(function(res) {
-              var suggestionThreads = res[1].data.suggestion_thread_dicts;
-              var suggestions = res[0].data.suggestions;
-              if (suggestionThreads.length !== suggestions.length) {
-                $log.error(
-                  'Number of suggestion threads doesn\'t match number of ' +
+                '/threadlisthandlerfortopic/<topic_id>',
+                {topic_id: UrlService.getTopicIdFromUrl()}));
+            $q.all([suggestionsPromise, threadsPromise])
+              .then(function(res) {
+                var suggestionThreads = res[1].data.suggestion_thread_dicts;
+                var suggestions = res[0].data.suggestions;
+                if (suggestionThreads.length !== suggestions.length) {
+                  $log.error(
+                    'Number of suggestion threads doesn\'t match number of ' +
                   'suggestion objects');
-              }
-              for (var i = 0; i < suggestionThreads.length; i++) {
-                for (var j = 0; j < suggestions.length; j++) {
-                  if (suggestionThreads[i].thread_id ===
+                }
+                for (var i = 0; i < suggestionThreads.length; i++) {
+                  for (var j = 0; j < suggestions.length; j++) {
+                    if (suggestionThreads[i].thread_id ===
                       suggestions[j].suggestion_id) {
-                    var suggestionThread = (
-                      SuggestionThreadObjectFactory.createFromBackendDicts(
-                        suggestionThreads[i], suggestions[j]));
-                    $scope.questionSuggestionThreads.push(suggestionThread);
-                    break;
+                      var suggestionThread = (
+                        SuggestionThreadObjectFactory.createFromBackendDicts(
+                          suggestionThreads[i], suggestions[j]));
+                      $scope.questionSuggestionThreads.push(suggestionThread);
+                      break;
+                    }
                   }
                 }
-              }
-            });
+              });
           };
 
           $scope.setActiveQuestion = function(questionSuggestionThread) {
@@ -341,9 +346,7 @@ oppia.directive('questionsTab', [
                   };
 
                   $scope.done = function() {
-                    $uibModalInstance.close({
-                      skillId: $scope.selectedSkillId
-                    });
+                    $uibModalInstance.close({skillId: $scope.selectedSkillId});
                   };
 
                   $scope.cancel = function() {
@@ -353,16 +356,18 @@ oppia.directive('questionsTab', [
               ]
             }).result.then(function(res) {
               $scope.selectedSkillId = res.skillId;
-              EditableSkillBackendApiService.fetchSkill(res.skillId).then(
-                function(skillDict) {
-                  $scope.misconceptions = skillDict.misconceptions.map(function(
-                      misconceptionsBackendDict) {
-                    return MisconceptionObjectFactory.createFromBackendDict(
-                      misconceptionsBackendDict);
+              EditableSkillBackendApiService.fetchSkill(res.skillId)
+                .then(
+                  function(skillDict) {
+                    $scope.misconceptions = skillDict.misconceptions
+                      .map(function(
+                          misconceptionsBackendDict) {
+                        return MisconceptionObjectFactory.createFromBackendDict(
+                          misconceptionsBackendDict);
+                      });
+                  }, function(error) {
+                    AlertsService.addWarning();
                   });
-                }, function(error) {
-                  AlertsService.addWarning();
-                });
             });
           };
 
@@ -378,10 +383,11 @@ oppia.directive('questionsTab', [
               skill_id: $scope.selectedSkillId,
               commit_message: 'unused_commit_message',
               review_message: reviewMessage
-            }).then(function() {
-              $scope.clearActiveQuestion();
-              $window.location.reload();
-            });
+            })
+              .then(function() {
+                $scope.clearActiveQuestion();
+                $window.location.reload();
+              });
           };
 
           $scope.rejectQuestion = function(suggestionId, reviewMessage) {
@@ -395,10 +401,11 @@ oppia.directive('questionsTab', [
               action: 'reject',
               commit_message: 'unused_commit_message',
               review_message: reviewMessage
-            }).then(function() {
-              $scope.clearActiveQuestion();
-              $window.location.reload();
-            });
+            })
+              .then(function() {
+                $scope.clearActiveQuestion();
+                $window.location.reload();
+              });
           };
 
           $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, _initTab);
@@ -408,4 +415,5 @@ oppia.directive('questionsTab', [
         }
       ]
     };
-  }]);
+  }
+]);

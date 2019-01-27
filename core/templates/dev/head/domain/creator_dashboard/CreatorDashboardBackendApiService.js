@@ -17,12 +17,12 @@
  * backend.
  */
 
-oppia.factory('CreatorDashboardBackendApiService', ['$http', function($http) {
-  var _fetchDashboardData = function() {
-    return $http.get('/creatordashboardhandler/data');
-  };
+oppia.factory('CreatorDashboardBackendApiService', [
+  '$http', function($http) {
+    var _fetchDashboardData = function() {
+      return $http.get('/creatordashboardhandler/data');
+    };
 
-  return {
-    fetchDashboardData: _fetchDashboardData
-  };
-}]);
+    return {fetchDashboardData: _fetchDashboardData};
+  }
+]);

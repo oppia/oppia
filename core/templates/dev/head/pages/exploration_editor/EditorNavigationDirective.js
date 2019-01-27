@@ -35,9 +35,7 @@ oppia.directive('editorNavigation', [
             ExplorationWarningsService, RouterService, SiteAnalyticsService,
             StateEditorTutorialFirstTimeService, ThreadDataService,
             UserService, WindowDimensionsService) {
-          $scope.popoverControlObject = {
-            postTutorialHelpPopoverIsShown: false
-          };
+          $scope.popoverControlObject = {postTutorialHelpPopoverIsShown: false};
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
           $scope.isImprovementsTabEnabled =
             ExplorationFeaturesService.isImprovementsTabEnabled;
@@ -56,9 +54,10 @@ oppia.directive('editorNavigation', [
           });
 
           $scope.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
-          });
+          UserService.getUserInfoAsync()
+            .then(function(userInfo) {
+              $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            });
 
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();
@@ -125,4 +124,5 @@ oppia.directive('editorNavigation', [
         }
       ]
     };
-  }]);
+  }
+]);

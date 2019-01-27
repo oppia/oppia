@@ -32,29 +32,26 @@ oppia.factory('EditableSkillBackendApiService', [
       SKILL_EDITOR_QUESTION_URL_TEMPLATE, UrlInterpolationService) {
     var _fetchSkill = function(skillId, successCallback, errorCallback) {
       var skillDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_SKILL_DATA_URL_TEMPLATE, {
-          skill_id: skillId
-        });
+        EDITABLE_SKILL_DATA_URL_TEMPLATE, {skill_id: skillId});
 
-      $http.get(skillDataUrl).then(function(response) {
-        var skill = angular.copy(response.data.skill);
-        if (successCallback) {
-          successCallback(skill);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(skillDataUrl)
+        .then(function(response) {
+          var skill = angular.copy(response.data.skill);
+          if (successCallback) {
+            successCallback(skill);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _updateSkill = function(
         skillId, skillVersion, commitMessage, changeList,
         successCallback, errorCallback) {
       var editableSkillDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_SKILL_DATA_URL_TEMPLATE, {
-          skill_id: skillId
-        });
+        EDITABLE_SKILL_DATA_URL_TEMPLATE, {skill_id: skillId});
 
       var putData = {
         version: skillVersion,
@@ -62,17 +59,18 @@ oppia.factory('EditableSkillBackendApiService', [
         change_dicts: changeList
       };
 
-      $http.put(editableSkillDataUrl, putData).then(function(response) {
+      $http.put(editableSkillDataUrl, putData)
+        .then(function(response) {
         // The returned data is an updated skill dict.
-        var skill = angular.copy(response.data.skill);
-        if (successCallback) {
-          successCallback(skill);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+          var skill = angular.copy(response.data.skill);
+          if (successCallback) {
+            successCallback(skill);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _fetchQuestions = function(
@@ -82,38 +80,38 @@ oppia.factory('EditableSkillBackendApiService', [
           skill_id: skillId,
           cursor: cursor ? cursor : ''
         });
-      $http.get(questionsDataUrl).then(function(response) {
-        var questionSummaries = angular.copy(
-          response.data.question_summary_dicts);
-        var nextCursor = response.data.next_start_cursor;
-        if (successCallback) {
-          successCallback({
-            questionSummaries: questionSummaries,
-            nextCursor: nextCursor
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(questionsDataUrl)
+        .then(function(response) {
+          var questionSummaries = angular.copy(
+            response.data.question_summary_dicts);
+          var nextCursor = response.data.next_start_cursor;
+          if (successCallback) {
+            successCallback({
+              questionSummaries: questionSummaries,
+              nextCursor: nextCursor
+            });
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _deleteSkill = function(skillId, successCallback, errorCallback) {
       var skillDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_SKILL_DATA_URL_TEMPLATE, {
-          skill_id: skillId
-        });
+        EDITABLE_SKILL_DATA_URL_TEMPLATE, {skill_id: skillId});
 
-      $http['delete'](skillDataUrl).then(function(response) {
-        if (successCallback) {
-          successCallback(response.status);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http['delete'](skillDataUrl)
+        .then(function(response) {
+          if (successCallback) {
+            successCallback(response.status);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     return {

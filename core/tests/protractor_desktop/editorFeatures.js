@@ -382,16 +382,18 @@ describe('Exploration history', function() {
       'param_changes: []\n' +
       ' ';
 
-    var expectedHistoryStates = [{
-      label: 'first (was: Introd...',
-      color: COLOR_CHANGED
-    }, {
-      label: 'second',
-      color: COLOR_ADDED
-    }, {
-      label: 'final card',
-      color: COLOR_ADDED
-    }];
+    var expectedHistoryStates = [
+      {
+        label: 'first (was: Introd...',
+        color: COLOR_CHANGED
+      }, {
+        label: 'second',
+        color: COLOR_ADDED
+      }, {
+        label: 'final card',
+        color: COLOR_ADDED
+      }
+    ];
     explorationEditorPage.navigateToHistoryTab();
     var historyGraph = explorationEditorHistoryTab.getHistoryGraph();
     historyGraph.selectTwoVersions(1, 2);
@@ -421,16 +423,18 @@ describe('Exploration history', function() {
       setDestination('final card', false, null);
     explorationEditorPage.saveChanges();
 
-    expectedHistoryStates = [{
-      label: 'first',
-      color: COLOR_CHANGED
-    }, {
-      label: 'second',
-      color: COLOR_DELETED
-    }, {
-      label: 'final card',
-      color: COLOR_UNCHANGED
-    }];
+    expectedHistoryStates = [
+      {
+        label: 'first',
+        color: COLOR_CHANGED
+      }, {
+        label: 'second',
+        color: COLOR_DELETED
+      }, {
+        label: 'final card',
+        color: COLOR_UNCHANGED
+      }
+    ];
     explorationEditorPage.navigateToHistoryTab();
     historyGraph = explorationEditorHistoryTab.getHistoryGraph();
     historyGraph.selectTwoVersions(2, 3);
@@ -446,13 +450,15 @@ describe('Exploration history', function() {
     explorationEditorMainTab.moveToState('first');
     explorationEditorMainTab.setStateName('third');
     explorationEditorPage.saveChanges();
-    expectedHistoryStates = [{
-      label: 'third (was: first)',
-      color: COLOR_RENAMED_UNCHANGED
-    }, {
-      label: 'final card',
-      color: COLOR_UNCHANGED
-    }];
+    expectedHistoryStates = [
+      {
+        label: 'third (was: first)',
+        color: COLOR_RENAMED_UNCHANGED
+      }, {
+        label: 'final card',
+        color: COLOR_UNCHANGED
+      }
+    ];
     explorationEditorPage.navigateToHistoryTab();
     historyGraph = explorationEditorHistoryTab.getHistoryGraph();
     historyGraph.selectTwoVersions(3, 4);
@@ -472,16 +478,18 @@ describe('Exploration history', function() {
     responseEditor.setDestination('final card', false, null);
     explorationEditorPage.saveChanges();
 
-    expectedHistoryStates = [{
-      label: 'third (was: first)',
-      color: COLOR_CHANGED
-    }, {
-      label: 'second',
-      color: COLOR_UNCHANGED
-    }, {
-      label: 'final card',
-      color: COLOR_UNCHANGED
-    }];
+    expectedHistoryStates = [
+      {
+        label: 'third (was: first)',
+        color: COLOR_CHANGED
+      }, {
+        label: 'second',
+        color: COLOR_UNCHANGED
+      }, {
+        label: 'final card',
+        color: COLOR_UNCHANGED
+      }
+    ];
     explorationEditorPage.navigateToHistoryTab();
     historyGraph = explorationEditorHistoryTab.getHistoryGraph();
     historyGraph.selectTwoVersions(2, 5);
@@ -502,16 +510,18 @@ describe('Exploration history', function() {
     explorationPlayerPage.expectExplorationToBeOver();
 
     general.moveToEditor();
-    expectedHistoryStates = [{
-      label: 'first (was: third)',
-      color: COLOR_CHANGED
-    }, {
-      label: 'second',
-      color: COLOR_ADDED
-    }, {
-      label: 'final card',
-      color: COLOR_UNCHANGED
-    }];
+    expectedHistoryStates = [
+      {
+        label: 'first (was: third)',
+        color: COLOR_CHANGED
+      }, {
+        label: 'second',
+        color: COLOR_ADDED
+      }, {
+        label: 'final card',
+        color: COLOR_UNCHANGED
+      }
+    ];
     explorationEditorPage.navigateToHistoryTab();
     historyGraph = explorationEditorHistoryTab.getHistoryGraph();
     historyGraph.selectTwoVersions(4, 6);
@@ -568,7 +578,8 @@ describe('ExplorationFeedback', function() {
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
-    ).toEqual(0);
+    )
+      .toEqual(0);
     users.logout();
 
     // Learner plays the exploration and submits a feedback.
@@ -584,15 +595,18 @@ describe('ExplorationFeedback', function() {
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
-    ).toEqual(1);
+    )
+      .toEqual(1);
     creatorDashboardPage.navigateToExplorationEditor();
 
     explorationEditorPage.navigateToFeedbackTab();
     explorationEditorFeedbackTab.expectToHaveFeedbackThread();
     explorationEditorFeedbackTab.readFeedbackMessages()
       .then(function(messages) {
-        expect(messages.length).toEqual(1);
-        expect(messages[0]).toEqual(feedback);
+        expect(messages.length)
+          .toEqual(1);
+        expect(messages[0])
+          .toEqual(feedback);
       });
     explorationEditorPage.navigateToFeedbackTab();
     explorationEditorFeedbackTab.sendResponseToLatestFeedback(feedbackResponse);
@@ -642,9 +656,10 @@ describe('Issues visualization', function() {
     explorationEditorMainTab.exitTutorial();
 
     var expId;
-    browser.getCurrentUrl().then(function(url) {
-      expId = url.split('/')[4].slice(0, -1);
-    });
+    browser.getCurrentUrl()
+      .then(function(url) {
+        expId = url.split('/')[4].slice(0, -1);
+      });
 
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
@@ -660,8 +675,9 @@ describe('Issues visualization', function() {
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Good job'), 'Two', true, 'Equals',
       'One');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
+    explorationEditorMainTab.getResponseEditor('default')
+      .setFeedback(
+        forms.toRichText('Try again'));
 
     explorationEditorMainTab.moveToState('Two');
     explorationEditorMainTab.setContent(
@@ -670,8 +686,9 @@ describe('Issues visualization', function() {
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Good job'), 'Three', true, 'Equals',
       'Two');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
+    explorationEditorMainTab.getResponseEditor('default')
+      .setFeedback(
+        forms.toRichText('Try again'));
 
     explorationEditorMainTab.moveToState('Three');
     explorationEditorMainTab.setContent(
@@ -683,8 +700,9 @@ describe('Issues visualization', function() {
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Try 2 again'), 'Two', false, 'Equals',
       'Two');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('Try again'));
+    explorationEditorMainTab.getResponseEditor('default')
+      .setFeedback(
+        forms.toRichText('Try again'));
 
     explorationEditorMainTab.moveToState('End');
     explorationEditorMainTab.setInteraction('EndExploration');
@@ -695,7 +713,8 @@ describe('Issues visualization', function() {
       'The set of exploration IDs for recording playthrough issues',
       'List',
       function(elem) {
-        elem.addItem('Unicode').setValue(expId);
+        elem.addItem('Unicode')
+          .setValue(expId);
       });
     adminPage.editConfigProperty(
       'The probability of recording playthroughs', 'Real',
@@ -888,14 +907,15 @@ describe('Suggestions on Explorations', function() {
     creatorDashboardPage.navigateToExplorationEditor();
 
     explorationEditorPage.navigateToFeedbackTab();
-    explorationEditorFeedbackTab.getSuggestionThreads().then(
-      function(threads) {
-        expect(threads.length).toEqual(2);
-        expect(threads[0]).toMatch(suggestionDescription2);
+    explorationEditorFeedbackTab.getSuggestionThreads()
+      .then(function(threads) {
+        expect(threads.length)
+          .toEqual(1);
+        expect(threads[0])
+          .toMatch(suggestionDescription);
       });
-    explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription1);
-    explorationEditorFeedbackTab.goBackToAllFeedbacks();
-    explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
+    explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription);
+
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
 

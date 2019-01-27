@@ -31,31 +31,45 @@ describe('User info factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     UserInfoObjectFactory = $injector.get('UserInfoObjectFactory');
-  }));
+  }]);
 
   it('should create correct UserInfo obeject from backend dict', function() {
     var userInfo = UserInfoObjectFactory.createFromBackendDict(
       sampleUserInfoBackendObject);
 
-    expect(userInfo.isModerator()).toBe(true);
-    expect(userInfo.isAdmin()).toBe(false);
-    expect(userInfo.isSuperAdmin()).toBe(false);
-    expect(userInfo.canCreateCollections()).toBe(true);
-    expect(userInfo.getPreferredSiteLanguageCode()).toBe('en');
-    expect(userInfo.getUsername()).toBe('tester');
-    expect(userInfo.isLoggedIn()).toBe(true);
+    expect(userInfo.isModerator())
+      .toBe(true);
+    expect(userInfo.isAdmin())
+      .toBe(false);
+    expect(userInfo.isSuperAdmin())
+      .toBe(false);
+    expect(userInfo.canCreateCollections())
+      .toBe(true);
+    expect(userInfo.getPreferredSiteLanguageCode())
+      .toBe('en');
+    expect(userInfo.getUsername())
+      .toBe('tester');
+    expect(userInfo.isLoggedIn())
+      .toBe(true);
   });
 
   it('should create correct default UserInfo object', function() {
     var userInfo = UserInfoObjectFactory.createDefault();
-    expect(userInfo.isModerator()).toBe(false);
-    expect(userInfo.isAdmin()).toBe(false);
-    expect(userInfo.isSuperAdmin()).toBe(false);
-    expect(userInfo.canCreateCollections()).toBe(false);
-    expect(userInfo.getPreferredSiteLanguageCode()).toBeNull();
-    expect(userInfo.getUsername()).toBeNull();
-    expect(userInfo.isLoggedIn()).toBe(false);
+    expect(userInfo.isModerator())
+      .toBe(false);
+    expect(userInfo.isAdmin())
+      .toBe(false);
+    expect(userInfo.isSuperAdmin())
+      .toBe(false);
+    expect(userInfo.canCreateCollections())
+      .toBe(false);
+    expect(userInfo.getPreferredSiteLanguageCode())
+      .toBeNull();
+    expect(userInfo.getUsername())
+      .toBeNull();
+    expect(userInfo.isLoggedIn())
+      .toBe(false);
   });
 });

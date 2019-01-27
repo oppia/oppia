@@ -42,4 +42,5 @@ oppia.directive('collectionMainTab', [
         }
       ]
     };
-  }]);
+  }
+]);

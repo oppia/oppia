@@ -34,15 +34,18 @@ var customizeInteraction = function(elem, recommendedExplorationIdArray) {
       addExplorationIdButton.click();
       objects.UnicodeStringEditor(
         elem.element(by.tagName('schema-based-unicode-editor'))
-      ).setValue(explorationId);
+      )
+        .setValue(explorationId);
     });
   }
 };
 
 var expectInteractionDetailsToMatch = function(elem) {
   expect(
-    elem.element(by.tagName('oppia-interactive-end-exploration')).isPresent()
-  ).toBe(true);
+    elem.element(by.tagName('oppia-interactive-end-exploration'))
+      .isPresent()
+  )
+    .toBe(true);
 };
 
 var testSuite = [];

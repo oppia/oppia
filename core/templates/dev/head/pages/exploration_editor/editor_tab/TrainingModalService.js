@@ -159,7 +159,8 @@ oppia.factory('TrainingModalService', [
               };
 
               $scope.init();
-            }]
+            }
+          ]
         });
         // Save the modified training data externally in state content.
         $rootScope.$broadcast('externalSave');

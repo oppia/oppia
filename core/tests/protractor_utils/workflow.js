@@ -70,20 +70,25 @@ var createExplorationAsAdmin = function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = function() {
-  element(by.css('.protractor-test-publish-exploration')).isDisplayed().then(
-    function() {
-      element(by.css('.protractor-test-publish-exploration')).click();
-    });
+  element(by.css('.protractor-test-publish-exploration'))
+    .isDisplayed()
+    .then(
+      function() {
+        element(by.css('.protractor-test-publish-exploration'))
+          .click();
+      });
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
-  prePublicationButtonElem.isPresent().then(function() {
-    prePublicationButtonElem.click();
-  });
+  prePublicationButtonElem.isPresent()
+    .then(function() {
+      prePublicationButtonElem.click();
+    });
 
   waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  element(by.css('.protractor-test-confirm-publish')).click();
+  element(by.css('.protractor-test-confirm-publish'))
+    .click();
 
   var sharePublishModal = element(
     by.css('.protractor-test-share-publish-modal'));
@@ -121,11 +126,15 @@ var createAndPublishExploration = function(
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = function(roleName, username) {
-  element(by.css('.protractor-test-edit-roles')).click();
-  element(by.css('.protractor-test-role-username')).sendKeys(username);
+  element(by.css('.protractor-test-edit-roles'))
+    .click();
+  element(by.css('.protractor-test-role-username'))
+    .sendKeys(username);
   element(by.css('.protractor-test-role-select')).
-    element(by.cssContainingText('option', roleName)).click();
-  element(by.css('.protractor-test-save-role')).click();
+    element(by.cssContainingText('option', roleName))
+    .click();
+  element(by.css('.protractor-test-save-role'))
+    .click();
 };
 
 var addExplorationManager = function(username) {
@@ -150,9 +159,10 @@ var _getExplorationRoles = function(roleName) {
   var listName = roleName + 'Names';
   return element.all(by.repeater(
     itemName + ' in ExplorationRightsService.' + listName + ' track by $index'
-  )).map(function(elem) {
-    return elem.getText();
-  });
+  ))
+    .map(function(elem) {
+      return elem.getText();
+    });
 };
 
 var getExplorationManagers = function() {

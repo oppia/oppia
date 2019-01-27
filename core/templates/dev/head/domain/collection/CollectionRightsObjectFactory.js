@@ -112,9 +112,7 @@ oppia.factory('CollectionRightsObjectFactory', [
     // Create a new, empty collection rights object. This is not guaranteed to
     // pass validation tests.
     CollectionRights.createEmptyCollectionRights = function() {
-      return new CollectionRights({
-        owner_names: []
-      });
+      return new CollectionRights({owner_names: []});
     };
 
     return CollectionRights;

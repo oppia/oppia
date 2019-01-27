@@ -120,4 +120,5 @@ oppia.directive('explorationSaveAndPublishButtons', [
         }
       ]
     };
-  }]);
+  }
+]);

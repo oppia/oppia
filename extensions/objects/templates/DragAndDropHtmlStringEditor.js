@@ -24,19 +24,24 @@ oppia.directive('dragAndDropHtmlStringEditor', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/drag_and_drop_html_string_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.name = math.random().toString(36).substring(7);
-        $scope.initArgs = $scope.getInitArgs();
-        $scope.choices = $scope.initArgs.choices;
+      controller: [
+        '$scope', function($scope) {
+          $scope.name = math.random()
+            .toString(36)
+            .substring(7);
+          $scope.initArgs = $scope.getInitArgs();
+          $scope.choices = $scope.initArgs.choices;
 
-        if (!$scope.value || $scope.value === '') {
-          $scope.value = $scope.choices[0].id;
+          if (!$scope.value || $scope.value === '') {
+            $scope.value = $scope.choices[0].id;
+          }
+          $scope.selectedItem = $scope.value;
+
+          $scope.selection = function(selectedItem) {
+            $scope.value = selectedItem;
+          };
         }
-        $scope.selectedItem = $scope.value;
-
-        $scope.selection = function(selectedItem) {
-          $scope.value = selectedItem;
-        };
-      }]
+      ]
     };
-  }]);
+  }
+]);

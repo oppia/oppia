@@ -37,10 +37,11 @@ oppia.directive('createActivityButton', [
 
           $scope.canCreateCollections = null;
           $scope.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.canCreateCollections = userInfo.canCreateCollections();
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
-          });
+          UserService.getUserInfoAsync()
+            .then(function(userInfo) {
+              $scope.canCreateCollections = userInfo.canCreateCollections();
+              $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            });
 
           $scope.showUploadExplorationModal = (
             ExplorationCreationService.showUploadExplorationModal);
@@ -76,10 +77,11 @@ oppia.directive('createActivityButton', [
                 controller: [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {
-                    UserService.getUserInfoAsync().then(function(userInfo) {
-                      $scope.canCreateCollections = (
-                        userInfo.canCreateCollections());
-                    });
+                    UserService.getUserInfoAsync()
+                      .then(function(userInfo) {
+                        $scope.canCreateCollections = (
+                          userInfo.canCreateCollections());
+                      });
 
                     $scope.chooseExploration = function() {
                       ExplorationCreationService.createNewExploration();
@@ -102,7 +104,8 @@ oppia.directive('createActivityButton', [
                     $scope.collectionImgUrl = (
                       UrlInterpolationService.getStaticImageUrl(
                         '/activity/collection.svg'));
-                  }],
+                  }
+                ],
                 windowClass: 'oppia-creation-modal'
               }).result.then(function() {}, function() {
                 $scope.creationInProgress = false;
@@ -123,4 +126,5 @@ oppia.directive('createActivityButton', [
         }
       ]
     };
-  }]);
+  }
+]);

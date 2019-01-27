@@ -28,12 +28,14 @@ oppia.directive('oppiaNoninteractiveCollapsible', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Collapsible' +
         '/directives/collapsible_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.heading = HtmlEscaperService.escapedJsonToObj(
-          $attrs.headingWithValue);
-        $scope.content = HtmlEscaperService.escapedJsonToObj(
-          $attrs.contentWithValue);
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.heading = HtmlEscaperService.escapedJsonToObj(
+            $attrs.headingWithValue);
+          $scope.content = HtmlEscaperService.escapedJsonToObj(
+            $attrs.contentWithValue);
+        }
+      ]
     };
   }
 ]);

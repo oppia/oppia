@@ -17,7 +17,8 @@
  * story domain objects.
  */
 
-oppia.factory('StoryObjectFactory', ['StoryContentsObjectFactory',
+oppia.factory('StoryObjectFactory', [
+  'StoryContentsObjectFactory',
   function(StoryContentsObjectFactory) {
     var Story = function(
         id, title, description, notes, storyContents, languageCode, version) {

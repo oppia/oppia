@@ -21,16 +21,19 @@ describe('Classifier Object Factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     ClassifierObjectFactory = $injector.get('ClassifierObjectFactory');
-  }));
+  }]);
 
   it('should create a new classifier', function() {
     var classifierObject = (
       ClassifierObjectFactory.create('TestClassifier', {}, 1));
 
-    expect(classifierObject.algorithmId).toEqual('TestClassifier');
-    expect(classifierObject.classifierData).toEqual({});
-    expect(classifierObject.dataSchemaVersion).toEqual(1);
+    expect(classifierObject.algorithmId)
+      .toEqual('TestClassifier');
+    expect(classifierObject.classifierData)
+      .toEqual({});
+    expect(classifierObject.dataSchemaVersion)
+      .toEqual(1);
   });
 });

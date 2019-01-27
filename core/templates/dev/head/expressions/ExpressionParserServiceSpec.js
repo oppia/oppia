@@ -16,9 +16,9 @@ describe('Expression parser service', function() {
   beforeEach(module('oppia'));
 
   var eps = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     eps = $injector.get('ExpressionParserService');
-  }));
+  }]);
 
   it('should parse to a correct tree', function() {
     [
@@ -33,36 +33,58 @@ describe('Expression parser service', function() {
       [true, 'true'],
       [false, 'false'],
 
-      [['#', 'abc'],
-        'abc'],
-      [['#', 'あいうえお'],
-        'あいうえお'],
-      [['abc'],
-        'abc()'],
-      [['abc', 1],
-        'abc(1)'],
-      [['abc', 1, 2],
-        'abc(1, 2)'],
-      [[[['abc', 1, 2]], 3],
-        'abc(1, 2)()(3)'],
+      [
+        ['#', 'abc'],
+        'abc'
+      ],
+      [
+        ['#', 'あいうえお'],
+        'あいうえお'
+      ],
+      [
+        ['abc'],
+        'abc()'
+      ],
+      [
+        ['abc', 1],
+        'abc(1)'
+      ],
+      [
+        ['abc', 1, 2],
+        'abc(1, 2)'
+      ],
+      [
+        [[['abc', 1, 2]], 3],
+        'abc(1, 2)()(3)'
+      ],
 
-      [['+', 10],
-        '+10'],
-      [['-', ['#', 'abc']],
-        '-abc'],
+      [
+        ['+', 10],
+        '+10'
+      ],
+      [
+        ['-', ['#', 'abc']],
+        '-abc'
+      ],
       [['-', 0.35], '-.35'],
 
       [['+', 1, 2], '1     +    2'],
       // There is a double width space after '+'.
       [['+', 1, 2], '\t1 +　2 '],
 
-      [['*', ['/', 3, 4], 5],
-        '3 / 4 * 5'],
-      [['-', ['+', 2, ['*', ['/', 3, 4], 5]], 6],
-        '2 + 3 / 4 * 5 - 6'],
+      [
+        ['*', ['/', 3, 4], 5],
+        '3 / 4 * 5'
+      ],
+      [
+        ['-', ['+', 2, ['*', ['/', 3, 4], 5]], 6],
+        '2 + 3 / 4 * 5 - 6'
+      ],
 
-      [['||', ['&&', ['<', 2, 3], ['==', 4, 6]], true],
-        '2 < 3 && 4 == 6 || true'],
+      [
+        ['||', ['&&', ['<', 2, 3], ['==', 4, 6]], true],
+        '2 < 3 && 4 == 6 || true'
+      ],
 
       // Expected to produce parser error.
       [undefined, 'a1a-'],
@@ -98,7 +120,8 @@ describe('Expression parser service', function() {
           failed = true;
         }
       }
-      expect(failed).toBe(false);
+      expect(failed)
+        .toBe(false);
     });
   });
 });

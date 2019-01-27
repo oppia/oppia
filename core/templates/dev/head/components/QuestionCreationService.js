@@ -23,18 +23,17 @@ oppia.factory('QuestionCreationService', [
 
     var _createNew = function(
         backendQuestionDict, successCallback, errorCallback) {
-      var postData = {
-        question_dict: backendQuestionDict
-      };
-      $http.post(QUESTION_CREATOR_URL, postData).then(function(response) {
-        if (successCallback) {
-          successCallback();
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      var postData = {question_dict: backendQuestionDict};
+      $http.post(QUESTION_CREATOR_URL, postData)
+        .then(function(response) {
+          if (successCallback) {
+            successCallback();
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     return {

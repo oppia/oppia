@@ -20,131 +20,165 @@ describe('Graph Input service', function() {
   beforeEach(module('oppia'));
 
   var girs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     girs = $injector.get('graphInputRulesService');
-  }));
+  }]);
 
   describe('graph utilities', function() {
     var utils = null;
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       utils = $injector.get('graphUtilsService');
-    }));
+    }]);
 
     it('should construct an adjacency matrix from a graph', function() {
       expect(utils.constructAdjacencyMatrix({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 3.0,
-          y: 3.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 2
-        }],
+        vertices: [
+          {
+            label: 'a',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'b',
+            x: 2.0,
+            y: 2.0
+          }, {
+            label: 'c',
+            x: 3.0,
+            y: 3.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 1,
+            dst: 2,
+            weight: 2
+          }
+        ],
         isDirected: false,
         isWeighted: true,
         isLabeled: true
-      })).toEqual([
-        [null, 1, null],
-        [1, null, 2],
-        [null, 2, null]
-      ]);
+      }))
+        .toEqual([
+          [null, 1, null],
+          [1, null, 2],
+          [null, 2, null]
+        ]);
       expect(utils.constructAdjacencyMatrix({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 3.0,
-          y: 3.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 2
-        }],
+        vertices: [
+          {
+            label: 'a',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'b',
+            x: 2.0,
+            y: 2.0
+          }, {
+            label: 'c',
+            x: 3.0,
+            y: 3.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 1,
+            dst: 2,
+            weight: 2
+          }
+        ],
         isDirected: false,
         isWeighted: false,
         isLabeled: true
-      })).toEqual([
-        [null, 1, null],
-        [1, null, 1],
-        [null, 1, null]
-      ]);
+      }))
+        .toEqual([
+          [null, 1, null],
+          [1, null, 1],
+          [null, 1, null]
+        ]);
     });
 
     it('should find the next lexicographical permutation', function() {
       var permutation = [0, 1, 2, 3];
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([0, 1, 3, 2]);
+      expect(permutation)
+        .toEqual([0, 1, 3, 2]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([0, 2, 1, 3]);
+      expect(permutation)
+        .toEqual([0, 2, 1, 3]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([0, 2, 3, 1]);
+      expect(permutation)
+        .toEqual([0, 2, 3, 1]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([0, 3, 1, 2]);
+      expect(permutation)
+        .toEqual([0, 3, 1, 2]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([0, 3, 2, 1]);
+      expect(permutation)
+        .toEqual([0, 3, 2, 1]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 0, 2, 3]);
+      expect(permutation)
+        .toEqual([1, 0, 2, 3]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 0, 3, 2]);
+      expect(permutation)
+        .toEqual([1, 0, 3, 2]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 2, 0, 3]);
+      expect(permutation)
+        .toEqual([1, 2, 0, 3]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 2, 3, 0]);
+      expect(permutation)
+        .toEqual([1, 2, 3, 0]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 3, 0, 2]);
+      expect(permutation)
+        .toEqual([1, 3, 0, 2]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 3, 2, 0]);
+      expect(permutation)
+        .toEqual([1, 3, 2, 0]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 0, 1, 3]);
+      expect(permutation)
+        .toEqual([2, 0, 1, 3]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 0, 3, 1]);
+      expect(permutation)
+        .toEqual([2, 0, 3, 1]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 1, 0, 3]);
+      expect(permutation)
+        .toEqual([2, 1, 0, 3]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 1, 3, 0]);
+      expect(permutation)
+        .toEqual([2, 1, 3, 0]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 3, 0, 1]);
+      expect(permutation)
+        .toEqual([2, 3, 0, 1]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 3, 1, 0]);
+      expect(permutation)
+        .toEqual([2, 3, 1, 0]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 0, 1, 2]);
+      expect(permutation)
+        .toEqual([3, 0, 1, 2]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 0, 2, 1]);
+      expect(permutation)
+        .toEqual([3, 0, 2, 1]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 1, 0, 2]);
+      expect(permutation)
+        .toEqual([3, 1, 0, 2]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 1, 2, 0]);
+      expect(permutation)
+        .toEqual([3, 1, 2, 0]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 2, 0, 1]);
+      expect(permutation)
+        .toEqual([3, 2, 0, 1]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 2, 1, 0]);
+      expect(permutation)
+        .toEqual([3, 2, 1, 0]);
       permutation = utils.nextPermutation(permutation);
-      expect(permutation).toBe(null);
+      expect(permutation)
+        .toBe(null);
     });
 
     it('should compare adjacency matrices with a permutation', function() {
@@ -156,7 +190,8 @@ describe('Graph Input service', function() {
         [null, 1, 1],
         [2, null, 1],
         [1, 1, null]
-      ], [0, 1, 2])).toBe(true);
+      ], [0, 1, 2]))
+        .toBe(true);
       expect(utils.areAdjacencyMatricesEqualWithPermutation([
         [null, 1, 1],
         [2, null, 1],
@@ -165,7 +200,8 @@ describe('Graph Input service', function() {
         [null, 1, null],
         [2, null, 1],
         [1, 1, null]
-      ], [0, 1, 2])).toBe(false);
+      ], [0, 1, 2]))
+        .toBe(false);
       expect(utils.areAdjacencyMatricesEqualWithPermutation([
         [null, 1, 2],
         [2, null, 1],
@@ -174,7 +210,8 @@ describe('Graph Input service', function() {
         [null, 1, 1],
         [2, null, 1],
         [1, 2, null]
-      ], [2, 0, 1])).toBe(true);
+      ], [2, 0, 1]))
+        .toBe(true);
     });
   });
 
@@ -280,617 +317,476 @@ describe('Graph Input service', function() {
 
   describe('\'is isomorphic to\' rule', function() {
     it('should match graphs which are the same', function() {
-      expect(girs.IsIsomorphicTo(undirectedEmptyGraph(), {
-        g: undirectedEmptyGraph()
-      })).toBe(true);
+      expect(girs.IsIsomorphicTo(undirectedEmptyGraph(),
+        {g: undirectedEmptyGraph()}))
+        .toBe(true);
 
-      expect(girs.IsIsomorphicTo(undirectedCycleGraph(5), {
-        g: undirectedCycleGraph(5)
-      })).toBe(true);
+      expect(girs.IsIsomorphicTo(undirectedCycleGraph(5),
+        {g: undirectedCycleGraph(5)}))
+        .toBe(true);
 
-      expect(girs.IsIsomorphicTo(directedCycleGraph(6), {
-        g: directedCycleGraph(6)
-      })).toBe(true);
+      expect(girs.IsIsomorphicTo(directedCycleGraph(6),
+        {g: directedCycleGraph(6)}))
+        .toBe(true);
     });
 
     it('should match isomorphic graphs', function() {
       expect(girs.IsIsomorphicTo(undirectedCycleGraph(5), {
         g: {
-          vertices: [{
-            label: '',
-            x: 1.0,
-            y: 1.0
-          }, {
-            label: '',
-            x: 1.0,
-            y: 1.0
-          }, {
-            label: '',
-            x: 1.0,
-            y: 1.0
-          }, {
-            label: '',
-            x: 1.0,
-            y: 1.0
-          }, {
-            label: '',
-            x: 1.0,
-            y: 1.0
-          }],
-          edges: [{
-            src: 0,
-            dst: 2,
-            weight: 1
-          }, {
-            src: 2,
-            dst: 4,
-            weight: 1
-          }, {
-            src: 4,
-            dst: 1,
-            weight: 1
-          }, {
-            src: 1,
-            dst: 3,
-            weight: 1
-          }, {
-            src: 3,
-            dst: 0,
-            weight: 1
-          }],
+          vertices: [
+            {
+              label: '',
+              x: 1.0,
+              y: 1.0
+            }, {
+              label: '',
+              x: 1.0,
+              y: 1.0
+            }, {
+              label: '',
+              x: 1.0,
+              y: 1.0
+            }, {
+              label: '',
+              x: 1.0,
+              y: 1.0
+            }, {
+              label: '',
+              x: 1.0,
+              y: 1.0
+            }
+          ],
+          edges: [
+            {
+              src: 0,
+              dst: 2,
+              weight: 1
+            }, {
+              src: 2,
+              dst: 4,
+              weight: 1
+            }, {
+              src: 4,
+              dst: 1,
+              weight: 1
+            }, {
+              src: 1,
+              dst: 3,
+              weight: 1
+            }, {
+              src: 3,
+              dst: 0,
+              weight: 1
+            }
+          ],
           isDirected: false,
           isWeighted: false,
           isLabeled: false
         }
-      })).toBe(true);
+      }))
+        .toBe(true);
     });
 
     it('should match isomorphic graphs with labels', function() {
       expect(girs.IsIsomorphicTo({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 3.0,
-          y: 3.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }],
+        vertices: [
+          {
+            label: 'a',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'b',
+            x: 2.0,
+            y: 2.0
+          }, {
+            label: 'c',
+            x: 3.0,
+            y: 3.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }
+        ],
         isDirected: false,
         isWeighted: false,
         isLabeled: true
       }, {
         g: {
-          vertices: [{
-            label: 'c',
-            x: 1.0,
-            y: 1.0
-          }, {
-            label: 'a',
-            x: 2.0,
-            y: 2.0
-          }, {
-            label: 'b',
-            x: 3.0,
-            y: 3.0
-          }],
-          edges: [{
-            src: 2,
-            dst: 1,
-            weight: 1
-          }],
+          vertices: [
+            {
+              label: 'c',
+              x: 1.0,
+              y: 1.0
+            }, {
+              label: 'a',
+              x: 2.0,
+              y: 2.0
+            }, {
+              label: 'b',
+              x: 3.0,
+              y: 3.0
+            }
+          ],
+          edges: [
+            {
+              src: 2,
+              dst: 1,
+              weight: 1
+            }
+          ],
           isDirected: false,
           isWeighted: false,
           isLabeled: true
         }
-      })).toBe(true);
+      }))
+        .toBe(true);
     });
 
     it('should match isomorphic graphs with labels and weights', function() {
       expect(girs.IsIsomorphicTo({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 3.0,
-          y: 3.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 2
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 1
-        }],
-        isDirected: false,
-        isWeighted: true,
-        isLabeled: true
-      }, {
-        g: {
-          vertices: [{
-            label: 'b',
+        vertices: [
+          {
+            label: 'a',
             x: 1.0,
             y: 1.0
           }, {
-            label: 'a',
+            label: 'b',
             x: 2.0,
             y: 2.0
           }, {
             label: 'c',
             x: 3.0,
             y: 3.0
-          }],
-          edges: [{
-            src: 2,
-            dst: 0,
-            weight: 1
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 2
           }, {
             src: 1,
-            dst: 0,
-            weight: 2
-          }],
+            dst: 2,
+            weight: 1
+          }
+        ],
+        isDirected: false,
+        isWeighted: true,
+        isLabeled: true
+      }, {
+        g: {
+          vertices: [
+            {
+              label: 'b',
+              x: 1.0,
+              y: 1.0
+            }, {
+              label: 'a',
+              x: 2.0,
+              y: 2.0
+            }, {
+              label: 'c',
+              x: 3.0,
+              y: 3.0
+            }
+          ],
+          edges: [
+            {
+              src: 2,
+              dst: 0,
+              weight: 1
+            }, {
+              src: 1,
+              dst: 0,
+              weight: 2
+            }
+          ],
           isDirected: false,
           isWeighted: true,
           isLabeled: true
         }
-      })).toBe(true);
+      }))
+        .toBe(true);
     });
 
     it('should match directed and undirected graphs', function() {
       expect(girs.IsIsomorphicTo({
-        vertices: [{
-          label: '',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: '',
-          x: 2.0,
-          y: 2.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }],
+        vertices: [
+          {
+            label: '',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: '',
+            x: 2.0,
+            y: 2.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }
+        ],
         isDirected: false,
         isWeighted: false,
         isLabeled: false
       }, {
         g: {
-          vertices: [{
-            label: '',
-            x: 1.0,
-            y: 1.0
-          }, {
-            label: '',
-            x: 2.0,
-            y: 2.0
-          }],
-          edges: [{
-            src: 0,
-            dst: 1,
-            weight: 1
-          }, {
-            src: 1,
-            dst: 0,
-            weight: 1
-          }],
+          vertices: [
+            {
+              label: '',
+              x: 1.0,
+              y: 1.0
+            }, {
+              label: '',
+              x: 2.0,
+              y: 2.0
+            }
+          ],
+          edges: [
+            {
+              src: 0,
+              dst: 1,
+              weight: 1
+            }, {
+              src: 1,
+              dst: 0,
+              weight: 1
+            }
+          ],
           isDirected: true,
           isWeighted: false,
           isLabeled: false
         }
-      })).toBe(true);
+      }))
+        .toBe(true);
     });
 
     it('should not match simple graphs with different edges', function() {
-      expect(girs.IsIsomorphicTo(undirectedCycleGraph(3), {
-        g: undirectedNullGraph(3)
-      })).toBe(false);
+      expect(girs.IsIsomorphicTo(undirectedCycleGraph(3),
+        {g: undirectedNullGraph(3)}))
+        .toBe(false);
 
-      expect(girs.IsIsomorphicTo(undirectedNullGraph(3), {
-        g: undirectedCycleGraph(3)
-      })).toBe(false);
+      expect(girs.IsIsomorphicTo(undirectedNullGraph(3),
+        {g: undirectedCycleGraph(3)}))
+        .toBe(false);
 
-      expect(girs.IsIsomorphicTo(undirectedCompleteGraph(4), {
-        g: undirectedCycleGraph(4)
-      })).toBe(false);
+      expect(girs.IsIsomorphicTo(undirectedCompleteGraph(4),
+        {g: undirectedCycleGraph(4)}))
+        .toBe(false);
 
-      expect(girs.IsIsomorphicTo(undirectedCycleGraph(4), {
-        g: undirectedCompleteGraph(4)
-      })).toBe(false);
+      expect(girs.IsIsomorphicTo(undirectedCycleGraph(4),
+        {g: undirectedCompleteGraph(4)}))
+        .toBe(false);
 
-      expect(girs.IsIsomorphicTo(directedCycleGraph(4), {
-        g: undirectedCompleteGraph(4)
-      })).toBe(false);
+      expect(girs.IsIsomorphicTo(directedCycleGraph(4),
+        {g: undirectedCompleteGraph(4)}))
+        .toBe(false);
     });
 
     it('should not match graphs with different numbers of nodes', function() {
-      expect(girs.IsIsomorphicTo(undirectedNullGraph(3), {
-        g: undirectedNullGraph(6)
-      })).toBe(false);
+      expect(girs.IsIsomorphicTo(undirectedNullGraph(3),
+        {g: undirectedNullGraph(6)}))
+        .toBe(false);
     });
 
     it('should not match graphs with different edges', function() {
       expect(girs.IsIsomorphicTo({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 3.0,
-          y: 3.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 2
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 2
-        }],
-        isDirected: false,
-        isWeighted: true,
-        isLabeled: true
-      }, {
-        g: {
-          vertices: [{
-            label: 'b',
+        vertices: [
+          {
+            label: 'a',
             x: 1.0,
             y: 1.0
           }, {
-            label: 'a',
+            label: 'b',
             x: 2.0,
             y: 2.0
           }, {
             label: 'c',
             x: 3.0,
             y: 3.0
-          }],
-          edges: [{
+          }
+        ],
+        edges: [
+          {
             src: 0,
             dst: 1,
-            weight: 1
+            weight: 2
           }, {
-            src: 0,
+            src: 1,
             dst: 2,
             weight: 2
-          }],
-          isDirected: false,
-          isWeighted: true,
-          isLabeled: true
-        }
-      })).toBe(false);
-    });
-
-    it('should not match graphs with different edge weights', function() {
-      expect(girs.IsIsomorphicTo({
-        vertices: [{
-          label: '',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: '',
-          x: 2.0,
-          y: 2.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }],
-        isDirected: false,
-        isWeighted: true,
-        isLabeled: false
-      }, {
-        g: {
-          vertices: [{
-            label: '',
-            x: 1.0,
-            y: 1.0
-          }, {
-            label: '',
-            x: 2.0,
-            y: 2.0
-          }],
-          edges: [{
-            src: 0,
-            dst: 1,
-            weight: 2
-          }],
-          isDirected: false,
-          isWeighted: true,
-          isLabeled: false
-        }
-      })).toBe(false);
-    });
-
-    it('should not match graphs with different labels', function() {
-      expect(girs.IsIsomorphicTo({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 2
-        }],
+          }
+        ],
         isDirected: false,
         isWeighted: true,
         isLabeled: true
       }, {
         g: {
-          vertices: [{
-            label: 'a',
-            x: 1.0,
-            y: 1.0
-          }, {
-            label: 'c',
-            x: 2.0,
-            y: 2.0
-          }],
-          edges: [{
-            src: 0,
-            dst: 1,
-            weight: 2
-          }],
+          vertices: [
+            {
+              label: 'b',
+              x: 1.0,
+              y: 1.0
+            }, {
+              label: 'a',
+              x: 2.0,
+              y: 2.0
+            }, {
+              label: 'c',
+              x: 3.0,
+              y: 3.0
+            }
+          ],
+          edges: [
+            {
+              src: 0,
+              dst: 1,
+              weight: 1
+            }, {
+              src: 0,
+              dst: 2,
+              weight: 2
+            }
+          ],
           isDirected: false,
           isWeighted: true,
           isLabeled: true
         }
-      })).toBe(false);
+      }))
+        .toBe(false);
+    });
+
+    it('should not match graphs with different edge weights', function() {
+      expect(girs.IsIsomorphicTo({
+        vertices: [
+          {
+            label: '',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: '',
+            x: 2.0,
+            y: 2.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }
+        ],
+        isDirected: false,
+        isWeighted: true,
+        isLabeled: false
+      }, {
+        g: {
+          vertices: [
+            {
+              label: '',
+              x: 1.0,
+              y: 1.0
+            }, {
+              label: '',
+              x: 2.0,
+              y: 2.0
+            }
+          ],
+          edges: [
+            {
+              src: 0,
+              dst: 1,
+              weight: 2
+            }
+          ],
+          isDirected: false,
+          isWeighted: true,
+          isLabeled: false
+        }
+      }))
+        .toBe(false);
+    });
+
+    it('should not match graphs with different labels', function() {
+      expect(girs.IsIsomorphicTo({
+        vertices: [
+          {
+            label: 'a',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'b',
+            x: 2.0,
+            y: 2.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 2
+          }
+        ],
+        isDirected: false,
+        isWeighted: true,
+        isLabeled: true
+      }, {
+        g: {
+          vertices: [
+            {
+              label: 'a',
+              x: 1.0,
+              y: 1.0
+            }, {
+              label: 'c',
+              x: 2.0,
+              y: 2.0
+            }
+          ],
+          edges: [
+            {
+              src: 0,
+              dst: 1,
+              weight: 2
+            }
+          ],
+          isDirected: false,
+          isWeighted: true,
+          isLabeled: true
+        }
+      }))
+        .toBe(false);
     });
   });
 
   describe('\'is weakly connected\' rule', function() {
     it('should return true on undirected connected graphs', function() {
-      expect(girs.HasGraphProperty(undirectedEmptyGraph(), {
-        p: 'weakly_connected'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedEmptyGraph(),
+        {p: 'weakly_connected'}))
+        .toBe(true);
 
-      expect(girs.HasGraphProperty(undirectedCycleGraph(5), {
-        p: 'weakly_connected'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedCycleGraph(5),
+        {p: 'weakly_connected'}))
+        .toBe(true);
 
-      expect(girs.HasGraphProperty(undirectedStarGraph(4), {
-        p: 'weakly_connected'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedStarGraph(4),
+        {p: 'weakly_connected'}))
+        .toBe(true);
 
-      expect(girs.HasGraphProperty(undirectedCompleteGraph(6), {
-        p: 'weakly_connected'
-      })).toBe(true);
-
-      expect(girs.HasGraphProperty({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 2
-        }, {
-          src: 2,
-          dst: 1,
-          weight: 1
-        }],
-        isDirected: false,
-        isWeighted: true,
-        isLabeled: true
-      }, {
-        p: 'weakly_connected'
-      })).toBe(true);
-    });
-
-    it('should return true on directed weakly connected graphs', function() {
-      expect(girs.HasGraphProperty(directedCycleGraph(4), {
-        p: 'weakly_connected'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedCompleteGraph(6),
+        {p: 'weakly_connected'}))
+        .toBe(true);
 
       expect(girs.HasGraphProperty({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 2
-        }, {
-          src: 2,
-          dst: 1,
-          weight: 1
-        }],
-        isDirected: true,
-        isWeighted: true,
-        isLabeled: true
-      }, {
-        p: 'weakly_connected'
-      })).toBe(true);
-    });
-
-    it('should return false for disconnected graphs', function() {
-      expect(girs.HasGraphProperty(undirectedNullGraph(2), {
-        p: 'weakly_connected'
-      })).toBe(false);
-
-      expect(girs.HasGraphProperty({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 2
-        }],
-        isDirected: false,
-        isWeighted: true,
-        isLabeled: true
-      }, {
-        p: 'weakly_connected'
-      })).toBe(false);
-    });
-  });
-
-  describe('\'is strongly connected\' rule', function() {
-    it('should return true for undirected connected graphs', function() {
-      expect(girs.HasGraphProperty(undirectedEmptyGraph(), {
-        p: 'strongly_connected'
-      })).toBe(true);
-
-      expect(girs.HasGraphProperty(undirectedCycleGraph(5), {
-        p: 'strongly_connected'
-      })).toBe(true);
-
-      expect(girs.HasGraphProperty(undirectedCompleteGraph(6), {
-        p: 'strongly_connected'
-      })).toBe(true);
-    });
-
-    it('should return true for directed strongly connected graphs', function() {
-      expect(girs.HasGraphProperty(directedCycleGraph(6), {
-        p: 'strongly_connected'
-      })).toBe(true);
-
-      expect(girs.HasGraphProperty({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 3.0,
-          y: 3.0
-        }, {
-          label: 'd',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 2
-        }, {
-          src: 2,
-          dst: 0,
-          weight: 3
-        }, {
-          src: 0,
-          dst: 3,
-          weight: 3
-        }, {
-          src: 3,
-          dst: 2,
-          weight: 3
-        }],
-        isDirected: true,
-        isWeighted: true,
-        isLabeled: true
-      }, {
-        p: 'strongly_connected'
-      })).toBe(true);
-    });
-
-    it('should return false for disconnected graphs', function() {
-      expect(girs.HasGraphProperty(undirectedNullGraph(2), {
-        p: 'strongly_connected'
-      })).toBe(false);
-
-      expect(girs.HasGraphProperty({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }],
-        isDirected: true,
-        isWeighted: true,
-        isLabeled: true
-      }, {
-        p: 'strongly_connected'
-      })).toBe(false);
-    });
-
-    it('should return false for graphs that are only weakly connected',
-      function() {
-        expect(girs.HasGraphProperty({
-          vertices: [{
+        vertices: [
+          {
             label: 'a',
             x: 1.0,
             y: 1.0
@@ -902,8 +798,10 @@ describe('Graph Input service', function() {
             label: 'c',
             x: 0.0,
             y: 0.0
-          }],
-          edges: [{
+          }
+        ],
+        edges: [
+          {
             src: 0,
             dst: 1,
             weight: 2
@@ -911,354 +809,581 @@ describe('Graph Input service', function() {
             src: 2,
             dst: 1,
             weight: 1
-          }],
+          }
+        ],
+        isDirected: false,
+        isWeighted: true,
+        isLabeled: true
+      }, {p: 'weakly_connected'}))
+        .toBe(true);
+    });
+
+    it('should return true on directed weakly connected graphs', function() {
+      expect(girs.HasGraphProperty(directedCycleGraph(4),
+        {p: 'weakly_connected'}))
+        .toBe(true);
+
+      expect(girs.HasGraphProperty({
+        vertices: [
+          {
+            label: 'a',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'b',
+            x: 2.0,
+            y: 2.0
+          }, {
+            label: 'c',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 2
+          }, {
+            src: 2,
+            dst: 1,
+            weight: 1
+          }
+        ],
+        isDirected: true,
+        isWeighted: true,
+        isLabeled: true
+      }, {p: 'weakly_connected'}))
+        .toBe(true);
+    });
+
+    it('should return false for disconnected graphs', function() {
+      expect(girs.HasGraphProperty(undirectedNullGraph(2),
+        {p: 'weakly_connected'}))
+        .toBe(false);
+
+      expect(girs.HasGraphProperty({
+        vertices: [
+          {
+            label: 'a',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'b',
+            x: 2.0,
+            y: 2.0
+          }, {
+            label: 'c',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 2
+          }
+        ],
+        isDirected: false,
+        isWeighted: true,
+        isLabeled: true
+      }, {p: 'weakly_connected'}))
+        .toBe(false);
+    });
+  });
+
+  describe('\'is strongly connected\' rule', function() {
+    it('should return true for undirected connected graphs', function() {
+      expect(girs.HasGraphProperty(undirectedEmptyGraph(),
+        {p: 'strongly_connected'}))
+        .toBe(true);
+
+      expect(girs.HasGraphProperty(undirectedCycleGraph(5),
+        {p: 'strongly_connected'}))
+        .toBe(true);
+
+      expect(girs.HasGraphProperty(undirectedCompleteGraph(6),
+        {p: 'strongly_connected'}))
+        .toBe(true);
+    });
+
+    it('should return true for directed strongly connected graphs', function() {
+      expect(girs.HasGraphProperty(directedCycleGraph(6),
+        {p: 'strongly_connected'}))
+        .toBe(true);
+
+      expect(girs.HasGraphProperty({
+        vertices: [
+          {
+            label: 'a',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'b',
+            x: 2.0,
+            y: 2.0
+          }, {
+            label: 'c',
+            x: 3.0,
+            y: 3.0
+          }, {
+            label: 'd',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 1,
+            dst: 2,
+            weight: 2
+          }, {
+            src: 2,
+            dst: 0,
+            weight: 3
+          }, {
+            src: 0,
+            dst: 3,
+            weight: 3
+          }, {
+            src: 3,
+            dst: 2,
+            weight: 3
+          }
+        ],
+        isDirected: true,
+        isWeighted: true,
+        isLabeled: true
+      }, {p: 'strongly_connected'}))
+        .toBe(true);
+    });
+
+    it('should return false for disconnected graphs', function() {
+      expect(girs.HasGraphProperty(undirectedNullGraph(2),
+        {p: 'strongly_connected'}))
+        .toBe(false);
+
+      expect(girs.HasGraphProperty({
+        vertices: [
+          {
+            label: 'a',
+            x: 1.0,
+            y: 1.0
+          }, {
+            label: 'b',
+            x: 2.0,
+            y: 2.0
+          }, {
+            label: 'c',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }
+        ],
+        isDirected: true,
+        isWeighted: true,
+        isLabeled: true
+      }, {p: 'strongly_connected'}))
+        .toBe(false);
+    });
+
+    it('should return false for graphs that are only weakly connected',
+      function() {
+        expect(girs.HasGraphProperty({
+          vertices: [
+            {
+              label: 'a',
+              x: 1.0,
+              y: 1.0
+            }, {
+              label: 'b',
+              x: 2.0,
+              y: 2.0
+            }, {
+              label: 'c',
+              x: 0.0,
+              y: 0.0
+            }
+          ],
+          edges: [
+            {
+              src: 0,
+              dst: 1,
+              weight: 2
+            }, {
+              src: 2,
+              dst: 1,
+              weight: 1
+            }
+          ],
           isDirected: true,
           isWeighted: true,
           isLabeled: true
-        }, {
-          p: 'strongly_connected'
-        })).toBe(false);
+        }, {p: 'strongly_connected'}))
+          .toBe(false);
       }
     );
   });
 
   describe('\'is acyclic\' rule', function() {
     it('should return true on acyclic graphs', function() {
-      expect(girs.HasGraphProperty(undirectedEmptyGraph(), {
-        p: 'acyclic'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedEmptyGraph(), {p: 'acyclic'}))
+        .toBe(true);
 
-      expect(girs.HasGraphProperty(undirectedCompleteGraph(2), {
-        p: 'acyclic'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedCompleteGraph(2), {p: 'acyclic'}))
+        .toBe(true);
 
-      expect(girs.HasGraphProperty(undirectedStarGraph(4), {
-        p: 'acyclic'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedStarGraph(4), {p: 'acyclic'}))
+        .toBe(true);
 
       expect(girs.HasGraphProperty({
-        vertices: [{
-          label: 'a',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: 'b',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: 'c',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: 'd',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 2,
-          weight: 2
-        }, {
-          src: 2,
-          dst: 3,
-          weight: 4
-        }, {
-          src: 1,
-          dst: 3,
-          weight: 123
-        }],
+        vertices: [
+          {
+            label: 'a',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: 'b',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: 'c',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: 'd',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 2,
+            weight: 2
+          }, {
+            src: 2,
+            dst: 3,
+            weight: 4
+          }, {
+            src: 1,
+            dst: 3,
+            weight: 123
+          }
+        ],
         isDirected: false,
         isWeighted: true,
         isLabeled: true
-      }, {
-        p: 'acyclic'
-      })).toBe(true);
+      }, {p: 'acyclic'}))
+        .toBe(true);
 
       expect(girs.HasGraphProperty({
-        vertices: [{
-          label: 'a',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: 'b',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: 'c',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: 'd',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 2
-        }, {
-          src: 2,
-          dst: 1,
-          weight: 4
-        }, {
-          src: 3,
-          dst: 1,
-          weight: 123
-        }],
+        vertices: [
+          {
+            label: 'a',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: 'b',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: 'c',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: 'd',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 2
+          }, {
+            src: 2,
+            dst: 1,
+            weight: 4
+          }, {
+            src: 3,
+            dst: 1,
+            weight: 123
+          }
+        ],
         isDirected: false,
         isWeighted: true,
         isLabeled: true
-      }, {
-        p: 'acyclic'
-      })).toBe(true);
+      }, {p: 'acyclic'}))
+        .toBe(true);
 
       expect(girs.HasGraphProperty({
-        vertices: [{
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 0,
-          dst: 2,
-          weight: 1
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 1
-        }],
+        vertices: [
+          {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 0,
+            dst: 2,
+            weight: 1
+          }, {
+            src: 1,
+            dst: 2,
+            weight: 1
+          }
+        ],
         isDirected: true,
         isWeighted: false,
         isLabeled: false
-      }, {
-        p: 'acyclic'
-      })).toBe(true);
+      }, {p: 'acyclic'}))
+        .toBe(true);
     });
 
     it('should return false on graphs with cycles', function() {
-      expect(girs.HasGraphProperty(undirectedCycleGraph(5), {
-        p: 'acyclic'
-      })).toBe(false);
+      expect(girs.HasGraphProperty(undirectedCycleGraph(5), {p: 'acyclic'}))
+        .toBe(false);
 
-      expect(girs.HasGraphProperty(directedCycleGraph(6), {
-        p: 'acyclic'
-      })).toBe(false);
+      expect(girs.HasGraphProperty(directedCycleGraph(6), {p: 'acyclic'}))
+        .toBe(false);
 
-      expect(girs.HasGraphProperty(undirectedCompleteGraph(4), {
-        p: 'acyclic'
-      })).toBe(false);
+      expect(girs.HasGraphProperty(undirectedCompleteGraph(4), {p: 'acyclic'}))
+        .toBe(false);
 
       expect(girs.HasGraphProperty({
-        vertices: [{
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 2,
-          dst: 0,
-          weight: 1
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 1
-        }],
+        vertices: [
+          {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 2,
+            dst: 0,
+            weight: 1
+          }, {
+            src: 1,
+            dst: 2,
+            weight: 1
+          }
+        ],
         isDirected: true,
         isWeighted: false,
         isLabeled: false
-      }, {
-        p: 'acyclic'
-      })).toBe(false);
+      }, {p: 'acyclic'}))
+        .toBe(false);
     });
   });
 
   describe('\'is regular\' rule', function() {
     it('should detect undirected regular graphs', function() {
-      expect(girs.HasGraphProperty(undirectedEmptyGraph(), {
-        p: 'regular'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedEmptyGraph(), {p: 'regular'}))
+        .toBe(true);
 
-      expect(girs.HasGraphProperty(undirectedNullGraph(9), {
-        p: 'regular'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedNullGraph(9), {p: 'regular'}))
+        .toBe(true);
 
-      expect(girs.HasGraphProperty(undirectedCompleteGraph(8), {
-        p: 'regular'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedCompleteGraph(8), {p: 'regular'}))
+        .toBe(true);
 
-      expect(girs.HasGraphProperty(undirectedCycleGraph(3), {
-        p: 'regular'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedCycleGraph(3), {p: 'regular'}))
+        .toBe(true);
 
-      expect(girs.HasGraphProperty(undirectedCycleGraph(4), {
-        p: 'regular'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(undirectedCycleGraph(4), {p: 'regular'}))
+        .toBe(true);
 
-      expect(girs.HasGraphProperty(undirectedStarGraph(4), {
-        p: 'regular'
-      })).toBe(false);
+      expect(girs.HasGraphProperty(undirectedStarGraph(4), {p: 'regular'}))
+        .toBe(false);
 
       expect(girs.HasGraphProperty({
-        vertices: [{
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }],
+        vertices: [
+          {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }
+        ],
         isDirected: false,
         isWeighted: false,
         isLabeled: false
-      }, {
-        p: 'regular'
-      })).toBe(false);
+      }, {p: 'regular'}))
+        .toBe(false);
 
       expect(girs.HasGraphProperty({
-        vertices: [{
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 2,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 3,
-          dst: 1,
-          weight: 1
-        }],
+        vertices: [
+          {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 2,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 3,
+            dst: 1,
+            weight: 1
+          }
+        ],
         isDirected: false,
         isWeighted: false,
         isLabeled: false
-      }, {
-        p: 'regular'
-      })).toBe(false);
+      }, {p: 'regular'}))
+        .toBe(false);
     });
 
     it('should detect directed regular graphs', function() {
-      expect(girs.HasGraphProperty(directedCycleGraph(4), {
-        p: 'regular'
-      })).toBe(true);
+      expect(girs.HasGraphProperty(directedCycleGraph(4), {p: 'regular'}))
+        .toBe(true);
 
       expect(girs.HasGraphProperty({
-        vertices: [{
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 2,
-          dst: 0,
-          weight: 1
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 1
-        }],
+        vertices: [
+          {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 2,
+            dst: 0,
+            weight: 1
+          }, {
+            src: 1,
+            dst: 2,
+            weight: 1
+          }
+        ],
         isDirected: true,
         isWeighted: false,
         isLabeled: false
-      }, {
-        p: 'regular'
-      })).toBe(true);
+      }, {p: 'regular'}))
+        .toBe(true);
 
       expect(girs.HasGraphProperty({
-        vertices: [{
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }, {
-          label: '',
-          x: 0.0,
-          y: 0.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 0,
-          dst: 2,
-          weight: 1
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 1
-        }],
+        vertices: [
+          {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }, {
+            label: '',
+            x: 0.0,
+            y: 0.0
+          }
+        ],
+        edges: [
+          {
+            src: 0,
+            dst: 1,
+            weight: 1
+          }, {
+            src: 0,
+            dst: 2,
+            weight: 1
+          }, {
+            src: 1,
+            dst: 2,
+            weight: 1
+          }
+        ],
         isDirected: true,
         isWeighted: false,
         isLabeled: false
-      }, {
-        p: 'regular'
-      })).toBe(false);
+      }, {p: 'regular'}))
+        .toBe(false);
     });
   });
 });

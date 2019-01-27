@@ -50,7 +50,8 @@ var ExplorationEditorMainTab = function() {
   var editOutcomeDestAddExplorationId = element(
     by.css('.protractor-test-add-refresher-exploration-id'));
   var editOutcomeDestDropdownOptions = function(targetOption) {
-    return element.all(by.cssContainingText('option', targetOption)).first();
+    return element.all(by.cssContainingText('option', targetOption))
+      .first();
   };
   var editParamChanges = element(
     by.css('.protractor-test-state-edit-param-changes'));
@@ -148,26 +149,28 @@ var ExplorationEditorMainTab = function() {
 
   this.exitTutorial = function() {
     // If the editor welcome modal shows up, exit it.
-    editorWelcomeModal.isPresent().then(function(isVisible) {
-      if (isVisible) {
-        waitFor.elementToBeClickable(
-          dismissWelcomeModalButton,
-          'Welcome modal is taking too long to appear');
-        dismissWelcomeModalButton.click();
-      }
-    });
+    editorWelcomeModal.isPresent()
+      .then(function(isVisible) {
+        if (isVisible) {
+          waitFor.elementToBeClickable(
+            dismissWelcomeModalButton,
+            'Welcome modal is taking too long to appear');
+          dismissWelcomeModalButton.click();
+        }
+      });
 
     waitFor.invisibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
-    element.all(by.css('.skipBtn')).then(function(buttons) {
-      if (buttons.length === 1) {
-        buttons[0].click();
-      } else if (buttons.length !== 0) {
-        throw 'Expected to find at most one \'exit tutorial\' button';
-      }
-    });
+    element.all(by.css('.skipBtn'))
+      .then(function(buttons) {
+        if (buttons.length === 1) {
+          buttons[0].click();
+        } else if (buttons.length !== 0) {
+          throw 'Expected to find at most one \'exit tutorial\' button';
+        }
+      });
   };
 
   this.finishTutorial = function() {
@@ -220,7 +223,8 @@ var ExplorationEditorMainTab = function() {
   this.startTutorial = function() {
     waitFor.visibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to appear');
-    element(by.css('.protractor-test-start-tutorial')).click();
+    element(by.css('.protractor-test-start-tutorial'))
+      .click();
     waitFor.visibilityOf(
       element(by.css('.ng-joyride-title')),
       'Tutorial modal takes too long to appear');
@@ -246,7 +250,8 @@ var ExplorationEditorMainTab = function() {
   this.addResponse = function(
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
-    expect(addResponseButton.isDisplayed()).toEqual(true);
+    expect(addResponseButton.isDisplayed())
+      .toEqual(true);
     // Open the "Add Response" modal if it is not already open.
     addResponseButton.click();
 
@@ -255,16 +260,18 @@ var ExplorationEditorMainTab = function() {
     for (var i = 5; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    expect(addResponseDetails.isDisplayed()).toBe(true);
+    expect(addResponseDetails.isDisplayed())
+      .toBe(true);
     _selectRule(addResponseDetails, interactionId, ruleName);
     _setRuleParameters.apply(null, args);
 
     // Open the feedback entry form if it is not already open.
-    feedbackEditor.isPresent().then(function(isVisible) {
-      if (isVisible) {
-        feedbackEditor.click();
-      }
-    });
+    feedbackEditor.isPresent()
+      .then(function(isVisible) {
+        if (isVisible) {
+          feedbackEditor.click();
+        }
+      });
 
     if (feedbackInstructions) {
       // Set feedback contents.
@@ -278,7 +285,8 @@ var ExplorationEditorMainTab = function() {
     }
 
     // Close new response modal.
-    expect(addNewResponseButton.isDisplayed()).toBe(true);
+    expect(addNewResponseButton.isDisplayed())
+      .toBe(true);
     addNewResponseButton.click();
     waitFor.invisibilityOf(
       addNewResponseButton, 'Add New Response Modal is not closed');
@@ -294,14 +302,17 @@ var ExplorationEditorMainTab = function() {
         responseNum);
     }
 
-    responseBody(responseNum).isPresent().then(function(isVisible) {
-      if (!isVisible) {
-        expect(headerElem.isDisplayed()).toBe(true);
-        waitFor.elementToBeClickable(
-          headerElem, 'Response Editor header is not clickable');
-        headerElem.click();
-      }
-    });
+    responseBody(responseNum)
+      .isPresent()
+      .then(function(isVisible) {
+        if (!isVisible) {
+          expect(headerElem.isDisplayed())
+            .toBe(true);
+          waitFor.elementToBeClickable(
+            headerElem, 'Response Editor header is not clickable');
+          headerElem.click();
+        }
+      });
 
     return {
       /**
@@ -318,7 +329,8 @@ var ExplorationEditorMainTab = function() {
         ruleDescription += '...';
         // Adding "..." to end of string.
         var answerTab = element(by.css('.protractor-test-answer-tab'));
-        expect(answerTab.getText()).toEqual(ruleDescription);
+        expect(answerTab.getText())
+          .toEqual(ruleDescription);
       },
       /**
        * Check for correct learner's feedback.
@@ -328,8 +340,9 @@ var ExplorationEditorMainTab = function() {
         // The first rule block's RTE.
         var feedbackRTE = responseBody(responseNum).
           element(by.className('oppia-rte-editor'));
-        expect(feedbackRTE.getText()).toEqual(
-          feedbackInstructionsText);
+        expect(feedbackRTE.getText())
+          .toEqual(
+            feedbackInstructionsText);
       },
       setFeedback: function(richTextInstructions) {
       // Begin editing feedback.
@@ -349,7 +362,8 @@ var ExplorationEditorMainTab = function() {
       setDestination: function(
           destinationName, createNewState, refresherExplorationId) {
       // Begin editing destination.
-        expect(openOutcomeDestEditor.isDisplayed()).toBe(true);
+        expect(openOutcomeDestEditor.isDisplayed())
+          .toBe(true);
         openOutcomeDestEditor.click();
 
         // Set destination contents.
@@ -357,7 +371,8 @@ var ExplorationEditorMainTab = function() {
           destinationName, createNewState, refresherExplorationId);
 
         // Save destination.
-        expect(saveOutcomeDestButton.isDisplayed()).toBe(true);
+        expect(saveOutcomeDestButton.isDisplayed())
+          .toBe(true);
         saveOutcomeDestButton.click();
       },
       // The current state name must be at the front of the list.
@@ -371,12 +386,15 @@ var ExplorationEditorMainTab = function() {
         // Create new option always at the end of the list.
         expectedOptionTexts.push(_NEW_STATE_OPTION);
 
-        editOutcomeDestBubble.all(by.tagName('option')).map(
-          function(optionElem) {
-            return optionElem.getText();
-          }).then(function(actualOptionTexts) {
-          expect(actualOptionTexts).toEqual(expectedOptionTexts);
-        });
+        editOutcomeDestBubble.all(by.tagName('option'))
+          .map(
+            function(optionElem) {
+              return optionElem.getText();
+            })
+          .then(function(actualOptionTexts) {
+            expect(actualOptionTexts)
+              .toEqual(expectedOptionTexts);
+          });
 
         // Cancel editing the destination.
         cancelOutcomeDestButton.click();
@@ -384,7 +402,7 @@ var ExplorationEditorMainTab = function() {
       addRule: function(interactionId, ruleName) {
       // Additional parameters may be provided after ruleName.
 
-      // Add the rule.
+        // Add the rule.
         addAnswerButton.click();
 
         // Set the rule description.
@@ -404,32 +422,39 @@ var ExplorationEditorMainTab = function() {
         confirmDeleteResponseButton.click();
       },
       expectCannotSetFeedback: function() {
-        expect(openOutcomeFeedBackEditor.isPresent()).toBeFalsy();
+        expect(openOutcomeFeedBackEditor.isPresent())
+          .toBeFalsy();
       },
       expectCannotSetDestination: function() {
         var destEditorElem = openOutcomeDestEditor;
-        expect(destEditorElem.isPresent()).toBeFalsy();
+        expect(destEditorElem.isPresent())
+          .toBeFalsy();
       },
       expectCannotAddRule: function() {
-        expect(addAnswerButton.isPresent()).toBeFalsy();
+        expect(addAnswerButton.isPresent())
+          .toBeFalsy();
       },
       expectCannotDeleteRule: function(ruleNum) {
         ruleElem = ruleBlock.get(ruleNum);
-        expect(deleteAnswerButton.isPresent()).toBeFalsy();
+        expect(deleteAnswerButton.isPresent())
+          .toBeFalsy();
       },
       expectCannotDeleteResponse: function() {
-        expect(deleteResponseButton.isPresent()).toBeFalsy();
+        expect(deleteResponseButton.isPresent())
+          .toBeFalsy();
       }
     };
   };
 
   this.expectCannotAddResponse = function() {
-    expect(addResponseButton.isPresent()).toBeFalsy();
+    expect(addResponseButton.isPresent())
+      .toBeFalsy();
   };
 
   var _setOutcomeDest = function(
       destName, createNewDest, refresherExplorationId) {
-    expect(destName === null && createNewDest).toBe(false);
+    expect(destName === null && createNewDest)
+      .toBe(false);
 
     if (createNewDest) {
       targetOption = _NEW_STATE_OPTION;
@@ -441,9 +466,11 @@ var ExplorationEditorMainTab = function() {
     waitFor.visibilityOf(
       editOutcomeDestDropdownOptions(targetOption),
       'editOutcomeDestDropdownOptions taking too long to appear');
-    expect(editOutcomeDestDropdownOptions(targetOption).isDisplayed())
+    expect(editOutcomeDestDropdownOptions(targetOption)
+      .isDisplayed())
       .toBe(true);
-    editOutcomeDestDropdownOptions(targetOption).click();
+    editOutcomeDestDropdownOptions(targetOption)
+      .click();
 
     if (createNewDest) {
       editOutcomeDestStateInput.sendKeys(destName);
@@ -475,7 +502,8 @@ var ExplorationEditorMainTab = function() {
     var richTextEditor = forms.RichTextEditor(stateContentEditor);
     richTextEditor.clear();
     richTextInstructions(richTextEditor);
-    expect(saveStateContentButton.isDisplayed()).toBe(true);
+    expect(saveStateContentButton.isDisplayed())
+      .toBe(true);
     saveStateContentButton.click();
     waitFor.invisibilityOf(
       saveStateContentButton,
@@ -494,7 +522,8 @@ var ExplorationEditorMainTab = function() {
   // possible to click on them to view their contents, as clicks instead open
   // the rich text editor.
   this.expectContentToMatch = function(richTextInstructions) {
-    forms.expectRichText(stateContentDisplay).toMatch(richTextInstructions);
+    forms.expectRichText(stateContentDisplay)
+      .toMatch(richTextInstructions);
   };
 
   // HINT
@@ -505,9 +534,13 @@ var ExplorationEditorMainTab = function() {
       by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
     waitFor.visibilityOf(
       addHintModal, 'Add hint modal takes too long to appear');
-    element(by.css('.protractor-test-hint-text')).all(by.tagName('p'))
-      .last().click();
-    browser.switchTo().activeElement().sendKeys(hint);
+    element(by.css('.protractor-test-hint-text'))
+      .all(by.tagName('p'))
+      .last()
+      .click();
+    browser.switchTo()
+      .activeElement()
+      .sendKeys(hint);
 
     waitFor.elementToBeClickable(
       saveHintButton,
@@ -521,24 +554,30 @@ var ExplorationEditorMainTab = function() {
   this.getHintEditor = function(hintNum) {
     var confirmDeteletHintButton = element(
       by.css('.protractor-test-confirm-delete-hint'));
-    var headerElem = element.all(by.css('.protractor-test-hint-tab')).get(
-      hintNum);
+    var headerElem = element.all(by.css('.protractor-test-hint-tab'))
+      .get(
+        hintNum);
     var deleteHintIcon = headerElem.element(
       by.css('.protractor-test-delete-response'));
     var hintBodyElem = element(
       by.css('.protractor-test-hint-body-' + hintNum));
-    hintBodyElem.isPresent().then(function(isVisible) {
-      if (!isVisible) {
-        headerElem.click();
-      }
-    });
+    hintBodyElem.isPresent()
+      .then(function(isVisible) {
+        if (!isVisible) {
+          headerElem.click();
+        }
+      });
     return {
       setHint: function(hint) {
         var editHintIcon = element(
           by.css('.protractor-test-open-hint-editor'));
         editHintIcon.click();
-        browser.switchTo().activeElement().clear();
-        browser.switchTo().activeElement().sendKeys(hint);
+        browser.switchTo()
+          .activeElement()
+          .clear();
+        browser.switchTo()
+          .activeElement()
+          .sendKeys(hint);
         waitFor.elementToBeClickable(
           saveHintEditButton,
           'Save Hint button takes too long to be clickable');
@@ -551,7 +590,8 @@ var ExplorationEditorMainTab = function() {
         confirmDeteletHintButton.click();
       },
       expectCannotDeleteHint: function() {
-        expect(deleteHintIcon.isPresent()).toBeFalsy();
+        expect(deleteHintIcon.isPresent())
+          .toBeFalsy();
       }
     };
   };
@@ -563,12 +603,17 @@ var ExplorationEditorMainTab = function() {
     waitFor.visibilityOf(
       addOrUpdateSolutionModal,
       'Add/Update Solution modal takes to long to appear');
-    interactions.getInteraction(interactionId).submitAnswer(
-      element(by.css('.protractor-test-interaction-html')),
-      solution.correctAnswer);
+    interactions.getInteraction(interactionId)
+      .submitAnswer(
+        element(by.css('.protractor-test-interaction-html')),
+        solution.correctAnswer);
     element(by.css('.protractor-test-explanation-textarea'))
-      .all(by.tagName('p')).first().click();
-    browser.switchTo().activeElement().sendKeys(solution.explanation);
+      .all(by.tagName('p'))
+      .first()
+      .click();
+    browser.switchTo()
+      .activeElement()
+      .sendKeys(solution.explanation);
     var submitSolutionButton = element(
       by.css('.protractor-test-submit-solution-button'));
     waitFor.elementToBeClickable(
@@ -619,7 +664,8 @@ var ExplorationEditorMainTab = function() {
     waitFor.elementToBeClickable(
       addInteractionButton,
       'Add Interaction button takes too long to be clickable');
-    expect(addInteractionButton.isDisplayed()).toBe(true);
+    expect(addInteractionButton.isDisplayed())
+      .toBe(true);
     addInteractionButton.click();
 
     var INTERACTION_ID_TO_TAB_NAME = {
@@ -643,10 +689,15 @@ var ExplorationEditorMainTab = function() {
     };
 
     expect(interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId])
-      .isDisplayed()).toBe(true);
-    interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
-    expect(interactionTile(interactionId).isDisplayed()).toBe(true);
-    interactionTile(interactionId).click();
+      .isDisplayed())
+      .toBe(true);
+    interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId])
+      .click();
+    expect(interactionTile(interactionId)
+      .isDisplayed())
+      .toBe(true);
+    interactionTile(interactionId)
+      .click();
   };
 
   // This function should not usually be invoked directly; please consider
@@ -664,11 +715,12 @@ var ExplorationEditorMainTab = function() {
 
     // The save interaction button doesn't appear for interactions having no
     // options to customize.
-    saveInteractionButton.isPresent().then(function(result) {
-      if (result) {
-        saveInteractionButton.click();
-      }
-    });
+    saveInteractionButton.isPresent()
+      .then(function(result) {
+        if (result) {
+          saveInteractionButton.click();
+        }
+      });
     waitFor.invisibilityOf(
       saveInteractionButton,
       'Customize Interaction modal taking too long to close');
@@ -678,12 +730,14 @@ var ExplorationEditorMainTab = function() {
   // using setInteraction instead.
   var closeAddResponseModal = function() {
     // If the "Add Response" modal opens, close it.
-    addResponseHeader.isPresent().then(function(isVisible) {
-      if (isVisible) {
-        expect(closeAddResponseButton.isDisplayed()).toBe(true);
-        closeAddResponseButton.click();
-      }
-    });
+    addResponseHeader.isPresent()
+      .then(function(isVisible) {
+        if (isVisible) {
+          expect(closeAddResponseButton.isDisplayed())
+            .toBe(true);
+          closeAddResponseButton.click();
+        }
+      });
   };
 
   // Likewise this can receive additional arguments.
@@ -701,7 +755,8 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.expectCannotDeleteInteraction = function() {
-    expect((deleteInteractionButton).isPresent()).toBeFalsy();
+    expect((deleteInteractionButton).isPresent())
+      .toBeFalsy();
   };
 
   var _setOutcomeFeedback = function(richTextInstructions) {
@@ -725,9 +780,11 @@ var ExplorationEditorMainTab = function() {
     addParamButton.click();
 
     var editorRowElem = element.all(by.css(
-      '.protractor-test-param-changes-list')).last();
+      '.protractor-test-param-changes-list'))
+      .last();
 
-    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
+    forms.AutocompleteDropdownEditor(editorRowElem)
+      .setValue(paramName);
 
     var editorRowOption = editorRowElem.element(
       by.cssContainingText('option', 'to one of'));
@@ -735,7 +792,8 @@ var ExplorationEditorMainTab = function() {
       editorRowOption, 'Param Options are not clickable');
     editorRowOption.click();
     paramValues.forEach(function(paramValue) {
-      var item = editorRowElem.all(by.tagName('input')).last();
+      var item = editorRowElem.all(by.tagName('input'))
+        .last();
       item.clear();
       item.sendKeys(paramValue);
     });
@@ -760,11 +818,14 @@ var ExplorationEditorMainTab = function() {
     addParamButton.click();
 
     var editorRowElem = element.all(by.css(
-      '.protractor-test-param-changes-list')).last();
+      '.protractor-test-param-changes-list'))
+      .last();
 
-    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
+    forms.AutocompleteDropdownEditor(editorRowElem)
+      .setValue(paramName);
 
-    var item = editorRowElem.all(by.tagName('input')).last();
+    var item = editorRowElem.all(by.tagName('input'))
+      .last();
     waitFor.elementToBeClickable(item, 'Param Options are not clickable');
     // Setting parameter value is difficult via css since input fields
     // are dynamically generated. We isolate it as the last input in the
@@ -813,7 +874,8 @@ var ExplorationEditorMainTab = function() {
     // Slicing first and last letter.
     if (angularSelectors) {
       angularSelectors.forEach(function(elem) {
-        parameterTypes.push(elem.toString().slice(1, -1));
+        parameterTypes.push(elem.toString()
+          .slice(1, -1));
       });
     }
     // Expected sample output = Array[NonnegativeInt, NonnegativeInt]
@@ -831,7 +893,8 @@ var ExplorationEditorMainTab = function() {
       parameterValues.push(arguments[i]);
     }
     var parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
-    expect(parameterValues.length).toEqual(parameterTypes.length);
+    expect(parameterValues.length)
+      .toEqual(parameterTypes.length);
     var answerDescriptionFragment = element.all(
       by.css('.protractor-test-answer-description-fragment'));
     for (var i = 0; i < parameterValues.length; i++) {
@@ -841,7 +904,8 @@ var ExplorationEditorMainTab = function() {
 
       if (interactionId === 'MultipleChoiceInput') {
       // This is a special case as it uses a dropdown to set a NonnegativeInt.
-        parameterElement.element(by.tagName('button')).click();
+        parameterElement.element(by.tagName('button'))
+          .click();
         multipleChoiceAnswerOptions(parameterValues[i])
           .click();
       } else {
@@ -892,10 +956,12 @@ var ExplorationEditorMainTab = function() {
     var ruleDescriptionInDropdown = ruleDescription;
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
-    expect(answerDescription.isDisplayed()).toBe(true);
+    expect(answerDescription.isDisplayed())
+      .toBe(true);
     answerDescription.click();
     var ruleDropdownElement = element.all(by.cssContainingText(
-      '.select2-results__option', ruleDescriptionInDropdown)).first();
+      '.select2-results__option', ruleDescriptionInDropdown))
+      .first();
     waitFor.visibilityOf(
       ruleDropdownElement, 'Rule dropdown element takes too long to appear');
     ruleDropdownElement.click();
@@ -906,11 +972,13 @@ var ExplorationEditorMainTab = function() {
   this.deleteState = function(stateName) {
     general.scrollToTop();
     var nodeElement = explorationGraph.all(
-      by.cssContainingText('.protractor-test-node', stateName)).first();
+      by.cssContainingText('.protractor-test-node', stateName))
+      .first();
     waitFor.visibilityOf(
       nodeElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
-    nodeElement.element(by.css('.protractor-test-delete-node')).click();
+    nodeElement.element(by.css('.protractor-test-delete-node'))
+      .click();
     expect(confirmDeleteStateButton.isDisplayed());
     confirmDeleteStateButton.click();
     waitFor.invisibilityOf(
@@ -921,10 +989,13 @@ var ExplorationEditorMainTab = function() {
   // exploration overview will be disabled.
   this.expectStateNamesToBe = function(names) {
     stateNodes.map(function(stateElement) {
-      return stateNodeLabel(stateElement).getText();
-    }).then(function(stateNames) {
-      expect(stateNames.sort()).toEqual(names.sort());
-    });
+      return stateNodeLabel(stateElement)
+        .getText();
+    })
+      .then(function(stateNames) {
+        expect(stateNames.sort())
+          .toEqual(names.sort());
+      });
   };
 
   // NOTE: if the state is not visible in the state graph this function will
@@ -932,21 +1003,24 @@ var ExplorationEditorMainTab = function() {
   this.moveToState = function(targetName) {
     general.scrollToTop();
     stateNodes.map(function(stateElement) {
-      return stateNodeLabel(stateElement).getText();
-    }).then(function(listOfNames) {
-      var matched = false;
-      for (var i = 0; i < listOfNames.length; i++) {
-        if (listOfNames[i] === targetName) {
-          stateNodes.get(i).click();
-          matched = true;
+      return stateNodeLabel(stateElement)
+        .getText();
+    })
+      .then(function(listOfNames) {
+        var matched = false;
+        for (var i = 0; i < listOfNames.length; i++) {
+          if (listOfNames[i] === targetName) {
+            stateNodes.get(i)
+              .click();
+            matched = true;
           // Wait to re-load the entire state editor.
+          }
         }
-      }
-      if (!matched) {
-        throw Error(
-          'State ' + targetName + ' not found by editorMainTab.moveToState.');
-      }
-    });
+        if (!matched) {
+          throw Error(
+            'State ' + targetName + ' not found by editorMainTab.moveToState.');
+        }
+      });
 
     var errorMessage = (
       'Current state name is:' +
@@ -983,7 +1057,8 @@ var ExplorationEditorMainTab = function() {
       stateNameContainer, name,
       'Expecting current state ' + stateNameContainer.getAttribute(
         'textContent') + ' to be ' + name);
-    expect(stateNameContainer.getAttribute('textContent')).toMatch(name);
+    expect(stateNameContainer.getAttribute('textContent'))
+      .toMatch(name);
   };
 };
 

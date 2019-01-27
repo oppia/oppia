@@ -17,22 +17,24 @@
  */
 
 // See: https://stackoverflow.com/a/11381730
-oppia.factory('DeviceInfoService', ['$window', function($window) {
-  return {
-    isMobileDevice: function() {
-      return Boolean(navigator.userAgent.match(/Android/i) ||
+oppia.factory('DeviceInfoService', [
+  '$window', function($window) {
+    return {
+      isMobileDevice: function() {
+        return Boolean(navigator.userAgent.match(/Android/i) ||
          navigator.userAgent.match(/webOS/i) ||
          navigator.userAgent.match(/iPhone/i) ||
          navigator.userAgent.match(/iPad/i) ||
          navigator.userAgent.match(/iPod/i) ||
          navigator.userAgent.match(/BlackBerry/i) ||
          navigator.userAgent.match(/Windows Phone/i));
-    },
-    isMobileUserAgent: function() {
-      return /Mobi/.test(navigator.userAgent);
-    },
-    hasTouchEvents: function() {
-      return 'ontouchstart' in $window;
-    }
-  };
-}]);
+      },
+      isMobileUserAgent: function() {
+        return /Mobi/.test(navigator.userAgent);
+      },
+      hasTouchEvents: function() {
+        return 'ontouchstart' in $window;
+      }
+    };
+  }
+]);

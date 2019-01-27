@@ -17,21 +17,23 @@
  * used at multiple places in the codebase.
  */
 
-oppia.factory('UtilsService', [function() {
-  var utils = {
-    isEmpty: function(obj) {
-      for (var property in obj) {
-        if (obj.hasOwnProperty(property)) {
-          return false;
+oppia.factory('UtilsService', [
+  function() {
+    var utils = {
+      isEmpty: function(obj) {
+        for (var property in obj) {
+          if (obj.hasOwnProperty(property)) {
+            return false;
+          }
         }
-      }
-      return true;
-    },
+        return true;
+      },
 
-    // http://stackoverflow.com/questions/203739
-    isString: function(input) {
-      return (typeof input === 'string' || input instanceof String);
-    }
-  };
-  return utils;
-}]);
+      // http://stackoverflow.com/questions/203739
+      isString: function(input) {
+        return (typeof input === 'string' || input instanceof String);
+      }
+    };
+    return utils;
+  }
+]);

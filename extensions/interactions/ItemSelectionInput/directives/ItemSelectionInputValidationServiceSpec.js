@@ -24,7 +24,7 @@ describe('ItemSelectionInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     validatorService = $injector.get('ItemSelectionInputValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
@@ -47,41 +47,38 @@ describe('ItemSelectionInputValidationService', function() {
     });
 
     customizationArguments = {
-      choices: {
-        value: ['Selection 1', 'Selection 2', 'Selection 3']
-      },
-      maxAllowableSelectionCount: {
-        value: 2
-      },
-      minAllowableSelectionCount: {
-        value: 1
-      }
+      choices: {value: ['Selection 1', 'Selection 2', 'Selection 3']},
+      maxAllowableSelectionCount: {value: 2},
+      minAllowableSelectionCount: {value: 1}
     };
-    goodAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
-        rule_type: 'Equals',
-        inputs: {
-          x: ['Selection 1', 'Selection 2']
-        }
-      })],
-      goodDefaultOutcome,
-      false,
-      null)
+    goodAnswerGroups = [
+      agof.createNew(
+        [
+          rof.createFromBackendDict({
+            rule_type: 'Equals',
+            inputs: {x: ['Selection 1', 'Selection 2']}
+          })
+        ],
+        goodDefaultOutcome,
+        false,
+        null)
     ];
-  }));
+  }]);
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings)
+      .toEqual([]);
   });
 
   it('should expect a choices customization argument', function() {
     expect(function() {
       validatorService.getAllWarnings(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-    }).toThrow('Expected customization arguments to have property: choices');
+    })
+      .toThrow('Expected customization arguments to have property: choices');
   });
 
   it(
@@ -93,12 +90,15 @@ describe('ItemSelectionInputValidationService', function() {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: (
-          'Please ensure that the max allowed count is not less than the ' +
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'Please ensure that the max allowed count is not less than the ' +
           'min count.')
-      }]);
+          }
+        ]);
     });
 
   it(
@@ -113,11 +113,15 @@ describe('ItemSelectionInputValidationService', function() {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: (
-          'Please ensure that you have enough choices to reach the max count.')
-      }]);
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'Please ensure that you have enough choices to ' +
+              'reach the max count.')
+          }
+        ]);
     });
 
   it(
@@ -133,11 +137,15 @@ describe('ItemSelectionInputValidationService', function() {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: (
-          'Please ensure that you have enough choices to reach the min count.')
-      }]);
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'Please ensure that you have enough choices to reach ' +
+              'the min count.')
+          }
+        ]);
     });
 
   it('should expect all choices to be nonempty', function() {
@@ -147,10 +155,13 @@ describe('ItemSelectionInputValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please ensure the choices are nonempty.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure the choices are nonempty.'
+        }
+      ]);
   });
 
   it('should expect all choices to be unique', function() {
@@ -160,9 +171,12 @@ describe('ItemSelectionInputValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please ensure the choices are unique.'
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure the choices are unique.'
+        }
+      ]);
   });
 });

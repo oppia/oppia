@@ -97,37 +97,41 @@ describe('Library index page', function() {
     // - Vingilot, ships, français
 
     var ALL_PUBLIC_EXPLORATION_TITLES = [
-      EXPLORATION_SILMARILS, EXPLORATION_VINGILOT];
+      EXPLORATION_SILMARILS,
+      EXPLORATION_VINGILOT
+    ];
 
-    var testCases = [{
-      categories: [],
-      languages: [],
-      expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
-    }, {
-      categories: [],
-      languages: [LANGUAGE_ENGLISH, LANGUAGE_FRANCAIS],
-      expectVisible: [EXPLORATION_VINGILOT]
-    }, {
-      categories: [],
-      languages: [LANGUAGE_ENGLISH, LANGUAGE_DEUTSCH, LANGUAGE_FRANCAIS],
-      expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
-    }, {
-      categories: [CATEGORY_ARCHITECTURE],
-      languages: [],
-      expectVisible: [EXPLORATION_SILMARILS]
-    }, {
-      categories: [CATEGORY_ARCHITECTURE, CATEGORY_BUSINESS],
-      languages: [],
-      expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
-    }, {
-      categories: [CATEGORY_ARCHITECTURE],
-      languages: [LANGUAGE_DEUTSCH],
-      expectVisible: [EXPLORATION_SILMARILS]
-    }, {
-      categories: [CATEGORY_ARCHITECTURE],
-      languages: [LANGUAGE_FRANCAIS],
-      expectVisible: []
-    }];
+    var testCases = [
+      {
+        categories: [],
+        languages: [],
+        expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
+      }, {
+        categories: [],
+        languages: [LANGUAGE_ENGLISH, LANGUAGE_FRANCAIS],
+        expectVisible: [EXPLORATION_VINGILOT]
+      }, {
+        categories: [],
+        languages: [LANGUAGE_ENGLISH, LANGUAGE_DEUTSCH, LANGUAGE_FRANCAIS],
+        expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
+      }, {
+        categories: [CATEGORY_ARCHITECTURE],
+        languages: [],
+        expectVisible: [EXPLORATION_SILMARILS]
+      }, {
+        categories: [CATEGORY_ARCHITECTURE, CATEGORY_BUSINESS],
+        languages: [],
+        expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
+      }, {
+        categories: [CATEGORY_ARCHITECTURE],
+        languages: [LANGUAGE_DEUTSCH],
+        expectVisible: [EXPLORATION_SILMARILS]
+      }, {
+        categories: [CATEGORY_ARCHITECTURE],
+        languages: [LANGUAGE_FRANCAIS],
+        expectVisible: []
+      }
+    ];
 
     // We now check explorations are visible under the right conditions.
     browser.get('/search/find?q=&language_code=("en")');
@@ -160,8 +164,9 @@ describe('Library index page', function() {
 
     libraryPage.findExploration(EXPLORATION_VINGILOT);
     // The first letter of the objective is automatically capitalized.
-    expect(libraryPage.getExplorationObjective(EXPLORATION_VINGILOT)).toBe(
-      'Seek the aid of the Valar');
+    expect(libraryPage.getExplorationObjective(EXPLORATION_VINGILOT))
+      .toBe(
+        'Seek the aid of the Valar');
     libraryPage.findExploration(EXPLORATION_SILMARILS);
     libraryPage.playExploration(EXPLORATION_SILMARILS);
     explorationPlayerPage.expectExplorationNameToBe('silmarils');
@@ -220,24 +225,28 @@ describe('Permissions for private explorations', function() {
     workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
     workflow.addExplorationCollaborator('bobPrivileges');
-    expect(workflow.getExplorationManagers()).toEqual(['alicePrivileges']);
-    expect(workflow.getExplorationCollaborators()).toEqual(['bobPrivileges']);
-    expect(workflow.getExplorationPlaytesters()).toEqual([]);
-    general.getExplorationIdFromEditor().then(function(explorationId) {
-      users.logout();
+    expect(workflow.getExplorationManagers())
+      .toEqual(['alicePrivileges']);
+    expect(workflow.getExplorationCollaborators())
+      .toEqual(['bobPrivileges']);
+    expect(workflow.getExplorationPlaytesters())
+      .toEqual([]);
+    general.getExplorationIdFromEditor()
+      .then(function(explorationId) {
+        users.logout();
 
-      users.login('bob@privileges.com');
-      general.openEditor(explorationId);
-      explorationEditorMainTab.setContent(forms.toRichText('I love you'));
-      explorationEditorMainTab.setInteraction('TextInput');
-      explorationEditorPage.saveChanges();
-      users.logout();
+        users.login('bob@privileges.com');
+        general.openEditor(explorationId);
+        explorationEditorMainTab.setContent(forms.toRichText('I love you'));
+        explorationEditorMainTab.setInteraction('TextInput');
+        explorationEditorPage.saveChanges();
+        users.logout();
 
-      users.login('eve@privileges.com');
-      general.openEditor(explorationId);
-      general.expect404Error();
-      users.logout();
-    });
+        users.login('eve@privileges.com');
+        general.openEditor(explorationId);
+        general.expect404Error();
+        users.logout();
+      });
   });
 
   it('should be correct for translators', function() {
@@ -251,31 +260,39 @@ describe('Permissions for private explorations', function() {
     explorationEditorPage.saveChanges('Added content to first card.');
     explorationEditorPage.navigateToSettingsTab();
     workflow.addExplorationTranslator('translator');
-    expect(workflow.getExplorationManagers()).toEqual(['expOwner']);
-    expect(workflow.getExplorationCollaborators()).toEqual([]);
-    expect(workflow.getExplorationTranslators()).toEqual(['translator']);
-    expect(workflow.getExplorationPlaytesters()).toEqual([]);
-    general.getExplorationIdFromEditor().then(function(explorationId) {
-      users.logout();
+    expect(workflow.getExplorationManagers())
+      .toEqual(['expOwner']);
+    expect(workflow.getExplorationCollaborators())
+      .toEqual([]);
+    expect(workflow.getExplorationTranslators())
+      .toEqual(['translator']);
+    expect(workflow.getExplorationPlaytesters())
+      .toEqual([]);
+    general.getExplorationIdFromEditor()
+      .then(function(explorationId) {
+        users.logout();
 
-      users.login('translator@oppia.tests');
-      general.openEditor(explorationId);
-      explorationEditorMainTab.expectContentToMatch(
-        forms.toRichText('this is card 1'));
-      expect(element(by.css(
-        '.protractor-test-save-changes')).isPresent()).toBeTruthy();
-      users.logout();
+        users.login('translator@oppia.tests');
+        general.openEditor(explorationId);
+        explorationEditorMainTab.expectContentToMatch(
+          forms.toRichText('this is card 1'));
+        expect(element(by.css(
+          '.protractor-test-save-changes'))
+          .isPresent())
+          .toBeTruthy();
+        users.logout();
 
-      users.login('guestUser@oppia.tests');
-      general.openEditor(explorationId);
-      general.expect404Error();
-      users.logout();
-    });
+        users.login('guestUser@oppia.tests');
+        general.openEditor(explorationId);
+        general.expect404Error();
+        users.logout();
+      });
   });
 
   afterEach(function() {
     general.checkForConsoleErrors([
-      'Failed to load resource: the server responded with a status of 404'
+      'Failed to load resource:' +
+    ' the server responded with a status of 404'
     ]);
   });
 });

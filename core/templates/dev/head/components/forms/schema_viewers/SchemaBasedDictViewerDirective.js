@@ -34,11 +34,13 @@ oppia.directive('schemaBasedDictViewer', [
         'schema_based_dict_viewer_directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: ['$scope', function($scope) {
-        $scope.getHumanReadablePropertyDescription = function(property) {
-          return property.description || '[' + property.name + ']';
-        };
-      }]
+      controller: [
+        '$scope', function($scope) {
+          $scope.getHumanReadablePropertyDescription = function(property) {
+            return property.description || '[' + property.name + ']';
+          };
+        }
+      ]
     };
   }
 ]);

@@ -21,16 +21,15 @@ oppia.directive('outcomeFeedbackEditor', [
   function(UrlInterpolationService, SubtitledHtmlObjectFactory) {
     return {
       restrict: 'E',
-      scope: {
-        outcome: '='
-      },
+      scope: {outcome: '='},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/' +
         'outcome_feedback_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.OUTCOME_FEEDBACK_SCHEMA = {
-          type: 'html'
-        };
-      }]
+      controller: [
+        '$scope', function($scope) {
+          $scope.OUTCOME_FEEDBACK_SCHEMA = {type: 'html'};
+        }
+      ]
     };
-  }]);
+  }
+]);

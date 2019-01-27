@@ -60,26 +60,30 @@ var ExplorationEditorHistoryTab = function() {
     return {
       openStateHistory: function(stateName) {
         stateNodes.map(function(stateElement) {
-          return stateNodeLabel(stateElement).getText();
-        }).then(function(listOfNames) {
-          var matched = false;
-          for (var i = 0; i < listOfNames.length; i++) {
-            if (listOfNames[i] === stateName) {
-              stateNodes.get(i).click();
-              matched = true;
+          return stateNodeLabel(stateElement)
+            .getText();
+        })
+          .then(function(listOfNames) {
+            var matched = false;
+            for (var i = 0; i < listOfNames.length; i++) {
+              if (listOfNames[i] === stateName) {
+                stateNodes.get(i)
+                  .click();
+                matched = true;
+              }
             }
-          }
-          if (!matched) {
-            throw Error(
-              'State ' + stateName + ' not found by getHistoryGraph.');
-          }
-        });
+            if (!matched) {
+              throw Error(
+                'State ' + stateName + ' not found by getHistoryGraph.');
+            }
+          });
       },
       closeStateHistory: function() {
         waitFor.elementToBeClickable(
           closeStateHistoryButton,
           'Close State History button is not clickable');
-        expect(closeStateHistoryButton.isDisplayed()).toBe(true);
+        expect(closeStateHistoryButton.isDisplayed())
+          .toBe(true);
         closeStateHistoryButton.click();
         waitFor.invisibilityOf(
           closeStateHistoryButton,
@@ -87,18 +91,23 @@ var ExplorationEditorHistoryTab = function() {
       },
       deselectTwoVersions: function(versionNumber1, versionNumber2) {
         // Array starts at 0.
-        historyCheckboxSelector.count().then(function(totalVersionNumber) {
-          v1Position = totalVersionNumber - versionNumber1;
-          v2Position = totalVersionNumber - versionNumber2;
+        historyCheckboxSelector.count()
+          .then(function(totalVersionNumber) {
+            v1Position = totalVersionNumber - versionNumber1;
+            v2Position = totalVersionNumber - versionNumber2;
 
-          expect(historyCheckboxSelector.get(v1Position).isDisplayed())
-            .toBe(true);
-          historyCheckboxSelector.get(v1Position).click();
+            expect(historyCheckboxSelector.get(v1Position)
+              .isDisplayed())
+              .toBe(true);
+            historyCheckboxSelector.get(v1Position)
+              .click();
 
-          expect(historyCheckboxSelector.get(v2Position).isDisplayed())
-            .toBe(true);
-          historyCheckboxSelector.get(v2Position).click();
-        });
+            expect(historyCheckboxSelector.get(v2Position)
+              .isDisplayed())
+              .toBe(true);
+            historyCheckboxSelector.get(v2Position)
+              .click();
+          });
       },
       /*
        * This method selects two version's checkboxes to be compared
@@ -108,20 +117,26 @@ var ExplorationEditorHistoryTab = function() {
        */
       selectTwoVersions: function(versionNumber1, versionNumber2) {
         // Array starts at 0
-        historyCheckboxSelector.count().then(function(totalVersionNumber) {
-          v1Position = totalVersionNumber - versionNumber1;
-          v2Position = totalVersionNumber - versionNumber2;
+        historyCheckboxSelector.count()
+          .then(function(totalVersionNumber) {
+            v1Position = totalVersionNumber - versionNumber1;
+            v2Position = totalVersionNumber - versionNumber2;
 
-          expect(historyCheckboxSelector.get(v1Position).isDisplayed())
-            .toBe(true);
-          historyCheckboxSelector.get(v1Position).click();
+            expect(historyCheckboxSelector.get(v1Position)
+              .isDisplayed())
+              .toBe(true);
+            historyCheckboxSelector.get(v1Position)
+              .click();
 
-          expect(historyCheckboxSelector.get(v2Position).isDisplayed())
-            .toBe(true);
-          historyCheckboxSelector.get(v2Position).click();
-        });
+            expect(historyCheckboxSelector.get(v2Position)
+              .isDisplayed())
+              .toBe(true);
+            historyCheckboxSelector.get(v2Position)
+              .click();
+          });
         // Click button to show graph.
-        expect(showHistoryGraphButton.isDisplayed()).toBe(true);
+        expect(showHistoryGraphButton.isDisplayed())
+          .toBe(true);
         showHistoryGraphButton.click();
       },
       /*
@@ -139,17 +154,22 @@ var ExplorationEditorHistoryTab = function() {
       expectHistoryStatesToMatch: function(expectedStates) {
         stateNodes.map(function(stateElement) {
           return {
-            label: stateNodeLabel(stateElement).getText(),
-            color: stateNodeBackground(stateElement).getCssValue('fill')
+            label: stateNodeLabel(stateElement)
+              .getText(),
+            color: stateNodeBackground(stateElement)
+              .getCssValue('fill')
           };
-        }).then(function(states) {
-          expect(states.length).toEqual(expectedStates.length);
-          // Note: we need to compare this way because the state graph is
-          // sometimes generated with states in different configurations.
-          states.forEach(function(element) {
-            expect(expectedStates).toContain(element);
+        })
+          .then(function(states) {
+            expect(states.length)
+              .toEqual(expectedStates.length);
+            // Note: we need to compare this way because the state graph is
+            // sometimes generated with states in different configurations.
+            states.forEach(function(element) {
+              expect(expectedStates)
+                .toContain(element);
+            });
           });
-        });
       },
       /*
        * This method checks for the number of deleted links(red), added links
@@ -167,20 +187,25 @@ var ExplorationEditorHistoryTab = function() {
         var addedCount = 0;
         var deletedCount = 0;
         historyGraphLink.map(function(link) {
-          link.getCssValue('stroke').then(function(linkColor) {
-            totalCount++;
-            if (linkColor === COLOR_ADDED) {
-              addedCount++;
-            } else if (linkColor === COLOR_DELETED) {
-              deletedCount++;
-            }
-            return;
+          link.getCssValue('stroke')
+            .then(function(linkColor) {
+              totalCount++;
+              if (linkColor === COLOR_ADDED) {
+                addedCount++;
+              } else if (linkColor === COLOR_DELETED) {
+                deletedCount++;
+              }
+              return;
+            });
+        })
+          .then(function() {
+            expect(totalLinks)
+              .toEqual(totalCount);
+            expect(addedLinks)
+              .toEqual(addedCount);
+            expect(deletedLinks)
+              .toEqual(deletedCount);
           });
-        }).then(function() {
-          expect(totalLinks).toEqual(totalCount);
-          expect(addedLinks).toEqual(addedCount);
-          expect(deletedLinks).toEqual(deletedCount);
-        });
       },
       /**
        * This method compares text contents of 2 version's state contents to
@@ -201,11 +226,15 @@ var ExplorationEditorHistoryTab = function() {
        */
       expectTextToMatch: function(v1StateContents, v2StateContents) {
         forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).first()
-        ).expectTextToBe(v1StateContents);
+          element.all(by.css('.CodeMirror-code'))
+            .first()
+        )
+          .expectTextToBe(v1StateContents);
         forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).last()
-        ).expectTextToBe(v2StateContents);
+          element.all(by.css('.CodeMirror-code'))
+            .last()
+        )
+          .expectTextToBe(v2StateContents);
       },
       /*
        *  This function compares regular/highlighted text contents of 2
@@ -221,11 +250,15 @@ var ExplorationEditorHistoryTab = function() {
       expectTextWithHighlightingToMatch: function(
           v1StateContents, v2StateContents) {
         forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).first()
-        ).expectTextWithHighlightingToBe(v1StateContents);
+          element.all(by.css('.CodeMirror-code'))
+            .first()
+        )
+          .expectTextWithHighlightingToBe(v1StateContents);
         forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).last()
-        ).expectTextWithHighlightingToBe(v2StateContents);
+          element.all(by.css('.CodeMirror-code'))
+            .last()
+        )
+          .expectTextWithHighlightingToBe(v2StateContents);
       }
     };
   };
@@ -234,12 +267,14 @@ var ExplorationEditorHistoryTab = function() {
   // first page of the exploration history.
   this.revertToVersion = function(version) {
     var versionPosition = null;
-    historyCheckboxSelector.count().then(function(versionNumber) {
+    historyCheckboxSelector.count()
+      .then(function(versionNumber) {
       // Note: there is no 'revert' link next to the current version
-      versionPosition = versionNumber - version - 1;
-      revertVersionButton.get(versionPosition).click();
-      confirmRevertVersionButton.click();
-    });
+        versionPosition = versionNumber - version - 1;
+        revertVersionButton.get(versionPosition)
+          .click();
+        confirmRevertVersionButton.click();
+      });
   };
 };
 

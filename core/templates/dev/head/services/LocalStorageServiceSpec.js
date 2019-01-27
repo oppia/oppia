@@ -37,7 +37,7 @@ describe('LocalStorageService', function() {
     var draftOne = null;
     var draftTwo = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       LocalStorageService = $injector.get('LocalStorageService');
       ExplorationDraftObjectFactory = $injector.get(
         'ExplorationDraftObjectFactory');
@@ -45,7 +45,7 @@ describe('LocalStorageService', function() {
         draftDictOne);
       draftTwo = ExplorationDraftObjectFactory.createFromLocalStorageDict(
         draftDictTwo);
-    }));
+    }]);
 
     it('should correctly save the draft', function() {
       LocalStorageService.saveExplorationDraft(explorationIdOne,
@@ -53,9 +53,11 @@ describe('LocalStorageService', function() {
       LocalStorageService.saveExplorationDraft(explorationIdTwo,
         changeList, draftChangeListIdTwo);
       expect(LocalStorageService.getExplorationDraft(
-        explorationIdOne)).toEqual(draftOne);
+        explorationIdOne))
+        .toEqual(draftOne);
       expect(LocalStorageService.getExplorationDraft(
-        explorationIdTwo)).toEqual(draftTwo);
+        explorationIdTwo))
+        .toEqual(draftTwo);
     });
 
     it('should correctly remove the draft', function() {
@@ -63,7 +65,8 @@ describe('LocalStorageService', function() {
         changeList, draftChangeListIdTwo);
       LocalStorageService.removeExplorationDraft(explorationIdTwo);
       expect(LocalStorageService.getExplorationDraft(
-        explorationIdTwo)).toBeNull();
+        explorationIdTwo))
+        .toBeNull();
     });
   });
 });

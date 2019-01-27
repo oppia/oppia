@@ -54,13 +54,14 @@ oppia.directive('outcomeDestinationEditor', [
           });
 
           $scope.canEditRefresherExplorationId = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
+          UserService.getUserInfoAsync()
+            .then(function(userInfo) {
             // We restrict editing of refresher exploration IDs to
             // admins/moderators for now, since the feature is still in
             // development.
-            $scope.canEditRefresherExplorationId = (
-              userInfo.isAdmin() || userInfo.isModerator());
-          });
+              $scope.canEditRefresherExplorationId = (
+                userInfo.isAdmin() || userInfo.isModerator());
+            });
 
           $scope.explorationAndSkillIdPattern =
             EXPLORATION_AND_SKILL_ID_PATTERN;
@@ -88,10 +89,12 @@ oppia.directive('outcomeDestinationEditor', [
             // This is a list of objects, each with an ID and name. These
             // represent all states, as well as an option to create a
             // new state.
-            $scope.destChoices = [{
-              id: (questionModeEnabled ? null : currentStateName),
-              text: '(try again)'
-            }];
+            $scope.destChoices = [
+              {
+                id: (questionModeEnabled ? null : currentStateName),
+                text: '(try again)'
+              }
+            ];
 
             // Arrange the remaining states based on their order in the state
             // graph.
@@ -156,4 +159,5 @@ oppia.directive('outcomeDestinationEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

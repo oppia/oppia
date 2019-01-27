@@ -54,20 +54,21 @@ oppia.directive('collectionNodeCreator', [
               $scope.searchQueryHasError = false;
               return SearchExplorationsBackendApiService.fetchExplorations(
                 searchQuery
-              ).then(function(explorationMetadataBackendDict) {
-                var options = [];
-                explorationMetadataBackendDict.collection_node_metadata_list.
-                  map(function(item) {
-                    if (!$scope.collection.containsCollectionNode(item.id)) {
-                      options.push(item.title + ' (' + item.id + ')');
-                    }
-                  });
-                return options;
-              }, function() {
-                AlertsService.addWarning(
-                  'There was an error when searching for matching ' +
+              )
+                .then(function(explorationMetadataBackendDict) {
+                  var options = [];
+                  explorationMetadataBackendDict.collection_node_metadata_list.
+                    map(function(item) {
+                      if (!$scope.collection.containsCollectionNode(item.id)) {
+                        options.push(item.title + ' (' + item.id + ')');
+                      }
+                    });
+                  return options;
+                }, function() {
+                  AlertsService.addWarning(
+                    'There was an error when searching for matching ' +
                   'explorations.');
-              });
+                });
             } else {
               $scope.searchQueryHasError = true;
             }
@@ -140,17 +141,16 @@ oppia.directive('collectionNodeCreator', [
             }
 
             // Create a new exploration with the given title.
-            $http.post('/contributehandler/create_new', {
-              title: title
-            }).then(function(response) {
-              $scope.newExplorationTitle = '';
-              var newExplorationId = response.data.explorationId;
+            $http.post('/contributehandler/create_new', {title: title})
+              .then(function(response) {
+                $scope.newExplorationTitle = '';
+                var newExplorationId = response.data.explorationId;
 
-              SiteAnalyticsService
-                .registerCreateNewExplorationInCollectionEvent(
-                  newExplorationId);
-              addExplorationToCollection(newExplorationId);
-            });
+                SiteAnalyticsService
+                  .registerCreateNewExplorationInCollectionEvent(
+                    newExplorationId);
+                addExplorationToCollection(newExplorationId);
+              });
           };
 
           // Checks whether the user has left a '#' at the end of their ID
@@ -171,4 +171,5 @@ oppia.directive('collectionNodeCreator', [
         }
       ]
     };
-  }]);
+  }
+]);

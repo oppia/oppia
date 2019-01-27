@@ -258,4 +258,5 @@ oppia.directive('ruleEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

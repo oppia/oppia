@@ -67,7 +67,8 @@ describe('Full system', function() {
   };
 
   it('should accept fully correct proofs', function() {
-    expect(completeCheck('p', 'p', 'we know p')).toBeUndefined();
+    expect(completeCheck('p', 'p', 'we know p'))
+      .toBeUndefined();
 
     // TODO: add back additional tests from commit 2d9335019521 when speed
     // issues are fixed.
@@ -82,25 +83,29 @@ describe('Full system', function() {
         '  from ∀x.(A(x)∧B(x)) at d we have A(d)∧B(d)',
         '  from A(d)∧B(d) we have B(d)',
         'd was arbitrary so ∀x.B(x)',
-        'from ∀x.A(x) and ∀x.B(x) have (∀x.A(x))∧(∀x.B(x))'].join('\n'))
-    ).toBeUndefined();
+        'from ∀x.A(x) and ∀x.B(x) have (∀x.A(x))∧(∀x.B(x))'
+      ].join('\n'))
+    )
+      .toBeUndefined();
   });
 
   it('should reject proofs with any error', function() {
     expect(function() {
       completeCheck('p', 'p', 'we knew p');
-    }).toThrow(
-      sharedErrorWrapper(
-        'The phrase starting \'we\' could not be identified; please ' +
+    })
+      .toThrow(
+        sharedErrorWrapper(
+          'The phrase starting \'we\' could not be identified; please ' +
           'make sure you are only using phrases from the given list of ' +
           'vocabulary.', 0, 'unidentified_phrase_starting_at', 'formattting')
-    );
+      );
 
     expect(function() {
       completeCheck('p', 'p', 'we know q');
-    }).toThrow(
-      sharedErrorWrapper(
-        'This line uses q, so you need to have an earlier line proving ' +
+    })
+      .toThrow(
+        sharedErrorWrapper(
+          'This line uses q, so you need to have an earlier line proving ' +
         'that q is true.', 0, 'missing_antecedent', 'logic'));
 
     expect(function() {
@@ -109,10 +114,12 @@ describe('Full system', function() {
         '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)',
         '  from A(c)∧B(c) we have A(c)',
         'c was arbitrary so ∀x.A(x)',
-        'from ∀x.A(x) and p have (∀x.A(x))∧p'].join('\n'));
-    }).toThrow(
-      sharedErrorWrapper(
-        'We are trying to prove ∀x.A(x) so it should be given by the ' +
+        'from ∀x.A(x) and p have (∀x.A(x))∧p'
+      ].join('\n'));
+    })
+      .toThrow(
+        sharedErrorWrapper(
+          'We are trying to prove ∀x.A(x) so it should be given by the ' +
         'final line of the proof.', 4, 'last_line_not_target', 'target'));
 
     expect(function() {
@@ -120,17 +127,20 @@ describe('Full system', function() {
         'given c',
         '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)',
         '  from A(c)∧B(c) we have A(c)',
-        'd was arbitrary so ∀x.A(x)'].join('\n'));
-    }).toThrow(
-      sharedErrorWrapper(
-        'You haven\'t said where d comes from; if you want it to be ' +
+        'd was arbitrary so ∀x.A(x)'
+      ].join('\n'));
+    })
+      .toThrow(
+        sharedErrorWrapper(
+          'You haven\'t said where d comes from; if you want it to be ' +
         'arbitrary then add a preceding line saying \'Given d\'; ' +
         'alternatively you might want to take a particular d witnessing ' +
         'some existential formula.', 3, 'unspecified_variable', 'variables'));
   });
 
   it('should check proofs in less than 10 seconds', function() {
-    var startTime = new Date().getTime();
+    var startTime = new Date()
+      .getTime();
 
     expect(
       completeCheck('', '~(A∨B)<=>~A∧~B', [
@@ -159,9 +169,12 @@ describe('Full system', function() {
         'Hence (~A∧~B)=>~(A∨B)',
         'From ~(A∨B)=>~A∧~B and (~A∧~B)=>~(A∨B) we have ~(A∨B)<=>~A∧~B'
       ].join('\n'))
-    ).toBeUndefined();
+    )
+      .toBeUndefined();
 
-    var endTime = new Date().getTime();
-    expect(endTime < startTime + 20000).toBe(true);
+    var endTime = new Date()
+      .getTime();
+    expect(endTime < startTime + 20000)
+      .toBe(true);
   });
 });

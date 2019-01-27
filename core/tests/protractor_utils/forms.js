@@ -68,7 +68,8 @@ var GraphEditor = function(graphInputContainer) {
       var nodeCoordinatesList = graphDict.vertices;
       var edgesList = graphDict.edges;
       if (nodeCoordinatesList) {
-        expect(nodeCoordinatesList.length).toBeGreaterThan(0);
+        expect(nodeCoordinatesList.length)
+          .toBeGreaterThan(0);
         // Assume x-coord is at index 0.
         nodeCoordinatesList.forEach(function(coordinateElement) {
           createVertex(coordinateElement[0], coordinateElement[1]);
@@ -86,7 +87,8 @@ var GraphEditor = function(graphInputContainer) {
       deleteButton.click();
       // Sample graph comes with 3 vertices.
       for (i = 2; i >= 0; i--) {
-        vertexElement(i).click();
+        vertexElement(i)
+          .click();
       }
     },
     expectCurrentGraphToBe: function(graphDict) {
@@ -96,7 +98,9 @@ var GraphEditor = function(graphInputContainer) {
         // Expecting total no. of vertices on the graph matches with the given
         // dict's vertices.
         nodeCoordinatesList.forEach(function(node, index) {
-          expect(vertexElement(index).isDisplayed()).toBe(true);
+          expect(vertexElement(index)
+            .isDisplayed())
+            .toBe(true);
         });
       }
       if (edgesList) {
@@ -105,7 +109,8 @@ var GraphEditor = function(graphInputContainer) {
         var allEdgesElement = element.all(by.css(
           '.protractor-test-graph-edge'));
         allEdgesElement.then(function(allEdges) {
-          expect(allEdges.length).toEqual(edgesList.length);
+          expect(allEdges.length)
+            .toEqual(edgesList.length);
         });
       }
     }
@@ -127,24 +132,30 @@ var ListEditor = function(elem) {
   // If objectType is not specified, this function returns nothing.
   var addItem = function(objectType) {
     var listLength = _getLength();
-    elem.element(by.css('.protractor-test-add-list-entry')).click();
+    elem.element(by.css('.protractor-test-add-list-entry'))
+      .click();
     if (objectType) {
       return getEditor(objectType)(
         elem.element(
-          by.repeater('item in localValue track by $index').row(listLength)));
+          by.repeater('item in localValue track by $index')
+            .row(listLength)));
     }
   };
   var deleteItem = function(index) {
     elem.element(
-      by.repeater('item in localValue track by $index').row(index)
-    ).element(by.css('.protractor-test-delete-list-entry')).click();
+      by.repeater('item in localValue track by $index')
+        .row(index)
+    )
+      .element(by.css('.protractor-test-delete-list-entry'))
+      .click();
   };
 
   return {
     editItem: function(index, objectType) {
       var item = elem.element(
         by.repeater('item in localValue track by $index'
-        ).row(index));
+        )
+          .row(index));
       var editor = getEditor(objectType);
       return editor(item);
     },
@@ -152,16 +163,18 @@ var ListEditor = function(elem) {
     deleteItem: deleteItem,
     // This will add or delete list elements as necessary
     setLength: function(desiredLength) {
-      elem.all(by.repeater('item in localValue track by $index')).count().then(
-        function(startingLength) {
-          for (var i = startingLength; i < desiredLength; i++) {
-            addItem();
+      elem.all(by.repeater('item in localValue track by $index'))
+        .count()
+        .then(
+          function(startingLength) {
+            for (var i = startingLength; i < desiredLength; i++) {
+              addItem();
+            }
+            for (var i = startingLength - 1; i >= desiredLength; i--) {
+              deleteItem(i);
+            }
           }
-          for (var i = startingLength - 1; i >= desiredLength; i--) {
-            deleteItem(i);
-          }
-        }
-      );
+        );
     }
   };
 };
@@ -169,25 +182,37 @@ var ListEditor = function(elem) {
 var RealEditor = function(elem) {
   return {
     setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+      elem.element(by.tagName('input'))
+        .clear();
+      elem.element(by.tagName('input'))
+        .sendKeys(value);
     }
   };
 };
 
 var RichTextEditor = function(elem) {
   // Set focus in the RTE.
-  elem.all(by.css('.oppia-rte')).first().click();
+  elem.all(by.css('.oppia-rte'))
+    .first()
+    .click();
 
   var _appendContentText = function(text) {
-    elem.all(by.css('.oppia-rte')).first().sendKeys(text);
+    elem.all(by.css('.oppia-rte'))
+      .first()
+      .sendKeys(text);
   };
   var _clickToolbarButton = function(buttonName) {
-    elem.element(by.css('.' + buttonName)).click();
+    elem.element(by.css('.' + buttonName))
+      .click();
   };
   var _clearContent = function() {
-    expect(elem.all(by.css('.oppia-rte')).first().isPresent()).toBe(true);
-    elem.all(by.css('.oppia-rte')).first().clear();
+    expect(elem.all(by.css('.oppia-rte'))
+      .first()
+      .isPresent())
+      .toBe(true);
+    elem.all(by.css('.oppia-rte'))
+      .first()
+      .clear();
   };
 
   return {
@@ -234,7 +259,8 @@ var RichTextEditor = function(elem) {
       _clickToolbarButton('cke_button__oppia' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
-      var modal = element.all(by.css('.modal-dialog')).last();
+      var modal = element.all(by.css('.modal-dialog'))
+        .last();
 
       // Need to convert arguments to an actual array; we tell the component
       // which modal to act on but drop the componentName.
@@ -245,17 +271,22 @@ var RichTextEditor = function(elem) {
       richTextComponents.getComponent(componentName).customizeComponent.apply(
         null, args);
       modal.element(
-        by.css('.protractor-test-close-rich-text-component-editor')).click();
+        by.css('.protractor-test-close-rich-text-component-editor'))
+        .click();
 
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
       if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
-        elem.all(by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
+        elem.all(by.css('.oppia-rte'))
+          .first()
+          .sendKeys(protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
-      elem.all(by.css('.oppia-rte')).first().sendKeys(
-        protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
+      elem.all(by.css('.oppia-rte'))
+        .first()
+        .sendKeys(
+          protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
 };
@@ -263,8 +294,10 @@ var RichTextEditor = function(elem) {
 var UnicodeEditor = function(elem) {
   return {
     setValue: function(text) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(text);
+      elem.element(by.tagName('input'))
+        .clear();
+      elem.element(by.tagName('input'))
+        .sendKeys(text);
     }
   };
 };
@@ -272,25 +305,35 @@ var UnicodeEditor = function(elem) {
 var AutocompleteDropdownEditor = function(elem) {
   return {
     setValue: function(text) {
-      elem.element(by.css('.select2-container')).click();
+      elem.element(by.css('.select2-container'))
+        .click();
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      element(by.css('.select2-dropdown')).element(
-        by.css('.select2-search input')).sendKeys(text + '\n');
+      element(by.css('.select2-dropdown'))
+        .element(
+          by.css('.select2-search input'))
+        .sendKeys(text + '\n');
     },
     expectOptionsToBe: function(expectedOptions) {
-      elem.element(by.css('.select2-container')).click();
-      element(by.css('.select2-dropdown')).all(by.tagName('li')).map(
-        function(optionElem) {
-          return optionElem.getText();
-        }
-      ).then(function(actualOptions) {
-        expect(actualOptions).toEqual(expectedOptions);
-      });
+      elem.element(by.css('.select2-container'))
+        .click();
+      element(by.css('.select2-dropdown'))
+        .all(by.tagName('li'))
+        .map(
+          function(optionElem) {
+            return optionElem.getText();
+          }
+        )
+        .then(function(actualOptions) {
+          expect(actualOptions)
+            .toEqual(expectedOptions);
+        });
       // Re-close the dropdown.
-      element(by.css('.select2-dropdown')).element(
-        by.css('.select2-search input')).sendKeys('\n');
+      element(by.css('.select2-dropdown'))
+        .element(
+          by.css('.select2-search input'))
+        .sendKeys('\n');
     }
   };
 };
@@ -300,10 +343,12 @@ var AutocompleteMultiDropdownEditor = function(elem) {
     setValues: function(texts) {
       // Clear all existing choices.
       elem.element(by.css('.select2-selection__rendered'))
-        .all(by.tagName('li')).map(function(choiceElem) {
+        .all(by.tagName('li'))
+        .map(function(choiceElem) {
           return choiceElem.element(
             by.css('.select2-selection__choice__remove'));
-        }).then(function(deleteButtons) {
+        })
+        .then(function(deleteButtons) {
           // We iterate in descending order, because clicking on a delete button
           // removes the element from the DOM. We also omit the last element
           // because it is the field for new input.
@@ -313,20 +358,25 @@ var AutocompleteMultiDropdownEditor = function(elem) {
         });
 
       for (var i = 0; i < texts.length; i++) {
-        elem.element(by.css('.select2-container')).click();
-        elem.element(by.css('.select2-search__field')).sendKeys(
-          texts[i] + '\n');
+        elem.element(by.css('.select2-container'))
+          .click();
+        elem.element(by.css('.select2-search__field'))
+          .sendKeys(
+            texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
       elem.element(by.css('.select2-selection__rendered'))
-        .all(by.tagName('li')).map(function(choiceElem) {
+        .all(by.tagName('li'))
+        .map(function(choiceElem) {
           return choiceElem.getText();
-        }).then(function(actualSelection) {
+        })
+        .then(function(actualSelection) {
           // Remove the element corresponding to the last <li>, which actually
           // corresponds to the field for new input.
           actualSelection.pop();
-          expect(actualSelection).toEqual(expectedCurrentSelection);
+          expect(actualSelection)
+            .toEqual(expectedCurrentSelection);
         });
     }
   };
@@ -338,14 +388,18 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    elem.element(by.css('.protractor-test-search-bar-dropdown-toggle')).click();
+    elem.element(by.css('.protractor-test-search-bar-dropdown-toggle'))
+      .click();
 
     elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
-      .all(by.tagName('span')).filter(function(choiceElem) {
-        return choiceElem.getText().then(function(choiceText) {
-          return texts.indexOf(choiceText) !== -1;
-        });
-      }).then(function(filteredElements) {
+      .all(by.tagName('span'))
+      .filter(function(choiceElem) {
+        return choiceElem.getText()
+          .then(function(choiceText) {
+            return texts.indexOf(choiceText) !== -1;
+          });
+      })
+      .then(function(filteredElements) {
         if (filteredElements.length !== texts.length) {
           throw (
             'Could not toggle element selection. Values requested: ' + texts +
@@ -354,14 +408,16 @@ var MultiSelectEditor = function(elem) {
 
         for (var i = 0; i < filteredElements.length; i++) {
         // Check that, before toggling, the element is in the correct state.
-          expect(filteredElements[i].getAttribute('class')).toMatch(
-            expectedClassBeforeToggle);
+          expect(filteredElements[i].getAttribute('class'))
+            .toMatch(
+              expectedClassBeforeToggle);
           filteredElements[i].click();
         }
 
         // Close the dropdown menu at the end.
         elem.element(by.css(
-          '.protractor-test-search-bar-dropdown-toggle')).click();
+          '.protractor-test-search-bar-dropdown-toggle'))
+          .click();
       });
   };
 
@@ -377,18 +433,23 @@ var MultiSelectEditor = function(elem) {
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
       // Open the dropdown menu.
       elem.element(by.css(
-        '.protractor-test-search-bar-dropdown-toggle')).click();
+        '.protractor-test-search-bar-dropdown-toggle'))
+        .click();
 
       // Find the selected elements.
       elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
-        .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
+        .all(by.css('.protractor-test-selected'))
+        .map(function(selectedElem) {
           return selectedElem.getText();
-        }).then(function(actualSelection) {
-          expect(actualSelection).toEqual(expectedCurrentSelection);
+        })
+        .then(function(actualSelection) {
+          expect(actualSelection)
+            .toEqual(expectedCurrentSelection);
 
           // Close the dropdown menu at the end.
           elem.element(by.css(
-            '.protractor-test-search-bar-dropdown-toggle')).click();
+            '.protractor-test-search-bar-dropdown-toggle'))
+            .click();
         });
     }
   };
@@ -415,25 +476,29 @@ var expectRichText = function(elem) {
     // surround, e.g., <i> tags, so we can't just ignore the <p> elements
     // altogether.)
     var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
-    elem.all(by.xpath(XPATH_SELECTOR)).map(function(entry) {
+    elem.all(by.xpath(XPATH_SELECTOR))
+      .map(function(entry) {
       // It is necessary to obtain the texts of the elements in advance since
       // applying .getText() while the RichTextChecker is running would be
       // asynchronous and so not allow us to update the textPointer
       // synchronously.
-      return entry.getText(function(text) {
-        return text;
-      });
-    }).then(function(arrayOfTexts) {
-      // We re-derive the array of elements as we need it too.
-      elem.all(by.xpath(XPATH_SELECTOR)).then(function(arrayOfElements) {
-        elem.getText().then(function(fullText) {
-          var checker = RichTextChecker(
-            arrayOfElements, arrayOfTexts, fullText);
-          richTextInstructions(checker);
-          checker.expectEnd();
+        return entry.getText(function(text) {
+          return text;
         });
+      })
+      .then(function(arrayOfTexts) {
+      // We re-derive the array of elements as we need it too.
+        elem.all(by.xpath(XPATH_SELECTOR))
+          .then(function(arrayOfElements) {
+            elem.getText()
+              .then(function(fullText) {
+                var checker = RichTextChecker(
+                  arrayOfElements, arrayOfTexts, fullText);
+                richTextInstructions(checker);
+                checker.expectEnd();
+              });
+          });
       });
-    });
   };
   return {
     toMatch: toMatch,
@@ -455,7 +520,8 @@ var expectRichText = function(elem) {
 //   area (including both element and text nodes, so more than just the
 //   concatenation of arrayOfTexts), e.g. 'textbold'.
 var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
-  expect(arrayOfElems.length).toEqual(arrayOfTexts.length);
+  expect(arrayOfElems.length)
+    .toEqual(arrayOfTexts.length);
   // These are shared by the returned functions, and records how far through
   // the child elements and text of the rich text area checking has gone. The
   // arrayPointer traverses both arrays simultaneously.
@@ -467,11 +533,14 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   var justPassedRteComponent = false;
 
   var _readFormattedText = function(text, tagName) {
-    expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
+    expect(arrayOfElems[arrayPointer].getTagName())
+      .toBe(tagName);
     expect(
       arrayOfElems[arrayPointer].getAttribute('innerHTML')
-    ).toBe(text);
-    expect(arrayOfTexts[arrayPointer]).toEqual(text);
+    )
+      .toBe(text);
+    expect(arrayOfTexts[arrayPointer])
+      .toEqual(text);
     arrayPointer = arrayPointer + 1;
     textPointer = textPointer + text.length;
     justPassedRteComponent = false;
@@ -482,7 +551,8 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       // Plain text is in a text node so not recorded in either array
       expect(
         fullText.substring(textPointer, textPointer + text.length)
-      ).toEqual(text);
+      )
+        .toEqual(text);
       textPointer = textPointer + text.length;
       justPassedRteComponent = false;
     },
@@ -499,7 +569,8 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       var elem = arrayOfElems[arrayPointer];
       expect(elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
-      expect(elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+      expect(elem.getText())
+        .toBe(arrayOfTexts[arrayPointer]);
 
       // Need to convert arguments to an actual array; we tell the component
       // which element to act on but drop the componentName.
@@ -515,7 +586,8 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       justPassedRteComponent = true;
     },
     expectEnd: function() {
-      expect(arrayPointer).toBe(arrayOfElems.length);
+      expect(arrayPointer)
+        .toBe(arrayOfElems.length);
     }
   };
 };
@@ -574,42 +646,47 @@ var CodeMirrorChecker = function(elem) {
     browser.executeScript(
       "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
       ');');
-    elem.all(by.xpath('./div')).map(function(lineElement) {
-      return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
-        .then(function(lineNumber) {
+    elem.all(by.xpath('./div'))
+      .map(function(lineElement) {
+        return lineElement.element(by.css('.CodeMirror-linenumber'))
+          .getText()
+          .then(function(lineNumber) {
           // Note: the last line in codemirror will have an empty string for
           // line number and for text. This is to skip that line.
-          if (lineNumber === '') {
+            if (lineNumber === '') {
+              return lineNumber;
+            }
+            if (!compareDict.hasOwnProperty(lineNumber)) {
+              throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+            }
+            expect(lineElement.element(by.xpath('./pre'))
+              .getText())
+              .toEqual(compareDict[lineNumber].text);
+            expect(
+              lineElement.element(
+                by.css('.CodeMirror-linebackground'))
+                .isPresent())
+              .toEqual(compareDict[lineNumber].highlighted);
+            compareDict[lineNumber].checked = true;
             return lineNumber;
-          }
-          if (!compareDict.hasOwnProperty(lineNumber)) {
-            throw Error('Line ' + lineNumber + ' not found in CodeMirror');
-          }
-          expect(lineElement.element(by.xpath('./pre')).getText())
-            .toEqual(compareDict[lineNumber].text);
-          expect(
-            lineElement.element(
-              by.css('.CodeMirror-linebackground')).isPresent())
-            .toEqual(compareDict[lineNumber].highlighted);
-          compareDict[lineNumber].checked = true;
-          return lineNumber;
-        });
-    }).then(function(lineNumbers) {
-      var largestLineNumber = lineNumbers[lineNumbers.length - 1];
-      if (largestLineNumber !== currentLineNumber) {
-        _compareTextAndHighlightingFromLine(
-          largestLineNumber,
-          scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
-          compareDict);
-      } else {
-        for (var lineNumber in compareDict) {
-          if (compareDict[lineNumber].checked !== true) {
-            throw Error('Expected line ' + lineNumber + ': \'' +
+          });
+      })
+      .then(function(lineNumbers) {
+        var largestLineNumber = lineNumbers[lineNumbers.length - 1];
+        if (largestLineNumber !== currentLineNumber) {
+          _compareTextAndHighlightingFromLine(
+            largestLineNumber,
+            scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
+            compareDict);
+        } else {
+          for (var lineNumber in compareDict) {
+            if (compareDict[lineNumber].checked !== true) {
+              throw Error('Expected line ' + lineNumber + ': \'' +
               compareDict[lineNumber].text + '\' to be found in CodeMirror');
+            }
           }
         }
-      }
-    });
+      });
   };
 
   /**
@@ -628,35 +705,37 @@ var CodeMirrorChecker = function(elem) {
     browser.executeScript(
       "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
       ');');
-    elem.getText().then(function(text) {
+    elem.getText()
+      .then(function(text) {
       // The 'text' arg is a string 2n lines long representing n lines of text
       // codemirror has loaded. The (2i)th line contains a line number and the
       // (2i+1)th line contains the text on that line.
-      var textArray = text.split('\n');
-      for (var i = 0; i < textArray.length; i += 2) {
-        var lineNumber = textArray[i];
-        var lineText = textArray[i + 1];
-        if (!compareDict.hasOwnProperty(lineNumber)) {
-          throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+        var textArray = text.split('\n');
+        for (var i = 0; i < textArray.length; i += 2) {
+          var lineNumber = textArray[i];
+          var lineText = textArray[i + 1];
+          if (!compareDict.hasOwnProperty(lineNumber)) {
+            throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+          }
+          expect(lineText)
+            .toEqual(compareDict[lineNumber].text);
+          compareDict[lineNumber].checked = true;
         }
-        expect(lineText).toEqual(compareDict[lineNumber].text);
-        compareDict[lineNumber].checked = true;
-      }
-      var largestLineNumber = textArray[textArray.length - 2];
-      if (largestLineNumber !== currentLineNumber) {
-        _compareTextFromLine(
-          largestLineNumber,
-          scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
-          compareDict);
-      } else {
-        for (var lineNumber in compareDict) {
-          if (compareDict[lineNumber].checked !== true) {
-            throw Error('Expected line ' + lineNumber + ': \'' +
+        var largestLineNumber = textArray[textArray.length - 2];
+        if (largestLineNumber !== currentLineNumber) {
+          _compareTextFromLine(
+            largestLineNumber,
+            scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
+            compareDict);
+        } else {
+          for (var lineNumber in compareDict) {
+            if (compareDict[lineNumber].checked !== true) {
+              throw Error('Expected line ' + lineNumber + ': \'' +
               compareDict[lineNumber].text + '\' to be found in CodeMirror');
+            }
           }
         }
-      }
-    });
+      });
   };
 
   return {

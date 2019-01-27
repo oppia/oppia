@@ -24,16 +24,16 @@ describe('CodeRepl interaction', function() {
     beforeEach(module('directiveTemplates'));
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(inject(function($compile, $rootScope, _$templateCache_) {
+    beforeEach(inject[function($compile, $rootScope, _$templateCache_) {
       $templateCache = _$templateCache_;
       var templatesHtml = $templateCache.get(
         '/extensions/interactions/CodeRepl/directives/' +
         'code_repl_interaction_directive.html');
       $compile(templatesHtml)($rootScope);
       $rootScope.$digest();
-    }));
+    }]);
 
-    beforeEach(inject(function($compile, _$httpBackend_, $rootScope) {
+    beforeEach(inject[function($compile, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
 
       var TAG_NAME = 'oppia-interactive-code-repl';
@@ -42,7 +42,7 @@ describe('CodeRepl interaction', function() {
       $compile(elt)(scope);
       scope.$digest();
       ctrlScope = elt.isolateScope();
-    }));
+    }]);
 
     afterEach(function() {
       scope.$apply();
@@ -51,8 +51,10 @@ describe('CodeRepl interaction', function() {
     });
 
     it('loads the code template', function() {
-      expect(elt.html()).toContain('code-repl-input-box');
-      expect(elt.html()).toContain('runCode(code)');
+      expect(elt.html())
+        .toContain('code-repl-input-box');
+      expect(elt.html())
+        .toContain('runCode(code)');
     });
   });
 });

@@ -17,18 +17,19 @@
  * and pencil code interactions.
  */
 
-oppia.factory('CodeNormalizerService', [function() {
-  var removeLeadingWhitespace = function(str) {
-    return str.replace(/^\s+/g, '');
-  };
-  var removeTrailingWhitespace = function(str) {
-    return str.replace(/\s+$/g, '');
-  };
-  var removeIntermediateWhitespace = function(str) {
-    return str.replace(/\s+/g, ' ');
-  };
-  return {
-    getNormalizedCode: function(codeString) {
+oppia.factory('CodeNormalizerService', [
+  function() {
+    var removeLeadingWhitespace = function(str) {
+      return str.replace(/^\s+/g, '');
+    };
+    var removeTrailingWhitespace = function(str) {
+      return str.replace(/\s+$/g, '');
+    };
+    var removeIntermediateWhitespace = function(str) {
+      return str.replace(/\s+/g, ' ');
+    };
+    return {
+      getNormalizedCode: function(codeString) {
       /*
        * Normalizes a code string (which is assumed not to contain tab
        * characters). In particular:
@@ -41,67 +42,68 @@ oppia.factory('CodeNormalizerService', [function() {
        * - Removes blank newlines.
        * - Make the indentation level four spaces.
        */
-      // TODO(sll): Augment this function to strip out comments that occur at
-      // the end of a line. However, be careful with lines where '#' is
-      // contained in quotes or the character is escaped.
-      var FOUR_SPACES = '    ';
-      // Maps the number of spaces at the beginning of a line to an int
-      // specifying the desired indentation level.
-      var numSpacesToDesiredIndentLevel = {
-        0: 0
-      };
+        // TODO(sll): Augment this function to strip out comments that occur at
+        // the end of a line. However, be careful with lines where '#' is
+        // contained in quotes or the character is escaped.
+        var FOUR_SPACES = '    ';
+        // Maps the number of spaces at the beginning of a line to an int
+        // specifying the desired indentation level.
+        var numSpacesToDesiredIndentLevel = {0: 0};
 
-      var codeLines = removeTrailingWhitespace(codeString).split('\n');
-      var normalizedCodeLines = [];
-      codeLines.forEach(function(line) {
-        if (removeLeadingWhitespace(line).indexOf('#') === 0) {
-          return;
-        }
-        line = removeTrailingWhitespace(line);
-        if (!line) {
-          return;
-        }
+        var codeLines = removeTrailingWhitespace(codeString)
+          .split('\n');
+        var normalizedCodeLines = [];
+        codeLines.forEach(function(line) {
+          if (removeLeadingWhitespace(line)
+            .indexOf('#') === 0) {
+            return;
+          }
+          line = removeTrailingWhitespace(line);
+          if (!line) {
+            return;
+          }
 
-        var numSpaces = line.length - removeLeadingWhitespace(line).length;
+          var numSpaces = line.length - removeLeadingWhitespace(line).length;
 
-        var existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
-        var maxNumSpaces = Math.max.apply(null, existingNumSpaces);
-        if (numSpaces > maxNumSpaces) {
+          var existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
+          var maxNumSpaces = Math.max.apply(null, existingNumSpaces);
+          if (numSpaces > maxNumSpaces) {
           // Add a new indentation level
-          numSpacesToDesiredIndentLevel[numSpaces] = existingNumSpaces.length;
-        }
+            numSpacesToDesiredIndentLevel[numSpaces] = existingNumSpaces.length;
+          }
 
-        // This is set when the indentation level of the current line does not
-        // start a new scope, and also does not match any previous indentation
-        // level. This case is actually invalid, but for now, we take the
-        // largest indentation level that is less than this one.
-        // TODO(sll): Bad indentation should result in an error nearer the
-        // source.
-        var isShortfallLine =
+          // This is set when the indentation level of the current line does not
+          // start a new scope, and also does not match any previous indentation
+          // level. This case is actually invalid, but for now, we take the
+          // largest indentation level that is less than this one.
+          // TODO(sll): Bad indentation should result in an error nearer the
+          // source.
+          var isShortfallLine =
           !numSpacesToDesiredIndentLevel.hasOwnProperty(numSpaces) &&
           numSpaces < maxNumSpaces;
 
-        // Clear all existing indentation levels to the right of this one.
-        for (var indentLength in numSpacesToDesiredIndentLevel) {
-          if (Number(indentLength) > numSpaces) {
-            delete numSpacesToDesiredIndentLevel[indentLength];
+          // Clear all existing indentation levels to the right of this one.
+          for (var indentLength in numSpacesToDesiredIndentLevel) {
+            if (Number(indentLength) > numSpaces) {
+              delete numSpacesToDesiredIndentLevel[indentLength];
+            }
           }
-        }
 
-        if (isShortfallLine) {
-          existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
-          numSpaces = Math.max.apply(null, existingNumSpaces);
-        }
+          if (isShortfallLine) {
+            existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
+            numSpaces = Math.max.apply(null, existingNumSpaces);
+          }
 
-        var normalizedLine = '';
-        for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
-          normalizedLine += FOUR_SPACES;
-        }
-        normalizedLine += removeIntermediateWhitespace(
-          removeLeadingWhitespace(line));
-        normalizedCodeLines.push(normalizedLine);
-      });
-      return normalizedCodeLines.join('\n');
-    }
-  };
-}]);
+          var normalizedLine = '';
+          for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
+            normalizedLine += FOUR_SPACES;
+          }
+          normalizedLine += removeIntermediateWhitespace(
+            removeLeadingWhitespace(line));
+          normalizedCodeLines.push(normalizedLine);
+        });
+        return normalizedCodeLines.join('\n');
+      }
+    };
+  }
+]);

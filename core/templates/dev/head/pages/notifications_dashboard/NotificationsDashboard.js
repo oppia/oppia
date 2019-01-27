@@ -36,13 +36,14 @@ oppia.controller('DashboardNotifications', [
     };
 
     $rootScope.loadingMessage = 'Loading';
-    $http.get('/notificationsdashboardhandler/data').then(function(response) {
-      var data = response.data;
-      $scope.recentNotifications = data.recent_notifications;
-      $scope.jobQueuedMsec = data.job_queued_msec;
-      $scope.lastSeenMsec = data.last_seen_msec || 0.0;
-      $scope.currentUsername = data.username;
-      $rootScope.loadingMessage = '';
-    });
+    $http.get('/notificationsdashboardhandler/data')
+      .then(function(response) {
+        var data = response.data;
+        $scope.recentNotifications = data.recent_notifications;
+        $scope.jobQueuedMsec = data.job_queued_msec;
+        $scope.lastSeenMsec = data.last_seen_msec || 0.0;
+        $scope.currentUsername = data.username;
+        $rootScope.loadingMessage = '';
+      });
   }
 ]);

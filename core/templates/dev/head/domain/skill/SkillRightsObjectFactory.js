@@ -72,4 +72,5 @@ oppia.factory('SkillRightsObjectFactory', [
     };
 
     return SkillRights;
-  }]);
+  }
+]);

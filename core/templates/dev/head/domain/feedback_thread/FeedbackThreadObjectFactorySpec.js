@@ -20,9 +20,9 @@ describe('Feedback thread object factory', function() {
   beforeEach(module('oppia'));
   var FeedbackThreadObjectFactory = null;
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
-  }));
+  }]);
 
   it('should create a new feedback thread from a backend dict.', function() {
     feedbackThreadBackendDict = {
@@ -38,22 +38,28 @@ describe('Feedback thread object factory', function() {
 
     feedbackThread = FeedbackThreadObjectFactory.createFromBackendDict(
       feedbackThreadBackendDict);
-    expect(feedbackThread.status).toEqual('accepted');
-    expect(feedbackThread.subject).toEqual('sample subject');
-    expect(feedbackThread.summary).toEqual('sample summary');
-    expect(feedbackThread.originalAuthorName).toEqual('author');
-    expect(feedbackThread.lastUpdated).toEqual(1000);
-    expect(feedbackThread.messageCount).toEqual(10);
-    expect(feedbackThread.stateName).toEqual('state 1');
-    expect(feedbackThread.threadId).toEqual('exp1.thread1');
-    expect(feedbackThread.isSuggestionThread()).toEqual(false);
+    expect(feedbackThread.status)
+      .toEqual('accepted');
+    expect(feedbackThread.subject)
+      .toEqual('sample subject');
+    expect(feedbackThread.summary)
+      .toEqual('sample summary');
+    expect(feedbackThread.originalAuthorName)
+      .toEqual('author');
+    expect(feedbackThread.lastUpdated)
+      .toEqual(1000);
+    expect(feedbackThread.messageCount)
+      .toEqual(10);
+    expect(feedbackThread.stateName)
+      .toEqual('state 1');
+    expect(feedbackThread.threadId)
+      .toEqual('exp1.thread1');
+    expect(feedbackThread.isSuggestionThread())
+      .toEqual(false);
 
-    messages = [{
-      text: 'message1'
-    }, {
-      text: 'message2'
-    }];
+    messages = [{text: 'message1'}, {text: 'message2'}];
     feedbackThread.setMessages(messages);
-    expect(feedbackThread.messages).toEqual(messages);
+    expect(feedbackThread.messages)
+      .toEqual(messages);
   });
 });

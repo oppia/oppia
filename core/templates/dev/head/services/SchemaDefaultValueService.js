@@ -17,31 +17,33 @@
  * SchemaBasedList item.
  */
 
-oppia.factory('SchemaDefaultValueService', [function() {
-  return {
+oppia.factory('SchemaDefaultValueService', [
+  function() {
+    return {
     // TODO(sll): Rewrite this to take validators into account, so that
     // we always start with a valid value.
-    getDefaultValue: function(schema) {
-      if (schema.choices) {
-        return schema.choices[0];
-      } else if (schema.type === 'bool') {
-        return false;
-      } else if (schema.type === 'unicode' || schema.type === 'html') {
-        return '';
-      } else if (schema.type === 'list') {
-        return [this.getDefaultValue(schema.items)];
-      } else if (schema.type === 'dict') {
-        var result = {};
-        for (var i = 0; i < schema.properties.length; i++) {
-          result[schema.properties[i].name] = this.getDefaultValue(
-            schema.properties[i].schema);
+      getDefaultValue: function(schema) {
+        if (schema.choices) {
+          return schema.choices[0];
+        } else if (schema.type === 'bool') {
+          return false;
+        } else if (schema.type === 'unicode' || schema.type === 'html') {
+          return '';
+        } else if (schema.type === 'list') {
+          return [this.getDefaultValue(schema.items)];
+        } else if (schema.type === 'dict') {
+          var result = {};
+          for (var i = 0; i < schema.properties.length; i++) {
+            result[schema.properties[i].name] = this.getDefaultValue(
+              schema.properties[i].schema);
+          }
+          return result;
+        } else if (schema.type === 'int' || schema.type === 'float') {
+          return 0;
+        } else {
+          console.error('Invalid schema type: ' + schema.type);
         }
-        return result;
-      } else if (schema.type === 'int' || schema.type === 'float') {
-        return 0;
-      } else {
-        console.error('Invalid schema type: ' + schema.type);
       }
-    }
-  };
-}]);
+    };
+  }
+]);

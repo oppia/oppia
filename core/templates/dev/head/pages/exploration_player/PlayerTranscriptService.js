@@ -104,7 +104,8 @@ oppia.factory('PlayerTranscriptService', [
           return null;
         } else {
           return transcript[displayedCardIndex].
-            getInputResponsePairs().slice(-1)[0].learnerInput;
+            getInputResponsePairs()
+            .slice(-1)[0].learnerInput;
         }
       },
       isLastCard: function(index) {
@@ -117,10 +118,13 @@ oppia.factory('PlayerTranscriptService', [
         return numAnswersSubmitted;
       },
       updateLatestInteractionHtml: function(newInteractionHtml) {
-        this.getLastCard().setInteractionHtml(newInteractionHtml);
+        this.getLastCard()
+          .setInteractionHtml(newInteractionHtml);
       },
       getLastStateName: function() {
-        return this.getLastCard().getStateName();
+        return this.getLastCard()
+          .getStateName();
       }
     };
-  }]);
+  }
+]);

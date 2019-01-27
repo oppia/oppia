@@ -32,48 +32,46 @@ oppia.factory('EditableTopicBackendApiService', [
     var _fetchTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
-          topic_id: topicId
-        });
+        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {topic_id: topicId});
 
-      $http.get(topicDataUrl).then(function(response) {
-        if (successCallback) {
+      $http.get(topicDataUrl)
+        .then(function(response) {
+          if (successCallback) {
           // The response is passed as a dict with 2 fields and not as 2
           // parameters, because the successCallback is called as the resolve
           // callback function in $q in fetchTopic(), and according to its
           // documentation (https://docs.angularjs.org/api/ng/service/$q),
           // resolve or reject can have only a single parameter.
-          successCallback({
-            topicDict: angular.copy(response.data.topic_dict),
-            skillIdToDescriptionDict: angular.copy(
-              response.data.skill_id_to_description_dict)
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+            successCallback({
+              topicDict: angular.copy(response.data.topic_dict),
+              skillIdToDescriptionDict: angular.copy(
+                response.data.skill_id_to_description_dict)
+            });
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _fetchStories = function(
         topicId, successCallback, errorCallback) {
       var storiesDataUrl = UrlInterpolationService.interpolateUrl(
-        TOPIC_EDITOR_STORY_URL_TEMPLATE, {
-          topic_id: topicId
-        });
+        TOPIC_EDITOR_STORY_URL_TEMPLATE, {topic_id: topicId});
 
-      $http.get(storiesDataUrl).then(function(response) {
-        var canonicalStorySummaries = angular.copy(
-          response.data.canonical_story_summary_dicts);
-        if (successCallback) {
-          successCallback(canonicalStorySummaries);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(storiesDataUrl)
+        .then(function(response) {
+          var canonicalStorySummaries = angular.copy(
+            response.data.canonical_story_summary_dicts);
+          if (successCallback) {
+            successCallback(canonicalStorySummaries);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _fetchQuestions = function(
@@ -84,21 +82,22 @@ oppia.factory('EditableTopicBackendApiService', [
           cursor: cursor ? cursor : ''
         });
 
-      $http.get(questionsDataUrl).then(function(response) {
-        var questionSummaries = angular.copy(
-          response.data.question_summary_dicts);
-        var nextCursor = response.data.next_start_cursor;
-        if (successCallback) {
-          successCallback({
-            questionSummaries: questionSummaries,
-            nextCursor: nextCursor
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(questionsDataUrl)
+        .then(function(response) {
+          var questionSummaries = angular.copy(
+            response.data.question_summary_dicts);
+          var nextCursor = response.data.next_start_cursor;
+          if (successCallback) {
+            successCallback({
+              questionSummaries: questionSummaries,
+              nextCursor: nextCursor
+            });
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _fetchSubtopicPage = function(
@@ -109,63 +108,62 @@ oppia.factory('EditableTopicBackendApiService', [
           subtopic_id: subtopicId.toString()
         });
 
-      $http.get(subtopicPageDataUrl).then(function(response) {
-        var topic = angular.copy(response.data.subtopic_page);
-        if (successCallback) {
-          successCallback(topic);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(subtopicPageDataUrl)
+        .then(function(response) {
+          var topic = angular.copy(response.data.subtopic_page);
+          if (successCallback) {
+            successCallback(topic);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _deleteTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
-          topic_id: topicId
+        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {topic_id: topicId});
+      $http['delete'](topicDataUrl)
+        .then(function(response) {
+          if (successCallback) {
+            successCallback(response.status);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
         });
-      $http['delete'](topicDataUrl).then(function(response) {
-        if (successCallback) {
-          successCallback(response.status);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
     };
 
     var _updateTopic = function(
         topicId, topicVersion, commitMessage, changeList,
         successCallback, errorCallback) {
       var editableTopicDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
-          topic_id: topicId
-        });
+        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {topic_id: topicId});
 
       var putData = {
         version: topicVersion,
         commit_message: commitMessage,
         topic_and_subtopic_page_change_dicts: changeList
       };
-      $http.put(editableTopicDataUrl, putData).then(function(response) {
-        if (successCallback) {
+      $http.put(editableTopicDataUrl, putData)
+        .then(function(response) {
+          if (successCallback) {
           // Here also, a dict with 2 fields are passed instead of just 2
           // parameters, due to the same reason as written for _fetchTopic().
-          successCallback({
-            topicDict: angular.copy(response.data.topic_dict),
-            skillIdToDescriptionDict: angular.copy(
-              response.data.skill_id_to_description_dict)
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+            successCallback({
+              topicDict: angular.copy(response.data.topic_dict),
+              skillIdToDescriptionDict: angular.copy(
+                response.data.skill_id_to_description_dict)
+            });
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     return {

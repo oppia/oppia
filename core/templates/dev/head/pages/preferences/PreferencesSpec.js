@@ -22,13 +22,14 @@ describe('Preferences Controller', function() {
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(inject(function($controller, $http, _$httpBackend_, $rootScope) {
+    beforeEach(inject[function($controller, $http, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET('/preferenceshandler/data').respond({
-        can_receive_email_updates: false,
-        can_receive_editor_role_email: true,
-        can_receive_feedback_message_email: true
-      });
+      $httpBackend.expectGET('/preferenceshandler/data')
+        .respond({
+          can_receive_email_updates: false,
+          can_receive_editor_role_email: true,
+          can_receive_feedback_message_email: true
+        });
 
       mockAlertsService = {};
 
@@ -40,29 +41,33 @@ describe('Preferences Controller', function() {
         $rootScope: $rootScope,
         AlertsService: mockAlertsService
       });
-    }));
+    }]);
 
     it('should show that editor role notifications checkbox is true by default',
       function() {
         $httpBackend.flush();
-        expect(scope.canReceiveEditorRoleEmail).toBe(true);
+        expect(scope.canReceiveEditorRoleEmail)
+          .toBe(true);
       });
 
     it('should show that feedback message notifications checkbox is true' +
       'by default',
     function() {
       $httpBackend.flush();
-      expect(scope.canReceiveFeedbackMessageEmail).toBe(true);
+      expect(scope.canReceiveFeedbackMessageEmail)
+        .toBe(true);
     });
 
     it('should map SUPPORTED_AUDIO_LANGUAGES correctly to ' +
        'AUDIO_LANGUAGE_CHOICES to support select2 plugin',
     function() {
       var numberOfAudioLanguageChoices = scope.AUDIO_LANGUAGE_CHOICES.length;
-      expect(numberOfAudioLanguageChoices > 0).toBe(true);
+      expect(numberOfAudioLanguageChoices > 0)
+        .toBe(true);
       for (var index = 0; index < numberOfAudioLanguageChoices; index++) {
-        expect(Object.keys(scope.AUDIO_LANGUAGE_CHOICES[index])).toEqual(
-          ['id', 'text']);
+        expect(Object.keys(scope.AUDIO_LANGUAGE_CHOICES[index]))
+          .toEqual(
+            ['id', 'text']);
       }
     });
   });

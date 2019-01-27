@@ -26,7 +26,7 @@ describe('Assets Backend API Service', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     AssetsBackendApiService = $injector.get(
       'AssetsBackendApiService');
     FileDownloadRequestObjectFactory = $injector.get(
@@ -36,7 +36,7 @@ describe('Assets Backend API Service', function() {
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
-  }));
+  }]);
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingRequest();
@@ -47,7 +47,8 @@ describe('Assets Backend API Service', function() {
     // can test the production URL, too.
     expect(
       AssetsBackendApiService.getAudioDownloadUrl('expid12345', 'a.mp3')
-    ).toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
+    )
+      .toEqual('/assetsdevhandler/expid12345/assets/audio/a.mp3');
   });
 
   it('should successfully fetch and cache audio', function() {
@@ -60,19 +61,26 @@ describe('Assets Backend API Service', function() {
         filename: 'myfile.mp3'
       });
 
-    $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
-    expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
+    $httpBackend.expect('GET', requestUrl)
+      .respond(201, 'audio data');
+    expect(AssetsBackendApiService.isCached('myfile.mp3'))
+      .toBe(false);
 
 
-    AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
-      successHandler, failHandler);
+    AssetsBackendApiService.loadAudio('0', 'myfile.mp3')
+      .then(
+        successHandler, failHandler);
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-      .audio.length).toBe(1);
+      .audio.length)
+      .toBe(1);
     $httpBackend.flush();
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-      .audio.length).toBe(0);
-    expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(true);
-    expect(successHandler).toHaveBeenCalled();
+      .audio.length)
+      .toBe(0);
+    expect(AssetsBackendApiService.isCached('myfile.mp3'))
+      .toBe(true);
+    expect(successHandler)
+      .toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
     $httpBackend.verifyNoOutstandingExpectation();
   });
@@ -87,19 +95,26 @@ describe('Assets Backend API Service', function() {
         filename: 'myfile.png'
       });
 
-    $httpBackend.expect('GET', requestUrl).respond(201, 'image data');
-    expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
+    $httpBackend.expect('GET', requestUrl)
+      .respond(201, 'image data');
+    expect(AssetsBackendApiService.isCached('myfile.png'))
+      .toBe(false);
 
 
-    AssetsBackendApiService.loadImage('0', 'myfile.png').then(
-      successHandler, failHandler);
+    AssetsBackendApiService.loadImage('0', 'myfile.png')
+      .then(
+        successHandler, failHandler);
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-      .image.length).toBe(1);
+      .image.length)
+      .toBe(1);
     $httpBackend.flush();
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-      .image.length).toBe(0);
-    expect(AssetsBackendApiService.isCached('myfile.png')).toBe(true);
-    expect(successHandler).toHaveBeenCalled();
+      .image.length)
+      .toBe(0);
+    expect(AssetsBackendApiService.isCached('myfile.png'))
+      .toBe(true);
+    expect(successHandler)
+      .toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
     $httpBackend.verifyNoOutstandingExpectation();
   });
@@ -115,13 +130,16 @@ describe('Assets Backend API Service', function() {
           filename: 'myfile.mp3'
         });
 
-      $httpBackend.expect('GET', requestUrl).respond(500, 'MutagenError');
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
-        successHandler, failHandler);
+      $httpBackend.expect('GET', requestUrl)
+        .respond(500, 'MutagenError');
+      AssetsBackendApiService.loadAudio('0', 'myfile.mp3')
+        .then(
+          successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
+      expect(failHandler)
+        .toHaveBeenCalled();
       $httpBackend.verifyNoOutstandingExpectation();
     });
 
@@ -136,13 +154,16 @@ describe('Assets Backend API Service', function() {
           filename: 'myfile.png'
         });
 
-      $httpBackend.expect('GET', requestUrl).respond(500, 'Error');
-      AssetsBackendApiService.loadImage('0', 'myfile.png').then(
-        successHandler, failHandler);
+      $httpBackend.expect('GET', requestUrl)
+        .respond(500, 'Error');
+      AssetsBackendApiService.loadImage('0', 'myfile.png')
+        .then(
+          successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
+      expect(failHandler)
+        .toHaveBeenCalled();
       $httpBackend.verifyNoOutstandingExpectation();
     });
 
@@ -157,19 +178,24 @@ describe('Assets Backend API Service', function() {
           filename: 'myfile.mp3'
         });
 
-      $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
+      $httpBackend.expect('GET', requestUrl)
+        .respond(201, 'audio data');
 
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
-        successHandler, failHandler);
+      AssetsBackendApiService.loadAudio('0', 'myfile.mp3')
+        .then(
+          successHandler, failHandler);
 
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
-        .audio.length).toBe(1);
+        .audio.length)
+        .toBe(1);
 
       AssetsBackendApiService.abortAllCurrentAudioDownloads();
       $httpBackend.verifyNoOutstandingRequest();
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
-        .audio.length).toBe(0);
-      expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
+        .audio.length)
+        .toBe(0);
+      expect(AssetsBackendApiService.isCached('myfile.mp3'))
+        .toBe(false);
     });
 
   it('should successfully abort the download of the all the image files',
@@ -183,19 +209,24 @@ describe('Assets Backend API Service', function() {
           filename: 'myfile.png'
         });
 
-      $httpBackend.expect('GET', requestUrl).respond(201, 'image data');
+      $httpBackend.expect('GET', requestUrl)
+        .respond(201, 'image data');
 
-      AssetsBackendApiService.loadImage('0', 'myfile.png').then(
-        successHandler, failHandler);
+      AssetsBackendApiService.loadImage('0', 'myfile.png')
+        .then(
+          successHandler, failHandler);
 
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
-        .image.length).toBe(1);
+        .image.length)
+        .toBe(1);
 
       AssetsBackendApiService.abortAllCurrentImageDownloads();
       $httpBackend.verifyNoOutstandingRequest();
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
-        .image.length).toBe(0);
-      expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
+        .image.length)
+        .toBe(0);
+      expect(AssetsBackendApiService.isCached('myfile.png'))
+        .toBe(false);
     });
 
   it('should use the correct blob type for audio assets', function() {
@@ -208,18 +239,24 @@ describe('Assets Backend API Service', function() {
         filename: 'myfile.mp3'
       });
 
-    $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
-    AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
-      successHandler, failHandler);
+    $httpBackend.expect('GET', requestUrl)
+      .respond(201, 'audio data');
+    AssetsBackendApiService.loadAudio('0', 'myfile.mp3')
+      .then(
+        successHandler, failHandler);
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-      .audio.length).toBe(1);
+      .audio.length)
+      .toBe(1);
     $httpBackend.flush();
     expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-      .audio.length).toBe(0);
+      .audio.length)
+      .toBe(0);
 
-    expect(successHandler).toHaveBeenCalled();
+    expect(successHandler)
+      .toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-    expect(successHandler.calls.first().args[0].data.type).toBe('audio/mpeg');
+    expect(successHandler.calls.first().args[0].data.type)
+      .toBe('audio/mpeg');
     $httpBackend.verifyNoOutstandingExpectation();
   });
 });

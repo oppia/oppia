@@ -21,10 +21,11 @@ oppia.controller('EmailDashboard', [
   function($scope, $rootDirective, EmailDashboardDataService, UserService) {
     $scope.username = '';
     $rootScope.loadingMessage = 'Loading';
-    UserService.getUserInfoAsync().then(function(userInfo) {
-      $scope.username = userInfo.getUsername();
-      $rootScope.loadingMessage = '';
-    });
+    UserService.getUserInfoAsync()
+      .then(function(userInfo) {
+        $scope.username = userInfo.getUsername();
+        $rootScope.loadingMessage = '';
+      });
 
     $scope.currentPageOfQueries = [];
 
@@ -46,18 +47,20 @@ oppia.controller('EmailDashboard', [
         edited_at_least_n_exps: $scope.edited_at_least_n_exps,
         edited_fewer_than_n_exps: $scope.edited_fewer_than_n_exps
       };
-      EmailDashboardDataService.submitQuery(data).then(function(queries) {
-        $scope.currentPageOfQueries = queries;
-      });
+      EmailDashboardDataService.submitQuery(data)
+        .then(function(queries) {
+          $scope.currentPageOfQueries = queries;
+        });
       $scope.resetForm();
       $scope.showSuccessMessage = true;
     };
 
     $scope.getNextPageOfQueries = function() {
       if (EmailDashboardDataService.isNextPageAvailable()) {
-        EmailDashboardDataService.getNextQueries().then(function(queries) {
-          $scope.currentPageOfQueries = queries;
-        });
+        EmailDashboardDataService.getNextQueries()
+          .then(function(queries) {
+            $scope.currentPageOfQueries = queries;
+          });
       }
     };
 
@@ -78,17 +81,19 @@ oppia.controller('EmailDashboard', [
 
     $scope.recheckStatus = function(index) {
       var queryId = $scope.currentPageOfQueries[index].id;
-      EmailDashboardDataService.fetchQuery(queryId).then(function(query) {
-        $scope.currentPageOfQueries[index] = query;
-      });
+      EmailDashboardDataService.fetchQuery(queryId)
+        .then(function(query) {
+          $scope.currentPageOfQueries[index] = query;
+        });
     };
 
     $scope.showLinkToResultPage = function(submitter, status) {
       return (submitter === $scope.username) && (status === 'completed');
     };
 
-    EmailDashboardDataService.getNextQueries().then(function(queries) {
-      $scope.currentPageOfQueries = queries;
-    });
+    EmailDashboardDataService.getNextQueries()
+      .then(function(queries) {
+        $scope.currentPageOfQueries = queries;
+      });
   }
 ]);

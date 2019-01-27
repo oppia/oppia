@@ -72,10 +72,12 @@ oppia.factory('SolutionObjectFactory', [
         correctAnswer = this.correctAnswer.correct;
       } else if (interactionId === 'FractionInput') {
         correctAnswer = FractionObjectFactory.fromDict(
-          this.correctAnswer).toString();
+          this.correctAnswer)
+          .toString();
       } else if (interactionId === 'NumberWithUnits') {
         correctAnswer = NumberWithUnitsObjectFactory.fromDict(
-          this.correctAnswer).toString();
+          this.correctAnswer)
+          .toString();
       } else {
         correctAnswer = (
           HtmlEscaperService.objToEscapedJson(this.correctAnswer));
@@ -99,7 +101,8 @@ oppia.factory('SolutionObjectFactory', [
       return {
         prefix: (this.answerIsExclusive ? 'The only' : 'One'),
         answer: ExplorationHtmlFormatterService.getShortAnswerHtml(
-          this.correctAnswer, interaction.id, interaction.customizationArgs)};
+          this.correctAnswer, interaction.id, interaction.customizationArgs)
+      };
     };
 
     Solution.prototype.getOppiaSolutionExplanationResponseHtml =
@@ -108,4 +111,5 @@ oppia.factory('SolutionObjectFactory', [
       };
 
     return Solution;
-  }]);
+  }
+]);

@@ -29,12 +29,19 @@ oppia.controller('About', [
     var visibleContent = 'oppia-about-visible-content';
 
     var activateTab = function(tabName) {
-      $("a[id='" + tabName + "']").parent().addClass(
-        activeTabClass
-      ).siblings().removeClass(activeTabClass);
-      $('.' + tabName).addClass(visibleContent).siblings().removeClass(
-        visibleContent
-      );
+      $("a[id='" + tabName + "']")
+        .parent()
+        .addClass(
+          activeTabClass
+        )
+        .siblings()
+        .removeClass(activeTabClass);
+      $('.' + tabName)
+        .addClass(visibleContent)
+        .siblings()
+        .removeClass(
+          visibleContent
+        );
     };
 
     if (hash === $scope.TAB_ID_FOUNDATION || hash === 'license') {
@@ -78,7 +85,8 @@ oppia.controller('About', [
       'Rachel Chen', 'Rahim Nathwani',
       'Robyn Choo', 'Tricia Ngoon',
       'Vikrant Nanda', 'Vinamrata Singal',
-      'Yarin Feigenbaum'];
+      'Yarin Feigenbaum'
+    ];
 
     $scope.onTabClick = function(tabName) {
       // Update hash
@@ -86,7 +94,8 @@ oppia.controller('About', [
       activateTab(tabName);
     };
     $scope.listOfNames = listOfNamesToThank
-      .slice(0, listOfNamesToThank.length - 1).join(', ') +
+      .slice(0, listOfNamesToThank.length - 1)
+      .join(', ') +
       ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.aboutPageMascotImgUrl = UrlInterpolationService.getStaticImageUrl(

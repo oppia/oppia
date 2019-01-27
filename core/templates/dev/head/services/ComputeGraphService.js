@@ -24,26 +24,27 @@ oppia.factory('ComputeGraphService', [
       var links = [];
       var finalStateIds = states.getFinalStateNames();
 
-      states.getStateNames().forEach(function(stateName) {
-        var interaction = states.getState(stateName).interaction;
-        nodes[stateName] = stateName;
-        if (interaction.id) {
-          var groups = interaction.answerGroups;
-          for (var h = 0; h < groups.length; h++) {
-            links.push({
-              source: stateName,
-              target: groups[h].outcome.dest,
-            });
-          }
+      states.getStateNames()
+        .forEach(function(stateName) {
+          var interaction = states.getState(stateName).interaction;
+          nodes[stateName] = stateName;
+          if (interaction.id) {
+            var groups = interaction.answerGroups;
+            for (var h = 0; h < groups.length; h++) {
+              links.push({
+                source: stateName,
+                target: groups[h].outcome.dest,
+              });
+            }
 
-          if (interaction.defaultOutcome) {
-            links.push({
-              source: stateName,
-              target: interaction.defaultOutcome.dest,
-            });
+            if (interaction.defaultOutcome) {
+              links.push({
+                source: stateName,
+                target: interaction.defaultOutcome.dest,
+              });
+            }
           }
-        }
-      });
+        });
 
       return {
         finalStateIds: finalStateIds,

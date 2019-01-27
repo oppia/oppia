@@ -48,7 +48,8 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
                   $scope.newSkillDescription = '';
                   $scope.createNewSkill = function() {
                     $uibModalInstance.close({
-                      description: $scope.newSkillDescription
+                      description:
+                      $scope.newSkillDescription
                     });
                   };
 
@@ -74,4 +75,5 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
         }
       ]
     };
-  }]);
+  }
+]);

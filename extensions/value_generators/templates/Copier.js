@@ -15,33 +15,35 @@
 // TODO(sll): Remove this directive (as well as the whole of the value
 // generators framework).
 
-oppia.directive('copier', ['$compile', function($compile) {
-  return {
-    link: function(scope, element) {
-      scope.getTemplateUrl = function() {
-        return '/value_generator_handler/' + scope.generatorId;
-      };
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    scope: {
-      customizationArgs: '=',
-      getGeneratorId: '&',
-      getInitArgs: '&',
-      getObjType: '&',
-    },
-    template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope) {
-      $scope.generatorId = $scope.getGeneratorId();
-      $scope.initArgs = $scope.getInitArgs();
-      $scope.objType = $scope.getObjType();
-      $scope.$watch('initArgs', function() {
+oppia.directive('copier', [
+  '$compile', function($compile) {
+    return {
+      link: function(scope, element) {
+        scope.getTemplateUrl = function() {
+          return '/value_generator_handler/' + scope.generatorId;
+        };
+        $compile(element.contents())(scope);
+      },
+      restrict: 'E',
+      scope: {
+        customizationArgs: '=',
+        getGeneratorId: '&',
+        getInitArgs: '&',
+        getObjType: '&',
+      },
+      template: '<span ng-include="getTemplateUrl()"></span>',
+      controller: function($scope) {
+        $scope.generatorId = $scope.getGeneratorId();
         $scope.initArgs = $scope.getInitArgs();
-      }, true);
-
-      $scope.$watch('objType', function() {
         $scope.objType = $scope.getObjType();
-      }, true);
-    }
-  };
-}]);
+        $scope.$watch('initArgs', function() {
+          $scope.initArgs = $scope.getInitArgs();
+        }, true);
+
+        $scope.$watch('objType', function() {
+          $scope.objType = $scope.getObjType();
+        }, true);
+      }
+    };
+  }
+]);

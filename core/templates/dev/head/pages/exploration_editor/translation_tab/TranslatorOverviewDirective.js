@@ -23,9 +23,7 @@ oppia.directive('translatorOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        isTranslationTabBusy: '='
-      },
+      scope: {isTranslationTabBusy: '='},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translator_overview_directive.html'),
@@ -83,4 +81,5 @@ oppia.directive('translatorOverview', [
         }
       ]
     };
-  }]);
+  }
+]);

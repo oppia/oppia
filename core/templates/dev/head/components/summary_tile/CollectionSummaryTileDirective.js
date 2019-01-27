@@ -50,9 +50,10 @@ oppia.directive('collectionSummaryTile', [
             $scope, DateTimeFormatService, UserService,
             COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL) {
           $scope.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
-          });
+          UserService.getUserInfoAsync()
+            .then(function(userInfo) {
+              $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            });
           $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
           $scope.ACTIVITY_TYPE_COLLECTION = constants.ACTIVITY_TYPE_COLLECTION;
 
@@ -66,9 +67,7 @@ oppia.directive('collectionSummaryTile', [
               $scope.isLinkedToEditorPage ?
                 COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
             return UrlInterpolationService.interpolateUrl(
-              targetUrl, {
-                collection_id: $scope.getCollectionId()
-              }
+              targetUrl, {collection_id: $scope.getCollectionId()}
             );
           };
 
@@ -87,4 +86,5 @@ oppia.directive('collectionSummaryTile', [
         }
       ]
     };
-  }]);
+  }
+]);

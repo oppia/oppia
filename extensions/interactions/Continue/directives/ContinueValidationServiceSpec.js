@@ -24,7 +24,7 @@ describe('ContinueValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     validatorService = $injector.get('ContinueValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     oof = $injector.get('OutcomeObjectFactory');
@@ -43,53 +43,61 @@ describe('ContinueValidationService', function() {
     });
 
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
-    customizationArguments = {
-      buttonText: {
-        value: 'Some Button Text'
-      }
-    };
-  }));
+    customizationArguments = {buttonText: {value: 'Some Button Text'}};
+  }]);
 
   it('should expect a non-empty button text customization argument',
     function() {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], goodDefaultOutcome);
-      expect(warnings).toEqual([]);
+      expect(warnings)
+        .toEqual([]);
 
       customizationArguments.buttonText.value = '';
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: 'The button text should not be empty.'
-      }]);
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.CRITICAL,
+            message: 'The button text should not be empty.'
+          }
+        ]);
 
       expect(function() {
         validatorService.getAllWarnings(
           currentState, {}, [], goodDefaultOutcome);
-      }).toThrow(
-        'Expected customization arguments to have property: buttonText');
+      })
+        .toThrow(
+          'Expected customization arguments to have property: buttonText');
     });
 
   it('should expect no answer groups', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: (
-        'Only the default outcome is necessary for a continue interaction.')
-    }]);
+    expect(warnings)
+      .toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: (
+            'Only the default outcome is necessary for a continue interaction.')
+        }
+      ]);
   });
 
   it('should expect a non-confusing and non-null default outcome',
     function() {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'Please specify what Oppia should do after the button is clicked.')
-      }]);
+      expect(warnings)
+        .toEqual([
+          {
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'Please specify what Oppia should do after' +
+              ' the button is clicked.')
+          }
+        ]);
     });
 });

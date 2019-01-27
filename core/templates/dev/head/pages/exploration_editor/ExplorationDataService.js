@@ -28,7 +28,8 @@ oppia.factory('ExplorationDataService', [
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
-    var pathnameArray = UrlService.getPathname().split('/');
+    var pathnameArray = UrlService.getPathname()
+      .split('/');
     for (var i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create') {
         var explorationId = pathnameArray[i + 1];
@@ -67,31 +68,33 @@ oppia.factory('ExplorationDataService', [
         $http.put(explorationDraftAutosaveUrl, {
           change_list: changeList,
           version: explorationData.data.version
-        }).then(function(response) {
-          draftChangeListId = response.data.draft_change_list_id;
-          // We can safely remove the locally saved draft copy if it was saved
-          // to the backend.
-          LocalStorageService.removeExplorationDraft(explorationId);
-          if (successCallback) {
-            successCallback(response);
-          }
-        }, function() {
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
+        })
+          .then(function(response) {
+            draftChangeListId = response.data.draft_change_list_id;
+            // We can safely remove the locally saved draft copy if it was saved
+            // to the backend.
+            LocalStorageService.removeExplorationDraft(explorationId);
+            if (successCallback) {
+              successCallback(response);
+            }
+          }, function() {
+            if (errorCallback) {
+              errorCallback();
+            }
+          });
       },
       discardDraft: function(successCallback, errorCallback) {
-        $http.post(explorationDraftAutosaveUrl, {}).then(function() {
-          LocalStorageService.removeExplorationDraft(explorationId);
-          if (successCallback) {
-            successCallback();
-          }
-        }, function() {
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
+        $http.post(explorationDraftAutosaveUrl, {})
+          .then(function() {
+            LocalStorageService.removeExplorationDraft(explorationId);
+            if (successCallback) {
+              successCallback();
+            }
+          }, function() {
+            if (errorCallback) {
+              errorCallback();
+            }
+          });
       },
       // Returns a promise that supplies the data for the current exploration.
       getData: function(errorCallback) {
@@ -106,28 +109,29 @@ oppia.factory('ExplorationDataService', [
           // (which is cached here) will be reused.
           return (
             EditableExplorationBackendApiService.fetchApplyDraftExploration(
-              explorationId).then(function(response) {
-              $log.info('Retrieved exploration data.');
-              $log.info(response);
-              draftChangeListId = response.draft_change_list_id;
-              explorationData.data = response;
-              var draft = LocalStorageService.getExplorationDraft(
-                explorationId);
-              if (draft) {
-                if (draft.isValid(draftChangeListId)) {
-                  var changeList = draft.getChanges();
-                  explorationData.autosaveChangeList(changeList, function() {
+              explorationId)
+              .then(function(response) {
+                $log.info('Retrieved exploration data.');
+                $log.info(response);
+                draftChangeListId = response.draft_change_list_id;
+                explorationData.data = response;
+                var draft = LocalStorageService.getExplorationDraft(
+                  explorationId);
+                if (draft) {
+                  if (draft.isValid(draftChangeListId)) {
+                    var changeList = draft.getChanges();
+                    explorationData.autosaveChangeList(changeList, function() {
                     // A reload is needed so that the changelist just saved is
                     // loaded as opposed to the exploration returned by this
                     // response.
-                    $window.location.reload();
-                  });
-                } else {
-                  errorCallback(explorationId, draft.getChanges());
+                      $window.location.reload();
+                    });
+                  } else {
+                    errorCallback(explorationId, draft.getChanges());
+                  }
                 }
-              }
-              return response;
-            })
+                return response;
+              })
           );
         }
       },
@@ -135,19 +139,19 @@ oppia.factory('ExplorationDataService', [
       // exploration.
       getLastSavedData: function() {
         return ReadOnlyExplorationBackendApiService.loadLatestExploration(
-          explorationId).then(function(response) {
-          $log.info('Retrieved saved exploration data.');
-          $log.info(response);
+          explorationId)
+          .then(function(response) {
+            $log.info('Retrieved saved exploration data.');
+            $log.info(response);
 
-          return response.exploration;
-        });
+            return response.exploration;
+          });
       },
       resolveAnswers: function(stateName, resolvedAnswersList) {
         AlertsService.clearWarnings();
         $http.put(
-          resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
-            resolved_answers: resolvedAnswersList
-          }
+          resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName),
+          {resolved_answers: resolvedAnswersList}
         );
       },
       /**
@@ -163,21 +167,22 @@ oppia.factory('ExplorationDataService', [
       save: function(
           changeList, commitMessage, successCallback, errorCallback) {
         EditableExplorationBackendApiService.updateExploration(explorationId,
-          explorationData.data.version, commitMessage, changeList).then(
-          function(response) {
-            AlertsService.clearWarnings();
-            explorationData.data = response;
-            if (successCallback) {
-              successCallback(
-                response.is_version_of_draft_valid,
-                response.draft_changes);
+          explorationData.data.version, commitMessage, changeList)
+          .then(
+            function(response) {
+              AlertsService.clearWarnings();
+              explorationData.data = response;
+              if (successCallback) {
+                successCallback(
+                  response.is_version_of_draft_valid,
+                  response.draft_changes);
+              }
+            }, function() {
+              if (errorCallback) {
+                errorCallback();
+              }
             }
-          }, function() {
-            if (errorCallback) {
-              errorCallback();
-            }
-          }
-        );
+          );
       }
     };
 

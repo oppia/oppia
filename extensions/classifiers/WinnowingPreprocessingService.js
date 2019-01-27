@@ -21,48 +21,50 @@
  * same task.
  */
 
-oppia.factory('WinnowingPreprocessingService', [function() {
-  var generateHashValue = function(tokens, tokenToId) {
-    var hashVal = 0;
-    var n = tokens.length - 1;
-    var base = Math.pow(Object.keys(tokenToId).length, n);
+oppia.factory('WinnowingPreprocessingService', [
+  function() {
+    var generateHashValue = function(tokens, tokenToId) {
+      var hashVal = 0;
+      var n = tokens.length - 1;
+      var base = Math.pow(Object.keys(tokenToId).length, n);
 
-    tokens.forEach(function(token) {
-      hashVal += tokenToId[token] * base;
-      base /= Object.keys(tokenToId).length;
-    });
-
-    return hashVal;
-  };
-
-  return {
-    getKGramHashes: function(tokens, tokenToId, K) {
-      // Generate all possible k-gram hashes from tokens.
-      var kGramHashes = [];
-      for (var i = 0; i < tokens.length - K + 1; i += 1) {
-        kTokens = tokens.slice(i, i + K);
-        kGramHashes.push(generateHashValue(kTokens, tokenToId));
-      }
-      return kGramHashes;
-    },
-
-    getFingerprintFromHashes: function(kGramHashes, T, K) {
-      // Generate fingerprint of a document from its k-gram hashes.
-      var windowSize = T - K + 1;
-      var fingerprintHashesIndex = new Set();
-      for (var i = 0; i < kGramHashes.length - windowSize + 1; i += 1) {
-        var windowHashes = kGramHashes.slice(i, i + windowSize);
-        var minHashValue = Math.min.apply(Math, windowHashes);
-        var minHashIndex = i + windowHashes.indexOf(minHashValue);
-        fingerprintHashesIndex.add(minHashIndex);
-      }
-
-      var fingerprint = [];
-      fingerprintHashesIndex.forEach(function(hashIndex) {
-        fingerprint.push([kGramHashes[hashIndex], hashIndex]);
+      tokens.forEach(function(token) {
+        hashVal += tokenToId[token] * base;
+        base /= Object.keys(tokenToId).length;
       });
 
-      return fingerprint;
-    }
-  };
-}]);
+      return hashVal;
+    };
+
+    return {
+      getKGramHashes: function(tokens, tokenToId, K) {
+      // Generate all possible k-gram hashes from tokens.
+        var kGramHashes = [];
+        for (var i = 0; i < tokens.length - K + 1; i += 1) {
+          kTokens = tokens.slice(i, i + K);
+          kGramHashes.push(generateHashValue(kTokens, tokenToId));
+        }
+        return kGramHashes;
+      },
+
+      getFingerprintFromHashes: function(kGramHashes, T, K) {
+      // Generate fingerprint of a document from its k-gram hashes.
+        var windowSize = T - K + 1;
+        var fingerprintHashesIndex = new Set();
+        for (var i = 0; i < kGramHashes.length - windowSize + 1; i += 1) {
+          var windowHashes = kGramHashes.slice(i, i + windowSize);
+          var minHashValue = Math.min.apply(Math, windowHashes);
+          var minHashIndex = i + windowHashes.indexOf(minHashValue);
+          fingerprintHashesIndex.add(minHashIndex);
+        }
+
+        var fingerprint = [];
+        fingerprintHashesIndex.forEach(function(hashIndex) {
+          fingerprint.push([kGramHashes[hashIndex], hashIndex]);
+        });
+
+        return fingerprint;
+      }
+    };
+  }
+]);

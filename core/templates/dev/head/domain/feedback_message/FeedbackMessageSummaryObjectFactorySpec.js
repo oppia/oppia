@@ -21,21 +21,25 @@ describe('Feedback message object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     FeedbackMessageSummaryObjectFactory = $injector.get(
       'FeedbackMessageSummaryObjectFactory');
-  }));
+  }]);
 
   it('should create a new message', function() {
     var feedbackMessageSummary = (
       FeedbackMessageSummaryObjectFactory.createNewMessage(
         0, 'Sample message', 'Test user', 'profile_picture_url'));
 
-    expect(feedbackMessageSummary.messageId).toEqual(0);
-    expect(feedbackMessageSummary.text).toEqual('Sample message');
-    expect(feedbackMessageSummary.authorUsername).toEqual('Test user');
-    expect(feedbackMessageSummary.authorPictureDataUrl).toEqual(
-      'profile_picture_url');
+    expect(feedbackMessageSummary.messageId)
+      .toEqual(0);
+    expect(feedbackMessageSummary.text)
+      .toEqual('Sample message');
+    expect(feedbackMessageSummary.authorUsername)
+      .toEqual('Test user');
+    expect(feedbackMessageSummary.authorPictureDataUrl)
+      .toEqual(
+        'profile_picture_url');
   });
 
   it('should fetch the feedback message domain object from the backend ' +
@@ -53,9 +57,12 @@ describe('Feedback message object factory', function() {
       FeedbackMessageSummaryObjectFactory.createFromBackendDict(
         messageSummary));
 
-    expect(feedbackMessageSummary.text).toEqual('Sample text');
-    expect(feedbackMessageSummary.authorUsername).toEqual('User 1');
-    expect(feedbackMessageSummary.authorPictureDataUrl).toEqual(
-      'sample_picture_url_1');
+    expect(feedbackMessageSummary.text)
+      .toEqual('Sample text');
+    expect(feedbackMessageSummary.authorUsername)
+      .toEqual('User 1');
+    expect(feedbackMessageSummary.authorPictureDataUrl)
+      .toEqual(
+        'sample_picture_url_1');
   });
 });

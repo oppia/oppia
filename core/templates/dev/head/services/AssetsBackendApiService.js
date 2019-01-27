@@ -65,39 +65,42 @@ oppia.factory('AssetsBackendApiService', [
         responseType: 'blob',
         url: _getDownloadUrl(explorationId, filename, assetType),
         timeout: canceler.promise
-      }).success(function(data) {
-        try {
-          if (assetType === ASSET_TYPE_AUDIO) {
+      })
+        .success(function(data) {
+          try {
+            if (assetType === ASSET_TYPE_AUDIO) {
             // Add type for audio assets. Without this, translations can
             // not be played on Safari.
-            var assetBlob = new Blob([data], {type: 'audio/mpeg'});
-          } else {
-            var assetBlob = new Blob([data]);
-          }
-        } catch (exception) {
-          window.BlobBuilder = window.BlobBuilder ||
+              var assetBlob = new Blob([data], {type: 'audio/mpeg'});
+            } else {
+              var assetBlob = new Blob([data]);
+            }
+          } catch (exception) {
+            window.BlobBuilder = window.BlobBuilder ||
                          window.WebKitBlobBuilder ||
                          window.MozBlobBuilder ||
                          window.MSBlobBuilder;
-          if (exception.name === 'TypeError' && window.BlobBuilder) {
-            var blobBuilder = new BlobBuilder();
-            blobBuilder.append(data);
-            var assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
-          } else {
-            throw exception;
+            if (exception.name === 'TypeError' && window.BlobBuilder) {
+              var blobBuilder = new BlobBuilder();
+              blobBuilder.append(data);
+              var assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
+            } else {
+              throw exception;
+            }
           }
-        }
-        assetsCache[filename] = assetBlob;
-        if (assetType === ASSET_TYPE_AUDIO) {
-          successCallback(
-            AudioFileObjectFactory.createNew(filename, assetBlob));
-        } else {
-          successCallback(
-            ImageFileObjectFactory.createNew(filename, assetBlob));
-        }
-      }).error(function() {
-        errorCallback(filename);
-      })['finally'](function() {
+          assetsCache[filename] = assetBlob;
+          if (assetType === ASSET_TYPE_AUDIO) {
+            successCallback(
+              AudioFileObjectFactory.createNew(filename, assetBlob));
+          } else {
+            successCallback(
+              ImageFileObjectFactory.createNew(filename, assetBlob));
+          }
+        })
+        .error(function() {
+          errorCallback(filename);
+        });
+      ['finally'](function() {
         _removeFromFilesCurrentlyBeingRequested(filename, assetType);
       });
     };
@@ -143,9 +146,7 @@ oppia.factory('AssetsBackendApiService', [
       var form = new FormData();
 
       form.append('raw_audio_file', rawAssetData);
-      form.append('payload', JSON.stringify({
-        filename: filename
-      }));
+      form.append('payload', JSON.stringify({filename: filename}));
       form.append('csrf_token', GLOBALS.csrf_token);
 
       $.ajax({
@@ -160,19 +161,21 @@ oppia.factory('AssetsBackendApiService', [
           var transformedData = data.substring(5);
           return JSON.parse(transformedData);
         },
-      }).done(function(response) {
-        if (successCallback) {
-          successCallback(response);
-        }
-      }).fail(function(data) {
+      })
+        .done(function(response) {
+          if (successCallback) {
+            successCallback(response);
+          }
+        })
+        .fail(function(data) {
         // Remove the XSSI prefix.
-        var transformedData = data.responseText.substring(5);
-        var parsedResponse = angular.fromJson(transformedData);
-        console.error(parsedResponse);
-        if (errorCallback) {
-          errorCallback(parsedResponse);
-        }
-      });
+          var transformedData = data.responseText.substring(5);
+          var parsedResponse = angular.fromJson(transformedData);
+          console.error(parsedResponse);
+          if (errorCallback) {
+            errorCallback(parsedResponse);
+          }
+        });
     };
 
     var _getDownloadUrl = function(explorationId, filename, assetType) {
@@ -185,9 +188,8 @@ oppia.factory('AssetsBackendApiService', [
     };
 
     var _getAudioUploadUrl = function(explorationId) {
-      return UrlInterpolationService.interpolateUrl(AUDIO_UPLOAD_URL_TEMPLATE, {
-        exploration_id: explorationId
-      });
+      return UrlInterpolationService.interpolateUrl(AUDIO_UPLOAD_URL_TEMPLATE,
+        {exploration_id: explorationId});
     };
 
     var _isAssetCurrentlyBeingRequested = function(filename, assetType) {
@@ -249,7 +251,8 @@ oppia.factory('AssetsBackendApiService', [
         _abortAllCurrentDownloads(ASSET_TYPE_IMAGE);
       },
       getAssetsFilesCurrentlyBeingRequested: function() {
-        return { audio: _audioFilesCurrentlyBeingRequested,
+        return {
+          audio: _audioFilesCurrentlyBeingRequested,
           image: _imageFilesCurrentlyBeingRequested
         };
       },

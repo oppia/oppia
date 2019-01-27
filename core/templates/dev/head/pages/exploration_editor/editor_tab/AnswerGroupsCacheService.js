@@ -19,23 +19,25 @@
 * This cache should be reset each time the state editor is initialized.
 */
 
-oppia.factory('AnswerGroupsCacheService', [function() {
-  var _cache = {};
-  return {
-    reset: function() {
-      _cache = {};
-    },
-    contains: function(interactionId) {
-      return _cache.hasOwnProperty(interactionId);
-    },
-    set: function(interactionId, answerGroups) {
-      _cache[interactionId] = angular.copy(answerGroups);
-    },
-    get: function(interactionId) {
-      if (!_cache.hasOwnProperty(interactionId)) {
-        return null;
+oppia.factory('AnswerGroupsCacheService', [
+  function() {
+    var _cache = {};
+    return {
+      reset: function() {
+        _cache = {};
+      },
+      contains: function(interactionId) {
+        return _cache.hasOwnProperty(interactionId);
+      },
+      set: function(interactionId, answerGroups) {
+        _cache[interactionId] = angular.copy(answerGroups);
+      },
+      get: function(interactionId) {
+        if (!_cache.hasOwnProperty(interactionId)) {
+          return null;
+        }
+        return angular.copy(_cache[interactionId]);
       }
-      return angular.copy(_cache[interactionId]);
-    }
-  };
-}]);
+    };
+  }
+]);

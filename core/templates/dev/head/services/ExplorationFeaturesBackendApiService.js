@@ -37,9 +37,11 @@ oppia.factory('ExplorationFeaturesBackendApiService', [
         return $http.get(
           UrlInterpolationService.interpolateUrl(
             EXPLORATION_FEATURES_URL, {exploration_id: explorationId})
-        ).then(function(response) {
-          return response.data;
-        });
+        )
+          .then(function(response) {
+            return response.data;
+          });
       },
     };
-  }]);
+  }
+]);

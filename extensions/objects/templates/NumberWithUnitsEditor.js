@@ -20,37 +20,36 @@ oppia.directive('numberWithUnitsEditor', [
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/number_with_units_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        var errorMessage = '';
-        var numberWithUnitsString = '';
-        if ($scope.value !== null) {
-          var defaultNumberWithUnits =
+      controller: [
+        '$scope', function($scope) {
+          var errorMessage = '';
+          var numberWithUnitsString = '';
+          if ($scope.value !== null) {
+            var defaultNumberWithUnits =
             NumberWithUnitsObjectFactory.fromDict($scope.value);
-          numberWithUnitsString = defaultNumberWithUnits.toString();
-        }
-        $scope.localValue = {
-          label: numberWithUnitsString
-        };
-
-        $scope.$watch('localValue.label', function(newValue) {
-          try {
-            var numberWithUnits =
-              NumberWithUnitsObjectFactory.fromRawInputString(newValue);
-            $scope.value = numberWithUnits;
-            errorMessage = '';
-          } catch (parsingError) {
-            errorMessage = parsingError.message;
+            numberWithUnitsString = defaultNumberWithUnits.toString();
           }
-        });
+          $scope.localValue = {label: numberWithUnitsString};
 
-        $scope.getWarningText = function() {
-          return errorMessage;
-        };
-      }]
+          $scope.$watch('localValue.label', function(newValue) {
+            try {
+              var numberWithUnits =
+              NumberWithUnitsObjectFactory.fromRawInputString(newValue);
+              $scope.value = numberWithUnits;
+              errorMessage = '';
+            } catch (parsingError) {
+              errorMessage = parsingError.message;
+            }
+          });
+
+          $scope.getWarningText = function() {
+            return errorMessage;
+          };
+        }
+      ]
     };
-  }]);
+  }
+]);

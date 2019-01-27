@@ -39,4 +39,5 @@ oppia.directive('threadTable', [
         }
       ]
     };
-  }]);
+  }
+]);

@@ -50,14 +50,17 @@ var LibraryPage = function() {
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(name) {
-    return element.all(by.css('.protractor-test-exp-summary-tile')).filter(
-      function(tile) {
-        return tile.element(by.css('.protractor-test-exp-summary-tile-title')).
-          getText().then(function(tileTitle) {
-            return (tileTitle === name);
-          });
-      }
-    );
+    return element.all(by.css('.protractor-test-exp-summary-tile'))
+      .filter(
+        function(tile) {
+          return tile.element(by.
+            css('.protractor-test-exp-summary-tile-title')).
+            getText()
+            .then(function(tileTitle) {
+              return (tileTitle === name);
+            });
+        }
+      );
   };
 
   var _submitSearchQuery = function(searchQuery) {
@@ -104,19 +107,23 @@ var LibraryPage = function() {
   };
 
   this.expectMainHeaderTextToBe = function(expectedHeaderText) {
-    expect(mainHeader.getText()).toEqual(expectedHeaderText);
+    expect(mainHeader.getText())
+      .toEqual(expectedHeaderText);
   };
 
   this.expectExplorationToBeVisible = function(name) {
-    _getExplorationElements(name).then(function(elems) {
-      expect(elems.length).not.toBe(0);
-    });
+    _getExplorationElements(name)
+      .then(function(elems) {
+        expect(elems.length).not.toBe(0);
+      });
   };
 
   this.expectExplorationToBeHidden = function(name) {
-    _getExplorationElements(name).then(function(elems) {
-      expect(elems.length).toBe(0);
-    });
+    _getExplorationElements(name)
+      .then(function(elems) {
+        expect(elems.length)
+          .toBe(0);
+      });
   };
 
   this.playCollection = function(collectionName) {
@@ -125,9 +132,12 @@ var LibraryPage = function() {
       allCollectionSummaryTile.first(),
       'Library Page does not have any collections');
     waitFor.visibilityOf(
-      allCollectionsTitled(collectionName).first(),
+      allCollectionsTitled(collectionName)
+        .first(),
       'Unable to find collection ' + collectionName);
-    allCollectionsTitled(collectionName).first().click();
+    allCollectionsTitled(collectionName)
+      .first()
+      .click();
     waitFor.pageToFullyLoad();
   };
 
@@ -137,29 +147,38 @@ var LibraryPage = function() {
       allExplorationSummaryTile.first(),
       'Library Page does not have any explorations');
     waitFor.visibilityOf(
-      allExplorationsTitled(explorationName).first(),
+      allExplorationsTitled(explorationName)
+        .first(),
       'Unable to find exploration ' + explorationName);
-    allExplorationsTitled(explorationName).first().click();
+    allExplorationsTitled(explorationName)
+      .first()
+      .click();
     waitFor.pageToFullyLoad();
   };
 
   this.getExplorationObjective = function(name) {
-    return _getExplorationElements(name).then(function(elems) {
-      return elems[0].element(by.css(
-        '.protractor-test-exp-summary-tile-objective'
-      )).getText();
-    });
+    return _getExplorationElements(name)
+      .then(function(elems) {
+        return elems[0].element(by.css(
+          '.protractor-test-exp-summary-tile-objective'
+        ))
+          .getText();
+      });
   };
 
   this.expectExplorationRatingToEqual = function(name, ratingValue) {
-    _getExplorationElements(name).then(function(elems) {
-      waitFor.visibilityOf(elems[0], 'Rating card takes too long to appear');
-      elems[0].element(by.css(
-        '.protractor-test-exp-summary-tile-rating'
-      )).getText().then(function(value) {
-        expect(value).toBe(ratingValue);
+    _getExplorationElements(name)
+      .then(function(elems) {
+        waitFor.visibilityOf(elems[0], 'Rating card takes too long to appear');
+        elems[0].element(by.css(
+          '.protractor-test-exp-summary-tile-rating'
+        ))
+          .getText()
+          .then(function(value) {
+            expect(value)
+              .toBe(ratingValue);
+          });
       });
-    });
   };
 
   this.clickCreateActivity = function() {

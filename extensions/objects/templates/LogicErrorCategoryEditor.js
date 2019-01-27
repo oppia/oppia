@@ -21,51 +21,52 @@ oppia.directive('logicErrorCategoryEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/logic_error_category_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = true;
-        $scope.errorCategories = [{
-          name: 'parsing',
-          humanReadable: 'Unparseable'
-        }, {
-          name: 'typing',
-          humanReadable: 'Ill-typed'
-        }, {
-          name: 'line',
-          humanReadable: 'Incorrect line'
-        }, {
-          name: 'layout',
-          humanReadable: 'Wrong indenting'
-        }, {
-          name: 'variables',
-          humanReadable: 'Variables error'
-        }, {
-          name: 'logic',
-          humanReadable: 'Invalid deduction'
-        }, {
-          name: 'target',
-          humanReadable: 'Target not proved'
-        }, {
-          name: 'mistake',
-          humanReadable: 'Unspecified'
-        }];
+      controller: [
+        '$scope', function($scope) {
+          $scope.alwaysEditable = true;
+          $scope.errorCategories = [
+            {
+              name: 'parsing',
+              humanReadable: 'Unparseable'
+            }, {
+              name: 'typing',
+              humanReadable: 'Ill-typed'
+            }, {
+              name: 'line',
+              humanReadable: 'Incorrect line'
+            }, {
+              name: 'layout',
+              humanReadable: 'Wrong indenting'
+            }, {
+              name: 'variables',
+              humanReadable: 'Variables error'
+            }, {
+              name: 'logic',
+              humanReadable: 'Invalid deduction'
+            }, {
+              name: 'target',
+              humanReadable: 'Target not proved'
+            }, {
+              name: 'mistake',
+              humanReadable: 'Unspecified'
+            }
+          ];
 
-        $scope.localValue = {
-          category: $scope.errorCategories[0]
-        };
-        for (var i = 0; i < $scope.errorCategories.length; i++) {
-          if ($scope.errorCategories[i].name === $scope.value) {
-            $scope.localValue.category = $scope.errorCategories[i];
+          $scope.localValue = {category: $scope.errorCategories[0]};
+          for (var i = 0; i < $scope.errorCategories.length; i++) {
+            if ($scope.errorCategories[i].name === $scope.value) {
+              $scope.localValue.category = $scope.errorCategories[i];
+            }
           }
-        }
 
-        $scope.$watch('localValue.category', function() {
-          $scope.value = $scope.localValue.category.name;
-        });
-      }]
+          $scope.$watch('localValue.category', function() {
+            $scope.value = $scope.localValue.category.name;
+          });
+        }
+      ]
     };
-  }]);
+  }
+]);

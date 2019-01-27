@@ -27,26 +27,27 @@ oppia.directive('codeStringEditor', [
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/code_string_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = $scope.getAlwaysEditable();
-        $scope.getWarningText = function() {
-          if ($scope.localValue.label.indexOf('\t') !== -1) {
-            return 'Code may not contain tab characters.';
-          }
-          return '';
-        };
-
-        // Reset the component each time the value changes (e.g. if this is part
-        // of an editable list).
-        $scope.$watch('value', function() {
-          $scope.localValue = {
-            label: $scope.value || ''
+      controller: [
+        '$scope', function($scope) {
+          $scope.alwaysEditable = $scope.getAlwaysEditable();
+          $scope.getWarningText = function() {
+            if ($scope.localValue.label.indexOf('\t') !== -1) {
+              return 'Code may not contain tab characters.';
+            }
+            return '';
           };
-        }, true);
 
-        $scope.$watch('localValue.label', function(newValue) {
-          $scope.value = newValue;
-        });
-      }]
+          // Reset the component each time the value changes (e.g. if this is part
+          // of an editable list).
+          $scope.$watch('value', function() {
+            $scope.localValue = {label: $scope.value || ''};
+          }, true);
+
+          $scope.$watch('localValue.label', function(newValue) {
+            $scope.value = newValue;
+          });
+        }
+      ]
     };
-  }]);
+  }
+]);

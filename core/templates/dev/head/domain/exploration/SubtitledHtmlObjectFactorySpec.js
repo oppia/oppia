@@ -22,7 +22,7 @@ describe('SubtitledHtml object factory', function() {
   describe('SubtitledHtmlObjectFactory', function() {
     var scope, shof, lus, subtitledHtml;
 
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(inject[function($injector, $rootScope) {
       scope = $rootScope.$new();
       shof = $injector.get('SubtitledHtmlObjectFactory');
 
@@ -30,45 +30,56 @@ describe('SubtitledHtml object factory', function() {
         content_id: 'content_id',
         html: '<p>some html</p>'
       });
-    }));
+    }]);
 
-    it('should get and set HTML correctly', inject(function() {
-      expect(subtitledHtml.getHtml()).toEqual('<p>some html</p>');
+    it('should get and set HTML correctly', inject[function() {
+      expect(subtitledHtml.getHtml())
+        .toEqual('<p>some html</p>');
       subtitledHtml.setHtml('new html');
-      expect(subtitledHtml.getHtml()).toEqual('new html');
-    }));
+      expect(subtitledHtml.getHtml())
+        .toEqual('new html');
+    }]);
 
-    it('should get contentId correctly', inject(function() {
-      expect(subtitledHtml.getContentId()).toEqual('content_id');
-    }));
+    it('should get contentId correctly', inject[function() {
+      expect(subtitledHtml.getContentId())
+        .toEqual('content_id');
+    }]);
 
-    it('should correctly check existence of HTML', inject(function() {
-      expect(subtitledHtml.hasNoHtml()).toBe(false);
+    it('should correctly check existence of HTML', inject[function() {
+      expect(subtitledHtml.hasNoHtml())
+        .toBe(false);
       subtitledHtml.setHtml('');
-      expect(subtitledHtml.hasNoHtml()).toBe(true);
-    }));
+      expect(subtitledHtml.hasNoHtml())
+        .toBe(true);
+    }]);
 
-    it('should correctly check emptiness', inject(function() {
-      expect(subtitledHtml.isEmpty()).toBe(false);
+    it('should correctly check emptiness', inject[function() {
+      expect(subtitledHtml.isEmpty())
+        .toBe(false);
 
       subtitledHtml.setHtml('');
-      expect(subtitledHtml.isEmpty()).toBe(true);
+      expect(subtitledHtml.isEmpty())
+        .toBe(true);
 
       subtitledHtml.setHtml('hello');
-      expect(subtitledHtml.isEmpty()).toBe(false);
-    }));
+      expect(subtitledHtml.isEmpty())
+        .toBe(false);
+    }]);
 
-    it('should convert to backend dict correctly', inject(function() {
-      expect(subtitledHtml.toBackendDict()).toEqual({
-        content_id: 'content_id',
-        html: '<p>some html</p>'
-      });
-    }));
+    it('should convert to backend dict correctly', inject[function() {
+      expect(subtitledHtml.toBackendDict())
+        .toEqual({
+          content_id: 'content_id',
+          html: '<p>some html</p>'
+        });
+    }]);
 
-    it('should create default object', inject(function() {
+    it('should create default object', inject[function() {
       var defaultSubtitledHtml = shof.createDefault('test html', 'content_id');
-      expect(defaultSubtitledHtml.getHtml()).toEqual('test html');
-      expect(defaultSubtitledHtml.getContentId()).toEqual('content_id');
-    }));
+      expect(defaultSubtitledHtml.getHtml())
+        .toEqual('test html');
+      expect(defaultSubtitledHtml.getContentId())
+        .toEqual('content_id');
+    }]);
   });
 });

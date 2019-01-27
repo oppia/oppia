@@ -23,7 +23,7 @@ describe('Guest collection progress service', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     GuestCollectionProgressService = $injector.get(
       'GuestCollectionProgressService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
@@ -40,7 +40,7 @@ describe('Guest collection progress service', function() {
     _collection0 = _createCollection(_collectionId0, 'a title');
     _collection0.addCollectionNode(
       CollectionNodeObjectFactory.createFromExplorationId(_expId0));
-  }));
+  }]);
 
   afterEach(function() {
     // Reset localStorage to ensure state is not shared between the tests.
@@ -93,7 +93,8 @@ describe('Guest collection progress service', function() {
       var hasProgress = (
         GuestCollectionProgressService.hasCompletedSomeExploration(
           _collectionId0));
-      expect(hasProgress).toBe(false);
+      expect(hasProgress)
+        .toBe(false);
     });
 
     it('should have progress after recording an exploration', function() {
@@ -102,7 +103,8 @@ describe('Guest collection progress service', function() {
       var hasProgress = (
         GuestCollectionProgressService.hasCompletedSomeExploration(
           _collectionId0));
-      expect(hasProgress).toBe(true);
+      expect(hasProgress)
+        .toBe(true);
     });
 
     it('should not have progress after exp completed for another collection',
@@ -112,7 +114,8 @@ describe('Guest collection progress service', function() {
         var hasProgress = (
           GuestCollectionProgressService.hasCompletedSomeExploration(
             _collectionId0));
-        expect(hasProgress).toBe(false);
+        expect(hasProgress)
+          .toBe(false);
       }
     );
   });
@@ -122,7 +125,8 @@ describe('Guest collection progress service', function() {
       var completedIds = (
         GuestCollectionProgressService.getCompletedExplorationIds(
           _collection0));
-      expect(completedIds).toEqual([]);
+      expect(completedIds)
+        .toEqual([]);
     });
 
     it('should provide completed exploration ID after completion', function() {
@@ -131,7 +135,8 @@ describe('Guest collection progress service', function() {
       var completedIds = (
         GuestCollectionProgressService.getCompletedExplorationIds(
           _collection0));
-      expect(completedIds).toEqual([_expId0]);
+      expect(completedIds)
+        .toEqual([_expId0]);
     });
 
     it('should not provide completed ID for exp not in collection', function() {
@@ -140,7 +145,8 @@ describe('Guest collection progress service', function() {
       var completedIds = (
         GuestCollectionProgressService.getCompletedExplorationIds(
           _collection0));
-      expect(completedIds).toEqual([]);
+      expect(completedIds)
+        .toEqual([]);
     });
 
     it('should provide multiple completed exploration IDs', function() {
@@ -151,7 +157,8 @@ describe('Guest collection progress service', function() {
         _collectionId1, _expId2);
       var completedIds = (
         GuestCollectionProgressService.getCompletedExplorationIds(collection));
-      expect(completedIds).toEqual([_expId0, _expId2]);
+      expect(completedIds)
+        .toEqual([_expId0, _expId2]);
     });
   });
 
@@ -160,7 +167,8 @@ describe('Guest collection progress service', function() {
       var collection = _createLinearCollection(_collectionId1);
       var nextExplorationId = (
         GuestCollectionProgressService.getNextExplorationId(collection, []));
-      expect(nextExplorationId).toEqual(_expId0);
+      expect(nextExplorationId)
+        .toEqual(_expId0);
     });
 
     it('should provide the third exp ID with first two exps done', function() {
@@ -170,7 +178,8 @@ describe('Guest collection progress service', function() {
           collection, [_expId0, _expId1]));
 
       // First two explorations are completed, so return the third.
-      expect(nextExplorationId).toEqual(_expId2);
+      expect(nextExplorationId)
+        .toEqual(_expId2);
     });
 
     it('should return null for fully completed collection', function() {
@@ -180,7 +189,8 @@ describe('Guest collection progress service', function() {
           collection, [_expId0, _expId1, _expId2]));
 
       // There are no explorations left to play.
-      expect(nextExplorationId).toEqual(null);
+      expect(nextExplorationId)
+        .toEqual(null);
     });
   });
 });

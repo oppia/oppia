@@ -20,75 +20,108 @@ describe('Set Input rules service', function() {
   beforeEach(module('oppia'));
 
   var sirs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     sirs = $injector.get('setInputRulesService');
-  }));
+  }]);
 
-  var RULE_INPUT = {
-    x: ['a', 'b']
-  };
+  var RULE_INPUT = {x: ['a', 'b']};
 
   it('should have a correct \'equals\' rule', function() {
-    expect(sirs.Equals(['a', 'b'], RULE_INPUT)).toBe(true);
-    expect(sirs.Equals(['b', 'a'], RULE_INPUT)).toBe(true);
-    expect(sirs.Equals(['a'], RULE_INPUT)).toBe(false);
-    expect(sirs.Equals(['b'], {
-      x: ['b', 'a']
-    })).toBe(false);
-    expect(sirs.Equals(['b', 'c'], {
-      x: ['c', 'd']
-    })).toBe(false);
+    expect(sirs.Equals(['a', 'b'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.Equals(['b', 'a'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.Equals(['a'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.Equals(['b'], {x: ['b', 'a']}))
+      .toBe(false);
+    expect(sirs.Equals(['b', 'c'], {x: ['c', 'd']}))
+      .toBe(false);
   });
 
   it('should have a correct \'is subset of\' rule', function() {
-    expect(sirs.IsSubsetOf(['a'], RULE_INPUT)).toBe(true);
-    expect(sirs.IsSubsetOf(['b'], RULE_INPUT)).toBe(true);
-    expect(sirs.IsSubsetOf([], RULE_INPUT)).toBe(true);
-    expect(sirs.IsSubsetOf(['a', 'b'], RULE_INPUT)).toBe(false);
-    expect(sirs.IsSubsetOf(['c'], RULE_INPUT)).toBe(false);
-    expect(sirs.IsSubsetOf(['a', 'b', 'c'], RULE_INPUT)).toBe(false);
+    expect(sirs.IsSubsetOf(['a'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.IsSubsetOf(['b'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.IsSubsetOf([], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.IsSubsetOf(['a', 'b'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.IsSubsetOf(['c'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.IsSubsetOf(['a', 'b', 'c'], RULE_INPUT))
+      .toBe(false);
   });
 
   it('should have a correct \'is superset of\' rule', function() {
-    expect(sirs.IsSupersetOf(['a', 'b', 'c'], RULE_INPUT)).toBe(true);
-    expect(sirs.IsSupersetOf(['a', 'b', 'ab'], RULE_INPUT)).toBe(true);
-    expect(sirs.IsSupersetOf(['a', 'c'], RULE_INPUT)).toBe(false);
-    expect(sirs.IsSupersetOf(['a', 'b'], RULE_INPUT)).toBe(false);
-    expect(sirs.IsSupersetOf(['a'], RULE_INPUT)).toBe(false);
-    expect(sirs.IsSupersetOf([], RULE_INPUT)).toBe(false);
+    expect(sirs.IsSupersetOf(['a', 'b', 'c'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.IsSupersetOf(['a', 'b', 'ab'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.IsSupersetOf(['a', 'c'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.IsSupersetOf(['a', 'b'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.IsSupersetOf(['a'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.IsSupersetOf([], RULE_INPUT))
+      .toBe(false);
   });
 
   it('should have a correct \'has elements in\' rule', function() {
-    expect(sirs.HasElementsIn(['a', 'b', 'c'], RULE_INPUT)).toBe(true);
-    expect(sirs.HasElementsIn(['a', 'b'], RULE_INPUT)).toBe(true);
-    expect(sirs.HasElementsIn(['a'], RULE_INPUT)).toBe(true);
-    expect(sirs.HasElementsIn(['c'], RULE_INPUT)).toBe(false);
-    expect(sirs.HasElementsIn([], RULE_INPUT)).toBe(false);
+    expect(sirs.HasElementsIn(['a', 'b', 'c'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.HasElementsIn(['a', 'b'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.HasElementsIn(['a'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.HasElementsIn(['c'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.HasElementsIn([], RULE_INPUT))
+      .toBe(false);
   });
 
   it('should have a correct \'has elements not in\' rule', function() {
-    expect(sirs.HasElementsNotIn(['a', 'b', 'c'], RULE_INPUT)).toBe(true);
-    expect(sirs.HasElementsNotIn(['c'], RULE_INPUT)).toBe(true);
-    expect(sirs.HasElementsNotIn(['a', 'b'], RULE_INPUT)).toBe(false);
-    expect(sirs.HasElementsNotIn(['a'], RULE_INPUT)).toBe(false);
-    expect(sirs.HasElementsNotIn([], RULE_INPUT)).toBe(false);
+    expect(sirs.HasElementsNotIn(['a', 'b', 'c'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.HasElementsNotIn(['c'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.HasElementsNotIn(['a', 'b'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.HasElementsNotIn(['a'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.HasElementsNotIn([], RULE_INPUT))
+      .toBe(false);
   });
 
   it('should have a correct \'omits elements in\' rule', function() {
-    expect(sirs.OmitsElementsIn(['c', 'ab'], RULE_INPUT)).toBe(true);
-    expect(sirs.OmitsElementsIn(['c'], RULE_INPUT)).toBe(true);
-    expect(sirs.OmitsElementsIn(['a'], RULE_INPUT)).toBe(true);
-    expect(sirs.OmitsElementsIn([], RULE_INPUT)).toBe(true);
-    expect(sirs.OmitsElementsIn(['a', 'b', 'c'], RULE_INPUT)).toBe(false);
-    expect(sirs.OmitsElementsIn(['a', 'b'], RULE_INPUT)).toBe(false);
+    expect(sirs.OmitsElementsIn(['c', 'ab'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.OmitsElementsIn(['c'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.OmitsElementsIn(['a'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.OmitsElementsIn([], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.OmitsElementsIn(['a', 'b', 'c'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.OmitsElementsIn(['a', 'b'], RULE_INPUT))
+      .toBe(false);
   });
 
   it('should have a correct \'is disjoint\' rule', function() {
-    expect(sirs.IsDisjointFrom(['c', 'ab'], RULE_INPUT)).toBe(true);
-    expect(sirs.IsDisjointFrom(['c'], RULE_INPUT)).toBe(true);
-    expect(sirs.IsDisjointFrom([], RULE_INPUT)).toBe(true);
-    expect(sirs.IsDisjointFrom(['a', 'b', 'c'], RULE_INPUT)).toBe(false);
-    expect(sirs.IsDisjointFrom(['a', 'b'], RULE_INPUT)).toBe(false);
-    expect(sirs.IsDisjointFrom(['a'], RULE_INPUT)).toBe(false);
+    expect(sirs.IsDisjointFrom(['c', 'ab'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.IsDisjointFrom(['c'], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.IsDisjointFrom([], RULE_INPUT))
+      .toBe(true);
+    expect(sirs.IsDisjointFrom(['a', 'b', 'c'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.IsDisjointFrom(['a', 'b'], RULE_INPUT))
+      .toBe(false);
+    expect(sirs.IsDisjointFrom(['a'], RULE_INPUT))
+      .toBe(false);
   });
 });

@@ -30,4 +30,5 @@ oppia.directive('schemaBasedHtmlEditor', [
         'schema_based_html_editor_directive.html'),
       restrict: 'E',
     };
-  }]);
+  }
+]);

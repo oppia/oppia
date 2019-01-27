@@ -24,11 +24,11 @@ describe('Text Input Prediction Service', function() {
 
   describe('Test text prediction service', function() {
     var predictionService;
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       predictionService = $injector.get('TextInputPredictionService');
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
-    }));
+    }]);
 
     it('should not have accuracy less than 85', function() {
       // These answers are taken from the text_input_training_data.json

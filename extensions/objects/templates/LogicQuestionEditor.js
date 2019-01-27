@@ -21,69 +21,70 @@ oppia.directive('logicQuestionEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
-        value: '='
-      },
+      scope: {value: '='},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/logic_question_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = true;
-        $scope.localValue = {
-          assumptionsString: logicProofShared.displayExpressionArray(
-            $scope.value.assumptions,
-            logicProofData.BASE_STUDENT_LANGUAGE.operators),
-          targetString: logicProofShared.displayExpression(
-            $scope.value.results[0],
-            logicProofData.BASE_STUDENT_LANGUAGE.operators),
-          errorMessage: '',
-          proofString: $scope.value.default_proof_string
-        };
+      controller: [
+        '$scope', function($scope) {
+          $scope.alwaysEditable = true;
+          $scope.localValue = {
+            assumptionsString: logicProofShared.displayExpressionArray(
+              $scope.value.assumptions,
+              logicProofData.BASE_STUDENT_LANGUAGE.operators),
+            targetString: logicProofShared.displayExpression(
+              $scope.value.results[0],
+              logicProofData.BASE_STUDENT_LANGUAGE.operators),
+            errorMessage: '',
+            proofString: $scope.value.default_proof_string
+          };
 
-        // NOTE: we use ng-change rather than $watch because the latter runs in
-        // response to any change to the watched value, and we only want to
-        // respond to changes made by the user.
-        $scope.changeAssumptions = function() {
-          $scope.convertThenBuild(
-            'logicQuestionAssumptions', 'assumptionsString');
-        };
-        $scope.changeTarget = function() {
-          $scope.convertThenBuild('logicQuestionTarget', 'targetString');
-        };
-        $scope.changeProof = function() {
-          $scope.convertThenBuild('logicQuestionProof', 'proofString');
-        };
+          // NOTE: we use ng-change rather than $watch because the latter runs in
+          // response to any change to the watched value, and we only want to
+          // respond to changes made by the user.
+          $scope.changeAssumptions = function() {
+            $scope.convertThenBuild(
+              'logicQuestionAssumptions', 'assumptionsString');
+          };
+          $scope.changeTarget = function() {
+            $scope.convertThenBuild('logicQuestionTarget', 'targetString');
+          };
+          $scope.changeProof = function() {
+            $scope.convertThenBuild('logicQuestionProof', 'proofString');
+          };
 
-        $scope.convertThenBuild = function(elementID, nameOfString) {
-          var element = document.getElementById(elementID);
-          var cursorPosition = element.selectionEnd;
-          $scope.localValue[nameOfString] =
+          $scope.convertThenBuild = function(elementID, nameOfString) {
+            var element = document.getElementById(elementID);
+            var cursorPosition = element.selectionEnd;
+            $scope.localValue[nameOfString] =
             logicProofConversion.convertToLogicCharacters(
               $scope.localValue[nameOfString]);
-          $scope.buildQuestion();
-          // NOTE: angular will reset the position of the cursor after this
-          // function runs, so we need to delay our re-resetting.
-          setTimeout(function() {
-            element.selectionEnd = cursorPosition;
-          }, 2);
-        };
+            $scope.buildQuestion();
+            // NOTE: angular will reset the position of the cursor after this
+            // function runs, so we need to delay our re-resetting.
+            setTimeout(function() {
+              element.selectionEnd = cursorPosition;
+            }, 2);
+          };
 
-        $scope.buildQuestion = function() {
-          try {
-            builtQuestion = angular.copy(
-              logicProofTeacher.buildQuestion(
-                $scope.localValue.assumptionsString,
-                $scope.localValue.targetString,
-                LOGIC_PROOF_DEFAULT_QUESTION_DATA.vocabulary));
-            $scope.value = {
-              assumptions: builtQuestion.assumptions,
-              results: builtQuestion.results,
-              default_proof_string: $scope.localValue.proofString
-            };
-            $scope.localValue.errorMessage = '';
-          } catch (err) {
-            $scope.localValue.errorMessage = err.message;
-          }
-        };
-      }]
+          $scope.buildQuestion = function() {
+            try {
+              builtQuestion = angular.copy(
+                logicProofTeacher.buildQuestion(
+                  $scope.localValue.assumptionsString,
+                  $scope.localValue.targetString,
+                  LOGIC_PROOF_DEFAULT_QUESTION_DATA.vocabulary));
+              $scope.value = {
+                assumptions: builtQuestion.assumptions,
+                results: builtQuestion.results,
+                default_proof_string: $scope.localValue.proofString
+              };
+              $scope.localValue.errorMessage = '';
+            } catch (err) {
+              $scope.localValue.errorMessage = err.message;
+            }
+          };
+        }
+      ]
     };
-  }]);
+  }
+]);

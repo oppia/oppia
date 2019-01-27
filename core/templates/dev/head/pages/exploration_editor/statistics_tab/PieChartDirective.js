@@ -16,57 +16,58 @@
  * @fileoverview Directive for pie chart visualization.
  */
 
-oppia.directive('pieChart', [function() {
-  return {
-    restrict: 'E',
-    scope: {
+oppia.directive('pieChart', [
+  function() {
+    return {
+      restrict: 'E',
+      scope: {
       // A read-only array representing the table of chart data.
-      data: '&',
-      // A read-only object containing several chart options. This object
-      // should have the following keys: pieHole, pieSliceTextStyleColor,
-      // chartAreaWidth, colors, height, legendPosition, width.
-      options: '&'
-    },
-    controller: ['$scope', '$element', function($scope, $element) {
-      if (!$.isArray($scope.data())) {
-        return;
-      }
-      var options = $scope.options();
-      var chart = null;
+        data: '&',
+        // A read-only object containing several chart options. This object
+        // should have the following keys: pieHole, pieSliceTextStyleColor,
+        // chartAreaWidth, colors, height, legendPosition, width.
+        options: '&'
+      },
+      controller: [
+        '$scope', '$element', function($scope, $element) {
+          if (!$.isArray($scope.data())) {
+            return;
+          }
+          var options = $scope.options();
+          var chart = null;
 
-      // Need to wait for load statement in editor template to finish.
-      // https://stackoverflow.com/questions/42714876/
-      google.charts.setOnLoadCallback(function() {
-        if (!chart) {
-          chart = new google.visualization.PieChart($element[0]);
-        }
-      });
-      var redrawChart = function() {
-        if (chart !== null) {
-          chart.draw(google.visualization.arrayToDataTable($scope.data()), {
-            title: options.title,
-            pieHole: options.pieHole,
-            pieSliceTextStyle: {
-              color: options.pieSliceTextStyleColor,
-            },
-            pieSliceBorderColor: options.pieSliceBorderColor,
-            pieSliceText: 'none',
-            chartArea: {
-              left: options.left,
-              width: options.chartAreaWidth
-            },
-            colors: options.colors,
-            height: options.height,
-            legend: {
-              position: options.legendPosition || 'none'
-            },
-            width: options.width
+          // Need to wait for load statement in editor template to finish.
+          // https://stackoverflow.com/questions/42714876/
+          google.charts.setOnLoadCallback(function() {
+            if (!chart) {
+              chart = new google.visualization.PieChart($element[0]);
+            }
           });
-        }
-      };
+          var redrawChart = function() {
+            if (chart !== null) {
+              chart.draw(google.visualization.arrayToDataTable($scope.data()), {
+                title: options.title,
+                pieHole: options.pieHole,
+                pieSliceTextStyle: {color: options.pieSliceTextStyleColor, },
+                pieSliceBorderColor: options.pieSliceBorderColor,
+                pieSliceText: 'none',
+                chartArea: {
+                  left: options.left,
+                  width: options.chartAreaWidth
+                },
+                colors: options.colors,
+                height: options.height,
+                legend: {position: options.legendPosition || 'none'},
+                width: options.width
+              });
+            }
+          };
 
-      $scope.$watch('data()', redrawChart);
-      $(window).resize(redrawChart);
-    }]
-  };
-}]);
+          $scope.$watch('data()', redrawChart);
+          $(window)
+            .resize(redrawChart);
+        }
+      ]
+    };
+  }
+]);

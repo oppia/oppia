@@ -20,35 +20,37 @@
 // the current active version? Previous versions should not be editable.
 // TODO(SD): Remove translatable part from this service after translation tab
 // will get implemented.
-oppia.factory('EditabilityService', [function() {
-  var isEditable = false;
-  var isTranslatable = false;
-  var inTutorialMode = false;
+oppia.factory('EditabilityService', [
+  function() {
+    var isEditable = false;
+    var isTranslatable = false;
+    var inTutorialMode = false;
 
-  return {
-    isEditable: function() {
-      return isEditable && !inTutorialMode;
-    },
-    isTranslatable: function() {
-      return isTranslatable && !inTutorialMode;
-    },
-    isEditableOutsideTutorialMode: function() {
-      return isEditable;
-    },
-    markEditable: function() {
-      isEditable = true;
-    },
-    markTranslatable: function() {
-      isTranslatable = true;
-    },
-    markNotEditable: function() {
-      isEditable = false;
-    },
-    onEndTutorial: function() {
-      inTutorialMode = false;
-    },
-    onStartTutorial: function() {
-      inTutorialMode = true;
-    }
-  };
-}]);
+    return {
+      isEditable: function() {
+        return isEditable && !inTutorialMode;
+      },
+      isTranslatable: function() {
+        return isTranslatable && !inTutorialMode;
+      },
+      isEditableOutsideTutorialMode: function() {
+        return isEditable;
+      },
+      markEditable: function() {
+        isEditable = true;
+      },
+      markTranslatable: function() {
+        isTranslatable = true;
+      },
+      markNotEditable: function() {
+        isEditable = false;
+      },
+      onEndTutorial: function() {
+        inTutorialMode = false;
+      },
+      onStartTutorial: function() {
+        inTutorialMode = true;
+      }
+    };
+  }
+]);

@@ -102,4 +102,5 @@ oppia.directive('schemaBasedFloatEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

@@ -119,7 +119,8 @@ oppia.factory('StoryContentsObjectFactory', [
       var initialNodeIsPresent = false;
       for (var i = 0; i < nodes.length; i++) {
         var nodeIdNumber = parseInt(
-          nodes[i].getId().replace(NODE_ID_PREFIX, ''));
+          nodes[i].getId()
+            .replace(NODE_ID_PREFIX, ''));
         if (nodes[i].getId() === this._initialNodeId) {
           initialNodeIsPresent = true;
         }
@@ -150,7 +151,8 @@ oppia.factory('StoryContentsObjectFactory', [
 
         // nodesQueue stores the pending nodes to visit in a queue form.
         var nodesQueue = [];
-        var nodeIsVisited = new Array(nodeIds.length).fill(false);
+        var nodeIsVisited = new Array(nodeIds.length)
+          .fill(false);
         var startingNode = nodes[this.getNodeIndex(this._initialNodeId)];
         nodesQueue.push(startingNode.getId());
 
@@ -168,9 +170,10 @@ oppia.factory('StoryContentsObjectFactory', [
           nodeIsVisited[currentNodeIndex] = true;
           var currentNode = nodes[currentNodeIndex];
 
-          startingNode.getAcquiredSkillIds().forEach(function(skillId) {
-            simulatedSkillIds.add(skillId);
-          });
+          startingNode.getAcquiredSkillIds()
+            .forEach(function(skillId) {
+              simulatedSkillIds.add(skillId);
+            });
           for (var i = 0; i < currentNode.getDestinationNodeIds().length; i++) {
             var nodeId = currentNode.getDestinationNodeIds()[i];
             var nodeIndex = this.getNodeIndex(nodeId);
@@ -184,16 +187,17 @@ oppia.factory('StoryContentsObjectFactory', [
               return issues;
             }
             var destinationNode = nodes[nodeIndex];
-            destinationNode.getPrerequisiteSkillIds().forEach(
-              function(skillId) {
-                if (!simulatedSkillIds.has(skillId)) {
-                  issues.push(
-                    'The prerequisite skill with id ' + skillId +
+            destinationNode.getPrerequisiteSkillIds()
+              .forEach(
+                function(skillId) {
+                  if (!simulatedSkillIds.has(skillId)) {
+                    issues.push(
+                      'The prerequisite skill with id ' + skillId +
                     ' was not completed before node with id ' + nodeId +
                     ' was unlocked');
+                  }
                 }
-              }
-            );
+              );
             nodesQueue.push(nodeId);
           }
         }
@@ -246,7 +250,8 @@ oppia.factory('StoryContentsObjectFactory', [
         }
       }
       for (var i = 0; i < this._nodes.length; i++) {
-        if (this._nodes[i].getDestinationNodeIds().indexOf(nodeId) !== -1) {
+        if (this._nodes[i].getDestinationNodeIds()
+          .indexOf(nodeId) !== -1) {
           this._nodes[i].removeDestinationNodeId(nodeId);
         }
       }

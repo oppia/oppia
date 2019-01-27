@@ -33,7 +33,8 @@ oppia.directive('workedExampleEditor', [
         function($scope, SkillUpdateService, SkillEditorStateService) {
           $scope.editorIsOpen = false;
           $scope.container = {
-            workedExampleHtml: $scope.workedExample.getHtml()
+            workedExampleHtml:
+             $scope.workedExample.getHtml()
           };
 
           $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
@@ -71,7 +72,8 @@ oppia.directive('workedExampleEditor', [
             $scope.workedExampleMemento = null;
             $scope.editorIsOpen = false;
           };
-        }]
+        }
+      ]
     };
   }
 ]);

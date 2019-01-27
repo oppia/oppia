@@ -34,4 +34,5 @@ oppia.directive('collectionPermissionsCard', [
         }
       ]
     };
-  }]);
+  }
+]);

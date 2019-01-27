@@ -23,22 +23,24 @@
  * propagated here.
  */
 
-oppia.factory('CountVectorizerService', [function() {
-  return {
-    vectorize: function(tokens, vocabulary) {
-      var vectorLength = Object.keys(vocabulary).length;
-      var vector = [];
-      for (var i = 0; i < vectorLength; i++) {
-        vector.push(0);
-      }
-
-      tokens.forEach(function(token) {
-        if (vocabulary.hasOwnProperty(token)) {
-          vector[vocabulary[token]] += 1;
+oppia.factory('CountVectorizerService', [
+  function() {
+    return {
+      vectorize: function(tokens, vocabulary) {
+        var vectorLength = Object.keys(vocabulary).length;
+        var vector = [];
+        for (var i = 0; i < vectorLength; i++) {
+          vector.push(0);
         }
-      });
 
-      return vector;
-    }
-  };
-}]);
+        tokens.forEach(function(token) {
+          if (vocabulary.hasOwnProperty(token)) {
+            vector[vocabulary[token]] += 1;
+          }
+        });
+
+        return vector;
+      }
+    };
+  }
+]);

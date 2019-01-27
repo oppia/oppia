@@ -59,70 +59,76 @@ describe('Collections', function() {
       'Languages',
       'First Test Exploration.'
     );
-    general.getExplorationIdFromEditor().then(function(expId) {
-      firstExplorationId = expId;
-      workflow.createAndPublishExploration(
-        'Second Exploration',
-        'Languages',
-        'Second Test Exploration.'
-      );
-      general.getExplorationIdFromEditor().then(function(expId) {
-        secondExplorationId = expId;
-      });
-      workflow.createAndPublishExploration(
-        'Third Exploration',
-        'Languages',
-        'Third Test Exploration.'
-      );
-      general.getExplorationIdFromEditor().then(function(expId) {
-        thirdExplorationId = expId;
-      });
-      workflow.createAndPublishExploration(
-        'Fourth Exploration',
-        'Languages',
-        'Fourth Test Exploration.'
-      );
-      general.getExplorationIdFromEditor().then(function(expId) {
-        fourthExplorationId = expId;
-      });
-      // Create searchable explorations.
-      workflow.createAndPublishExploration(
-        'The Lazy Magician',
-        'Algorithms',
-        'discover the binary search algorithm'
-      );
-      workflow.createAndPublishExploration(
-        'Root Linear Coefficient Theorem',
-        'Algebra',
-        'discover the Root Linear Coefficient Theorem'
-      );
-      workflow.createAndPublishExploration(
-        'Test Exploration',
-        'Languages',
-        'discover the Protractor Testing'
-      );
-      users.logout();
+    general.getExplorationIdFromEditor()
+      .then(function(expId) {
+        firstExplorationId = expId;
+        workflow.createAndPublishExploration(
+          'Second Exploration',
+          'Languages',
+          'Second Test Exploration.'
+        );
+        general.getExplorationIdFromEditor()
+          .then(function(expId) {
+            secondExplorationId = expId;
+          });
+        workflow.createAndPublishExploration(
+          'Third Exploration',
+          'Languages',
+          'Third Test Exploration.'
+        );
+        general.getExplorationIdFromEditor()
+          .then(function(expId) {
+            thirdExplorationId = expId;
+          });
+        workflow.createAndPublishExploration(
+          'Fourth Exploration',
+          'Languages',
+          'Fourth Test Exploration.'
+        );
+        general.getExplorationIdFromEditor()
+          .then(function(expId) {
+            fourthExplorationId = expId;
+          });
+        // Create searchable explorations.
+        workflow.createAndPublishExploration(
+          'The Lazy Magician',
+          'Algorithms',
+          'discover the binary search algorithm'
+        );
+        workflow.createAndPublishExploration(
+          'Root Linear Coefficient Theorem',
+          'Algebra',
+          'discover the Root Linear Coefficient Theorem'
+        );
+        workflow.createAndPublishExploration(
+          'Test Exploration',
+          'Languages',
+          'discover the Protractor Testing'
+        );
+        users.logout();
 
-      users.login('player@collections.com');
-      creatorDashboardPage.get();
-      creatorDashboardPage.clickCreateActivityButton();
-      creatorDashboardPage.clickCreateCollectionButton();
-      browser.getCurrentUrl().then(function(url) {
-        var pathname = url.split('/');
-        // in the url a # is added at the end that is not part of collection ID
-        collectionId = pathname[5].slice(0, -1);
+        users.login('player@collections.com');
+        creatorDashboardPage.get();
+        creatorDashboardPage.clickCreateActivityButton();
+        creatorDashboardPage.clickCreateCollectionButton();
+        browser.getCurrentUrl()
+          .then(function(url) {
+            var pathname = url.split('/');
+            // in the url a # is added at the end that is not part of collection ID
+            collectionId = pathname[5].slice(0, -1);
+          });
+        // Add existing explorations.
+        collectionEditorPage.addExistingExploration(firstExplorationId);
+        collectionEditorPage.saveDraft();
+        collectionEditorPage.closeSaveModal();
+        collectionEditorPage.publishCollection();
+        collectionEditorPage.setTitle('Test Collection 2');
+        collectionEditorPage.setObjective('This is the second test ' +
+          'collection.');
+        collectionEditorPage.setCategory('Algebra');
+        collectionEditorPage.saveChanges();
+        users.logout();
       });
-      // Add existing explorations.
-      collectionEditorPage.addExistingExploration(firstExplorationId);
-      collectionEditorPage.saveDraft();
-      collectionEditorPage.closeSaveModal();
-      collectionEditorPage.publishCollection();
-      collectionEditorPage.setTitle('Test Collection 2');
-      collectionEditorPage.setObjective('This is the second test collection.');
-      collectionEditorPage.setCategory('Algebra');
-      collectionEditorPage.saveChanges();
-      users.logout();
-    });
   });
 
   it('visits the collection editor', function() {

@@ -63,9 +63,10 @@ oppia.controller('FeedbackTab', [
     $scope.clearActiveThread();
     ThreadDataService.fetchFeedbackStats();
     var threadPromise = ThreadDataService.fetchThreads();
-    $q.all([userInfoPromise, threadPromise]).then(function() {
-      $rootScope.loadingMessage = '';
-    });
+    $q.all([userInfoPromise, threadPromise])
+      .then(function() {
+        $rootScope.loadingMessage = '';
+      });
 
     $scope.showCreateThreadModal = function() {
       $uibModal.open({
@@ -74,31 +75,33 @@ oppia.controller('FeedbackTab', [
           'editor_create_feedback_thread_modal_directive.html'),
         backdrop: true,
         resolve: {},
-        controller: ['$scope', '$uibModalInstance', function(
-            $scope, $uibModalInstance) {
-          $scope.newThreadSubject = '';
-          $scope.newThreadText = '';
+        controller: [
+          '$scope', '$uibModalInstance', function(
+              $scope, $uibModalInstance) {
+            $scope.newThreadSubject = '';
+            $scope.newThreadText = '';
 
-          $scope.create = function(newThreadSubject, newThreadText) {
-            if (!newThreadSubject) {
-              AlertsService.addWarning('Please specify a thread subject.');
-              return;
-            }
-            if (!newThreadText) {
-              AlertsService.addWarning('Please specify a message.');
-              return;
-            }
+            $scope.create = function(newThreadSubject, newThreadText) {
+              if (!newThreadSubject) {
+                AlertsService.addWarning('Please specify a thread subject.');
+                return;
+              }
+              if (!newThreadText) {
+                AlertsService.addWarning('Please specify a message.');
+                return;
+              }
 
-            $uibModalInstance.close({
-              newThreadSubject: newThreadSubject,
-              newThreadText: newThreadText
-            });
-          };
+              $uibModalInstance.close({
+                newThreadSubject: newThreadSubject,
+                newThreadText: newThreadText
+              });
+            };
 
-          $scope.cancel = function() {
-            $uibModalInstance.dismiss('cancel');
-          };
-        }]
+            $scope.cancel = function() {
+              $uibModalInstance.dismiss('cancel');
+            };
+          }
+        ]
       }).result.then(function(result) {
         ThreadDataService.createNewThread(
           result.newThreadSubject, result.newThreadText, function() {
@@ -251,9 +254,8 @@ oppia.controller('FeedbackTab', [
               }
               ExplorationDataService.data.version += 1;
               ExplorationStatesService.setState(stateName, state);
-              $rootScope.$broadcast('refreshVersionHistory', {
-                forceRefresh: true
-              });
+              $rootScope.$broadcast('refreshVersionHistory',
+                {forceRefresh: true});
               $rootScope.$broadcast('refreshStateEditor');
             }
           }, function() {

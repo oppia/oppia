@@ -33,10 +33,11 @@ oppia.controller('LearnerLocalNav', [
     $scope.canEdit = GLOBALS.canEdit;
     $scope.username = '';
     $rootScope.loadingMessage = 'Loading';
-    UserService.getUserInfoAsync().then(function(userInfo) {
-      $scope.username = userInfo.getUsername();
-      $rootScope.loadingMessage = '';
-    });
+    UserService.getUserInfoAsync()
+      .then(function(userInfo) {
+        $scope.username = userInfo.getUsername();
+        $rootScope.loadingMessage = '';
+      });
     $scope.showLearnerSuggestionModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -81,7 +82,8 @@ oppia.controller('LearnerLocalNav', [
               };
               $uibModalInstance.close(data);
             };
-          }]
+          }
+        ]
       }).result.then(function(result) {
         data = {
           suggestion_type: result.suggestion_type,
@@ -95,16 +97,15 @@ oppia.controller('LearnerLocalNav', [
             cmd: 'edit_state_property',
             property_name: 'content',
             state_name: result.stateName,
-            new_value: {
-              html: result.suggestionHtml
-            }
+            new_value: {html: result.suggestionHtml}
           }
         };
         url = '/suggestionhandler/';
 
-        $http.post(url, data).error(function(res) {
-          AlertsService.addWarning(res);
-        });
+        $http.post(url, data)
+          .error(function(res) {
+            AlertsService.addWarning(res);
+          });
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/' +
@@ -157,18 +158,15 @@ oppia.controller('LearnerLocalNav', [
         ]
       }).result.then(function(result) {
         var flagExplorationUrl = UrlInterpolationService.interpolateUrl(
-          FLAG_EXPLORATION_URL_TEMPLATE, {
-            exploration_id: $scope.explorationId
-          }
+          FLAG_EXPLORATION_URL_TEMPLATE, {exploration_id: $scope.explorationId}
         );
         var report = (
           '[' + result.state + '] (' + result.report_type + ') ' +
           result.report_text);
-        $http.post(flagExplorationUrl, {
-          report_text: report
-        }).error(function(error) {
-          AlertsService.addWarning(error);
-        });
+        $http.post(flagExplorationUrl, {report_text: report})
+          .error(function(error) {
+            AlertsService.addWarning(error);
+          });
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/' +

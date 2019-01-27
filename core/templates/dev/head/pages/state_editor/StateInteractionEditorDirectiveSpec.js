@@ -52,7 +52,7 @@ describe('State Interaction controller', function() {
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function(
+    beforeEach(inject[function(
         $compile, $controller, $injector, $rootScope, $templateCache) {
       scope = $rootScope.$new();
       ecs = $injector.get('StateEditorService');
@@ -81,19 +81,21 @@ describe('State Interaction controller', function() {
           },
           interaction: {
             id: 'TextInput',
-            answer_groups: [{
-              rule_specs: [],
-              outcome: {
-                dest: 'default',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
+            answer_groups: [
+              {
+                rule_specs: [],
+                outcome: {
+                  dest: 'default',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ''
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null
                 },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
-              },
-            }],
+              }
+            ],
             default_outcome: {
               dest: 'default',
               feedback: {
@@ -120,19 +122,21 @@ describe('State Interaction controller', function() {
           },
           interaction: {
             id: 'TextInput',
-            answer_groups: [{
-              rule_specs: [],
-              outcome: {
-                dest: 'default',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
+            answer_groups: [
+              {
+                rule_specs: [],
+                outcome: {
+                  dest: 'default',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ''
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null
+                }
               }
-            }],
+            ],
             default_outcome: {
               dest: 'default',
               feedback: {
@@ -184,7 +188,7 @@ describe('State Interaction controller', function() {
       var compiledElem = $compile(elem)(outerScope);
       outerScope.$digest();
       directiveScope = compiledElem[0].getControllerScope();
-    }));
+    }]);
 
     it('should keep non-empty content when setting a terminal interaction',
       function() {
@@ -202,9 +206,12 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TerminalInteraction';
         directiveScope.onCustomizationModalSavePostHook();
 
-        expect(outerScope.saveInteractionId).toHaveBeenCalled();
-        expect(outerScope.saveInteractionCustomizationArgs).toHaveBeenCalled();
-        expect(outerScope.recomputeGraph).toHaveBeenCalled();
+        expect(outerScope.saveInteractionId)
+          .toHaveBeenCalled();
+        expect(outerScope.saveInteractionCustomizationArgs)
+          .toHaveBeenCalled();
+        expect(outerScope.recomputeGraph)
+          .toHaveBeenCalled();
       }
     );
 
@@ -224,9 +231,12 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TerminalInteraction';
         directiveScope.onCustomizationModalSavePostHook();
 
-        expect(outerScope.saveInteractionId).toHaveBeenCalled();
-        expect(outerScope.saveInteractionCustomizationArgs).toHaveBeenCalled();
-        expect(outerScope.recomputeGraph).toHaveBeenCalled();
+        expect(outerScope.saveInteractionId)
+          .toHaveBeenCalled();
+        expect(outerScope.saveInteractionCustomizationArgs)
+          .toHaveBeenCalled();
+        expect(outerScope.recomputeGraph)
+          .toHaveBeenCalled();
       }
     );
 
@@ -245,8 +255,10 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TextInput';
         directiveScope.onCustomizationModalSavePostHook();
 
-        expect(outerScope.saveInteractionCustomizationArgs).toHaveBeenCalled();
-        expect(outerScope.recomputeGraph).toHaveBeenCalled();
+        expect(outerScope.saveInteractionCustomizationArgs)
+          .toHaveBeenCalled();
+        expect(outerScope.recomputeGraph)
+          .toHaveBeenCalled();
       }
     );
   });

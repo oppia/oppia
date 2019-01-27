@@ -88,12 +88,14 @@ oppia.factory('ExpressionEvaluatorService', [
         }
 
         // Evaluate rest of the elements, i.e. the arguments.
-        var args = parsed.slice(1).map(function(item) {
-          return evaluate(item, envs);
-        });
+        var args = parsed.slice(1)
+          .map(function(item) {
+            return evaluate(item, envs);
+          });
         // The first element should be a function name.
         return ExpressionSyntaxTreeService.lookupEnvs(
-          parsed[0], envs).eval(args);
+          parsed[0], envs)
+          .eval(args);
       }
 
       // This should be a terminal node with the actual value.
@@ -131,9 +133,10 @@ oppia.factory('ExpressionEvaluatorService', [
       ExpressionSyntaxTreeService.lookupEnvs(parsed[0], envs);
 
       // Evaluate rest of the elements, i.e. the arguments.
-      var args = parsed.slice(1).map(function(item) {
-        return validate(item, envs);
-      });
+      var args = parsed.slice(1)
+        .map(function(item) {
+          return validate(item, envs);
+        });
 
       // If it is a name look up, make sure the name exists.
       // TODO: Validate args for other operators.

@@ -16,36 +16,38 @@
  * @fileoverview Service for computing the average rating.
  */
 
-oppia.factory('RatingComputationService', [function() {
-  var areRatingsShown = function(ratingFrequencies) {
-    var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
+oppia.factory('RatingComputationService', [
+  function() {
+    var areRatingsShown = function(ratingFrequencies) {
+      var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
 
-    var totalNumber = 0;
-    for (var value in ratingFrequencies) {
-      totalNumber += ratingFrequencies[value];
-    }
-
-    return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS;
-  };
-
-  return {
-    computeAverageRating: function(ratingFrequencies) {
-      if (!areRatingsShown(ratingFrequencies)) {
-        return undefined;
-      } else {
-        var totalNumber = 0;
-        var totalValue = 0.0;
-        for (var value in ratingFrequencies) {
-          totalValue += value * ratingFrequencies[value];
-          totalNumber += ratingFrequencies[value];
-        }
-
-        if (totalNumber === 0) {
-          return undefined;
-        }
-
-        return totalValue / totalNumber;
+      var totalNumber = 0;
+      for (var value in ratingFrequencies) {
+        totalNumber += ratingFrequencies[value];
       }
-    }
-  };
-}]);
+
+      return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS;
+    };
+
+    return {
+      computeAverageRating: function(ratingFrequencies) {
+        if (!areRatingsShown(ratingFrequencies)) {
+          return undefined;
+        } else {
+          var totalNumber = 0;
+          var totalValue = 0.0;
+          for (var value in ratingFrequencies) {
+            totalValue += value * ratingFrequencies[value];
+            totalNumber += ratingFrequencies[value];
+          }
+
+          if (totalNumber === 0) {
+            return undefined;
+          }
+
+          return totalValue / totalNumber;
+        }
+      }
+    };
+  }
+]);

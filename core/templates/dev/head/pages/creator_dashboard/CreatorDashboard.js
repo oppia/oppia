@@ -16,9 +16,7 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
-oppia.constant('EXPLORATION_DROPDOWN_STATS', {
-  OPEN_FEEDBACK: 'open_feedback'
-});
+oppia.constant('EXPLORATION_DROPDOWN_STATS', {OPEN_FEEDBACK: 'open_feedback'});
 
 oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
   TITLE: 'title',
@@ -178,9 +176,10 @@ oppia.controller('CreatorDashboard', [
       }
     );
 
-    $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
-      $rootScope.loadingMessage = '';
-    });
+    $q.all([userInfoPromise, dashboardDataPromise])
+      .then(function() {
+        $rootScope.loadingMessage = '';
+      });
 
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
@@ -208,11 +207,11 @@ oppia.controller('CreatorDashboard', [
     };
 
     $scope.setMyExplorationsView = function(newViewType) {
-      $http.post('/creatordashboardhandler/data', {
-        display_preference: newViewType,
-      }).then(function() {
-        $scope.myExplorationsView = newViewType;
-      });
+      $http.post('/creatordashboardhandler/data',
+        {display_preference: newViewType, })
+        .then(function() {
+          $scope.myExplorationsView = newViewType;
+        });
       userDashboardDisplayPreference = newViewType;
     };
 
@@ -249,9 +248,10 @@ oppia.controller('CreatorDashboard', [
     };
 
     $scope.updatesGivenScreenWidth();
-    angular.element($window).bind('resize', function() {
-      $scope.updatesGivenScreenWidth();
-    });
+    angular.element($window)
+      .bind('resize', function() {
+        $scope.updatesGivenScreenWidth();
+      });
 
     $scope.setExplorationsSortingOptions = function(sortType) {
       if (sortType === $scope.currentSortType) {
@@ -282,16 +282,17 @@ oppia.controller('CreatorDashboard', [
     };
 
     var _fetchMessages = function(threadId) {
-      $http.get('/threadhandler/' + threadId).then(function(response) {
-        var allThreads = $scope.mySuggestionsList.concat(
-          $scope.suggestionsToReviewList);
-        for (var i = 0; i < allThreads.length; i++) {
-          if (allThreads[i].threadId === threadId) {
-            allThreads[i].setMessages(response.data.messages);
-            break;
+      $http.get('/threadhandler/' + threadId)
+        .then(function(response) {
+          var allThreads = $scope.mySuggestionsList.concat(
+            $scope.suggestionsToReviewList);
+          for (var i = 0; i < allThreads.length; i++) {
+            if (allThreads[i].threadId === threadId) {
+              allThreads[i].setMessages(response.data.messages);
+              break;
+            }
           }
-        }
-      });
+        });
     };
 
     $scope.clearActiveThread = function() {
@@ -465,9 +466,8 @@ oppia.controller('CreatorDashboard', [
         if (result.action === 'resubmit' &&
             result.suggestionType === 'edit_exploration_state_content') {
           url = UrlInterpolationService.interpolateUrl(
-            RESUBMIT_SUGGESTION_URL_TEMPLATE, {
-              suggestion_id: $scope.activeThread.suggestion.suggestionId
-            }
+            RESUBMIT_SUGGESTION_URL_TEMPLATE,
+            {suggestion_id: $scope.activeThread.suggestion.suggestionId}
           );
           data = {
             action: result.action,
@@ -477,9 +477,7 @@ oppia.controller('CreatorDashboard', [
               property_name: 'content',
               state_name: result.stateName,
               old_value: result.oldContent,
-              new_value: {
-                html: result.newSuggestionHtml
-              }
+              new_value: {html: result.newSuggestionHtml}
             }
           };
         } else {
@@ -497,17 +495,18 @@ oppia.controller('CreatorDashboard', [
           };
         }
 
-        $http.put(url, data).then(function() {
-          for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
-            if ($scope.suggestionsToReviewList[i] === $scope.activeThread) {
-              $scope.suggestionsToReviewList.splice(i, 1);
-              break;
+        $http.put(url, data)
+          .then(function() {
+            for (var i = 0; i < $scope.suggestionsToReviewList.length; i++) {
+              if ($scope.suggestionsToReviewList[i] === $scope.activeThread) {
+                $scope.suggestionsToReviewList.splice(i, 1);
+                break;
+              }
             }
-          }
-          $scope.clearActiveThread();
-        }, function() {
-          $log.error('Error resolving suggestion');
-        });
+            $scope.clearActiveThread();
+          }, function() {
+            $log.error('Error resolving suggestion');
+          });
       });
     };
 

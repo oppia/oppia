@@ -80,12 +80,13 @@ oppia.directive('searchBar', [
             function(languageItem) {
               return languageItem.code.length === 2;
             }
-          ).map(function(languageItem) {
-            return {
-              id: languageItem.code,
-              text: languageItem.name
-            };
-          });
+          )
+            .map(function(languageItem) {
+              return {
+                id: languageItem.code,
+                text: languageItem.name
+              };
+            });
 
           $scope.searchQuery = '';
           $scope.selectionDetails = {
@@ -217,7 +218,8 @@ oppia.directive('searchBar', [
           };
 
           $scope.$on('$locationChangeSuccess', function() {
-            if (UrlService.getUrlParams().hasOwnProperty('q')) {
+            if (UrlService.getUrlParams()
+              .hasOwnProperty('q')) {
               updateSearchFieldsBasedOnUrlQuery();
             }
           });
@@ -237,7 +239,8 @@ oppia.directive('searchBar', [
 
               updateSelectionDetails('languageCodes');
 
-              if (UrlService.getUrlParams().hasOwnProperty('q')) {
+              if (UrlService.getUrlParams()
+                .hasOwnProperty('q')) {
                 updateSearchFieldsBasedOnUrlQuery();
               }
 
@@ -275,4 +278,5 @@ oppia.directive('searchBar', [
         }
       ]
     };
-  }]);
+  }
+]);

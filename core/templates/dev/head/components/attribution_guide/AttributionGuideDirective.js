@@ -32,4 +32,5 @@ oppia.directive('attributionGuide', [
         }
       ]
     };
-  }]);
+  }
+]);

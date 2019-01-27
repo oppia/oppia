@@ -21,52 +21,54 @@
 // TODO(bhenning): Consolidate the backend ExplorationChange and
 // CollectionChange domain objects.
 
-oppia.factory('ChangeObjectFactory', [function() {
-  var Change = function(
-      backendChangeObject, applyChangeToObject, reverseChangeToObject) {
-    this._backendChangeObject = angular.copy(backendChangeObject);
-    this._applyChangeToObject = applyChangeToObject;
-    this._reverseChangeToObject = reverseChangeToObject;
-  };
+oppia.factory('ChangeObjectFactory', [
+  function() {
+    var Change = function(
+        backendChangeObject, applyChangeToObject, reverseChangeToObject) {
+      this._backendChangeObject = angular.copy(backendChangeObject);
+      this._applyChangeToObject = applyChangeToObject;
+      this._reverseChangeToObject = reverseChangeToObject;
+    };
 
-  // Instance methods
+    // Instance methods
 
-  // Returns the JSON object which represents a backend python dict of this
-  // change. Changes to this object are not reflected in this domain object.
-  Change.prototype.getBackendChangeObject = function() {
-    return angular.copy(this._backendChangeObject);
-  };
+    // Returns the JSON object which represents a backend python dict of this
+    // change. Changes to this object are not reflected in this domain object.
+    Change.prototype.getBackendChangeObject = function() {
+      return angular.copy(this._backendChangeObject);
+    };
 
-  Change.prototype.setBackendChangeObject = function(backendChangeObject) {
-    return this._backendChangeObject = angular.copy(backendChangeObject);
-  };
+    Change.prototype.setBackendChangeObject = function(backendChangeObject) {
+      return this._backendChangeObject = angular.copy(backendChangeObject);
+    };
 
-  // Applies this change to the related object (such as a frontend collection
-  // domain object).
-  Change.prototype.applyChange = function(domainObject) {
-    this._applyChangeToObject(this._backendChangeObject, domainObject);
-  };
+    // Applies this change to the related object (such as a frontend collection
+    // domain object).
+    Change.prototype.applyChange = function(domainObject) {
+      this._applyChangeToObject(this._backendChangeObject, domainObject);
+    };
 
-  // Reverse-applies this change to the related object (such as a frontend
-  // collection domain object). This method should only be used to reverse a
-  // change that was previously applied by calling the applyChange() method.
-  Change.prototype.reverseChange = function(domainObject) {
-    this._reverseChangeToObject(this._backendChangeObject, domainObject);
-  };
+    // Reverse-applies this change to the related object (such as a frontend
+    // collection domain object). This method should only be used to reverse a
+    // change that was previously applied by calling the applyChange() method.
+    Change.prototype.reverseChange = function(domainObject) {
+      this._reverseChangeToObject(this._backendChangeObject, domainObject);
+    };
 
-  // Static class methods. Note that "this" is not available in static
-  // contexts. The first parameter is a JSON representation of a backend
-  // python dict for the given change. The second parameter is a callback
-  // which will receive both the backend change object dictionary (as
-  // read-only) and the domain object in which to apply the change. The third
-  // parameter is a callback which behaves in the same way as the second
-  // parameter and takes the same inputs, except it should reverse the change
-  // for the provided domain object.
-  Change.create = function(
-      backendChangeObject, applyChangeToObject, reverseChangeToObject) {
-    return new Change(
-      backendChangeObject, applyChangeToObject, reverseChangeToObject);
-  };
+    // Static class methods. Note that "this" is not available in static
+    // contexts. The first parameter is a JSON representation of a backend
+    // python dict for the given change. The second parameter is a callback
+    // which will receive both the backend change object dictionary (as
+    // read-only) and the domain object in which to apply the change. The third
+    // parameter is a callback which behaves in the same way as the second
+    // parameter and takes the same inputs, except it should reverse the change
+    // for the provided domain object.
+    Change.create = function(
+        backendChangeObject, applyChangeToObject, reverseChangeToObject) {
+      return new Change(
+        backendChangeObject, applyChangeToObject, reverseChangeToObject);
+    };
 
-  return Change;
-}]);
+    return Change;
+  }
+]);

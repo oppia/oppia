@@ -58,7 +58,8 @@ oppia.factory('OutcomeObjectFactory', [
     };
 
     Outcome.prototype.hasNonemptyFeedback = function() {
-      return this.feedback.getHtml().trim() !== '';
+      return this.feedback.getHtml()
+        .trim() !== '';
     };
 
     Outcome.createNew = function(dest, feedbackTextId, feedbackText,

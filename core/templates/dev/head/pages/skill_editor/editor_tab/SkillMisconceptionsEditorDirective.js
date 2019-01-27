@@ -68,13 +68,15 @@ oppia.directive('skillMisconceptionsEditor', [
 
                   $scope.confirm = function() {
                     $uibModalInstance.close({
-                      id: $scope.skill.getMisconceptionAtIndex(index).getId()
+                      id: $scope.skill.getMisconceptionAtIndex(index)
+                        .getId()
                     });
                   };
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
                   };
-                }]
+                }
+              ]
             }).result.then(function(result) {
               SkillUpdateService.deleteMisconception($scope.skill, result.id);
               $scope.misconceptions = $scope.skill.getMisconceptions();
@@ -94,9 +96,7 @@ oppia.directive('skillMisconceptionsEditor', [
                   $scope.skill = SkillEditorStateService.getSkill();
                   $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
                     type: 'html',
-                    ui_config: {
-                      startupFocusEnabled: false
-                    }
+                    ui_config: {startupFocusEnabled: false}
                   };
 
                   $scope.MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA = {
@@ -126,14 +126,16 @@ oppia.directive('skillMisconceptionsEditor', [
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
                   };
-                }]
+                }
+              ]
             }).result.then(function(result) {
               SkillUpdateService.addMisconception(
                 $scope.skill, result.misconception);
               $scope.misconceptions = $scope.skill.getMisconceptions();
             });
           };
-        }]
+        }
+      ]
     };
   }
 ]);

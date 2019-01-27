@@ -70,15 +70,17 @@ var CollectionEditorPage = function() {
     var dropdownResultElements = element.all(by.css('.dropdown-menu'));
     dropdownResultElements.map(function(dropdownResult) {
       return dropdownResult.getText();
-    }).then(function(listOfResult) {
-      listOfResult.forEach(function(element, index) {
-        if (element.indexOf(query) >= 0) {
+    })
+      .then(function(listOfResult) {
+        listOfResult.forEach(function(element, index) {
+          if (element.indexOf(query) >= 0) {
           // Selects the exploration from dropdown.
-          dropdownResultElements.get(index).click();
-          matched = true;
-        }
+            dropdownResultElements.get(index)
+              .click();
+            matched = true;
+          }
+        });
       });
-    });
     if (!matched) {
       // Press Tab to fill in the default result should one appear when
       // none of the answer matches the given query.
@@ -86,18 +88,20 @@ var CollectionEditorPage = function() {
       // If query gets zero result, hitting Tab would not enable the
       // addExplorationButton.
     }
-    addExplorationButton.isEnabled().then( function(isEnabled) {
-      if (isEnabled) {
-        addExplorationButton.click();
-      } else {
-        throw Error ('Add Exploration Button is not clickable');
-      }
-    });
+    addExplorationButton.isEnabled()
+      .then( function(isEnabled) {
+        if (isEnabled) {
+          addExplorationButton.click();
+        } else {
+          throw Error ('Add Exploration Button is not clickable');
+        }
+      });
   };
 
   // Shift a node left in the node graph.
   this.shiftNodeLeft = function(number) {
-    editorShiftLeft.get(number).click();
+    editorShiftLeft.get(number)
+      .click();
   };
 
   this.setCommitMessage = function(message) {
@@ -110,12 +114,14 @@ var CollectionEditorPage = function() {
 
   // Shift a node right in the node graph.
   this.shiftNodeRight = function(number) {
-    editorShiftRight.get(number).click();
+    editorShiftRight.get(number)
+      .click();
   };
 
   // Delete a node in the node graph.
   this.deleteNode = function(number) {
-    editorDeleteNode.get(number).click();
+    editorDeleteNode.get(number)
+      .click();
   };
 
   // Save draft of the collection.
@@ -153,8 +159,11 @@ var CollectionEditorPage = function() {
 
   // Set collection category.
   this.setCategory = function(category) {
-    editorCategoryDropdown.first().click();
-    browser.driver.switchTo().activeElement().sendKeys(category + '\n');
+    editorCategoryDropdown.first()
+      .click();
+    browser.driver.switchTo()
+      .activeElement()
+      .sendKeys(category + '\n');
   };
 
   // Saves changes and publishes collection.

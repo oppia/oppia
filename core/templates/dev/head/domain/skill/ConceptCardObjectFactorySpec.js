@@ -23,7 +23,7 @@ describe('Concept card object factory', function() {
     var ConceptCardObjectFactory;
     var conceptCardDict;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject[function($injector) {
       ConceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');
       SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
@@ -59,35 +59,42 @@ describe('Concept card object factory', function() {
           worked_example_2: {}
         }
       };
-    }));
+    }]);
 
     it('should create a new concept card from a backend dictionary',
       function() {
         var conceptCard =
           ConceptCardObjectFactory.createFromBackendDict(conceptCardDict);
-        expect(conceptCard.getExplanation()).toEqual(
-          SubtitledHtmlObjectFactory.createDefault(
-            'test explanation', 'explanation'));
-        expect(conceptCard.getWorkedExamples()).toEqual(
-          [SubtitledHtmlObjectFactory.createDefault(
-            'worked example 1', 'worked_example_1'),
-          SubtitledHtmlObjectFactory.createDefault(
-            'worked example 2', 'worked_example_2')]);
+        expect(conceptCard.getExplanation())
+          .toEqual(
+            SubtitledHtmlObjectFactory.createDefault(
+              'test explanation', 'explanation'));
+        expect(conceptCard.getWorkedExamples())
+          .toEqual(
+            [
+              SubtitledHtmlObjectFactory.createDefault(
+                'worked example 1', 'worked_example_1'),
+              SubtitledHtmlObjectFactory.createDefault(
+                'worked example 2', 'worked_example_2')
+            ]);
       });
 
     it('should convert to a backend dictionary', function() {
       var conceptCard =
         ConceptCardObjectFactory.createFromBackendDict(conceptCardDict);
-      expect(conceptCard.toBackendDict()).toEqual(conceptCardDict);
+      expect(conceptCard.toBackendDict())
+        .toEqual(conceptCardDict);
     });
 
     it('should create an interstitial concept card', function() {
       var conceptCard =
         ConceptCardObjectFactory.createInterstitialConceptCard();
-      expect(conceptCard.getExplanation()).toEqual(
-        SubtitledHtmlObjectFactory.createDefault(
-          'Loading review material', 'explanation'));
-      expect(conceptCard.getWorkedExamples()).toEqual([]);
+      expect(conceptCard.getExplanation())
+        .toEqual(
+          SubtitledHtmlObjectFactory.createDefault(
+            'Loading review material', 'explanation'));
+      expect(conceptCard.getWorkedExamples())
+        .toEqual([]);
     });
   });
 });

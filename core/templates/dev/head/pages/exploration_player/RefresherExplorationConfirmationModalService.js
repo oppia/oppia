@@ -41,9 +41,8 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
                   'parent');
                 var EXPLORATION_URL_TEMPLATE = '/explore/<exploration_id>';
                 var url = UrlInterpolationService.interpolateUrl(
-                  EXPLORATION_URL_TEMPLATE, {
-                    exploration_id: refresherExplorationId
-                  });
+                  EXPLORATION_URL_TEMPLATE,
+                  {exploration_id: refresherExplorationId});
                 if (collectionId) {
                   url = UrlService.addField(url, 'collection_id', collectionId);
                 }

@@ -125,4 +125,5 @@ oppia.directive('progressNav', [
         }
       ]
     };
-  }]);
+  }
+]);

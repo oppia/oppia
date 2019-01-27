@@ -17,7 +17,8 @@
  * domain objects.
  */
 
-oppia.factory('ParamTypeObjectFactory', [function() {
+oppia.factory('ParamTypeObjectFactory', [
+  function() {
   /**
    * @private @constructor
    * Defines a specific type that a parameter can take.
@@ -30,75 +31,77 @@ oppia.factory('ParamTypeObjectFactory', [function() {
    *    is valid.
    * @param {?} defaultValue - simple value any parameter of this type can take.
    */
-  var ParamType = function(typeDefinitionObject) {
-    if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
-      throw new Error(
-        'The default value is invalid according to validation function');
-    }
+    var ParamType = function(typeDefinitionObject) {
+      if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
+        throw new Error(
+          'The default value is invalid according to validation function');
+      }
 
-    /** @member {String} */
-    this._name = null;
-    /** @member {Function.<?, Boolean>} */
-    this.valueIsValid = typeDefinitionObject.validate;
-    /** @member {?} */
-    this.defaultValue = typeDefinitionObject.default_value;
-  };
-
-
-  // Instance methods.
-
-  /** @returns {?} - A valid default value for this particular type. */
-  ParamType.prototype.createDefaultValue = function() {
-    return angular.copy(this.defaultValue);
-  };
-
-  /** @returns {String} - The display-name of this type. */
-  ParamType.prototype.getName = function() {
-    return this._name;
-  };
+      /** @member {String} */
+      this._name = null;
+      /** @member {Function.<?, Boolean>} */
+      this.valueIsValid = typeDefinitionObject.validate;
+      /** @member {?} */
+      this.defaultValue = typeDefinitionObject.default_value;
+    };
 
 
-  // Class methods.
+    // Instance methods.
 
-  /**
+    /** @returns {?} - A valid default value for this particular type. */
+    ParamType.prototype.createDefaultValue = function() {
+      return angular.copy(this.defaultValue);
+    };
+
+    /** @returns {String} - The display-name of this type. */
+    ParamType.prototype.getName = function() {
+      return this._name;
+    };
+
+
+    // Class methods.
+
+    /**
    * @param {String} backendName - the name of the type to fetch.
    * @returns {ParamType} - The associated type, if any.
    * @throws {Error} - When the given type name isn't registered.
    */
-  ParamType.getTypeFromBackendName = function(backendName) {
-    if (!ParamType.registry.hasOwnProperty(backendName)) {
-      throw new Error(backendName + ' is not a registered parameter type.');
-    }
-    return ParamType.registry[backendName];
-  };
+    ParamType.getTypeFromBackendName = function(backendName) {
+      if (!ParamType.registry.hasOwnProperty(backendName)) {
+        throw new Error(backendName + ' is not a registered parameter type.');
+      }
+      return ParamType.registry[backendName];
+    };
 
-  /** @returns {ParamType} - Implementation-defined default parameter type. */
-  ParamType.getDefaultType = function() {
-    return ParamType.registry.UnicodeString;
-  };
+    /** @returns {ParamType} - Implementation-defined default parameter type. */
+    ParamType.getDefaultType = function() {
+      return ParamType.registry.UnicodeString;
+    };
 
 
-  // Type registration.
+    // Type registration.
 
-  /** @type {Object.<String, ParamType>} */
-  ParamType.registry = {};
+    /** @type {Object.<String, ParamType>} */
+    ParamType.registry = {};
 
-  ParamType.registry.UnicodeString = new ParamType({
-    validate: function(value) {
-      return (typeof value === 'string' || value instanceof String);
-    },
-    default_value: '',
-  });
+    ParamType.registry.UnicodeString = new ParamType({
+      validate: function(value) {
+        return (typeof value === 'string' || value instanceof String);
+      },
+      default_value: '',
+    });
 
-  // To finalize type registration, we encode the name of each type into their
-  // definition, then freeze them from modifications.
-  Object.keys(ParamType.registry).forEach(function(paramTypeName) {
-    var paramType = ParamType.registry[paramTypeName];
-    paramType._name = paramTypeName;
-    Object.freeze(paramType);
-  });
-  // Finally, we freeze the registry itself.
-  Object.freeze(ParamType.registry);
+    // To finalize type registration, we encode the name of each type into their
+    // definition, then freeze them from modifications.
+    Object.keys(ParamType.registry)
+      .forEach(function(paramTypeName) {
+        var paramType = ParamType.registry[paramTypeName];
+        paramType._name = paramTypeName;
+        Object.freeze(paramType);
+      });
+    // Finally, we freeze the registry itself.
+    Object.freeze(ParamType.registry);
 
-  return ParamType;
-}]);
+    return ParamType;
+  }
+]);

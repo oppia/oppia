@@ -23,8 +23,6 @@ oppia.factory('LearnerDashboardIdsBackendApiService', [
       return $http.get('/learnerdashboardidshandler/data');
     };
 
-    return {
-      fetchLearnerDashboardIds: _fetchLearnerDashboardIds
-    };
+    return {fetchLearnerDashboardIds: _fetchLearnerDashboardIds};
   }
 ]);

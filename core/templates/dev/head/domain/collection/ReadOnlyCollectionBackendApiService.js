@@ -30,20 +30,19 @@ oppia.factory('ReadOnlyCollectionBackendApiService', [
     var _fetchCollection = function(
         collectionId, successCallback, errorCallback) {
       var collectionDataUrl = UrlInterpolationService.interpolateUrl(
-        COLLECTION_DATA_URL_TEMPLATE, {
-          collection_id: collectionId
-        });
+        COLLECTION_DATA_URL_TEMPLATE, {collection_id: collectionId});
 
-      $http.get(collectionDataUrl).then(function(response) {
-        var collection = angular.copy(response.data.collection);
-        if (successCallback) {
-          successCallback(collection);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(collectionDataUrl)
+        .then(function(response) {
+          var collection = angular.copy(response.data.collection);
+          if (successCallback) {
+            successCallback(collection);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _isCached = function(collectionId) {

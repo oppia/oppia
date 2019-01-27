@@ -63,17 +63,18 @@ oppia.factory('StoryEditorStateService', [
       loadStory: function(topicId, storyId) {
         _storyIsLoading = true;
         EditableStoryBackendApiService.fetchStory(
-          topicId, storyId).then(
-          function(newBackendStoryObject) {
-            _setTopicName(newBackendStoryObject.topicName);
-            _updateStory(newBackendStoryObject.story);
-            _storyIsLoading = false;
-          },
-          function(error) {
-            AlertsService.addWarning(
-              error || 'There was an error when loading the story.');
-            _storyIsLoading = false;
-          });
+          topicId, storyId)
+          .then(
+            function(newBackendStoryObject) {
+              _setTopicName(newBackendStoryObject.topicName);
+              _updateStory(newBackendStoryObject.story);
+              _storyIsLoading = false;
+            },
+            function(error) {
+              AlertsService.addWarning(
+                error || 'There was an error when loading the story.');
+              _storyIsLoading = false;
+            });
       },
 
       /**
@@ -140,19 +141,20 @@ oppia.factory('StoryEditorStateService', [
         _storyIsBeingSaved = true;
         EditableStoryBackendApiService.updateStory(
           topicId, _story.getId(), _story.getVersion(),
-          commitMessage, UndoRedoService.getCommittableChangeList()).then(
-          function(storyBackendObject) {
-            _updateStory(storyBackendObject);
-            UndoRedoService.clearChanges();
-            _storyIsBeingSaved = false;
-            if (successCallback) {
-              successCallback();
-            }
-          }, function(error) {
-            AlertsService.addWarning(
-              error || 'There was an error when saving the story.');
-            _storyIsBeingSaved = false;
-          });
+          commitMessage, UndoRedoService.getCommittableChangeList())
+          .then(
+            function(storyBackendObject) {
+              _updateStory(storyBackendObject);
+              UndoRedoService.clearChanges();
+              _storyIsBeingSaved = false;
+              if (successCallback) {
+                successCallback();
+              }
+            }, function(error) {
+              AlertsService.addWarning(
+                error || 'There was an error when saving the story.');
+              _storyIsBeingSaved = false;
+            });
         return true;
       },
 

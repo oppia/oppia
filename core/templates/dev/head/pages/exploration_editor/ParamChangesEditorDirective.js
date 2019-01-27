@@ -54,7 +54,8 @@ oppia.directive('paramChangesEditor', [
           });
 
           var generateParamNameChoices = function() {
-            return ExplorationParamSpecsService.displayed.getParamNames().sort()
+            return ExplorationParamSpecsService.displayed.getParamNames()
+              .sort()
               .map(function(paramName) {
                 return {
                   id: paramName,
@@ -250,4 +251,5 @@ oppia.directive('paramChangesEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

@@ -244,9 +244,7 @@ oppia.factory('CollectionObjectFactory', [
     // Create a new, empty collection. This is not guaranteed to pass validation
     // tests.
     Collection.createEmptyCollection = function() {
-      return new Collection({
-        nodes: [],
-      });
+      return new Collection({nodes: [], });
     };
 
     return Collection;

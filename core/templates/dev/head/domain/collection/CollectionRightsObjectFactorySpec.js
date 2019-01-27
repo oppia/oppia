@@ -21,10 +21,10 @@ describe('Collection rights object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     CollectionRightsObjectFactory = $injector.get(
       'CollectionRightsObjectFactory');
-  }));
+  }]);
 
   it('should not be able to modify owner names', function() {
     var initialCollectionRightsBackendObject = {
@@ -40,7 +40,8 @@ describe('Collection rights object factory', function() {
     var ownerNames = sampleCollectionRights.getOwnerNames();
     ownerNames.push('B');
 
-    expect(sampleCollectionRights.getOwnerNames()).toEqual(['A']);
+    expect(sampleCollectionRights.getOwnerNames())
+      .toEqual(['A']);
   });
 
   it('should accept accept changes to the bindable list of collection nodes',
@@ -58,7 +59,8 @@ describe('Collection rights object factory', function() {
       var ownerNames = sampleCollectionRights.getBindableOwnerNames();
       ownerNames.push('B');
 
-      expect(sampleCollectionRights.getOwnerNames()).toEqual(['A', 'B']);
+      expect(sampleCollectionRights.getOwnerNames())
+        .toEqual(['A', 'B']);
     }
   );
 
@@ -73,12 +75,16 @@ describe('Collection rights object factory', function() {
 
     sampleCollectionRights = CollectionRightsObjectFactory.create(
       initialCollectionRightsBackendObject);
-    expect(sampleCollectionRights.isPrivate()).toBe(true);
-    expect(sampleCollectionRights.isPublic()).toBe(false);
+    expect(sampleCollectionRights.isPrivate())
+      .toBe(true);
+    expect(sampleCollectionRights.isPublic())
+      .toBe(false);
 
     sampleCollectionRights.setPublic();
-    expect(sampleCollectionRights.isPrivate()).toBe(false);
-    expect(sampleCollectionRights.isPublic()).toBe(true);
+    expect(sampleCollectionRights.isPrivate())
+      .toBe(false);
+    expect(sampleCollectionRights.isPublic())
+      .toBe(true);
   });
 
   it('should throw error and not be able to set public when canEdit is false',
@@ -93,14 +99,19 @@ describe('Collection rights object factory', function() {
 
       sampleCollectionRights = CollectionRightsObjectFactory.create(
         initialCollectionRightsBackendObject);
-      expect(sampleCollectionRights.isPrivate()).toBe(true);
-      expect(sampleCollectionRights.isPublic()).toBe(false);
+      expect(sampleCollectionRights.isPrivate())
+        .toBe(true);
+      expect(sampleCollectionRights.isPublic())
+        .toBe(false);
 
       expect(function() {
         sampleCollectionRights.setPublic();
-      }).toThrow(new Error('User is not allowed to edit this collection.'));
-      expect(sampleCollectionRights.isPrivate()).toBe(true);
-      expect(sampleCollectionRights.isPublic()).toBe(false);
+      })
+        .toThrow(new Error('User is not allowed to edit this collection.'));
+      expect(sampleCollectionRights.isPrivate())
+        .toBe(true);
+      expect(sampleCollectionRights.isPublic())
+        .toBe(false);
     }
   );
 
@@ -115,12 +126,16 @@ describe('Collection rights object factory', function() {
 
     sampleCollectionRights = CollectionRightsObjectFactory.create(
       initialCollectionRightsBackendObject);
-    expect(sampleCollectionRights.isPrivate()).toBe(false);
-    expect(sampleCollectionRights.isPublic()).toBe(true);
+    expect(sampleCollectionRights.isPrivate())
+      .toBe(false);
+    expect(sampleCollectionRights.isPublic())
+      .toBe(true);
 
     sampleCollectionRights.setPrivate();
-    expect(sampleCollectionRights.isPrivate()).toBe(true);
-    expect(sampleCollectionRights.isPublic()).toBe(false);
+    expect(sampleCollectionRights.isPrivate())
+      .toBe(true);
+    expect(sampleCollectionRights.isPublic())
+      .toBe(false);
   });
 
   it('should throw error when when canUnpublish is false during unpublishing',
@@ -135,17 +150,22 @@ describe('Collection rights object factory', function() {
 
       sampleCollectionRights = CollectionRightsObjectFactory.create(
         noUnpublishCollectionRightsBackendObject);
-      expect(sampleCollectionRights.isPrivate()).toBe(false);
-      expect(sampleCollectionRights.isPublic()).toBe(true);
+      expect(sampleCollectionRights.isPrivate())
+        .toBe(false);
+      expect(sampleCollectionRights.isPublic())
+        .toBe(true);
 
       expect(function() {
         sampleCollectionRights.setPrivate();
-      }).toThrow(
-        new Error('User is not allowed to unpublish this collection.'));
+      })
+        .toThrow(
+          new Error('User is not allowed to unpublish this collection.'));
 
       // Verify that the status remains unchanged.
-      expect(sampleCollectionRights.isPrivate()).toBe(false);
-      expect(sampleCollectionRights.isPublic()).toBe(true);
+      expect(sampleCollectionRights.isPrivate())
+        .toBe(false);
+      expect(sampleCollectionRights.isPublic())
+        .toBe(true);
     }
   );
 
@@ -154,11 +174,16 @@ describe('Collection rights object factory', function() {
       CollectionRightsObjectFactory.createEmptyCollectionRights());
 
     expect(
-      emptyCollectionRightsBackendObject.getCollectionId()).toBeUndefined();
-    expect(emptyCollectionRightsBackendObject.canEdit()).toBeUndefined();
-    expect(emptyCollectionRightsBackendObject.canUnpublish()).toBeUndefined();
-    expect(emptyCollectionRightsBackendObject.isPrivate()).toBeUndefined();
-    expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual([]);
+      emptyCollectionRightsBackendObject.getCollectionId())
+      .toBeUndefined();
+    expect(emptyCollectionRightsBackendObject.canEdit())
+      .toBeUndefined();
+    expect(emptyCollectionRightsBackendObject.canUnpublish())
+      .toBeUndefined();
+    expect(emptyCollectionRightsBackendObject.isPrivate())
+      .toBeUndefined();
+    expect(emptyCollectionRightsBackendObject.getOwnerNames())
+      .toEqual([]);
   });
 
   it('should make a copy from another collection rights', function() {
@@ -178,10 +203,15 @@ describe('Collection rights object factory', function() {
 
     emptyCollectionRightsBackendObject.copyFromCollectionRights(
       sampleCollectionRights);
-    expect(emptyCollectionRightsBackendObject.getCollectionId()).toEqual(0);
-    expect(emptyCollectionRightsBackendObject.canEdit()).toBe(true);
-    expect(emptyCollectionRightsBackendObject.canUnpublish()).toBe(false);
-    expect(emptyCollectionRightsBackendObject.isPrivate()).toBe(false);
-    expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual(['A']);
+    expect(emptyCollectionRightsBackendObject.getCollectionId())
+      .toEqual(0);
+    expect(emptyCollectionRightsBackendObject.canEdit())
+      .toBe(true);
+    expect(emptyCollectionRightsBackendObject.canUnpublish())
+      .toBe(false);
+    expect(emptyCollectionRightsBackendObject.isPrivate())
+      .toBe(false);
+    expect(emptyCollectionRightsBackendObject.getOwnerNames())
+      .toEqual(['A']);
   });
 });

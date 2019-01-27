@@ -21,10 +21,10 @@ describe('Feedback thread object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     FeedbackThreadSummaryObjectFactory = $injector.get(
       'FeedbackThreadSummaryObjectFactory');
-  }));
+  }]);
 
   it('should update the summary of the thread on addition of a ' +
      ' message', function() {
@@ -34,9 +34,12 @@ describe('Feedback thread object factory', function() {
 
     feedbackThreadSummary.appendNewMessage(
       'Looks good!', 'Test user 3');
-    expect(feedbackThreadSummary.authorLastMessage).toEqual('Test user 3');
-    expect(feedbackThreadSummary.lastMessageText).toEqual('Looks good!');
-    expect(feedbackThreadSummary.totalMessageCount).toEqual(3);
+    expect(feedbackThreadSummary.authorLastMessage)
+      .toEqual('Test user 3');
+    expect(feedbackThreadSummary.lastMessageText)
+      .toEqual('Looks good!');
+    expect(feedbackThreadSummary.totalMessageCount)
+      .toEqual(3);
   });
 
   it('should fetch the feedback thread domain object from the backend ' +
@@ -59,12 +62,16 @@ describe('Feedback thread object factory', function() {
     var feedbackThreadSummary = (
       FeedbackThreadSummaryObjectFactory.createFromBackendDict(threadSummary));
 
-    expect(feedbackThreadSummary.explorationTitle).toEqual(
-      'Sample exploration 1');
-    expect(feedbackThreadSummary.originalAuthorId).toEqual(
-      'Test user 1');
-    expect(feedbackThreadSummary.lastMessageText).toEqual(
-      'last message');
-    expect(feedbackThreadSummary.totalMessageCount).toEqual(2);
+    expect(feedbackThreadSummary.explorationTitle)
+      .toEqual(
+        'Sample exploration 1');
+    expect(feedbackThreadSummary.originalAuthorId)
+      .toEqual(
+        'Test user 1');
+    expect(feedbackThreadSummary.lastMessageText)
+      .toEqual(
+        'last message');
+    expect(feedbackThreadSummary.totalMessageCount)
+      .toEqual(2);
   });
 });

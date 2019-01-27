@@ -38,25 +38,28 @@ oppia.controller('PreviewTab', [
       ParameterMetadataService, PlayerCorrectnessFeedbackEnabledService,
       StateEditorService, UrlInterpolationService) {
     $scope.isExplorationPopulated = false;
-    ExplorationDataService.getData().then(function() {
-      var initStateNameForPreview = StateEditorService.getActiveStateName();
-      var manualParamChanges = [];
+    ExplorationDataService.getData()
+      .then(function() {
+        var initStateNameForPreview = StateEditorService.getActiveStateName();
+        var manualParamChanges = [];
 
-      // Show a warning message if preview doesn't start from the first state
-      if (initStateNameForPreview !==
+        // Show a warning message if preview doesn't start from the first state
+        if (initStateNameForPreview !==
           ExplorationInitStateNameService.savedMemento) {
-        $scope.previewWarning =
+          $scope.previewWarning =
           'Preview started from \"' + initStateNameForPreview + '\"';
-      } else {
-        $scope.previewWarning = '';
-      }
+        } else {
+          $scope.previewWarning = '';
+        }
 
-      // Prompt user to enter any unset parameters, then populate exploration
-      manualParamChanges = $scope.getManualParamChanges(initStateNameForPreview)
-        .then(function(manualParamChanges) {
-          $scope.loadPreviewState(initStateNameForPreview, manualParamChanges);
-        });
-    });
+        // Prompt user to enter any unset parameters, then populate exploration
+        manualParamChanges = $scope
+          .getManualParamChanges(initStateNameForPreview)
+          .then(function(manualParamChanges) {
+            $scope.loadPreviewState(initStateNameForPreview,
+              manualParamChanges);
+          });
+      });
 
     $scope.getManualParamChanges = function(initStateNameForPreview) {
       var deferred = $q.defer();
@@ -127,16 +130,18 @@ oppia.controller('PreviewTab', [
       $timeout(function() {
         var explorationId = ContextService.getExplorationId();
         EditableExplorationBackendApiService.fetchApplyDraftExploration(
-          explorationId).then(function(returnDict) {
-          ExplorationEngineService.init(
-            returnDict, null, null, null,
-            function(unusedInitialStateName, unusedInitHtml, unusedNewParams) {
-              $scope.loadPreviewState(initStateNameForPreview, []);
-            });
-          PlayerCorrectnessFeedbackEnabledService.init(
-            returnDict.correctness_feedback_enabled);
-          NumberAttemptsService.reset();
-        });
+          explorationId)
+          .then(function(returnDict) {
+            ExplorationEngineService.init(
+              returnDict, null, null, null,
+              function(unusedInitialStateName, unusedInitHtml,
+                  unusedNewParams) {
+                $scope.loadPreviewState(initStateNameForPreview, []);
+              });
+            PlayerCorrectnessFeedbackEnabledService.init(
+              returnDict.correctness_feedback_enabled);
+            NumberAttemptsService.reset();
+          });
       }, 200);
     };
 

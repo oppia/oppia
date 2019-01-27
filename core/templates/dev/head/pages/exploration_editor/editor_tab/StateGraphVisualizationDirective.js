@@ -107,7 +107,8 @@ oppia.directive('stateGraphViz', [
           // If statistics for a different version of the exploration are
           // loaded, this may change the opacities of the nodes.
           $scope.$watch('opacityMap', redrawGraph);
-          $(window).resize(redrawGraph);
+          $(window)
+            .resize(redrawGraph);
 
           var getElementDimensions = function() {
             return {
@@ -302,7 +303,8 @@ oppia.directive('stateGraphViz', [
                 var dimensions = getElementDimensions();
 
                 d3.select($element.find('rect.pannable-rect')[0])
-                  .call(d3.behavior.zoom().scaleExtent([1, 1])
+                  .call(d3.behavior.zoom()
+                    .scaleExtent([1, 1])
                     .on('zoom', function() {
                       if (graphBounds.right - graphBounds.left < dimensions.w) {
                         d3.event.translate[0] = 0;
@@ -377,5 +379,6 @@ oppia.directive('stateGraphViz', [
         }
       ]
     };
-  }]);
+  }
+]);
 /* eslint-enable angular/directive-restrict */

@@ -34,16 +34,17 @@ oppia.factory('EditableExplorationBackendApiService', [
       var editableExplorationDataUrl = _getExplorationUrl(
         explorationId, applyDraft);
 
-      $http.get(editableExplorationDataUrl).then(function(response) {
-        var exploration = angular.copy(response.data);
-        if (successCallback) {
-          successCallback(exploration);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+      $http.get(editableExplorationDataUrl)
+        .then(function(response) {
+          var exploration = angular.copy(response.data);
+          if (successCallback) {
+            successCallback(exploration);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _updateExploration = function(
@@ -57,41 +58,43 @@ oppia.factory('EditableExplorationBackendApiService', [
         commit_message: commitMessage,
         change_list: changeList
       };
-      $http.put(editableExplorationDataUrl, putData).then(function(response) {
+      $http.put(editableExplorationDataUrl, putData)
+        .then(function(response) {
         // The returned data is an updated exploration dict.
-        var exploration = angular.copy(response.data);
+          var exploration = angular.copy(response.data);
 
-        // Delete from the ReadOnlyExplorationBackendApiService's cache
-        // As the two versions of the data (learner and editor) now differ
-        ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
-          explorationId, exploration);
+          // Delete from the ReadOnlyExplorationBackendApiService's cache
+          // As the two versions of the data (learner and editor) now differ
+          ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
+            explorationId, exploration);
 
-        if (successCallback) {
-          successCallback(exploration);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+          if (successCallback) {
+            successCallback(exploration);
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _deleteExploration = function(
         explorationId, successCallback, errorCallback) {
       var editableExplorationDataUrl = _getExplorationUrl(explorationId, null);
 
-      $http['delete'](editableExplorationDataUrl).then(function() {
+      $http['delete'](editableExplorationDataUrl)
+        .then(function() {
         // Delete item from the ReadOnlyExplorationBackendApiService's cache
-        ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
-          explorationId);
-        if (successCallback) {
-          successCallback({});
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
+          ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
+            explorationId);
+          if (successCallback) {
+            successCallback({});
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
     };
 
     var _getExplorationUrl = function(explorationId, applyDraft) {
@@ -104,15 +107,13 @@ oppia.factory('EditableExplorationBackendApiService', [
       }
       if (!GLOBALS.can_edit && GLOBALS.can_translate) {
         return UrlInterpolationService.interpolateUrl(
-          TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE, {
-            exploration_id: explorationId
-          });
+          TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE,
+          {exploration_id: explorationId});
       }
 
       return UrlInterpolationService.interpolateUrl(
-        EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
-          exploration_id: explorationId
-        });
+        EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
+        {exploration_id: explorationId});
     };
 
     return {

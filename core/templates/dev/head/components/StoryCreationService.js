@@ -62,9 +62,7 @@ oppia.factory('StoryCreationService', [
           var topic = TopicEditorStateService.getTopic();
           $rootScope.loadingMessage = 'Creating story';
           var createStoryUrl = UrlInterpolationService.interpolateUrl(
-            STORY_CREATOR_URL_TEMPLATE, {
-              topic_id: topic.getId()
-            }
+            STORY_CREATOR_URL_TEMPLATE, {topic_id: topic.getId()}
           );
           $http.post(createStoryUrl, {title: storyTitle})
             .then(function(response) {

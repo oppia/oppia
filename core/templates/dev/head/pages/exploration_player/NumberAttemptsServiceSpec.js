@@ -20,20 +20,23 @@ describe('Number attempts service', function() {
   beforeEach(module('oppia'));
 
   var NumberAttemptsService = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     NumberAttemptsService = $injector.get('NumberAttemptsService');
-  }));
+  }]);
 
   it('should increment number of attempts correctly', function() {
     NumberAttemptsService.reset();
-    expect(NumberAttemptsService.getNumberAttempts()).toEqual(0);
+    expect(NumberAttemptsService.getNumberAttempts())
+      .toEqual(0);
     NumberAttemptsService.submitAttempt();
-    expect(NumberAttemptsService.getNumberAttempts()).toEqual(1);
+    expect(NumberAttemptsService.getNumberAttempts())
+      .toEqual(1);
   });
 
   it('should properly reset the number of attempts to zero', function() {
     NumberAttemptsService.submitAttempt();
     NumberAttemptsService.reset();
-    expect(NumberAttemptsService.getNumberAttempts()).toEqual(0);
+    expect(NumberAttemptsService.getNumberAttempts())
+      .toEqual(0);
   });
 });

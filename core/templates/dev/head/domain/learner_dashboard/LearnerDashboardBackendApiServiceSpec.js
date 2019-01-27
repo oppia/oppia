@@ -53,11 +53,11 @@ describe('Learner Dashboard Backend API Service', function() {
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     LearnerDashboardBackendApiService = $injector.get(
       'LearnerDashboardBackendApiService');
     $httpBackend = $injector.get('$httpBackend');
-  }));
+  }]);
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
@@ -69,14 +69,17 @@ describe('Learner Dashboard Backend API Service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', LEARNER_DASHBOARD_DATA_URL).respond(
-        sampleDataResults);
-      LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(
-        successHandler, failHandler);
+      $httpBackend.expect('GET', LEARNER_DASHBOARD_DATA_URL)
+        .respond(
+          sampleDataResults);
+      LearnerDashboardBackendApiService.fetchLearnerDashboardData()
+        .then(
+          successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(jasmine.objectContaining(
-        {data: sampleDataResults}));
+      expect(successHandler)
+        .toHaveBeenCalledWith(jasmine.objectContaining(
+          {data: sampleDataResults}));
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
@@ -88,14 +91,17 @@ describe('Learner Dashboard Backend API Service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', LEARNER_DASHBOARD_DATA_URL).respond(
-        ERROR_STATUS_CODE, 'Error loading dashboard data.');
-      LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(
-        successHandler, failHandler);
+      $httpBackend.expect('GET', LEARNER_DASHBOARD_DATA_URL)
+        .respond(
+          ERROR_STATUS_CODE, 'Error loading dashboard data.');
+      LearnerDashboardBackendApiService.fetchLearnerDashboardData()
+        .then(
+          successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(jasmine.objectContaining(
-        {data: 'Error loading dashboard data.'}));
+      expect(failHandler)
+        .toHaveBeenCalledWith(jasmine.objectContaining(
+          {data: 'Error loading dashboard data.'}));
     });
 });

@@ -90,4 +90,5 @@ oppia.directive('storyEditorNavbar', [
         }
       ]
     };
-  }]);
+  }
+]);

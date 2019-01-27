@@ -36,10 +36,14 @@ describe('PlaythroughService', function() {
         this.expId, this.expVersion, this.playthroughRecordingProbability);
 
       var playthrough = this.PlaythroughService.getPlaythrough();
-      expect(playthrough.expId).toEqual(this.expId);
-      expect(playthrough.expVersion).toEqual(this.expVersion);
-      expect(playthrough.actions).toEqual([]);
-      expect(playthrough.issueCustomizationArgs).toEqual({});
+      expect(playthrough.expId)
+        .toEqual(this.expId);
+      expect(playthrough.expVersion)
+        .toEqual(this.expVersion);
+      expect(playthrough.actions)
+        .toEqual([]);
+      expect(playthrough.issueCustomizationArgs)
+        .toEqual({});
     });
   });
 
@@ -60,11 +64,12 @@ describe('PlaythroughService', function() {
         this.PlaythroughService.recordExplorationStartAction('initStateName1');
 
         var playthrough = this.PlaythroughService.getPlaythrough();
-        expect(playthrough.actions).toEqual([
-          this.LearnerActionObjectFactory.createNew('ExplorationStart', {
-            state_name: {value: 'initStateName1'},
-          }),
-        ]);
+        expect(playthrough.actions)
+          .toEqual([
+            this.LearnerActionObjectFactory
+              .createNew('ExplorationStart',
+                {state_name: {value: 'initStateName1'}, }, 1)
+          ]);
       });
     });
 
@@ -74,16 +79,17 @@ describe('PlaythroughService', function() {
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
 
         var playthrough = this.PlaythroughService.getPlaythrough();
-        expect(playthrough.actions).toEqual([
-          this.LearnerActionObjectFactory.createNew('AnswerSubmit', {
-            state_name: {value: 'stateName1'},
-            dest_state_name: {value: 'stateName2'},
-            interaction_id: {value: 'TextInput'},
-            submitted_answer: {value: 'Hello'},
-            feedback: {value: 'Try again'},
-            time_spent_state_in_msecs: {value: 30},
-          }),
-        ]);
+        expect(playthrough.actions)
+          .toEqual([
+            this.LearnerActionObjectFactory.createNew('AnswerSubmit', {
+              state_name: {value: 'stateName1'},
+              dest_state_name: {value: 'stateName2'},
+              interaction_id: {value: 'TextInput'},
+              submitted_answer: {value: 'Hello'},
+              feedback: {value: 'Try again'},
+              time_spent_state_in_msecs: {value: 30},
+            }, 1),
+          ]);
       });
     });
 
@@ -92,12 +98,13 @@ describe('PlaythroughService', function() {
         this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
         var playthrough = this.PlaythroughService.getPlaythrough();
-        expect(playthrough.actions).toEqual([
-          this.LearnerActionObjectFactory.createNew('ExplorationQuit', {
-            state_name: {value: 'stateName1'},
-            time_spent_in_state_in_msecs: {value: 120}
-          }),
-        ]);
+        expect(playthrough.actions)
+          .toEqual([
+            this.LearnerActionObjectFactory.createNew('ExplorationQuit', {
+              state_name: {value: 'stateName1'},
+              time_spent_in_state_in_msecs: {value: 120}
+            }, 1),
+          ]);
       });
     });
 
@@ -118,11 +125,13 @@ describe('PlaythroughService', function() {
         this.PlaythroughService.recordPlaythrough();
 
         var playthrough = this.PlaythroughService.getPlaythrough();
-        expect(playthrough.issueType).toEqual('MultipleIncorrectSubmissions');
-        expect(playthrough.issueCustomizationArgs).toEqual({
-          state_name: {value: 'stateName1'},
-          num_times_answered_incorrectly: {value: 5}
-        });
+        expect(playthrough.issueType)
+          .toEqual('MultipleIncorrectSubmissions');
+        expect(playthrough.issueCustomizationArgs)
+          .toEqual({
+            state_name: {value: 'stateName1'},
+            num_times_answered_incorrectly: {value: 5}
+          });
       });
 
       it('identifies early quits', function() {
@@ -134,11 +143,13 @@ describe('PlaythroughService', function() {
         this.PlaythroughService.recordPlaythrough();
 
         var playthrough = this.PlaythroughService.getPlaythrough();
-        expect(playthrough.issueType).toEqual('EarlyQuit');
+        expect(playthrough.issueType)
+          .toEqual('EarlyQuit');
         // We don't check the time spent issue customization arg because it is
         // flaky between tests.
-        expect(playthrough.issueCustomizationArgs).toEqual(
-          jasmine.objectContaining({state_name: {value: 'stateName1'}}));
+        expect(playthrough.issueCustomizationArgs)
+          .toEqual(
+            jasmine.objectContaining({state_name: {value: 'stateName1'}}));
       });
 
       it('identifies cyclic state transitions', function() {
@@ -166,12 +177,17 @@ describe('PlaythroughService', function() {
         this.PlaythroughService.recordPlaythrough();
 
         var playthrough = this.PlaythroughService.getPlaythrough();
-        expect(playthrough.issueType).toEqual('CyclicStateTransitions');
-        expect(playthrough.issueCustomizationArgs).toEqual({
-          state_names: {
-            value: ['stateName1', 'stateName2', 'stateName3', 'stateName1']
-          },
-        });
+        expect(playthrough.issueType)
+          .toEqual('CyclicStateTransitions');
+        expect(playthrough.issueCustomizationArgs)
+          .toEqual({
+            state_names: {
+              value: [
+                'stateName1', 'stateName2',
+                'stateName3', 'stateName1'
+              ]
+            },
+          });
       });
 
       it('identifies p-shaped cyclic state transitions', function() {
@@ -201,11 +217,18 @@ describe('PlaythroughService', function() {
         this.PlaythroughService.recordPlaythrough();
 
         var playthrough = this.PlaythroughService.getPlaythrough();
-        expect(playthrough.issueType).toEqual('CyclicStateTransitions');
+        expect(playthrough.issueType)
+          .toEqual('CyclicStateTransitions');
         // The cycle is stateName2->stateName3->stateName2.
-        expect(playthrough.issueCustomizationArgs).toEqual({
-          state_names: {value: ['stateName2', 'stateName3', 'stateName2']},
-        });
+        expect(playthrough.issueCustomizationArgs)
+          .toEqual({
+            state_names: {
+              value: [
+                'stateName2',
+                'stateName3', 'stateName2'
+              ]
+            },
+          });
       });
     });
   });
@@ -226,7 +249,8 @@ describe('PlaythroughService', function() {
       this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
 
       var playthrough = this.PlaythroughService.getPlaythrough();
-      expect(playthrough.actions).toEqual([]);
+      expect(playthrough.actions)
+        .toEqual([]);
     });
   });
 });

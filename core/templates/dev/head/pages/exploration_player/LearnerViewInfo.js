@@ -35,13 +35,15 @@ oppia.controller('LearnerViewInfo', [
             include_private_explorations: JSON.stringify(
               true)
           }
-        }).then(function(response) {
-          expInfo = response.data.summaries[0];
-          openInformationCardModal();
-        }, function() {
-          $log.error(
-            'Information card failed to load for exploration ' + explorationId);
-        });
+        })
+          .then(function(response) {
+            expInfo = response.data.summaries[0];
+            openInformationCardModal();
+          }, function() {
+            $log.error(
+              'Information card failed to load for exploration ' +
+              explorationId);
+          });
       }
     };
 
@@ -94,20 +96,22 @@ oppia.controller('LearnerViewInfo', [
               RatingComputationService.computeAverageRating(expInfo.ratings));
             var contributorsSummary = (
               expInfo.human_readable_contributors_summary || {});
-            $scope.contributorNames = Object.keys(contributorsSummary).sort(
-              function(contributorUsername1, contributorUsername2) {
-                var commitsOfContributor1 = contributorsSummary[
-                  contributorUsername1].num_commits;
-                var commitsOfContributor2 = contributorsSummary[
-                  contributorUsername2].num_commits;
-                return commitsOfContributor2 - commitsOfContributor1;
-              }
-            );
+            $scope.contributorNames = Object.keys(contributorsSummary)
+              .sort(
+                function(contributorUsername1, contributorUsername2) {
+                  var commitsOfContributor1 = contributorsSummary[
+                    contributorUsername1].num_commits;
+                  var commitsOfContributor2 = contributorsSummary[
+                    contributorUsername2].num_commits;
+                  return commitsOfContributor2 - commitsOfContributor1;
+                }
+              );
             $scope.explorationId = expInfo.id;
             $scope.explorationTags = getExplorationTagsSummary(expInfo.tags);
             $scope.explorationTitle = expInfo.title;
             $scope.infoCardBackgroundCss = {
-              'background-color': expInfo.thumbnail_bg_color
+              'background-color':
+             expInfo.thumbnail_bg_color
             };
             $scope.infoCardBackgroundImageUrl = expInfo.thumbnail_icon_url;
             $scope.getStaticImageUrl = (

@@ -46,9 +46,8 @@ oppia.factory('CollectionCreationService', [
               response.data.collectionId);
             $timeout(function() {
               $window.location = UrlInterpolationService.interpolateUrl(
-                CREATE_NEW_COLLECTION_URL_TEMPLATE, {
-                  collection_id: response.data.collectionId
-                }
+                CREATE_NEW_COLLECTION_URL_TEMPLATE,
+                {collection_id: response.data.collectionId}
               );
             }, 150);
           }, function() {

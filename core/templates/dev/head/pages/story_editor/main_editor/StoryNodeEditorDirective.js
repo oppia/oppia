@@ -46,8 +46,9 @@ oppia.directive('storyNodeEditor', [
                 continue;
               }
               if (
-                $scope.getDestinationNodeIds().indexOf(
-                  $scope.storyNodeIds[i]) !== -1) {
+                $scope.getDestinationNodeIds()
+                  .indexOf(
+                    $scope.storyNodeIds[i]) !== -1) {
                 continue;
               }
               $scope.availableNodes.push({
@@ -58,10 +59,12 @@ oppia.directive('storyNodeEditor', [
           };
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
-            $scope.storyNodeIds = $scope.story.getStoryContents().getNodeIds();
+            $scope.storyNodeIds = $scope.story.getStoryContents()
+              .getNodeIds();
             $scope.nodeIdToTitleMap =
-              $scope.story.getStoryContents().getNodeIdsToTitleMap(
-                $scope.storyNodeIds);
+              $scope.story.getStoryContents()
+                .getNodeIdsToTitleMap(
+                  $scope.storyNodeIds);
             _recalculateAvailableNodes();
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
@@ -71,9 +74,7 @@ oppia.directive('storyNodeEditor', [
             $scope.nodeTitleEditorIsShown = false;
             $scope.OUTLINE_SCHEMA = {
               type: 'html',
-              ui_config: {
-                rows: 100
-              }
+              ui_config: {rows: 100}
             };
           };
 
@@ -107,9 +108,11 @@ oppia.directive('storyNodeEditor', [
 
           $scope.addNewDestinationNode = function() {
             var nodeTitles =
-              $scope.story.getStoryContents().getNodes().map(function(node) {
-                return node.getTitle();
-              });
+              $scope.story.getStoryContents()
+                .getNodes()
+                .map(function(node) {
+                  return node.getTitle();
+                });
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/story_editor/main_editor/' +
@@ -145,7 +148,8 @@ oppia.directive('storyNodeEditor', [
 
             modalInstance.result.then(function(title) {
               var nextNodeId =
-                $scope.story.getStoryContents().getNextNodeId();
+                $scope.story.getStoryContents()
+                  .getNextNodeId();
               StoryUpdateService.addStoryNode($scope.story, title);
               StoryUpdateService.addDestinationNodeIdToNode(
                 $scope.story, $scope.getId(), nextNodeId);
@@ -213,4 +217,5 @@ oppia.directive('storyNodeEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

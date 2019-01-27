@@ -21,40 +21,49 @@ describe('Admin task manager service', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     AdminTaskManagerService = $injector.get('AdminTaskManagerService');
-  }));
+  }]);
 
   it('should initially have no tasks running', function() {
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
+    expect(AdminTaskManagerService.isTaskRunning())
+      .toBe(false);
   });
 
   it('should be able to start a task and record it as running', function() {
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
+    expect(AdminTaskManagerService.isTaskRunning())
+      .toBe(false);
     AdminTaskManagerService.startTask();
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(true);
+    expect(AdminTaskManagerService.isTaskRunning())
+      .toBe(true);
   });
 
   it('should not change running state when stopping no tasks', function() {
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
+    expect(AdminTaskManagerService.isTaskRunning())
+      .toBe(false);
     AdminTaskManagerService.finishTask();
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
+    expect(AdminTaskManagerService.isTaskRunning())
+      .toBe(false);
   });
 
   it('should be able to stop a running task', function() {
     AdminTaskManagerService.startTask();
 
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(true);
+    expect(AdminTaskManagerService.isTaskRunning())
+      .toBe(true);
     AdminTaskManagerService.finishTask();
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
+    expect(AdminTaskManagerService.isTaskRunning())
+      .toBe(false);
   });
 
   it('should be able to start a task twice and stop it once', function() {
     AdminTaskManagerService.startTask();
     AdminTaskManagerService.startTask();
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(true);
+    expect(AdminTaskManagerService.isTaskRunning())
+      .toBe(true);
 
     AdminTaskManagerService.finishTask();
-    expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
+    expect(AdminTaskManagerService.isTaskRunning())
+      .toBe(false);
   });
 });

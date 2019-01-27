@@ -90,39 +90,44 @@ oppia.factory('CompareVersionsService', [
             ExplorationDataService.explorationId, v1),
           v2Data: ReadOnlyExplorationBackendApiService.loadExploration(
             ExplorationDataService.explorationId, v2)
-        }).then(function(response) {
-          var v1StatesDict = response.v1Data.exploration.states;
-          var v2StatesDict = response.v2Data.exploration.states;
+        })
+          .then(function(response) {
+            var v1StatesDict = response.v1Data.exploration.states;
+            var v2StatesDict = response.v2Data.exploration.states;
 
-          // Track changes from v1 to LCA, and then from LCA to v2.
-          var lca = VersionTreeService.findLCA(v1, v2);
+            // Track changes from v1 to LCA, and then from LCA to v2.
+            var lca = VersionTreeService.findLCA(v1, v2);
 
-          var v1States = StatesObjectFactory.createFromBackendDict(
-            v1StatesDict).getStateObjects();
-          var v2States = StatesObjectFactory.createFromBackendDict(
-            v2StatesDict).getStateObjects();
+            var v1States = StatesObjectFactory.createFromBackendDict(
+              v1StatesDict)
+              .getStateObjects();
+            var v2States = StatesObjectFactory.createFromBackendDict(
+              v2StatesDict)
+              .getStateObjects();
 
-          var diffGraphData = ExplorationDiffService.getDiffGraphData(
-            v1States, v2States, [{
-              changeList: _getCombinedChangeList(lca, v1, false),
-              directionForwards: false
-            }, {
-              changeList: _getCombinedChangeList(lca, v2, true),
-              directionForwards: true
-            }]
-          );
-          return {
-            nodes: diffGraphData.nodes,
-            links: diffGraphData.links,
-            finalStateIds: diffGraphData.finalStateIds,
-            v1InitStateId: diffGraphData.originalStateIds[
-              response.v1Data.exploration.init_state_name],
-            v2InitStateId: diffGraphData.stateIds[
-              response.v2Data.exploration.init_state_name],
-            v1States: v1States,
-            v2States: v2States
-          };
-        });
+            var diffGraphData = ExplorationDiffService.getDiffGraphData(
+              v1States, v2States, [
+                {
+                  changeList: _getCombinedChangeList(lca, v1, false),
+                  directionForwards: false
+                }, {
+                  changeList: _getCombinedChangeList(lca, v2, true),
+                  directionForwards: true
+                }
+              ]
+            );
+            return {
+              nodes: diffGraphData.nodes,
+              links: diffGraphData.links,
+              finalStateIds: diffGraphData.finalStateIds,
+              v1InitStateId: diffGraphData.originalStateIds[
+                response.v1Data.exploration.init_state_name],
+              v2InitStateId: diffGraphData.stateIds[
+                response.v2Data.exploration.init_state_name],
+              v1States: v1States,
+              v2States: v2States
+            };
+          });
       }
     };
   }

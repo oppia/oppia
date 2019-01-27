@@ -28,9 +28,7 @@ var GLOBALS = {
         {
           default_value: '',
           name: 'placeholder',
-          schema: {
-            type: 'unicode'
-          },
+          schema: {type: 'unicode'},
           description: 'Placeholder text (optional)'
         },
         {
@@ -71,13 +69,15 @@ var GLOBALS = {
       narrow_instructions: null
     }
   },
-  SUPPORTED_SITE_LANGUAGES: [{
-    id: 'id',
-    text: 'Bahasa Indonesia'
-  }, {
-    id: 'en',
-    text: 'English'
-  }],
+  SUPPORTED_SITE_LANGUAGES: [
+    {
+      id: 'id',
+      text: 'Bahasa Indonesia'
+    }, {
+      id: 'en',
+      text: 'English'
+    }
+  ],
   GCS_RESOURCE_BUCKET_NAME: null,
   userIsLoggedIn: true
 };
@@ -103,10 +103,12 @@ var hashes = {
  * (see the 'Unit Testing' section).
  */
 GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS = function($provide, $translateProvider) {
-  $provide.factory('customLoader', ['$q', function($q) {
-    return function() {
-      return $q.resolve({});
-    };
-  }]);
+  $provide.factory('customLoader', [
+    '$q', function($q) {
+      return function() {
+        return $q.resolve({});
+      };
+    }
+  ]);
   $translateProvider.useLoader('customLoader');
 };

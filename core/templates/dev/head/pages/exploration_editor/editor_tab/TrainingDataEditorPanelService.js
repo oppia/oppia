@@ -72,16 +72,17 @@ oppia.factory('TrainingDataEditorPanelService', [
               var _rebuildTrainingData = function() {
                 $scope.trainingData = [];
                 TrainingDataService.getTrainingDataOfAnswerGroup(
-                  answerGroupIndex).forEach(function(answer) {
-                  var answerTemplate = (
-                    ExplorationHtmlFormatterService.getAnswerHtml(
-                      answer, StateInteractionIdService.savedMemento,
-                      StateCustomizationArgsService.savedMemento));
-                  $scope.trainingData.push({
-                    answer: answer,
-                    answerTemplate: answerTemplate
+                  answerGroupIndex)
+                  .forEach(function(answer) {
+                    var answerTemplate = (
+                      ExplorationHtmlFormatterService.getAnswerHtml(
+                        answer, StateInteractionIdService.savedMemento,
+                        StateCustomizationArgsService.savedMemento));
+                    $scope.trainingData.push({
+                      answer: answer,
+                      answerTemplate: answerTemplate
+                    });
                   });
-                });
               };
 
               $scope.init = function() {
@@ -185,7 +186,8 @@ oppia.factory('TrainingDataEditorPanelService', [
               };
 
               $scope.init();
-            }]
+            }
+          ]
         });
         // Save the modified training data externally in state content.
         $rootScope.$broadcast('externalSave');

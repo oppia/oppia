@@ -70,19 +70,21 @@ oppia.directive('topicsList', [
             });
 
             modalInstance.result.then(function() {
-              EditableTopicBackendApiService.deleteTopic(topicId).then(
-                function(status) {
-                  $rootScope.$broadcast(
-                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
-                },
-                function(error) {
-                  AlertsService.addWarning(
-                    error || 'There was an error when deleting the topic.');
-                }
-              );
+              EditableTopicBackendApiService.deleteTopic(topicId)
+                .then(
+                  function(status) {
+                    $rootScope.$broadcast(
+                      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                  },
+                  function(error) {
+                    AlertsService.addWarning(
+                      error || 'There was an error when deleting the topic.');
+                  }
+                );
             });
           };
         }
       ]
     };
-  }]);
+  }
+]);

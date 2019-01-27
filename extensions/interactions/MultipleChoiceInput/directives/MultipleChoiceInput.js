@@ -62,11 +62,13 @@ oppia.directive('oppiaResponseMultipleChoiceInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MultipleChoiceInput/directives/' +
         'multiple_choice_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
-        $scope.response = _choices[_answer];
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
+          $scope.response = _choices[_answer];
+        }
+      ]
     };
   }
 ]);
@@ -87,15 +89,18 @@ oppia.directive('oppiaShortResponseMultipleChoiceInput', [
           var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
           var response = $filter('convertToPlainText')(_choices[_answer]);
           $scope.response = $filter('truncateAtFirstLine')(response);
-        }]
+        }
+      ]
     };
   }
 ]);
 
-oppia.factory('multipleChoiceInputRulesService', [function() {
-  return {
-    Equals: function(answer, inputs) {
-      return answer === inputs.x;
-    }
-  };
-}]);
+oppia.factory('multipleChoiceInputRulesService', [
+  function() {
+    return {
+      Equals: function(answer, inputs) {
+        return answer === inputs.x;
+      }
+    };
+  }
+]);

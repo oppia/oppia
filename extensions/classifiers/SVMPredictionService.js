@@ -27,8 +27,7 @@
  */
 
 oppia.factory('SVMPredictionService', [
-  '$log', 'PredictionResultOjectFactory',
-  function($log, PredictionResultOjectFactory) {
+  '$log', function($log) {
     return {
       kernel: function(kernelParams, supportVectors, input) {
         var kernel = kernelParams.kernel;
@@ -57,91 +56,6 @@ oppia.factory('SVMPredictionService', [
         return kvalues;
       },
 
-      // Find multiclass probabilities.
-      // NOTE: This function is implemented as it is given in LibSVM.
-      // For more information on exact approach used, read following paper:
-      // https://www.csie.ntu.edu.tw/~cjlin/papers/svmprob/svmprob.pdf
-      // Also take a look at implementation by LibSVM:
-      // https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L1829
-      calculateMulticlassProbabilities: function(nClasses, pairwiseProb) {
-        var Q = [];
-        for (var i = 0; i < nClasses; i++) {
-          Q.push([]);
-          for (var j = 0; j < nClasses; j++) {
-            Q[i].push(0);
-          }
-        }
-
-        var Qp = [];
-        for (var i = 0; i < nClasses; i++) {
-          Qp.push(0);
-        }
-
-        var P = [];
-        for (var i = 0; i < nClasses; i++) {
-          P.push(0);
-        }
-
-        var maxIter = Math.max(100, nClasses);
-        var eps = 0.005 / nClasses;
-
-        for (var t = 0; t < nClasses; t++) {
-          P[t] = 1.0 / nClasses;
-          Q[t][t] = 0.0;
-          for (var j = 0; j < t; j++) {
-            Q[t][t] += pairwiseProb[j][t] * pairwiseProb[j][t];
-            Q[t][j] = Q[j][t];
-          }
-
-          for (var j = t + 1; j < nClasses; j++) {
-            Q[t][t] += pairwiseProb[j][t] * pairwiseProb[j][t];
-            Q[t][j] = -pairwiseProb[j][t] * pairwiseProb[t][j];
-          }
-        }
-
-        var iter = 0;
-        for (iter = 0; iter < maxIter; iter++) {
-          var pQp = 0.0;
-
-          for (var t = 0; t < nClasses; t++) {
-            Qp[t] = 0;
-            for (var j = 0; j < nClasses; j++) {
-              Qp[t] += Q[t][j] * P[j];
-            }
-            pQp += P[t] * Qp[t];
-          }
-
-          var maxError = 0;
-          for (var t = 0; t < nClasses; t++) {
-            var error = Math.abs(Qp[t] - pQp);
-            if (error > maxError) {
-              maxError = error;
-            }
-          }
-
-          if (maxError < eps) {
-            break;
-          }
-
-          for (var t = 0; t < nClasses; t++) {
-            var diff = (-Qp[t] + pQp) / Q[t][t];
-            P[t] += diff;
-            pQp = (
-              (pQp + diff * (diff * Q[t][t] + 2 * Qp[t])) /
-              (1 + diff) / (1 + diff));
-            for (var j = 0; j < nClasses; j++) {
-              Qp[j] = (Qp[j] + diff * Q[t][j]) / (1 + diff);
-              P[j] /= (1 + diff);
-            }
-          }
-        }
-
-        if (iter >= maxIter) {
-          $log.info('Exceeds maxIter in calculateMulticlassProbabilities');
-        }
-
-        return P;
-      },
       predict: function(classifierData, input) {
         var nSupport = classifierData.n_support;
         var supportVectors = classifierData.support_vectors;
@@ -149,8 +63,6 @@ oppia.factory('SVMPredictionService', [
         var intercept = classifierData.intercept;
         var classes = classifierData.classes;
         var kernelParams = classifierData.kernel_params;
-        var probA = classifierData.probA;
-        var probB = classifierData.probB;
 
         var startIndices = [];
         startIndices[0] = 0;
@@ -159,7 +71,7 @@ oppia.factory('SVMPredictionService', [
         }
 
         if (supportVectors[0].length !== input.length) {
-          // Support vector and input dimensions do not match.
+        // Support vector and input dimensions do not match.
           $log.error(
             'Dimension of support vectors and given input is different.');
         }
@@ -173,14 +85,6 @@ oppia.factory('SVMPredictionService', [
           votes.push(0);
         }
 
-        var pairwiseProb = [];
-        for (var i = 0; i < classes.length; i++) {
-          pairwiseProb.push([]);
-          for (var j = 0; j < classes.length; j++) {
-            pairwiseProb[i].push(0);
-          }
-        }
-
         var p = 0;
         for (var i = 0; i < classes.length; i++) {
           for (var j = i + 1; j < classes.length; j++) {
@@ -188,7 +92,6 @@ oppia.factory('SVMPredictionService', [
             var sj = startIndices[j];
             var ci = nSupport[i];
             var cj = nSupport[j];
-            var minProb = 1e-7;
 
             var coef1 = dualCoef[j - 1];
             var coef2 = dualCoef[i];
@@ -208,41 +111,26 @@ oppia.factory('SVMPredictionService', [
             // For more info see github following issue:
             // https://github.com/oppia/oppia/issues/4166
             sum += intercept[p];
-
-            // The following approach to calculate pairwise probabilities was
-            // proposed by platt. For more info on LibSVM's implementation
-            // of platt scaling, read following paper:
-            // https://www.csie.ntu.edu.tw/~cjlin/papers/plattprob.pdf
-            // Also take a look at following implementation by LibSVM:
-            // https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L2552
-            var f = probA[p] * sum + probB[p];
-            var prob = 0;
-            if (f >= 0) {
-              prob = Math.exp(-f) / (1 + Math.exp(-f));
+            if (sum > 0) {
+              votes[i]++;
             } else {
-              prob = 1 / (1 + Math.exp(f));
+              votes[j]++;
             }
-            prob = Math.min(Math.max(prob, minProb), 1 - minProb);
-            pairwiseProb[i][j] = prob;
-            pairwiseProb[j][i] = 1 - prob;
             p++;
           }
         }
 
-        var probabilities = this.calculateMulticlassProbabilities(
-          classes.length, pairwiseProb);
-
-        var maxProbIdx = 0;
-        for (var i = 1; i < classes.length; i++) {
-          if (probabilities[i] > probabilities[maxProbIdx]) {
-            maxProbIdx = i;
+        // Find out class which has got maximum votes.
+        var maxVoteIdx = 0;
+        for (var i = 0; i < votes.length; i++) {
+          if (votes[i] > votes[maxVoteIdx]) {
+            maxVoteIdx = i;
           }
         }
 
-        var predictedLabel = classes[maxProbIdx];
-        var prediction = PredictionResultOjectFactory.createNew(
-          predictedLabel, probabilities[maxProbIdx]);
-        return prediction;
+        var predictedLabel = classes[maxVoteIdx];
+        return predictedLabel;
       }
     };
-  }]);
+  }
+]);

@@ -20,16 +20,18 @@ describe('ParamType objects', function() {
   var ParamType = null;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     ParamType = $injector.get('ParamTypeObjectFactory');
-  }));
+  }]);
 
   it('should have its registry frozen', function() {
-    expect(Object.isFrozen(ParamType.registry)).toBe(true);
+    expect(Object.isFrozen(ParamType.registry))
+      .toBe(true);
   });
 
   it('should use UnicodeString as default type', function() {
-    expect(ParamType.getDefaultType()).toBe(ParamType.registry.UnicodeString);
+    expect(ParamType.getDefaultType())
+      .toBe(ParamType.registry.UnicodeString);
   });
 
   it('should throw for non-existant types', function() {
@@ -48,7 +50,8 @@ describe('ParamType objects', function() {
         },
         default_value: -1,
       });
-    }).toThrowError(/default value is invalid/);
+    })
+      .toThrowError(/default value is invalid/);
   });
 
   describe('UnicodeString', function() {
@@ -59,21 +62,27 @@ describe('ParamType objects', function() {
     });
 
     it('should be frozen', function() {
-      expect(Object.isFrozen(UnicodeString)).toBe(true);
+      expect(Object.isFrozen(UnicodeString))
+        .toBe(true);
     });
 
     it('should give an empty string by default', function() {
-      expect(UnicodeString.createDefaultValue()).toEqual('');
+      expect(UnicodeString.createDefaultValue())
+        .toEqual('');
     });
 
     it('should be named correctly', function() {
-      expect(UnicodeString.getName()).toEqual('UnicodeString');
+      expect(UnicodeString.getName())
+        .toEqual('UnicodeString');
     });
 
     it('should be able to tell whether or not values are strings', function() {
-      expect(UnicodeString.valueIsValid('abc')).toBe(true);
-      expect(UnicodeString.valueIsValid(3)).toBe(false);
-      expect(UnicodeString.valueIsValid([1, 2])).toBe(false);
+      expect(UnicodeString.valueIsValid('abc'))
+        .toBe(true);
+      expect(UnicodeString.valueIsValid(3))
+        .toBe(false);
+      expect(UnicodeString.valueIsValid([1, 2]))
+        .toBe(false);
     });
   });
 });

@@ -30,33 +30,39 @@ var customizeInteraction = function(elem) {
 
 var expectInteractionDetailsToMatch = function(elem) {
   expect(
-    mathExpressionInputTag(elem).isPresent()
-  ).toBe(true);
+    mathExpressionInputTag(elem)
+      .isPresent()
+  )
+    .toBe(true);
 };
 
 var submitAnswer = function(elem, answer) {
-  mathExpressionInputTag(elem).click();
+  mathExpressionInputTag(elem)
+    .click();
   var mathInputElem = element(by.css('.guppy_active'));
   var submitAnswerButon = element(by.css(
     '.protractor-test-submit-answer-button'));
   // Input box is always empty.
-  mathInputElem.isPresent().then(function(present) {
-    if (present) {
-      mathInputElem.sendKeys(answer);
-      submitAnswerButon.click();
-    }
-  });
+  mathInputElem.isPresent()
+    .then(function(present) {
+      if (present) {
+        mathInputElem.sendKeys(answer);
+        submitAnswerButon.click();
+      }
+    });
 };
 
 var answerObjectType = 'UnicodeString';
 
-var testSuite = [{
-  interactionArguments: [],
-  ruleArguments: ['IsMathematicallyEquivalentTo', '{x}^{3}'],
-  expectedInteractionDetails: [],
-  wrongAnswers: ['x', '3x', '2x^3'],
-  correctAnswers: ['x^3', 'xxx']
-}];
+var testSuite = [
+  {
+    interactionArguments: [],
+    ruleArguments: ['IsMathematicallyEquivalentTo', '{x}^{3}'],
+    expectedInteractionDetails: [],
+    wrongAnswers: ['x', '3x', '2x^3'],
+    correctAnswers: ['x^3', 'xxx']
+  }
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

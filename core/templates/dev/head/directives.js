@@ -19,55 +19,62 @@
 
 // HTML bind directive that trusts the value it is given and also evaluates
 // custom directive tags in the provided value.
-oppia.directive('angularHtmlBind', ['$compile', function($compile) {
-  return {
-    restrict: 'E',
-    link: function(scope, elm, attrs) {
+oppia.directive('angularHtmlBind', [
+  '$compile', function($compile) {
+    return {
+      restrict: 'E',
+      link: function(scope, elm, attrs) {
       // Clean up old scopes if the html changes.
       // Reference: https://stackoverflow.com/a/42927814
-      var newScope;
-      scope.$watch(attrs.htmlData, function(newValue) {
-        if (newScope) {
-          newScope.$destroy();
-        }
-        elm.empty();
-        newScope = scope.$new();
-        elm.html(newValue);
-        $compile(elm.contents())(newScope);
-      });
-    }
-  };
-}]);
-
-oppia.directive('mathjaxBind', [function() {
-  return {
-    restrict: 'E',
-    controller: [
-      '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        $scope.$watch($attrs.mathjaxData, function(value) {
-          var $script = angular.element(
-            '<script type="math/tex">'
-          ).html(value === undefined ? '' : value);
-          $element.html('');
-          $element.append($script);
-          MathJax.Hub.Queue(['Reprocess', MathJax.Hub, $element[0]]);
+        var newScope;
+        scope.$watch(attrs.htmlData, function(newValue) {
+          if (newScope) {
+            newScope.$destroy();
+          }
+          elm.empty();
+          newScope = scope.$new();
+          elm.html(newValue);
+          $compile(elm.contents())(newScope);
         });
       }
-    ]
-  };
-}]);
+    };
+  }
+]);
+
+oppia.directive('mathjaxBind', [
+  function() {
+    return {
+      restrict: 'E',
+      controller: [
+        '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+          $scope.$watch($attrs.mathjaxData, function(value) {
+            var $script = angular.element(
+              '<script type="math/tex">'
+            )
+              .html(value === undefined ? '' : value);
+            $element.html('');
+            $element.append($script);
+            MathJax.Hub.Queue(['Reprocess', MathJax.Hub, $element[0]]);
+          });
+        }
+      ]
+    };
+  }
+]);
 
 // Highlights the text of an input field when it is clicked.
-oppia.directive('selectOnClick', [function() {
-  return {
-    restrict: 'E',
-    link: function(scope, elm) {
-      elm.bind('click', function() {
-        this.select();
-      });
-    }
-  };
-}]);
+oppia.directive('selectOnClick', [
+  function() {
+    return {
+      restrict: 'E',
+      link: function(scope, elm) {
+        elm.bind('click', function() {
+          this.select();
+        });
+      }
+    };
+  }
+]);
 
 // A popover that is shown when its label is hovered or clicked upon, and
 // disappears when focus moves away from its label.
@@ -79,31 +86,34 @@ oppia.directive('customPopover', [
         '/custom_popover_directive.html'),
       link: function(scope, elt, attrs) {
         scope.label = attrs.popoverLabel;
-        $(elt).popover({
-          trigger: 'hover',
-          html: true,
-          content: $sce.getTrustedHtml(
-            '<pre class="oppia-pre-wrapped-text">' + attrs.popoverText +
+        $(elt)
+          .popover({
+            trigger: 'hover',
+            html: true,
+            content: $sce.getTrustedHtml(
+              '<pre class="oppia-pre-wrapped-text">' + attrs.popoverText +
             '</pre>'),
-          placement: attrs.popoverPlacement
-        });
+            placement: attrs.popoverPlacement
+          });
       },
-      controller: ['$scope', '$element', function($scope, $element) {
-        $scope.isShown = false;
-
-        $element.on('shown.bs.popover', function() {
-          $scope.isShown = true;
-        });
-        $element.on('hidden.bs.popover', function() {
+      controller: [
+        '$scope', '$element', function($scope, $element) {
           $scope.isShown = false;
-        });
 
-        $scope.showPopover = function() {
-          if (!$scope.isShown) {
-            $element.popover('show');
-          }
-        };
-      }]
+          $element.on('shown.bs.popover', function() {
+            $scope.isShown = true;
+          });
+          $element.on('hidden.bs.popover', function() {
+            $scope.isShown = false;
+          });
+
+          $scope.showPopover = function() {
+            if (!$scope.isShown) {
+              $element.popover('show');
+            }
+          };
+        }
+      ]
     };
   }
 ]);
@@ -128,40 +138,44 @@ oppia.directive('focusOn', [
   }
 ]);
 
-oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
-  return {
-    restrict: 'E',
-    scope: {},
-    controller: ['$scope', 'DeviceInfoService', function(
-        $scope, DeviceInfoService) {
-      $scope.opened = false;
-      $scope.deviceHasTouchEvents = DeviceInfoService.hasTouchEvents();
-    }],
-    link: function(scope, element) {
-      var TIME_TOOLTIP_CLOSE_DELAY_MOBILE = 1000;
+oppia.directive('mobileFriendlyTooltip', [
+  '$timeout', function($timeout) {
+    return {
+      restrict: 'E',
+      scope: {},
+      controller: [
+        '$scope', 'DeviceInfoService', function(
+            $scope, DeviceInfoService) {
+          $scope.opened = false;
+          $scope.deviceHasTouchEvents = DeviceInfoService.hasTouchEvents();
+        }
+      ],
+      link: function(scope, element) {
+        var TIME_TOOLTIP_CLOSE_DELAY_MOBILE = 1000;
 
-      if (scope.deviceHasTouchEvents) {
-        element.on('touchstart', function() {
-          scope.opened = true;
-          scope.$apply();
-        });
-        element.on('touchend', function() {
+        if (scope.deviceHasTouchEvents) {
+          element.on('touchstart', function() {
+            scope.opened = true;
+            scope.$apply();
+          });
+          element.on('touchend', function() {
           // Set time delay before tooltip close
-          $timeout(function() {
-            scope.opened = false;
-          }, TIME_TOOLTIP_CLOSE_DELAY_MOBILE);
-        });
-      } else {
-        element.on('mouseenter', function() {
-          scope.opened = true;
-          scope.$apply();
-        });
+            $timeout(function() {
+              scope.opened = false;
+            }, TIME_TOOLTIP_CLOSE_DELAY_MOBILE);
+          });
+        } else {
+          element.on('mouseenter', function() {
+            scope.opened = true;
+            scope.$apply();
+          });
 
-        element.on('mouseleave', function() {
-          scope.opened = false;
-          scope.$apply();
-        });
+          element.on('mouseleave', function() {
+            scope.opened = false;
+            scope.$apply();
+          });
+        }
       }
-    }
-  };
-}]);
+    };
+  }
+]);

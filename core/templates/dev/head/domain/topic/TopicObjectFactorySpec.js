@@ -22,7 +22,7 @@ describe('Topic object factory', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     TopicObjectFactory = $injector.get('TopicObjectFactory');
 
     var sampleTopicBackendObject = {
@@ -33,11 +33,13 @@ describe('Topic object factory', function() {
       uncategorized_skill_ids: ['skill_1', 'skill_2'],
       canonical_story_ids: ['story_1', 'story_4'],
       additional_story_ids: ['story_2', 'story_3'],
-      subtopics: [{
-        id: 1,
-        title: 'Title',
-        skill_ids: ['skill_3']
-      }],
+      subtopics: [
+        {
+          id: 1,
+          title: 'Title',
+          skill_ids: ['skill_3']
+        }
+      ],
       next_subtopic_id: 1,
       language_code: 'en'
     };
@@ -48,10 +50,11 @@ describe('Topic object factory', function() {
     };
     _sampleTopic = TopicObjectFactory.create(
       sampleTopicBackendObject, skillIdToDescriptionDict);
-  }));
+  }]);
 
   it('should not find issues with a valid topic', function() {
-    expect(_sampleTopic.validate()).toEqual([]);
+    expect(_sampleTopic.validate())
+      .toEqual([]);
   });
 
   it('should validate the topic', function() {
@@ -59,39 +62,53 @@ describe('Topic object factory', function() {
     _sampleTopic.addCanonicalStoryId('story_2');
     _sampleTopic.getSubtopics()[0].addSkill('skill_1');
 
-    expect(_sampleTopic.validate()).toEqual([
-      'Topic name should not be empty.',
-      'The story with id story_2 is present in both canonical ' +
+    expect(_sampleTopic.validate())
+      .toEqual([
+        'Topic name should not be empty.',
+        'The story with id story_2 is present in both canonical ' +
       'and additional stories.',
-      'The skill with id skill_1 is duplicated in the topic'
-    ]);
+        'The skill with id skill_1 is duplicated in the topic'
+      ]);
   });
 
   it('should be able to create an interstitial topic object', function() {
     var topic = TopicObjectFactory.createInterstitialTopic();
-    expect(topic.getId()).toEqual(null);
-    expect(topic.getName()).toEqual('Topic name loading');
-    expect(topic.getDescription()).toEqual('Topic description loading');
-    expect(topic.getLanguageCode()).toBe('en');
-    expect(topic.getSubtopics()).toEqual([]);
-    expect(topic.getAdditionalStoryIds()).toEqual([]);
-    expect(topic.getCanonicalStoryIds()).toEqual([]);
-    expect(topic.getUncategorizedSkillSummaries()).toEqual([]);
+    expect(topic.getId())
+      .toEqual(null);
+    expect(topic.getName())
+      .toEqual('Topic name loading');
+    expect(topic.getDescription())
+      .toEqual('Topic description loading');
+    expect(topic.getLanguageCode())
+      .toBe('en');
+    expect(topic.getSubtopics())
+      .toEqual([]);
+    expect(topic.getAdditionalStoryIds())
+      .toEqual([]);
+    expect(topic.getCanonicalStoryIds())
+      .toEqual([]);
+    expect(topic.getUncategorizedSkillSummaries())
+      .toEqual([]);
   });
 
   it('should correctly remove the various array elements', function() {
     _sampleTopic.removeCanonicalStoryId('story_1');
     _sampleTopic.removeAdditionalStoryId('story_2');
     _sampleTopic.removeUncategorizedSkill('skill_1');
-    expect(_sampleTopic.getAdditionalStoryIds()).toEqual(['story_3']);
-    expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_4']);
-    expect(_sampleTopic.getUncategorizedSkillSummaries().length).toEqual(1);
+    expect(_sampleTopic.getAdditionalStoryIds())
+      .toEqual(['story_3']);
+    expect(_sampleTopic.getCanonicalStoryIds())
+      .toEqual(['story_4']);
+    expect(_sampleTopic.getUncategorizedSkillSummaries().length)
+      .toEqual(1);
     expect(
       _sampleTopic.getUncategorizedSkillSummaries()[0].getId()
-    ).toEqual('skill_2');
+    )
+      .toEqual('skill_2');
     expect(
       _sampleTopic.getUncategorizedSkillSummaries()[0].getDescription()
-    ).toEqual('Description 2');
+    )
+      .toEqual('Description 2');
   });
 
   it('should be able to copy from another topic', function() {
@@ -105,11 +122,13 @@ describe('Topic object factory', function() {
       canonical_story_ids: ['story_5'],
       uncategorized_skill_ids: ['skill_2', 'skill_3'],
       next_subtopic_id: 2,
-      subtopics: [{
-        id: 1,
-        title: 'Title',
-        skill_ids: ['skill_1']
-      }]
+      subtopics: [
+        {
+          id: 1,
+          title: 'Title',
+          skill_ids: ['skill_1']
+        }
+      ]
     }, {
       skill_1: 'Description 1',
       skill_2: 'Description 2',
@@ -121,6 +140,7 @@ describe('Topic object factory', function() {
 
     _sampleTopic.copyFromTopic(secondTopic);
     expect(_sampleTopic).not.toBe(secondTopic);
-    expect(_sampleTopic).toEqual(secondTopic);
+    expect(_sampleTopic)
+      .toEqual(secondTopic);
   });
 });

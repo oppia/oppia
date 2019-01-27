@@ -63,15 +63,16 @@ oppia.factory('ExplorationRightsService', [
         return $http.put(requestUrl, {
           version: ExplorationDataService.data.version,
           make_community_owned: true
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.translator_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
-        });
+        })
+          .then(function(response) {
+            var data = response.data;
+            AlertsService.clearWarnings();
+            that.init(
+              data.rights.owner_names, data.rights.editor_names,
+              data.rights.translator_names, data.rights.viewer_names,
+              data.rights.status, data.rights.cloned_from,
+              data.rights.community_owned, data.rights.viewable_if_private);
+          });
       },
       setViewability: function(viewableIfPrivate) {
         var that = this;
@@ -81,15 +82,16 @@ oppia.factory('ExplorationRightsService', [
         return $http.put(requestUrl, {
           version: ExplorationDataService.data.version,
           viewable_if_private: viewableIfPrivate
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.translator_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
-        });
+        })
+          .then(function(response) {
+            var data = response.data;
+            AlertsService.clearWarnings();
+            that.init(
+              data.rights.owner_names, data.rights.editor_names,
+              data.rights.translator_names, data.rights.viewer_names,
+              data.rights.status, data.rights.cloned_from,
+              data.rights.community_owned, data.rights.viewable_if_private);
+          });
       },
       saveRoleChanges: function(newMemberUsername, newMemberRole) {
         var that = this;
@@ -100,32 +102,32 @@ oppia.factory('ExplorationRightsService', [
           version: ExplorationDataService.data.version,
           new_member_role: newMemberRole,
           new_member_username: newMemberUsername
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.translator_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
-        });
+        })
+          .then(function(response) {
+            var data = response.data;
+            AlertsService.clearWarnings();
+            that.init(
+              data.rights.owner_names, data.rights.editor_names,
+              data.rights.translator_names, data.rights.viewer_names,
+              data.rights.status, data.rights.cloned_from,
+              data.rights.community_owned, data.rights.viewable_if_private);
+          });
       },
       publish: function() {
         var that = this;
         var requestUrl = (
           '/createhandler/status/' + ExplorationDataService.explorationId);
 
-        return $http.put(requestUrl, {
-          make_public: true
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.translator_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
-        });
+        return $http.put(requestUrl, {make_public: true})
+          .then(function(response) {
+            var data = response.data;
+            AlertsService.clearWarnings();
+            that.init(
+              data.rights.owner_names, data.rights.editor_names,
+              data.rights.translator_names, data.rights.viewer_names,
+              data.rights.status, data.rights.cloned_from,
+              data.rights.community_owned, data.rights.viewable_if_private);
+          });
       },
       saveModeratorChangeToBackend: function(emailBody) {
         var that = this;
@@ -136,15 +138,16 @@ oppia.factory('ExplorationRightsService', [
         $http.put(explorationModeratorRightsUrl, {
           email_body: emailBody,
           version: ExplorationDataService.data.version
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.translator_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
-        });
+        })
+          .then(function(response) {
+            var data = response.data;
+            AlertsService.clearWarnings();
+            that.init(
+              data.rights.owner_names, data.rights.editor_names,
+              data.rights.translator_names, data.rights.viewer_names,
+              data.rights.status, data.rights.cloned_from,
+              data.rights.community_owned, data.rights.viewable_if_private);
+          });
       }
     };
   }

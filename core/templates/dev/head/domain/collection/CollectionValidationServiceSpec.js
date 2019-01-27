@@ -28,7 +28,7 @@ describe('Collection validation service', function() {
 
   beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     CollectionValidationService = $injector.get('CollectionValidationService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
@@ -44,14 +44,15 @@ describe('Collection validation service', function() {
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
     _addCollectionNode('exp_id0', EXISTS, PRIVATE_STATUS);
-  }));
+  }]);
 
   var _addCollectionNode = function(explorationId, exists, isPublic) {
     var collectionNode = CollectionNodeObjectFactory.createFromExplorationId(
       explorationId);
     if (exists) {
       collectionNode.setExplorationSummaryObject({
-        status: isPublic ? 'public' : 'private'
+        status: isPublic ?
+        'public' : 'private'
       });
     }
     return _sampleCollection.addCollectionNode(collectionNode);
@@ -73,83 +74,103 @@ describe('Collection validation service', function() {
 
   it('should not find issues with a collection with one node', function() {
     var issues = _findPrivateValidationIssues();
-    expect(issues).toEqual([]);
+    expect(issues)
+      .toEqual([]);
   });
 
   it('should expect at least one collection node', function() {
-    expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
-    expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
+    expect(_sampleCollection.deleteCollectionNode('exp_id0'))
+      .toBe(true);
+    expect(_sampleCollection.getCollectionNodeCount())
+      .toEqual(0);
 
     var issues = _findPrivateValidationIssues();
-    expect(issues).toEqual([
-      'There should be at least 1 exploration in the collection.']);
+    expect(issues)
+      .toEqual(['There should be at least 1 exploration in the collection.']);
   });
 
   it('should detect nonexistent/inaccessible explorations', function() {
     expect(_addCollectionNode(
-      'exp_id1', DOES_NOT_EXIST, PRIVATE_STATUS)).toBe(true);
+      'exp_id1', DOES_NOT_EXIST, PRIVATE_STATUS))
+      .toBe(true);
     var node0 = _getCollectionNode('exp_id0');
     var node1 = _getCollectionNode('exp_id1');
 
     var issues = _findPrivateValidationIssues();
-    expect(issues).toEqual([
-      'The following exploration(s) either do not exist, or you do not have ' +
-      'edit access to add them to this collection: exp_id1'
-    ]);
+    expect(issues)
+      .toEqual([
+        'The following exploration(s) either do not exist, or you do not' +
+      ' have edit access to add them to this collection: exp_id1'
+      ]);
   });
 
   it('should allow private and public explorations in a private collection',
     function() {
-      expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
-      expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS)).toBe(true);
+      expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS))
+        .toBe(true);
+      expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS))
+        .toBe(true);
       var node0 = _getCollectionNode('exp_id0');
       var node1 = _getCollectionNode('exp_id1');
       var node2 = _getCollectionNode('exp_id2');
 
       var issues = _findPrivateValidationIssues();
-      expect(issues).toEqual([]);
+      expect(issues)
+        .toEqual([]);
     }
   );
 
   it('should not allow private explorations in a public collection',
     function() {
-      expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
+      expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS))
+        .toBe(true);
       var node1 = _getCollectionNode('exp_id1');
       var node0 = _getCollectionNode('exp_id0');
 
       var issues = _findPublicValidationIssues();
-      expect(issues).toEqual([
-        'Private explorations cannot be added to a public collection: exp_id0'
-      ]);
+      expect(issues)
+        .toEqual([
+          'Private explorations cannot be added to a public' +
+        ' collection: exp_id0'
+        ]);
 
-      expect(_sampleCollection.deleteCollectionNode('exp_id0')).toBe(true);
+      expect(_sampleCollection.deleteCollectionNode('exp_id0'))
+        .toBe(true);
       issues = _findPublicValidationIssues();
-      expect(issues).toEqual([]);
+      expect(issues)
+        .toEqual([]);
     }
   );
 
   it('should be able to detect multiple validation issues', function() {
-    expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
-    expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
+    expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS))
+      .toBe(true);
+    expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS))
+      .toBe(true);
 
     var node0 = _getCollectionNode('exp_id0');
     var node1 = _getCollectionNode('exp_id1');
     var node2 = _getCollectionNode('exp_id2');
 
     var issues = _findPublicValidationIssues();
-    expect(issues).toEqual([
-      'Private explorations cannot be added to a public collection: ' +
+    expect(issues)
+      .toEqual([
+        'Private explorations cannot be added to a public collection: ' +
       'exp_id0, exp_id2'
-    ]);
+      ]);
   });
 
   it('should return false if the tags are not valid', function() {
-    expect(CollectionValidationService.isTagValid(['test'])).toBe(true);
-    expect(CollectionValidationService.isTagValid(['test', 'math'])).toBe(true);
+    expect(CollectionValidationService.isTagValid(['test']))
+      .toBe(true);
+    expect(CollectionValidationService.isTagValid(['test', 'math']))
+      .toBe(true);
 
     expect(CollectionValidationService.isTagValid(
-      ['test', 'test'])).toBe(false);
+      ['test', 'test']))
+      .toBe(false);
     expect(CollectionValidationService.isTagValid(
-      ['test '])).toBe(false);
+      ['test ']))
+      .toBe(false);
   });
 });

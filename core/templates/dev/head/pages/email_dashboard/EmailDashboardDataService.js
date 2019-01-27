@@ -35,9 +35,10 @@ oppia.factory('EmailDashboardDataService', [
           num_queries_to_fetch: pageSize,
           cursor: cursor
         }
-      }).then(function(response) {
-        return response.data;
-      });
+      })
+        .then(function(response) {
+          return response.data;
+        });
     };
 
     return {
@@ -57,14 +58,13 @@ oppia.factory('EmailDashboardDataService', [
         var startQueryIndex = currentPageIndex * QUERIES_PER_PAGE;
         var endQueryIndex = (currentPageIndex + 1) * QUERIES_PER_PAGE;
 
-        return $http.post(QUERY_DATA_URL, {
-          data: data
-        }).then(function(response) {
-          var data = response.data;
-          var newQueries = [data.query];
-          queries = newQueries.concat(queries);
-          return queries.slice(startQueryIndex, endQueryIndex);
-        });
+        return $http.post(QUERY_DATA_URL, {data: data})
+          .then(function(response) {
+            var data = response.data;
+            var newQueries = [data.query];
+            queries = newQueries.concat(queries);
+            return queries.slice(startQueryIndex, endQueryIndex);
+          });
       },
 
       getNextQueries: function() {
@@ -105,19 +105,16 @@ oppia.factory('EmailDashboardDataService', [
       },
 
       fetchQuery: function(queryId) {
-        return $http.get(QUERY_STATUS_CHECK_URL, {
-          params: {
-            query_id: queryId
-          }
-        }).then(function(response) {
-          var data = response.data;
-          queries.forEach(function(query, index, queries) {
-            if (query.id === queryId) {
-              queries[index] = data.query;
-            }
+        return $http.get(QUERY_STATUS_CHECK_URL, {params: {query_id: queryId}})
+          .then(function(response) {
+            var data = response.data;
+            queries.forEach(function(query, index, queries) {
+              if (query.id === queryId) {
+                queries[index] = data.query;
+              }
+            });
+            return data.query;
           });
-          return data.query;
-        });
       }
     };
   }

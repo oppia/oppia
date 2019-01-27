@@ -23,21 +23,11 @@ describe('Extracting Image file names in the state service', function() {
     // descendant dependencies.
     module(function($provide) {
       $provide.constant('INTERACTION_SPECS', {
-        TextInput: {
-          is_terminal: false
-        },
-        ItemSelectionInput: {
-          is_terminal: false
-        },
-        MultipleChoiceInput: {
-          is_terminal: false
-        },
-        Continue: {
-          is_terminal: false
-        },
-        EndExploration: {
-          is_terminal: true
-        }
+        TextInput: {is_terminal: false},
+        ItemSelectionInput: {is_terminal: false},
+        MultipleChoiceInput: {is_terminal: false},
+        Continue: {is_terminal: false},
+        EndExploration: {is_terminal: true}
       });
     });
   });
@@ -46,7 +36,7 @@ describe('Extracting Image file names in the state service', function() {
   var $rootScope = null;
   var explorationDict;
   var ImageFilenamesInExploration;
-  beforeEach(inject(function($injector) {
+  beforeEach(inject[function($injector) {
     eof = $injector.get('ExplorationObjectFactory');
     ecs = $injector.get('ContextService');
     eifss = $injector.get('ExtractImageFilenamesFromStateService');
@@ -84,11 +74,7 @@ describe('Extracting Image file names in the state service', function() {
               param_changes: []
             },
             confirmed_unclassified_answers: [],
-            customization_args: {
-              buttonText: {
-                value: 'Continue'
-              }
-            },
+            customization_args: {buttonText: {value: 'Continue'}},
             solution: null,
             answer_groups: [],
             hints: []
@@ -109,11 +95,7 @@ describe('Extracting Image file names in the state service', function() {
             id: 'EndExploration',
             default_outcome: null,
             confirmed_unclassified_answers: [],
-            customization_args: {
-              recommendedExplorationIds: {
-                value: []
-              }
-            },
+            customization_args: {recommendedExplorationIds: {value: []}},
             solution: null,
             answer_groups: [],
             hints: []
@@ -172,9 +154,7 @@ describe('Extracting Image file names in the state service', function() {
                 },
                 rule_specs: [
                   {
-                    inputs: {
-                      x: 0
-                    },
+                    inputs: {x: 0},
                     rule_type: 'Equals'
                   }
                 ]
@@ -192,9 +172,7 @@ describe('Extracting Image file names in the state service', function() {
                 },
                 rule_specs: [
                   {
-                    inputs: {
-                      x: 1
-                    },
+                    inputs: {x: 1},
                     rule_type: 'Equals'
                   }
                 ]
@@ -233,12 +211,8 @@ describe('Extracting Image file names in the state service', function() {
             },
             confirmed_unclassifies_answers: [],
             customization_args: {
-              minAllowableSelectionCount: {
-                value: 1
-              },
-              maxAllowableSelectionCount: {
-                value: 2
-              },
+              minAllowableSelectionCount: {value: 1},
+              maxAllowableSelectionCount: {value: 2},
               choices: {
                 value: [
                   '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
@@ -246,7 +220,8 @@ describe('Extracting Image file names in the state service', function() {
                   '</oppia-noninteractive-image></p>',
                   '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
                   'quot;s4Choice2.png&amp;quot;">' +
-                  '</oppia-noninteractive-image></p>']
+                  '</oppia-noninteractive-image></p>'
+                ]
               }
             },
             hints: [],
@@ -341,12 +316,12 @@ describe('Extracting Image file names in the state service', function() {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_specs: [{
-                  inputs: {
-                    x: 'classdef'
-                  },
-                  rule_type: 'IsInRegion'
-                }]
+                rule_specs: [
+                  {
+                    inputs: {x: 'classdef'},
+                    rule_type: 'IsInRegion'
+                  }
+                ]
               },
               {
                 labelled_as_correct: false,
@@ -360,12 +335,12 @@ describe('Extracting Image file names in the state service', function() {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_specs: [{
-                  inputs: {
-                    x: 'instancefunc'
-                  },
-                  rule_type: 'IsInRegion'
-                }]
+                rule_specs: [
+                  {
+                    inputs: {x: 'instancefunc'},
+                    rule_type: 'IsInRegion'
+                  }
+                ]
               },
               {
                 labelled_as_correct: false,
@@ -378,12 +353,12 @@ describe('Extracting Image file names in the state service', function() {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_specs: [{
-                  inputs: {
-                    x: 'docstring'
-                  },
-                  rule_type: 'IsInRegion'
-                }]
+                rule_specs: [
+                  {
+                    inputs: {x: 'docstring'},
+                    rule_type: 'IsInRegion'
+                  }
+                ]
               },
               {
                 labelled_as_correct: false,
@@ -397,12 +372,12 @@ describe('Extracting Image file names in the state service', function() {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_specs: [{
-                  inputs: {
-                    x: 'classfunc'
-                  },
-                  rule_type: 'IsInRegion'
-                }]
+                rule_specs: [
+                  {
+                    inputs: {x: 'classfunc'},
+                    rule_type: 'IsInRegion'
+                  }
+                ]
               },
               {
                 labelled_as_correct: false,
@@ -416,71 +391,71 @@ describe('Extracting Image file names in the state service', function() {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_specs: [{
-                  inputs: {
-                    x: 'ctor'
-                  },
-                  rule_type: 'IsInRegion'
-                }]
+                rule_specs: [
+                  {
+                    inputs: {x: 'ctor'},
+                    rule_type: 'IsInRegion'
+                  }
+                ]
               }
             ],
             customization_args: {
-              highlightRegionsOnHover: {
-                value: true
-              },
+              highlightRegionsOnHover: {value: true},
               imageAndRegions: {
                 value: {
                   imagePath: 's5ImagePath.png',
-                  labeledRegions: [{
-                    label: 'classdef',
-                    region: {
-                      area: [
-                        [0.004291845493562232, 0.004692192192192192],
-                        [0.40987124463519314, 0.05874624624624625]
-                      ],
-                      regionType: 'Rectangle'
+                  labeledRegions: [
+                    {
+                      label: 'classdef',
+                      region: {
+                        area: [
+                          [0.004291845493562232, 0.004692192192192192],
+                          [0.40987124463519314, 0.05874624624624625]
+                        ],
+                        regionType: 'Rectangle'
+                      }
+                    },
+                    {
+                      label: 'docstring',
+                      region: {
+                        area: [
+                          [0.07296137339055794, 0.06475225225225226],
+                          [0.9892703862660944, 0.1218093093093093]
+                        ],
+                        regionType: 'Rectangle'
+                      }
+                    },
+                    {
+                      label: 'instancefunc',
+                      region: {
+                        area: [
+                          [0.07296137339055794, 0.15183933933933935],
+                          [0.6995708154506438, 0.44012762762762764]
+                        ],
+                        regionType: 'Rectangle'
+                      }
+                    },
+                    {
+                      label: 'classfunc',
+                      region: {
+                        area: [
+                          [0.06866952789699571, 0.46114864864864863],
+                          [0.6931330472103004, 0.776463963963964]
+                        ],
+                        regionType: 'Rectangle'
+                      }
+                    },
+                    {
+                      label: 'ctor',
+                      region: {
+                        area: [
+                          [0.06437768240343347, 0.821509009009009],
+                          [0.740343347639485, 0.9926801801801802]
+                        ],
+                        regionType: 'Rectangle'
+                      }
                     }
-                  },
-                  {
-                    label: 'docstring',
-                    region: {
-                      area: [
-                        [0.07296137339055794, 0.06475225225225226],
-                        [0.9892703862660944, 0.1218093093093093]
-                      ],
-                      regionType: 'Rectangle'
-                    }
-                  },
-                  {
-                    label: 'instancefunc',
-                    region: {
-                      area: [
-                        [0.07296137339055794, 0.15183933933933935],
-                        [0.6995708154506438, 0.44012762762762764]
-                      ],
-                      regionType: 'Rectangle'
-                    }
-                  },
-                  {
-                    label: 'classfunc',
-                    region: {
-                      area: [
-                        [0.06866952789699571, 0.46114864864864863],
-                        [0.6931330472103004, 0.776463963963964]
-                      ],
-                      regionType: 'Rectangle'
-                    }
-                  },
-                  {
-                    label: 'ctor',
-                    region: {
-                      area: [
-                        [0.06437768240343347, 0.821509009009009],
-                        [0.740343347639485, 0.9926801801801802]
-                      ],
-                      regionType: 'Rectangle'
-                    }
-                  }]
+                  ]
                 }
               }
             },
@@ -516,56 +491,56 @@ describe('Extracting Image file names in the state service', function() {
             },
             confirmed_unclassified_answers: [],
             customization_args: {
-              rows: {
-                value: 1
-              },
-              placeholder: {
-                value: ''
-              }
+              rows: {value: 1},
+              placeholder: {value: ''}
             },
-            answer_groups: [{
-              rule_specs: [{
-                inputs: {
-                  x: '1'
-                },
-                rule_type: 'Contains'
-              }],
-              outcome: {
-                dest: 'State 1',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: "<p>Let's go to State 1</p>"
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
+            answer_groups: [
+              {
+                rule_specs: [
+                  {
+                    inputs: {x: '1'},
+                    rule_type: 'Contains'
+                  }
+                ],
+                outcome: {
+                  dest: 'State 1',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: "<p>Let's go to State 1</p>"
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null
+                }
+              }, {
+                rule_specs: [
+                  {
+                    inputs: {x: '2'},
+                    rule_type: 'Contains'
+                  }
+                ],
+                outcome: {
+                  dest: 'State 1',
+                  feedback: {
+                    content_id: 'feedback_2',
+                    html: "<p>Let's go to State 1</p>"
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null
+                }
               }
-            }, {
-              rule_specs: [{
-                inputs: {
-                  x: '2'
-                },
-                rule_type: 'Contains'
-              }],
-              outcome: {
-                dest: 'State 1',
-                feedback: {
-                  content_id: 'feedback_2',
-                  html: "<p>Let's go to State 1</p>"
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null
-              }
-            }],
-            hints: [{
-              hint_content: {
-                content_id: 'hint_1',
-                html: '<p><oppia-noninteractive-image filepath-with-value="' +
+            ],
+            hints: [
+              {
+                hint_content: {
+                  content_id: 'hint_1',
+                  html: '<p><oppia-noninteractive-image filepath-with-value="' +
                       '&amp;quot;s6Hint1.png&amp;quot;">' +
                       '</oppia-noninteractive-image></p>'
+                }
               }
-            }],
+            ],
             solution: {
               answer_is_exclusive: false,
               correct_answer: 'cat',
@@ -588,14 +563,18 @@ describe('Extracting Image file names in the state service', function() {
     ImageFilenamesInExploration = {
       'State 1': [],
       'State 3': [],
-      'State 4': ['s4Content.png', 's4Choice1.png', 's4Choice2.png',
-        's4DefaultOutcomeFeedback.png'],
+      'State 4': [
+        's4Content.png', 's4Choice1.png', 's4Choice2.png',
+        's4DefaultOutcomeFeedback.png'
+      ],
       'State 5': ['s5ImagePath.png'],
       'State 6': ['s6Hint1.png', 's6SolutionExplanation.png'],
-      Introduction: ['sIMultipleChoice1.png', 'sIMultipleChoice2.png',
-        'sIOutcomeFeedback.png']
+      Introduction: [
+        'sIMultipleChoice1.png', 'sIMultipleChoice2.png',
+        'sIOutcomeFeedback.png'
+      ]
     };
-  }));
+  }]);
 
   it('should get all the filenames of the images in a state',
     function() {
@@ -606,7 +585,8 @@ describe('Extracting Image file names in the state service', function() {
         var filenamesInState = (
           eifss.getImageFilenamesInState(states.getState(statename)));
         filenamesInState.forEach(function(filename) {
-          expect(ImageFilenamesInExploration[statename]).toContain(filename);
+          expect(ImageFilenamesInExploration[statename])
+            .toContain(filename);
         });
       });
     });

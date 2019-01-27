@@ -18,9 +18,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
       HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
-      scope: {
-        getLastAnswer: '&lastAnswer',
-      },
+      scope: {getLastAnswer: '&lastAnswer', },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/LogicProof/directives/' +
         'logic_proof_interaction_directive.html'),
@@ -188,9 +186,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
             }, {
               line: lineNum,
               ch: 100
-            }, {
-              className: 'logic-proof-erroneous-line'
-            });
+            }, {className: 'logic-proof-erroneous-line'});
           };
 
           $scope.constructDisplayedMessage = function(message, lineNum) {
@@ -208,10 +204,12 @@ oppia.directive('oppiaInteractiveLogicProof', [
             return (errorLineNum === undefined) ?
               [numberedLines.join('\n')] :
               [
-                numberedLines.slice(0, errorLineNum).join('\n'),
+                numberedLines.slice(0, errorLineNum)
+                  .join('\n'),
                 numberedLines[errorLineNum],
                 numberedLines.slice(
-                  errorLineNum + 1, numberedLines.length).join('\n')
+                  errorLineNum + 1, numberedLines.length)
+                  .join('\n')
               ];
           };
 
@@ -274,7 +272,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
               ]
             }).result.then(function() {});
           };
-        }]
+        }
+      ]
     };
   }
 ]);
@@ -288,9 +287,11 @@ oppia.directive('oppiaResponseLogicProof', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/LogicProof/directives/' +
         'logic_proof_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        }
+      ]
     };
   }
 ]);
@@ -304,23 +305,27 @@ oppia.directive('oppiaShortResponseLogicProof', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/LogicProof/directives/' +
         'logic_proof_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      }]
+      controller: [
+        '$scope', '$attrs', function($scope, $attrs) {
+          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        }
+      ]
     };
   }
 ]);
 
-oppia.factory('logicProofRulesService', [function() {
-  return {
-    Correct: function(answer) {
-      return answer.correct;
-    },
-    NotCorrect: function(answer) {
-      return !answer.correct;
-    },
-    NotCorrectByCategory: function(answer, inputs) {
-      return !answer.correct && answer.error_category === inputs.c;
-    }
-  };
-}]);
+oppia.factory('logicProofRulesService', [
+  function() {
+    return {
+      Correct: function(answer) {
+        return answer.correct;
+      },
+      NotCorrect: function(answer) {
+        return !answer.correct;
+      },
+      NotCorrectByCategory: function(answer, inputs) {
+        return !answer.correct && answer.error_category === inputs.c;
+      }
+    };
+  }
+]);
