@@ -795,8 +795,8 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
             self.add_message('function-args-order-cls', node=node)
 
 
-class NewlineAtEOFChecker(checkers.BaseChecker):
-    """Checker for newline at EOF."""
+class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
+    """Checker for single character files and newline at EOF."""
 
     __implements__ = interfaces.IRawChecker
     name = 'newline-at-eof'
@@ -841,4 +841,4 @@ def register(linter):
     linter.register_checker(ImportOnlyModulesChecker(linter))
     linter.register_checker(BackslashContinuationChecker(linter))
     linter.register_checker(FunctionArgsOrderChecker(linter))
-    linter.register_checker(NewlineAtEOFChecker(linter))
+    linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
