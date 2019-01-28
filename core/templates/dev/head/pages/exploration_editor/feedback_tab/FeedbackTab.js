@@ -60,10 +60,6 @@ oppia.controller('FeedbackTab', [
     };
     $scope.clearActiveThread();
     ThreadDataService.fetchFeedbackStats();
-    $scope.winReload = function() {
-      console.log("Check");
-      $window.location.reload();
-    };
     var threadPromise = ThreadDataService.fetchThreads();
     $q.all([userInfoPromise, threadPromise]).then(function() {
       $rootScope.loadingMessage = '';
