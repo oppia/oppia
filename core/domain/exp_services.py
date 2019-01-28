@@ -739,6 +739,11 @@ def apply_change_list(exploration_id, change_list):
                         exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS): # pylint: disable=line-too-long
                     state.update_content_ids_to_audio_translations(
                         change.new_value)
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_CONTENT_TRANSLATIONS):
+                    state.update_content_translations(change.new_value)
+
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)

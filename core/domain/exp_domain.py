@@ -47,6 +47,7 @@ STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = (
     'content_ids_to_audio_translations')
+STATE_PROPERTY_CONTENT_TRANSLATIONS = 'content_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
@@ -113,6 +114,7 @@ class ExplorationChange(object):
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+        STATE_PROPERTY_CONTENT_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
@@ -585,6 +587,8 @@ class Exploration(object):
                 } for content_id, audio_translations in (
                     sdict['content_ids_to_audio_translations'].iteritems())
             }
+            state.content_translations = state_domain.ContentTranslations(
+                sdict['content_translations'])
 
             exploration.states[state_name] = state
 
@@ -2082,6 +2086,71 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v25_dict_to_v26_dict(cls, states_dict):
+        """Converts from version 25 to 26. Version 26 adds content_translations
+        dict to the state, which will allow translators to add translation
+        script for the state contents.
+
+        NOTE: This migration will also filter out the content_id from
+        content_ids_to_audio_translations such that the state passes the new
+        validation check safely.
+
+        Earler state validation use to check that the set of all content ids
+        present withing the state is sub-set of the
+        content_ids_to_audio_translations keys, but the new validation will
+        check whether both are equal.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for _, state_dict in states_dict.iteritems():
+            state_content_id_list = []
+
+            # Add state card's content id into the state_content_id_list.
+            state_content_id_list.append(state_dict['content']['content_id'])
+
+            # Add answer_groups content id into the state_content_id_list.
+            for answer_group in state_dict['interaction']['answer_groups']:
+                answer_feedback = answer_group['outcome']['feedback']
+                state_content_id_list.append(answer_feedback['content_id'])
+
+            # If present add default_outcome content id into
+            # state_content_id_list.
+            default_outcome = state_dict['interaction']['default_outcome']
+            if default_outcome:
+                state_content_id_list.append(
+                    default_outcome['feedback']['content_id'])
+
+            # Add hints content id into state_content_id_list.
+            for hints in state_dict['interaction']['hints']:
+                state_content_id_list.append(hint['hint_content']['content_id'])
+
+            # If present add solution content id into state_content_id_list.
+            solution = state_dict['interaction']['solution']
+            if solution:
+                state_content_id_list.append(
+                    solution['explanation']['content_id'])
+
+            # FIlter content_ids_to_audio_translations with unwanted content id.
+            citat = state_dict['content_ids_to_audio_translations']
+            extra_content_ids_in_citat = (
+                set(citat.keys()) - set(state_content_id_list))
+            for content_id in extra_content_ids_in_citat:
+                state_dict['content_ids_to_audio_translations'].pop(content_id)
+
+            # Create content_translations using the state_content_id_list.
+            state_dict['content_translations'] = {}
+            for content_id in state_content_id_list:
+                state_dict['content_translations'][content_id] = {}
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2116,7 +2185,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 30
+    CURRENT_EXP_SCHEMA_VERSION = 31
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2665,6 +2734,20 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v30_dict_to_v31_dict(cls, exploration_dict):
+        """Converts a v30 exploration dict into a v31 exploration dict.
+
+        Adds content_tranlations in state for adding text translation.
+        """
+        exploration_dict['schema_version'] = 31
+
+        exploration_dict['states'] = cls._convert_states_v25_dict_to_v26_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 26
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -2846,6 +2929,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v29_dict_to_v30_dict(
                 exp_id, exploration_dict)
             exploration_schema_version = 30
+
+        if exploration_schema_version == 30:
+            exploration_dict = cls._convert_v30_dict_to_v31_dict(
+                exploration_dict)
+            exploration_schema_version = 31
 
         return (exploration_dict, initial_schema_version)
 

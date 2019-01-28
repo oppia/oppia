@@ -142,7 +142,7 @@ class Hint(object):
 
         Args:
             hint_content: SubtitledHtml. The hint text and ID referring to the
-              other assets for this content.
+                other assets for this content.
         """
         self.hint_content = hint_content
 
@@ -819,13 +819,22 @@ class ContentTranslations(object):
 
         return cls(content_translations)
 
-    def validate(self):
+    def validate(self, expected_content_id_list=None):
         """Validates properties of the ContentTranslations.
 
         Raises:
             ValidationError: One or more attributes of the ContentTranslations
             are invalid.
         """
+        if expected_content_id_list:
+            if not set(self.content_translations.keys()) == (
+                    set(expected_content_id_list)):
+                raise utils.ValidationError(
+                    'Expected state content_translations to have all of the '
+                    'listed content ids %s, found %s' % (
+                        expected_content_id_list,
+                        self.content_translations.keys())
+                    )
         for (content_id, language_code_to_translation_script) in (
                 self.content_translations.iteritems()):
             if not isinstance(content_id, basestring):
@@ -1088,7 +1097,8 @@ class State(object):
 
     def __init__(
             self, content, param_changes, interaction,
-            content_ids_to_audio_translations, classifier_model_id=None):
+            content_ids_to_audio_translations, content_translations,
+            classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -1100,6 +1110,8 @@ class State(object):
                 associated with this state.
             content_ids_to_audio_translations: dict. A dict representing audio
                 translations for corresponding content_id.
+            content_translations: dict. A dict representing translation script
+                for corresponding contnet_id.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -1119,6 +1131,7 @@ class State(object):
         self.classifier_model_id = classifier_model_id
         self.content_ids_to_audio_translations = (
             content_ids_to_audio_translations)
+        self.content_translations = content_translations
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         """Validates various properties of the State.
@@ -1179,16 +1192,25 @@ class State(object):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
-        available_content_ids = self.content_ids_to_audio_translations.keys()
-        if not set(content_id_list) <= set(available_content_ids):
+        available_content_ids_in_audio_translations = (
+            self.content_ids_to_audio_translations.keys())
+
+        self.content_translations.validate(
+            expected_content_id_list=content_id_list)
+
+        if not set(content_id_list) == set(
+                available_content_ids_in_audio_translations):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to have all '
-                'of the listed content ids %s, found %s' %
-                (content_id_list, available_content_ids))
+                'of the listed content ids %s, found %s' % (
+                    content_id_list,
+                    available_content_ids_in_audio_translations))
+
         if not isinstance(self.content_ids_to_audio_translations, dict):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to be a dict,'
-                'received %s' % self.param_changes)
+                'received %s' % self.content_ids_to_audio_translations)
+
         for (content_id, audio_translations) in (
                 self.content_ids_to_audio_translations.iteritems()):
 
@@ -1467,6 +1489,20 @@ class State(object):
                 content_ids_to_audio_translations_dict.iteritems())
         }
 
+    def update_content_translations(self, content_translations_dict):
+        """Update the content_translations of a state.
+
+        Args:
+            content_translations_dict: dict. The dict representation of
+                content_translations.
+        """
+        if not isinstance(content_translations_dict, dict):
+            raise Exception(
+                'Expected content_translations to be a dict, received %s'
+                % content_translations_dict)
+        self.content_translations = ContentTranslations.from_dict(
+            content_translations_dict)
+
     def to_dict(self):
         """Returns a dict representing this State domain object.
 
@@ -1490,7 +1526,8 @@ class State(object):
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
             'content_ids_to_audio_translations': (
-                content_ids_to_audio_translations_dict)
+                content_ids_to_audio_translations_dict),
+            'content_translations': self.content_translations.to_dict()
         }
 
     @classmethod
@@ -1519,6 +1556,7 @@ class State(object):
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
             content_ids_to_audio_translations,
+            ContentTranslations.from_dict(state_dict['content_translations']),
             state_dict['classifier_model_id'])
 
     @classmethod
@@ -1542,7 +1580,8 @@ class State(object):
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),
-            feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
+            feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+            ContentTranslations(feconf.DEFAULT_CONTENT_TRANSLATIONS))
 
     @classmethod
     def convert_html_fields_in_state(cls, state_dict, conversion_fn):
