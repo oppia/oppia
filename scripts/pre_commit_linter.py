@@ -69,7 +69,7 @@ import docstrings_checker  # pylint: disable=relative-import
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
-_PARSER.add_argument(
+_EXCLUSIVE_GROUP.add_argument(
     '--path',
     help='path to the directory with files to be linted',
     action='store')
