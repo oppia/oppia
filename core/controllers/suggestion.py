@@ -183,10 +183,11 @@ class EditSuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_suggestion
     def put(self, target_id, suggestion_id):# pylint: disable=unused-argument
-        """Edits the submitted suggestion.
+        """Edits the submitted suggestion by author or reviewer.
+
         Args:
-            target_id: str. target_id id.
-            suggestion_id: str. id of suggestion to be edit.
+            target_id: str. Target id of exploration.
+            suggestion_id: str. Id of suggestion to be edit.
         """
         new_change = self.payload.get('change')
         suggestion_services.edit_suggestion(suggestion_id, new_change)

@@ -196,15 +196,16 @@ oppia.controller('FeedbackTab', [
           }
         },
         controller: [
-          '$scope', '$log', '$http', '$uibModalInstance', 'suggestionIsHandled',
-          'stateName', 'suggestionId', 'targetId', 'suggestionIsValid',
-          'unsavedChangesExist', 'suggestionStatus', 'description',
-          'currentContent', 'newContent', 'EditabilityService',
+          '$scope', '$log', '$http', '$uibModalInstance', 'currentContent',
+          'description', 'EditabilityService', 'newContent', 'stateName',
+          'suggestionId', 'suggestionIsHandled', 'suggestionIsValid',
+          'suggestionStatus', 'targetId','unsavedChangesExist',
           function(
-              $scope, $log, $http, $uibModalInstance, suggestionIsHandled,
-              stateName, suggestionId, targetId, suggestionIsValid,
-              unsavedChangesExist, suggestionStatus, description,
-              currentContent, newContent, EditabilityService) {
+              $scope, $log, $http, $uibModalInstance, currentContent,
+              description, EditabilityService, newContent, stateName,
+              suggestionId, suggestionIsHandled, suggestionIsValid,
+              suggestionStatus, targetId,unsavedChangesExist,
+              ) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
@@ -216,7 +217,7 @@ oppia.controller('FeedbackTab', [
               'you wish to accept.';
             var ACTION_EDIT_SUGGESTION = 'edit';
             $scope.stateName = stateName;
-            $scope.suggestion_id = suggestionId;
+            $scope.suggestionId = suggestionId;
             $scope.target_id = targetId;
             $scope.isNotHandled = !suggestionIsHandled;
             $scope.canEdit = EditabilityService.isEditable();
@@ -280,7 +281,7 @@ oppia.controller('FeedbackTab', [
               url = UrlInterpolationService.interpolateUrl(
                 '/suggestionactionhandler/edit/<target_id>/<suggestion_id>', {
                   target_id: $scope.target_id,
-                  suggestion_id: $scope.suggestion_id,
+                  suggestion_id: $scope.suggestionId,
                 });
 
               data = {
@@ -297,7 +298,8 @@ oppia.controller('FeedbackTab', [
                 }
               };
 
-              $http.put(url, data); // sending changed suggestion to server.
+              // Sending changed suggestion to server.
+              $http.put(url, data);
             };
 
             $scope.cancelReview = function() {

@@ -409,7 +409,7 @@ oppia.controller('CreatorDashboard', [
             $scope.commitMessage = description;
             $scope.reviewMessage = null;
             $scope.summaryMessage = null;
-            $scope.isEditButtonShown = true;
+            $scope.EditButtonShown = true;
             $scope.isSaveButtonShown = false;
             $scope.canReviewActiveThread = canReviewActiveThread;
             // ng-model needs to bind to a property of an object on
@@ -434,7 +434,7 @@ oppia.controller('CreatorDashboard', [
             };
             $scope.editSuggestion = function() {
               $scope.suggestionEditorIsShown = true;
-              $scope.isEditButtonShown = false;
+              $scope.EditButtonShown = false;
               $scope.isSaveButtonShown = true;
             };
             $scope.cancel = function() {
