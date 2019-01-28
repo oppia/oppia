@@ -113,7 +113,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 if RemoveIllegalPlaythroughsOneOffJob.is_illegal(model)]
             issue['playthrough_ids'] = [
                 pid for pid in issue['playthrough_ids']
-                if not any(pid == model.id for model in illegal_models)]
+                if all(model.id != pid for model in illegal_models)]
             stats_models.PlaythroughModel.delete_multi(illegal_models)
             playthroughs_deleted += len(illegal_models)
         playthrough_issues_model.unresolved_issues = [
