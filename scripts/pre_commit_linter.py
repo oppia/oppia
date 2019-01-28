@@ -714,7 +714,6 @@ def _get_all_files():
     eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     parsed_args = _PARSER.parse_args()
     mode = 'nv'
-    print parsed_args
     if parsed_args.v is True:
         mode = 'v'
     if parsed_args.path:
