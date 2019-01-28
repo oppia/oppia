@@ -867,6 +867,36 @@ class ContentTranslations(object):
                 languages_list.append(language_code)
         return set(languages_list)
 
+    def add_content_id_for_translation(self, content_id):
+        """Adds a content id as a key for the translation into the
+        content_translation dict.
+
+        Args:
+            content_id: str. The id representing a subtitled html.
+
+        Raises:
+            Exception: The content id isn't a string.
+        """
+        if not isinstance(content_id, basestring):
+            raise Exception(
+                'Expected content_id to be a string, received %s' % content_id)
+        if content_id not in self.content_translations:
+            self.content_translations[content_id] = {}
+
+    def delete_content_id_for_translation(self, content_id):
+        """Deletes a content id from the content_translation dict.
+
+        Args:
+            content_id: str. The id representing a subtitled html.
+
+        Raises:
+            Exception: The content id isn't a string.
+        """
+        if not isinstance(content_id, basestring):
+            raise Exception(
+                'Expected content_id to be a string, received %s' % content_id)
+        self.content_translations.pop(content_id, None)
+
     def update_content_translation(
             self, content_id, language_code, translation_script):
         """Updates the ContentTranslations domain object with the give
@@ -1294,6 +1324,28 @@ class State(object):
 
         return utils.yaml_from_dict(state.to_dict(), width=width)
 
+    def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
+        """Adds or deletes content ids in assets i.e, other parts of state
+        object such as content_ids_to_audio_translations.
+
+        Args:
+            old_ids_list: list(str.). A list of content ids present earlier
+                within the substructure (like answer groups, hints etc.) of
+                state.
+            new_ids_list: list(str.). A list of content ids currently present
+                within the substructure (like answer groups, hints etc.) of
+                state.
+        """
+        content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
+        content_ids_to_add = set(new_ids_list) - set(old_ids_list)
+        for content_id in content_ids_to_delete:
+            self.content_ids_to_audio_translations.pop(content_id)
+            self.content_translations.delete_content_id_for_translation(
+                content_id)
+        for content_id in content_ids_to_add:
+            self.content_ids_to_audio_translations[content_id] = {}
+            self.content_translations.add_content_id_for_translation(content_id)
+
     def update_content(self, content_dict):
         """Update the content of this state.
 
@@ -1348,7 +1400,9 @@ class State(object):
                 % answer_groups_list)
 
         interaction_answer_groups = []
-
+        old_content_id_list = [
+            answer_group.outcome.feedback.content_id for answer_group in (
+                self.interaction.answer_groups)]
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
         for answer_group_dict in answer_groups_list:
@@ -1395,6 +1449,12 @@ class State(object):
             interaction_answer_groups.append(answer_group)
         self.interaction.answer_groups = interaction_answer_groups
 
+        new_content_id_list = [
+            answer_group.outcome.feedback.content_id for answer_group in (
+                self.interaction.answer_groups)]
+        self._update_content_ids_in_assets(
+            old_content_id_list, new_content_id_list)
+
     def update_interaction_default_outcome(self, default_outcome_dict):
         """Update the default_outcome of InteractionInstance domain object.
 
@@ -1402,6 +1462,12 @@ class State(object):
             default_outcome_dict: dict. Dict that represents Outcome domain
                 object.
         """
+        old_content_id_list = []
+        new_content_id_list = []
+        if self.interaction.default_outcome:
+            old_content_id_list.append(
+                self.interaction.default_outcome.feedback.content_id)
+
         if default_outcome_dict:
             if not isinstance(default_outcome_dict, dict):
                 raise Exception(
@@ -1409,9 +1475,13 @@ class State(object):
                     % default_outcome_dict)
             self.interaction.default_outcome = Outcome.from_dict(
                 default_outcome_dict)
-
+            new_content_id_list.append(
+                self.interaction.default_outcome.feedback.content_id)
         else:
             self.interaction.default_outcome = None
+
+        self._update_content_ids_in_assets(
+            old_content_id_list, new_content_id_list)
 
     def update_interaction_confirmed_unclassified_answers(
             self, confirmed_unclassified_answers):
@@ -1447,9 +1517,16 @@ class State(object):
             raise Exception(
                 'Expected hints_list to be a list, received %s'
                 % hints_list)
+        old_content_id_list = [
+            hint.hint_content.content_id for hint in self.interaction.hints]
         self.interaction.hints = [
             Hint.from_dict(hint_dict)
             for hint_dict in hints_list]
+
+        new_content_id_list = [
+            hint.hint_content.content_id for hint in self.interaction.hints]
+        self._update_content_ids_in_assets(
+            old_content_id_list, new_content_id_list)
 
     def update_interaction_solution(self, solution_dict):
         """Update the solution of interaction.
@@ -1461,6 +1538,12 @@ class State(object):
         Raises:
             Exception: 'solution_dict' is not a dict.
         """
+        old_content_id_list = []
+        new_content_id_list = []
+        if self.interaction.solution:
+            old_content_id_list.append(
+                self.interaction.solution.explanation.content_id)
+
         if solution_dict is not None:
             if not isinstance(solution_dict, dict):
                 raise Exception(
@@ -1468,8 +1551,13 @@ class State(object):
                     % solution_dict)
             self.interaction.solution = Solution.from_dict(
                 self.interaction.id, solution_dict)
+            new_content_id_list.append(
+                self.interaction.solution.explanation.content_id)
         else:
             self.interaction.solution = None
+
+        self._update_content_ids_in_assets(
+            old_content_id_list, new_content_id_list)
 
     def update_content_ids_to_audio_translations(
             self, content_ids_to_audio_translations_dict):
@@ -1580,8 +1668,9 @@ class State(object):
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),
-            feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-            ContentTranslations(feconf.DEFAULT_CONTENT_TRANSLATIONS))
+            copy.deepcopy(feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS),
+            ContentTranslations(
+                copy.deepcopy(feconf.DEFAULT_CONTENT_TRANSLATIONS)))
 
     @classmethod
     def convert_html_fields_in_state(cls, state_dict, conversion_fn):

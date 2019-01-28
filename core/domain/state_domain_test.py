@@ -53,6 +53,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'content': {},
                 'default_outcome': {}
             },
+            'content_translations': {
+                'content': {},
+                'default_outcome': {}
+            },
             'interaction': {
                 'answer_groups': [],
                 'confirmed_unclassified_answers': [],
@@ -194,7 +198,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.rename_state('END', 'AnotherEnd')
         another_end_state = exploration.states['AnotherEnd']
         another_end_state.update_interaction_id('EndExploration')
-        another_end_state.interaction.default_outcome = None
+        another_end_state.update_interaction_default_outcome(None)
         exploration.validate(strict=True)
 
         # Name it back for final tests.
@@ -462,16 +466,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-
+        # YAMAHA
         content_translations = state_domain.ContentTranslations.from_dict(
             content_translations_dict)
         content_translations.validate()
 
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid content HTML'
-            ):
-            with self.swap(content_translations_dict, 'html', 30):
-                translation_script.validate()
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -498,16 +497,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        init_state.update_content_ids_to_audio_translations({
-            'content': {},
-            'default_outcome': {},
-            'hint_1': {},
-            'solution': {}
-        })
-
-        init_state.interaction.solution = (
-            state_domain.Solution.from_dict(
-                init_state.interaction.id, solution))
+        init_state.update_interaction_solution(solution)
         exploration.validate()
 
         hints_list.append({
@@ -533,13 +523,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         del hints_list[1]
         init_state.update_interaction_hints(hints_list)
 
-        init_state.update_content_ids_to_audio_translations({
-            'content': {},
-            'default_outcome': {},
-            'hint_1': {},
-            'hint_3': {},
-            'solution': {}
-        })
         self.assertEqual(len(init_state.interaction.hints), 2)
         exploration.validate()
 
@@ -585,15 +568,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': 'hello_world is a string'
             }
         }
-        init_state.interaction.solution = (
-            state_domain.Solution.from_dict(
-                init_state.interaction.id, solution))
-        init_state.update_content_ids_to_audio_translations({
-            'content': {},
-            'default_outcome': {},
-            'hint_1': {},
-            'solution': {}
-        })
+        init_state.update_interaction_solution(solution)
         exploration.validate()
 
 
@@ -631,103 +606,3 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             content_translations.get_available_languages(),
             expected_available_languages)
-
-    def test_update_content_translation_for_existing_content_id_updates_correctly(self): #pylint: disable=line-too-long
-
-        content_translations_dict = {
-            'content1': {
-                'en': {
-                    'html': 'hello',
-                    'needs_update': True
-                },
-                'hi': {
-                    'html': 'Hey!',
-                    'needs_update': False
-                }
-            }
-        }
-
-        content_translations = state_domain.ContentTranslations.from_dict(
-            content_translations_dict)
-
-        new_translation_dict = {
-            'html': 'new translation!',
-            'needs_update': True
-        }
-        new_translation_language = 'heb'
-
-        content_translations.update_content_translation(
-            'content1', new_translation_language, new_translation_dict
-            )
-
-        expected_content_translations_dict = {
-            'content1': {
-                'en': {
-                    'html': 'Translation in english.',
-                    'needs_update': True
-                },
-                'hi': {
-                    'html': 'Translation in hindi.',
-                    'needs_update': False
-                },
-                'heb': {
-                    'html': 'Translation in other language.',
-                    'needs_update': True
-                }
-            }
-        }
-
-        self.assertEqual(
-            expected_content_translations_dict,
-            content_translations.to_dict())
-
-    def test_update_content_translation_for_non_existing_content_id_updates_correctly(self): #pylint: disable=line-too-long
-
-        content_translations_dict = {
-            'content1': {
-                'en': {
-                    'html': 'hello',
-                    'needs_update': True
-                },
-                'hi': {
-                    'html': 'Hey!',
-                    'needs_update': False
-                }
-            }
-        }
-
-        content_translations = state_domain.ContentTranslations.from_dict(
-            content_translations_dict)
-
-        new_content_id = 'content2'
-        new_translation_dict = {
-            'html': 'new translation!',
-            'needs_update': True
-        }
-        new_translation_language = 'en'
-
-        content_translations.update_content_translation(
-            new_content_id, new_translation_language, new_translation_dict
-            )
-
-        expected_content_translations_dict = {
-            'content1': {
-                'en': {
-                    'html': 'hello',
-                    'needs_update': True
-                },
-                'hi': {
-                    'html': 'Hey!',
-                    'needs_update': False
-                },
-            },
-            'content2': {
-                'en': {
-                    'html': 'new translation!',
-                    'needs_update': True
-                }
-            }
-        }
-
-        self.assertEqual(
-            expected_content_translations_dict, content_translations.to_dict())

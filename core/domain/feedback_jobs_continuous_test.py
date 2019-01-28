@@ -163,6 +163,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(exp_id, 'owner')
             thread = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id)
+            thread.message_count = 0
             thread.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread.entity_id = exp_id
             thread.subject = 'subject'
@@ -181,12 +182,14 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(exp_id, 'owner')
             thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_1)
+            thread_1.message_count = 0
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'
             thread_1.put()
             thread_2 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_2)
+            thread_2.message_count = 0
             thread_2.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_2.entity_id = exp_id
             thread_2.subject = 'subject'
@@ -212,18 +215,21 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
             thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_1)
+            thread_1.message_count = 0
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id_1
             thread_1.subject = 'subject'
             thread_1.put()
             thread_2 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_2)
+            thread_2.message_count = 0
             thread_2.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_2.entity_id = exp_id_1
             thread_2.subject = 'subject'
             thread_2.put()
             thread_3 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_3)
+            thread_3.message_count = 0
             thread_3.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_3.entity_id = exp_id_3
             thread_3.subject = 'subject'
@@ -288,6 +294,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(exp_id, 'owner')
             thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_1)
+            thread_1.message_count = 0
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'
@@ -327,6 +334,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(exp_id, 'owner')
             thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_1)
+            thread_1.message_count = 0
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'
@@ -386,6 +394,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(exp_id, 'owner')
             thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_1)
+            thread_1.message_count = 0
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'

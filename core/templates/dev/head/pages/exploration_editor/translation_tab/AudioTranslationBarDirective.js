@@ -97,7 +97,7 @@ oppia.directive('audioTranslationBar', [
             var stateName = StateEditorService.getActiveStateName();
             var value = StateContentIdsToAudioTranslationsService.displayed;
             ExplorationStatesService.saveContentIdsToAudioTranslations(
-              stateName, value);
+              stateName, value, true);
           };
 
           var getAvailableAudio = function(contentId, languageCode) {

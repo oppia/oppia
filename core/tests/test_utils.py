@@ -368,6 +368,9 @@ states:
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
+    content_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1025,7 +1028,7 @@ tags: []
             exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
             end_state.update_interaction_id('EndExploration')
-            end_state.interaction.default_outcome = None
+            end_state.update_interaction_default_outcome(None)
 
             # Link first state to ending state (to maintain validity).
             init_state = exploration.states[exploration.init_state_name]
@@ -1077,7 +1080,7 @@ tags: []
             from_state.interaction.default_outcome.dest = dest_state_name
         end_state = exploration.states[state_names[-1]]
         end_state.update_interaction_id('EndExploration')
-        end_state.interaction.default_outcome = None
+        end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration

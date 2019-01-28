@@ -438,6 +438,9 @@ content:
 content_ids_to_audio_translations:
   content: {}
   default_outcome: {}
+content_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -465,6 +468,9 @@ content:
   content_id: content
   html: ''
 content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
+content_translations:
   content: {}
   default_outcome: {}
 interaction:
@@ -496,6 +502,9 @@ content:
 content_ids_to_audio_translations:
   content: {}
   default_outcome: {}
+content_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -525,6 +534,9 @@ content:
   content_id: content
   html: ''
 content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
+content_translations:
   content: {}
   default_outcome: {}
 interaction:

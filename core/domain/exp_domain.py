@@ -726,6 +726,11 @@ class Exploration(object):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
+            if self.language_code in (
+                state.content_translations.get_available_languages()):
+                raise utils.ValidationError(
+                        'This exploration has text translation in its own '
+                        'language.')
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -2095,8 +2100,8 @@ class Exploration(object):
         content_ids_to_audio_translations such that the state passes the new
         validation check safely.
 
-        Earler state validation use to check that the set of all content ids
-        present withing the state is sub-set of the
+        Earlier state validation use to check that the set of all content ids
+        present within the state is sub-set of the
         content_ids_to_audio_translations keys, but the new validation will
         check whether both are equal.
 
@@ -2127,7 +2132,7 @@ class Exploration(object):
                     default_outcome['feedback']['content_id'])
 
             # Add hints content id into state_content_id_list.
-            for hints in state_dict['interaction']['hints']:
+            for hint in state_dict['interaction']['hints']:
                 state_content_id_list.append(hint['hint_content']['content_id'])
 
             # If present add solution content id into state_content_id_list.
@@ -2136,7 +2141,7 @@ class Exploration(object):
                 state_content_id_list.append(
                     solution['explanation']['content_id'])
 
-            # FIlter content_ids_to_audio_translations with unwanted content id.
+            # Filter content_ids_to_audio_translations with unwanted content id.
             citat = state_dict['content_ids_to_audio_translations']
             extra_content_ids_in_citat = (
                 set(citat.keys()) - set(state_content_id_list))
