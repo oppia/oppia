@@ -96,7 +96,8 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 their associated issue.
             All issues have at least one legal playthrough referenced, otherwise
                 they are deleted.
-            All models have at least one issue, otherwise they are deleted.
+            All playthrough issues models have at least one issue, otherwise
+                they are deleted.
 
         Args:
             playthrough_issues_model: ExplorationIssuesModel.
