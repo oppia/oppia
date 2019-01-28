@@ -1118,7 +1118,7 @@ class State(object):
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
         for content_id in content_ids_to_delete:
-            self.content_ids_to_audio_translations.pop(content_id, None)
+            self.content_ids_to_audio_translations.pop(content_id)
         for content_id in content_ids_to_add:
             self.content_ids_to_audio_translations[content_id] = {}
 
@@ -1176,20 +1176,9 @@ class State(object):
                 % answer_groups_list)
 
         interaction_answer_groups = []
-
-        def _get_answer_groups_content_id():
-            """Returns a list of content ids present in answer groups.
-
-            Returns:
-                list(str.). A list of content id present in the answer groups.
-            """
-            content_id_list = []
-            for answer_group in self.interaction.answer_groups:
-                outcome = answer_group.outcome
-                content_id_list.append(outcome.feedback.content_id)
-            return content_id_list
-
-        old_content_id_list = _get_answer_groups_content_id()
+        old_content_id_list = [
+            answer_group.outcome.feedback.content_id for answer_group in (
+                self.interaction.answer_groups)]
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
         for answer_group_dict in answer_groups_list:
@@ -1236,7 +1225,9 @@ class State(object):
             interaction_answer_groups.append(answer_group)
         self.interaction.answer_groups = interaction_answer_groups
 
-        new_content_id_list = _get_answer_groups_content_id()
+        new_content_id_list = [
+            answer_group.outcome.feedback.content_id for answer_group in (
+                self.interaction.answer_groups)]
         self.update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
@@ -1247,19 +1238,12 @@ class State(object):
             default_outcome_dict: dict. Dict that represents Outcome domain
                 object.
         """
-        def _get_default_outcome_content_id():
-            """Returns a list of content ids present in default outcome.
+        old_content_id_list = []
+        new_content_id_list = []
+        if self.interaction.default_outcome:
+            old_content_id_list.append(
+                self.interaction.default_outcome.feedback.content_id)
 
-            Returns:
-                list(str.). A list of containing default outcome content_id.
-            """
-            current_content_id_list = []
-            if self.interaction.default_outcome:
-                current_content_id_list.append(
-                    self.interaction.default_outcome.feedback.content_id)
-            return current_content_id_list
-
-        old_content_id_list = _get_default_outcome_content_id()
         if default_outcome_dict:
             if not isinstance(default_outcome_dict, dict):
                 raise Exception(
@@ -1267,11 +1251,11 @@ class State(object):
                     % default_outcome_dict)
             self.interaction.default_outcome = Outcome.from_dict(
                 default_outcome_dict)
-
+            new_content_id_list.append(
+                self.interaction.default_outcome.feedback.content_id)
         else:
             self.interaction.default_outcome = None
 
-        new_content_id_list = _get_default_outcome_content_id()
         self.update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
@@ -1305,25 +1289,18 @@ class State(object):
         Raises:
             Exception: 'hints_list' is not a list.
         """
-        def _get_hints_content_id():
-            """Returns a list of content ids present in the hints.
-
-            Returns:
-                list(str.). A list of content_id present within the hints.
-            """
-            return [
-                hint.hint_content.content_id for hint in self.interaction.hints]
-
         if not isinstance(hints_list, list):
             raise Exception(
                 'Expected hints_list to be a list, received %s'
                 % hints_list)
-        old_content_id_list = _get_hints_content_id()
+        old_content_id_list = [
+            hint.hint_content.content_id for hint in self.interaction.hints]
         self.interaction.hints = [
             Hint.from_dict(hint_dict)
             for hint_dict in hints_list]
 
-        new_content_id_list = _get_hints_content_id()
+        new_content_id_list = [
+            hint.hint_content.content_id for hint in self.interaction.hints]
         self.update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
@@ -1337,19 +1314,12 @@ class State(object):
         Raises:
             Exception: 'solution_dict' is not a dict.
         """
-        def _get_solution_content_id():
-            """Returns a solution content id in a list.
+        old_content_id_list = []
+        new_content_id_list = []
+        if self.interaction.solution:
+            old_content_id_list.append(
+                self.interaction.solution.explanation.content_id)
 
-            Returns:
-                list(str.). The solution content id in a list.
-            """
-            current_content_id_list = []
-            if self.interaction.solution:
-                current_content_id_list.append(
-                    self.interaction.solution.explanation.content_id)
-            return current_content_id_list
-
-        old_content_id_list = _get_solution_content_id()
         if solution_dict is not None:
             if not isinstance(solution_dict, dict):
                 raise Exception(
@@ -1357,10 +1327,11 @@ class State(object):
                     % solution_dict)
             self.interaction.solution = Solution.from_dict(
                 self.interaction.id, solution_dict)
+            new_content_id_list.append(
+                self.interaction.solution.explanation.content_id)
         else:
             self.interaction.solution = None
 
-        new_content_id_list = _get_solution_content_id()
         self.update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 

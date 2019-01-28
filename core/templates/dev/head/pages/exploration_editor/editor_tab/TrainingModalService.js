@@ -86,7 +86,7 @@ oppia.factory('TrainingModalService', [
                 translationService.saveDisplayedValue();
                 ExplorationStatesService.saveContentIdsToAudioTranslations(
                   translationService.stateName,
-                  angular.copy(translationService.displayed));
+                  angular.copy(translationService.displayed), false);
               };
 
               $scope.exitTrainer = function() {

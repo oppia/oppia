@@ -1773,12 +1773,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'missing_prerequisite_skill_id': None
         }
 
-        self.content_ids_to_audio_translations = {
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {}
-        }
-
     def test_add_state_cmd(self):
         """ Test adding of states."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)

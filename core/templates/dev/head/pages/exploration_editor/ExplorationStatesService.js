@@ -128,7 +128,7 @@ oppia.factory('ExplorationStatesService', [
     };
 
     var saveStateProperty = function(
-        stateName, backendName, newValue, noChangeListRequired) {
+        stateName, backendName, newValue, changeListRequired) {
       var oldValue = getStatePropertyMemento(stateName, backendName);
       var newBackendValue = angular.copy(newValue);
       var oldBackendValue = angular.copy(oldValue);
@@ -139,7 +139,7 @@ oppia.factory('ExplorationStatesService', [
       }
 
       if (!angular.equals(oldValue, newValue)) {
-        if (!noChangeListRequired) {
+        if (changeListRequired) {
           ChangeListService.editStateProperty(
             stateName, backendName, newBackendValue, oldBackendValue);
         }
@@ -222,19 +222,19 @@ oppia.factory('ExplorationStatesService', [
         return getStatePropertyMemento(stateName, 'content');
       },
       saveStateContent: function(stateName, newContent) {
-        saveStateProperty(stateName, 'content', newContent);
+        saveStateProperty(stateName, 'content', newContent, true);
       },
       getStateParamChangesMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'param_changes');
       },
       saveStateParamChanges: function(stateName, newParamChanges) {
-        saveStateProperty(stateName, 'param_changes', newParamChanges);
+        saveStateProperty(stateName, 'param_changes', newParamChanges, true);
       },
       getInteractionIdMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'widget_id');
       },
       saveInteractionId: function(stateName, newInteractionId) {
-        saveStateProperty(stateName, 'widget_id', newInteractionId);
+        saveStateProperty(stateName, 'widget_id', newInteractionId, true);
       },
       getInteractionCustomizationArgsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'widget_customization_args');
@@ -242,13 +242,13 @@ oppia.factory('ExplorationStatesService', [
       saveInteractionCustomizationArgs: function(
           stateName, newCustomizationArgs) {
         saveStateProperty(
-          stateName, 'widget_customization_args', newCustomizationArgs);
+          stateName, 'widget_customization_args', newCustomizationArgs, true);
       },
       getInteractionAnswerGroupsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'answer_groups');
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
-        saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
+        saveStateProperty(stateName, 'answer_groups', newAnswerGroups, true);
         stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
           callback(stateName);
         });
@@ -259,25 +259,26 @@ oppia.factory('ExplorationStatesService', [
       },
       saveConfirmedUnclassifiedAnswers: function(stateName, newAnswers) {
         saveStateProperty(
-          stateName, 'confirmed_unclassified_answers', newAnswers);
+          stateName, 'confirmed_unclassified_answers', newAnswers, true);
       },
       getInteractionDefaultOutcomeMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'default_outcome');
       },
       saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
-        saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
+        saveStateProperty(
+          stateName, 'default_outcome', newDefaultOutcome, true);
       },
       getHintsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'hints');
       },
       saveHints: function(stateName, newHints) {
-        saveStateProperty(stateName, 'hints', newHints);
+        saveStateProperty(stateName, 'hints', newHints, true);
       },
       getSolutionMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'solution');
       },
       saveSolution: function(stateName, newSolution) {
-        saveStateProperty(stateName, 'solution', newSolution);
+        saveStateProperty(stateName, 'solution', newSolution, true);
       },
       getContentIdsToAudioTranslationsMemento: function(stateName) {
         return getStatePropertyMemento(
@@ -285,10 +286,9 @@ oppia.factory('ExplorationStatesService', [
       },
       saveContentIdsToAudioTranslations: function(
           stateName, newContentIdsToAudioTranslations, changeListRequired) {
-        var noChangeListRequired = !createChangeList;
         saveStateProperty(
           stateName, 'content_ids_to_audio_translations',
-          newContentIdsToAudioTranslations, noChangeListRequired);
+          newContentIdsToAudioTranslations, changeListRequired);
       },
       isInitialized: function() {
         return _states !== null;
