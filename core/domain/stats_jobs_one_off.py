@@ -48,13 +48,13 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     keep the database healthy.
 
     Specifically, we want to remove playthroughs which were:
-     1. Created *before* the final release of the project.
+      - Created *before* the final release of the project.
           - These playthroughs did not use validation logic before being
             submitted into the database.
-     2. Created for explorations which are not curated for playthroughs.
+      - Created for an exploration which is not curated for playthroughs.
           - Playthroughs have the potential to store personally-identifiable
-            information. We want to ensure that we will not record playthroughs
-            in explorations with malicious interactions (for example, consider:
+            information. We want to ensure that we never record playthroughs in
+            explorations with malicious interactions (for example, consider:
             TextInput -> "Enter your credit card information"). Currently, we
             accomplish this by only recording playthroughs in explorations
             admins feel confident are safe.
@@ -65,18 +65,25 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [stats_models.ExplorationIssuesModel]
 
     @staticmethod
-    def is_too_old(playthrough_model):
-        """Returns whether the given playthrough model is too old.
+    def is_illegal(playthrough_model):
+        """Returns whether the given playthrough model is illegal.
+
+        A playthrough is illegal iff it was:
+          - Created *before* the final release of the project.
+          - Created for an exploration which is not curated for playthroughs.
 
         Args:
-            playthrough_model: stats_models.PlaythroughModel|None.
+            playthrough_model: stats_models.PlaythroughModel | None.
 
         Returns:
-            bool. Whether the playthrough model was created before the release
-            date of the Playthroughs GSoC 2018 project.
+            bool. Whether the playthrough model is illegal, and should thus be
+            deleted.
         """
+        whitelisted_exploration_ids = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         return (
             playthrough_model is None or
+            playthrough_model.exp_id not in whitelisted_exploration_ids or
             playthrough_model.created_on < PLAYTHROUGH_PROJECT_RELEASE_DATETIME)
 
     @staticmethod
@@ -98,46 +105,26 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             tuple(str, int). Returns the exploration id the given model is
             associated to, and the number of playthroughs deleted from it.
         """
-        exp_id = playthrough_issues_model.exp_id
         playthroughs_deleted = 0
-        unresolved_issues = playthrough_issues_model.unresolved_issues
-        whitelisted_exploration_ids = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
-
-        if exp_id not in whitelisted_exploration_ids:
-            for unresolved_issue in unresolved_issues:
-                playthrough_ids = unresolved_issue['playthrough_ids']
-                stats_models.PlaythroughModel.delete_multi(
-                    stats_models.PlaythroughModel.get_multi(playthrough_ids))
-                playthroughs_deleted += len(playthrough_ids)
-            # We use slice assignment here to clear the values in
-            # unresolved_issues: https://stackoverflow.com/a/10155987/4859885.
-            unresolved_issues[:] = []
-        else:
-            for unresolved_issue in unresolved_issues:
-                playthrough_ids = unresolved_issue['playthrough_ids']
-                old_models = [
-                    model for model in stats_models.PlaythroughModel.get_multi(
-                        playthrough_ids)
-                    if RemoveIllegalPlaythroughsOneOffJob.is_too_old(model)]
-                stats_models.PlaythroughModel.delete_multi(old_models)
-                playthroughs_deleted += len(old_models)
-                # We use slice assignment here to replace the values in
-                # playthrough_ids: https://stackoverflow.com/a/10155987/4859885.
-                playthrough_ids[:] = [
-                    pid for pid in playthrough_ids
-                    if not any(model.id == pid for model in old_models)]
-            # We use slice assignment here to replace the values in
-            # unresolved_issues: https://stackoverflow.com/a/10155987/4859885.
-            unresolved_issues[:] = [
-                unresolved_issue for unresolved_issue in unresolved_issues
-                if unresolved_issue['playthrough_ids']]
-        if not unresolved_issues:
+        for issue in playthrough_issues_model.unresolved_issues:
+            illegal_models = [
+                model for model in stats_models.PlaythroughModel.get_multi(
+                    issue['playthrough_ids'])
+                if RemoveIllegalPlaythroughsOneOffJob.is_illegal(model)]
+            issue['playthrough_ids'] = [
+                pid for pid in issue['playthrough_ids']
+                if not any(pid == model.id for model in illegal_models)]
+            stats_models.PlaythroughModel.delete_multi(illegal_models)
+            playthroughs_deleted += len(illegal_models)
+        playthrough_issues_model.unresolved_issues = [
+            issue for issue in playthrough_issues_model.unresolved_issues
+            if issue['playthrough_ids']]
+        if not playthrough_issues_model.unresolved_issues:
             playthrough_issues_model.delete()
         else:
             playthrough_issues_model.put()
 
-        yield (exp_id, playthroughs_deleted)
+        yield (playthrough_issues_model.exp_id, playthroughs_deleted)
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -146,8 +133,8 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         Args:
             key: str. The id of the exploration.
-            stringified_values: list(str). Each item is the the stringified
-                number of playthroughs deleted. For the given exploration.
+            stringified_values: list(str). Each item is a stringified count of
+                how many playthroughs were deleted by a map job.
 
         Yields:
             tuple(str). A 1-tuple containing a string which summarizes how many
