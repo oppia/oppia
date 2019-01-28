@@ -1105,15 +1105,17 @@ class State(object):
 
         return utils.yaml_from_dict(state.to_dict(), width=width)
 
-    def update_content_ids_in_assets(self, old_ids_list, new_ids_list):
-        """Adds or deletes the content ids from other parts of the state
-        whenever a new content is created or deleted.
+    def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
+        """Adds or deletes content ids in assets i.e, other parts of state
+        object such as content_ids_to_audio_translations.
 
         Args:
-            old_ids_list: list(str.). A list of content ids already present in
-                the state.
-            new_ids_list: list(str.). A list of content ids to be added added in
-                the state.
+            old_ids_list: list(str.). A list of content ids present earlier
+                within the substructure (like answer groups, hints etc.) of
+                state.
+            new_ids_list: list(str.). A list of content ids currently present
+                within the substructure (like answer groups, hints etc.) of
+                state.
         """
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
@@ -1228,7 +1230,7 @@ class State(object):
         new_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
-        self.update_content_ids_in_assets(
+        self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
     def update_interaction_default_outcome(self, default_outcome_dict):
@@ -1256,7 +1258,7 @@ class State(object):
         else:
             self.interaction.default_outcome = None
 
-        self.update_content_ids_in_assets(
+        self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
     def update_interaction_confirmed_unclassified_answers(
@@ -1301,7 +1303,7 @@ class State(object):
 
         new_content_id_list = [
             hint.hint_content.content_id for hint in self.interaction.hints]
-        self.update_content_ids_in_assets(
+        self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
     def update_interaction_solution(self, solution_dict):
@@ -1332,7 +1334,7 @@ class State(object):
         else:
             self.interaction.solution = None
 
-        self.update_content_ids_in_assets(
+        self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
     def update_content_ids_to_audio_translations(
@@ -1428,7 +1430,7 @@ class State(object):
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),
-            feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
+            copy.deepcopy(feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS))
 
     @classmethod
     def convert_html_fields_in_state(cls, state_dict, conversion_fn):
