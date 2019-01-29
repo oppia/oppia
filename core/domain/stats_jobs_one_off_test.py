@@ -54,11 +54,11 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
 
 
-class RemoveIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
-    ONE_OFF_JOB_CLASS = stats_jobs_one_off.RemoveIllegalPlaythroughsOneOffJob
+class DeleteIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
+    ONE_OFF_JOB_CLASS = stats_jobs_one_off.DeleteIllegalPlaythroughsOneOffJob
 
     def setUp(self):
-        super(RemoveIllegalPlaythroughsOneOffJobTests, self).setUp()
+        super(DeleteIllegalPlaythroughsOneOffJobTests, self).setUp()
         self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
 
     def create_playthrough_model(self):

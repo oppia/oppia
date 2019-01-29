@@ -39,7 +39,7 @@ import feconf
 PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
 
 
-class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class DeleteIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for deleting illegal playthroughs.
 
     Playthroughs were introduced as a GSoC 2018 project. During the project,
@@ -135,7 +135,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         remaining_issues = []
         for issue in playthrough_issues_model.unresolved_issues:
             playthroughs_deleted, playthroughs_remaining = (
-                RemoveIllegalPlaythroughsOneOffJob.delete_illegal_playthroughs(
+                DeleteIllegalPlaythroughsOneOffJob.delete_illegal_playthroughs(
                     issue))
             total_playthroughs_deleted += playthroughs_deleted
             if playthroughs_remaining:
