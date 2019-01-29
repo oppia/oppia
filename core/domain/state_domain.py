@@ -851,6 +851,15 @@ class ContentTranslations(object):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
                         % language_code)
+                if not utils.is_valid_language_code(language_code):
+                    raise utils.ValidationError(
+                        'Invalid language_code: %s' % language_code)
+                # TODO(DubeySandeep): Remove this check once App Engine supports
+                # 3-letter language codes in search.
+                if len(language_code) != 2:
+                    raise utils.ValidationError(
+                        'Invalid language_code, it should have exactly 2 '
+                        'letters: %s' % language_code)
                 translation_script.validate()
 
     def get_available_languages(self):
@@ -896,28 +905,6 @@ class ContentTranslations(object):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
         self.content_translations.pop(content_id, None)
-
-    def update_content_translation(
-            self, content_id, language_code, translation_script):
-        """Updates the ContentTranslations domain object with the give
-        parameters.
-
-        Args:
-            content_id: str. The contnet_id of a SubtitledHtml object.
-            language_code: str. The language code of the translation script.
-            translation_script: TranslationScript. The translation script in the
-                give language code.
-        """
-        translation_script = TranslationScript.from_dict(translation_script)
-        translation_script.validate()
-
-        if content_id not in self.content_translations:
-            self.content_translations[content_id] = {
-                language_code: translation_script
-            }
-        else:
-            self.content_translations[content_id][language_code] = (
-                translation_script)
 
 
 class RuleSpec(object):
