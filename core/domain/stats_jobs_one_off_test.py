@@ -244,11 +244,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
 
     def create_playthrough(self):
-        """Helper method to create a simple playthrough and return its id.
-
-        Returns:
-            stats_models.PlaythroughModel.
-        """
+        """Helper method to create and return a simple playthrough model."""
         playthrough_id = stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, issue_type='EarlyQuit',
             issue_customization_args={}, actions=[])
