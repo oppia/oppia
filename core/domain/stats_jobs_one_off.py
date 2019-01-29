@@ -104,7 +104,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 representation of a stats_domain.ExplorationIssue object.
 
         Returns:
-            tuple. A 2-tuple of ints, with the structure:
+            tuple(int, int). A 2-tuple with the structure:
                 (playthroughs_deleted, playthroughs_remaining).
         """
         legal_playthroughs = []
