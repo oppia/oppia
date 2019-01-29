@@ -64,8 +64,8 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def entity_classes_to_map_over(cls):
         return [stats_models.ExplorationIssuesModel]
 
-    @staticmethod
-    def is_illegal(playthrough_model):
+    @classmethod
+    def is_illegal(cls, playthrough_model):
         """Returns whether the given playthrough model is illegal.
 
         A playthrough is illegal iff it was:
@@ -85,6 +85,35 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             playthrough_model is None or
             playthrough_model.exp_id not in whitelisted_exploration_ids or
             playthrough_model.created_on < PLAYTHROUGH_PROJECT_RELEASE_DATETIME)
+
+    @classmethod
+    def delete_illegal_playthroughs(cls, playthrough_issue_backend_dict):
+        """Deletes illegal playthroughs referenced by the given playthrough
+        issue.
+
+        Args:
+            playthrough_issue_backend_dict: dict(str : *). The backend dict
+                representation of a stats_domain.ExplorationIssue object.
+
+        Returns:
+            tuple. A 2-tuple of ints, with the structure:
+                (playthroughs_deleted, playthroughs_remaining).
+        """
+        legal_playthroughs = []
+        illegal_playthroughs = []
+
+        ids = playthrough_issue_backend_dict['playthrough_ids']
+        for playthrough in stats_models.PlaythroughModel.get_multi(ids):
+            target_playthrough_list = (
+                illegal_playthroughs if cls.is_illegal(playthrough) else
+                legal_playthroughs)
+            target_playthrough_list.append(playthrough)
+
+        stats_models.PlaythroughModel.delete_multi(illegal_playthroughs)
+        playthrough_issue_backend_dict['playthrough_ids'] = [
+            playthrough.id for playthrough in legal_playthroughs]
+
+        return (len(illegal_playthroughs), len(legal_playthroughs))
 
     @staticmethod
     def map(playthrough_issues_model):
@@ -106,26 +135,23 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             tuple(str, int). Returns the exploration id the given model is
             associated to, and the number of playthroughs deleted from it.
         """
-        playthroughs_deleted = 0
-        for issue in playthrough_issues_model.unresolved_issues:
-            illegal_models = [
-                model for model in stats_models.PlaythroughModel.get_multi(
-                    issue['playthrough_ids'])
-                if RemoveIllegalPlaythroughsOneOffJob.is_illegal(model)]
-            issue['playthrough_ids'] = [
-                pid for pid in issue['playthrough_ids']
-                if all(model.id != pid for model in illegal_models)]
-            stats_models.PlaythroughModel.delete_multi(illegal_models)
-            playthroughs_deleted += len(illegal_models)
-        playthrough_issues_model.unresolved_issues = [
-            issue for issue in playthrough_issues_model.unresolved_issues
-            if issue['playthrough_ids']]
-        if not playthrough_issues_model.unresolved_issues:
-            playthrough_issues_model.delete()
-        else:
-            playthrough_issues_model.put()
+        total_playthroughs_deleted = 0
+        remaining_issues = []
+        for playthrough_issue in playthrough_issues_model.unresolved_issues:
+            playthroughs_deleted, playthroughs_remaining = (
+                RemoveIllegalPlaythroughsOneOffJob.delete_illegal_playthroughs(
+                    playthrough_issue))
+            total_playthroughs_deleted += playthroughs_deleted
+            if playthroughs_remaining:
+                remaining_issues.append(playthrough_issue)
 
-        yield (playthrough_issues_model.exp_id, playthroughs_deleted)
+        if remaining_issues:
+            playthrough_issues_model.unresolved_issues = remaining_issues
+            playthrough_issues_model.put()
+        else:
+            playthrough_issues_model.delete()
+
+        yield (playthrough_issues_model.exp_id, total_playthroughs_deleted)
 
     @staticmethod
     def reduce(key, stringified_values):
