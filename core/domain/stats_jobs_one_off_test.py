@@ -45,6 +45,9 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
 
         Assumes the existence of a class constant ONE_OFF_JOB_CLASS, pointing
         to the queue under test.
+
+        Returns:
+            str. The ID of the job which ran to completion.
         """
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
@@ -52,6 +55,7 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
+        return job_id
 
 
 class DeleteIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
@@ -236,7 +240,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.PlaythroughAudit
 
     def setUp(self):
-        super(DeleteIllegalPlaythroughsOneOffJobTests, self).setUp()
+        super(PlaythroughAuditTests, self).setUp()
         self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
 
     def create_playthrough(self):
@@ -251,14 +255,42 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         return stats_models.PlaythroughModel.get(playthrough_id)
 
     def test_output_of_pre_release_date_playthroughs(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
         playthrough = self.create_playthrough()
         # Set created_on to a date which is definitely before GSoC 2018.
         playthrough.created_on = datetime.datetime(2017, 12, 31)
         playthrough.put()
 
-        self.run_one_off_job()
+        output = self.ONE_OFF_JOB_CLASS.get_output(self.run_one_off_job())
 
-        # Test output somehow..?
+        self.assertEqual(len(output), 1)
+        self.assertIn('before the GSoC 2018 submission deadline', output[0])
+
+    def test_output_of_non_whitelisted_playthroughs(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id + 'differentiated'])
+        self.create_playthrough()
+
+        output = self.ONE_OFF_JOB_CLASS.get_output(self.run_one_off_job())
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('has not been curated for recording', output[0])
+
+    def test_output_of_duplicate_playthroughs(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        playthrough.actions.append('invalid schema value')
+        playthrough.put()
+
+        output = self.ONE_OFF_JOB_CLASS.get_output(self.run_one_off_job())
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('could not be validated', output[0])
 
 
 class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):

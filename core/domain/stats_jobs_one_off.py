@@ -231,32 +231,30 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
         Yields:
             tuple(str). A 1-tuple whose only element is an error message.
         """
-        if len(stringified_values) != 1:
-            yield (
-                'playthrough_id:%s should correspond to exactly one model, but '
-                '%d were discovered.' % (key, len(stringified_values)),)
-            return
-        value = ast.literal_eval(stringified_values[0])
+        for stringified_value in stringified_values:
+            value = ast.literal_eval(stringified_value)
 
-        if value['validate_error'] is not None:
-            yield (
-                'playthrough_id:%s could not be validated as a domain object '
-                'because of the error: %s.' % (key, value['validate_error']),)
+            if value['validate_error'] is not None:
+                yield (
+                    'playthrough_id:%s could not be validated as a domain '
+                    'object because of the error: %s.' % (
+                        key, value['validate_error']),)
 
-        whitelisted_exploration_ids_for_playthroughs = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
-        if value['exp_id'] not in whitelisted_exploration_ids_for_playthroughs:
-            yield (
-                'playthrough_id:%s was recorded in exploration_id:%s which has '
-                'not been curated for recording.' % (key, value['exp_id']),)
+            whitelisted_exploration_ids_for_playthroughs = (
+                config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+            if value['exp_id'] not in whitelisted_exploration_ids_for_playthroughs:
+                yield (
+                    'playthrough_id:%s was recorded in exploration_id:%s which '
+                    'has not been curated for recording.' % (
+                        key, value['exp_id']),)
 
-        created_on_datetime = (
-            datetime.datetime.strptime(value['created_on'], '%Y-%m-%d'))
-        if created_on_datetime < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
-            yield (
-                'playthrough_id:%s was released on %s, which is before the '
-                'GSoC 2018 submission deadline (2018-09-01) and should '
-                'therefore not exist.' % (key, value['created_on']),)
+            created_on_datetime = (
+                datetime.datetime.strptime(value['created_on'], '%Y-%m-%d'))
+            if created_on_datetime < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
+                yield (
+                    'playthrough_id:%s was released on %s, which is before the '
+                    'GSoC 2018 submission deadline (2018-09-01) and should '
+                    'therefore not exist.' % (key, value['created_on']),)
 
 
 class ExplorationIssuesModelCreatorOneOffJob(
