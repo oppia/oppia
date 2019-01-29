@@ -162,7 +162,7 @@ class SkillEditorQuestionHandler(base.BaseHandler):
         start_cursor = self.request.get('cursor')
 
         question_summaries, next_start_cursor = (
-            question_services.get_question_summaries_linked_to_skills(
+            question_services.get_question_summaries_and_skill_descriptions(
                 constants.NUM_QUESTIONS_PER_PAGE, [skill_id], start_cursor)
         )
         question_summary_dicts = [{

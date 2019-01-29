@@ -105,13 +105,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_id_3, 'skill_2')
 
         question_summaries, _ = (
-            question_services.get_question_summaries_linked_to_skills(
+            question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_2', 'skill_3'], ''))
 
         with self.assertRaisesRegexp(
             Exception, 'Querying linked question summaries for more than 3 '
             'skills at a time is not supported currently.'):
-            question_services.get_question_summaries_linked_to_skills(
+            question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], '')
         question_ids = [summary['summary'].id for summary in question_summaries]
         skill_descriptions = [
@@ -134,7 +134,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.assertEqual('Skill Description 2', description)
 
         question_summaries, _ = (
-            question_services.get_question_summaries_linked_to_skills(
+            question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_3'], ''))
         question_ids = [summary['summary'].id for summary in question_summaries]
         self.assertEqual(len(question_ids), 2)

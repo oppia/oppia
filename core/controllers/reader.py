@@ -326,7 +326,7 @@ class PretestHandler(base.BaseHandler):
             raise self.InvalidInputException
 
         pretest_questions, next_start_cursor = (
-            question_services.get_questions_by_skill_ids(
+            question_services.get_questions_and_skill_descriptions_by_skill_ids(
                 feconf.NUM_PRETEST_QUESTIONS,
                 story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
                 start_cursor)

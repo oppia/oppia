@@ -324,7 +324,7 @@ def update_skill_ids_of_questions(
         new_question_skill_link_models)
 
 
-def get_question_summaries_linked_to_skills(
+def get_question_summaries_and_skill_descriptions(
         question_count, skill_ids, start_cursor):
     """Returns the list of question summaries linked to all the skills given by
     skill_ids.

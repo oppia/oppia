@@ -146,7 +146,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     self.skill_id
                 ), {}, csrf_token=csrf_token)
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills(
+                question_services.get_question_summaries_and_skill_descriptions(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(
@@ -164,7 +164,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     self.skill_id
                 ), {}, csrf_token=csrf_token)
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills(
+                question_services.get_question_summaries_and_skill_descriptions(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 2)
             question_ids = [
@@ -195,7 +195,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     self.skill_id
                 ))
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills(
+                question_services.get_question_summaries_and_skill_descriptions(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(
@@ -211,7 +211,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     self.skill_id
                 ))
             question_summaries, _ = (
-                question_services.get_question_summaries_linked_to_skills(
+                question_services.get_question_summaries_and_skill_descriptions(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 0)
             self.logout()
