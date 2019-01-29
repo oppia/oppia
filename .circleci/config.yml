@@ -5,17 +5,6 @@ anchor_for_job_defaults: &job_defaults
   docker:
     - image: *docker_image
 
-anchor_for_installing_dependencies: &install_dependencies
-  name: Install dependencies
-  command: |
-    sudo apt-get install lsb-release libappindicator3-1
-    curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_67.0.3396.99-1_amd64.deb
-    sudo dpkg -i google-chrome.deb
-    sudo sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox --no-sandbox|g' "/opt/google/chrome/google-chrome"
-    rm google-chrome.deb
-    source scripts/setup.sh || exit 1
-    source scripts/setup_gae.sh || exit 1
-
 anchor_for_restoring_setup_cache: &restore_setup_cache
   key: setup-files-cache
 
@@ -84,40 +73,17 @@ jobs:
           command: |
             bash scripts/run_backend_tests.sh --exclude_load_tests
 
-  e2e_tests_accessiblity:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - restore_cache:
-          <<: *restore_setup_cache
-          <<: *restore_third_party_cache
-          <<: *restore_build_cache
-      - run:
-          name: Run e2e tests accessiblity
-          command: |
-            bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env
-      - save_cache:
-          key: build-cache
-          paths:
-            - /home/circleci/oppia/backend_prod_files/templates/head
-            - /home/circleci/oppia/build/templates/head
-            - /home/circleci/oppia/backend_prod_files/extensions
-            - /home/circleci/oppia/build/extensions
-
 workflows:
   version: 2
   circleci_tests:
     jobs:
       - setup
-      # - lint_tests:
-      #     requires:
-      #       - setup
-      # - frontend_tests:
-      #     requires:
-      #       - setup
-      # - backend_tests:
-      #     requires:
-      #       - setup
-      - e2e_tests_accessiblity:
-          requires:
-            - setup
+       - lint_tests:
+           requires:
+             - setup
+       - frontend_tests:
+           requires:
+             - setup
+       - backend_tests:
+           requires:
+             - setup
