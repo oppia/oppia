@@ -250,9 +250,9 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                 'playthrough_id:%s was recorded in exploration_id:%s which has '
                 'not been curated for recording.' % (key, value['exp_id']),)
 
-        created_on = (
+        created_on_datetime = (
             datetime.datetime.strptime(value['created_on'], '%Y-%m-%d'))
-        if created_on < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
+        if created_on_datetime < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
             yield (
                 'playthrough_id:%s was released on %s, which is before the '
                 'GSoC 2018 submission deadline (2018-09-01) and should '
