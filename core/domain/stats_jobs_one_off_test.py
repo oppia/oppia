@@ -247,7 +247,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         """Helper method to create a simple playthrough and return its id.
 
         Returns:
-            str. The ID of the newly created playthrough model.
+            stats_models.PlaythroughModel.
         """
         playthrough_id = stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, issue_type='EarlyQuit',
@@ -284,7 +284,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
         playthrough = self.create_playthrough()
-        playthrough.actions.append('invalid schema value')
+        playthrough.actions.append({object(): 'incorrect schema value'})
         playthrough.put()
 
         output = self.ONE_OFF_JOB_CLASS.get_output(self.run_one_off_job())
