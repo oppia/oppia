@@ -58,7 +58,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         "Enter your credit card number"). We currently accomplish this by only
         recording playthroughs in explorations admins feel confident are safe.
 
-    This job ensures:
+    Ensures:
         All Playthrough models deleted are removed as a reference from their
             associated ExplorationIssue model.
         ExplorationIssues models without any legal playthrough references are
@@ -74,10 +74,6 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def is_illegal(cls, playthrough_model):
         """Returns whether the given playthrough model is illegal.
-
-        A playthrough is illegal iff it was:
-          - Created *before* the final release of the project.
-          - Created for an exploration which is not curated for playthroughs.
 
         Args:
             playthrough_model: stats_models.PlaythroughModel | None.
@@ -137,13 +133,13 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         total_playthroughs_deleted = 0
 
         remaining_issues = []
-        for playthrough_issue in playthrough_issues_model.unresolved_issues:
+        for issue in playthrough_issues_model.unresolved_issues:
             playthroughs_deleted, playthroughs_remaining = (
                 RemoveIllegalPlaythroughsOneOffJob.delete_illegal_playthroughs(
-                    playthrough_issue))
+                    issue))
             total_playthroughs_deleted += playthroughs_deleted
             if playthroughs_remaining:
-                remaining_issues.append(playthrough_issue)
+                remaining_issues.append(issue)
 
         if remaining_issues:
             playthrough_issues_model.unresolved_issues = remaining_issues
