@@ -47,17 +47,25 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     now place on them. This one-off job aims to get rid of such playthroughs to
     keep the database healthy.
 
-    Specifically, we want to remove playthroughs which were:
-      - Created *before* the final release of the project.
-          - These playthroughs did not use validation logic before being
-            submitted into the database.
-      - Created for an exploration which is not curated for playthroughs.
-          - Playthroughs have the potential to store personally-identifiable
-            information. We want to ensure that we never record playthroughs in
-            explorations with malicious interactions (for example, consider:
-            TextInput -> "Enter your credit card information"). Currently, we
+    Specifically, we will remove playthroughs which were:
+        Created before the final release of the project, because these
+            playthroughs did not use validation logic before being submitted
+            into the database.
+        Created for an exploration which is not curated for playthroughs,
+            because playthroughs have the potential to store
+            personally-identifiable information. We want to ensure that we never
+            record playthroughs in explorations with malicious interactions (for
+            example: TextInput -> "Enter your credit card number"). We currently
             accomplish this by only recording playthroughs in explorations
             admins feel confident are safe.
+
+    This job ensures:
+        All Playthrough models deleted are removed as a reference from their
+            associated ExplorationIssue model.
+        ExplorationIssues models without any legal playthrough references are
+            deleted.
+        Individual ExplorationIssues without any legal playthrough references
+            are deleted.
     """
 
     @classmethod
@@ -117,16 +125,8 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(playthrough_issues_model):
-        """Iterates through all playthroughs associated to an exploration,
-        deleting any that are illegal. Must be declared @staticmethod.
-
-        Ensures:
-            Playthroughs deleted by this job are removed as a reference from
-                their associated issue.
-            All issues have at least one legal playthrough referenced, otherwise
-                they are deleted.
-            All playthrough issues models have at least one issue, otherwise
-                they are deleted.
+        """Deletes any illegal playthroughs associated to the given issues. Must
+        be declared @staticmethod.
 
         Args:
             playthrough_issues_model: ExplorationIssuesModel.
@@ -145,6 +145,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             total_playthroughs_deleted += playthroughs_deleted
             if playthroughs_remaining:
                 remaining_issues.append(playthrough_issue)
+
         if remaining_issues:
             playthrough_issues_model.unresolved_issues = remaining_issues
             playthrough_issues_model.put()
