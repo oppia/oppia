@@ -250,7 +250,17 @@ class PlaythroughAuditTests(OneOffJobTestBase):
             issue_customization_args={}, actions=[])
         return stats_models.PlaythroughModel.get(playthrough_id)
 
-    def test_output_of_pre_release_date_playthroughs(self):
+    def test_empty_output_for_good_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        self.create_playthrough()
+
+        output = self.run_one_off_job()
+
+        self.assertEqual(len(output), 0)
+
+    def test_output_of_pre_release_date_playthrough(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
@@ -264,7 +274,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         self.assertEqual(len(output), 1)
         self.assertIn('before the GSoC 2018 submission deadline', output[0])
 
-    def test_output_of_non_whitelisted_playthroughs(self):
+    def test_output_of_non_whitelisted_playthrough(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id + 'differentiated'])
@@ -275,7 +285,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         self.assertEqual(len(output), 1)
         self.assertIn('has not been curated for recording', output[0])
 
-    def test_output_of_duplicate_playthroughs(self):
+    def test_output_of_invalid_playthrough(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
