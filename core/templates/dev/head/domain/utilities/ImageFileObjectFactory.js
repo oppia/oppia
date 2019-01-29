@@ -17,14 +17,13 @@
  */
 
 oppia.factory('ImageFileObjectFactory', [function() {
-  var ImageFile = function(filename, data, loadTime) {
+  var ImageFile = function(filename, data) {
     this.filename = filename;
     this.data = data;
-    this.loadTime = loadTime;
   };
 
-  ImageFile.createNew = function(filename, data, loadTime) {
-    return new ImageFile(filename, data, loadTime);
+  ImageFile.createNew = function(filename, data) {
+    return new ImageFile(filename, data);
   };
 
   return ImageFile;

@@ -60,10 +60,10 @@ oppia.directive('oppiaNoninteractiveImage', [
             $scope.isLoadingIndicatorShown = true;
             $scope.isTryAgainShown = false;
             ImagePreloaderService.getImageUrl($scope.filepath)
-              .then(function(obj) {
+              .then(function(objectUrl) {
                 $scope.isTryAgainShown = false;
                 $scope.isLoadingIndicatorShown = false;
-                $scope.imageUrl = obj.objectUrl;
+                $scope.imageUrl = objectUrl;
               }, function() {
                 $scope.isTryAgainShown = true;
                 $scope.isLoadingIndicatorShown = false;
