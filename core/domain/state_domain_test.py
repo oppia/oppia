@@ -19,7 +19,6 @@
 import functools
 import os
 
-from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import html_validation_service
@@ -426,22 +425,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(audio_translation, 'needs_update', 'hello'):
                 audio_translation.validate()
 
-    def test_translation_script_validation(self):
+    def test_written_translation_validation(self):
         """Test validation of translation script."""
-        translation_script = state_domain.TranslationScript('Test.', True)
-        translation_script.validate()
+        written_translation = state_domain.WrittenTranslation('Test.', True)
+        written_translation.validate()
 
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid content HTML'
-            ):
-            with self.swap(translation_script, 'html', 30):
-                translation_script.validate()
+            utils.ValidationError, 'Invalid content HTML'):
+            with self.swap(written_translation, 'html', 30):
+                written_translation.validate()
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected needs_update to be a bool'
             ):
-            with self.swap(translation_script, 'needs_update', 20):
-                translation_script.validate()
+            with self.swap(written_translation, 'needs_update', 20):
+                written_translation.validate()
 
     def test_hints_validation(self):
         """Test validation of state hints."""
@@ -598,6 +596,25 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
             content_translations.add_content_id_for_translation(
                 invalid_content_id)
 
+    def test_add_content_id_for_translation_with_existing_content_id_raise_error( # pylint: disable=line-too-long
+            self):
+        content_translations_dict = {
+            'feedback_1': {
+                'en': {
+                    'html': 'hello!',
+                    'needs_update': False
+                }
+            }
+        }
+
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+        existing_content_id = 'feedback_1'
+        with self.assertRaisesRegexp(
+            Exception, 'The content_id feedback_1 already exist.'):
+            content_translations.add_content_id_for_translation(
+                existing_content_id)
+
     def test_delete_content_id_for_translations_deletes_content_id(self):
         old_content_translations_dict = {
             'content': {
@@ -613,6 +630,18 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
         content_translations.delete_content_id_for_translation('content')
 
         self.assertEqual(len(content_translations.to_dict()), 0)
+
+    def test_delete_content_id_for_translation_with_nonexisting_content_id_raise_error(self): # pylint: disable=line-too-long
+        content_translations_dict = {
+            'content': {}
+        }
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+        nonexisting_content_id_to_delete = 'feedback_1'
+        with self.assertRaisesRegexp(
+            Exception, 'The content_id feedback_1 does not exist.'):
+            content_translations.delete_content_id_for_translation(
+                nonexisting_content_id_to_delete)
 
     def test_delete_content_id_for_translation_with_invalid_content_id_raise_error(self): # pylint: disable=line-too-long
         content_translations = state_domain.ContentTranslations.from_dict({})
@@ -664,27 +693,3 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             content_translations, 'Invalid language_code: ed')
-
-    def test_validation_with_3_letter_langauge_code_raise_error(self):
-        content_translations_dict = {
-            'content': {
-                'xyz': {
-                    'html': 'hello!',
-                    'needs_update': False
-                }
-            }
-        }
-
-        content_translations = state_domain.ContentTranslations.from_dict(
-            content_translations_dict)
-
-        # Adding a 3-letter language code in ALL_LANGUAGE_CODES for validation.
-        constants.ALL_LANGUAGE_CODES.append({
-            'code': 'xyz',
-            'description': 'Invalid language code'
-        })
-        self._assert_validation_error(
-            content_translations, 'Invalid language_code, it should have ')
-
-        # Undo changes made in ALL_LANGUAGE_CODES.
-        constants.ALL_LANGUAGE_CODES.pop()
