@@ -136,6 +136,7 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             associated to, and the number of playthroughs deleted from it.
         """
         total_playthroughs_deleted = 0
+
         remaining_issues = []
         for playthrough_issue in playthrough_issues_model.unresolved_issues:
             playthroughs_deleted, playthroughs_remaining = (
@@ -144,7 +145,6 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             total_playthroughs_deleted += playthroughs_deleted
             if playthroughs_remaining:
                 remaining_issues.append(playthrough_issue)
-
         if remaining_issues:
             playthrough_issues_model.unresolved_issues = remaining_issues
             playthrough_issues_model.put()
