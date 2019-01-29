@@ -5,6 +5,12 @@ anchor_for_job_defaults: &job_defaults
   docker:
     - image: *docker_image
 
+anchor_for_installing_dependencies: &install_dependencies
+  name: Install dependencies
+  command: |
+    source scripts/setup.sh || exit 1
+    source scripts/setup_gae.sh || exit 1
+
 anchor_for_restoring_setup_cache: &restore_setup_cache
   key: setup-files-cache
 
@@ -23,6 +29,8 @@ jobs:
       - restore_cache:
           <<: *restore_setup_cache
           <<: *restore_third_party_cache
+      - run:
+          <<: *install_dependencies
       - save_cache:
           key: setup-files-cache
           paths:
