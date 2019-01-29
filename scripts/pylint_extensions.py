@@ -821,8 +821,7 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
 
         file_content = node.stream().readlines()
         file_length = len(file_content)
-        print '@@@@@@@'
-        print len(file_content[0])
+
         if file_length == 1 and len(file_content[0]) == 1:
             self.add_message('only-one-character', line=file_length)
         if file_length >= 2 and not re.search(r'[^\n]\n', file_content[-1]):
