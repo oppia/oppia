@@ -47,7 +47,7 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         to the queue under test.
 
         Returns:
-            str. The ID of the job which ran to completion.
+            *. The output of the one off job.
         """
         job_id = self.ONE_OFF_JOB_CLASS.create_new()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
@@ -55,7 +55,7 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
-        return job_id
+        return self.ONE_OFF_JOB_CLASS.get_output(job_id)
 
 
 class DeleteIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
@@ -259,7 +259,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         playthrough.created_on = datetime.datetime(2017, 12, 31)
         playthrough.put()
 
-        output = self.ONE_OFF_JOB_CLASS.get_output(self.run_one_off_job())
+        output = self.run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('before the GSoC 2018 submission deadline', output[0])
@@ -270,7 +270,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
             [self.exp.id + 'differentiated'])
         self.create_playthrough()
 
-        output = self.ONE_OFF_JOB_CLASS.get_output(self.run_one_off_job())
+        output = self.run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('has not been curated for recording', output[0])
@@ -283,7 +283,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         playthrough.actions.append({'bad schema key': 'bad schema value'})
         playthrough.put()
 
-        output = self.ONE_OFF_JOB_CLASS.get_output(self.run_one_off_job())
+        output = self.run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('could not be validated', output[0])
