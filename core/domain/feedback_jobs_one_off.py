@@ -66,3 +66,35 @@ class ValidateLastUpdatedFieldOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, instance_ids):
         yield (key, instance_ids)
+
+
+class PopulateMessageCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for populating the message count field."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Returns a list of datastore class references to map over."""
+        return [feedback_models.GeneralFeedbackThreadModel]
+
+    @staticmethod
+    def map(thread):
+        if thread.message_count is None:
+            # Assigning the value of message_count if it is None.
+            thread.message_count = (
+                feedback_models.GeneralFeedbackMessageModel.get_message_count(
+                    thread.id))
+            try:
+                # Sets the message_count if it is None.
+                thread.put()
+                yield ('SUCCESS', thread.id)
+            except Exception:
+                yield ('FAILED', thread.id)
+        else:
+            yield ('NO-OP', thread.id)
+
+    @staticmethod
+    def reduce(message, thread_ids):
+        if message == 'FAILED':
+            yield (message, thread_ids)
+        else:
+            yield (message, len(thread_ids))

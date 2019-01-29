@@ -192,7 +192,6 @@ class ExplorationPage(EditorHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_CREATE,
             'value_generators_js': jinja2.utils.Markup(
                 get_value_generators_js()),
             'title': exploration.title,
@@ -712,22 +711,6 @@ class ResolveIssueHandler(EditorHandler):
         stats_services.save_exp_issues_model_transactional(exp_issues)
 
         self.render_json({})
-
-
-class FetchPlaythroughWhitelistHandler(EditorHandler):
-    """Handles fetching the whitelisted exploration ids which will record and
-    render playthroughs.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handle GET requests for the playthrough whitelist of explorations."""
-        self.render_json({
-            'whitelisted_exploration_ids_for_playthroughs':
-                config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value
-        })
 
 
 class ImageUploadHandler(EditorHandler):

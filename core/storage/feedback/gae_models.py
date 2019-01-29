@@ -73,7 +73,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     has_suggestion = ndb.BooleanProperty(
         indexed=True, default=False, required=True)
     # The number of messages in the thread.
-    message_count = ndb.IntegerProperty(indexed=True)
+    message_count = ndb.IntegerProperty(indexed=True, default=0)
     # When this thread was last updated. This overrides the field in
     # BaseModel. We are overriding it because we do not want the last_updated
     # field to be updated everytime the feedback thread is changed. For example,

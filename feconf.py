@@ -598,9 +598,6 @@ EMBEDDED_GOOGLE_GROUP_URL = (
 # External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
-# Whether to allow YAML file uploads.
-ALLOW_YAML_FILE_UPLOAD = False
-
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'
 TASK_URL_FEEDBACK_MESSAGE_EMAILS = (
@@ -636,6 +633,7 @@ CUSTOM_VOLUNTEERS_LANDING_PAGE_URL = '/volunteers'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
+EXPLORATION_FEATURES_PREFIX = '/explorehandler/features'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
@@ -709,25 +707,6 @@ UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
-
-NAV_MODE_ABOUT = 'about'
-NAV_MODE_GET_STARTED = 'get_started'
-NAV_MODE_COLLECTION = 'collection'
-NAV_MODE_CONTACT = 'contact'
-NAV_MODE_CREATE = 'create'
-NAV_MODE_CREATOR_DASHBOARD = 'creator_dashboard'
-NAV_MODE_DONATE = 'donate'
-NAV_MODE_EXPLORE = 'explore'
-NAV_MODE_LEARNER_DASHBOARD = 'learner_dashboard'
-NAV_MODE_LIBRARY = 'library'
-NAV_MODE_PROFILE = 'profile'
-NAV_MODE_SIGNUP = 'signup'
-NAV_MODE_SPLASH = 'splash'
-NAV_MODE_STORY_EDITOR = 'story_editor'
-NAV_MODE_TEACH = 'teach'
-NAV_MODE_THANKS = 'thanks'
-NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD = 'topics_and_skills_dashboard'
-NAV_MODE_TOPIC_EDITOR = 'topic_editor'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

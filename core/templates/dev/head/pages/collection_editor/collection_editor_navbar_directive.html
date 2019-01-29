@@ -1,6 +1,6 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" style="margin-left: 20px;">
   <!-- Editor -->
-  <li ng-class="{'active': getTabStatuses().active === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>">
+  <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>">
     <a href="#" uib-tooltip="Editor" ng-click="selectMainTab()" class="protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
@@ -22,7 +22,7 @@
   </li>
 
   <!-- Settings -->
-  <li ng-class="{'active': getTabStatuses().active === 'settings'}">
+  <li ng-class="{'active': getActiveTabName() === 'settings'}">
     <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
       <i class="material-icons">&#xE8B8;</i>
     </a>
