@@ -231,6 +231,9 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
         Yields:
             tuple(str). A 1-tuple whose only element is an error message.
         """
+        whitelisted_exp_ids_for_playthroughs = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+
         for stringified_value in stringified_values:
             value = ast.literal_eval(stringified_value)
 
@@ -240,9 +243,6 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     'object because of the error: %s.' % (
                         key, value['validate_error']),)
 
-            whitelisted_exp_ids_for_playthroughs = (
-                config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value
-            )
             if value['exp_id'] not in whitelisted_exp_ids_for_playthroughs:
                 yield (
                     'playthrough_id:%s was recorded in exploration_id:%s which '
