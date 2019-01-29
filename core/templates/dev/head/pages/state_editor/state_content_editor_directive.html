@@ -1,3 +1,16 @@
+<!--
+  Off-screen preview of the learner view card in order to check if the height of the card has exceeded a specified limit.
+-->
+<div class="oppia-shadow-preview-card" aria-hidden="true">
+  <div class="oppia-learner-view-card-content">
+    <div class="oppia-learner-view-card-top-section">
+      <angular-html-bind class="oppia-rte-viewer oppia-learner-view-card-top-content"
+                         html-data="StateContentService.displayed._html">
+      </angular-html-bind>
+    </div>
+  </div>
+</div>
+
 <div ng-if="!contentEditorIsOpen">
   <div class="protractor-test-edit-content"
        ng-class="{'oppia-editable-section': isEditable()}"
@@ -37,4 +50,23 @@
     <button type="button" class="btn btn-default pull-right" ng-click="cancelEdit()">Cancel</button>
     <div style="clear: both;"></div>
   </div>
+  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" style="padding-top: 10px;">
+    <span class="oppia-card-height-limit-warning">
+      <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xE88F;</i>
+      <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
+    </span>
+  </div>
 </div>
+
+<style>
+  .oppia-card-height-limit-warning {
+    color: #0277BD;
+  }
+
+  .oppia-shadow-preview-card {
+    left: -30000px;
+    max-width: 560px;
+    position: fixed;
+    top: -30000px;
+  }
+</style>

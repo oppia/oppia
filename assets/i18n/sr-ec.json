@@ -99,6 +99,8 @@
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING": "Подели своје истраживање",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9": "Када они који уче прођу кроз истраживање, могу да пошаљу повратне информације да Вас обавесте о проблемима или поделе идеје за унапређивање.",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING": "Унапредите своје истраживање",
+	"I18N_INTERACTIONS_LOGIC_PROOF_CORRECT_ANSWERS": "Тачно",
+	"I18N_INTERACTIONS_LOGIC_PROOF_INCORRECT_ANSWERS": "Нетачно",
 	"I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE": "Одговори",
 	"I18N_LEARNER_DASHBOARD_REMOVE_BUTTON": "Уклони",
 	"I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE": "Пошаљи",
@@ -136,5 +138,7 @@
 	"I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2": "Истраживања треба да се континуирано унапређују, а она која не буду уређивана дуго времена могу да постану „сирочад”. У овом случају, власништво може да се преда Опијиној заједници у целини (по модераторовом нахођењу), тако да се истраживање може наставити унапређивати.",
 	"I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK": "Приручник за учешће",
 	"I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA": "Учење са Опијом",
-	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Пријава преко Гугла"
+	"I18N_TOPIC_VIEWER_PRACTICE": "Пракса",
+	"I18N_TOPIC_VIEWER_STORY": "Прича",
+	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Пријава преко Google-а"
 }
