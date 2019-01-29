@@ -714,25 +714,25 @@ class AudioTranslation(object):
                 self.needs_update)
 
 
-class TranslationScript(object):
-    """Value object representing a translation script."""
+class WrittenTranslation(object):
+    """Value object representing a written translation for a content."""
 
     def __init__(self, html, needs_update):
-        """Initializes a TranslationScript domain object.
+        """Initializes a WrittenTranslation domain object.
 
         Args:
             html: str. A piece of user submitted HTML. This is cleaned in such
                 a way as to contain a restricted set of HTML tags.
             needs_update: bool. Whether html is marked for needing review.
         """
-        self.html = html
+        self.html = html_cleaner.clean(html)
         self.needs_update = needs_update
 
     def to_dict(self):
-        """Returns a dict representing this TranslationScript domain object.
+        """Returns a dict representing this WrittenTranslation domain object.
 
         Returns:
-            dict. A dict, mapping all fields of TranslationScript instance.
+            dict. A dict, mapping all fields of WrittenTranslation instance.
         """
         return {
             'html': self.html,
@@ -740,27 +740,27 @@ class TranslationScript(object):
         }
 
     @classmethod
-    def from_dict(cls, translation_script_dict):
-        """Return a TranslationScript domain object from a dict.
+    def from_dict(cls, written_translation_dict):
+        """Return a WrittenTranslation domain object from a dict.
 
         Args:
-            translation_script_dict: dict. The dict representation of
-                TranslationScript object.
+            written_translation_dict: dict. The dict representation of
+                WrittenTranslation object.
 
         Returns:
-            TranslationScript. The corresponding TranslationScript domain
+            WrittenTranslation. The corresponding WrittenTranslation domain
             object.
         """
         return cls(
-            translation_script_dict['html'],
-            translation_script_dict['needs_update'])
+            written_translation_dict['html'],
+            written_translation_dict['needs_update'])
 
     def validate(self):
-        """Validates properties of the TranslationScript.
+        """Validates properties of the WrittenTranslation.
 
         Raises:
-            ValidationError: One or more attributes of the TranslationScript are
-            invalid.
+            ValidationError: One or more attributes of the WrittenTranslation
+            are invalid.
         """
         if not isinstance(self.html, basestring):
             raise utils.ValidationError(
@@ -773,7 +773,10 @@ class TranslationScript(object):
 
 
 class ContentTranslations(object):
-    """Value object representing a content translations."""
+    """Value object representing a content translations which stores
+    translated contents of all state contents (like hints, feedback etc.) in
+    different languages linked through their content_id.
+    """
 
     def __init__(self, content_translations):
         """Initializes a ContentTranslations domain object."""
@@ -786,13 +789,13 @@ class ContentTranslations(object):
             dict. A dict, mapping all fields of ContentTranslations instance.
         """
         content_translations_dict = {}
-        for (content_id, language_code_to_translation_script) in (
+        for (content_id, language_code_to_written_translation) in (
                 self.content_translations.iteritems()):
             content_translations_dict[content_id] = {}
-            for (language_code, translation_script) in (
-                    language_code_to_translation_script.iteritems()):
+            for (language_code, written_translation) in (
+                    language_code_to_written_translation.iteritems()):
                 content_translations_dict[content_id][language_code] = (
-                    translation_script.to_dict())
+                    written_translation.to_dict())
 
         return content_translations_dict
 
@@ -809,13 +812,13 @@ class ContentTranslations(object):
             object.
         """
         content_translations = {}
-        for (content_id, language_code_to_translation_script) in (
+        for (content_id, language_code_to_written_translation) in (
                 content_translations_dict.iteritems()):
             content_translations[content_id] = {}
-            for (language_code, translation_script) in (
-                    language_code_to_translation_script.iteritems()):
+            for (language_code, written_translation) in (
+                    language_code_to_written_translation.iteritems()):
                 content_translations[content_id][language_code] = (
-                    TranslationScript.from_dict(translation_script))
+                    WrittenTranslation.from_dict(written_translation))
 
         return cls(content_translations)
 
@@ -826,18 +829,18 @@ class ContentTranslations(object):
             ValidationError: One or more attributes of the ContentTranslations
             are invalid.
         """
-        for (content_id, language_code_to_translation_script) in (
+        for (content_id, language_code_to_written_translation) in (
                 self.content_translations.iteritems()):
             if not isinstance(content_id, basestring):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
                     % content_id)
-            if not isinstance(language_code_to_translation_script, dict):
+            if not isinstance(language_code_to_written_translation, dict):
                 raise utils.ValidationError(
                     'Expected content_id value to be a dict, received %s'
-                    % language_code_to_translation_script)
-            for (language_code, translation_script) in (
-                    language_code_to_translation_script.iteritems()):
+                    % language_code_to_written_translation)
+            for (language_code, written_translation) in (
+                    language_code_to_written_translation.iteritems()):
                 if not isinstance(language_code, basestring):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
@@ -845,27 +848,21 @@ class ContentTranslations(object):
                 if not utils.is_valid_language_code(language_code):
                     raise utils.ValidationError(
                         'Invalid language_code: %s' % language_code)
-                # TODO(DubeySandeep): Remove this check once App Engine supports
-                # 3-letter language codes in search.
-                if len(language_code) != 2:
-                    raise utils.ValidationError(
-                        'Invalid language_code, it should have exactly 2 '
-                        'letters: %s' % language_code)
-                translation_script.validate()
+
+                written_translation.validate()
 
     def get_available_languages(self):
         """Returns a set of language available in the ContentTranslations.
 
         Returns:
-            set. A set of languages available in the ContentTranslations.
+            set(str.). A set of languages available in the ContentTranslations.
         """
-        languages_list = []
-        for (_, language_code_to_translation_script) in (
-                self.content_translations.iteritems()):
-            for (language_code, _) in (
-                    language_code_to_translation_script.iteritems()):
-                languages_list.append(language_code)
-        return set(languages_list)
+        languages_list = set([])
+        for language_code_to_written_translation in (
+                self.content_translations.itervalues()):
+            for language_code in language_code_to_written_translation:
+                languages_list.add(language_code)
+        return languages_list
 
     def add_content_id_for_translation(self, content_id):
         """Adds a content id as a key for the translation into the
@@ -880,7 +877,10 @@ class ContentTranslations(object):
         if not isinstance(content_id, basestring):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
-        if content_id not in self.content_translations:
+        if content_id in self.content_translations:
+            raise Exception(
+                'The content_id %s already exist.' % content_id)
+        else:
             self.content_translations[content_id] = {}
 
     def delete_content_id_for_translation(self, content_id):
@@ -895,7 +895,11 @@ class ContentTranslations(object):
         if not isinstance(content_id, basestring):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
-        self.content_translations.pop(content_id, None)
+        if content_id not in self.content_translations:
+            raise Exception(
+                'The content_id %s does not exist.' % content_id)
+        else:
+            self.content_translations.pop(content_id, None)
 
 
 class RuleSpec(object):
