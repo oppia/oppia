@@ -146,14 +146,8 @@ oppia.directive('stateHintsEditor', [
               ]
             }).result.then(function(result) {
               StateHintsService.displayed.push(result.hint);
-              StateContentIdsToAudioTranslationsService.displayed.addContentId(
-                result.contentId);
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
-              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations(
-                StateContentIdsToAudioTranslationsService.displayed
-              );
             });
           };
 
@@ -212,15 +206,6 @@ oppia.directive('stateHintsEditor', [
               StateHintsService.displayed = [];
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
-
-              StateContentIdsToAudioTranslationsService.displayed
-                .deleteContentId(solutionContentId);
-              StateContentIdsToAudioTranslationsService.displayed
-                .deleteContentId(hintContentId);
-              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations(
-                StateContentIdsToAudioTranslationsService.displayed
-              );
             });
           };
 
@@ -258,12 +243,6 @@ oppia.directive('stateHintsEditor', [
                 StateHintsService.displayed.splice(index, 1);
                 StateHintsService.saveDisplayedValue();
                 $scope.onSaveHints(StateHintsService.displayed);
-                StateContentIdsToAudioTranslationsService.displayed
-                  .deleteContentId(hintContentId);
-                StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-                $scope.onSaveContentIdsToAudioTranslations(
-                  StateContentIdsToAudioTranslationsService.displayed
-                );
               }
             });
           };

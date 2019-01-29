@@ -22,15 +22,15 @@ oppia.factory('ExplorationStatesService', [
   '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
   'StateEditorService', 'ValidatorsService', 'StatesObjectFactory',
-  'SolutionValidityService', 'AngularNameService',
-  'AnswerClassificationService', 'ContextService',
+  'SolutionValidityService', 'StateContentIdsToAudioTranslationsService',
+  'AngularNameService', 'AnswerClassificationService', 'ContextService',
   'UrlInterpolationService',
   function(
       $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       ExplorationInitStateNameService, AlertsService, ChangeListService,
       StateEditorService, ValidatorsService, StatesObjectFactory,
-      SolutionValidityService, AngularNameService,
-      AnswerClassificationService, ContextService,
+      SolutionValidityService, StateContentIdsToAudioTranslationsService,
+      AngularNameService, AnswerClassificationService, ContextService,
       UrlInterpolationService) {
     var _states = null;
 
@@ -99,6 +99,44 @@ oppia.factory('ExplorationStatesService', [
       widget_customization_args: ['interaction', 'customizationArgs']
     };
 
+    CONTENT_ID_EXTRACTION = {
+      answer_groups: function(answerGroups) {
+        contentIds = new Set();
+        answerGroups.forEach(function(answerGroup) {
+          contentIds.add(answerGroup.outcome.feedback.getContentId());
+        });
+        return contentIds;
+      },
+      default_outcome: function(defaultOutcome) {
+        contentIds = new Set();
+        if (defaultOutcome) {
+          contentIds.add(defaultOutcome.feedback.getContentId());
+        }
+        return contentIds;
+      },
+      hints: function(hints) {
+        contentIds = new Set();
+        hints.forEach(function(hint) {
+          contentIds.add(hint.hintContent.getContentId());
+        });
+        return contentIds;
+      },
+      solution: function(solution) {
+        contentIds = new Set();
+        if (solution) {
+          contentIds.add(solution.explanation.getContentId());
+        }
+        return contentIds;
+      }
+    };
+
+    var _getSetDifference = function(setA, setB) {
+      diffList = Array.from(setA).filter(function(element) {
+        return !setB.has(element);
+      });
+      return diffList;
+    };
+
     var _setState = function(stateName, stateData, refreshGraph) {
       _states.setState(stateName, angular.copy(stateData));
       if (refreshGraph) {
@@ -127,8 +165,7 @@ oppia.factory('ExplorationStatesService', [
       return angular.copy(propertyRef);
     };
 
-    var saveStateProperty = function(
-        stateName, backendName, newValue, changeListRequired) {
+    var saveStateProperty = function(stateName, backendName, newValue) {
       var oldValue = getStatePropertyMemento(stateName, backendName);
       var newBackendValue = angular.copy(newValue);
       var oldBackendValue = angular.copy(oldValue);
@@ -139,14 +176,31 @@ oppia.factory('ExplorationStatesService', [
       }
 
       if (!angular.equals(oldValue, newValue)) {
-        if (changeListRequired) {
-          ChangeListService.editStateProperty(
-            stateName, backendName, newBackendValue, oldBackendValue);
-        }
+        ChangeListService.editStateProperty(
+          stateName, backendName, newBackendValue, oldBackendValue);
 
         var newStateData = _states.getState(stateName);
         var accessorList = PROPERTY_REF_DATA[backendName];
 
+        if (CONTENT_ID_EXTRACTION.hasOwnProperty(backendName)) {
+          var oldContentIds = CONTENT_ID_EXTRACTION[backendName](oldValue);
+          var newContentIds = CONTENT_ID_EXTRACTION[backendName](newValue);
+          var contentIdsToDelete = _getSetDifference(
+            oldContentIds, newContentIds);
+          var contentIdsToAdd = _getSetDifference(newContentIds, oldContentIds);
+          contentIdsToDelete.forEach(function(contentId) {
+            newStateData.contentIdsToAudioTranslations.deleteContentId(
+              contentId);
+            StateContentIdsToAudioTranslationsService.displayed.deleteContentId(
+              contentId);
+          });
+          contentIdsToAdd.forEach(function(contentId) {
+            newStateData.contentIdsToAudioTranslations.addContentId(contentId);
+            StateContentIdsToAudioTranslationsService.displayed.addContentId(
+              contentId);
+          });
+          StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+        }
         var propertyRef = newStateData;
         for (var i = 0; i < accessorList.length - 1; i++) {
           propertyRef = propertyRef[accessorList[i]];
@@ -222,19 +276,19 @@ oppia.factory('ExplorationStatesService', [
         return getStatePropertyMemento(stateName, 'content');
       },
       saveStateContent: function(stateName, newContent) {
-        saveStateProperty(stateName, 'content', newContent, true);
+        saveStateProperty(stateName, 'content', newContent);
       },
       getStateParamChangesMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'param_changes');
       },
       saveStateParamChanges: function(stateName, newParamChanges) {
-        saveStateProperty(stateName, 'param_changes', newParamChanges, true);
+        saveStateProperty(stateName, 'param_changes', newParamChanges);
       },
       getInteractionIdMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'widget_id');
       },
       saveInteractionId: function(stateName, newInteractionId) {
-        saveStateProperty(stateName, 'widget_id', newInteractionId, true);
+        saveStateProperty(stateName, 'widget_id', newInteractionId);
       },
       getInteractionCustomizationArgsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'widget_customization_args');
@@ -242,7 +296,7 @@ oppia.factory('ExplorationStatesService', [
       saveInteractionCustomizationArgs: function(
           stateName, newCustomizationArgs) {
         saveStateProperty(
-          stateName, 'widget_customization_args', newCustomizationArgs, true);
+          stateName, 'widget_customization_args', newCustomizationArgs);
       },
       getInteractionAnswerGroupsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'answer_groups');
@@ -259,36 +313,35 @@ oppia.factory('ExplorationStatesService', [
       },
       saveConfirmedUnclassifiedAnswers: function(stateName, newAnswers) {
         saveStateProperty(
-          stateName, 'confirmed_unclassified_answers', newAnswers, true);
+          stateName, 'confirmed_unclassified_answers', newAnswers);
       },
       getInteractionDefaultOutcomeMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'default_outcome');
       },
       saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
-        saveStateProperty(
-          stateName, 'default_outcome', newDefaultOutcome, true);
+        saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
       },
       getHintsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'hints');
       },
       saveHints: function(stateName, newHints) {
-        saveStateProperty(stateName, 'hints', newHints, true);
+        saveStateProperty(stateName, 'hints', newHints);
       },
       getSolutionMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'solution');
       },
       saveSolution: function(stateName, newSolution) {
-        saveStateProperty(stateName, 'solution', newSolution, true);
+        saveStateProperty(stateName, 'solution', newSolution);
       },
       getContentIdsToAudioTranslationsMemento: function(stateName) {
         return getStatePropertyMemento(
           stateName, 'content_ids_to_audio_translations');
       },
       saveContentIdsToAudioTranslations: function(
-          stateName, newContentIdsToAudioTranslations, changeListRequired) {
+          stateName, newContentIdsToAudioTranslations) {
         saveStateProperty(
           stateName, 'content_ids_to_audio_translations',
-          newContentIdsToAudioTranslations, changeListRequired);
+          newContentIdsToAudioTranslations);
       },
       isInitialized: function() {
         return _states !== null;
