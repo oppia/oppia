@@ -1,0 +1,116 @@
+Starting linter...
+Starting CSS, Javascript and Python Linting
+----------------------------------------
+There are no CSS files to lint.
+There are no CSS files to lint.
+There are no JavaScript files to lint.
+Linting 1 Python files
+Linting Python files 1 to 1...
+Python linting finished.
+
+
+Starting directive scope check
+----------------------------------------
+SUCCESS  Directive scope check passed
+
+----------------------------------------
+
+Starting controller dependency line break check
+----------------------------------------
+SUCCESS  Controller dependency line break check passed
+
+----------------------------------------
+
+Starting HTML directive name check
+----------------------------------------
+
+----------------------------------------
+
+There are no files to be checked.
+Starting import-order checks
+----------------------------------------
+
+----------------------------------------
+
+FAILED   Import order checks failed
+Starting newline-at-EOF checks
+----------------------------------------
+
+----------------------------------------
+
+(1 files checked, 0 errors found)
+SUCCESS   Newline character checks passed
+Starting docstring checks
+----------------------------------------
+
+----------------------------------------
+
+FAILED   Docstring check failed
+Starting comment checks
+----------------------------------------
+
+----------------------------------------
+
+FAILED   Comments check failed
+Starting HTML tag and attribute check
+----------------------------------------
+SUCCESS  HTML tag and attribute check passed
+
+----------------------------------------
+
+Starting HTML linter...
+----------------------------------------
+
+----------------------------------------
+
+SUCCESS   HTML linting passed
+HTML linting finished.
+
+Starting Pattern Checks
+----------------------------------------
+
+----------------------------------------
+
+There are no files to be checked.
+Starting copyright notice check
+----------------------------------------
+SUCCESS  Copyright notice check passed
+
+----------------------------------------
+
+Summary of Errors:
+----------------------------------------
+
+
+
+************* Module oppia.scripts.pre_commit_linter
+C:838, 0: Exactly one space required after assignment
+    js_messages =[]
+                ^ (bad-whitespace)
+W: 58, 0: Reimport 'contextlib' (imported line 56) (reimported)
+C: 58, 0: Imports from package contextlib are not grouped (ungrouped-imports)
+
+------------------------------------------------------------------
+Your code has been rated at 9.96/10 (previous run: 9.96/10, +0.00)
+
+scripts/pre_commit_linter.py:838:18: E225 missing whitespace around operator
+
+FAILED    Python linting failed
+
+ERROR: /home/jude/foss/oppia/scripts/pre_commit_linter.py Imports are incorrectly sorted.
+--- /home/jude/foss/oppia/scripts/pre_commit_linter.py:before	2019-01-29 15:19:10.903669
++++ /home/jude/foss/oppia/scripts/pre_commit_linter.py:after	2019-01-29 15:19:19.220279
+@@ -55,7 +55,6 @@
+ import ast
+ import contextlib
+ import fnmatch
+-import contextlib
+ import multiprocessing
+ import os
+ import re
+
+scripts/pre_commit_linter.py --> Line 1061: There should be a period at the end of the docstring.
+
+scripts/pre_commit_linter.py --> Line 1111: There should be a period at the end of the comment.
+
+

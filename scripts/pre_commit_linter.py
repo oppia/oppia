@@ -840,8 +840,7 @@ def _pre_commit_linter(all_files):
 
     print ''
     print '\n'.join(js_messages)
-    print 'Summary of Errors:'
-    print '----------------------------------------'
+
     summary_messages = []
 
     result_queues = [
@@ -852,8 +851,10 @@ def _pre_commit_linter(all_files):
         while not result_queue.empty():
             summary_messages.append(result_queue.get())
 
-    print '\n'.join(summary_messages)
-    print ''
+    with _redirect_stdout(_TARGET_STDOUT):
+        print '\n'.join(summary_messages)
+        print ''
+
     return summary_messages
 
 
@@ -1774,8 +1775,10 @@ def _check_for_copyright_notice(all_files):
     return summary_messages
 
 
-def _print_summary_messages():
+def _print_complete_summary_of_errors():
     """Print complete summary of errors."""
+    print 'Summary of Errors:'
+    print '----------------------------------------'
     print _TARGET_STDOUT.getvalue()
 
 
@@ -1784,6 +1787,7 @@ def main():
     files.
     """
     all_files = _get_all_files()
+    linter_messages = _pre_commit_linter(all_files)
     directive_scope_messages = _check_directive_scope(all_files)
     controller_dependency_messages = (
         _match_line_breaks_in_controller_dependencies(all_files))
@@ -1798,8 +1802,7 @@ def main():
     html_linter_messages = _lint_html_files(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     copyright_notice_messages = _check_for_copyright_notice(all_files)
-    linter_messages = _pre_commit_linter(all_files)
-    _print_summary_messages()
+    _print_complete_summary_of_errors()
     all_messages = (
         directive_scope_messages + controller_dependency_messages +
         html_directive_name_messages + import_order_messages +
