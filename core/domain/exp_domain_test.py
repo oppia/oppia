@@ -3430,7 +3430,100 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V30
+    YAML_CONTENT_V31 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 21
+states:
+(untitled state):
+classifier_model_id: null
+content:
+  audio_translations: {}
+  html: ''
+interaction:
+  answer_groups:
+  - labelled_as_correct: false
+    outcome:
+      dest: END
+      feedback:
+        audio_translations: {}
+        html: Correct!
+      param_changes: []
+      refresher_exploration_id: null
+    rule_specs:
+    - inputs:
+        x: InputString
+      rule_type: Equals
+  confirmed_unclassified_answers: []
+  customization_args:
+    placeholder:
+      value: ''
+    rows:
+      value: 1
+  default_outcome:
+    dest: (untitled state)
+    feedback:
+      audio_translations: {}
+      html: ''
+    param_changes: []
+    refresher_exploration_id: null
+  hints: []
+  id: TextInput
+  solution: null
+param_changes: []
+END:
+classifier_model_id: null
+content:
+  audio_translations: {}
+  html: Congratulations, you have finished!
+interaction:
+  answer_groups: []
+  confirmed_unclassified_answers: []
+  customization_args:
+    recommendedExplorationIds:
+      value: []
+  default_outcome: null
+  hints: []
+  id: EndExploration
+  solution: null
+param_changes: []
+New state:
+classifier_model_id: null
+content:
+  audio_translations: {}
+  html: ''
+interaction:
+  answer_groups: []
+  confirmed_unclassified_answers: []
+  customization_args:
+    placeholder:
+      value: ''
+    rows:
+      value: 1
+  default_outcome:
+    dest: END
+    feedback:
+      audio_translations: {}
+      html: ''
+    param_changes: []
+    refresher_exploration_id: null
+  hints: []
+  id: TextInput
+  solution: null
+param_changes: []
+states_schema_version: 26
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V31
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -3604,6 +3697,12 @@ title: Title
         """Test direct loading from a v29 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V29)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v31(self):
+        """Test direct loading from a v31 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V31)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
 
