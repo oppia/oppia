@@ -23,8 +23,6 @@ jobs:
       - restore_cache:
           <<: *restore_setup_cache
           <<: *restore_third_party_cache
-      - run:
-          <<: *install_dependencies
       - save_cache:
           key: setup-files-cache
           paths:
