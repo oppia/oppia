@@ -187,12 +187,15 @@ oppia.directive('questionsList', [
           };
 
           $scope.editQuestion = function(questionSummary) {
+            $scope.misconceptions = [];
             EditableQuestionBackendApiService.fetchQuestion(
               questionSummary.id).then(function(response) {
               if (response.associated_skill_dicts) {
                 response.associated_skill_dicts.forEach(function(skillDict) {
                   skillDict.misconceptions.forEach(function(misconception) {
-                    $scope.misconceptions.push(misconception);
+                    $scope.misconceptions.push(
+                      MisconceptionObjectFactory.createFromBackendDict(
+                        misconception));
                   });
                 });
               }

@@ -269,9 +269,9 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         new_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(new_skill_id, self.admin_id, 'Skill Description')
         old_links = question_services.get_question_skill_links_of_skill(
-            old_skill_id)
+            old_skill_id, 'Old Description')
         new_links = question_services.get_question_skill_links_of_skill(
-            new_skill_id)
+            new_skill_id, 'Skill Description')
 
         self.assertEqual(len(old_links), 1)
         self.assertEqual(old_links[0].skill_id, old_skill_id)
@@ -287,9 +287,9 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 self.url, payload, csrf_token=csrf_token)
 
             old_links = question_services.get_question_skill_links_of_skill(
-                old_skill_id)
+                old_skill_id, 'Old Description')
             new_links = question_services.get_question_skill_links_of_skill(
-                new_skill_id)
+                new_skill_id, 'Skill Description')
 
             self.assertEqual(json_response['merged_into_skill'], new_skill_id)
             self.assertEqual(len(old_links), 0)
