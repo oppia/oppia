@@ -124,11 +124,11 @@ def get_questions_and_skill_descriptions_by_skill_ids(
             questions are to be returned. This value should be urlsafe.
 
     Returns:
-        list(dict), str. The list of questions and the corresponding linked
-            skill descriptions which are linked to the given skill ids and the
-            next cursor value to be used for the next batch of questions (or
-            None if no more pages are left). The returned next cursor value is
-            urlsafe.
+        list(Question), list(str), str. The list of questions and the
+            corresponding linked skill descriptions which are linked to the
+            given skill ids and the next cursor value to be used for the next
+            batch of questions (or None if no more pages are left). The returned
+            next cursor value is urlsafe.
     """
     question_skill_link_models, skill_descriptions, next_cursor = (
         question_models.QuestionSkillLinkModel.get_question_skill_links_and_skill_descriptions( #pylint: disable=line-too-long
@@ -138,14 +138,7 @@ def get_questions_and_skill_descriptions_by_skill_ids(
         for index, model in enumerate(question_skill_link_models)]
     question_ids = [obj.question_id for obj in question_skill_links]
     questions = get_questions_by_ids(question_ids)
-    return_obj = []
-    for index, question in enumerate(questions):
-        return_obj.append({
-            'question': question,
-            'skill_description': (
-                question_skill_links[index].skill_description)
-        })
-    return return_obj, next_cursor
+    return questions, skill_descriptions, next_cursor
 
 
 def get_new_question_id():
@@ -341,11 +334,11 @@ def get_question_summaries_and_skill_descriptions(
         a time is not supported currently.
 
     Returns:
-        list(dict), str|None. The list of question summaries and the
-            corresponding linked skill descriptions which are linked to the
-            given skill ids and the next cursor value to be used for the next
-            batch of questions (or None if no more pages are left). The returned
-            next cursor value is urlsafe.
+        list(QuestionSummary), list(str), str|None. The list of question
+            summaries and the corresponding linked skill descriptions which are
+            linked to the given skill ids and the next cursor value to be used
+            for the next batch of questions (or None if no more pages are left).
+            The returned next cursor value is urlsafe.
     """
     if len(skill_ids) == 0:
         return [], None
@@ -363,13 +356,7 @@ def get_question_summaries_and_skill_descriptions(
     question_ids = [obj.question_id for obj in question_skill_links]
 
     question_summaries = get_question_summaries_by_ids(question_ids)
-    return_obj = []
-    for index, summary in enumerate(question_summaries):
-        return_obj.append({
-            'summary': summary,
-            'skill_description': question_skill_links[index].skill_description
-        })
-    return return_obj, next_cursor
+    return question_summaries, skill_descriptions, next_cursor
 
 
 def get_questions_by_ids(question_ids):

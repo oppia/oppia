@@ -80,12 +80,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_get_questions_by_skill_ids(self):
         question_services.create_new_question_skill_link(
             self.question_id, 'skill_1')
-        questions, _ = (
+        questions, _, _ = (
             question_services.get_questions_and_skill_descriptions_by_skill_ids(
                 2, ['skill_1'], ''))
         self.assertEqual(len(questions), 1)
         self.assertEqual(
-            questions[0]['question'].to_dict(), self.question.to_dict())
+            questions[0].to_dict(), self.question.to_dict())
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
@@ -104,7 +104,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             question_id_3, 'skill_2')
 
-        question_summaries, _ = (
+        question_summaries, skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_2', 'skill_3'], ''))
 
@@ -113,9 +113,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'skills at a time is not supported currently.'):
             question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], '')
-        question_ids = [summary['summary'].id for summary in question_summaries]
+        question_ids = [summary.id for summary in question_summaries]
         skill_descriptions = [
-            summary['skill_description'] for summary in question_summaries
+            description for description in skill_descriptions
         ]
 
         self.assertEqual(len(question_ids), 3)
@@ -133,10 +133,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             else:
                 self.assertEqual('Skill Description 2', description)
 
-        question_summaries, _ = (
+        question_summaries, skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_3'], ''))
-        question_ids = [summary['summary'].id for summary in question_summaries]
+        question_ids = [summary.id for summary in question_summaries]
         self.assertEqual(len(question_ids), 2)
         self.assertItemsEqual(
             question_ids, [self.question_id, question_id_2])

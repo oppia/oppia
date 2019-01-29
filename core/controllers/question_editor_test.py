@@ -145,14 +145,14 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                     self.skill_id
                 ), {}, csrf_token=csrf_token)
-            question_summaries, _ = (
+            question_summaries, skill_descriptions, _ = (
                 question_services.get_question_summaries_and_skill_descriptions(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(
-                question_summaries[0]['summary'].id, self.question_id)
+                question_summaries[0].id, self.question_id)
             self.assertEqual(
-                question_summaries[0]['skill_description'], 'Skill Description')
+                skill_descriptions[0], 'Skill Description')
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
@@ -163,12 +163,12 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id_2,
                     self.skill_id
                 ), {}, csrf_token=csrf_token)
-            question_summaries, _ = (
+            question_summaries, skill_descriptions, _ = (
                 question_services.get_question_summaries_and_skill_descriptions(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 2)
             question_ids = [
-                summary['summary'].id for summary in question_summaries
+                summary.id for summary in question_summaries
             ]
             self.assertItemsEqual(
                 question_ids, [self.question_id, self.question_id_2])
@@ -194,14 +194,14 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                     self.skill_id
                 ))
-            question_summaries, _ = (
+            question_summaries, skill_descriptions, _ = (
                 question_services.get_question_summaries_and_skill_descriptions(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(
-                question_summaries[0]['summary'].id, self.question_id_2)
+                question_summaries[0].id, self.question_id_2)
             self.assertEqual(
-                question_summaries[0]['skill_description'], 'Skill Description')
+                skill_descriptions[0], 'Skill Description')
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)

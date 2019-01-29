@@ -325,18 +325,16 @@ class PretestHandler(base.BaseHandler):
         if not story.has_exploration(exploration_id):
             raise self.InvalidInputException
 
-        pretest_questions, next_start_cursor = (
+        pretest_questions, _, next_start_cursor = (
             question_services.get_questions_and_skill_descriptions_by_skill_ids(
                 feconf.NUM_PRETEST_QUESTIONS,
                 story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
                 start_cursor)
         )
-        pretest_question_dicts = [
-            obj['question'].to_dict() for obj in pretest_questions
-        ]
+        question_dicts = [question.to_dict() for question in pretest_questions]
 
         self.values.update({
-            'pretest_question_dicts': pretest_question_dicts,
+            'pretest_question_dicts': question_dicts,
             'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
