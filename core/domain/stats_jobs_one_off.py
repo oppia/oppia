@@ -235,27 +235,27 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
 
         for stringified_value in stringified_values:
-            value = ast.literal_eval(stringified_value)
+            audit_data = ast.literal_eval(stringified_value)
 
-            if value['validate_error'] is not None:
+            if audit_data['validate_error'] is not None:
                 yield (
                     'playthrough_id:%s could not be validated as a domain '
                     'object because of the error: %s.' % (
-                        key, value['validate_error']),)
+                        key, audit_data['validate_error']),)
 
-            if value['exp_id'] not in whitelisted_exp_ids_for_playthroughs:
+            if audit_data['exp_id'] not in whitelisted_exp_ids_for_playthroughs:
                 yield (
                     'playthrough_id:%s was recorded in exploration_id:%s which '
                     'has not been curated for recording.' % (
-                        key, value['exp_id']),)
+                        key, audit_data['exp_id']),)
 
             created_on_datetime = (
-                datetime.datetime.strptime(value['created_on'], '%Y-%m-%d'))
+                datetime.datetime.strptime(audit_data['created_on'], '%Y-%m-%d'))
             if created_on_datetime < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
                 yield (
                     'playthrough_id:%s was released on %s, which is before the '
                     'GSoC 2018 submission deadline (2018-09-01) and should '
-                    'therefore not exist.' % (key, value['created_on']),)
+                    'therefore not exist.' % (key, audit_data['created_on']),)
 
 
 class ExplorationIssuesModelCreatorOneOffJob(
