@@ -48,16 +48,15 @@ class RemoveIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     keep the database healthy.
 
     Specifically, we will remove playthroughs which were:
-        Created before the final release of the project, because these
-            playthroughs did not use validation logic before being submitted
-            into the database.
-        Created for an exploration which is not curated for playthroughs,
-            because playthroughs have the potential to store
-            personally-identifiable information. We want to ensure that we never
-            record playthroughs in explorations with malicious interactions (for
-            example: TextInput -> "Enter your credit card number"). We currently
-            accomplish this by only recording playthroughs in explorations
-            admins feel confident are safe.
+      - Created before the final release of the project, because these
+        playthroughs did not use validation logic before being submitted into
+        the database.
+      - Created for an exploration which is not curated for playthroughs,
+        because playthroughs have the potential to store personally-identifiable
+        information. We want to ensure that we never record playthroughs in
+        explorations with malicious interactions (for example: TextInput ->
+        "Enter your credit card number"). We currently accomplish this by only
+        recording playthroughs in explorations admins feel confident are safe.
 
     This job ensures:
         All Playthrough models deleted are removed as a reference from their
