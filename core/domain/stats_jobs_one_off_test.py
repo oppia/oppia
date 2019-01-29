@@ -124,8 +124,8 @@ class RemoveIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
 
         # Getting these models should not raise.
         for playthrough_id in playthrough_ids:
-            _ = stats_models.PlaythroughModel.get(playthrough_id)
-        _ = stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
+            stats_models.PlaythroughModel.get(playthrough_id)
+        stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
 
     def test_playthroughs_removed_from_non_whitelisted_explorations(self):
         self.set_config_property(
@@ -142,9 +142,9 @@ class RemoveIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
 
         for playthrough_id in playthrough_ids:
             with self.assertRaisesRegexp(Exception, 'not found'):
-                _ = stats_models.PlaythroughModel.get(playthrough_id)
+                stats_models.PlaythroughModel.get(playthrough_id)
         with self.assertRaisesRegexp(Exception, 'not found'):
-            _ = stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
+            stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
 
     def test_old_playthroughs_removed(self):
         self.set_config_property(
@@ -159,9 +159,9 @@ class RemoveIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
         self.run_one_off_job()
 
         with self.assertRaisesRegexp(Exception, 'not found'):
-            _ = stats_models.PlaythroughModel.get(old_playthrough_id)
+            stats_models.PlaythroughModel.get(old_playthrough_id)
         # Should not raise.
-        _ = stats_models.PlaythroughModel.get(new_playthrough_id)
+        stats_models.PlaythroughModel.get(new_playthrough_id)
         # The list of supporting playthroughs should only have the new one.
         playthrough_issues_model = (
             stats_models.ExplorationIssuesModel.get(playthrough_issues_id))
@@ -184,9 +184,9 @@ class RemoveIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
 
         for old_playthrough_id in old_playthrough_ids:
             with self.assertRaisesRegexp(Exception, 'not found'):
-                _ = stats_models.PlaythroughModel.get(old_playthrough_id)
+                stats_models.PlaythroughModel.get(old_playthrough_id)
         with self.assertRaisesRegexp(Exception, 'not found'):
-            _ = stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
+            stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
 
     def test_issues_with_mixed_playthrough_ages(self):
         self.set_config_property(
@@ -213,10 +213,10 @@ class RemoveIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
         # Assert old playthroughs have been deleted.
         for playthrough_id in old_playthrough_ids:
             with self.assertRaisesRegexp(Exception, 'not found'):
-                _ = stats_models.PlaythroughModel.get(playthrough_id)
+                stats_models.PlaythroughModel.get(playthrough_id)
         for playthrough_id in new_playthrough_ids:
             # Should not raise.
-            _ = stats_models.PlaythroughModel.get(playthrough_id)
+            stats_models.PlaythroughModel.get(playthrough_id)
         # Only two issues remain, because one of them only had old playthroughs.
         playthrough_issues_model = (
             stats_models.ExplorationIssuesModel.get(playthrough_issues_id))
