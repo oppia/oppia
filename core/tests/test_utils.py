@@ -1707,6 +1707,9 @@ class AppEngineTestBase(TestBase):
 
         self.signup_superadmin_user()
 
+        # Set up the storage for task responses.
+        self._task_response = {}
+
     def tearDown(self):
         self.logout()
         self._delete_all_models()
@@ -1772,6 +1775,12 @@ class AppEngineTestBase(TestBase):
         else:
             return self.taskqueue_stub.get_filtered_tasks()
 
+    def get_task_response(self, task_name):
+        """Returns the last response from the task with the given name, or None
+        if it hasn't output anything yet.
+        """
+        return self._task_response.get(task_name)
+
     def process_and_flush_pending_tasks(self, queue_name=None):
         """Runs and flushes pending tasks. If queue_name is None, does so for
         all queues; otherwise, this only runs and flushes tasks for the
@@ -1792,28 +1801,30 @@ class AppEngineTestBase(TestBase):
             for task in tasks:
                 if task.url == '/_ah/queue/deferred':
                     from google.appengine.ext import deferred
-                    deferred.run(task.payload)
+                    self._task_response[task.name] = deferred.run(task.payload)
                 else:
-                    # All other tasks are expected to be mapreduce ones, or
+                    # All other tasks are expected to be mapreduce ones or
                     # Oppia-taskqueue-related ones.
+                    if task.url.startswith('/task'):
+                        app = webtest.TestApp(main_taskqueue.app)
+                    else:
+                        app = self.testapp
+
+                    payload = str(task.payload or '')
                     headers = {
                         key: str(val) for key, val in task.headers.iteritems()
                     }
-                    headers['Content-Length'] = str(len(task.payload or ''))
-
-                    app = (
-                        webtest.TestApp(main_taskqueue.app)
-                        if task.url.startswith('/task')
-                        else self.testapp)
+                    headers['Content-Length'] = str(len(payload))
                     response = app.post(
-                        url=str(task.url), params=(task.payload or ''),
-                        headers=headers)
+                        url=str(task.url), params=payload, headers=headers)
                     if response.status_code != 200:
                         raise RuntimeError(
                             'MapReduce task to URL %s failed' % task.url)
+                    self._task_response[task.name] = (
+                        response.unicode_normal_body)
 
-            tasks = self.taskqueue_stub.get_filtered_tasks(
-                queue_names=queue_names)
+            tasks = (
+                self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names))
             for queue in queue_names:
                 self.taskqueue_stub.FlushQueue(queue)
 

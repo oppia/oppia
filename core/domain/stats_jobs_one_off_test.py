@@ -232,6 +232,35 @@ class DeleteIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
             [new_playthrough_ids[2]])
 
 
+class PlaythroughAuditTests(OneOffJobTestBase):
+    ONE_OFF_JOB_CLASS = stats_jobs_one_off.PlaythroughAudit
+
+    def setUp(self):
+        super(DeleteIllegalPlaythroughsOneOffJobTests, self).setUp()
+        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
+
+    def create_playthrough(self):
+        """Helper method to create a simple playthrough and return its id.
+
+        Returns:
+            str. The ID of the newly created playthrough model.
+        """
+        playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp.id, self.exp.version, issue_type='EarlyQuit',
+            issue_customization_args={}, actions=[])
+        return stats_models.PlaythroughModel.get(playthrough_id)
+
+    def test_output_of_pre_release_date_playthroughs(self):
+        playthrough = self.create_playthrough()
+        # Set created_on to a date which is definitely before GSoC 2018.
+        playthrough.created_on = datetime.datetime(2017, 12, 31)
+        playthrough.put()
+
+        self.run_one_off_job()
+
+        # Test output somehow..?
+
+
 class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = (
         stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob)
