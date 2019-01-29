@@ -249,8 +249,8 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     'has not been curated for recording.' % (
                         key, audit_data['exp_id']),)
 
-            created_on_datetime = (
-                datetime.datetime.strptime(audit_data['created_on'], '%Y-%m-%d'))
+            created_on_datetime = datetime.datetime.strptime(
+                audit_data['created_on'], '%Y-%m-%d')
             if created_on_datetime < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
                 yield (
                     'playthrough_id:%s was released on %s, which is before the '
