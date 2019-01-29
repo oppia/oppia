@@ -240,9 +240,10 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     'object because of the error: %s.' % (
                         key, value['validate_error']),)
 
-            whitelisted_exploration_ids_for_playthroughs = (
-                config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
-            if value['exp_id'] not in whitelisted_exploration_ids_for_playthroughs:
+            whitelisted_exp_ids_for_playthroughs = (
+                config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value
+            )
+            if value['exp_id'] not in whitelisted_exp_ids_for_playthroughs:
                 yield (
                     'playthrough_id:%s was recorded in exploration_id:%s which '
                     'has not been curated for recording.' % (
