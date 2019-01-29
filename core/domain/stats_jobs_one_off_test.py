@@ -284,7 +284,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
         playthrough = self.create_playthrough()
-        playthrough.actions.append({object(): 'incorrect schema value'})
+        playthrough.actions.append({'bad schema key': 'bad schema value'})
         playthrough.put()
 
         output = self.ONE_OFF_JOB_CLASS.get_output(self.run_one_off_job())
