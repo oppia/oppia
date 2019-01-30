@@ -18,6 +18,7 @@ import copy
 import logging
 
 from core.domain import question_domain
+from core.domain import skill_services
 from core.domain import state_domain
 from core.platform import models
 import feconf
@@ -111,7 +112,8 @@ def delete_question_skill_link(question_id, skill_id):
     question_skill_link_model.delete()
 
 
-def get_questions_by_skill_ids(question_count, skill_ids, start_cursor):
+def get_questions_and_skill_descriptions_by_skill_ids(
+        question_count, skill_ids, start_cursor):
     """Returns the questions linked to the given skill ids.
 
     Args:
@@ -122,16 +124,21 @@ def get_questions_by_skill_ids(question_count, skill_ids, start_cursor):
             questions are to be returned. This value should be urlsafe.
 
     Returns:
-        list(Question), str. The list of questions which are linked to the given
-            skill ids and the next cursor value to be used for the next
+        list(Question), list(str), str. The list of questions and the
+            corresponding linked skill descriptions which are linked to the
+            given skill ids and the next cursor value to be used for the next
             batch of questions (or None if no more pages are left). The returned
             next cursor value is urlsafe.
     """
-    question_ids, next_cursor = (
-        question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
+    question_skill_link_models, skill_descriptions, next_cursor = (
+        question_models.QuestionSkillLinkModel.get_question_skill_links_and_skill_descriptions( #pylint: disable=line-too-long
             question_count, skill_ids, start_cursor))
-
-    return get_questions_by_ids(question_ids), next_cursor
+    question_skill_links = [
+        get_question_skill_link_from_model(model, skill_descriptions[index])
+        for index, model in enumerate(question_skill_link_models)]
+    question_ids = [obj.question_id for obj in question_skill_links]
+    questions = get_questions_by_ids(question_ids)
+    return questions, skill_descriptions, next_cursor
 
 
 def get_new_question_id():
@@ -204,12 +211,14 @@ def get_question_from_model(question_model):
         question_model.created_on, question_model.last_updated)
 
 
-def get_question_skill_link_from_model(question_skill_link_model):
+def get_question_skill_link_from_model(
+        question_skill_link_model, skill_description):
     """Returns domain object representing the given question skill link model.
 
     Args:
         question_skill_link_model: QuestionSkillLinkModel. The question skill
             link model loaded from the datastore.
+        skill_description: str. The description of skill linked to question.
 
     Returns:
         QuestionSkillLink. The domain object representing the question skill
@@ -218,7 +227,7 @@ def get_question_skill_link_from_model(question_skill_link_model):
 
     return question_domain.QuestionSkillLink(
         question_skill_link_model.question_id,
-        question_skill_link_model.skill_id)
+        question_skill_link_model.skill_id, skill_description)
 
 
 def get_question_by_id(question_id, strict=True):
@@ -242,12 +251,13 @@ def get_question_by_id(question_id, strict=True):
         return None
 
 
-def get_question_skill_links_of_skill(skill_id):
+def get_question_skill_links_of_skill(skill_id, skill_description):
     """Returns a list of QuestionSkillLinks of
     a particular skill ID.
 
     Args:
         skill_id: str. ID of the skill.
+        skill_description: str. Description of the skill.
 
     Returns:
         list(QuestionSkillLink). The list of question skill link
@@ -256,44 +266,45 @@ def get_question_skill_links_of_skill(skill_id):
     """
 
     question_skill_links = [
-        get_question_skill_link_from_model(model) for model in
+        get_question_skill_link_from_model(
+            model, skill_description) for model in
         question_models.QuestionSkillLinkModel.get_models_by_skill_id(
             skill_id)]
     return question_skill_links
 
 
-def get_question_skill_links_of_question(question_id):
-    """Returns a list of QuestionSkillLinks of
-    a particular question ID.
+def get_skills_linked_to_question(question_id):
+    """Returns a list of skills linked to a particular question.
 
     Args:
         question_id: str. ID of the question.
 
     Returns:
-        list(QuestionSkillLink). The list of question skill link
-        domain objects that are linked to the question ID or an empty list
-        if the question does not exist.
+        list(Skill). The list of skills that are linked to the question.
     """
-
-    question_skill_links = [
-        get_question_skill_link_from_model(model) for model in
+    question_skill_link_models = (
         question_models.QuestionSkillLinkModel.get_models_by_question_id(
-            question_id)]
-    return question_skill_links
+            question_id))
+    skill_ids = [model.skill_id for model in question_skill_link_models]
+    skills = skill_services.get_multi_skills(skill_ids)
+    return skills
 
 
-def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
+def update_skill_ids_of_questions(
+        curr_skill_id, curr_skill_description, new_skill_id):
     """Updates the skill ID of QuestionSkillLinkModels to the superseding
     skill ID.
 
     Args:
         curr_skill_id: str. ID of the current skill.
+        curr_skill_description: str. Description of the current skill.
         new_skill_id: str. ID of the superseding skill.
     """
     old_question_skill_link_models = (
         question_models.QuestionSkillLinkModel.get_models_by_skill_id(
             curr_skill_id))
-    old_question_skill_links = get_question_skill_links_of_skill(curr_skill_id)
+    old_question_skill_links = get_question_skill_links_of_skill(
+        curr_skill_id, curr_skill_description)
     new_question_skill_link_models = []
     for question_skill_link in old_question_skill_links:
         new_question_skill_link_models.append(
@@ -306,7 +317,7 @@ def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
         new_question_skill_link_models)
 
 
-def get_question_summaries_linked_to_skills(
+def get_question_summaries_and_skill_descriptions(
         question_count, skill_ids, start_cursor):
     """Returns the list of question summaries linked to all the skills given by
     skill_ids.
@@ -323,10 +334,11 @@ def get_question_summaries_linked_to_skills(
         a time is not supported currently.
 
     Returns:
-        list(QuestionSummary), str|None. The list of question summaries linked
-            to the given skill_ids and the next cursor value to be used for the
-            next page (or None if no more pages are left). The returned next
-            cursor value is urlsafe.
+        list(QuestionSummary), list(str), str|None. The list of question
+            summaries and the corresponding linked skill descriptions which are
+            linked to the given skill ids and the next cursor value to be used
+            for the next batch of questions (or None if no more pages are left).
+            The returned next cursor value is urlsafe.
     """
     if len(skill_ids) == 0:
         return [], None
@@ -335,13 +347,16 @@ def get_question_summaries_linked_to_skills(
         raise Exception(
             'Querying linked question summaries for more than 3 skills at a '
             'time is not supported currently.')
-    question_ids, next_cursor = (
-        question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
-            question_count, skill_ids, start_cursor)
-    )
+    question_skill_link_models, skill_descriptions, next_cursor = (
+        question_models.QuestionSkillLinkModel.get_question_skill_links_and_skill_descriptions( #pylint: disable=line-too-long
+            question_count, skill_ids, start_cursor))
+    question_skill_links = [
+        get_question_skill_link_from_model(model, skill_descriptions[index])
+        for index, model in enumerate(question_skill_link_models)]
+    question_ids = [obj.question_id for obj in question_skill_links]
 
     question_summaries = get_question_summaries_by_ids(question_ids)
-    return question_summaries, next_cursor
+    return question_summaries, skill_descriptions, next_cursor
 
 
 def get_questions_by_ids(question_ids):
