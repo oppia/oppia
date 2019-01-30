@@ -31,6 +31,9 @@ oppia.factory('CountVectorizerService', [function() {
       for (var i = 0; i < vectorLength; i++) {
         vector.push(0);
       }
+      if (tokens === null) {
+        return vector;
+      }
 
       tokens.forEach(function(token) {
         if (vocabulary.hasOwnProperty(token)) {
