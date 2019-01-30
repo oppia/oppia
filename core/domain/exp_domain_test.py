@@ -3451,10 +3451,6 @@ states:
       content: {}
       default_outcome: {}
       feedback_1: {}
-    content_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -3498,8 +3494,6 @@ states:
       html: <p>Congratulations, you have finished!</p>
     content_ids_to_audio_translations:
       content: {}
-    content_translations:
-      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3517,9 +3511,6 @@ states:
       content_id: content
       html: ''
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    content_translations:
       content: {}
       default_outcome: {}
     interaction:
