@@ -1110,10 +1110,10 @@ class State(object):
         object such as content_ids_to_audio_translations.
 
         Args:
-            old_ids_list: list(str.). A list of content ids present earlier
+            old_ids_list: list(str). A list of content ids present earlier
                 within the substructure (like answer groups, hints etc.) of
                 state.
-            new_ids_list: list(str.). A list of content ids currently present
+            new_ids_list: list(str). A list of content ids currently present
                 within the substructure (like answer groups, hints etc.) of
                 state.
         """
