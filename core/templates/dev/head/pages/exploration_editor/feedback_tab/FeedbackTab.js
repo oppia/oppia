@@ -64,6 +64,9 @@ oppia.controller('FeedbackTab', [
     $q.all([userInfoPromise, threadPromise]).then(function() {
       $rootScope.loadingMessage = '';
     });
+    $scope.printData = function() {
+      $scope.threadData = ThreadDataService.data;
+    };
 
     $scope.showCreateThreadModal = function() {
       $uibModal.open({
