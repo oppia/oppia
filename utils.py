@@ -635,6 +635,11 @@ def is_valid_language_code(language_code):
     Returns:
         bool. Whether the language code is valid or not.
     """
+    # TODO(DubeySandeep): Remove this check once App Engine supports 3-letter
+    # language codes in search.
+    if len(language_code != 2):
+        return False
+
     language_codes = [lc['code'] for lc in constants.ALL_LANGUAGE_CODES]
     return language_code in language_codes
 

@@ -855,14 +855,14 @@ class ContentTranslations(object):
         """Returns a set of language available in the ContentTranslations.
 
         Returns:
-            set(str.). A set of languages available in the ContentTranslations.
+            set(str). A set of languages available in the ContentTranslations.
         """
-        languages_list = set([])
+        language_codes_set = set([])
         for language_code_to_written_translation in (
                 self.content_translations.itervalues()):
             for language_code in language_code_to_written_translation:
-                languages_list.add(language_code)
-        return languages_list
+                language_codes_set.add(language_code)
+        return language_codes_set
 
     def add_content_id_for_translation(self, content_id):
         """Adds a content id as a key for the translation into the
