@@ -99,7 +99,7 @@ oppia.factory('ExplorationStatesService', [
       widget_customization_args: ['interaction', 'customizationArgs']
     };
 
-    CONTENT_ID_EXTRACTION = {
+    CONTENT_ID_EXTRACTORS = {
       answer_groups: function(answerGroups) {
         contentIds = new Set();
         answerGroups.forEach(function(answerGroup) {
@@ -130,7 +130,7 @@ oppia.factory('ExplorationStatesService', [
       }
     };
 
-    var _getSetDifference = function(setA, setB) {
+    var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
       diffList = Array.from(setA).filter(function(element) {
         return !setB.has(element);
       });
@@ -182,12 +182,13 @@ oppia.factory('ExplorationStatesService', [
         var newStateData = _states.getState(stateName);
         var accessorList = PROPERTY_REF_DATA[backendName];
 
-        if (CONTENT_ID_EXTRACTION.hasOwnProperty(backendName)) {
-          var oldContentIds = CONTENT_ID_EXTRACTION[backendName](oldValue);
-          var newContentIds = CONTENT_ID_EXTRACTION[backendName](newValue);
-          var contentIdsToDelete = _getSetDifference(
+        if (CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
+          var oldContentIds = CONTENT_ID_EXTRACTORS[backendName](oldValue);
+          var newContentIds = CONTENT_ID_EXTRACTORS[backendName](newValue);
+          var contentIdsToDelete = _getElementsInFirstSetButNotInSecond(
             oldContentIds, newContentIds);
-          var contentIdsToAdd = _getSetDifference(newContentIds, oldContentIds);
+          var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
+            newContentIds, oldContentIds);
           contentIdsToDelete.forEach(function(contentId) {
             newStateData.contentIdsToAudioTranslations.deleteContentId(
               contentId);
@@ -302,7 +303,7 @@ oppia.factory('ExplorationStatesService', [
         return getStatePropertyMemento(stateName, 'answer_groups');
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
-        saveStateProperty(stateName, 'answer_groups', newAnswerGroups, true);
+        saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
         stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
           callback(stateName);
         });

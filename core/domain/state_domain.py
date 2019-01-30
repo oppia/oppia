@@ -1120,15 +1120,15 @@ class State(object):
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
         for content_id in content_ids_to_delete:
-            if not content_id in self.content_ids_to_audio_translations.keys():
+            if not content_id in self.content_ids_to_audio_translations:
                 raise Exception(
-                    'The content_id %s does not exist.' % content_id)
+                    'The content_id %s does not exists.' % content_id)
             else:
                 self.content_ids_to_audio_translations.pop(content_id)
         for content_id in content_ids_to_add:
-            if content_id in self.content_ids_to_audio_translations.keys():
+            if content_id in self.content_ids_to_audio_translations:
                 raise Exception(
-                    'The content_id %s already exist.' % content_id)
+                    'The content_id %s already exists.' % content_id)
             else:
                 self.content_ids_to_audio_translations[content_id] = {}
 

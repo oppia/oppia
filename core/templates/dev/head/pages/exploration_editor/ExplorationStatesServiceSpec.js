@@ -21,6 +21,8 @@ describe('ExplorationStatesService', function() {
 
   beforeEach(inject(function($injector) {
     this.ess = $injector.get('ExplorationStatesService');
+    this.citatof = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
+    this.scitats = $injector.get('StateContentIdsToAudioTranslationsService');
 
     spyOn($injector.get('ContextService'), 'getExplorationId')
       .and.returnValue('7');
@@ -28,29 +30,47 @@ describe('ExplorationStatesService', function() {
 
   describe('Callback Registration', function() {
     beforeEach(function() {
+      var contentIdToAudioTranslationsDict = {
+        content: {},
+        default_outcome: {},
+        feedback_1: {}
+      };
+      this.scitats.displayed = this.citatof.createFromBackendDict(
+        contentIdToAudioTranslationsDict);
+      this.scitats.saveDisplayedValue();
       this.ess.init({
         Hola: {
-          content: '',
+          content: {
+            content_id: 'content',
+            html: ''
+          },
+          content_ids_to_audio_translations: contentIdToAudioTranslationsDict,
           param_changes: [],
           interaction: {
             answer_groups: [{
               rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
               outcome: {
                 dest: 'Me Llamo',
-                feedback: {html: 'buen trabajo!'},
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: 'buen trabajo!'
+                },
                 labelled_as_correct: true
               }
             }],
             default_outcome: {
               dest: 'Hola',
-              feedback: {html: 'try again!'},
+              feedback: {
+                content_id: 'default_outcome',
+                html: 'try again!'
+              },
               labelled_as_correct: false
             },
             hints: [],
             id: 'TextInput',
+            solution: null
           },
           classifier_model_id: 0,
-          content_ids_to_audio_translations: {}
         }
       });
     });

@@ -149,7 +149,7 @@ oppia.controller('ExplorationEditorTab', [
 
     $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
       ExplorationStatesService.saveContentIdsToAudioTranslations(
-        $scope.stateName, angular.copy(displayedValue), false);
+        $scope.stateName, angular.copy(displayedValue));
     };
 
     $scope.navigateToState = function(stateName) {
