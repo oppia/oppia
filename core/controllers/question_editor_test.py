@@ -210,7 +210,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id_2,
                     self.skill_id
                 ))
-            question_summaries, _ = (
+            question_summaries, _, _ = (
                 question_services.get_question_summaries_and_skill_descriptions(
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 0)
