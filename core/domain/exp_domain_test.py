@@ -3442,82 +3442,107 @@ param_changes: []
 param_specs: {}
 schema_version: 31
 states:
-(untitled state):
-classifier_model_id: null
-content:
-  audio_translations: {}
-  html: ''
-interaction:
-  answer_groups:
-  - labelled_as_correct: false
-    outcome:
-      dest: END
-      feedback:
-        audio_translations: {}
-        html: Correct!
-      param_changes: []
-      refresher_exploration_id: null
-    rule_specs:
-    - inputs:
-        x: InputString
-      rule_type: Equals
-  confirmed_unclassified_answers: []
-  customization_args:
-    placeholder:
-      value: ''
-    rows:
-      value: 1
-  default_outcome:
-    dest: (untitled state)
-    feedback:
-      audio_translations: {}
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+    content_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
     param_changes: []
-    refresher_exploration_id: null
-  hints: []
-  id: TextInput
-  solution: null
-param_changes: []
-END:
-classifier_model_id: null
-content:
-  audio_translations: {}
-  html: Congratulations, you have finished!
-interaction:
-  answer_groups: []
-  confirmed_unclassified_answers: []
-  customization_args:
-    recommendedExplorationIds:
-      value: []
-  default_outcome: null
-  hints: []
-  id: EndExploration
-  solution: null
-param_changes: []
-New state:
-classifier_model_id: null
-content:
-  audio_translations: {}
-  html: ''
-interaction:
-  answer_groups: []
-  confirmed_unclassified_answers: []
-  customization_args:
-    placeholder:
-      value: ''
-    rows:
-      value: 1
-  default_outcome:
-    dest: END
-    feedback:
-      audio_translations: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
+    content_translations:
+      content: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+    content_translations:
+      content: {}
+      default_outcome: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
     param_changes: []
-    refresher_exploration_id: null
-  hints: []
-  id: TextInput
-  solution: null
-param_changes: []
 states_schema_version: 26
 tags: []
 title: Title
