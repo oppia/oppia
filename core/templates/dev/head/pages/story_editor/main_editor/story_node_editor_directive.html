@@ -29,6 +29,30 @@
     <input type="text" ng-model="explorationId">
     <button type="submit" class="btn btn-success btn-sm">Save</button>
   </form>
+  <label style="padding-top: 2em;" class="form-heading"> Prerequisite Skill IDs </label>
+  <form class="form-horizontal" role="form" ng-submit="addPrerequisiteSkillId(prerequisiteSkillId)">
+    <input type="text" ng-model="prerequisiteSkillId" style="margin-bottom: 1em;">
+    <button type="submit" class="btn btn-success btn-sm">Add</button>
+    <md-card class="destination-node-id"
+             ng-repeat="skillId in getPrerequisiteSkillIds()">
+      <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank"><[skillId]></a>
+      <span style="float: right;" ng-click="removePrerequisiteSkillId(skillId)" aria-hidden="true">
+        <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+      </span>
+    </md-card>
+  </form>
+  <label style="padding-top: 2em;" class="form-heading"> Acquired Skill IDs </label>
+  <form class="form-horizontal" role="form" ng-submit="addAcquiredSkillId(acquiredSkillId)">
+    <input type="text" ng-model="acquiredSkillId" style="margin-bottom: 1em;">
+    <button type="submit" class="btn btn-success btn-sm">Add</button>
+    <md-card class="destination-node-id"
+             ng-repeat="skillId in getAcquiredSkillIds()">
+      <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank"><[skillId]></a>
+      <span style="float: right;" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
+        <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+      </span>
+    </md-card>
+  </form>
   <div class="node-field">
     <label class="form-heading"> Next Chapters </label>
     <div ng-if="getDestinationNodeIds().length === 0">
