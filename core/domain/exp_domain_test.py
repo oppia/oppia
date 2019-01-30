@@ -3912,7 +3912,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long
-    YAML_CONTENT_V30_IMAGE_DIMENSIONS = ("""author_notes: ''
+    YAML_CONTENT_V31_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -3922,7 +3922,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 30
+schema_version: 31
 states:
   Introduction:
     classifier_model_id: null
@@ -4107,7 +4107,7 @@ states:
       id: ItemSelectionInput
       solution: null
     param_changes: []
-states_schema_version: 25
+states_schema_version: 26
 tags: []
 title: title
 """)
@@ -4222,7 +4222,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V30_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V31_WITH_IMAGE_CAPTION = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4232,7 +4232,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 30
+schema_version: 31
 states:
   (untitled state):
     classifier_model_id: null
@@ -4328,7 +4328,7 @@ states:
       id: TextInput
       solution: null
     param_changes: []
-states_schema_version: 25
+states_schema_version: 26
 tags: []
 title: Title
 """)
@@ -4345,7 +4345,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V30_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V31_IMAGE_DIMENSIONS)
 
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
@@ -4356,7 +4356,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V30_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V31_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
