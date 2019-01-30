@@ -22,7 +22,9 @@ import utils
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, skill_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.skill
+])
 
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -193,9 +195,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_model_instance
 
     @classmethod
-    def get_question_ids_linked_to_skill_ids(
+    def get_question_skill_links_and_skill_descriptions(
             cls, question_count, skill_ids, start_cursor):
-        """Fetches the list of question ids linked to the skill in batches.
+        """Fetches the list of QuestionSkillLinkModels linked to the skill in
+        batches.
 
         Args:
             question_count: int. The number of questions to be returned.
@@ -205,9 +208,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 questions are to be returned. This value should be urlsafe.
 
         Returns:
-            list(str), str|None. The question ids linked to given skills and the
-                next cursor value to be used for the next page (or None if no
-                more pages are left). The returned next cursor value is urlsafe.
+            list(QuestionSkillLinkModel), list(str), str|None. The
+                QuestionSkillLinkModels corresponding to given skill_ids, the
+                corresponding skill descriptions and the next cursor value to be
+                used for the next page (or None if no more pages are left). The
+                returned next cursor value is urlsafe.
         """
         if not start_cursor == '':
             cursor = datastore_query.Cursor(urlsafe=start_cursor)
@@ -226,13 +231,14 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             ).order(-cls.last_updated, cls.key).fetch_page(
                 question_count
             )
-        question_ids = [
-            model.question_id for model in question_skill_link_models
-        ]
+
+        skill_ids = [model.skill_id for model in question_skill_link_models]
+        skills = skill_models.SkillModel.get_multi(skill_ids)
+        skill_descriptions = [skill.description for skill in skills]
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
-        return question_ids, next_cursor_str
+        return question_skill_link_models, skill_descriptions, next_cursor_str
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(cls, skill_id):

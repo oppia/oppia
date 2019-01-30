@@ -1,113 +1,16 @@
 <md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown && !activeQuestion">
   <div class="questions">
     <h3 class="form-heading"> Questions included in this topic </h3>
-    <button class="btn btn-default"
-            ng-click="createQuestion()"
-            style="float: right;">
-      Create Question
-    </button>
-    <table class="dashboard-table" ng-if="questionSummaries.length > 0">
-      <colgroup>
-        <col style="width: 10%;">
-        <col style="width: 90%;">
-      </colgroup>
-      <tr>
-        <th class="dashboard-table-headings">
-          <p> No. </p>
-        </th>
-        <th class="dashboard-table-headings">
-          <p> Question Content </p>
-        </th>
-      </tr>
-      <tr ng-repeat="question in questionSummaries"
-          class="list-item"
-          ng-click="editQuestion(question)">
-        <td><[getQuestionIndex($index)]></td>
-        <td>
-          <a class="list-summary">
-            <angular-html-bind html-data="question.question_content"></angular-html-bind>
-          </a>
-        </td>
-      </tr>
-    </table>
-    <h4 ng-if="questionSummaries.length === 0" style="color: gray;">
-      Click on Create Question to create a new question and link it to a skill in this topic
-    </h4>
-
-    <h3 class="form-heading" ng-if="questionSuggestionThreads.length > 0"> Questions suggested to this topic </h3>
-    <table class="dashboard-table" ng-if="questionSuggestionThreads.length > 0">
-      <colgroup>
-        <col style="width: 10%;">
-        <col style="width: 80%;">
-        <col style="width: 10%">
-      </colgroup>
-      <tr>
-        <th class="dashboard-table-headings">
-          <p> No. </p>
-        </th>
-        <th class="dashboard-table-headings">
-          <p> Question Content </p>
-        </th>
-        <th class="dashboard-table-headings">
-          <p> Status </p>
-        </th>
-      </tr>
-      <tr ng-repeat="questionSuggestionThread in questionSuggestionThreads" ng-click="setActiveQuestion(questionSuggestionThread)" class="list-item">
-        <td> <[$index + 1]> </td>
-        <td>
-          <a class="list-summary">
-            <angular-html-bind html-data="questionSuggestionThread.suggestion.question.getStateData().content.getHtml()"></angular-html-bind>
-          </a>
-        </td>
-        <td>
-          <p><[questionSuggestionThread.suggestion.status]></p>
-        </td>
-      </tr>
-    </table>
-    <div class="page-navigation-arrows" ng-if="questionSummaries.length > 0">
-      <i class="material-icons md-18"
-         ng-if="currentPage !== 0"
-         ng-click="goToPreviousPage()">&#xE5C4;
-      </i> Page <[currentPage + 1]>
-      <i class="material-icons md-18" ng-if="!isLastPage(currentPage)" ng-click="goToNextPage()">&#xE5C8;</i>
-    </div>
+    <questions-list topic-id="topic.getId()"
+                    get-question-summaries="getQuestionSummaries"
+                    fetch-question-summaries="fetchQuestionSummaries"
+                    is-last-question-batch="isLastQuestionBatch"
+                    all-skill-summaries="allSkillSummaries"
+                    can-edit-question="canEditQuestion"
+                    question-suggestion-threads="questionSuggestionThreads">
+    </questions-list>
   </div>
 </md-card>
-
-<div ng-if="questionEditorIsShown">
-  <div style="padding-left: 45%;">
-    <button type="button"
-            class="btn btn-success oppia-editor-publish-button"
-            ng-click="saveQuestion()"
-            ng-disabled="!hasChanges()">
-      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-         alt="Publish to Oppia Library">
-        &#xE2C3;
-      </i>
-      <span class="oppia-save-publish-button-label" ng-if="questionIsBeingSaved">Saving...</span>
-      <span class="oppia-save-publish-button-label" ng-if="!questionIsBeingUpdated && !questionIsBeingSaved">Save and Publish Question</span>
-      <span class="oppia-save-publish-button-label" ng-if="questionIsBeingUpdated && !questionIsBeingSaved">Save Changes</span>
-    </button>
-  </div>
-  <question-editor question-id="questionId"
-                   misconceptions="misconceptions"
-                   question="question"
-                   can-edit-question="canEditQuestion">
-  </question-editor>
-</div>
-
-<div ng-if="activeQuestion">
-  <question-editor question-id="activeQuestion.getId()"
-                   misconceptions="emptyMisconceptionsList"
-                   question="activeQuestion"
-                   can-edit-question="false">
-  </question-editor>
-
-  <textarea ng-model="suggestionReviewMessage"></textarea><br>
-  <button class="btn btn-default" ng-click="showSelectSkillModal()">Select skill</button>
-  <button class="btn btn-success" ng-click="acceptQuestion(idOfActiveSuggestion, suggestionReviewMessage)">Approve</button>
-  <button class="btn btn-danger" ng-click="rejectQuestion(idOfActiveSuggestion, suggestionReviewMessage)">Reject</button>
-</div>
 
 <style>
   questions-tab .oppia-page-card {
@@ -118,58 +21,5 @@
 
   questions-tab .questions {
     padding-bottom: 10px;
-  }
-
-  questions-tab .oppia-editor-publish-button {
-    margin-top: 2%;
-  }
-
-  questions-tab .dashboard-table {
-    font-size: 15px;
-    text-align: center;
-    width: 100%;
-  }
-
-  questions-tab .page-navigation-arrows {
-    float: right;
-  }
-
-  questions-tab .list-summary,
-  questions-tab .list-summary:active,
-  questions-tab .list-summary:visited {
-    color: inherit;
-    display: block;
-    height: 2em;
-    text-decoration: none;
-  }
-
-  questions-tab .dashboard-table .dashboard-table-headings {
-    border-bottom: 2px solid #bbb;
-    padding-bottom: 0.7em;
-    text-align: center;
-  }
-
-  questions-tab .dashboard-table .dashboard-table-headings p {
-    display: inline;
-  }
-
-  questions-tab .list-item:not(:last-child) {
-    border-bottom: 1px solid #bbb;
-  }
-
-  questions-tab .list-item:hover {
-    background-color: #ededed;
-  }
-
-  questions-tab .list-summary span {
-    display: inline-block;
-    line-height: normal;
-    vertical-align: middle;
-  }
-
-  @media(max-width: 815px) {
-    questions-tab .list-summary .additional-text {
-      display: none;
-    }
   }
 </style>

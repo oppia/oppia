@@ -16,6 +16,7 @@
 
 from core.domain import question_domain
 from core.domain import question_services
+from core.domain import skill_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -58,6 +59,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'))
 
+        self.save_new_skill(
+            'skill_1', self.admin_id, 'Skill Description 1')
+        self.save_new_skill(
+            'skill_2', self.admin_id, 'Skill Description 2')
+
     def test_get_question_by_id(self):
         question = question_services.get_question_by_id(self.question_id)
 
@@ -74,10 +80,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_get_questions_by_skill_ids(self):
         question_services.create_new_question_skill_link(
             self.question_id, 'skill_1')
-        questions, _ = (
-            question_services.get_questions_by_skill_ids(2, ['skill_1'], ''))
+        questions, _, _ = (
+            question_services.get_questions_and_skill_descriptions_by_skill_ids(
+                2, ['skill_1'], ''))
         self.assertEqual(len(questions), 1)
-        self.assertEqual(questions[0].to_dict(), self.question.to_dict())
+        self.assertEqual(
+            questions[0].to_dict(), self.question.to_dict())
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
@@ -96,22 +104,37 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             question_id_3, 'skill_2')
 
-        question_summaries, _ = (
-            question_services.get_question_summaries_linked_to_skills(
+        question_summaries, skill_descriptions, _ = (
+            question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_2', 'skill_3'], ''))
 
         with self.assertRaisesRegexp(
             Exception, 'Querying linked question summaries for more than 3 '
             'skills at a time is not supported currently.'):
-            question_services.get_question_summaries_linked_to_skills(
+            question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], '')
         question_ids = [summary.id for summary in question_summaries]
+        skill_descriptions = [
+            description for description in skill_descriptions
+        ]
+
         self.assertEqual(len(question_ids), 3)
+        self.assertEqual(len(skill_descriptions), 3)
         self.assertItemsEqual(
             question_ids, [self.question_id, question_id_2, question_id_3])
 
-        question_summaries, _ = (
-            question_services.get_question_summaries_linked_to_skills(
+        # Make sure the correct skill description corresponds to respective
+        # question summaries.
+        for index, description in enumerate(skill_descriptions):
+            if (
+                    question_ids[index] == self.question_id or
+                    question_ids[index] == question_id_2):
+                self.assertEqual('Skill Description 1', description)
+            else:
+                self.assertEqual('Skill Description 2', description)
+
+        question_summaries, skill_descriptions, _ = (
+            question_services.get_question_summaries_and_skill_descriptions(
                 5, ['skill_1', 'skill_3'], ''))
         question_ids = [summary.id for summary in question_summaries]
         self.assertEqual(len(question_ids), 2)
@@ -127,13 +150,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # If the skill id doesnt exist at all, it returns an empty list.
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
-                'non_existent_skill_id'))
+                'non_existent_skill_id', 'Skill Description'))
         self.assertEqual(len(question_skill_links), 0)
 
         # If the question ids dont exist for a skill, it returns an empty list.
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
-                'skill_1'))
+                'skill_1', 'Skill Description 1'))
         self.assertEqual(len(question_skill_links), 0)
 
         question_id_2 = question_services.get_new_question_id()
@@ -155,7 +178,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # When question ids exist, it returns a list of questionskilllinks.
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
-                'skill_1'))
+                'skill_1', 'Skill Description 1'))
 
         self.assertEqual(len(question_skill_links), 2)
         self.assertTrue(isinstance(question_skill_links[0],
@@ -239,7 +262,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
-                'skill_1'))
+                'skill_1', 'Skill Description 1'))
 
         self.assertEqual(len(question_skill_links), 2)
         question_ids = [question_skill.question_id for question_skill
@@ -248,16 +271,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_ids, [self.question_id, question_id_2])
 
         question_services.update_skill_ids_of_questions(
-            'skill_1', 'skill_3')
+            'skill_1', 'Description 1', 'skill_3')
 
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
-                'skill_1'))
+                'skill_1', 'Description 1'))
 
         self.assertEqual(len(question_skill_links), 0)
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
-                'skill_3'))
+                'skill_3', 'Skill Description 3'))
 
         question_ids = [question_skill.question_id for question_skill
                         in question_skill_links]
@@ -301,10 +324,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_question_skill_links_of_question(self):
         # If the question id doesnt exist at all, it returns an empty list.
-        question_skill_links = (
-            question_services.get_question_skill_links_of_question(
+        skills = (
+            question_services.get_skills_linked_to_question(
                 'non_existent_question_id'))
-        self.assertEqual(len(question_skill_links), 0)
+        self.assertEqual(len(skills), 0)
 
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
@@ -324,14 +347,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             question_id_3, 'skill_2')
 
-        question_skill_links = (
-            question_services.get_question_skill_links_of_question(
+        skills = (
+            question_services.get_skills_linked_to_question(
                 question_id_2))
 
-        self.assertTrue(isinstance(question_skill_links[0],
-                                   question_domain.QuestionSkillLink))
-        self.assertEqual(len(question_skill_links), 2)
-        skill_ids = [question_skill.skill_id for question_skill
-                     in question_skill_links]
+        self.assertTrue(isinstance(skills[0], skill_domain.Skill))
+        self.assertEqual(len(skills), 2)
+        skill_ids = [skill.id for skill in skills]
         self.assertItemsEqual(
             skill_ids, ['skill_1', 'skill_2'])

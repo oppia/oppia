@@ -1,46 +1,12 @@
 <md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown">
   <div class="questions">
     <h3 class="form-heading"> Questions linked to this skill </h3>
-    <button class="btn btn-default"
-            ng-click="createQuestion()"
-            style="float: right;">
-      Create Question
-    </button>
-    <table class="dashboard-table" ng-if="questionSummaries.length > 0">
-      <colgroup>
-        <col style="width: 10%;">
-        <col style="width: 90%;">
-      </colgroup>
-      <tr>
-        <th class="dashboard-table-headings">
-          <p> No. </p>
-        </th>
-        <th class="dashboard-table-headings">
-          <p> Question Content </p>
-        </th>
-      </tr>
-      <tr ng-repeat="question in questionSummaries"
-          class="list-item"
-          ng-click="editQuestion(question)">
-        <td> <[getQuestionIndex($index)]> </td>
-        <td>
-          <a class="list-summary">
-            <angular-html-bind html-data="question.question_content"></angular-html-bind>
-          </a>
-        </td>
-      </tr>
-    </table>
-    <h4 ng-if="questionSummaries.length === 0" style="color: gray;">
-      Click on Create Question to create a new question and link it to this skill.
-    </h4>
-
-    <div class="page-navigation-arrows" ng-if="questionSummaries.length > 0">
-      <i class="material-icons md-18"
-         ng-if="currentPage !== 0"
-         ng-click="goToPreviousPage()">&#xE5C4;
-      </i> Page <[currentPage + 1]>
-      <i class="material-icons md-18" ng-if="!isLastPage(currentPage)" ng-click="goToNextPage()">&#xE5C8;</i>
-    </div>
+    <questions-list skill="skill"
+                    get-question-summaries="getQuestionSummaries"
+                    fetch-question-summaries="fetchQuestionSummaries"
+                    is-last-question-batch="isLastQuestionBatch"
+                    can-edit-question="true">
+    </questions-list>
   </div>
 </md-card>
 
@@ -53,58 +19,5 @@
 
   questions-tab .questions {
     padding-bottom: 10px;
-  }
-
-  questions-tab .oppia-editor-publish-button {
-    margin-top: 2%;
-  }
-
-  questions-tab .dashboard-table {
-    font-size: 15px;
-    text-align: center;
-    width: 100%;
-  }
-
-  questions-tab .page-navigation-arrows {
-    float: right;
-  }
-
-  questions-tab .list-summary,
-  questions-tab .list-summary:active,
-  questions-tab .list-summary:visited {
-    color: inherit;
-    display: block;
-    height: 2em;
-    text-decoration: none;
-  }
-
-  questions-tab .dashboard-table .dashboard-table-headings {
-    border-bottom: 2px solid #bbb;
-    padding-bottom: 0.7em;
-    text-align: center;
-  }
-
-  questions-tab .dashboard-table .dashboard-table-headings p {
-    display: inline;
-  }
-
-  questions-tab .list-item:not(:last-child) {
-    border-bottom: 1px solid #bbb;
-  }
-
-  questions-tab .list-item:hover {
-    background-color: #ededed;
-  }
-
-  questions-tab .list-summary span {
-    display: inline-block;
-    line-height: normal;
-    vertical-align: middle;
-  }
-
-  @media(max-width: 815px) {
-    questions-tab .list-summary .additional-text {
-      display: none;
-    }
   }
 </style>
