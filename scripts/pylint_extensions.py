@@ -805,7 +805,7 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
         'C0007': (
             'Files should end in a single newline character.',
             'newline-at-eof',
-            'Please enter a newline at the end of the file'),
+            'Please enter a single newline at the end of the file'),
         'C0008': (
             'Only one character in file',
             'only-one-character',

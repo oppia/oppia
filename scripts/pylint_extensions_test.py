@@ -259,3 +259,65 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
             ),
         ):
             checker_test_object.checker.visit_functiondef(functiondef_node2)
+
+
+class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
+
+    def test_checks_single_char_and_newline_eof(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.SingleCharAndNewlineAtEOFChecker)
+        checker_test_object.setup_method()
+        node1 = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write(
+                """c = 'something dummy'
+                """)
+        node1.file = filename
+        node1.path = filename
+
+        checker_test_object.checker.process_module(node1)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='newline-at-eof',
+                line=2
+            ),
+        ):
+            temp_file.close()
+
+        node2 = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with open(filename, 'w') as tmp:
+            tmp.write("""1""")
+        node2.file = filename
+        node2.path = filename
+
+        checker_test_object.checker.process_module(node2)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='only-one-character',
+                line=1
+            ),
+        ):
+            temp_file.close()
+
+        node3 = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with open(filename, 'w') as tmp:
+            tmp.write("""x = 'something dummy'""")
+        node3.file = filename
+        node3.path = filename
+
+        checker_test_object.checker.process_module(node3)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()
