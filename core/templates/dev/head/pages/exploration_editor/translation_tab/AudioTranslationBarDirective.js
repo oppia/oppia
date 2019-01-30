@@ -90,7 +90,7 @@ oppia.directive('audioTranslationBar', [
           $scope.showRecorderWarning = false;
           $scope.audioLoadingIndicatorIsShown = false;
           $scope.checkingMicrophonePermission = false;
-          $scope.isAudioTimerShown = true;
+          $scope.audioTimerIsShown = true;
           $scope.audioIsCurrentlyBeingSaved = false;
 
           var saveContentIdsToAudioTranslationChanges = function() {
@@ -286,11 +286,11 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.playPauseUploadedAudioTranslation = function(languageCode) {
-            $scope.isAudioTimerShown = true;
+            $scope.audioTimerIsShown = true;
             if (!AudioPlayerService.isPlaying()) {
               if (AudioPlayerService.isTrackLoaded()) {
                 AudioPlayerService.play();
-                $scope.isAudioTimerShown = true;
+                $scope.audioTimerIsShown = true;
               } else {
                 loadAndPlayAudioTranslation();
               }
@@ -306,14 +306,14 @@ oppia.directive('audioTranslationBar', [
 
           $scope.getUploadedAudioTimer = function() {
             if (AudioPlayerService.isTrackLoaded()) {
-              $scope.isAudioTimerShown = true;
+              $scope.audioTimerIsShown = true;
               var currentTime = $filter('formatTimer')(AudioPlayerService
                 .getCurrentTime());
               var duration = $filter('formatTimer')(AudioPlayerService
                 .getAudioDuration());
               return currentTime + ' / ' + duration;
             } else {
-              $scope.isAudioTimerShown = false;
+              $scope.audioTimerIsShown = false;
               return '--:-- / --:--';
             }
           };
@@ -330,7 +330,7 @@ oppia.directive('audioTranslationBar', [
               AudioPlayerService.load(audioTranslation.filename)
                 .then(function() {
                   $scope.audioLoadingIndicatorIsShown = false;
-                  $scope.isAudioTimerShown = true;
+                  $scope.audioTimerIsShown = true;
                   AudioPlayerService.play();
                 });
             }
