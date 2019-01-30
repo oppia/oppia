@@ -3699,12 +3699,6 @@ title: Title
             'eid', self.YAML_CONTENT_V29)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
-    def test_load_from_v31(self):
-        """Test direct loading from a v31 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V31)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
 
 class HTMLMigrationUnitTests(test_utils.GenericTestBase):
     """Test HTML migration."""
