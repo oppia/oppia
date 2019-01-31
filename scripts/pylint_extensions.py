@@ -794,6 +794,38 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
             self.add_message('function-args-order-cls', node=node)
 
 
+class RestrictedImportChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks restricted imports."""
+
+    __implements__ = interfaces.IAstroidChecker
+    name = 'disallowed-layer-import'
+    priority = -1
+    msgs = {
+        'C0009': (
+            'Importing domain layer in storage layer is prohibited.',
+            'disallowed-layer-import',
+            'Storage layer(core/storage) importing domain layer(core/domain)'
+            ' is not allowed.'),
+    }
+
+    def visit_import(self, node):
+        """Visits every import statement in the file.
+
+        Args:
+         node: astroid.node_classes.Import. Node for a import statement
+                 in the AST.
+        """
+
+        modnode = node.root()
+        names = [name for name, _ in node.names]
+        if 'oppia.core.storage' in modnode.name:
+            if any('core.domain' in name for name in names):
+                self.add_message(
+                    'disallowed-layer-import',
+                    node=node,
+                )
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -806,3 +838,4 @@ def register(linter):
     linter.register_checker(ImportOnlyModulesChecker(linter))
     linter.register_checker(BackslashContinuationChecker(linter))
     linter.register_checker(FunctionArgsOrderChecker(linter))
+    linter.register_checker(RestrictedImportChecker(linter))
