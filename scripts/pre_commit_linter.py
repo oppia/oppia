@@ -1453,7 +1453,8 @@ def _check_sorted_dependencies(all_files, parsed_js_files_dict):
     imported in the controllers/directives/factories in js
     files are in following pattern, first dollar imports in
     sorted form, then regular imports in sorted form and
-    then constant imports in sorted form."""
+    then constant imports in sorted form.
+    """
     print 'Starting sorted dependecies check'
     print '----------------------------------------'
     files_to_check = [
@@ -1508,7 +1509,7 @@ def _check_sorted_dependencies(all_files, parsed_js_files_dict):
                 regular_imports.sort()
                 constant_imports.sort()
                 sorted_imports = (dollar_imports + regular_imports +
-                                  constant_imports) #pylint: disable=line-too-long
+                                  constant_imports)
                 if sorted_imports != function_args:
                     failed = True
                     print (
@@ -1845,8 +1846,10 @@ def main():
     """
     all_files = _get_all_files()
     parsed_js_files_dict = _validate_and_parse_js_file(all_files)
-    directive_scope_messages = _check_directive_scope(all_files, parsed_js_files_dict)
-    sorted_dependencies_messages = _check_sorted_dependencies(all_files, parsed_js_files_dict)
+    directive_scope_messages = _check_directive_scope(
+        all_files, parsed_js_files_dict)
+    sorted_dependencies_messages = _check_sorted_dependencies(
+        all_files, parsed_js_files_dict)
     controller_dependency_messages = (
         _match_line_breaks_in_controller_dependencies(all_files))
     html_directive_name_messages = _check_html_directive_name(all_files)
@@ -1862,7 +1865,7 @@ def main():
     pattern_messages = _check_bad_patterns(all_files)
     copyright_notice_messages = _check_for_copyright_notice(all_files)
     all_messages = (
-        directive_scope_messages + sorted_imports_messages +
+        directive_scope_messages + sorted_dependencies_messages +
         controller_dependency_messages +
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
