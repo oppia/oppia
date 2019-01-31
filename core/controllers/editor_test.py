@@ -1928,26 +1928,3 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
-
-
-class EditorFirstTimeTutorialIntegrationTest(BaseEditorControllerTests):
-    """This controller does integration tests of the first time tutorial
-    instances for the exploration editor.
-    """
-
-    def setUp(self):
-        super(EditorFirstTimeTutorialIntegrationTest, self).setUp()
-        # Load exploration.
-        self.EXP_ID = '0'
-        exp_services.load_demo(self.EXP_ID)
-
-    def test_firsttime_translation_tutorial(self):
-        """ Testing of the firsttime translation tutorial http requests."""
-        self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/create/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
-        # Check if method returns 200 http status.
-        self.post_json(
-            '/createhandler/started_translation_tutorial_event/%s'
-            % self.EXP_ID, {}, csrf_token=csrf_token,
-            expected_status_int=200)

@@ -470,7 +470,7 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.StartedTutorialEventHandler),
     get_redirect_route(
         r'/createhandler/started_translation_tutorial_event/<exploration_id>',
-        editor.StartedTranslationTutorialEventHandler),
+        translator.StartedTranslationTutorialEventHandler),
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',
         editor.EditorAutosaveHandler),

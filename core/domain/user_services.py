@@ -137,7 +137,7 @@ class UserSettings(object):
         self.last_agreed_to_terms = last_agreed_to_terms
         self.last_started_state_editor_tutorial = (  # pylint: disable=invalid-name
             last_started_state_editor_tutorial)
-        self.last_started_state_translation_tutorial = (  # pylint: disable=invalid-name
+        self.last_started_state_translation_tutorial = (
             last_started_state_translation_tutorial)
         self.last_logged_in = last_logged_in
         self.last_edited_an_exploration = last_edited_an_exploration
