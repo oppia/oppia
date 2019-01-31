@@ -285,8 +285,6 @@ class ExplorationHandler(base.BaseHandler):
                     'data_schema_version': data_schema_version
                 }
 
-        whitelisted_exp_ids = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
@@ -301,7 +299,6 @@ class ExplorationHandler(base.BaseHandler):
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
-            'whitelisted_exploration_ids_for_playthroughs': whitelisted_exp_ids,
             'record_playthrough_probability': (
                 config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value)
         })
@@ -325,18 +322,16 @@ class PretestHandler(base.BaseHandler):
         if not story.has_exploration(exploration_id):
             raise self.InvalidInputException
 
-        pretest_questions, next_start_cursor = (
-            question_services.get_questions_by_skill_ids(
+        pretest_questions, _, next_start_cursor = (
+            question_services.get_questions_and_skill_descriptions_by_skill_ids(
                 feconf.NUM_PRETEST_QUESTIONS,
                 story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
                 start_cursor)
         )
-        pretest_question_dicts = [
-            question.to_dict() for question in pretest_questions
-        ]
+        question_dicts = [question.to_dict() for question in pretest_questions]
 
         self.values.update({
-            'pretest_question_dicts': pretest_question_dicts,
+            'pretest_question_dicts': question_dicts,
             'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)

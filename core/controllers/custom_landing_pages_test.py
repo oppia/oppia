@@ -19,6 +19,7 @@ import feconf
 
 
 class FractionLandingPageTest(test_utils.GenericTestBase):
+    """Test for showing landing page for fractions."""
 
     def test_fraction_landing_page_without_viewer_type(self):
         """Test for showing the landing page for fractions,

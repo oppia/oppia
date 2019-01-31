@@ -337,8 +337,7 @@ class BaseHandler(webapp2.RequestHandler):
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'user_is_logged_in': user_services.has_fully_registered(
-                self.user_id),
-            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
+                self.user_id)
         })
         if feconf.ENABLE_PROMO_BAR:
             promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
@@ -366,14 +365,8 @@ class BaseHandler(webapp2.RequestHandler):
             redirect_url_on_logout = self.request.uri
 
         if self.user_id:
-            values['login_url'] = None
             values['logout_url'] = self._get_logout_url(redirect_url_on_logout)
         else:
-            target_url = (
-                '/' if self.request.uri.endswith(feconf.SPLASH_URL)
-                else self.request.uri)
-            values['login_url'] = (
-                current_user_services.create_login_url(target_url))
             values['logout_url'] = None
 
         # Create a new csrf token for inclusion in HTML responses. This assumes

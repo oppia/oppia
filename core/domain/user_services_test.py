@@ -992,6 +992,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
             @classmethod
             def utcnow(cls):
+                """Returns the current date and time 11 hours ahead of UTC."""
                 return current_datetime + datetime.timedelta(hours=11)
 
         class MockDatetime13Hours(datetime.datetime):
@@ -999,6 +1000,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
             @classmethod
             def utcnow(cls):
+                """Returns the current date and time 13 hours ahead of UTC."""
                 return current_datetime + datetime.timedelta(hours=13)
 
         with self.swap(datetime, 'datetime', MockDatetime11Hours):

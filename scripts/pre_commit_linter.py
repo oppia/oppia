@@ -244,7 +244,8 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
-    'assets/scripts/*', 'core/tests/data/*', '*.mp3', '*.mp4')
+    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
+    '*.mp3', '*.mp4')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
@@ -293,9 +294,6 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'smmap-0.9.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'gitdb-0.6.4'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'GitPython-2.1.11'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'beautifulsoup4-4.6.0'),
@@ -330,14 +328,43 @@ class FileCache(object):
 
     @classmethod
     def read(cls, filename, mode='r'):
+        """Returns the data read from the file.
+
+        Args:
+            filename: str. The file name from which data is to be read.
+            mode: str. The mode in which the file is to be opened.
+
+        Returns:
+            str. The data read from the file.
+        """
         return cls._get_data(filename, mode)[0]
 
     @classmethod
     def readlines(cls, filename, mode='r'):
+        """Returns the tuple containing data line by line as read from the
+        file.
+
+        Args:
+            filename: str. The file name from which data is to be read.
+            mode: str. The mode in which the file is to be opened.
+
+        Returns:
+            tuple(str). The tuple containing data line by line as read from the
+                file.
+        """
         return cls._get_data(filename, mode)[1]
 
     @classmethod
     def _get_cache_lock(cls, key):
+        """Returns the cache lock corresponding to the given key.
+
+        Args:
+            key: str. The key corresponding to which the cache lock is to be
+                found.
+
+        Returns:
+            str. The cache lock corresponding to the given key.
+        """
         if key not in cls._CACHE_LOCK_DICT:
             with cls._CACHE_LOCK_DICT_LOCK:
                 if key not in cls._CACHE_LOCK_DICT:
@@ -346,6 +373,18 @@ class FileCache(object):
 
     @classmethod
     def _get_data(cls, filename, mode):
+        """Returns the collected data from the file corresponding to the given
+        filename.
+
+        Args:
+            filename: str. The file name from which data is to be read.
+            mode: str. The mode in which the file is to be opened.
+
+        Returns:
+            tuple(str, tuple(str)). The tuple containing data read from the file
+                as first element and tuple containing the text line by line as
+                second element.
+        """
         key = (filename, mode)
         if key not in cls._CACHE_DATA_DICT:
             with cls._get_cache_lock(key):
@@ -412,6 +451,14 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
 
 @contextlib.contextmanager
 def _redirect_stdout(new_target):
+    """Redirect stdout to the new target.
+
+    Args:
+        new_target: TextIOWrapper. The new target to which stdout is redirected.
+
+    Yields:
+        TextIOWrapper. The new target.
+    """
     old_target = sys.stdout
     sys.stdout = new_target
     try:
