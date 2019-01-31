@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for the learner dashboard page and
- * subscriptions functionality.
+ * @fileoverview End-to-end tests for the learner dashboard page.
  */
 
 var forms = require('../protractor_utils/forms.js');

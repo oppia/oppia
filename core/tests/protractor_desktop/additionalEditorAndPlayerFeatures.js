@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests of the full exploration editor.
- */
+* @fileoverview End-to-end tests for additional features of the exploration
+* editor and player. Additional features include those features without which
+* an exploration can still be published. These include hints, solutions,
+* refresher explorations, state parameters, etc.
+*/
 
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
@@ -22,6 +25,8 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var CreatorDashboardPage =
@@ -33,6 +38,7 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
+  var collectionEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -41,14 +47,28 @@ describe('Full exploration editor', function() {
   var libraryPage = null;
 
   beforeAll(function() {
+    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
   });
+
+  it('should walk through the tutorial when user repeatedly clicks Next',
+    function() {
+      users.createUser(
+        'userTutorial@stateEditor.com', 'userTutorialStateEditor');
+      users.login('userTutorial@stateEditor.com');
+
+      workflow.createExplorationAndStartTutorial();
+      explorationEditorMainTab.startTutorial();
+      explorationEditorMainTab.playTutorial();
+      explorationEditorMainTab.finishTutorial();
+      users.logout();
+    }
+  );
 
   it('should prevent going back when help card is shown', function() {
     users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
@@ -274,6 +294,53 @@ describe('Full exploration editor', function() {
     });
   });
 
+  it('should generate warning message if card height limit is exceeded ',
+    function() {
+      users.createUser('user@heightWarning.com', 'userHeightWarning');
+      users.login('user@heightWarning.com');
+
+      workflow.createExploration();
+
+      var postTutorialPopover = element(by.css('.popover-content'));
+      var stateEditContent = element(by.css('.protractor-test-edit-content'));
+      waitFor.invisibilityOf(
+        postTutorialPopover, 'Post-tutorial popover does not disappear.');
+      waitFor.elementToBeClickable(
+        stateEditContent,
+        'stateEditContent taking too long to appear to set content');
+      stateEditContent.click();
+      var stateEditorTag = element(by.tagName('state-content-editor'));
+      var stateContentEditor = stateEditorTag.element(
+        by.css('.protractor-test-state-content-editor'));
+      waitFor.visibilityOf(
+        stateContentEditor,
+        'stateContentEditor taking too long to appear to set content');
+      var richTextEditor = forms.RichTextEditor(stateContentEditor);
+
+      var content = 'line1\n\n\n\nline2\n\n\n\nline3\n\n\nline4';
+
+      var heightMessage = element(by.css('.oppia-card-height-limit-warning'));
+
+      richTextEditor.appendPlainText(content);
+      expect(heightMessage.isPresent()).toBe(false);
+
+      richTextEditor.appendPlainText('\n\n\nline5');
+      waitFor.visibilityOf(
+        heightMessage, 'Card height limit message not displayed');
+
+      richTextEditor.appendPlainText('\b\b\b\b\b\b\b\b');
+      expect(heightMessage.isPresent()).toBe(false);
+
+      richTextEditor.appendPlainText('\n\n\nline5');
+      waitFor.visibilityOf(
+        heightMessage, 'Card height limit message not displayed');
+
+      element(by.css('.oppia-hide-card-height-warning-icon')).click();
+      expect(heightMessage.isPresent()).toBe(false);
+
+      users.logout();
+    });
+
   it('should navigate multiple states correctly, with parameters', function() {
     users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
     users.login('user4@editorAndPlayer.com');
@@ -318,6 +385,47 @@ describe('Full exploration editor', function() {
       'this is card 2 with previous answer 21'));
     explorationPlayerPage.expectExplorationToNotBeOver();
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'complete');
+    explorationPlayerPage.expectExplorationToBeOver();
+    users.logout();
+  });
+
+  it('uses hints and solutions in an exploration', function() {
+    var explorationPlayerPage = (
+      new ExplorationPlayerPage.ExplorationPlayerPage());
+    users.createUser('user1@hintsAndSolutions.com', 'hintsAndSolutions');
+
+    // Creator creates and publishes an exploration.
+    users.login('user1@hintsAndSolutions.com');
+    workflow.createExploration();
+
+    explorationEditorMainTab.setStateName('Introduction');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('What language is Oppia?'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
+      'Finnish');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+    explorationEditorMainTab.addHint('Try language of Finland');
+    explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'Finnish',
+      explanation: 'Finland language'
+    });
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
+    general.moveToPlayer();
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('What language is Oppia?'));
+    explorationPlayerPage.submitAnswer('TextInput', 'Roman');
+    explorationPlayerPage.viewHint();
+    explorationPlayerPage.submitAnswer('TextInput', 'Greek');
+
+    explorationPlayerPage.viewSolution();
+    explorationPlayerPage.expectExplorationToNotBeOver();
+    explorationPlayerPage.submitAnswer('TextInput', 'Finnish');
+    explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
     users.logout();
   });
