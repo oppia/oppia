@@ -49,14 +49,6 @@ oppia.directive('collectionDetailsEditor', [
             }
           );
 
-          // TODO(sll): Remove the filter once the App Engine search API
-          // supports 3-letter language codes.
-          $scope.languageListForSelect = (
-            constants.ALL_LANGUAGE_CODES.filter(function(languageCodeDict) {
-              return languageCodeDict.code.length === 2;
-            })
-          );
-
           $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
           var refreshSettingsTab = function() {

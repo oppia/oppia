@@ -481,10 +481,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(exploration, 'Invalid language_code')
         exploration.language_code = 'English'
         self._assert_validation_error(exploration, 'Invalid language_code')
-        # TODO(sll): Remove the next two lines once the App Engine search
-        # service supports 3-letter language codes.
-        exploration.language_code = 'kab'
-        self._assert_validation_error(exploration, 'Invalid language_code')
         exploration.language_code = 'en'
         exploration.validate()
 
