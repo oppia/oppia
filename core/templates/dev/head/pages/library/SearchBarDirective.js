@@ -80,7 +80,7 @@ oppia.directive('searchBar', [
                 id: languageItem.code,
                 text: languageItem.name
               };
-          });
+            });
 
           $scope.searchQuery = '';
           $scope.selectionDetails = {
