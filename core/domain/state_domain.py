@@ -1122,7 +1122,7 @@ class State(object):
         for content_id in content_ids_to_delete:
             if not content_id in self.content_ids_to_audio_translations:
                 raise Exception(
-                    'The content_id %s does not exists.' % content_id)
+                    'The content_id %s does not exist.' % content_id)
             else:
                 self.content_ids_to_audio_translations.pop(content_id)
         for content_id in content_ids_to_add:
