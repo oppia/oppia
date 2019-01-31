@@ -1303,17 +1303,27 @@ def _check_html_directive_name(all_files):
     return summary_messages
 
 
-def _validate_and_parse_js_file(filename, content):
+def _validate_and_parse_js_file(all_files):
     """This function validates a JavaScript file and returns the parsed contents
     as a Python dictionary.
     """
+    parsed_js_files_dict = dict()
     # Use Pyjsparser to parse a JS file as a Python dictionary.
     parser = pyjsparser.PyJsParser()
-    print 'Validating and parsing %s file ...' % filename
-    return parser.parse(content)
+    # Select JS files which need to be checked.
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.js')]
+    for filename in files_to_check:
+        with open(filename) as f:
+            content = f.read()
+        print 'Validating and parsing %s file ...' % filename
+        parsed_js_files_dict[filename] = parser.parse(content)
+    return parsed_js_files_dict
 
 
-def _check_directive_scope(all_files):
+def _check_directive_scope(all_files, parsed_js_files_dict):
     """This function checks that all directives have an explicit
     scope: {} and it should not be scope: true.
     """
@@ -1327,8 +1337,7 @@ def _check_directive_scope(all_files):
     failed = False
     summary_messages = []
     for filename in files_to_check:
-        content = FileCache.read(filename)
-        parsed_dict = _validate_and_parse_js_file(filename, content)
+        parsed_dict = parsed_js_files_dict[filename]
         # Parse the body of the content as nodes.
         parsed_nodes = parsed_dict['body']
         for parsed_node in parsed_nodes:
@@ -1439,11 +1448,13 @@ def _check_directive_scope(all_files):
     return summary_messages
 
 
-def _check_sorted_imports(all_files):
-    """This function checks that the imports are sorted
-    according to di-order rule of  angular plugin of eslint.
-    """
-    print 'Starting sorted imports check'
+def _check_sorted_dependencies(all_files, parsed_js_files_dict):
+    """This function checks that the dependencies which are
+    imported in the controllers/directives/factories in js
+    files are in following pattern, first dollar imports in
+    sorted form, then regular imports in sorted form and
+    then constant imports in sorted form."""
+    print 'Starting sorted dependecies check'
     print '----------------------------------------'
     files_to_check = [
         filename for filename in all_files if not
@@ -1453,9 +1464,7 @@ def _check_sorted_imports(all_files):
     failed = False
     summary_messages = []
     for filename in files_to_check:
-        with open(filename) as f:
-            content = f.read()
-        parsed_dict = _validate_and_parse_js_file(filename, content)
+        parsed_dict = parsed_js_files_dict[filename]
         parsed_nodes = parsed_dict['body']
         for parsed_node in parsed_nodes:
             if parsed_node['type'] != 'ExpressionStatement':
@@ -1520,13 +1529,13 @@ def _check_sorted_imports(all_files):
 
     if failed:
         summary_message = (
-            '%s   Sorted imports check failed' % (
+            '%s   Sorted dependencies check failed' % (
                 _MESSAGE_TYPE_FAILED))
         print summary_message
         summary_messages.append(summary_message)
     else:
         summary_message = (
-            '%s  Sorted imports check passed' % (
+            '%s  Sorted dependencies check passed' % (
                 _MESSAGE_TYPE_SUCCESS))
         print summary_message
         summary_messages.append(summary_message)
@@ -1835,8 +1844,9 @@ def main():
     files.
     """
     all_files = _get_all_files()
-    directive_scope_messages = _check_directive_scope(all_files)
-    sorted_imports_messages = _check_sorted_imports(all_files)
+    parsed_js_files_dict = _validate_and_parse_js_file(all_files)
+    directive_scope_messages = _check_directive_scope(all_files, parsed_js_files_dict)
+    sorted_dependencies_messages = _check_sorted_dependencies(all_files, parsed_js_files_dict)
     controller_dependency_messages = (
         _match_line_breaks_in_controller_dependencies(all_files))
     html_directive_name_messages = _check_html_directive_name(all_files)
