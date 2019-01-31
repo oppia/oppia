@@ -657,6 +657,14 @@ class Topic(object):
                 % uncategorized_skill_id)
         self.uncategorized_skill_ids.remove(uncategorized_skill_id)
 
+    def get_all_subtopics(self):
+        """Returns all subtopics in the topic.
+
+        Returns:
+            list(Subtopic). The list of all subtopics present in topic.
+        """
+        return self.subtopics
+
     def get_subtopic_index(self, subtopic_id):
         """Gets the index of the subtopic with the given id in the subtopics
         list.
