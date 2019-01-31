@@ -18,7 +18,6 @@ from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_services
-from core.domain import topic_domain
 from core.domain import topic_services
 import feconf
 
@@ -74,7 +73,7 @@ class TopicPageDataHandler(base.BaseHandler):
             summary.to_human_readable_dict() for summary
             in additional_story_summaries]
 
-        ids_skill = topic.get_all_skill_ids()
+        skill_ids = topic.get_all_skill_ids()
 
         subtopics = topic.get_all_subtopics()
 
