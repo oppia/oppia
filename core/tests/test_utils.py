@@ -179,7 +179,7 @@ class TestBase(unittest.TestCase):
         }
     }
 
-    VERSION_25_STATE_DICT = {
+    VERSION_26_STATE_DICT = {
         'content': {'content_id': u'content', 'html': u''},
         'param_changes': [],
         'content_ids_to_audio_translations': {
@@ -1477,10 +1477,10 @@ tags: []
         question_services.add_question(owner_id, question)
         return question
 
-    def save_new_question_with_state_data_schema_v25(
+    def save_new_question_with_state_data_schema_v26(
             self, question_id, owner_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Saves a new default question with a default version 25 state
+        """Saves a new default question with a default version 26 state
         data dictionary.
 
         This function should only be used for creating questions in tests
@@ -1501,10 +1501,10 @@ tags: []
         question_services.create_new_question_rights(question_id, owner_id)
         question_model = question_models.QuestionModel(
             id=question_id,
-            question_state_data=self.VERSION_25_STATE_DICT,
+            question_state_data=self.VERSION_26_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_schema_version=25
+            question_state_schema_version=26
         )
         question_model.commit(
             owner_id, 'New question created',
