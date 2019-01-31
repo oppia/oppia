@@ -93,7 +93,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 }],
                 'additional_story_dicts': [],
                 'skill_ids': [],
-                'subtopics':[]
+                'subtopics': []
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
