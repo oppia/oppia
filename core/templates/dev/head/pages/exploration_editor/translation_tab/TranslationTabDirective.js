@@ -262,7 +262,7 @@ oppia.directive('translationTab', [
                     $uibModalInstance.dismiss('cancel');
                   };
                   // translation tutorial image url for modal
-                  $scope.editorWelcomeImgUrl = (
+                  $scope.translationWelcomeImgUrl = (
                     UrlInterpolationService.getStaticImageUrl(
                       '/general/editor_welcome.svg'));
                 }
