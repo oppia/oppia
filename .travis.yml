@@ -41,7 +41,6 @@ env:
     - RUN_E2E_TESTS_LIBRARY=true
     - RUN_E2E_TESTS_NAVIGATION=true
     - RUN_E2E_TESTS_PREFERENCES=true
-    - RUN_E2E_TESTS_PROFILE_FEATURES=false
     - RUN_E2E_TESTS_PROFILE_MENU=true
     - RUN_E2E_TESTS_PUBLICATION=true
     - RUN_E2E_TESTS_SUBSCRIPTIONS=true
@@ -124,7 +123,6 @@ script:
 - if [ "$RUN_E2E_TESTS_LIBRARY" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="library" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_NAVIGATION" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="navigation" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PREFERENCES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="preferences" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_PROFILE_FEATURES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="profileFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PROFILE_MENU" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="profileMenu" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PUBLICATION" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="publication" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_SUBSCRIPTIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env; fi
