@@ -29,7 +29,9 @@ oppia.factory('ExplorationLanguageCodeService', [
       }
     };
     child._isValid = function(value) {
-      return constants.ALL_LANGUAGE_CODES;
+      return constants.ALL_LANGUAGE_CODES.some(function(elt) {
+        return elt.code === value;
+      });
     };
     return child;
   }
