@@ -28,7 +28,7 @@ import feconf
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
 
-class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
+class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -36,7 +36,7 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
     SKILL_ID = 'skill_id'
 
     def setUp(self):
-        super(SkillMigrationOneOffJobTest, self).setUp()
+        super(SkillMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test skills.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -60,7 +60,7 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
             skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
@@ -98,7 +98,7 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
             skill_services.get_skill_by_id(self.SKILL_ID)
 
         # Start migration job on sample skill.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
             skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
@@ -130,7 +130,9 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
                 'content_id': 'explanation',
                 'html': feconf.DEFAULT_SKILL_EXPLANATION
             },
-            'content_ids_to_audio_translations': {}
+            'content_ids_to_audio_translations': {
+                'explanation': {}
+            }
         }
         self.save_new_skill_with_story_and_skill_contents_schema_version(
             self.SKILL_ID, self.albert_id, 'A description', 0,
@@ -141,7 +143,7 @@ class SkillMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(skill.skill_contents_schema_version, 1)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             job_id = (
                 skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
             skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)

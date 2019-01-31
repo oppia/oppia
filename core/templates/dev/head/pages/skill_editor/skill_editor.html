@@ -4,6 +4,17 @@
   Skill Editor
 {% endblock maintitle %}
 
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
+    GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
+      '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
+    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
+      '{{DEFAULT_OBJECT_VALUES|js_string}}');
+  </script>
+
+{% endblock header_js %}
 
 {% block navbar_breadcrumb %}
   <skill-editor-navbar-breadcrumb>
@@ -15,13 +26,15 @@
   </skill-editor-navbar>
 {% endblock local_top_nav_options %}
 
-{% block header_js %}
-  {{ super() }}
-{% endblock header_js %}
-
 {% block content %}
   <div ng-controller="SkillEditor">
-    <skill-editor-main-tab></skill-editor-main-tab>
+    <div ng-if="getActiveTabName() === 'main'">
+      <skill-editor-main-tab></skill-editor-main-tab>
+    </div>
+
+    <div ng-if="getActiveTabName() === 'questions'">
+      <questions-tab></questions-tab>
+    </div>
   </div>
 {% endblock content %}
 
@@ -33,10 +46,12 @@
   <script src="/templates/dev/head/pages/skill_editor/editor_tab/SkillMisconceptionsEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/skill_editor/editor_tab/MisconceptionEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/skill_editor/editor_tab/WorkedExampleEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/skill_editor/questions_tab/QuestionsTabDirective.js"></script>
   <script src="/templates/dev/head/pages/skill_editor/SkillEditor.js"></script>
   <script src="/templates/dev/head/pages/skill_editor/SkillEditorStateService.js"></script>
   <script src="/templates/dev/head/pages/skill_editor/SkillEditorNavbarDirective.js"></script>
   <script src="/templates/dev/head/pages/skill_editor/SkillEditorNavbarBreadcrumbDirective.js"></script>
+  <script src="/templates/dev/head/pages/skill_editor/SkillEditorRoutingService.js"></script>
 
   <script src="/templates/dev/head/pages/state_editor/StatePropertyServices.js"></script>
 
@@ -47,9 +62,80 @@
   <script src="/templates/dev/head/domain/skill/EditableSkillBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/skill/SkillRightsBackendApiService.js"></script>
 
+  <script src="/templates/dev/head/pages/state_editor/StateContentEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/StateInteractionEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/StateHintsEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/StateSolutionEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/StateResponsesDirective.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/StateEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/StateEditorService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/StatePropertyServices.js"></script>
+
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/SolutionVerificationService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/SolutionValidityService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/InteractionDetailsCacheService.js"></script>
+  <script src="/templates/dev/head/pages/question_editor/QuestionEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/questions_list/QuestionsListDirective.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/EditorFirstTimeEventsService.js"></script>
+  <script src="/templates/dev/head/services/EditabilityService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/ResponsesService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/TrainingDataEditorPanelService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/AnswerGroupsCacheService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/AngularNameService.js"></script>
+  <script src="/templates/dev/head/domain/classifier/AnswerClassificationResultObjectFactory.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/PredictionAlgorithmRegistryService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/AnswerClassificationService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/StateClassifierMappingService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/PlayerConstants.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/CurrentInteractionService.js"></script>
+  <script src="/templates/dev/head/domain/classifier/ClassifierObjectFactory.js"></script>
+
   <script src="/templates/dev/head/domain/skill/SkillUpdateService.js"></script>
   <script src="/templates/dev/head/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/editor/undo_redo/UndoRedoService.js"></script>
+
+  <script src="/templates/dev/head/components/QuestionCreationService.js"></script>
+  <script src="/templates/dev/head/components/HintAndSolutionButtonsDirective.js"></script>
+  <script src="/templates/dev/head/components/AnswerGroupEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/HintEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/OutcomeEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/OutcomeDestinationEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/OutcomeFeedbackEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/ResponseHeaderDirective.js"></script>
+  <script src="/templates/dev/head/components/RuleEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/RuleTypeSelectorDirective.js"></script>
+  <script src="/templates/dev/head/components/SolutionEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/SolutionExplanationEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/StateGraphLayoutService.js"></script>
+  <script src="/templates/dev/head/components/forms/HtmlSelectDirective.js"></script>
+
+  <script src="/templates/dev/head/domain/question/EditableQuestionBackendApiService.js"></script>
+  <script src="/templates/dev/head/domain/question/QuestionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/question/QuestionUpdateService.js"></script>
+  <script src="/templates/dev/head/domain/state/StateObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/AnswerGroupObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/AnswerStatsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/AudioTranslationObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ExplorationDraftObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ExplorationObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/HintObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ContentIdsToAudioTranslationsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/InteractionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/OutcomeObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamChangeObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamChangesObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamMetadataObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamSpecObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamSpecsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamTypeObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/RuleObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/SolutionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/StatesObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/objects/NumberWithUnitsObjectFactory.js"></script>
+
+  <script src="/templates/dev/head/services/ExplorationHtmlFormatterService.js"></script>
+  <script src="/templates/dev/head/services/ExtensionTagAssemblerService.js"></script>
 
   <script src="/templates/dev/head/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/ContentIdsToAudioTranslationsObjectFactory.js"></script>
@@ -76,9 +162,34 @@
   <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
 
-  <script src="/extensions/objects/templates/MathLatexStringEditor.js"></script>
-  <script src="/extensions/objects/templates/SanitizedUrlEditor.js"></script>
+  <script src="/extensions/objects/templates/BooleanEditor.js"></script>
+  <script src="/extensions/objects/templates/CodeStringEditor.js"></script>
+  <script src="/extensions/objects/templates/CoordTwoDimEditor.js"></script>
+  <script src="/extensions/objects/templates/DragAndDropHtmlStringEditor.js"></script>
+  <script src="/extensions/objects/templates/DragAndDropPositiveIntEditor.js"></script>
+  <script src="/extensions/objects/templates/FilepathEditor.js"></script>
+  <script src="/extensions/objects/templates/FractionEditor.js"></script>
+  <script src="/extensions/objects/templates/GraphEditor.js"></script>
+  <script src="/extensions/objects/templates/GraphPropertyEditor.js"></script>
+  <script src="/extensions/objects/templates/HtmlEditor.js"></script>
+  <script src="/extensions/objects/templates/ImageWithRegionsEditor.js"></script>
+  <script src="/extensions/objects/templates/IntEditor.js"></script>
+  <script src="/extensions/objects/templates/ListOfSetsOfHtmlStringsEditor.js"></script>
   <script src="/extensions/objects/templates/ListOfTabsEditor.js"></script>
+  <script src="/extensions/objects/templates/ListOfUnicodeStringEditor.js"></script>
+  <script src="/extensions/objects/templates/LogicErrorCategoryEditor.js"></script>
+  <script src="/extensions/objects/templates/LogicQuestionEditor.js"></script>
+  <script src="/extensions/objects/templates/MathLatexStringEditor.js"></script>
+  <script src="/extensions/objects/templates/MusicPhraseEditor.js"></script>
+  <script src="/extensions/objects/templates/NonnegativeIntEditor.js"></script>
+  <script src="/extensions/objects/templates/NormalizedStringEditor.js"></script>
+  <script src="/extensions/objects/templates/NumberWithUnitsEditor.js"></script>
+  <script src="/extensions/objects/templates/ParameterNameEditor.js"></script>
+  <script src="/extensions/objects/templates/RealEditor.js"></script>
+  <script src="/extensions/objects/templates/SanitizedUrlEditor.js"></script>
+  <script src="/extensions/objects/templates/SetOfHtmlStringEditor.js"></script>
+  <script src="/extensions/objects/templates/SetOfUnicodeStringEditor.js"></script>
+  <script src="/extensions/objects/templates/UnicodeStringEditor.js"></script>
 
   <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
   <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
@@ -95,6 +206,9 @@
   <script src="/templates/dev/head/domain/utilities/AudioLanguageObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/utilities/AutogeneratedAudioLanguageObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/utilities/BrowserCheckerService.js"></script>
-
+  <script src="/extensions/interactions/baseValidator.js"></script>
   {% include 'components/rich_text_components.html' %}
+  {{ interaction_templates }}
+  {{ visualizations_html }}
+  {{ dependencies_html }}
 {% endblock footer_js %}

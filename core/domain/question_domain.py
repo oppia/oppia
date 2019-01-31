@@ -223,7 +223,7 @@ class Question(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        INTERACTION_SPECS = interaction_registry.Registry.get_all_specs()
+        interaction_specs = interaction_registry.Registry.get_all_specs()
         at_least_one_correct_answer = False
         dest_is_specified = False
         interaction = self.question_state_data.interaction
@@ -256,7 +256,7 @@ class Question(object):
 
         if (
                 (interaction.solution is None) and
-                (INTERACTION_SPECS[interaction.id]['can_have_solution'])):
+                (interaction_specs[interaction.id]['can_have_solution'])):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
@@ -373,17 +373,20 @@ class QuestionSkillLink(object):
         question_id: str. The ID of the question.
         skill_id: str. The ID of the skill to which the
             question is linked.
+        skill_description: str. The description of the corresponding skill.
     """
 
-    def __init__(self, question_id, skill_id):
+    def __init__(self, question_id, skill_id, skill_description):
         """Constructs a Question Skill Link domain object.
 
         Args:
             question_id: str. The ID of the question.
             skill_id: str. The ID of the skill to which the question is linked.
+            skill_description: str. The description of the corresponding skill.
         """
         self.question_id = question_id
         self.skill_id = skill_id
+        self.skill_description = skill_description
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
@@ -394,15 +397,8 @@ class QuestionSkillLink(object):
         return {
             'question_id': self.question_id,
             'skill_id': self.skill_id,
+            'skill_description': self.skill_description
         }
-
-    def update_skill_id(self, skill_id):
-        """Updates the skill id of the domain object.
-
-        Args:
-            skill_id: str. The ID of the new skill.
-        """
-        self.skill_id = skill_id
 
 
 class QuestionRights(object):

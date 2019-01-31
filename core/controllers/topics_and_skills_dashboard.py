@@ -33,12 +33,9 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
-        self.values.update({
-            'nav_mode': feconf.NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD
-        })
         self.render_template(
             'pages/topics_and_skills_dashboard/'
             'topics_and_skills_dashboard.html', redirect_url_on_logout='/')
@@ -135,7 +132,7 @@ class NewTopicHandler(base.BaseHandler):
     @acl_decorators.can_create_topic
     def post(self):
         """Handles POST requests."""
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         name = self.payload.get('name')
 
@@ -154,7 +151,7 @@ class NewSkillHandler(base.BaseHandler):
 
     @acl_decorators.can_create_skill
     def post(self):
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         description = self.payload.get('description')
@@ -187,12 +184,20 @@ class MergeSkillHandler(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self):
         """Handles the POST request."""
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         old_skill_id = self.payload.get('old_skill_id')
         new_skill_id = self.payload.get('new_skill_id')
+        new_skill = skill_services.get_skill_by_id(new_skill_id, strict=False)
+        if new_skill is None:
+            raise self.PageNotFoundException(
+                Exception('The new skill with the given id doesn\'t exist.'))
+        old_skill = skill_services.get_skill_by_id(old_skill_id, strict=False)
+        if old_skill is None:
+            raise self.PageNotFoundException(
+                Exception('The old skill with the given id doesn\'t exist.'))
         question_services.update_skill_ids_of_questions(
-            old_skill_id, new_skill_id)
+            old_skill_id, old_skill.description, new_skill_id)
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,

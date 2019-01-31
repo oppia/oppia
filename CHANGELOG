@@ -1,11 +1,192 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.7.2 (14 January 2019)
+------------------------
+Updates to landing pages
+* Small landing page changes based on feedback from Kefeh (#5951)
+* Fix #5978: Stewards page content alignment (#6042)
+
+Analytics for creators
+* Hide playthrough issues on exploration editor stats tab if exploration isn't whitelisted (#5947)
+* Fixes #5860: Fix fraction display in statistics tab (#5976)
+* Rename playthrough-related issues services/directives/factories (#5990)
+* Fix #5798: Introduce Improvements tab to exploration editor (#5991)
+* Introduce FetchPlaythroughWhitelistHandler (#5966)
+
+Generalized review system
+* Fix #4995: Remove complex logic from the storage layer, and add domain/service layer for emails (#5940)
+* Fix error while displaying suggestion threads on learner dashboard page (#5965)
+
+Development workflow
+* Fix #5761: --test_target flag redirects to the corresponding test file if needed (#6014)
+* Fix #5885: Only run front end tests when front end files are changed (#5936)
+* Fix #5782: Added custom check to remove backslash continuation (#5964)
+* Fix #5529: Print python lint errors at the end of the check (#6005)
+* Add try/except block in pre-commit linter (#6019)
+* Enforce variables to be in snake case (#5943)
+* Fix #5876: Check that cls arguments come first in function args (#5919)
+* Fix part of #6024: Consolidate file access in the pre-commit linter (#6023)
+* Fix #5938: Lint checks should run only for files changed by the user (#6033)
+* Introduce eslint: space-before-blocks rule (#6048)
+* Fix max-len error (#5994)
+* Fix false positive Travis build in pre-commit linter (#6002)
+* Fix #6040: Fix issues in develop which led to lint test failures (#6038)
+
+New structures
+* Implement editing of questions (#5614)
+* Allow admins to assign topic managers to topics (#5971)
+* Split ENABLE_NEW_STRUCTURES flag to 2 flags for editors and players (#5987)
+
+Test coverage
+* Fix part of #5134: Add more tests to increase coverage of core.controllers.classifier (#5926)
+* Fix part of #5134: Add tests for core.controllers.custom_landing_pages. (#5925)
+* Fix part of #5134: Add core.platform.models tests (#5944)
+
+Code health and documentation
+* Upgrade pylint to 1.9.3 and fix some docstring issues (#5935)
+* Fix code duplication in ExplorationPlayerStateService (#6000)
+* Fix #4968: Move customization args method from state_domain to customization_args_util (#6015)
+* Fix parts of #4374: Add docstrings to Python files. (#5928, #5969, #5977, #6006, #6013, #6027, #6035, #6041)
+
+Improvements to editor features
+* Fix #5933: Changed code editor prompt in test exploration to be more explicit (#5941)
+* Fix #5853: Remove weird image artifact in rich-text editor (#5954)
+* Fix #5039: Add continue button in preview mode (#5962)
+* Fix #5949: Make RTE spacing uniform (#5953)
+* Fix #5701: Alert user to save changes before publishing (#5948)
+* Fix #5980: Make line-spacing consistent within a paragraph (#5981)
+* Add questions list tab and create question functionality to skill editor (#5920)
+* Fix #5973: Fix the changed space when the text is added just below the image (#5996)
+* Fix #5982: Fix modal overflow issue by using word-break property (#5983)
+* Fix #3972: Fix the faulty vertical offset (#6030)
+* Fix #6016: Limited the selection area of multiple choice option (#6029)
+* Fix #6056: Prevent the text box in the Save Draft modal from flowing out of the modal boundaries (#6057)
+* Fix #6064: Change backdrop controls to static for exploratoin publication modal (#6071)
+
+Updates to the library and splash pages
+* Fix #4936: The drop down menus work similar to the keyboard behavior for the About and Profile dropdowns (#5974)
+* Fix #3972: Fix the faulty vertical offset (#6030)
+* Fix #5755: Add padding to cards to fix alignment issue on mobile view (#5968)
+
+Infrastructure changes
+* Fix part of #3950: Remove Jinja ifs from exploration_player.html (#5958)
+* Fix part of #3950: Remove Jinja ifs from collection player (#5869)
+* Add more debugging info to help identify cause of undefined states (#5827)
+* Fix part of #5002: Remove NAV_MODE from side navigation bar (#6008)
+
+
+v2.7.1 (20 December 2018)
+-------------------------
+Updates to landing pages:
+* Updates to the text on the stewards page. (#5912)
+* Add landing page for parents and teachers. (#5905)
+
+Development workflow:
+* Fix #5466: Added check to enforce that all name of controllers end with "Handler" or "Page" (#5878)
+* Fix part of #5476: Enforce docstring arg order (#5844)
+* Fix #5843: Changes _check_comment to check for spaces and capitals (#5852)
+* Fix #5809: Add check to match line breaks in controller dependencies (#5833)
+* Fix docstrings tests, Swapped if blocks for _check_docstrings (#5752)
+* Remove mobile tests env var for PR builds and add a job for it (#5835)
+* Update bug_report.md (#5866)
+* Fix #5896: Set threads' daemon property to False (#5897)
+
+New Structures:
+* Add paging for questions in topic editor and story editor modifications (#5892)
+* UI modifications to story editor. (#5724)
+* Add functionality to Publish stories (#5709)
+* Revert some changes in #5810. (#5841)
+
+Improving test coverage:
+* Fix #5861: Updated Test for Email Truncation (#5915)
+* Fix part of #5134: Added missing tests for question domain. (#5887)
+* Fix part of #5134: Added backend tests for `core.domain.learner_progress_domain` (#5859)
+* Fix part of #5134: Backend test for core.controllers.tasks (#5840)
+* Fix #5787: Add a unit test to check blob type for uploaded audio. (#5858)
+
+Code health and documentation:
+* Added comment to Image Uploader fix (#5895)
+* Fix part of #4374: Add docstrings to python files (#5871)
+* Some follow-up fixes to style issues in #5730. (#5842)
+* Added missing docstrings in scripts/common.py and scripts/docstrings_checker.py (#5870)
+* Added missing docstrings in scripts/build.py (#5808)
+* Fix part of #4374: Add docstrings to the python files. (#5849)
+* Added docstring for clamp method and simplified usage. (#5834)
+
+Improvements to editor features
+* Fix #3691: Implements email functionality for failed ML training job (#5902)
+* Fix #5606: Logic Proof Truncation and Display (#5864)
+* Change 'compliment' feedback to use a green background colour. (#5865)
+* Fix #5746: Added saving log and disabled buttons while saving (#5764)
+* Fix #5777: Add statename in translation tab (#5830)
+* Fix #5821: Adjust placement of accessibility tooltips in the exploration editor. (#5824)
+
+Updates to the library and splash pages
+* Fix #5907: Increase width of search input box such that whole text is visible (#5910)
+* Swap the order of the browse/create buttons on the splash page. (#5828)
+
+Infrastructure changes
+* Consolidate image and audio handlers to use one AssetDevHandler that handles all assets (#5857)
+* Fix part of #3950: Remove Jinja ifs from collection player (#5869)
+* Add more debugging info to help identify cause of undefined states (#5827)
+
+
+v2.7.0 (29 November 2018)
+-------------------------
+Bug fixes:
+* Fix video on fractions landing (#5906)
+* Fix profile picture modal not showing picture when we add it again after discard it (#5891)
+* Fix #5862: fixes preferred audio language doesn't display options in preferences page. (#5882)
+* Added automaticTextToSpeech check for audio bar. (#5880)
+* Added a "_directive" suffix to "view_suggestion_edit_exploration_state_content_modal.html" file. (#5848)
+* Fix #5814: Double edit button in exploration player navbar (#5815)
+* Remove code duplication for calculating answer choices (#5779)
+
+New structures:
+* Remove skills from a topic (#5804)
+* URL decode topic name using urllib.unquote_plus (#5810)
+* Add field canonical_name for Topic and TopicSummary (#5775)
+* Add audio translation schema for concept card (#5677)
+* Fix #5052: Create one-off schema migration jobs for topics, skills, questions and stories (#5660)
+* Fix #5671: Create success message toasts for topics and skills (#5705)
+* Fix #5712: Display an appropriate message when creating questions in topic editor with no skills (#5736)
+
+Infrastructure:
+* Fix #5310: Added a size check to third party folder to prevent breaching the 10k files limit on AppEngine (#5743)
+* Fix #4973: Add minify_only option to build.py (#5758)
+* Fix #5713: Change asset handler url to make it clearer that it's used in dev mode (#5721)
+
+Developer workflow and code health:
+* Fix part of #4374: Add docstrings to the Python files. (#5734)
+* Fix part of #5002: Move user related variables form GLOBALS (#5659)
+* Fix part of #5529: print CSS and JS lint check error messages at the end of the check (#5748)
+* Fix part of #4374: Add acl decorator docstrings (#5803)
+* Fix #5243: Set ignore_whitespace to true in .isort.cfg (#5789)
+* Fix part of #4057: Remove TriggerObjectFactory code (#5770)
+* Fix part of #5134: Added AnswerSubmittedEventHandlerTest (#5778)
+* Fix part of #4374: Added missing docstrings to scripts (#5723)
+* Fix part of #5134: Improve test coverage of core.controllers.topics_and_skills_dashboard (#5741)
+* Fix part of #5134: Improve test coverage of core.controllers.concept_card_viewer (#5762)
+* Fix part of #5134: Improve test coverage of core.controllers.topic_viewer (#5742)
+* Fix typo in constants.py (#5754)
+* Fix part of #4374: Add docstrings for docstring_checker (#5744)
+* Fix part of #4374: Add docstrings for main.py (#5704)
+
+Investigation work:
+* Add more debugging info to help identify cause of undefined states (#5827)
+
+Miscellaneous:
+* Fixes #5687: Allow resubmission of rejected suggestions. (#5730)
+* Fix #5553: Enable audio translations for Safari (#5780)
+* Fix broken SkillMigrationOneOffJobTest (#5781)
+
+
 v2.6.9 (30 Oct 2018)
 --------------------
 Bug fixes:
 * Fixes prod bug by preventing populating old_content value of suggestion when state doesn't exist (#5772)
 * Fix #5691: Fix bug in translation tab resulting from answer choices not being calculated for the short answer summaries (#5756)
-* Fix #5748: Incorrect get-involved link (#5750)
+* Fix #5749: Incorrect get-involved link (#5750)
 * Fix #5688: Added users to user condition if only 1 user has reviewed an exploration (#5708)
 
 New structures:
@@ -3919,4 +4100,3 @@ v1.0.1 (29 Mar 2013)
 v1.0 (22 Mar 2013)
 ------------------
 * Initial release
-

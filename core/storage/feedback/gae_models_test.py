@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for core.storage.feedback.gae_models."""
+
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -32,7 +34,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_put_function(self):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION, entity_id='exp_id_1',
-            subject='dummy subject')
+            subject='dummy subject', message_count=0)
         feedback_thread_model.put()
 
         last_updated = feedback_thread_model.last_updated

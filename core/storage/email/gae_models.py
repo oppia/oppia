@@ -341,7 +341,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             thread_id: str. ID of the corresponding thread.
 
         Returns:
-            str. A unique ID that can be used in 'reply-to' email address.
+            FeedbackEmailReplyToIdModel. The created instance
+            with the unique reply_to_id generated.
 
         Raises:
             Exception: Model instance for given user_id and
@@ -365,8 +366,9 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             reply_to_id: str. The unique 'reply-to' id.
 
         Returns:
-            str or None. The FeedbackEmailReplyToIdModel instance corresponding
-                to the given 'reply-to' id if it is fetched else None.
+            FeedbackEmailReplyToIdModel or None. The instance corresponding to
+            the given 'reply_to_id' if it is present in the datastore,
+            else None.
         """
         model = cls.query(cls.reply_to_id == reply_to_id).get()
         return model
@@ -411,43 +413,3 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         user_models = cls.get_multi(instance_ids)
         return {
             user_id: model for user_id, model in zip(user_ids, user_models)}
-
-    @property
-    def user_id(self):
-        """Returns the user id corresponding to this FeedbackEmailReplyToIdModel
-        instance.
-
-        Returns:
-            str. The user id.
-        """
-        return self.id.split('.')[0]
-
-
-    @property
-    def entity_type(self):
-        """Returns the entity type extracted from the unique id.
-
-        Returns:
-            str. The entity type.
-        """
-        return self.id.split('.')[1]
-
-
-    @property
-    def entity_id(self):
-        """Returns the entity id extracted from the unique id.
-
-        Returns:
-            str. The entity id.
-        """
-        return self.id.split('.')[2]
-
-    @property
-    def thread_id(self):
-        """Returns the thread id extracted from the unique id.
-
-        Returns:
-            str. The thread id.
-        """
-        return '.'.join(
-            [self.entity_type, self.entity_id, self.id.split('.')[3]])
