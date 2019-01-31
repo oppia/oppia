@@ -226,7 +226,7 @@ class StartedTranslationTutorialEventHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id):
-        """Handles GET requests."""
+        """Handles POST requests."""
         user_services.record_user_started_state_translation_tutorial(
             self.user_id)
         self.render_json({})
