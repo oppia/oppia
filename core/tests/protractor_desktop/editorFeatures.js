@@ -1085,6 +1085,7 @@ describe('Exploration translation', function() {
       explorationEditorMainTab.setInteraction('EndExploration');
       explorationEditorMainTab.moveToState('two');
       explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.exitTutorial();
       explorationEditorTranslationTab.navigateToFeedbackTab();
       explorationEditorPage.saveChanges();
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
