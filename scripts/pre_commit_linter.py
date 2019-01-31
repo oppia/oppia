@@ -670,25 +670,25 @@ def _lint_html_files(all_files):
                 error_summary.append(error_count)
                 print linter_stdout
 
-    print '----------------------------------------'
-    for error_count in error_summary:
-        total_error_count += error_count
-    total_files_checked = len(html_files_to_lint)
-    if total_error_count:
-        print '(%s files checked, %s errors found)' % (
-            total_files_checked, total_error_count)
-        summary_message = '%s   HTML linting failed' % (
-            _MESSAGE_TYPE_FAILED)
-        summary_messages.append(summary_message)
-    else:
-        summary_message = '%s   HTML linting passed' % (
-            _MESSAGE_TYPE_SUCCESS)
-        summary_messages.append(summary_message)
+        print '----------------------------------------'
+        for error_count in error_summary:
+            total_error_count += error_count
+        total_files_checked = len(html_files_to_lint)
+        if total_error_count:
+            print '(%s files checked, %s errors found)' % (
+                total_files_checked, total_error_count)
+            summary_message = '%s   HTML linting failed' % (
+                _MESSAGE_TYPE_FAILED)
+            summary_messages.append(summary_message)
+        else:
+            summary_message = '%s   HTML linting passed' % (
+                _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
 
-    print ''
-    print summary_message
-    print 'HTML linting finished.'
-    print ''
+        print ''
+        print summary_message
+        print 'HTML linting finished.'
+        print ''
     return summary_messages
 
 
@@ -885,23 +885,23 @@ def _check_newline_character(all_files):
                     'newline char.' % filename)
                 print ''
 
-    if errors_found:
-        summary_message = '%s   Newline character checks failed' % (
-            _MESSAGE_TYPE_FAILED)
-        summary_messages.append(summary_message)
-    else:
-        summary_message = '%s   Newline character checks passed' % (
-            _MESSAGE_TYPE_SUCCESS)
-        summary_messages.append(summary_message)
+        if errors_found:
+            summary_message = '%s   Newline character checks failed' % (
+                _MESSAGE_TYPE_FAILED)
+            summary_messages.append(summary_message)
+        else:
+            summary_message = '%s   Newline character checks passed' % (
+                _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
 
-    print ''
-    print '----------------------------------------'
-    print ''
-    if files_checked:
-        print '(%s files checked, %s errors found)\n%s' % (
-            files_checked, errors_found, summary_message)
-    else:
-        print 'There are no files to be checked.'
+        print ''
+        print '----------------------------------------'
+        print ''
+        if files_checked:
+            print '(%s files checked, %s errors found)\n%s' % (
+                files_checked, errors_found, summary_message)
+        else:
+            print 'There are no files to be checked.'
 
     return summary_messages
 
@@ -996,22 +996,22 @@ def _check_bad_patterns(all_files):
                             REQUIRED_STRINGS_CONSTANTS[pattern]['message'])
                         print ''
                         total_error_count += 1
-    if failed:
-        summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED
-        summary_messages.append(summary_message)
-    else:
-        summary_message = '%s   Pattern checks passed' % _MESSAGE_TYPE_SUCCESS
-        summary_messages.append(summary_message)
+        if failed:
+            summary_message = '%s Pattern checks failed' % _MESSAGE_TYPE_FAILED
+            summary_messages.append(summary_message)
+        else:
+            summary_message = '%s Pattern checks passed' % _MESSAGE_TYPE_SUCCESS
+            summary_messages.append(summary_message)
 
-    print ''
-    print '----------------------------------------'
-    print ''
-    if total_files_checked == 0:
-        print 'There are no files to be checked.'
-    else:
-        print '(%s files checked, %s errors found)' % (
-            total_files_checked, total_error_count)
-        print summary_message
+        print ''
+        print '----------------------------------------'
+        print ''
+        if total_files_checked == 0:
+            print 'There are no files to be checked.'
+        else:
+            print '(%s files checked, %s errors found)' % (
+                total_files_checked, total_error_count)
+            print summary_message
 
     return summary_messages
 
@@ -1039,19 +1039,19 @@ def _check_import_order(all_files):
                 failed = True
                 print ''
 
-    print ''
-    print '----------------------------------------'
-    print ''
-    if failed:
-        summary_message = (
-            '%s   Import order checks failed' % _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = (
-            '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
+        print ''
+        print '----------------------------------------'
+        print ''
+        if failed:
+            summary_message = (
+                '%s   Import order checks failed' % _MESSAGE_TYPE_FAILED)
+            print summary_message
+            summary_messages.append(summary_message)
+        else:
+            summary_message = (
+                '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
+            print summary_message
+            summary_messages.append(summary_message)
 
     return summary_messages
 
@@ -1118,19 +1118,19 @@ def _check_comments(all_files):
                         filename, line_num + 1, message)
                     print ''
 
-    print ''
-    print '----------------------------------------'
-    print ''
-    if failed:
-        summary_message = (
-            '%s   Comments check failed' % _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = (
-            '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
+        print ''
+        print '----------------------------------------'
+        print ''
+        if failed:
+            summary_message = (
+                '%s   Comments check failed' % _MESSAGE_TYPE_FAILED)
+            print summary_message
+            summary_messages.append(summary_message)
+        else:
+            summary_message = (
+                '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
+            print summary_message
+            summary_messages.append(summary_message)
 
     return summary_messages
 
@@ -1257,19 +1257,19 @@ def _check_docstrings(all_files):
                     print ''
                     failed = True
 
-    print ''
-    print '----------------------------------------'
-    print ''
-    if failed:
-        summary_message = (
-            '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = (
-            '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
+        print ''
+        print '----------------------------------------'
+        print ''
+        if failed:
+            summary_message = (
+                '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
+            print summary_message
+            summary_messages.append(summary_message)
+        else:
+            summary_message = (
+                '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
+            print summary_message
+            summary_messages.append(summary_message)
 
     return summary_messages
 
@@ -1309,24 +1309,24 @@ def _check_html_directive_name(all_files):
                         'with _directive.html.' % directive_filename)
                     print ''
 
-    if failed:
-        summary_message = '%s   HTML directive name check failed' % (
-            _MESSAGE_TYPE_FAILED)
-        summary_messages.append(summary_message)
-    else:
-        summary_message = '%s   HTML directive name check passed' % (
-            _MESSAGE_TYPE_SUCCESS)
-        summary_messages.append(summary_message)
+        if failed:
+            summary_message = '%s   HTML directive name check failed' % (
+                _MESSAGE_TYPE_FAILED)
+            summary_messages.append(summary_message)
+        else:
+            summary_message = '%s   HTML directive name check passed' % (
+                _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
 
-    print ''
-    print '----------------------------------------'
-    print ''
-    if total_files_checked == 0:
-        print 'There are no files to be checked.'
-    else:
-        print '(%s files checked, %s errors found)' % (
-            total_files_checked, total_error_count)
-        print summary_message
+        print ''
+        print '----------------------------------------'
+        print ''
+        if total_files_checked == 0:
+            print 'There are no files to be checked.'
+        else:
+            print '(%s files checked, %s errors found)' % (
+                total_files_checked, total_error_count)
+            print summary_message
 
     return summary_messages
 
@@ -1454,20 +1454,20 @@ def _check_directive_scope(all_files):
                                                 directive_name, filename))
                                         print ''
 
-    if failed:
-        summary_message = '%s   Directive scope check failed' % (
-            _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = '%s  Directive scope check passed' % (
-            _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
+        if failed:
+            summary_message = '%s   Directive scope check failed' % (
+                _MESSAGE_TYPE_FAILED)
+            print summary_message
+            summary_messages.append(summary_message)
+        else:
+            summary_message = '%s  Directive scope check passed' % (
+                _MESSAGE_TYPE_SUCCESS)
+            print summary_message
+            summary_messages.append(summary_message)
 
-    print ''
-    print '----------------------------------------'
-    print ''
+        print ''
+        print '----------------------------------------'
+        print ''
 
     return summary_messages
 
@@ -1512,22 +1512,22 @@ def _match_line_breaks_in_controller_dependencies(all_files):
                             function_parameters))
                     print ''
 
-    if failed:
-        summary_message = (
-            '%s   Controller dependency line break check failed' % (
-                _MESSAGE_TYPE_FAILED))
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = (
-            '%s  Controller dependency line break check passed' % (
-                _MESSAGE_TYPE_SUCCESS))
-        print summary_message
-        summary_messages.append(summary_message)
+        if failed:
+            summary_message = (
+                '%s   Controller dependency line break check failed' % (
+                    _MESSAGE_TYPE_FAILED))
+            print summary_message
+            summary_messages.append(summary_message)
+        else:
+            summary_message = (
+                '%s  Controller dependency line break check passed' % (
+                    _MESSAGE_TYPE_SUCCESS))
+            print summary_message
+            summary_messages.append(summary_message)
 
-    print ''
-    print '----------------------------------------'
-    print ''
+        print ''
+        print '----------------------------------------'
+        print ''
 
     return summary_messages
 
@@ -1701,20 +1701,20 @@ def _check_html_tags_and_attributes(all_files, debug=False):
             if parser.failed:
                 failed = True
 
-    if failed:
-        summary_message = '%s   HTML tag and attribute check failed' % (
-            _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = '%s  HTML tag and attribute check passed' % (
-            _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
+        if failed:
+            summary_message = '%s   HTML tag and attribute check failed' % (
+                _MESSAGE_TYPE_FAILED)
+            print summary_message
+            summary_messages.append(summary_message)
+        else:
+            summary_message = '%s  HTML tag and attribute check passed' % (
+                _MESSAGE_TYPE_SUCCESS)
+            print summary_message
+            summary_messages.append(summary_message)
 
-    print ''
-    print '----------------------------------------'
-    print ''
+        print ''
+        print '----------------------------------------'
+        print ''
 
     return summary_messages
 
@@ -1757,20 +1757,20 @@ def _check_for_copyright_notice(all_files):
                     'file.' % (filename))
                 print ''
 
-    if failed:
-        summary_message = '%s   Copyright notice check failed' % (
-            _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = '%s  Copyright notice check passed' % (
-            _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
+        if failed:
+            summary_message = '%s   Copyright notice check failed' % (
+                _MESSAGE_TYPE_FAILED)
+            print summary_message
+            summary_messages.append(summary_message)
+        else:
+            summary_message = '%s  Copyright notice check passed' % (
+                _MESSAGE_TYPE_SUCCESS)
+            print summary_message
+            summary_messages.append(summary_message)
 
-    print ''
-    print '----------------------------------------'
-    print ''
+        print ''
+        print '----------------------------------------'
+        print ''
 
     return summary_messages
 
