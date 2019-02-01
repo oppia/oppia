@@ -63,8 +63,8 @@ oppia.directive('editorNavigation', [
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();
             SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
-            var editorTutorialMode = 'editor';
-            var translationTutorialMode = 'translation';
+            var EDITOR_TUTORIAL_MODE = 'editor';
+            var TRANSLATION_TUTORIAL_MODE = 'translation';
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/' +
@@ -83,14 +83,14 @@ oppia.directive('editorNavigation', [
                     SiteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
-                    $uibModalInstance.close(editorTutorialMode);
+                    $uibModalInstance.close(EDITOR_TUTORIAL_MODE);
                   };
 
                   $scope.beginTranslationTutorial = function() {
                     SiteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
-                    $uibModalInstance.close(translationTutorialMode);
+                    $uibModalInstance.close(TRANSLATION_TUTORIAL_MODE);
                   };
 
                   $scope.goToHelpCenter = function() {
@@ -104,9 +104,9 @@ oppia.directive('editorNavigation', [
             });
 
             modalInstance.result.then(function(mode) {
-              if (mode === editorTutorialMode) {
+              if (mode === EDITOR_TUTORIAL_MODE) {
                 $rootScope.$broadcast('openEditorTutorial');
-              } else if (mode === translationTutorialMode) {
+              } else if (mode === TRANSLATION_TUTORIAL_MODE) {
                 $rootScope.$broadcast('openTranslationTutorial');
               }
             }, function() {

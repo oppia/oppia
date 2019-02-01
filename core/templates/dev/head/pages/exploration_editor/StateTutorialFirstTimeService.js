@@ -53,18 +53,20 @@ oppia.factory('StateTutorialFirstTimeService', [
         _currentlyInEditorFirstVisit = false;
       },
       initTranslation: function(firstTime, expId) {
-        if (firstTime && _currentlyInTranslationFirstVisit) {
-          // After the first call to it in a client session, this does nothing.
+        // After the first call to it in a client session, this does nothing.
+        if (!firstTime || !_currentlyInTranslationFirstVisit) {
+          _currentlyInTranslationFirstVisit = false;
+        }
+
+        if (_currentlyInTranslationFirstVisit) {
           $rootScope.$broadcast('enterTranslationForTheFirstTime');
           EditorFirstTimeEventsService.initRegisterEvents(expId);
-
           $http.post(STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId)
             .error(function() {
               console.error(
                 'Warning: could not record translation tutorial start event.'
               );
             });
-          _currentlyInTranslationFirstVisit = false;
         }
       },
       markTranslationTutorialFinished: function() {

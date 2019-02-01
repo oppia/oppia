@@ -135,7 +135,7 @@ class UserSettings(object):
         self.role = role
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
-        self.last_started_state_editor_tutorial = (  # pylint: disable=invalid-name
+        self.last_started_state_editor_tutorial = (
             last_started_state_editor_tutorial)
         self.last_started_state_translation_tutorial = (
             last_started_state_translation_tutorial)
