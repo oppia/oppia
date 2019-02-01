@@ -2,10 +2,8 @@
 #
 #   pylint core --rcfile=.pylintrc -i y
 
-[GENERAL]
-init-hook='import sys; sys.path.append("../oppia_tools/google_appengine_1.9.67/google_appengine")'
-
 [MASTER]
+init-hook='import sys; sys.path.append("../oppia_tools/google_appengine_1.9.67/google_appengine")'
 
 # Checks for correct docstring style
 load-plugins=pylint.extensions.docstyle, pylint_quotes, scripts.pylint_extensions
