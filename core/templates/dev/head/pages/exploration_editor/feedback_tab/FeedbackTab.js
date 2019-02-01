@@ -40,7 +40,7 @@ oppia.controller('FeedbackTab', [
 
     $scope.activeThread = null;
     $scope.userIsLoggedIn = null;
-    $scope.isThreadUpdated = False;
+    $scope.isThreadUpdated = false;
     $rootScope.loadingMessage = 'Loading';
     var userInfoPromise = UserService.getUserInfoAsync();
     userInfoPromise.then(function(userInfo) {
