@@ -895,8 +895,6 @@ def _check_newline_character(all_files):
             summary_messages.append(summary_message)
 
         print ''
-        print '----------------------------------------'
-        print ''
         if files_checked:
             print '(%s files checked, %s errors found)\n%s' % (
                 files_checked, errors_found, summary_message)
@@ -1004,8 +1002,6 @@ def _check_bad_patterns(all_files):
             summary_messages.append(summary_message)
 
         print ''
-        print '----------------------------------------'
-        print ''
         if total_files_checked == 0:
             print 'There are no files to be checked.'
         else:
@@ -1039,8 +1035,6 @@ def _check_import_order(all_files):
                 failed = True
                 print ''
 
-        print ''
-        print '----------------------------------------'
         print ''
         if failed:
             summary_message = (
@@ -1118,8 +1112,6 @@ def _check_comments(all_files):
                         filename, line_num + 1, message)
                     print ''
 
-        print ''
-        print '----------------------------------------'
         print ''
         if failed:
             summary_message = (
@@ -1258,8 +1250,6 @@ def _check_docstrings(all_files):
                     failed = True
 
         print ''
-        print '----------------------------------------'
-        print ''
         if failed:
             summary_message = (
                 '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
@@ -1319,8 +1309,6 @@ def _check_html_directive_name(all_files):
             summary_messages.append(summary_message)
 
         print ''
-        print '----------------------------------------'
-        print ''
         if total_files_checked == 0:
             print 'There are no files to be checked.'
         else:
@@ -1354,10 +1342,11 @@ def _check_directive_scope(all_files):
         and filename.endswith('.js')]
     failed = False
     summary_messages = []
-    with _redirect_stdout(_TARGET_STDOUT):
-        for filename in files_to_check:
-            content = FileCache.read(filename)
-            parsed_dict = _validate_and_parse_js_file(filename, content)
+
+    for filename in files_to_check:
+        content = FileCache.read(filename)
+        parsed_dict = _validate_and_parse_js_file(filename, content)
+        with _redirect_stdout(_TARGET_STDOUT):
             # Parse the body of the content as nodes.
             parsed_nodes = parsed_dict['body']
             for parsed_node in parsed_nodes:
@@ -1466,8 +1455,6 @@ def _check_directive_scope(all_files):
             summary_messages.append(summary_message)
 
         print ''
-        print '----------------------------------------'
-        print ''
 
     return summary_messages
 
@@ -1525,8 +1512,6 @@ def _match_line_breaks_in_controller_dependencies(all_files):
             print summary_message
             summary_messages.append(summary_message)
 
-        print ''
-        print '----------------------------------------'
         print ''
 
     return summary_messages
@@ -1713,8 +1698,6 @@ def _check_html_tags_and_attributes(all_files, debug=False):
             summary_messages.append(summary_message)
 
         print ''
-        print '----------------------------------------'
-        print ''
 
     return summary_messages
 
@@ -1768,8 +1751,6 @@ def _check_for_copyright_notice(all_files):
             print summary_message
             summary_messages.append(summary_message)
 
-        print ''
-        print '----------------------------------------'
         print ''
 
     return summary_messages
