@@ -259,3 +259,36 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
             ),
         ):
             checker_test_object.checker.visit_functiondef(functiondef_node2)
+
+
+class RestrictedImportCheckerTests(unittest.TestCase):
+
+    def test_detect_restricted_import(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.RestrictedImportChecker)
+        checker_test_object.setup_method()
+
+        node_import = astroid.extract_node("""
+            import core.domain.acl_decorators #@
+        """)
+        node_import.root().name = 'oppia.core.storage.topic'
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='disallowed-layer-import',
+                node=node_import,
+            ),
+        ):
+            checker_test_object.checker.visit_import(node_import)
+
+        node_importfrom = astroid.extract_node("""
+            from core.domain import acl_decorators #@
+        """)
+        node_importfrom.root().name = 'oppia.core.storage.topic'
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='disallowed-layer-import',
+                node=node_importfrom,
+            )
+        ):
+            checker_test_object.checker.visit_importfrom(node_importfrom)

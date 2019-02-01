@@ -825,6 +825,23 @@ class RestrictedImportChecker(checkers.BaseChecker):
                     node=node,
                 )
 
+    def visit_importfrom(self, node):
+        """Visits all import-from statements in a python file and checks that
+        modules are imported. It then adds a message accordingly.
+
+        Args:
+            node: astroid.node_classes.ImportFrom. Node for a function or method
+                definition in AST.
+        """
+
+        modnode = node.root()
+        if 'oppia.core.storage' in modnode.name:
+            if 'core.domain' in node.modname:
+                self.add_message(
+                    'disallowed-layer-import',
+                    node=node,
+                )
+
 
 def register(linter):
     """Registers the checker with pylint.
