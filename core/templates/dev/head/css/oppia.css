@@ -1461,7 +1461,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-editor-card-section {
   padding: 20px 50px 20px 35px;
-  word-break: break-all;
+  word-wrap: break-word;
 }
 
 .oppia-state-content {
@@ -1694,7 +1694,6 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-learner-view-card-content {
-  word-break: break-all;
   word-wrap: break-word;
 }
 
