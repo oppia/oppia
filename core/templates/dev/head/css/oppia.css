@@ -1461,7 +1461,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-editor-card-section {
   padding: 20px 50px 20px 35px;
-  word-break: break-all;
+  word-wrap: break-word;
 }
 
 .oppia-state-content {
@@ -1670,7 +1670,6 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-learner-view-card-content {
-  word-break: break-all;
   word-wrap: break-word;
 }
 
@@ -3781,7 +3780,7 @@ md-card.preview-conversation-skin-supplemental-card {
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
   box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
   padding: 8px;
-  word-break: break-all;
+  word-wrap: break-word;
 }
 
 .oppia-rte:focus {
