@@ -16,6 +16,7 @@ inbound_services:
 
 default_expiration: "10m"
 handlers:
+# PRODUCTION STATIC
 - url: /favicon.ico
   static_files: assets/favicon.ico
   upload: assets/favicon.ico
@@ -32,6 +33,15 @@ handlers:
   static_dir: build
   secure: always
   expiration: "90d"
+- url: /third_party/static
+  static_dir: third_party/static
+  secure: always
+  expiration: "90d"
+- url: /mapreduce/pipeline/images
+  static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
+  secure: always
+
+# DEVELOPMENT STATIC
 - url: /assets
   static_dir: assets
   secure: always
@@ -47,10 +57,6 @@ handlers:
   static_files: core/templates/dev/head/\1
   upload: core/templates/dev/head/(.*directive\.html)$
   secure: always
-- url: /third_party/static
-  static_dir: third_party/static
-  secure: always
-  expiration: "90d"
 - url: /third_party/generated
   static_dir: third_party/generated
   secure: always
@@ -78,9 +84,8 @@ handlers:
   static_files: extensions/objects/templates/\1
   upload: extensions/objects/templates/(.*\.html)
   secure: always
-- url: /mapreduce/pipeline/images
-  static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
-  secure: always
+
+# DYNAMIC
 - url: /mapreduce(/.*)?
   script: mapreduce.main.APP
   login: admin
