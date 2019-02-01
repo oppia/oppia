@@ -23,15 +23,14 @@ oppia.directive('solutionExplanationEditor', [
       restrict: 'E',
       scope: {
         onSaveSolution: '=',
-        onSaveContentIdsToAudioTranslations: '='
+        onSaveContentIdsToAudioTranslations: '=',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_explanation_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'EditabilityService',
-        'StateContentIdsToAudioTranslationsService', 'StateSolutionService',
-        function($scope, $uibModal, EditabilityService,
-            StateContentIdsToAudioTranslationsService, StateSolutionService) {
+        '$scope', 'EditabilityService', 'StateSolutionService',
+        function($scope, EditabilityService, StateSolutionService) {
           $scope.isEditable = EditabilityService.isEditable();
           $scope.editSolutionForm = {};
           $scope.explanationEditorIsOpen = false;
@@ -53,12 +52,11 @@ oppia.directive('solutionExplanationEditor', [
             var contentHasChanged = (
               StateSolutionService.displayed.explanation.getHtml() !==
               StateSolutionService.savedMemento.explanation.getHtml());
-            var solutionContentId = StateSolutionService.displayed.explanation
-              .getContentId();
-            if (StateContentIdsToAudioTranslationsService.displayed
-              .hasUnflaggedAudioTranslations(solutionContentId) &&
-              contentHasChanged) {
-              openMarkAllAudioAsNeedingUpdateModal();
+            if (contentHasChanged) {
+              var solutionContentId = StateSolutionService.displayed.explanation
+                .getContentId();
+              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+                solutionContentId);
             }
             StateSolutionService.saveDisplayedValue();
             $scope.onSaveSolution(StateSolutionService.displayed);
@@ -75,25 +73,6 @@ oppia.directive('solutionExplanationEditor', [
               $scope.saveThisExplanation();
             }
           });
-
-          var openMarkAllAudioAsNeedingUpdateModal = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/forms/' +
-                'mark_all_audio_as_needing_update_modal_directive.html'),
-              backdrop: true,
-              resolve: {},
-              controller: 'MarkAllAudioAsNeedingUpdateController'
-            }).result.then(function() {
-              var solutionContentId = StateSolutionService.displayed.explanation
-                .getContentId();
-              StateContentIdsToAudioTranslationsService.displayed
-                .markAllAudioAsNeedingUpdate(solutionContentId);
-              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations(
-                StateContentIdsToAudioTranslationsService.displayed);
-            });
-          };
         }
       ]
     };

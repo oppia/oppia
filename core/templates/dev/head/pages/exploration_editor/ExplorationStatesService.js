@@ -22,14 +22,14 @@ oppia.factory('ExplorationStatesService', [
   '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
   'StateEditorService', 'ValidatorsService', 'StatesObjectFactory',
-  'SolutionValidityService', 'StateContentIdsToAudioTranslationsService',
+  'SolutionValidityService',
   'AngularNameService', 'AnswerClassificationService', 'ContextService',
   'UrlInterpolationService',
   function(
       $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       ExplorationInitStateNameService, AlertsService, ChangeListService,
       StateEditorService, ValidatorsService, StatesObjectFactory,
-      SolutionValidityService, StateContentIdsToAudioTranslationsService,
+      SolutionValidityService,
       AngularNameService, AnswerClassificationService, ContextService,
       UrlInterpolationService) {
     var _states = null;
@@ -192,15 +192,10 @@ oppia.factory('ExplorationStatesService', [
           contentIdsToDelete.forEach(function(contentId) {
             newStateData.contentIdsToAudioTranslations.deleteContentId(
               contentId);
-            StateContentIdsToAudioTranslationsService.displayed.deleteContentId(
-              contentId);
           });
           contentIdsToAdd.forEach(function(contentId) {
             newStateData.contentIdsToAudioTranslations.addContentId(contentId);
-            StateContentIdsToAudioTranslationsService.displayed.addContentId(
-              contentId);
           });
-          StateContentIdsToAudioTranslationsService.saveDisplayedValue();
         }
         var propertyRef = newStateData;
         for (var i = 0; i < accessorList.length - 1; i++) {
@@ -473,6 +468,8 @@ oppia.factory('ExplorationStatesService', [
       registerOnStateAnswerGroupsSavedCallback: function(callback) {
         stateAnswerGroupsSavedCallbacks.push(callback);
       },
+      markActiveStateAllAudioNeedsUpdate: function(stateName, contentId) {
+      }
     };
   }
 ]);

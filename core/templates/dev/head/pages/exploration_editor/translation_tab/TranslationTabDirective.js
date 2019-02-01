@@ -17,21 +17,32 @@
  */
 
 oppia.directive('translationTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'ExplorationStatesService', 'StateContentIdsToAudioTranslationsService',
+  'StateEditorService', 'UrlInterpolationService',
+  function(
+      ExplorationStatesService, StateContentIdsToAudioTranslationsService,
+      StateEditorService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      link: function(scope) {
-        scope.$broadcast('refreshTranslationTab');
-      },
+
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
       controller: ['$scope', '$rootScope', function($scope, $rootScope) {
         $rootScope.loadingMessage = 'Loading';
         $scope.isTranslationTabBusy = false;
-        $scope.$on('refreshTranslationTab', function() {
+
+        var initTranslationTab = function() {
+          var stateName = StateEditorService.getActiveStateName();
+          StateContentIdsToAudioTranslationsService.init(
+            stateName,
+            ExplorationStatesService.getContentIdsToAudioTranslationsMemento(
+              stateName));
           $scope.$broadcast('refreshStateTranslation');
+        };
+        $scope.$on('refreshTranslationTab', function() {
+          initTranslationTab();
         });
       }]
     };

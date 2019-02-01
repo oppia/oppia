@@ -34,6 +34,7 @@ oppia.directive('answerGroupEditor', [
         onSaveContentIdsToAudioTranslations: '=',
         outcome: '=',
         rules: '=',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
         suppressWarnings: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

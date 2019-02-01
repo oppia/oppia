@@ -23,7 +23,8 @@ oppia.directive('stateHintsEditor', [
       scope: {
         onSaveContentIdsToAudioTranslations: '=',
         onSaveHints: '=',
-        onSaveSolution: '='
+        onSaveSolution: '=',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_hints_editor_directive.html'),
@@ -31,16 +32,14 @@ oppia.directive('stateHintsEditor', [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',
         'StateHintsService', 'COMPONENT_NAME_HINT', 'StateEditorService',
-        'StateContentIdsToAudioTranslationsService', 'EditabilityService',
-        'StateInteractionIdService', 'UrlInterpolationService',
-        'HintObjectFactory', 'StateSolutionService',
+        'EditabilityService', 'StateInteractionIdService',
+        'UrlInterpolationService', 'HintObjectFactory', 'StateSolutionService',
         function(
             $scope, $rootScope, $uibModal, $filter,
             GenerateContentIdService, AlertsService, INTERACTION_SPECS,
             StateHintsService, COMPONENT_NAME_HINT, StateEditorService,
-            StateContentIdsToAudioTranslationsService, EditabilityService,
-            StateInteractionIdService, UrlInterpolationService,
-            HintObjectFactory, StateSolutionService) {
+            EditabilityService, StateInteractionIdService,
+            UrlInterpolationService, HintObjectFactory, StateSolutionService) {
           $scope.EditabilityService = EditabilityService;
           $scope.StateHintsService = StateHintsService;
           $scope.activeHintIndex = null;
@@ -52,6 +51,15 @@ oppia.directive('stateHintsEditor', [
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
             $scope.activeHintIndex = null;
           });
+
+          var _getExistingHintsContentIds = function() {
+            var existingContentIds = [];
+            StateHintsService.displayed.forEach(function(hint) {
+              var contentId = hint.hintContent.getContentId();
+              existingContentIds.push(contentId);
+            });
+            return existingContentIds;
+          };
 
           $scope.getHintButtonText = function() {
             var hintButtonText = '+ Add Hint';
@@ -103,6 +111,7 @@ oppia.directive('stateHintsEditor', [
             if ($scope.StateHintsService.displayed.length === 5) {
               return;
             }
+            var existingHintsContentIds = _getExistingHintsContentIds();
             AlertsService.clearWarnings();
             $rootScope.$broadcast('externalSave');
 
@@ -127,9 +136,7 @@ oppia.directive('stateHintsEditor', [
 
                   $scope.saveHint = function() {
                     var contentId = GenerateContentIdService.getNextId(
-                      StateContentIdsToAudioTranslationsService
-                        .displayed.getAllContentId(),
-                      COMPONENT_NAME_HINT);
+                      existingHintsContentIds, COMPONENT_NAME_HINT);
                     // Close the modal and save it afterwards.
                     $uibModalInstance.close({
                       hint: angular.copy(

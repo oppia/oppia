@@ -23,7 +23,8 @@ oppia.directive('stateSolutionEditor', [
       scope: {
         onSaveContentIdsToAudioTranslations: '=',
         onSaveSolution: '=',
-        refreshWarnings: '&'
+        refreshWarnings: '&',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_solution_editor_directive.html'),

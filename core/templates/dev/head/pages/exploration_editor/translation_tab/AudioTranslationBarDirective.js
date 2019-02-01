@@ -368,6 +368,7 @@ oppia.directive('audioTranslationBar', [
               $scope.audioBlob = null;
               $scope.selectedRecording = false;
             }
+            $rootScope.loadingMessage = '';
           };
 
           $scope.track = {
@@ -507,8 +508,9 @@ oppia.directive('audioTranslationBar', [
               $scope.initAudioBar();
             });
           };
-
-          $scope.initAudioBar();
+          $scope.$on('refreshAudioTranslationBar', function() {
+            $scope.initAudioBar();
+          });
         }]
     };
   }]);
