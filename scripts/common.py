@@ -77,8 +77,11 @@ def verify_local_repo_is_clean():
     git_status_output = subprocess.check_output(
         ['git', 'status']).strip().split('\n')
 
-    branch_is_clean_message = 'nothing to commit, working directory clean'
-    if not branch_is_clean_message in git_status_output:
+    branch_is_clean_message_1 = 'nothing to commit, working directory clean'
+    branch_is_clean_message_2 = 'nothing to commit, working tree clean'
+    if (
+            not branch_is_clean_message_1 in git_status_output and
+            not branch_is_clean_message_2 in git_status_output):
         raise Exception(
             'ERROR: This script should be run from a clean branch.')
 
