@@ -1,7 +1,7 @@
 var_for_docker_image: &docker_image circleci/python:2.7.14-jessie-browsers
 
 anchor_for_job_defaults: &job_defaults
-  working_directory: ~/oppia
+  working_directory: /home/circleci/oppia
   docker:
     - image: *docker_image
 
@@ -79,9 +79,9 @@ workflows:
       - lint_tests:
           requires:
             - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - backend_tests:
-          requires:
-            - setup
+      # - frontend_tests:
+      #     requires:
+      #       - setup
+      # - backend_tests:
+      #     requires:
+      #       - setup
