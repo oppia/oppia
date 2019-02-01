@@ -55,7 +55,7 @@
 
     <div class="row" ng-if="activeThread.messages">
       <div style="margin-top: 10px" class="col-lg-12 col-md-12 col-sm-12">
-        <table class="table">
+        <table class="table" style="table-layout: fixed; word-wrap: break-word;">
           <tr ng-repeat="m in activeThread.messages|orderBy:'message_id'">
             <td>
               <div class="row">
