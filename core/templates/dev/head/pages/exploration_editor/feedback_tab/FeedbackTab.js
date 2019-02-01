@@ -40,7 +40,7 @@ oppia.controller('FeedbackTab', [
 
     $scope.activeThread = null;
     $scope.userIsLoggedIn = null;
-    $scope.updatedThreadFlag = 0;
+    $scope.isThreadUpdated = False;
     $rootScope.loadingMessage = 'Loading';
     var userInfoPromise = UserService.getUserInfoAsync();
     userInfoPromise.then(function(userInfo) {
@@ -68,10 +68,10 @@ oppia.controller('FeedbackTab', [
       $rootScope.loadingMessage = '';
     });
     $scope.fetchThreadsAgain = function() {
-      if ($scope.updatedThreadFlag === 1) {
+      if ($scope.isThreadUpdated === true) {
         ThreadDataService.fetchThreads();
         $scope.threadData = ThreadDataService.data;
-        $scope.updatedThreadFlag = 0;
+        $scope.isThreadUpdated = false;
       }
     };
 
@@ -279,7 +279,7 @@ oppia.controller('FeedbackTab', [
         AlertsService.addWarning('Invalid message status: ' + tmpStatus);
         return;
       }
-      $scope.updatedThreadFlag = 1;
+      $scope.isThreadUpdated = true;
       $scope.messageSendingInProgress = true;
       ThreadDataService.addNewMessage(threadId, tmpText, tmpStatus, function() {
         _resetTmpMessageFields();
