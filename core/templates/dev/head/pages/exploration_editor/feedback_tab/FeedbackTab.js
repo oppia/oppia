@@ -68,12 +68,10 @@ oppia.controller('FeedbackTab', [
       $rootScope.loadingMessage = '';
     });
     $scope.fetchThreadsAgain = function() {
-      if($scope.updatedThreadFlag === 1)
-      {
+      if ($scope.updatedThreadFlag === 1) {
         ThreadDataService.fetchThreads();
         $scope.threadData = ThreadDataService.data;
         $scope.updatedThreadFlag = 0;
-        console.log('DONE');
       }
     };
 
