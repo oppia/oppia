@@ -406,7 +406,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.user_admin, self.user_a,
                 'invalid_role', self.STORY_ID)
 
-    def reassigning_none_role_to_same_user(self):
+    def test_reassigning_none_role_to_same_user(self):
         with self.assertRaisesRegexp(
             Exception, 'This user already has no role for this story'):
             story_services.assign_role(
@@ -424,10 +424,14 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
     """
 
     def _get_progress_model(self, user_id, STORY_ID):
+        """Returns the StoryProgressModel corresponding to the story id and user
+        id.
+        """
         return user_models.StoryProgressModel.get(
             user_id, STORY_ID, strict=False)
 
     def _record_completion(self, user_id, STORY_ID, node_id):
+        """Records the completion of a node in the context of a story."""
         story_services.record_completed_node_in_story_context(
             user_id, STORY_ID, node_id)
 

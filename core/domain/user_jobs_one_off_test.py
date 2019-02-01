@@ -30,7 +30,7 @@ from core.domain import feedback_services
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import subscription_services
-from core.domain import user_jobs_continuous_test
+from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.platform import models
@@ -704,6 +704,28 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
 
 
+class MockUserStatsAggregator(
+        user_jobs_continuous.UserStatsAggregator):
+    """A modified UserStatsAggregator that does not start a new
+     batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockUserStatsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockUserStatsMRJobManager(
+        user_jobs_continuous.UserStatsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockUserStatsAggregator
+
+
 class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard stats job."""
 
@@ -733,13 +755,29 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-    def _mock_get_current_date_as_string(self):
+    def mock_get_current_date_as_string(self):
         return self.CURRENT_DATE_AS_STRING
 
     def _rate_exploration(self, user_id, exp_id, rating):
+        """Assigns rating to the exploration corresponding to the given
+        exploration id.
+
+        Args:
+            user_id: str. The user id.
+            exp_id: str. The exploration id.
+            rating: int. The rating to be assigned to the given exploration.
+        """
         rating_services.assign_rating_to_exploration(user_id, exp_id, rating)
 
     def _record_play(self, exp_id, state):
+        """Calls StartExplorationEventHandler and records the 'play' event
+        corresponding to the given exploration id.
+
+        Args:
+            exp_id: str. The exploration id.
+            state: dict(str, *). The state of the exploration corresponding to
+                the given id.
+        """
         event_services.StartExplorationEventHandler.record(
             exp_id, self.EXP_VERSION, state, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
@@ -760,12 +798,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         expected_results_list = [{
-            self._mock_get_current_date_as_string(): {
+            self.mock_get_current_date_as_string(): {
                 'num_ratings': 0,
                 'average_ratings': None,
                 'total_plays': 0
@@ -777,21 +815,19 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             expected_results_list[0])
 
     def test_weekly_stats_if_no_explorations(self):
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 0,
                     'average_ratings': None,
                     'total_plays': 0
@@ -813,21 +849,19 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 1,
                     'average_ratings': 5.0,
                     'total_plays': 1
@@ -853,21 +887,19 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 2,
                     'average_ratings': 4.5,
                     'total_plays': 1
@@ -890,37 +922,31 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         with self.swap(
             user_services,
             'get_current_date_as_string',
-            self._mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
         self.assertEqual(
             weekly_stats, [{
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 1,
                     'average_ratings': 4.0,
                     'total_plays': 2
                 }
             }])
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            stop_computation(self.owner_id))
+        MockUserStatsAggregator.stop_computation(self.owner_id)
         self.process_and_flush_pending_tasks()
 
         self._rate_exploration('user2', exp_id, 2)
 
-        (
-            user_jobs_continuous_test.ModifiedUserStatsAggregator.
-            start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
         def _mock_get_date_after_one_week():
@@ -935,7 +961,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
 
         expected_results_list = [
             {
-                self._mock_get_current_date_as_string(): {
+                self.mock_get_current_date_as_string(): {
                     'num_ratings': 1,
                     'average_ratings': 4.0,
                     'total_plays': 2
@@ -1055,10 +1081,10 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
         user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
 
-        def _mock_fetch_gravatar(unused_email):
+        def mock_fetch_gravatar(unused_email):
             return self.FETCHED_GRAVATAR
 
-        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+        with self.swap(user_services, 'fetch_gravatar', mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL has been updated.
@@ -1079,10 +1105,10 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
         user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
 
-        def _mock_fetch_gravatar(unused_email):
+        def mock_fetch_gravatar(unused_email):
             return self.FETCHED_GRAVATAR
 
-        with self.swap(user_services, 'fetch_gravatar', _mock_fetch_gravatar):
+        with self.swap(user_services, 'fetch_gravatar', mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL is still the manually-added one.
