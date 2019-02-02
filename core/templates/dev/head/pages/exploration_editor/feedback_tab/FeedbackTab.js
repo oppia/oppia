@@ -75,7 +75,7 @@ oppia.controller('FeedbackTab', [
     };
     $scope.onBackButtonClicked = function() {
       $scope.clearActiveThread();
-      if($scope.threadIsUpdated) {
+      if ($scope.threadIsUpdated) {
         $scope.fetchUpdatedThreads();
       }
     };
