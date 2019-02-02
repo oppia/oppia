@@ -287,8 +287,8 @@ class BaseHandler(webapp2.RequestHandler):
     def render_downloadable_file(self, values, filename, content_type):
         """Prepares downloadable content to be sent to the client."""
         self.response.headers['Content-Type'] = content_type
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename=%s' % (filename))
+        self.response.headers['Content-Disposition'] = str(
+            'attachment; filename=%s' % filename)
         self.response.write(values)
 
     def _get_logout_url(self, redirect_url_on_logout):
