@@ -30,7 +30,6 @@ oppia.directive('stateContentEditor', [
       scope: {
         getStateContentPlaceholder: '&stateContentPlaceholder',
         onSaveStateContent: '=',
-        onSaveContentIdsToAudioTranslations: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

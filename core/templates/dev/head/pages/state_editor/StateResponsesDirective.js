@@ -22,7 +22,6 @@ oppia.directive('stateResponses', [
       scope: {
         addState: '=',
         onResponsesInitialized: '=',
-        onSaveContentIdsToAudioTranslations: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionDefaultOutcome: '=',
         navigateToState: '=',

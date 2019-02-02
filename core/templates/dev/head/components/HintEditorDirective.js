@@ -22,7 +22,6 @@ oppia.directive('hintEditor', [
       restrict: 'E',
       scope: {
         hint: '=',
-        onSaveContentIdsToAudioTranslations: '=',
         getIndexPlusOne: '&indexPlusOne',
         getOnSaveFn: '&onSave',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='

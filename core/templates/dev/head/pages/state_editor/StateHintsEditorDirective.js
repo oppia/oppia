@@ -21,7 +21,6 @@ oppia.directive('stateHintsEditor', [
     return {
       restrict: 'E',
       scope: {
-        onSaveContentIdsToAudioTranslations: '=',
         onSaveHints: '=',
         onSaveSolution: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='

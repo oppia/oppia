@@ -21,7 +21,6 @@ oppia.directive('stateSolutionEditor', [
     return {
       restrict: 'E',
       scope: {
-        onSaveContentIdsToAudioTranslations: '=',
         onSaveSolution: '=',
         refreshWarnings: '&',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='

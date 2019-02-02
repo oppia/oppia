@@ -23,7 +23,6 @@ oppia.directive('solutionExplanationEditor', [
       restrict: 'E',
       scope: {
         onSaveSolution: '=',
-        onSaveContentIdsToAudioTranslations: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

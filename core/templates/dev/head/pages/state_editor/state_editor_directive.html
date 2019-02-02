@@ -4,7 +4,6 @@
     <div id="tutorialStateContent" class="oppia-editor-card-section"
          style="padding-top: 36px; padding-bottom: 36px;">
       <state-content-editor on-save-state-content="onSaveStateContent"
-                            on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
                             show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired"
                             state-content-placeholder="getStateContentPlaceholder()">
       </state-content-editor>
@@ -17,7 +16,6 @@
                             on-save-interaction-id="onSaveInteractionId"
                             on-save-interaction-customization-args="onSaveInteractionCustomizationArgs"
                             on-save-solution="onSaveSolution"
-                            on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
                             recompute-graph="recomputeGraph">
   </state-interaction-editor>
 </div>
@@ -26,7 +24,6 @@
   <state-responses add-state="addState"
                    navigate-to-state="navigateToState"
                    on-responses-initialized="reinitializeEditor"
-                   on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
                    on-save-interaction-answer-groups="onSaveInteractionAnswerGroups"
                    on-save-interaction-default-outcome="onSaveInteractionDefaultOutcome"
                    refresh-warnings="refreshWarnings"
@@ -35,13 +32,11 @@
   <div>
     <state-hints-editor on-save-hints="onSaveHints"
                         on-save-solution="onSaveSolution"
-                        on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
                         show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired">
     </state-hints-editor>
   </div>
   <div ng-if="currentInteractionCanHaveSolution">
     <state-solution-editor on-save-solution="onSaveSolution"
-                           on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations"
                            refresh-warnings="refreshWarnings"
                            show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired">
     </state-solution-editor>

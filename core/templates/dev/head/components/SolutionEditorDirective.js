@@ -32,7 +32,6 @@ oppia.directive('solutionEditor', [
       scope: {
         getInteractionId: '&interactionId',
         onSaveSolution: '=',
-        onSaveContentIdsToAudioTranslations: '=',
         correctAnswerEditorHtml: '=',
         onOpenSolutionEditor: '&',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='

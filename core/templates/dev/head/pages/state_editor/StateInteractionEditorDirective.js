@@ -28,7 +28,6 @@ oppia.directive('stateInteractionEditor', [
         };
       },
       scope: {
-        onSaveContentIdsToAudioTranslations: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionId: '=',
         onSaveSolution: '=',

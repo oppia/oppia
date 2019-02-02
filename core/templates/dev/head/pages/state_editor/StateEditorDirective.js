@@ -24,7 +24,6 @@ oppia.directive('stateEditor', [
         getStateContentPlaceholder: '&stateContentPlaceholder',
         isInteractionShown: '&interactionIsShown',
         navigateToState: '=',
-        onSaveContentIdsToAudioTranslations: '=',
         onSaveHints: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionId: '=',

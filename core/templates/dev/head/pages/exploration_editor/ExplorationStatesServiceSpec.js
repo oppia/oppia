@@ -21,8 +21,6 @@ describe('ExplorationStatesService', function() {
 
   beforeEach(inject(function($injector) {
     this.ess = $injector.get('ExplorationStatesService');
-    this.citatof = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
-    this.scitats = $injector.get('StateContentIdsToAudioTranslationsService');
 
     spyOn($injector.get('ContextService'), 'getExplorationId')
       .and.returnValue('7');
@@ -30,21 +28,17 @@ describe('ExplorationStatesService', function() {
 
   describe('Callback Registration', function() {
     beforeEach(function() {
-      var contentIdToAudioTranslationsDict = {
-        content: {},
-        default_outcome: {},
-        feedback_1: {}
-      };
-      this.scitats.displayed = this.citatof.createFromBackendDict(
-        contentIdToAudioTranslationsDict);
-      this.scitats.saveDisplayedValue();
       this.ess.init({
         Hola: {
           content: {
             content_id: 'content',
             html: ''
           },
-          content_ids_to_audio_translations: contentIdToAudioTranslationsDict,
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          },
           param_changes: [],
           interaction: {
             answer_groups: [{

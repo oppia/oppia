@@ -39,8 +39,6 @@ describe('Solution Verification Service', function() {
   var rootScope;
   var mockExplorationData;
   var successCallbackSpy, errorCallbackSpy;
-  var scitats = null;
-  var citatof = null;
 
   beforeEach(function() {
     mockExplorationData = {
@@ -61,27 +59,22 @@ describe('Solution Verification Service', function() {
     sof = $injector.get('SolutionObjectFactory');
     see = $injector.get('StateEditorService');
     svs = $injector.get('SolutionVerificationService');
-    citatof = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
-    scitats = $injector.get('StateContentIdsToAudioTranslationsService');
     IS = $injector.get('INTERACTION_SPECS');
     rootScope = $injector.get('$rootScope');
-    var contentIdToAudioTranslationsDict = {
-      content: {},
-      default_outcome: {},
-      feedback_1: {},
-      hint_1: {},
-      hint_2: {}
-    };
-    scitats.displayed = citatof.createFromBackendDict(
-      contentIdToAudioTranslationsDict);
-    scitats.saveDisplayedValue();
+
     ess.init({
       'First State': {
         content: {
           content_id: 'content',
           html: 'First State Content'
         },
-        content_ids_to_audio_translations: contentIdToAudioTranslationsDict,
+        content_ids_to_audio_translations: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          hint_1: {},
+          hint_2: {}
+        },
         interaction: {
           id: 'TextInput',
           answer_groups: [{
