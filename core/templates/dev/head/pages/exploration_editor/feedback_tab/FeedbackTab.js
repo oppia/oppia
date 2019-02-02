@@ -69,15 +69,15 @@ oppia.controller('FeedbackTab', [
     });
     // Fetches the threads again if any thread is updated.
     $scope.fetchUpdatedThreads = function() {
-      if ($scope.threadIsUpdated) {
-        ThreadDataService.fetchThreads();
-        $scope.threadData = ThreadDataService.data;
-        $scope.threadIsUpdated = false;
-      }
+      ThreadDataService.fetchThreads();
+      $scope.threadData = ThreadDataService.data;
+      $scope.threadIsUpdated = false;
     };
     $scope.onBackButtonClicked = function() {
       $scope.clearActiveThread();
-      $scope.fetchUpdatedThreads();
+      if($scope.threadIsUpdated) {
+        $scope.fetchUpdatedThreads();
+      }
     };
 
     $scope.showCreateThreadModal = function() {
