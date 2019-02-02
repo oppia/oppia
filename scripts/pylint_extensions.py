@@ -696,8 +696,8 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
         modules are imported. It then adds a message accordingly.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node for a function or method
-                definition in AST.
+            node: astroid.node_classes.ImportFrom. Node for a import-from
+                statement in the AST.
         """
 
         try:
@@ -830,8 +830,8 @@ class RestrictedImportChecker(checkers.BaseChecker):
         modules are imported. It then adds a message accordingly.
 
         Args:
-            node: astroid.node_classes.ImportFrom. Node for a function or method
-                definition in AST.
+            node: astroid.node_classes.ImportFrom. Node for a import-from
+                statement in the AST.
         """
 
         modnode = node.root()
