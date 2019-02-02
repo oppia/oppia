@@ -1,0 +1,92 @@
+<div class="modal-body oppia-long-text protractor-test-translation-tab-welcome-modal">
+  <div class="row">
+    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-7">
+      <h1 class="oppia-welcome-modal-h1">Welcome!</h1>
+      <p class="oppia-welcome-modal-p">
+        It looks like you're new to translating explorations.
+      </p>
+      <p class="oppia-welcome-modal-p">
+        Would you like an introduction to translations in Oppia?
+      </p>
+
+      <button type="button"
+              class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-translation-tab-start-tutorial"
+              ng-click="beginTutorial()">
+        Yes, please!
+      </button>
+
+      <button type="button"
+              class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-translation-tab-dismiss-welcome-modal"
+              ng-click="cancel()">
+        Nope, I'm good.
+      </button>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-5">
+      <img class="oppia-welcome-modal-img" ng-src="<[translationWelcomeImgUrl]>">
+    </div>
+  </div>
+</div>
+
+<style>
+    .oppia-welcome-modal .modal-body {
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+      height: 100%;
+      margin: 0 auto;
+      top: 10%;
+      width: 95%;
+    }
+
+    .oppia-welcome-modal .oppia-welcome-modal-h1 {
+      color: #015c53;
+    }
+
+    .oppia-welcome-modal .oppia-welcome-modal-p {
+      font-size: 0.9em;
+      margin-top: 0;
+      margin-bottom: 6px;
+    }
+
+    .oppia-welcome-modal .oppia-welcome-modal-button {
+      background-color: #015c53;
+      border-radius: 0;
+      color: #fff;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+      font-size: 14px;
+      margin-top: 10px;
+      text-transform: uppercase;
+      width: 250px;
+    }
+    .oppia-welcome-modal .oppia-welcome-modal-button:hover,
+    .oppia-welcome-modal .oppia-welcome-modal-button:focus,
+    .oppia-welcome-modal .oppia-welcome-modal-button:active {
+      background-color: rgba(5, 190, 178, 1);
+      color: #fff;
+    }
+
+    .oppia-welcome-modal .oppia-welcome-modal-img {
+      min-width: 100px;
+    }
+
+    .oppia-welcome-modal .modal-content {
+      border-radius: 0;
+      height: 100%;
+      min-height: 450px;
+    }
+
+    .oppia-welcome-modal .modal-dialog {
+      height: 70%;
+      width: 70%;
+    }
+
+    @media (max-width: 770px) {
+      .oppia-welcome-modal .modal-body {
+        top: 5%;
+      }
+
+      .oppia-welcome-modal .modal-dialog {
+        margin: 10% auto;
+        width: 95%;
+      }
+    }
+</style>
