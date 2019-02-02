@@ -40,6 +40,7 @@ oppia.controller('FeedbackTab', [
 
     $scope.activeThread = null;
     $scope.userIsLoggedIn = null;
+    $scope.threadIsUpdated = false;
     $rootScope.loadingMessage = 'Loading';
     var userInfoPromise = UserService.getUserInfoAsync();
     userInfoPromise.then(function(userInfo) {
@@ -66,6 +67,18 @@ oppia.controller('FeedbackTab', [
     $q.all([userInfoPromise, threadPromise]).then(function() {
       $rootScope.loadingMessage = '';
     });
+    // Fetches the threads again if any thread is updated.
+    $scope.fetchUpdatedThreads = function() {
+      ThreadDataService.fetchThreads();
+      $scope.threadData = ThreadDataService.data;
+      $scope.threadIsUpdated = false;
+    };
+    $scope.onBackButtonClicked = function() {
+      $scope.clearActiveThread();
+      if ($scope.threadIsUpdated) {
+        $scope.fetchUpdatedThreads();
+      }
+    };
 
     $scope.showCreateThreadModal = function() {
       $uibModal.open({
@@ -271,7 +284,7 @@ oppia.controller('FeedbackTab', [
         AlertsService.addWarning('Invalid message status: ' + tmpStatus);
         return;
       }
-
+      $scope.threadIsUpdated = true;
       $scope.messageSendingInProgress = true;
       ThreadDataService.addNewMessage(threadId, tmpText, tmpStatus, function() {
         _resetTmpMessageFields();
