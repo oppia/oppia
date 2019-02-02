@@ -798,12 +798,12 @@ class RestrictedImportChecker(checkers.BaseChecker):
     """Custom pylint checker which checks restricted imports."""
 
     __implements__ = interfaces.IAstroidChecker
-    name = 'disallowed-layer-import'
+    name = 'invalid-import'
     priority = -1
     msgs = {
         'C0009': (
             'Importing domain layer in storage layer is prohibited.',
-            'disallowed-layer-import',
+            'invalid-import',
             'Storage layer(core/storage) importing domain layer(core/domain)'
             ' is not allowed.'),
     }
@@ -821,7 +821,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
         if 'oppia.core.storage' in modnode.name:
             if any('core.domain' in name for name in names):
                 self.add_message(
-                    'disallowed-layer-import',
+                    'invalid-import',
                     node=node,
                 )
 
@@ -838,7 +838,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
         if 'oppia.core.storage' in modnode.name:
             if 'core.domain' in node.modname:
                 self.add_message(
-                    'disallowed-layer-import',
+                    'invalid-import',
                     node=node,
                 )
 

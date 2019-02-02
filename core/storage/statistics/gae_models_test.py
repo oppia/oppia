@@ -16,7 +16,7 @@
 
 """Tests for Oppia statistics models."""
 
-from core.domain import exp_domain
+from core.domain import exp_domain  # pylint: disable=invalid-import
 from core.platform import models
 from core.tests import test_utils
 import feconf

@@ -14,7 +14,7 @@
 
 """Tests for core.storage.question.gae_models."""
 
-from core.domain import state_domain
+from core.domain import state_domain  # pylint: disable=invalid-import
 from core.platform import models
 from core.tests import test_utils
 

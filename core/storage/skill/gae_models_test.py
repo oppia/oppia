@@ -16,7 +16,7 @@
 
 """Tests for Skill models."""
 
-from core.domain import rights_manager
+from core.domain import rights_manager  # pylint: disable=invalid-import
 from core.platform import models
 from core.tests import test_utils
 

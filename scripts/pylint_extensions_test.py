@@ -275,7 +275,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         node_import.root().name = 'oppia.core.storage.topic'
         with checker_test_object.assertAddsMessages(
             testutils.Message(
-                msg_id='disallowed-layer-import',
+                msg_id='invalid-import',
                 node=node_import,
             ),
         ):
@@ -287,7 +287,7 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         node_importfrom.root().name = 'oppia.core.storage.topic'
         with checker_test_object.assertAddsMessages(
             testutils.Message(
-                msg_id='disallowed-layer-import',
+                msg_id='invalid-import',
                 node=node_importfrom,
             )
         ):
