@@ -16,9 +16,9 @@
 
 """Tests for collection models."""
 from constants import constants
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import rights_manager
+from core.domain import collection_domain  # pylint: disable=invalid-import
+from core.domain import collection_services  # pylint: disable=invalid-import
+from core.domain import rights_manager  # pylint: disable=invalid-import
 from core.platform import models
 from core.tests import test_utils
 
