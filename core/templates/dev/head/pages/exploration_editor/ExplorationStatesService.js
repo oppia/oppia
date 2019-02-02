@@ -22,16 +22,14 @@ oppia.factory('ExplorationStatesService', [
   '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
   'StateEditorService', 'ValidatorsService', 'StatesObjectFactory',
-  'SolutionValidityService',
-  'AngularNameService', 'AnswerClassificationService', 'ContextService',
-  'UrlInterpolationService',
+  'SolutionValidityService', 'AngularNameService',
+  'AnswerClassificationService', 'ContextService', 'UrlInterpolationService',
   function(
       $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       ExplorationInitStateNameService, AlertsService, ChangeListService,
       StateEditorService, ValidatorsService, StatesObjectFactory,
-      SolutionValidityService,
-      AngularNameService, AnswerClassificationService, ContextService,
-      UrlInterpolationService) {
+      SolutionValidityService, AngularNameService, AnswerClassificationService,
+      ContextService, UrlInterpolationService) {
     var _states = null;
 
     var stateAddedCallbacks = [];
