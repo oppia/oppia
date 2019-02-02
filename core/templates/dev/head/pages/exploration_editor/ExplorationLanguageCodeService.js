@@ -19,11 +19,7 @@ oppia.factory('ExplorationLanguageCodeService', [
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'language_code';
     child.getAllLanguageCodes = function() {
-      // TODO(sll): Update this once the App Engine search service supports
-      // 3-letter language codes.
-      return constants.ALL_LANGUAGE_CODES.filter(function(languageCodeDict) {
-        return languageCodeDict.code.length === 2;
-      });
+      return constants.ALL_LANGUAGE_CODES;
     };
     child.getCurrentLanguageDescription = function() {
       for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
@@ -34,9 +30,7 @@ oppia.factory('ExplorationLanguageCodeService', [
     };
     child._isValid = function(value) {
       return constants.ALL_LANGUAGE_CODES.some(function(elt) {
-        // TODO(sll): Remove the second clause once the App Engine search
-        // service supports 3-letter language codes.
-        return elt.code === value && elt.code.length === 2;
+        return elt.code === value;
       });
     };
     return child;

@@ -87,11 +87,6 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.language_code = 0
         self._assert_validation_error('Expected language code to be a string')
 
-        # TODO(sll): Remove the next two lines once the App Engine search
-        # service supports 3-letter language codes.
-        self.collection.language_code = 'kab'
-        self._assert_validation_error('it should have exactly 2 letters')
-
         self.collection.language_code = 'xz'
         self._assert_validation_error('Invalid language code')
 

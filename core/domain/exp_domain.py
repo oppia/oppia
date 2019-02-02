@@ -643,12 +643,6 @@ class Exploration(object):
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
-        # TODO(sll): Remove this check once App Engine supports 3-letter
-        # language codes in search.
-        if len(self.language_code) != 2:
-            raise utils.ValidationError(
-                'Invalid language_code, it should have exactly 2 letters: %s' %
-                self.language_code)
 
         if not isinstance(self.tags, list):
             raise utils.ValidationError(
