@@ -39,11 +39,12 @@ class SplashPageTest(test_utils.GenericTestBase):
         response.mustcontain('I18N_SPLASH_TITLE')
 
 
-    def test_loading_splash_page_with_c_value_loads_correctly(self):
+    def test_loading_splash_page_with_c_value_is_redirected_correctly(self):
         """Test for splash page when c value is included."""
         response = self.testapp.get('/splash?c=c')
         self.assertEqual(response.status_int, 302)
         self.assertEqual(response.content_type, 'text/html')
+        self.assertIn('splash', response.headers['location'])
 
 
 class GetStartedPageTest(test_utils.GenericTestBase):
@@ -112,7 +113,6 @@ class TermsPageTest(test_utils.GenericTestBase):
         self.assertEqual(response.content_type, 'text/html')
 
 
-
 class PrivacyPageTest(test_utils.GenericTestBase):
     """Test for privacy page."""
 
@@ -123,11 +123,12 @@ class PrivacyPageTest(test_utils.GenericTestBase):
 
 
 class AboutRedirectPageTest(test_utils.GenericTestBase):
-    """Test for about redirect page."""
+    """Test for redirect to about page."""
 
     def test_redirect_to_about_page_loads_correctly(self):
         response = self.testapp.get('/credits')
         self.assertEqual(response.status_int, 302)
+        self.assertIn('about', response.headers['location'])
 
 
 class FoundationRedirectPageTest(test_utils.GenericTestBase):
@@ -136,6 +137,7 @@ class FoundationRedirectPageTest(test_utils.GenericTestBase):
     def test_redirect_to_foundation_page_loads_correctly(self):
         response = self.testapp.get('/foundation')
         self.assertEqual(response.status_int, 302)
+        self.assertIn('foundation', response.headers['location'])
 
 
 class TeachRedirectPageTest(test_utils.GenericTestBase):
@@ -144,6 +146,7 @@ class TeachRedirectPageTest(test_utils.GenericTestBase):
     def test_redirect_to_teach_page_loads_correctly(self):
         response = self.testapp.get('/participate')
         self.assertEqual(response.status_int, 302)
+        self.assertIn('teach', response.headers['location'])
 
 
 class ConsoleErrorPageTest(test_utils.GenericTestBase):
@@ -161,3 +164,10 @@ class MaintenancePageTest(test_utils.GenericTestBase):
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True):
             response = self.testapp.get('/admin')
             self.assertEqual(response.status_int, 302)
+            self.assertIn('admin', response.headers['location'])
+
+    def test_does_not_load_maintenance_page(self):
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            response = self.testapp.get('/admin')
+            self.assertEqual(response.status_int, 302)
+            self.assertIn('admin', response.headers['location'])
