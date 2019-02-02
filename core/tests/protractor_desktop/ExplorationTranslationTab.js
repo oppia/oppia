@@ -39,6 +39,20 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
   });
 
+  it('should walkthrough translation tutorial when user clicks next',
+    function() {
+      users.createUser('userclicknext@translationTabTutorial.com',
+        'userclicknextTranslationTabTutorial');
+      users.login('userclicknext@translationTabTutorial.com');
+      workflow.createExploration();
+
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.startTutorial();
+      explorationEditorTranslationTab.playTutorial();
+      explorationEditorTranslationTab.finishTutorial();
+      users.logout();
+    });
+
   it('should have all the state contents', function() {
     users.createUser('user@translationTab.com', 'userTranslationTab');
     users.login('user@translationTab.com');
@@ -72,6 +86,7 @@ describe('Exploration translation', function() {
     explorationEditorPage.saveChanges();
 
     explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.exitTutorial();
     explorationEditorTranslationTab.expectContentTabContentToMatch(
       'This is first card.');
     explorationEditorTranslationTab.expectFeedbackTabContentsToMatch(
@@ -170,6 +185,7 @@ describe('Exploration translation', function() {
       explorationEditorMainTab.setInteraction('EndExploration');
       explorationEditorMainTab.moveToState('two');
       explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.exitTutorial();
       explorationEditorTranslationTab.navigateToFeedbackTab();
       explorationEditorPage.saveChanges();
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
