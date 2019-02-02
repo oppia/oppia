@@ -17,7 +17,7 @@
 """Models for topics and related constructs."""
 
 from constants import constants
-import core.domain.acl_decorators
+from core.domain import acl_decorators
 from core.platform import models
 
 from google.appengine.ext import ndb
