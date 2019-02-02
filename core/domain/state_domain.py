@@ -142,7 +142,7 @@ class Hint(object):
 
         Args:
             hint_content: SubtitledHtml. The hint text and ID referring to the
-              audio translations for this content.
+                other assets for this content.
         """
         self.hint_content = hint_content
 
@@ -714,6 +714,194 @@ class AudioTranslation(object):
                 self.needs_update)
 
 
+class WrittenTranslation(object):
+    """Value object representing a written translation for a content."""
+
+    def __init__(self, html, needs_update):
+        """Initializes a WrittenTranslation domain object.
+
+        Args:
+            html: str. A piece of user submitted HTML. This is cleaned in such
+                a way as to contain a restricted set of HTML tags.
+            needs_update: bool. Whether html is marked for needing review.
+        """
+        self.html = html_cleaner.clean(html)
+        self.needs_update = needs_update
+
+    def to_dict(self):
+        """Returns a dict representing this WrittenTranslation domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of WrittenTranslation instance.
+        """
+        return {
+            'html': self.html,
+            'needs_update': self.needs_update,
+        }
+
+    @classmethod
+    def from_dict(cls, written_translation_dict):
+        """Return a WrittenTranslation domain object from a dict.
+
+        Args:
+            written_translation_dict: dict. The dict representation of
+                WrittenTranslation object.
+
+        Returns:
+            WrittenTranslation. The corresponding WrittenTranslation domain
+            object.
+        """
+        return cls(
+            written_translation_dict['html'],
+            written_translation_dict['needs_update'])
+
+    def validate(self):
+        """Validates properties of the WrittenTranslation.
+
+        Raises:
+            ValidationError: One or more attributes of the WrittenTranslation
+            are invalid.
+        """
+        if not isinstance(self.html, basestring):
+            raise utils.ValidationError(
+                'Invalid content HTML: %s' % self.html)
+
+        if not isinstance(self.needs_update, bool):
+            raise utils.ValidationError(
+                'Expected needs_update to be a bool, received %s' %
+                self.needs_update)
+
+
+class ContentTranslations(object):
+    """Value object representing a content translations which stores
+    translated contents of all state contents (like hints, feedback etc.) in
+    different languages linked through their content_id.
+    """
+
+    def __init__(self, content_translations):
+        """Initializes a ContentTranslations domain object."""
+        self.content_translations = content_translations
+
+    def to_dict(self):
+        """Returns a dict representing this ContentTranslations domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of ContentTranslations instance.
+        """
+        content_translations_dict = {}
+        for (content_id, language_code_to_written_translation) in (
+                self.content_translations.iteritems()):
+            content_translations_dict[content_id] = {}
+            for (language_code, written_translation) in (
+                    language_code_to_written_translation.iteritems()):
+                content_translations_dict[content_id][language_code] = (
+                    written_translation.to_dict())
+
+        return content_translations_dict
+
+    @classmethod
+    def from_dict(cls, content_translations_dict):
+        """Return a ContentTranslations domain object from a dict.
+
+        Args:
+            content_translations_dict: dict. The dict representation of
+                ContentTranslations object.
+
+        Returns:
+            ContentTranslations. The corresponding ContentTranslations domain
+            object.
+        """
+        content_translations = {}
+        for (content_id, language_code_to_written_translation) in (
+                content_translations_dict.iteritems()):
+            content_translations[content_id] = {}
+            for (language_code, written_translation) in (
+                    language_code_to_written_translation.iteritems()):
+                content_translations[content_id][language_code] = (
+                    WrittenTranslation.from_dict(written_translation))
+
+        return cls(content_translations)
+
+    def validate(self):
+        """Validates properties of the ContentTranslations.
+
+        Raises:
+            ValidationError: One or more attributes of the ContentTranslations
+            are invalid.
+        """
+        for (content_id, language_code_to_written_translation) in (
+                self.content_translations.iteritems()):
+            if not isinstance(content_id, basestring):
+                raise utils.ValidationError(
+                    'Expected content_id to be a string, received %s'
+                    % content_id)
+            if not isinstance(language_code_to_written_translation, dict):
+                raise utils.ValidationError(
+                    'Expected content_id value to be a dict, received %s'
+                    % language_code_to_written_translation)
+            for (language_code, written_translation) in (
+                    language_code_to_written_translation.iteritems()):
+                if not isinstance(language_code, basestring):
+                    raise utils.ValidationError(
+                        'Expected language_code to be a string, received %s'
+                        % language_code)
+                if not utils.is_valid_language_code(language_code):
+                    raise utils.ValidationError(
+                        'Invalid language_code: %s' % language_code)
+
+                written_translation.validate()
+
+    def get_available_languages(self):
+        """Returns a set of language available in the ContentTranslations.
+
+        Returns:
+            set(str). A set of languages available in the ContentTranslations.
+        """
+        language_codes_set = set([])
+        for language_code_to_written_translation in (
+                self.content_translations.itervalues()):
+            for language_code in language_code_to_written_translation:
+                language_codes_set.add(language_code)
+        return language_codes_set
+
+    def add_content_id_for_translation(self, content_id):
+        """Adds a content id as a key for the translation into the
+        content_translation dict.
+
+        Args:
+            content_id: str. The id representing a subtitled html.
+
+        Raises:
+            Exception: The content id isn't a string.
+        """
+        if not isinstance(content_id, basestring):
+            raise Exception(
+                'Expected content_id to be a string, received %s' % content_id)
+        if content_id in self.content_translations:
+            raise Exception(
+                'The content_id %s already exist.' % content_id)
+        else:
+            self.content_translations[content_id] = {}
+
+    def delete_content_id_for_translation(self, content_id):
+        """Deletes a content id from the content_translation dict.
+
+        Args:
+            content_id: str. The id representing a subtitled html.
+
+        Raises:
+            Exception: The content id isn't a string.
+        """
+        if not isinstance(content_id, basestring):
+            raise Exception(
+                'Expected content_id to be a string, received %s' % content_id)
+        if content_id not in self.content_translations:
+            raise Exception(
+                'The content_id %s does not exist.' % content_id)
+        else:
+            self.content_translations.pop(content_id, None)
+
+
 class RuleSpec(object):
     """Value object representing a rule specification."""
 
@@ -836,8 +1024,8 @@ class SubtitledHtml(object):
         """Initializes a SubtitledHtml domain object.
 
         Args:
-            content_id: str. A unique id referring to the audio translations for
-              this content.
+            content_id: str. A unique id referring to the other assets for this
+                content.
             html: str. A piece of user submitted HTML. This is cleaned in such
                 a way as to contain a restricted set of HTML tags.
         """
