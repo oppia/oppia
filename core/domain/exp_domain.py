@@ -2092,7 +2092,33 @@ class Exploration(object):
 
     @classmethod
     def _convert_states_v25_dict_to_v26_dict(cls, states_dict):
-        """Converts from version 25 to 26. Version 26 adds content_translations
+        """Converts from version 25 to 26. Version 26 adds a new
+        customization arg to DragAndDropSortInput interaction which allows
+        multiple sort items in the same position.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'DragAndDropSortInput':
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'allowMultipleItemsInSamePosition': {
+                        'value': False
+                    }
+                })
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v26_dict_to_v27_dict(cls, states_dict):
+        """Converts from version 26 to 27. Version 27 adds content_translations
         dict to the state, which will allow translators to add translation
         script for the state contents.
 
@@ -2105,7 +2131,7 @@ class Exploration(object):
         content_ids_to_audio_translations keys, but the new validation will
         check whether both are equal.
 
-        Args:
+         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
@@ -2190,7 +2216,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 31
+    CURRENT_EXP_SCHEMA_VERSION = 32
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2742,13 +2768,28 @@ class Exploration(object):
     def _convert_v30_dict_to_v31_dict(cls, exploration_dict):
         """Converts a v30 exploration dict into a v31 exploration dict.
 
-        Adds content_tranlations in state for adding text translation.
+        Adds a new customization arg to DragAndDropSortInput interactions
+        which allows multiple sort items in the same position.
         """
         exploration_dict['schema_version'] = 31
 
         exploration_dict['states'] = cls._convert_states_v25_dict_to_v26_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 26
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v31_dict_to_v32_dict(cls, exploration_dict):
+        """Converts a v31 exploration dict into a v32 exploration dict.
+
+        Adds content_tranlations in state for adding text translation.
+        """
+        exploration_dict['schema_version'] = 32
+
+        exploration_dict['states'] = cls._convert_states_v26_dict_to_v27_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 27
 
         return exploration_dict
 
@@ -2939,6 +2980,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v30_dict_to_v31_dict(
                 exploration_dict)
             exploration_schema_version = 31
+
+        if exploration_schema_version == 31:
+            exploration_dict = cls._convert_v31_dict_to_v32_dict(
+                exploration_dict)
+            exploration_schema_version = 32
 
         return (exploration_dict, initial_schema_version)
 

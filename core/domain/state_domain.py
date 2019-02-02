@@ -1321,22 +1321,31 @@ class State(object):
         object such as content_ids_to_audio_translations.
 
         Args:
-            old_ids_list: list(str.). A list of content ids present earlier
+            old_ids_list: list(str). A list of content ids present earlier
                 within the substructure (like answer groups, hints etc.) of
                 state.
-            new_ids_list: list(str.). A list of content ids currently present
+            new_ids_list: list(str). A list of content ids currently present
                 within the substructure (like answer groups, hints etc.) of
                 state.
         """
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
         for content_id in content_ids_to_delete:
-            self.content_ids_to_audio_translations.pop(content_id)
-            self.content_translations.delete_content_id_for_translation(
-                content_id)
+            if not content_id in self.content_ids_to_audio_translations:
+                raise Exception(
+                    'The content_id %s does not exist.' % content_id)
+            else:
+                self.content_ids_to_audio_translations.pop(content_id)
+                self.content_translations.delete_content_id_for_translation(
+                    content_id)
         for content_id in content_ids_to_add:
-            self.content_ids_to_audio_translations[content_id] = {}
-            self.content_translations.add_content_id_for_translation(content_id)
+            if content_id in self.content_ids_to_audio_translations:
+                raise Exception(
+                    'The content_id %s already exists.' % content_id)
+            else:
+                self.content_ids_to_audio_translations[content_id] = {}
+                self.content_translations.add_content_id_for_translation(
+                    content_id)
 
     def update_content(self, content_dict):
         """Update the content of this state.

@@ -17,13 +17,13 @@
  */
 
 oppia.controller('ExplorationEditorTab', [
-  '$rootScope', '$scope', 'AlertsService', 'ContextService',
+  '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
   'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
   'ExplorationInitStateNameService', 'ExplorationStatesService',
   'ExplorationWarningsService', 'GraphDataService', 'RouterService',
   'StateEditorService', 'UrlInterpolationService',
   function(
-      $rootScope, $scope, AlertsService, ContextService,
+      $rootScope, $scope, $uibModal, AlertsService, ContextService,
       ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
       ExplorationInitStateNameService, ExplorationStatesService,
       ExplorationWarningsService, GraphDataService, RouterService,
@@ -149,7 +149,29 @@ oppia.controller('ExplorationEditorTab', [
 
     $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
       ExplorationStatesService.saveContentIdsToAudioTranslations(
-        $scope.stateName, angular.copy(displayedValue), false);
+        $scope.stateName, angular.copy(displayedValue));
+    };
+
+    $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
+        contentId) {
+      var stateName = StateEditorService.getActiveStateName();
+      var state = ExplorationStatesService.getState(stateName);
+      var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
+      if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
+        contentId)) {
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/forms/' +
+            'mark_all_audio_as_needing_update_modal_directive.html'),
+          backdrop: true,
+          resolve: {},
+          controller: 'MarkAllAudioAsNeedingUpdateController'
+        }).result.then(function() {
+          contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(contentId);
+          ExplorationStatesService.saveContentIdsToAudioTranslations(
+            stateName, contentIdsToAudioTranslations);
+        });
+      }
     };
 
     $scope.navigateToState = function(stateName) {
@@ -189,15 +211,13 @@ oppia.directive('trainingPanel', [
         'StateCustomizationArgsService', 'AnswerGroupObjectFactory',
         'OutcomeObjectFactory', 'GenerateContentIdService',
         'COMPONENT_NAME_FEEDBACK',
-        'StateContentIdsToAudioTranslationsService',
         function(
             $scope, ExplorationHtmlFormatterService,
             StateEditorService, ExplorationStatesService,
             TrainingDataService, ResponsesService, StateInteractionIdService,
             StateCustomizationArgsService, AnswerGroupObjectFactory,
             OutcomeObjectFactory, GenerateContentIdService,
-            COMPONENT_NAME_FEEDBACK,
-            StateContentIdsToAudioTranslationsService) {
+            COMPONENT_NAME_FEEDBACK) {
           $scope.addingNewResponse = false;
 
           var _stateName = StateEditorService.getActiveStateName();
@@ -212,6 +232,15 @@ oppia.directive('trainingPanel', [
                 StateCustomizationArgsService.savedMemento));
           };
 
+          var _getExistingOutcomeContentIds = function() {
+            var existingContentIds = [];
+            $scope.allOutcomes.forEach(function(outcome) {
+              var contentId = outcome.feedback.getContentId();
+              existingContentIds.push(contentId);
+            });
+            return existingContentIds;
+          };
+
           $scope.$watch('answer', _updateAnswerTemplate);
           _updateAnswerTemplate();
           $scope.selectedAnswerGroupIndex = (
@@ -223,9 +252,7 @@ oppia.directive('trainingPanel', [
 
           $scope.beginAddingNewResponse = function() {
             var contentId = GenerateContentIdService.getNextId(
-              StateContentIdsToAudioTranslationsService.displayed
-                .getAllContentId(),
-              COMPONENT_NAME_FEEDBACK);
+              _getExistingOutcomeContentIds(), COMPONENT_NAME_FEEDBACK);
             $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
               StateEditorService.getActiveStateName(), contentId, '', []);
             $scope.addingNewResponse = true;
