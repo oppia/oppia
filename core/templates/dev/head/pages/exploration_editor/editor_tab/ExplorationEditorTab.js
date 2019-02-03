@@ -17,13 +17,13 @@
  */
 
 oppia.controller('ExplorationEditorTab', [
-  '$rootScope', '$scope', 'AlertsService', 'ContextService',
+  '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
   'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
   'ExplorationInitStateNameService', 'ExplorationStatesService',
   'ExplorationWarningsService', 'GraphDataService', 'RouterService',
   'StateEditorService', 'UrlInterpolationService',
   function(
-      $rootScope, $scope, AlertsService, ContextService,
+      $rootScope, $scope, $uibModal, AlertsService, ContextService,
       ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
       ExplorationInitStateNameService, ExplorationStatesService,
       ExplorationWarningsService, GraphDataService, RouterService,
@@ -150,6 +150,28 @@ oppia.controller('ExplorationEditorTab', [
     $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
       ExplorationStatesService.saveContentIdsToAudioTranslations(
         $scope.stateName, angular.copy(displayedValue));
+    };
+
+    $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
+        contentId) {
+      var stateName = StateEditorService.getActiveStateName();
+      var state = ExplorationStatesService.getState(stateName);
+      var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
+      if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
+        contentId)) {
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/forms/' +
+            'mark_all_audio_as_needing_update_modal_directive.html'),
+          backdrop: true,
+          resolve: {},
+          controller: 'MarkAllAudioAsNeedingUpdateController'
+        }).result.then(function() {
+          contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(contentId);
+          ExplorationStatesService.saveContentIdsToAudioTranslations(
+            stateName, contentIdsToAudioTranslations);
+        });
+      }
     };
 
     $scope.navigateToState = function(stateName) {

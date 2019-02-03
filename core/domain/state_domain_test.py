@@ -421,6 +421,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(audio_translation, 'needs_update', 'hello'):
                 audio_translation.validate()
 
+    def test_written_translation_validation(self):
+        """Test validation of translation script."""
+        written_translation = state_domain.WrittenTranslation('Test.', True)
+        written_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid content HTML'):
+            with self.swap(written_translation, 'html', 30):
+                written_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected needs_update to be a bool'
+            ):
+            with self.swap(written_translation, 'needs_update', 20):
+                written_translation.validate()
+
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -447,16 +463,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        init_state.update_content_ids_to_audio_translations({
-            'content': {},
-            'default_outcome': {},
-            'hint_1': {},
-            'solution': {}
-        })
-
-        init_state.interaction.solution = (
-            state_domain.Solution.from_dict(
-                init_state.interaction.id, solution))
+        init_state.update_interaction_solution(solution)
         exploration.validate()
 
         hints_list.append({
@@ -482,13 +489,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         del hints_list[1]
         init_state.update_interaction_hints(hints_list)
 
-        init_state.update_content_ids_to_audio_translations({
-            'content': {},
-            'default_outcome': {},
-            'hint_1': {},
-            'hint_3': {},
-            'solution': {}
-        })
         self.assertEqual(len(init_state.interaction.hints), 2)
         exploration.validate()
 
@@ -534,13 +534,158 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': 'hello_world is a string'
             }
         }
-        init_state.interaction.solution = (
-            state_domain.Solution.from_dict(
-                init_state.interaction.id, solution))
-        init_state.update_content_ids_to_audio_translations({
-            'content': {},
-            'default_outcome': {},
-            'hint_1': {},
-            'solution': {}
-        })
+        init_state.update_interaction_solution(solution)
         exploration.validate()
+
+
+class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
+    """Test methods operating on content transcripts."""
+
+    def test_get_available_languages_gives_correct_set_of_langauges(self):
+        content_translations_dict = {
+            'content1': {
+                'en': {
+                    'html': 'hello',
+                    'needs_update': True
+                },
+                'hi': {
+                    'html': 'Hey!',
+                    'needs_update': False
+                }
+            },
+            'content2': {
+                'hi': {
+                    'html': 'Testing!',
+                    'needs_update': False
+                },
+                'en': {
+                    'html': 'hello!',
+                    'needs_update': False
+                }
+            }
+        }
+
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+        expected_available_languages = set(['en', 'hi'])
+
+        self.assertEqual(
+            content_translations.get_available_languages(),
+            expected_available_languages)
+
+    def test_add_content_id_for_translations_adds_content_id(self):
+        content_translations = state_domain.ContentTranslations.from_dict({})
+        new_content_id = 'content_id'
+        content_translations.add_content_id_for_translation(new_content_id)
+
+        self.assertEqual(
+            len(content_translations.to_dict()), 1)
+        self.assertEqual(
+            content_translations.to_dict().keys(), ['content_id'])
+
+    def test_add_content_id_for_translation_with_invalid_content_id_raise_error(
+            self):
+        content_translations = state_domain.ContentTranslations.from_dict({})
+        invalid_content_id = 123
+        with self.assertRaisesRegexp(
+            Exception, 'Expected content_id to be a string, received 123'):
+            content_translations.add_content_id_for_translation(
+                invalid_content_id)
+
+    def test_add_content_id_for_translation_with_existing_content_id_raise_error( # pylint: disable=line-too-long
+            self):
+        content_translations_dict = {
+            'feedback_1': {
+                'en': {
+                    'html': 'hello!',
+                    'needs_update': False
+                }
+            }
+        }
+
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+        existing_content_id = 'feedback_1'
+        with self.assertRaisesRegexp(
+            Exception, 'The content_id feedback_1 already exist.'):
+            content_translations.add_content_id_for_translation(
+                existing_content_id)
+
+    def test_delete_content_id_for_translations_deletes_content_id(self):
+        old_content_translations_dict = {
+            'content': {
+                'en': {
+                    'html': 'hello!',
+                    'needs_update': False
+                }
+            }
+        }
+
+        content_translations = state_domain.ContentTranslations.from_dict(
+            old_content_translations_dict)
+        content_translations.delete_content_id_for_translation('content')
+
+        self.assertEqual(len(content_translations.to_dict()), 0)
+
+    def test_delete_content_id_for_translation_with_nonexisting_content_id_raise_error(self): # pylint: disable=line-too-long
+        content_translations_dict = {
+            'content': {}
+        }
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+        nonexisting_content_id_to_delete = 'feedback_1'
+        with self.assertRaisesRegexp(
+            Exception, 'The content_id feedback_1 does not exist.'):
+            content_translations.delete_content_id_for_translation(
+                nonexisting_content_id_to_delete)
+
+    def test_delete_content_id_for_translation_with_invalid_content_id_raise_error(self): # pylint: disable=line-too-long
+        content_translations = state_domain.ContentTranslations.from_dict({})
+        invalid_content_id_to_delete = 123
+        with self.assertRaisesRegexp(
+            Exception, 'Expected content_id to be a string, '):
+            content_translations.delete_content_id_for_translation(
+                invalid_content_id_to_delete)
+
+    def test_validation_with_invalid_content_id_raise_error(self):
+        content_translations_dict = {
+            123: {}
+        }
+
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+
+        self._assert_validation_error(
+            content_translations, 'Expected content_id to be a string, ')
+
+    def test_validation_with_invalid_type_langauge_code_raise_error(self):
+        content_translations_dict = {
+            'content': {
+                123: {
+                    'html': 'hello!',
+                    'needs_update': False
+                }
+            }
+        }
+
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+
+        self._assert_validation_error(
+            content_translations, 'Expected language_code to be a string, ')
+
+    def test_validation_with_unknown_langauge_code_raise_error(self):
+        content_translations_dict = {
+            'content': {
+                'ed': {
+                    'html': 'hello!',
+                    'needs_update': False
+                }
+            }
+        }
+
+        content_translations = state_domain.ContentTranslations.from_dict(
+            content_translations_dict)
+
+        self._assert_validation_error(
+            content_translations, 'Invalid language_code: ed')

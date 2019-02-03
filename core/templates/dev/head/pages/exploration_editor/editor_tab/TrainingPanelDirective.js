@@ -43,15 +43,13 @@ oppia.directive('trainingPanel', [
         'StateCustomizationArgsService', 'AnswerGroupObjectFactory',
         'OutcomeObjectFactory', 'GenerateContentIdService',
         'COMPONENT_NAME_FEEDBACK',
-        'StateContentIdsToAudioTranslationsService',
         function(
             $scope, ExplorationHtmlFormatterService,
             StateEditorService, ExplorationStatesService,
             TrainingDataService, ResponsesService, StateInteractionIdService,
             StateCustomizationArgsService, AnswerGroupObjectFactory,
             OutcomeObjectFactory, GenerateContentIdService,
-            COMPONENT_NAME_FEEDBACK,
-            StateContentIdsToAudioTranslationsService) {
+            COMPONENT_NAME_FEEDBACK) {
           $scope.addingNewResponse = false;
 
           var _stateName = StateEditorService.getActiveStateName();
@@ -66,6 +64,15 @@ oppia.directive('trainingPanel', [
                 StateCustomizationArgsService.savedMemento));
           };
 
+          var _getExistingOutcomeContentIds = function() {
+            var existingContentIds = [];
+            $scope.allOutcomes.forEach(function(outcome) {
+              var contentId = outcome.feedback.getContentId();
+              existingContentIds.push(contentId);
+            });
+            return existingContentIds;
+          };
+
           $scope.$watch('answer', _updateAnswerTemplate);
           _updateAnswerTemplate();
           $scope.selectedAnswerGroupIndex = (
@@ -77,9 +84,7 @@ oppia.directive('trainingPanel', [
 
           $scope.beginAddingNewResponse = function() {
             var contentId = GenerateContentIdService.getNextId(
-              StateContentIdsToAudioTranslationsService.displayed
-                .getAllContentId(),
-              COMPONENT_NAME_FEEDBACK);
+              _getExistingOutcomeContentIds(), COMPONENT_NAME_FEEDBACK);
             $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
               StateEditorService.getActiveStateName(), contentId, '', []);
             $scope.addingNewResponse = true;
