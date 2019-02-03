@@ -1343,10 +1343,10 @@ class State(object):
                 raise Exception(
                     'The content_id %s does not exist in '
                     'content_ids_to_audio_translations.' % content_id)
-            if not content_id in (
+            elif not content_id in (
                     self.content_translations.get_all_content_ids_for_translation()): # pylint: disable=line-too-long
                 raise Exception(
-                    'The content_id %s does not exist in content__translations.'
+                    'The content_id %s does not exist in content_translations.'
                     % content_id)
             else:
                 self.content_ids_to_audio_translations.pop(content_id)
@@ -1356,7 +1356,13 @@ class State(object):
         for content_id in content_ids_to_add:
             if content_id in self.content_ids_to_audio_translations:
                 raise Exception(
-                    'The content_id %s already exists.' % content_id)
+                    'The content_id %s already exists in '
+                    'content_ids_to_audio_translations.' % content_id)
+            elif content_id in (
+                    self.content_translations.get_all_content_ids_for_translation()): # pylint: disable=line-too-long
+                raise Exception(
+                    'The content_id %s does not exist in content_translations.'
+                    % content_id)
             else:
                 self.content_ids_to_audio_translations[content_id] = {}
                 self.content_translations.add_content_id_for_translation(

@@ -595,17 +595,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         })
         init_state.update_interaction_hints(hints_list)
 
-        # Changing content id directly for testing validation error.
-        init_state.interaction.hints[0].hint_content.content_id = 'hint_2'
+        # Removing content id directly from content_ids_to_audio_translation for
+        # testing validation error.
+        init_state.content_ids_to_audio_translations.pop('hint_1')
 
         self._assert_validation_error(
             exploration,
             r'Expected state content_ids_to_audio_translations to have all '
             r'of the listed content ids \[\'content\', \'default_outcome\', '
-            r'\'hint_2\'\]')
+            r'\'hint_1\'\]')
 
         # Undo above changes.
-        init_state.interaction.hints[0].hint_content.content_id = 'hint_1'
+        init_state.content_ids_to_audio_translations['hint_1'] = {}
 
         hints_list.append({
             'hint_content': {
