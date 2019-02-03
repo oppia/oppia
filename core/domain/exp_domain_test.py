@@ -246,35 +246,31 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         default_outcome = init_state.interaction.default_outcome
         default_outcome.dest = exploration.init_state_name
-        init_state.interaction.answer_groups.append(
-            state_domain.AnswerGroup.from_dict({
-                'outcome': {
-                    'dest': exploration.init_state_name,
-                    'feedback': {
-                        'content_id': 'feedback_1',
-                        'html': 'Feedback'
-                    },
-                    'labelled_as_correct': False,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
+        old_answer_groups = copy.deepcopy(init_state.interaction.answer_groups)
+        old_answer_groups.append({
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Feedback'
                 },
-                'rule_specs': [{
-                    'inputs': {
-                        'x': 'Test'
-                    },
-                    'rule_type': 'Contains'
-                }],
-                'training_data': [],
-                'tagged_misconception_id': None
-            })
-        )
-
-        init_state.update_content_ids_to_audio_translations({
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {}
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_misconception_id': None
         })
+
+        init_state.update_interaction_answer_groups(old_answer_groups)
+
         exploration.validate()
 
         interaction = init_state.interaction
@@ -595,11 +591,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         })
         init_state.update_interaction_hints(hints_list)
 
+        # Changing content id directly for testing validation error.
+        init_state.interaction.hints[0].hint_content.content_id = 'hint_2'
+
         self._assert_validation_error(
             exploration,
             r'Expected state content_ids_to_audio_translations to have all '
             r'of the listed content ids \[\'content\', \'default_outcome\', '
-            r'\'hint_1\'\]')
+            r'\'hint_2\'\]')
+
+        # Undo above changes.
+        init_state.interaction.hints[0].hint_content.content_id = 'hint_1'
 
         hints_list.append({
             'hint_content': {
@@ -612,9 +614,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Found a duplicate content id hint_1')
 
-        init_state.interaction.hints[1].hint_content.content_id = 'hint_2'
-        init_state.content_ids_to_audio_translations['hint_1'] = {}
-        init_state.content_ids_to_audio_translations['hint_2'] = {}
+        hints_list[1]['hint_content']['content_id'] = 'hint_2'
+        init_state.update_interaction_hints(hints_list)
         exploration.validate()
 
     def test_get_trainable_states_dict(self):
