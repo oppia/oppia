@@ -31,7 +31,9 @@ var TopicsAndSkillsDashboardPage = function() {
   var skillsListItems = element.all(
     by.css('.protractor-test-skills-list-item'));
   var topicNameField = element(by.css('.protractor-test-new-topic-name-field'));
-  var skillNameField = element(by.css('.protractor-test-new-skill-description-field'));
+  var skillNameField = element(
+    by.css('.protractor-test-new-skill-description-field')
+  );
   var confirmTopicCreationButton = element(
     by.css('.protractor-test-confirm-topic-creation-button')
   );
