@@ -70,6 +70,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.get_all_skill_ids(),
             ['skill_id_2', 'skill_id_3', 'skill_id_1'])
 
+    def test_get_all_subtopics(self):
+        self.topic.subtopics = topic_domain.Subtopic(1, 'Title', ['skill_id_1'])
+        subtopic = self.topic.get_all_subtopics()
+        self.assertEqual(
+            [subtopic.id, subtopic.title, subtopic.skill_ids], [1, 'Title', ['skill_id_1']])
+
     def test_delete_story(self):
         self.topic.canonical_story_ids = [
             'story_id', 'story_id_1', 'story_id_2']
