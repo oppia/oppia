@@ -3,10 +3,12 @@
   <div class="oppia-drop-area-message">Drop your file here!</div>
 </div>
 <div class="oppia-audio-recording-bar" ng-show="(!isAudioAvailable || audioIsUpdating) && !selectedRecording">
-  <button class="btn oppia-audio-button" disabled>
-    <i class="material-icons">&#xE039;</i>
-  </button>
-  <div class="oppia-audio-bar-info">
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition" disabled>
+      <i class="material-icons">play_arrow</i>
+    </button>
+  </div>
+  <div class="oppia-content-wrapper oppia-audio-bar-info">
     <div ng-if="!cannotRecord && !checkingMicrophonePermission">
       No audio recorded.<span ng-if="canTranslate"> Press <i class="material-icons">mic</i>  to start recording.</span>
     </div>
@@ -20,92 +22,109 @@
       Sorry, your browser does not support recording feature.
     </div>
   </div>
-  <button class="btn oppia-audio-button"
-          uib-tooltip="Record" tooltip-placement="bottom"
-          ng-click="checkAndStartRecording()"
-          ng-disabled="!canTranslate || cannotRecord">
-    <i class="material-icons">&#xE029;</i>
-  </button>
-  <button class="btn oppia-audio-button"
-          uib-tooltip="Upload" tooltip-placement="bottom"
-          ng-click="openAddAudioTranslationModal()"
-          ng-disabled="!canTranslate">
-    <i class="material-icons">&#xE2C6;</i>
-  </button>
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+            uib-tooltip="Record"
+            tooltip-placement="above"
+            ng-click="checkAndStartRecording()"
+            ng-disabled="!canTranslate || cannotRecord">
+      <i class="material-icons">&#xE029;</i>
+    </button>
+  </div>
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+            uib-tooltip="Upload"
+            tooltip-placement="above"
+            ng-click="openAddAudioTranslationModal()"
+            ng-disabled="!canTranslate">
+      <i class="material-icons">&#xE2C6;</i>
+    </button>
+  </div>
 </div>
-
-<div class="oppia-audio-recording-bar" ng-show="selectedRecording && !audioIsCurrentlyBeingSaved">
+<div class="oppia-audio-recording-bar" ng-show="selectedRecording  && !audioIsCurrentlyBeingSaved">
   <ng-audio-recorder id="<[RECORDER_ID]>"
                      on-record-start="onRecordStart()"
                      on-conversion-complete="onConversionComplete()"
                      audio-model="audioBlob"
                      time-limit="recordingTimeLimit">
-    <button class="btn oppia-audio-button"
-            ng-click="recorder.status.isPlaying ? recorder.playbackPause() : recorder.playbackResume()"
-            ng-disabled="recorder.status.isRecording || !recorder.audioModel">
-      <i class="material-icons">
-        {{recorder.status.isStopped || recorder.status.isPaused ? '&#xE039;' : '&#xE035;']>
-      </i>
-    </button>
-    <div class="oppia-audio-visulaizer">
-      <div class="oppia-mp3-converting" ng-if="recorder.status.isConverting">
-        Converting to mp3<loading-dots></loading-dots>
+    <div class="oppia-content-wrapper">
+      <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+              ng-click="recorder.status.isPlaying ? recorder.playbackPause() : recorder.playbackResume()"
+              ng-disabled="recorder.status.isRecording || !recorder.audioModel">
+        <i class="material-icons">
+          {{recorder.status.isStopped || recorder.status.isPaused ? 'play_arrow' : 'pause']>
+        </i>
+      </button>
+    </div>
+    <div class="oppia-content-wrapper oppia-flex-1-wrapper">
+      <div class="oppia-audio-visualiser">
+        <div class="oppia-mp3-converting" ng-if="recorder.status.isConverting">
+          Converting to mp3<loading-dots></loading-dots>
+        </div>
+        <canvas-sizer id="analyser">
+          <div class="oppia-recoding-analyzer" ng-show="recorder.isHtml5 && recorder.status.isRecording && !audioIsCurrentlyBeingSaved">
+            <ng-audio-recorder-analyzer height="66" wave-color="black" ></ng-audio-recorder-analyzer>
+          </div>
+          <div class="oppia-audio-wave-view" ng-show="!recorder.status.isRecording && recorder.audioModel && !audioIsCurrentlyBeingSaved">
+            <ng-audio-recorder-wave-view wave-color="#009688" progress-color="#ccc" height="38"></ng-audio-recorder-wave-view>
+          </div>
+        </canvas-sizer>
       </div>
-      <canvas-sizer id="analyser" >
-        <div class="oppia-recoding-analyzer" ng-show="recorder.isHtml5 && recorder.status.isRecording && !audioIsCurrentlyBeingSaved ">
-          <ng-audio-recorder-analyzer height="110" wave-color="black" ></ng-audio-recorder-analyzer>
-        </div>
-
-        <div class="oppia-audio-wave-view" ng-show="!recorder.status.isRecording && recorder.audioModel && !audioIsCurrentlyBeingSaved " >
-          <ng-audio-recorder-wave-view wave-color="#009688" progress-color="#ccc" height="50"></ng-audio-recorder-wave-view>
-        </div>
-      </canvas-sizer>
     </div>
-
-    <div class="oppia-recording-timer"
-         ng-if="recorder.status.isRecording">
-      <[recorder.elapsedTime | formatTimer]> / <[recorder.timeLimit | formatTimer]>
+    <div class="oppia-content-wrapper" ng-if="recorder.status.isRecording">
+      <div class="oppia-recording-timer">
+        <[recorder.elapsedTime | formatTimer]> / <[recorder.timeLimit | formatTimer]>
+      </div>
     </div>
-    <button class="btn oppia-audio-button"
-            uib-tooltip="Stop" tooltip-placement="bottom"
-            ng-if="recorder.status.isRecording"
-            ng-click="recorder.stopRecord()">
-      <i class="material-icons">&#xE047;</i>
-    </button>
+    <div class="oppia-content-wrapper" ng-if="recorder.status.isRecording">
+      <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+              uib-tooltip="Stop"
+              tooltip-placement="above"
+              ng-click="recorder.stopRecord()">
+        <i class="material-icons">stop</i>
+      </button>
+    </div>
   </ng-audio-recorder>
-  <button class="btn oppia-audio-button"
-          uib-tooltip="Re-take" tooltip-placement="bottom"
-          ng-if="!recorder.status.isRecording && audioBlob"
-          ng-click="reRecord()">
-    <i class="material-icons">&#xE028;</i>
-  </button>
-  <button class="btn oppia-audio-button"
-          uib-tooltip="Save" tooltip-placement="bottom"
-          ng-if="!recorder.status.isRecording && audioBlob"
-          ng-click="saveRecordedAudio()">
-    <i class="material-icons">&#xE161;</i>
-  </button>
-  <button class="btn oppia-audio-button"
-          uib-tooltip="Cancel" tooltip-placement="bottom"
-          ng-if="!recorder.status.isRecording && audioBlob"
-          ng-click="cancelRecording()">
-    <i class="material-icons">&#xE5C9;</i>
-  </button>
-</div>
-<div class="oppia-audio-recording-bar" ng-if="audioIsCurrentlyBeingSaved">
-  <button class="btn oppia-audio-button" disabled>
-    <i class="material-icons">&#xE039;</i>
-  </button>
-  <div class="oppia-audio-bar-info">
-    <div>Saving<loading-dots></loading-dots></div>
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition"
+            ng-if="!recorder.status.isRecording && audioBlob"
+            ng-click="reRecord()">
+      Re-take
+    </button>
+  </div>
+  <div class="oppia-content-wrapper" ng-if="!recorder.status.isRecording && audioBlob">
+    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition"
+            ng-click="saveRecordedAudio()">
+      Confirm
+    </button>
+  </div>
+  <div class="oppia-content-wrapper" ng-if="!recorder.status.isRecording && audioBlob">
+    <button class="btn oppia-cancel-button oppia-audio-bar-button-transition"
+            ng-click="cancelRecording()">
+      Cancel
+    </button>
   </div>
 </div>
-<div ng-if="isAudioAvailable && !audioIsUpdating">
-  <button class="btn oppia-audio-button"
-          ng-click="playPauseUploadedAudioTranslation()">
-    <i class="material-icons"><[isPlayingUploadedAudio() ? '&#xE035;' : '&#xE039;']></i>
-  </button>
-  <div class="oppia-slider-section">
+<div class="oppia-audio-recording-bar" ng-if="audioIsCurrentlyBeingSaved">
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition" disabled>
+      <i class="material-icons">play_arrow</i>
+    </button>
+  </div>
+  <div class="oppia-content-wrapper oppia-flex-1-wrapper">
+    <div class="oppia-audio-bar-info">
+      <div>Saving<loading-dots></loading-dots></div>
+    </div>
+  </div>
+</div>
+<div ng-if="isAudioAvailable && !audioIsUpdating" class="oppia-audio-recording-bar">
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+            ng-click="playPauseUploadedAudioTranslation()">
+      <i class="material-icons"><[isPlayingUploadedAudio() ? 'pause' : 'play_arrow']></i>
+    </button>
+  </div>
+  <div class="oppia-slider-section oppia-content-wrapper">
     <div ng-if="audioLoadingIndicatorIsShown">
       <md-progress-linear md-mode="indeterminate"></md-progress-linear>
     </div>
@@ -114,42 +133,53 @@
       </md-slider>
     </div>
   </div>
-  <div class="oppia-recording-timer" ng-if="!audioLoadingIndicatorIsShown">
+  <div class="oppia-content-wrapper oppia-recording-timer">
+    <div ng-if="audioTimerIsShown">
       <[getUploadedAudioTimer()]>
+    </div>
   </div>
-  <div class="oppia-audio-extra-buttons">
-    <button class="btn oppia-audio-button"
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+            uib-tooltip="Upload audio"
+            tooltip-placement="above"
             ng-disabled="!canTranslate"
-            uib-tooltip="Record new" tooltip-placement="bottom"
-            ng-click="updateAudio()">
-      <i class="material-icons">&#xE028;</i>
+            ng-click="openAddAudioTranslationModal()">
+      <i class="material-icons">&#xE2C6;</i>
     </button>
-    <button class="btn oppia-audio-button"
-            uib-tooltip="Delete" tooltip-placement="bottom"
+  </div>
+  <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+            uib-tooltip="Delete"
+            tooltip-placement="above"
             ng-disabled="!canTranslate"
             ng-click="openDeleteAudioTranslationModal()">
       <i class="material-icons">&#xE872;</i>
     </button>
-    <div class="btn dropdown oppia-audio-button" type="button"
-         ng-disabled="!canTranslate">
-      <div class="dropdown-toggle" type="button" data-toggle="dropdown">
-        <i class="material-icons">&#xE5D2;</i>
-      </div>
-      <ul class="dropdown-menu dropdown-menu-right">
-        <li ng-click="openAddAudioTranslationModal()"><a href="">Upload audio</a></li>
-        <li ng-if="!audioNeedsUpdate" ng-click="toggleAudioNeedsUpdate()"><a href="">Mark need update</a></li>
-        <li ng-if="audioNeedsUpdate" ng-click="toggleAudioNeedsUpdate()"><a href="">Unmark need update</a></li>
-      </ul>
-    </div>
+  </div>
+  <div class="oppia-content-wrapper" ng-if="!audioNeedsUpdate">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+            uib-tooltip="Audio needs update"
+            tooltip-placement="above"
+            ng-disabled="!canTranslate"
+            ng-click="toggleAudioNeedsUpdate()">
+      <i class="material-icons">warning</i>
+    </button>
+  </div>
+  <div class="oppia-content-wrapper" ng-if="audioNeedsUpdate">
+    <button class="btn oppia-audio-button audio-update-needed-button oppia-audio-bar-button-transition"
+            uib-tooltip="Audio does not need update"
+            tooltip-placement="top"
+            ng-disabled="!canTranslate"
+            ng-click="toggleAudioNeedsUpdate()">
+      <i class="material-icons">warning</i>
+    </button>
   </div>
 </div>
-
 <div class="oppia-translation-bottom-right-container" ng-if="showRecorderWarning">
   <span>
     <strong>Warning: </strong>Don't navigate to other tabs of this page before saving recorded audio, otherwise the recorded audio will be lost.
   </span>
 </div>
-
 <style>
   .oppia-drop-area {
     border: 3px dashed #aaa;
@@ -175,88 +205,157 @@
     width: 100%;
   }
   .oppia-audio-recording-bar {
-    width: 100%;
+    align-items: center;
+    background-color: #f7f7f7;
+    display: flex;
     height: 100%;
-    display: inline-block;
+    padding: 0px 10px;
+    width: 100%;
+  }
+  .audioRecorder {
+    align-items: center;
+    display: flex;
+  }
+  .audioRecorder > div:first-child {
+    width: 0 !important;
+  }
+  .oppia-content-wrapper {
+    margin: 0 10px;
   }
   .oppia-audio-bar-info {
-    float: left;
-    width: 79%;
+    background-color: #009688;
+    border-radius: 3px;
+    color: white;
+    flex: 1;
+    font-size: 12px;
+    height: 38px;
+    line-height: 27px;
+    padding: 5px 40px;
     text-align: center;
-    padding: 13px 0px 13px 0px;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
   }
   .oppia-audio-button {
-    background: white;
-    color: #009688;
-    float: left;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    border-radius: 0px;
-    padding: 13px;
-    width: 7%
+    background-color: #009688;
+    border-radius: 20px;
+    color: white;
+    padding-left: 6px;
+    width: 38px;
   }
-  .oppia-audio-visulaizer {
-    width: 72%;
-    float: left;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
+  .oppia-audio-bar-button-transition {
+    -moz-transition: background-color .2s cubic-bezier(.35,0,.25,1);
+    -o-transition: background-color .2s cubic-bezier(.35,0,.25,1);
+    transition: background-color .2s cubic-bezier(.35,0,.25,1);
+    -webkit-transition: background-color .2s cubic-bezier(.35,0,.25,1);
+  }
+  .oppia-audio-action-button {
+    background-color: #009688;
+    border-radius: 3px;
+    color: white;
+    padding-left: 6px;
+    width: 63px;
+  }
+  .oppia-cancel-button {
+    background-color: #009688;
+    border-radius: 3px;
+    color: white;
+    padding-left: 6px;
+    width: 57px;
+  }
+  .oppia-audio-button:hover, .oppia-audio-action-button:hover, .oppia-cancel-button:hover {
+    background-color: #01675d;
+    color: white;
+  }
+  .oppia-audio-button[disabled] {
+    background-color: #009688;
+    pointer-events: auto;
+  }
+  .oppia-audio-button:focus {
+    color: white;
+  }
+  .oppia-audio-visualiser {
+    flex: 1;
+    height: 38px;
+  }
+  .oppia-flex-1-wrapper {
+    flex: 1;
   }
   .oppia-mp3-converting {
+    background-color: #009688;
+    border-radius: 3px;
+    color: white;
+    flex: 1;
+    font-size: 12px;
+    height: 38px;
+    line-height: 27px;
+    padding: 5px 40px;
     text-align: center;
-    padding: 13px 0px 13px 0px;
   }
   .oppia-recording-timer {
-    float: left;
     font-size: 14px;
-    width: 14%;
     text-align: center;
-    padding: 13px 0px 13px 0px;
-    border-right: 1px solid #ccc;
-    border-left: 1px solid #ccc;
-  }
-  .oppia-recording-stop-warning {
-    background: red;
+    width: 83px;
   }
   .oppia-slider-section {
-    width: 58%;
-    float: left;
-    border-left: 1px solid #ccc;
-    border-right: 2px solid #ccc;
+    background-color: #009688;
+    border-radius: 3px;
+    color: white;
+    flex: 1;
+    font-size: 12px;
+    height: 38px;
+    padding: 0 15px;
+    text-align: center;
   }
   .oppia-translation-bottom-right-container {
-    position: relative;
-    top: 10px;
-    text-align: center;
+    color: #ce133b;
     font-size: 12px;
-    color: red;
+    letter-spacing: 0.5px;
+    position: relative;
+    text-align: center;
+    top: 10px;
+  }
+  audio-translation-bar .audio-update-needed-button {
+    background-color: red;
+  }
+  ng-audio-recorder {
+    width: 100%;
+  }
+  audio-translation-bar .tooltip-inner {
+  max-width: none;
+  white-space: nowrap;
   }
   audio-translation-bar md-progress-linear {
-    padding-top: 20px;
-    height: 50px;
+    height: 38px;
+    padding-top: 12px;
+  }
+  audio-translation-bar md-progress-linear.md-default-theme .md-container {
+    background-color: #f8f8f8;
   }
   audio-translation-bar md-progress-linear.md-default-theme .md-bar {
     background-color: #009688;
   }
-  audio-translation-bar md-slider .md-thumb-container {
-    left: 4px;
-  }
   audio-translation-bar md-slider {
-    height: 50px;
+    height: 38px;
+  }
+  audio-translation-bar md-slider .md-track-container {
+    height: 1px;
+    top: 18px !important;
+  }
+  audio-translation-bar md-slider .md-track {
+    background-color: #f8f8f8;
   }
   audio-translation-bar md-slider.md-default-theme .md-track-fill {
     background-color: #009688;
   }
-
-  audio-translation-bar md-slider.md-default-theme .md-thumb:after {
-    border-color: #ccc;
-    background-color: #009688;
+  audio-translation-bar .md-thumb-container {
+    left: 4px;
+    top: -5px;
   }
-  canvas {
-    background: #EEA;
+  audio-translation-bar md-slider.md-default-theme .md-thumb:after {
+    background-color: #009688;
+    border-color: #ccc;
+  }
+  audio-translation-bar canvas {
+    background: #e4e1d1;
+    border-radius: 3px;
     max-width: unset;
   }
-
 </style>
