@@ -17,15 +17,17 @@
  */
 
 oppia.directive('translationTab', [
-  'UrlInterpolationService', 'ContextService', 'ExplorationDataService',
-  'StateTutorialFirstTimeService',
-  function(UrlInterpolationService, ContextService, ExplorationDataService,
-      StateTutorialFirstTimeService) {
+  'ContextService', 'ExplorationDataService', 'ExplorationStatesService',
+  'StateContentIdsToAudioTranslationsService', 'StateEditorService',
+  'StateTutorialFirstTimeService', 'UrlInterpolationService',
+  function(
+      ContextService, ExplorationDataService, ExplorationStatesService,
+      StateContentIdsToAudioTranslationsService, StateEditorService,
+      StateTutorialFirstTimeService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      link: function(scope) {
-        scope.$broadcast('refreshTranslationTab');
+      link: function() {
         ExplorationDataService.getData().then(function(data) {
           StateTutorialFirstTimeService.initTranslation(
             data.show_state_translation_tutorial_on_load,
@@ -36,6 +38,7 @@ oppia.directive('translationTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
+
       controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
         'EditabilityService', 'StateTutorialFirstTimeService',
         'UrlInterpolationService',
@@ -44,6 +47,19 @@ oppia.directive('translationTab', [
             UrlInterpolationService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
+
+          var initTranslationTab = function() {
+            var stateName = StateEditorService.getActiveStateName();
+            StateContentIdsToAudioTranslationsService.init(
+              stateName,
+              ExplorationStatesService.getContentIdsToAudioTranslationsMemento(
+                stateName));
+            $scope.$broadcast('refreshStateTranslation');
+          };
+
+          $scope.$on('refreshTranslationTab', function() {
+            initTranslationTab();
+          });
           // Toggles the translation tab tutorial on/off
           $scope.translationTutorial = false;
           var _ID_TUTORIAL_TRANSLATION_LANGUAGE =

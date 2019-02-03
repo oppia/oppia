@@ -1022,7 +1022,7 @@ tags: []
             exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
             end_state.update_interaction_id('EndExploration')
-            end_state.interaction.default_outcome = None
+            end_state.update_interaction_default_outcome(None)
 
             # Link first state to ending state (to maintain validity).
             init_state = exploration.states[exploration.init_state_name]
