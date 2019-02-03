@@ -1018,8 +1018,8 @@ class PlaythroughIssuesModel(base_models.BaseModel):
                 datastore.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
-        exp_issues_model = cls.get(instance_id, strict=False)
-        return exp_issues_model
+        playthrough_issues_model = cls.get(instance_id, strict=False)
+        return playthrough_issues_model
 
     @classmethod
     def create(cls, exp_id, exp_version, unresolved_issues):
@@ -1037,10 +1037,10 @@ class PlaythroughIssuesModel(base_models.BaseModel):
             str. ID of the new PlaythroughIssuesModel instance.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
-        exp_issues_instance = cls(
+        playthrough_issues_instance = cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             unresolved_issues=unresolved_issues)
-        exp_issues_instance.put()
+        playthrough_issues_instance.put()
         return instance_id
 
 

@@ -232,7 +232,7 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
 class PlaythroughIssuesModelUnitTests(test_utils.GenericTestBase):
     """Test the PlaythroughIssuesModel class."""
 
-    def test_create_and_get_exp_issues_model(self):
+    def test_create_and_get_playthrough_issues_model(self):
         model_id = (
             stat_models.PlaythroughIssuesModel.create(
                 'exp_id1', 1, []))

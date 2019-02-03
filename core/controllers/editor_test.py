@@ -1565,10 +1565,10 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
 
     def test_invalid_issues_are_not_retrieved(self):
         """Test that invalid issues are not retrieved."""
-        exp_issues_model = stats_models.PlaythroughIssuesModel.get_model(
-            self.EXP_ID, 1)
-        exp_issues_model.unresolved_issues[1]['is_valid'] = False
-        exp_issues_model.put()
+        playthrough_issues_model = (
+            stats_models.PlaythroughIssuesModel.get_model(self.EXP_ID, 1))
+        playthrough_issues_model.unresolved_issues[1]['is_valid'] = False
+        playthrough_issues_model.put()
 
         response = self.get_json(
             '/issuesdatahandler/%s' % (self.EXP_ID),
@@ -1682,7 +1682,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             }]
         )
 
-        self.exp_issue_dict = {
+        self.playthrough_issue_dict = {
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
@@ -1705,42 +1705,43 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
         self.post_json(
             '/resolveissuehandler/%s' % (self.EXP_ID),
             {
-                'exp_issue_dict': self.exp_issue_dict,
+                'playthrough_issue_dict': self.playthrough_issue_dict,
                 'exp_version': 1
             }, csrf_token=self.csrf_token)
 
-        exp_issues = stats_services.get_exp_issues(self.EXP_ID, 1)
-        self.assertEqual(exp_issues.unresolved_issues, [])
+        playthrough_issues = (
+            stats_services.get_playthrough_issues(self.EXP_ID, 1))
+        self.assertEqual(playthrough_issues.unresolved_issues, [])
 
         playthrough_instances = stats_models.PlaythroughModel.get_multi(
             [self.playthrough_id1, self.playthrough_id2])
         self.assertEqual(playthrough_instances, [None, None])
 
-    def test_error_on_passing_invalid_exp_issue_dict(self):
+    def test_error_on_passing_invalid_playthrough_issue_dict(self):
         """Test that error is raised on passing invalid exploration issue
         dict.
         """
-        del self.exp_issue_dict['issue_type']
+        del self.playthrough_issue_dict['issue_type']
         # Since we deleted the 'issue_type' key in the exploration issue dict,
         # the dict is invalid now and exception should be raised.
         self.post_json(
             '/resolveissuehandler/%s' % (self.EXP_ID),
             {
-                'exp_issue_dict': self.exp_issue_dict,
+                'playthrough_issue_dict': self.playthrough_issue_dict,
                 'exp_version': 1
             }, csrf_token=self.csrf_token,
             expected_status_int=404)
 
-    def test_error_on_passing_non_matching_exp_issue_dict(self):
+    def test_error_on_passing_non_matching_playthrough_issue_dict(self):
         """Test that error is raised on passing an exploration issue dict that
         doesn't match an issue in the exploration issues model.
         """
-        self.exp_issue_dict['issue_customization_args']['state_name'][
+        self.playthrough_issue_dict['issue_customization_args']['state_name'][
             'value'] = 'state_name2'
         self.post_json(
             '/resolveissuehandler/%s' % (self.EXP_ID),
             {
-                'exp_issue_dict': self.exp_issue_dict,
+                'playthrough_issue_dict': self.playthrough_issue_dict,
                 'exp_version': 1
             }, csrf_token=self.csrf_token,
             expected_status_int=404)

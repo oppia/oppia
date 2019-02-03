@@ -453,22 +453,24 @@ class PlaythroughIssues(object):
         }
 
     @classmethod
-    def from_dict(cls, exp_issues_dict):
+    def from_dict(cls, playthrough_issues_dict):
         """Returns an PlaythroughIssues object from a dict.
 
         Args:
-            exp_issues_dict: dict. A dict mapping of all fields of
+            playthrough_issues_dict: dict. A dict mapping of all fields of
                 PlaythroughIssues object.
 
         Returns:
             PlaythroughIssues. The corresponding PlaythroughIssues domain
                 object.
         """
+        unresolved_issues_dict = playthrough_issues_dict['unresolved_issues']
         unresolved_issues = [
             PlaythroughIssue.from_dict(unresolved_issue_dict)
-            for unresolved_issue_dict in exp_issues_dict['unresolved_issues']]
+            for unresolved_issue_dict in unresolved_issues_dict]
         return cls(
-            exp_issues_dict['exp_id'], exp_issues_dict['exp_version'],
+            playthrough_issues_dict['exp_id'],
+            playthrough_issues_dict['exp_version'],
             unresolved_issues)
 
     def validate(self):
@@ -690,35 +692,38 @@ class PlaythroughIssue(object):
             issue_dict['is_valid'])
 
     @classmethod
-    def from_backend_dict(cls, exp_issue_dict):
+    def from_backend_dict(cls, playthrough_issue_dict):
         """Checks whether the exploration issue dict has the correct keys and
         then returns a domain object instance.
 
         Args:
-            exp_issue_dict: dict. Dict representing an exploration issue.
+            playthrough_issue_dict: dict. Dict representing an exploration
+                issue.
 
         Returns:
             PlaythroughIssue. The exploration issue domain object.
         """
-        exp_issue_properties = [
+        playthrough_issue_properties = [
             'issue_type', 'schema_version', 'issue_customization_args',
             'playthrough_ids', 'is_valid']
 
-        for exp_issue_property in exp_issue_properties:
-            if exp_issue_property not in exp_issue_dict:
+        for playthrough_issue_property in playthrough_issue_properties:
+            if playthrough_issue_property not in playthrough_issue_dict:
                 raise utils.ValidationError(
-                    '%s not in exploration issue dict.' % (exp_issue_property))
+                    '%s not in exploration issue dict.' % (
+                        playthrough_issue_property))
 
-        dummy_exp_issue = cls(
-            exp_issue_dict['issue_type'],
-            exp_issue_dict['issue_customization_args'], [],
-            exp_issue_dict['schema_version'], exp_issue_dict['is_valid'])
+        dummy_playthrough_issue = cls(
+            playthrough_issue_dict['issue_type'],
+            playthrough_issue_dict['issue_customization_args'], [],
+            playthrough_issue_dict['schema_version'],
+            playthrough_issue_dict['is_valid'])
 
-        dummy_exp_issue.validate()
-        return dummy_exp_issue
+        dummy_playthrough_issue.validate()
+        return dummy_playthrough_issue
 
     @classmethod
-    def update_exp_issue_from_model(cls, issue_dict):
+    def update_playthrough_issue_from_model(cls, issue_dict):
         """Converts the exploration issue blob given from
         current issue_schema_version to current issue_schema_version + 1.
         Note that the issue_dict being passed in is modified in-place.

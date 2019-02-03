@@ -1369,7 +1369,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
 
-    def test_new_exp_issue_gets_created(self):
+    def test_new_playthrough_issue_gets_created(self):
         """Test that a new playthrough gets created and a new issue is created
         for it.
         """
