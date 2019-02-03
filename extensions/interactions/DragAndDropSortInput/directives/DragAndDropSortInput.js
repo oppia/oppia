@@ -37,6 +37,17 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
 
           var answers = [];
           $scope.list = [];
+          $scope.dataMaxDepth = 1;
+
+          $scope.allowMultipleItemsInSamePosition = (
+            $attrs.allowMultipleItemsInSamePositionWithValue === 'true');
+
+          if ($scope.allowMultipleItemsInSamePosition) {
+            $scope.dataMaxDepth = 2;
+          } else {
+            $scope.dataMaxDepth = 1;
+          }
+
           // Make list of dicts from the list of choices.
           for (var i = 0; i < $scope.choices.length; i++) {
             $scope.list.push({title: $scope.choices[i], items: []});

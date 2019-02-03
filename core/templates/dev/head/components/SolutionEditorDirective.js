@@ -32,9 +32,9 @@ oppia.directive('solutionEditor', [
       scope: {
         getInteractionId: '&interactionId',
         onSaveSolution: '=',
-        onSaveContentIdsToAudioTranslations: '=',
         correctAnswerEditorHtml: '=',
-        onOpenSolutionEditor: '&'
+        onOpenSolutionEditor: '&',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_editor_directive.html'),

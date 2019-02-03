@@ -23,13 +23,13 @@ oppia.directive('topicEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/topic_editor_navbar_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'AlertsService',
+        '$scope', '$rootScope', '$uibModal', '$window', 'AlertsService',
         'UndoRedoService', 'TopicEditorStateService', 'UrlService',
         'TopicRightsBackendApiService', 'TopicEditorRoutingService',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $rootScope, $uibModal, AlertsService,
+            $scope, $rootScope, $uibModal, $window, AlertsService,
             UndoRedoService, TopicEditorStateService, UrlService,
             TopicRightsBackendApiService, TopicEditorRoutingService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
@@ -54,13 +54,20 @@ oppia.directive('topicEditorNavbar', [
             if (!$scope.topicRights.canPublishTopic()) {
               return false;
             }
+            var redirectToDashboard = false;
             TopicRightsBackendApiService.publishTopic($scope.topicId).then(
               function() {
+                if (!$scope.topicRights.isPublished()) {
+                  redirectToDashboard = true;
+                }
                 $scope.topicRights.markTopicAsPublished();
                 TopicEditorStateService.setTopicRights($scope.topicRights);
               }
             ).then(function() {
               var successToast = 'Topic published.';
+              if (redirectToDashboard) {
+                $window.location = '/topics_and_skills_dashboard';
+              }
               AlertsService.addSuccessMessage(
                 successToast, 1000);
             });
