@@ -46,6 +46,9 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'public_topic_name')
         self.topic.uncategorized_skill_ids.append('skill_id_1')
+        self.topic.subtopics.append(topic_domain.Subtopic(
+            1, 'subtopic_name', ['skill_id_2']))
+        self.topic.next_subtopic_id = 2
         self.topic.canonical_story_ids.append(self.story_id)
         topic_services.save_new_topic(self.admin_id, self.topic)
 
@@ -93,8 +96,11 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     'description': self.story.description
                 }],
                 'additional_story_dicts': [],
-                'skill_ids': [u'skill_id_1'],
-                'subtopics': []
+                'skill_ids': [u'skill_id_1', u'skill_id_2'],
+                'subtopics': [{
+                    u'skill_ids': [u'skill_id_2'],
+                    u'id': 1,
+                    u'title': u'subtopic_name'}]
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 

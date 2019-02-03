@@ -661,9 +661,13 @@ class Topic(object):
         """Returns all subtopics in the topic.
 
         Returns:
-            list(Subtopic). The list of all subtopics present in topic.
+            list(Subtopic in dict format). The list of all subtopics present
+                in topic.
         """
-        return self.subtopics
+        subtopics = []
+        for _, subtopic in enumerate(self.subtopics):
+            subtopics.append(subtopic.to_dict())
+        return subtopics
 
     def get_subtopic_index(self, subtopic_id):
         """Gets the index of the subtopic with the given id in the subtopics
