@@ -74,7 +74,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = topic_domain.Subtopic(1, 'Title', ['skill_id_1'])
         subtopic = self.topic.get_all_subtopics()
         self.assertEqual(
-            [subtopic.id, subtopic.title, subtopic.skill_ids], [1, 'Title', ['skill_id_1']])
+            [subtopic.id, subtopic.title,
+             subtopic.skill_ids], [1, 'Title', ['skill_id_1']])
 
     def test_delete_story(self):
         self.topic.canonical_story_ids = [
