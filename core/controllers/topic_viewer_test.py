@@ -45,7 +45,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'public_topic_name')
-        self.topic.uncategorized_skill_ids.append('skill_id_1');
+        self.topic.uncategorized_skill_ids.append('skill_id_1')
         self.topic.canonical_story_ids.append(self.story_id)
         topic_services.save_new_topic(self.admin_id, self.topic)
 
