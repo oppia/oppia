@@ -671,7 +671,7 @@ class FetchPlaythroughHandler(EditorHandler):
 class ResolveIssueHandler(EditorHandler):
     """Handler used for resolving an issue. Currently, when an issue is
     resolved, the issue is removed from the unresolved issues list in the
-    ExplorationIssuesModel instance, and all corresponding playthrough
+    PlaythroughIssuesModel instance, and all corresponding playthrough
     instances are deleted.
     """
 
@@ -680,7 +680,7 @@ class ResolveIssueHandler(EditorHandler):
         """Handles POST requests."""
         exp_issue_dict = self.payload.get('exp_issue_dict')
         try:
-            unused_exp_issue = stats_domain.ExplorationIssue.from_backend_dict(
+            unused_exp_issue = stats_domain.PlaythroughIssue.from_backend_dict(
                 exp_issue_dict)
         except utils.ValidationError as e:
             raise self.PageNotFoundException(e)

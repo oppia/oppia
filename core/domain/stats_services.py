@@ -58,7 +58,7 @@ def _migrate_to_latest_issue_schema(exp_issue_dict):
             stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
     while issue_schema_version < stats_models.CURRENT_ISSUE_SCHEMA_VERSION:
-        stats_domain.ExplorationIssue.update_exp_issue_from_model(
+        stats_domain.PlaythroughIssue.update_exp_issue_from_model(
             exp_issue_dict)
         issue_schema_version += 1
 
@@ -235,13 +235,13 @@ def handle_stats_creation_for_new_exp_version(
 
 
 def create_exp_issues_for_new_exploration(exp_id, exp_version):
-    """Creates the ExplorationIssuesModel instance for the exploration.
+    """Creates the PlaythroughIssuesModel instance for the exploration.
 
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
     """
-    stats_models.ExplorationIssuesModel.create(exp_id, exp_version, [])
+    stats_models.PlaythroughIssuesModel.create(exp_id, exp_version, [])
 
 
 def _handle_exp_issues_after_state_deletion(
@@ -251,12 +251,12 @@ def _handle_exp_issues_after_state_deletion(
 
     Args:
         state_name: str. The issue's concerened state name.
-        exp_issue: ExplorationIssue. The exploration issue domain object.
+        exp_issue: PlaythroughIssue. The exploration issue domain object.
         deleted_state_names: list(str). The list of deleted state names in this
             commit.
 
     Returns:
-        ExplorationIssue. The exploration issue domain object.
+        PlaythroughIssue. The exploration issue domain object.
     """
     if state_name in deleted_state_names:
         exp_issue.is_valid = False
@@ -271,7 +271,7 @@ def _handle_exp_issues_after_state_rename(
 
     Args:
         state_name: str. The issue's concerened state name.
-        exp_issue: ExplorationIssue. The exploration issue domain object.
+        exp_issue: PlaythroughIssue. The exploration issue domain object.
         old_to_new_state_names: dict. The dict mapping state names to their
             renamed versions. This mapping contains state names only if it is
             actually renamed.
@@ -279,7 +279,7 @@ def _handle_exp_issues_after_state_rename(
             their new ones
 
     Returns:
-        ExplorationIssue. The exploration issue domain object.
+        PlaythroughIssue. The exploration issue domain object.
     """
     if state_name not in old_to_new_state_names:
         return exp_issue, playthrough_ids_by_state_name
@@ -306,7 +306,7 @@ def _handle_exp_issues_after_state_rename(
 
 def update_exp_issues_for_new_exp_version(
         exploration, exp_versions_diff, revert_to_version):
-    """Retrieves the ExplorationIssuesModel for the old exp_version and makes
+    """Retrieves the PlaythroughIssuesModel for the old exp_version and makes
     any required changes to the structure of the model.
 
     Args:
@@ -410,18 +410,18 @@ def update_exp_issues_for_new_exp_version(
 
 
 def get_exp_issues(exp_id, exp_version):
-    """Retrieves the ExplorationIssues domain object.
+    """Retrieves the PlaythroughIssues domain object.
 
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
 
     Returns:
-        ExplorationIssues|None: The domain object for exploration issues or
+        PlaythroughIssues|None: The domain object for exploration issues or
             None if the exp_id is invalid.
     """
     exp_issues = None
-    exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+    exp_issues_model = stats_models.PlaythroughIssuesModel.get_model(
         exp_id, exp_version)
     if exp_issues_model is not None:
         exp_issues = get_exp_issues_from_model(exp_issues_model)
@@ -531,22 +531,22 @@ def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
 
 
 def get_exp_issues_from_model(exp_issues_model):
-    """Gets an ExplorationIssues domain object from an ExplorationIssuesModel
+    """Gets an PlaythroughIssues domain object from an PlaythroughIssuesModel
     instance.
 
     Args:
-        exp_issues_model: ExplorationIssuesModel. Exploration issues model in
+        exp_issues_model: PlaythroughIssuesModel. Exploration issues model in
             datastore.
 
     Returns:
-        ExplorationIssues. The domain object for exploration issues.
+        PlaythroughIssues. The domain object for exploration issues.
     """
     unresolved_issues = []
     for unresolved_issue_dict in exp_issues_model.unresolved_issues:
         _migrate_to_latest_issue_schema(copy.deepcopy(unresolved_issue_dict))
         unresolved_issues.append(
-            stats_domain.ExplorationIssue.from_dict(unresolved_issue_dict))
-    return stats_domain.ExplorationIssues(
+            stats_domain.PlaythroughIssue.from_dict(unresolved_issue_dict))
+    return stats_domain.PlaythroughIssues(
         exp_issues_model.exp_id, exp_issues_model.exp_version,
         unresolved_issues)
 
@@ -671,30 +671,30 @@ def save_stats_model_transactional(exploration_stats):
 
 
 def create_exp_issues_model(exp_issues):
-    """Creates a new ExplorationIssuesModel in the datastore.
+    """Creates a new PlaythroughIssuesModel in the datastore.
 
     Args:
-        exp_issues: ExplorationIssues. The exploration issues domain object.
+        exp_issues: PlaythroughIssues. The exploration issues domain object.
     """
     unresolved_issues_dicts = [
         unresolved_issue.to_dict()
         for unresolved_issue in exp_issues.unresolved_issues]
-    stats_models.ExplorationIssuesModel.create(
+    stats_models.PlaythroughIssuesModel.create(
         exp_issues.exp_id, exp_issues.exp_version, unresolved_issues_dicts)
 
 
 def _save_exp_issues_model(exp_issues):
-    """Updates the ExplorationIssuesModel datastore instance with the passed
-    ExplorationIssues domain object.
+    """Updates the PlaythroughIssuesModel datastore instance with the passed
+    PlaythroughIssues domain object.
 
     Args:
-        exp_issues: ExplorationIssues. The exploration issues domain
+        exp_issues: PlaythroughIssues. The exploration issues domain
             object.
     """
     unresolved_issues_dicts = [
         unresolved_issue.to_dict()
         for unresolved_issue in exp_issues.unresolved_issues]
-    exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+    exp_issues_model = stats_models.PlaythroughIssuesModel.get_model(
         exp_issues.exp_id, exp_issues.exp_version)
     exp_issues_model.exp_version = exp_issues.exp_version
     exp_issues_model.unresolved_issues = unresolved_issues_dicts
@@ -703,11 +703,11 @@ def _save_exp_issues_model(exp_issues):
 
 
 def save_exp_issues_model_transactional(exp_issues):
-    """Updates the ExplorationIssuesModel datastore instance with the passed
-    ExplorationIssues domain object in a transaction.
+    """Updates the PlaythroughIssuesModel datastore instance with the passed
+    PlaythroughIssues domain object in a transaction.
 
     Args:
-        exp_issues: ExplorationIssues. The exploration issues domain
+        exp_issues: PlaythroughIssues. The exploration issues domain
             object.
     """
     transaction_services.run_in_transaction(

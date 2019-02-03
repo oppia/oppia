@@ -48,7 +48,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.stats_model_id = (
             stats_models.ExplorationStatsModel.create(
                 'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}))
-        stats_models.ExplorationIssuesModel.create(
+        stats_models.PlaythroughIssuesModel.create(
             self.exp_id, self.exp_version, [])
         self.playthrough_id = stats_models.PlaythroughModel.create(
             'exp_id1', 1, 'EarlyQuit', {}, [])
@@ -204,7 +204,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 },
                 'schema_version': 1
             }])
-        exp_issue1 = stats_domain.ExplorationIssue.from_dict({
+        exp_issue1 = stats_domain.PlaythroughIssue.from_dict({
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
@@ -588,7 +588,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 },
                 'schema_version': 1
             }])
-        exp_issue1 = stats_domain.ExplorationIssue.from_dict({
+        exp_issue1 = stats_domain.PlaythroughIssue.from_dict({
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
@@ -602,7 +602,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
-        exp_issue2 = stats_domain.ExplorationIssue.from_dict({
+        exp_issue2 = stats_domain.PlaythroughIssue.from_dict({
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
@@ -755,9 +755,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
     def test_create_exp_issues_model(self):
         """Test the create_exp_issues_model method."""
-        exp_issues = stats_domain.ExplorationIssues(self.exp_id, 1, [])
+        exp_issues = stats_domain.PlaythroughIssues(self.exp_id, 1, [])
         stats_services.create_exp_issues_model(exp_issues)
-        exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
+        exp_issues_instance = stats_models.PlaythroughIssuesModel.get_model(
             self.exp_id, 1)
         self.assertEqual(exp_issues_instance.exp_id, self.exp_id)
         self.assertEqual(exp_issues_instance.exp_version, 1)
@@ -765,7 +765,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
     def test_get_exp_issues_from_model(self):
         """Test the get_exp_issues_from_model method."""
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
         exp_issues = stats_services.get_exp_issues_from_model(model)
         self.assertEqual(exp_issues.exp_id, self.exp_id)
         self.assertEqual(exp_issues.exp_version, 1)
@@ -878,10 +878,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
     def test_save_exp_issues_model_transactional(self):
         """Test the save_exp_issues_model_transactional method."""
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
         exp_issues = stats_services.get_exp_issues_from_model(model)
         exp_issues.unresolved_issues.append(
-            stats_domain.ExplorationIssue.from_dict({
+            stats_domain.PlaythroughIssue.from_dict({
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
                     'state_name': {
@@ -897,7 +897,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }))
         stats_services.save_exp_issues_model_transactional(exp_issues)
 
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(
             model.unresolved_issues[0],
             exp_issues.unresolved_issues[0].to_dict())

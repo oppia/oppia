@@ -406,18 +406,18 @@ class StateStats(object):
                     '%s cannot have negative values' % (stat_property))
 
 
-class ExplorationIssues(object):
+class PlaythroughIssues(object):
     """Domain object representing the exploration to issues mapping for an
     exploration.
     """
 
     def __init__(self, exp_id, exp_version, unresolved_issues):
-        """Constructs an ExplorationIssues domain object.
+        """Constructs an PlaythroughIssues domain object.
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
-            unresolved_issues: list(ExplorationIssue). List of exploration
+            unresolved_issues: list(PlaythroughIssue). List of exploration
                 issues.
         """
         self.exp_id = exp_id
@@ -426,22 +426,22 @@ class ExplorationIssues(object):
 
     @classmethod
     def create_default(cls, exp_id, exp_version):
-        """Creates a default ExplorationIssues domain object.
+        """Creates a default PlaythroughIssues domain object.
 
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
 
         Returns:
-            ExplorationIssues. The exploration issues domain object.
+            PlaythroughIssues. The exploration issues domain object.
         """
         return cls(exp_id, exp_version, [])
 
     def to_dict(self):
-        """Returns a dict representation of the ExplorationIssues domain object.
+        """Returns a dict representation of the PlaythroughIssues domain object.
 
         Returns:
-            dict. A dict mapping of all fields of ExplorationIssues object.
+            dict. A dict mapping of all fields of PlaythroughIssues object.
         """
         unresolved_issue_dicts = [
             unresolved_issue.to_dict()
@@ -454,25 +454,25 @@ class ExplorationIssues(object):
 
     @classmethod
     def from_dict(cls, exp_issues_dict):
-        """Returns an ExplorationIssues object from a dict.
+        """Returns an PlaythroughIssues object from a dict.
 
         Args:
             exp_issues_dict: dict. A dict mapping of all fields of
-                ExplorationIssues object.
+                PlaythroughIssues object.
 
         Returns:
-            ExplorationIssues. The corresponding ExplorationIssues domain
+            PlaythroughIssues. The corresponding PlaythroughIssues domain
                 object.
         """
         unresolved_issues = [
-            ExplorationIssue.from_dict(unresolved_issue_dict)
+            PlaythroughIssue.from_dict(unresolved_issue_dict)
             for unresolved_issue_dict in exp_issues_dict['unresolved_issues']]
         return cls(
             exp_issues_dict['exp_id'], exp_issues_dict['exp_version'],
             unresolved_issues)
 
     def validate(self):
-        """Validates the ExplorationIssues domain object."""
+        """Validates the PlaythroughIssues domain object."""
         if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % type(
@@ -628,13 +628,13 @@ class Playthrough(object):
             action.validate()
 
 
-class ExplorationIssue(object):
+class PlaythroughIssue(object):
     """Domain object representing an exploration issue."""
 
     def __init__(
             self, issue_type, issue_customization_args, playthrough_ids,
             schema_version, is_valid):
-        """Constructs an ExplorationIssue domain object.
+        """Constructs an PlaythroughIssue domain object.
 
         Args:
             issue_type: str. Type of the issue.
@@ -654,10 +654,10 @@ class ExplorationIssue(object):
         self.is_valid = is_valid
 
     def to_dict(self):
-        """Returns a dict representation of the ExplorationIssue domain object.
+        """Returns a dict representation of the PlaythroughIssue domain object.
 
         Returns:
-            dict. A dict mapping of all fields of ExplorationIssue object.
+            dict. A dict mapping of all fields of PlaythroughIssue object.
         """
         return {
             'issue_type': self.issue_type,
@@ -673,14 +673,14 @@ class ExplorationIssue(object):
 
     @classmethod
     def from_dict(cls, issue_dict):
-        """Returns an ExplorationIssue object from a dict.
+        """Returns an PlaythroughIssue object from a dict.
 
         Args:
-            issue_dict: dict. A dict mapping of all fields of ExplorationIssue
+            issue_dict: dict. A dict mapping of all fields of PlaythroughIssue
                 object.
 
         Returns:
-            ExplorationIssue. The corresponding ExplorationIssue domain object.
+            PlaythroughIssue. The corresponding PlaythroughIssue domain object.
         """
         return cls(
             issue_dict['issue_type'],
@@ -698,7 +698,7 @@ class ExplorationIssue(object):
             exp_issue_dict: dict. Dict representing an exploration issue.
 
         Returns:
-            ExplorationIssue. The exploration issue domain object.
+            PlaythroughIssue. The exploration issue domain object.
         """
         exp_issue_properties = [
             'issue_type', 'schema_version', 'issue_customization_args',
@@ -724,7 +724,7 @@ class ExplorationIssue(object):
         Note that the issue_dict being passed in is modified in-place.
 
         Args:
-            issue_dict: dict. Dict representing the ExplorationIssue object.
+            issue_dict: dict. Dict representing the PlaythroughIssue object.
         """
         current_issue_schema_version = issue_dict['schema_version']
         issue_dict['schema_version'] += 1
@@ -742,7 +742,7 @@ class ExplorationIssue(object):
         raise NotImplementedError
 
     def validate(self):
-        """Validates the ExplorationIssue domain object."""
+        """Validates the PlaythroughIssue domain object."""
         if not isinstance(self.issue_type, basestring):
             raise utils.ValidationError(
                 'Expected issue_type to be a string, received %s' % (

@@ -978,7 +978,7 @@ class ExplorationStatsModel(base_models.BaseModel):
         cls.put_multi(exploration_stats_models)
 
 
-class ExplorationIssuesModel(base_models.BaseModel):
+class PlaythroughIssuesModel(base_models.BaseModel):
     """Model for storing the list of playthroughs for an exploration grouped by
     issues.
     """
@@ -1001,13 +1001,13 @@ class ExplorationIssuesModel(base_models.BaseModel):
             exp_version: int. Version of the exploration.
 
         Returns:
-            str. ID of the new ExplorationIssuesModel instance.
+            str. ID of the new PlaythroughIssuesModel instance.
         """
         return '%s.%s' % (exp_id, exp_version)
 
     @classmethod
     def get_model(cls, exp_id, exp_version):
-        """Retrieves ExplorationIssuesModel given exploration ID and version.
+        """Retrieves PlaythroughIssuesModel given exploration ID and version.
 
         Args:
             exp_id: str. ID of the exploration.
@@ -1023,7 +1023,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, exp_id, exp_version, unresolved_issues):
-        """Creates an ExplorationIssuesModel instance and writes it to the
+        """Creates an PlaythroughIssuesModel instance and writes it to the
         datastore.
 
         Args:
@@ -1034,7 +1034,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
                 represents an issue along with the associated playthroughs.
 
         Returns:
-            str. ID of the new ExplorationIssuesModel instance.
+            str. ID of the new PlaythroughIssuesModel instance.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
         exp_issues_instance = cls(

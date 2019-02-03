@@ -100,7 +100,7 @@ class DeleteIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
         Returns:
             str. The ID of the new playthrough issue model.
         """
-        return stats_models.ExplorationIssuesModel.create(
+        return stats_models.PlaythroughIssuesModel.create(
             self.exp.id, self.exp.version, unresolved_issues=[
                 {
                     'issue_type': 'EarlyQuit',
@@ -129,7 +129,7 @@ class DeleteIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
         # Getting these models should not raise.
         for playthrough_id in playthrough_ids:
             stats_models.PlaythroughModel.get(playthrough_id)
-        stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
+        stats_models.PlaythroughIssuesModel.get(playthrough_issues_id)
 
     def test_playthroughs_removed_from_non_whitelisted_explorations(self):
         self.set_config_property(
@@ -148,7 +148,7 @@ class DeleteIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
             with self.assertRaisesRegexp(Exception, 'not found'):
                 stats_models.PlaythroughModel.get(playthrough_id)
         with self.assertRaisesRegexp(Exception, 'not found'):
-            stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
+            stats_models.PlaythroughIssuesModel.get(playthrough_issues_id)
 
     def test_old_playthroughs_removed(self):
         self.set_config_property(
@@ -168,7 +168,7 @@ class DeleteIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
         stats_models.PlaythroughModel.get(new_playthrough_id)
         # The list of supporting playthroughs should only have the new one.
         playthrough_issues_model = (
-            stats_models.ExplorationIssuesModel.get(playthrough_issues_id))
+            stats_models.PlaythroughIssuesModel.get(playthrough_issues_id))
         self.assertEqual(
             playthrough_issues_model.unresolved_issues[0]['playthrough_ids'],
             [new_playthrough_id])
@@ -190,7 +190,7 @@ class DeleteIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
             with self.assertRaisesRegexp(Exception, 'not found'):
                 stats_models.PlaythroughModel.get(old_playthrough_id)
         with self.assertRaisesRegexp(Exception, 'not found'):
-            stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
+            stats_models.PlaythroughIssuesModel.get(playthrough_issues_id)
 
     def test_issues_with_mixed_playthrough_ages(self):
         self.set_config_property(
@@ -223,7 +223,7 @@ class DeleteIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
             stats_models.PlaythroughModel.get(playthrough_id)
         # Only two issues remain, because one of them only had old playthroughs.
         playthrough_issues_model = (
-            stats_models.ExplorationIssuesModel.get(playthrough_issues_id))
+            stats_models.PlaythroughIssuesModel.get(playthrough_issues_id))
         self.assertEqual(len(playthrough_issues_model.unresolved_issues), 2)
         # The first element should be the issue where all playthroughs are new.
         self.assertEqual(
@@ -299,14 +299,14 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         self.assertIn('could not be validated', output[0])
 
 
-class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
+class PlaythroughIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = (
-        stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob)
+        stats_jobs_one_off.PlaythroughIssuesModelCreatorOneOffJob)
     EXP_ID1 = 'EXP_ID1'
     EXP_ID2 = 'EXP_ID2'
 
     def setUp(self):
-        super(ExplorationIssuesModelCreatorOneOffJobTests, self).setUp()
+        super(PlaythroughIssuesModelCreatorOneOffJobTests, self).setUp()
         self.exp1 = self.save_new_valid_exploration(self.EXP_ID1, 'owner')
         self.exp1.add_states(['New state'])
         change_list = [
@@ -320,28 +320,28 @@ class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
     def test_default_job_execution(self):
         self.run_one_off_job()
 
-        # ExplorationIssuesModel will be created for versions 1 and 2.
-        exp_issues1_v1 = stats_models.ExplorationIssuesModel.get_model(
+        # PlaythroughIssuesModel will be created for versions 1 and 2.
+        exp_issues1_v1 = stats_models.PlaythroughIssuesModel.get_model(
             self.EXP_ID1, self.exp1.version - 1)
         self.assertEqual(exp_issues1_v1.exp_id, self.EXP_ID1)
         self.assertEqual(exp_issues1_v1.exp_version, self.exp1.version - 1)
         self.assertEqual(exp_issues1_v1.unresolved_issues, [])
 
-        exp_issues1_v2 = stats_models.ExplorationIssuesModel.get_model(
+        exp_issues1_v2 = stats_models.PlaythroughIssuesModel.get_model(
             self.EXP_ID1, self.exp1.version)
         self.assertEqual(exp_issues1_v2.exp_id, self.EXP_ID1)
         self.assertEqual(exp_issues1_v2.exp_version, self.exp1.version)
         self.assertEqual(exp_issues1_v2.unresolved_issues, [])
 
-        # ExplorationIssuesModel will be created only for version 1.
-        exp_issues2 = stats_models.ExplorationIssuesModel.get_model(
+        # PlaythroughIssuesModel will be created only for version 1.
+        exp_issues2 = stats_models.PlaythroughIssuesModel.get_model(
             self.EXP_ID2, self.exp2.version)
         self.assertEqual(exp_issues2.exp_id, self.EXP_ID2)
         self.assertEqual(exp_issues2.exp_version, self.exp2.version)
         self.assertEqual(exp_issues2.unresolved_issues, [])
 
     def test_with_existing_exp_issues_instance(self):
-        stats_models.ExplorationIssuesModel.create(
+        stats_models.PlaythroughIssuesModel.create(
             self.EXP_ID1, self.exp1.version, unresolved_issues=[{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
@@ -358,13 +358,13 @@ class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
 
         self.run_one_off_job()
 
-        exp_issues1 = stats_models.ExplorationIssuesModel.get_model(
+        exp_issues1 = stats_models.PlaythroughIssuesModel.get_model(
             self.EXP_ID1, self.exp1.version)
         self.assertEqual(exp_issues1.exp_id, self.EXP_ID1)
         self.assertEqual(exp_issues1.exp_version, self.exp1.version)
         self.assertEqual(exp_issues1.unresolved_issues, [])
 
-        exp_issues2 = stats_models.ExplorationIssuesModel.get_model(
+        exp_issues2 = stats_models.PlaythroughIssuesModel.get_model(
             self.EXP_ID2, self.exp2.version)
         self.assertEqual(exp_issues2.exp_id, self.EXP_ID2)
         self.assertEqual(exp_issues2.exp_version, self.exp2.version)

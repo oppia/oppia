@@ -1522,7 +1522,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
                 },
                 'schema_version': 1
             }])
-        stats_models.ExplorationIssuesModel.create(
+        stats_models.PlaythroughIssuesModel.create(
             self.EXP_ID, 1,
             [{
                 'issue_type': 'EarlyQuit',
@@ -1565,7 +1565,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
 
     def test_invalid_issues_are_not_retrieved(self):
         """Test that invalid issues are not retrieved."""
-        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+        exp_issues_model = stats_models.PlaythroughIssuesModel.get_model(
             self.EXP_ID, 1)
         exp_issues_model.unresolved_issues[1]['is_valid'] = False
         exp_issues_model.put()
@@ -1664,7 +1664,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
                 'schema_version': 1
             }])
 
-        stats_models.ExplorationIssuesModel.create(
+        stats_models.PlaythroughIssuesModel.create(
             self.EXP_ID, 1,
             [{
                 'issue_type': 'EarlyQuit',

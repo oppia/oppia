@@ -346,7 +346,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         """Method that initializes member variables for the handler.
 
         Attributes:
-            current_exp_issues: ExplorationIssues. The exploration issues domain
+            current_exp_issues: PlaythroughIssues. The exploration issues domain
                 object.
             current_issue_schema_version: int. The issue schema version.
             current_playthrough_id: str|None. The Playthrough ID or None.
@@ -399,7 +399,7 @@ class StorePlaythroughHandler(base.BaseHandler):
                 issue.playthrough_ids.append(self.current_playthrough_id)
                 did_move_playthrough_to_new_issue = True
         else:
-            issue = stats_domain.ExplorationIssue(
+            issue = stats_domain.PlaythroughIssue(
                 playthrough.issue_type,
                 playthrough.issue_customization_args,
                 [self.current_playthrough_id],
@@ -448,7 +448,7 @@ class StorePlaythroughHandler(base.BaseHandler):
                 playthrough.exp_id, playthrough.exp_version,
                 playthrough.issue_type,
                 playthrough.issue_customization_args, actions)
-            issue = stats_domain.ExplorationIssue(
+            issue = stats_domain.PlaythroughIssue(
                 playthrough.issue_type,
                 playthrough.issue_customization_args,
                 [playthrough_id], self.current_issue_schema_version,
@@ -486,7 +486,7 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         exp_version = playthrough_data['exp_version']
 
-        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+        exp_issues_model = stats_models.PlaythroughIssuesModel.get_model(
             exploration_id, exp_version)
         self.current_exp_issues = stats_services.get_exp_issues_from_model(
             exp_issues_model)
