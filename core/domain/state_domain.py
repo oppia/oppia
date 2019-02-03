@@ -865,14 +865,22 @@ class ContentTranslations(object):
         """Returns a set of language available in the ContentTranslations.
 
         Returns:
-            set(str.). A set of languages available in the ContentTranslations.
+            set(str). A set of languages available in the ContentTranslations.
         """
-        languages_list = set([])
+        language_codes_set = set([])
         for language_code_to_written_translation in (
                 self.content_translations.itervalues()):
             for language_code in language_code_to_written_translation:
-                languages_list.add(language_code)
-        return languages_list
+                language_codes_set.add(language_code)
+        return language_codes_set
+
+    def get_all_content_ids_for_translation(self):
+        """Returns a list of content_id available for text translation.
+
+        Returns:
+            list(str). A list of content id available for text translation.
+        """
+        return self.content_translations.keys()
 
     def add_content_id_for_translation(self, content_id):
         """Adds a content id as a key for the translation into the
@@ -1333,11 +1341,18 @@ class State(object):
         for content_id in content_ids_to_delete:
             if not content_id in self.content_ids_to_audio_translations:
                 raise Exception(
-                    'The content_id %s does not exist.' % content_id)
+                    'The content_id %s does not exist in '
+                    'content_ids_to_audio_translations.' % content_id)
+            if not content_id in (
+                    self.content_translations.get_all_content_ids_for_translation()): # pylint: disable=line-too-long
+                raise Exception(
+                    'The content_id %s does not exist in content__translations.'
+                    % content_id)
             else:
                 self.content_ids_to_audio_translations.pop(content_id)
                 self.content_translations.delete_content_id_for_translation(
                     content_id)
+
         for content_id in content_ids_to_add:
             if content_id in self.content_ids_to_audio_translations:
                 raise Exception(
