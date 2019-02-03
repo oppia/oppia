@@ -85,7 +85,6 @@ class DeleteIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         whitelisted_exploration_ids = (
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         return (
-            playthrough_model is None or
             playthrough_model.exp_id not in whitelisted_exploration_ids or
             playthrough_model.created_on < PLAYTHROUGH_PROJECT_RELEASE_DATETIME)
 
@@ -102,21 +101,23 @@ class DeleteIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             tuple(int, int). A 2-tuple with the structure:
                 (playthroughs_deleted, playthroughs_remaining).
         """
-        legal_playthroughs = []
-        illegal_playthroughs = []
+        playthroughs_to_remain = []
+        playthroughs_to_delete = []
 
         ids = playthrough_issue_backend_dict['playthrough_ids']
         for playthrough in stats_models.PlaythroughModel.get_multi(ids):
+            if playthrough is None or playthrough.deleted:
+                continue
             target_playthrough_list = (
-                illegal_playthroughs if cls.is_illegal(playthrough) else
-                legal_playthroughs)
+                playthroughs_to_delete if cls.is_illegal(playthrough) else
+                playthroughs_to_remain)
             target_playthrough_list.append(playthrough)
 
-        stats_models.PlaythroughModel.delete_multi(illegal_playthroughs)
+        stats_models.PlaythroughModel.delete_multi(playthroughs_to_delete)
         playthrough_issue_backend_dict['playthrough_ids'] = [
-            playthrough.id for playthrough in legal_playthroughs]
+            playthrough.id for playthrough in playthroughs_to_remain]
 
-        return (len(illegal_playthroughs), len(legal_playthroughs))
+        return (len(playthroughs_to_delete), len(playthroughs_to_remain))
 
     @staticmethod
     def map(playthrough_issues_model):
@@ -130,9 +131,11 @@ class DeleteIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             tuple(str, int). Returns the exploration id the given model is
             associated to, and the number of playthroughs deleted from it.
         """
-        total_playthroughs_deleted = 0
+        if playthrough_issues_model.deleted:
+            return
 
         remaining_issues = []
+        total_playthroughs_deleted = 0
         for issue in playthrough_issues_model.unresolved_issues:
             playthroughs_deleted, playthroughs_remaining = (
                 DeleteIllegalPlaythroughsOneOffJob.delete_illegal_playthroughs(
