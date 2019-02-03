@@ -29,6 +29,9 @@ handlers:
   static_files: assets/sitemap.xml
   upload: assets/sitemap.xml
   secure: always
+- url: /mapreduce/pipeline/images
+  static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
+  secure: always
 - url: /build
   static_dir: build
   secure: always
@@ -37,15 +40,13 @@ handlers:
   static_dir: third_party/static
   secure: always
   expiration: "90d"
-- url: /mapreduce/pipeline/images
-  static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
-  secure: always
 
 # DEVELOPMENT STATIC
 - url: /assets
   static_dir: assets
   secure: always
   application_readable: true
+  expiration: "0"
 # Serve js scripts and css files under core/templates/dev/head.
 # This regex allows us to recursively serve js scripts.
 # "\1" inserts text captured by the capture group in the URL pattern.
@@ -53,21 +54,26 @@ handlers:
   static_files: core/templates/dev/head/\1
   upload: core/templates/dev/head/(.*\.(js|css))$
   secure: always
+  expiration: "0"
 - url: /templates/dev/head/(.*directive\.html)$
   static_files: core/templates/dev/head/\1
   upload: core/templates/dev/head/(.*directive\.html)$
   secure: always
+  expiration: "0"
 - url: /third_party/generated
   static_dir: third_party/generated
   secure: always
+  expiration: "0"
 - url: /extensions/interactions/(.*)/static/(.*)
   static_files: extensions/interactions/\1/static/\2
   upload: extensions/interactions/(.*)/static/(.*)
   secure: always
+  expiration: "0"
 - url: /extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
   static_files: extensions/\1/\2/directives/\3
   upload: extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
   secure: always
+  expiration: "0"
 # Serve js scripts for gadgets, interactions, rich_text_components, custom ckeditor plugins
 # and objects under extensions in dev mode. This regex allows us to recursively serve js
 # scripts under the three specified directories. "\1" and "\2" insert capture
@@ -76,14 +82,17 @@ handlers:
   static_files: extensions/\1/\2
   upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js|png))$
   secure: always
+  expiration: "0"
 - url: /extensions/visualizations/(.*\.html)
   static_files: extensions/visualizations/\1
   upload: extensions/visualizations/(.*\.html)
   secure: always
+  expiration: "0"
 - url: /extensions/objects/templates/(.*\.html)
   static_files: extensions/objects/templates/\1
   upload: extensions/objects/templates/(.*\.html)
   secure: always
+  expiration: "0"
 
 # DYNAMIC
 - url: /mapreduce(/.*)?
@@ -123,7 +132,6 @@ libraries:
 
 env_variables:
   PYTHONHTTPSVERIFY: 1
-
 
 skip_files:
 # .pyc and .pyo files
