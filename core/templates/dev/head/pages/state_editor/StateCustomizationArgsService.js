@@ -13,9 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the current state customization args for the
- * interaction. This is a dict mapping customization arg names to dicts of the
- * form {value: customization_arg_value}.
+ * @fileoverview A data service that stores the current state customization
+ * args for theinteraction. This is a dict mapping customization arg names
+ * to dicts of the form {value: customization_arg_value}.
  */
 
 // TODO(sll): Add validation.

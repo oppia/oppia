@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the current list of state parameter changes.
+ * @fileoverview A data service that stores the current list of
+ * state parameter changes.
  */
 
 // TODO(sll): Add validation.
