@@ -53,6 +53,50 @@ oppia.factory('QuestionUpdateService', [
       return _getParameterFromChangeDict(changeDict, 'new_value');
     };
 
+    var _getAllContentIds = function(state) {
+      allContentIdsSet = new Set();
+      allContentIdsSet.add(state.content.getContentId());
+      state.interaction.answerGroups.forEach(function(answerGroup) {
+        allContentIdsSet.add(answerGroup.outcome.feedback.getContentId());
+      });
+      if (state.interaction.defaultOutcome) {
+        allContentIdsSet.add(
+          state.interaction.defaultOutcome.feedback.getContentId());
+      }
+      state.interaction.hints.forEach(function(hint) {
+        allContentIdsSet.add(hint.hintContent.getContentId());
+      });
+      if (state.interaction.solution) {
+        allContentIdsSet.add(
+          state.interaction.solution.explanation.getContentId());
+      }
+
+      return allContentIdsSet;
+    };
+
+    var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
+      diffList = Array.from(setA).filter(function(element) {
+        return !setB.has(element);
+      });
+      return diffList;
+    };
+
+    var _updateContentIdsToAudioTranslations = function(newState, oldState) {
+      newContentIds = _getAllContentIds(newState);
+      oldContentIds = _getAllContentIds(oldState);
+      var contentIdsToDelete = _getElementsInFirstSetButNotInSecond(
+        oldContentIds, newContentIds);
+      var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
+        newContentIds, oldContentIds);
+      contentIdsToDelete.forEach(function(contentId) {
+        newState.contentIdsToAudioTranslations.deleteContentId(
+          contentId);
+      });
+      contentIdsToAdd.forEach(function(contentId) {
+        newState.contentIdsToAudioTranslations.addContentId(contentId);
+      });
+    };
+
     return {
       setQuestionLanguageCode: function(question, newLanguageCode) {
         var oldLanguageCode = angular.copy(question.getLanguageCode());
@@ -83,6 +127,7 @@ oppia.factory('QuestionUpdateService', [
         // for creating the change to send to the backend.
         updateFunction();
         var newStateData = question.getStateData();
+        _updateContentIdsToAudioTranslations(newStateData, oldStateData);
         _applyPropertyChange(
           question, QUESTION_PROPERTY_QUESTION_STATE_DATA,
           newStateData.toBackendDict(),

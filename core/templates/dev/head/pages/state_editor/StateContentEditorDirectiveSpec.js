@@ -196,11 +196,13 @@ describe('State content editor directive', function() {
 
     outerScope = $rootScope.$new();
     outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
+    outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired = (
+      jasmine.createSpy(''));
     var elem = angular.element(
       '<state-content-editor ' +
       'on-save-state-content="saveStateContent" ' +
-      'on-save-content-ids-to-audio-translations=' +
-      '"saveContentIdsToAudioTranslations">' +
+      'show-mark-all-audio-as-needing-update-modal-if-required=' +
+      '"showMarkAllAudioAsNeedingUpdateModalIfRequired">' +
       '</state-content-editor>');
     var compiledElem = $compile(elem)(outerScope);
     outerScope.$digest();
@@ -237,6 +239,9 @@ describe('State content editor directive', function() {
       'content', 'And now for something completely different.');
     ctrlScope.onSaveContentButtonClicked();
     expect(outerScope.saveStateContent).toHaveBeenCalled();
+    expect(
+      outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired)
+      .toHaveBeenCalled();
   });
 
   it('should not save changes to content when edit is cancelled', function() {

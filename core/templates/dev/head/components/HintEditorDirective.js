@@ -22,17 +22,15 @@ oppia.directive('hintEditor', [
       restrict: 'E',
       scope: {
         hint: '=',
-        onSaveContentIdsToAudioTranslations: '=',
         getIndexPlusOne: '&indexPlusOne',
-        getOnSaveFn: '&onSave'
+        getOnSaveFn: '&onSave',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/hint_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'EditabilityService', 'StateHintsService',
-        'StateContentIdsToAudioTranslationsService',
-        function($scope, $uibModal, EditabilityService, StateHintsService,
-            StateContentIdsToAudioTranslationsService) {
+        '$scope', 'EditabilityService', 'StateHintsService',
+        function($scope, EditabilityService, StateHintsService) {
           $scope.isEditable = EditabilityService.isEditable();
           $scope.StateHintsService = StateHintsService;
           $scope.editHintForm = {};
@@ -57,12 +55,11 @@ oppia.directive('hintEditor', [
             var contentHasChanged = (
               $scope.hintMemento.hintContent.getHtml() !==
               $scope.hint.hintContent.getHtml());
-            var hintContentId = $scope.hint.hintContent.getContentId();
             $scope.hintMemento = null;
-            if (StateContentIdsToAudioTranslationsService.displayed
-              .hasUnflaggedAudioTranslations(hintContentId) &&
-              contentHasChanged) {
-              openMarkAllAudioAsNeedingUpdateModal();
+            if (contentHasChanged) {
+              var hintContentId = $scope.hint.hintContent.getContentId();
+              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+                hintContentId);
             }
             $scope.getOnSaveFn()();
           };
@@ -79,24 +76,6 @@ oppia.directive('hintEditor', [
               $scope.saveThisHint();
             }
           });
-
-          var openMarkAllAudioAsNeedingUpdateModal = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/forms/' +
-                'mark_all_audio_as_needing_update_modal_directive.html'),
-              backdrop: true,
-              resolve: {},
-              controller: 'MarkAllAudioAsNeedingUpdateController'
-            }).result.then(function() {
-              var hintContentId = $scope.hint.hintContent.getContentId();
-              StateContentIdsToAudioTranslationsService.displayed
-                .markAllAudioAsNeedingUpdate(hintContentId);
-              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations(
-                StateContentIdsToAudioTranslationsService.displayed);
-            });
-          };
         }
       ]
     };

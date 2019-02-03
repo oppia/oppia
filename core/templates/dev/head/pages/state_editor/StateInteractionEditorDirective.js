@@ -28,7 +28,6 @@ oppia.directive('stateInteractionEditor', [
         };
       },
       scope: {
-        onSaveContentIdsToAudioTranslations: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionId: '=',
         onSaveSolution: '=',
@@ -43,7 +42,6 @@ oppia.directive('stateInteractionEditor', [
         'INTERACTION_SPECS', 'StateInteractionIdService',
         'StateCustomizationArgsService', 'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
-        'StateContentIdsToAudioTranslationsService',
         'ExplorationHtmlFormatterService', 'SubtitledHtmlObjectFactory',
         'StateSolutionService', 'StateHintsService',
         'StateContentService', function(
@@ -52,7 +50,6 @@ oppia.directive('stateInteractionEditor', [
             INTERACTION_SPECS, StateInteractionIdService,
             StateCustomizationArgsService, EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
-            StateContentIdsToAudioTranslationsService,
             ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
             StateSolutionService, StateHintsService,
             StateContentService) {
@@ -364,8 +361,6 @@ oppia.directive('stateInteractionEditor', [
                 $scope.onCustomizationModalSavePostHook, function() {
                   StateInteractionIdService.restoreFromMemento();
                   StateCustomizationArgsService.restoreFromMemento();
-                  StateContentIdsToAudioTranslationsService
-                    .restoreFromMemento();
                 });
             }
           };
@@ -392,12 +387,6 @@ oppia.directive('stateInteractionEditor', [
             }).result.then(function() {
               StateInteractionIdService.displayed = null;
               StateCustomizationArgsService.displayed = {};
-              if (StateSolutionService.displayed) {
-                var solutionContentId =
-                  StateSolutionService.displayed.explanation.getContentId();
-                StateContentIdsToAudioTranslationsService.displayed
-                  .deleteContentId(solutionContentId);
-              }
               StateSolutionService.displayed = null;
               InteractionDetailsCacheService.removeDetails(
                 StateInteractionIdService.savedMemento);
@@ -411,11 +400,6 @@ oppia.directive('stateInteractionEditor', [
 
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
-
-              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations(
-                StateContentIdsToAudioTranslationsService.displayed
-              );
 
               $rootScope.$broadcast(
                 'onInteractionIdChanged',

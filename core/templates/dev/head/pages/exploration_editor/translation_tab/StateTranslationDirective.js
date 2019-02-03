@@ -30,17 +30,17 @@ oppia.directive('stateTranslation', [
         '$scope', '$filter', '$rootScope', 'StateEditorService',
         'ExplorationStatesService', 'ExplorationInitStateNameService',
         'ExplorationCorrectnessFeedbackService', 'RouterService',
-        'TranslationStatusService', 'COMPONENT_NAME_CONTENT',
-        'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
-        'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
+        'StateContentIdsToAudioTranslationsService', 'TranslationStatusService',
+        'COMPONENT_NAME_CONTENT', 'COMPONENT_NAME_FEEDBACK',
+        'COMPONENT_NAME_HINT', 'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
         'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
             $scope, $filter, $rootScope, StateEditorService,
             ExplorationStatesService, ExplorationInitStateNameService,
             ExplorationCorrectnessFeedbackService, RouterService,
-            TranslationStatusService, COMPONENT_NAME_CONTENT,
-            COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
-            COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
+            StateContentIdsToAudioTranslationsService, TranslationStatusService,
+            COMPONENT_NAME_CONTENT, COMPONENT_NAME_FEEDBACK,
+            COMPONENT_NAME_HINT, COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
             RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           // Define tab constants.
           $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
@@ -290,16 +290,8 @@ oppia.directive('stateTranslation', [
             $scope.answerChoices = StateEditorService.getAnswerChoices(
               $scope.stateInteractionId, currentCustomizationArgs);
             $scope.onTabClick($scope.TAB_ID_CONTENT);
+            $scope.$broadcast('refreshAudioTranslationBar');
           };
-
-          // TODO(DubeySandeep): We need to call initStateTranslation() here in
-          // case the listener that receives 'refreshStateTranslation' is not
-          // set by the time it is broadcasted from ExplorationEditor.js. Figure
-          // out a solution that does not rely on covering the race condition.
-          if (ExplorationStatesService.isInitialized()) {
-            $scope.initStateTranslation();
-          }
-          $rootScope.loadingMessage = '';
         }
       ]
     };

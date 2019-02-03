@@ -463,16 +463,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        init_state.update_content_ids_to_audio_translations({
-            'content': {},
-            'default_outcome': {},
-            'hint_1': {},
-            'solution': {}
-        })
-
-        init_state.interaction.solution = (
-            state_domain.Solution.from_dict(
-                init_state.interaction.id, solution))
+        init_state.update_interaction_solution(solution)
         exploration.validate()
 
         hints_list.append({
@@ -498,13 +489,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         del hints_list[1]
         init_state.update_interaction_hints(hints_list)
 
-        init_state.update_content_ids_to_audio_translations({
-            'content': {},
-            'default_outcome': {},
-            'hint_1': {},
-            'hint_3': {},
-            'solution': {}
-        })
         self.assertEqual(len(init_state.interaction.hints), 2)
         exploration.validate()
 
@@ -550,15 +534,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': 'hello_world is a string'
             }
         }
-        init_state.interaction.solution = (
-            state_domain.Solution.from_dict(
-                init_state.interaction.id, solution))
-        init_state.update_content_ids_to_audio_translations({
-            'content': {},
-            'default_outcome': {},
-            'hint_1': {},
-            'solution': {}
-        })
+        init_state.update_interaction_solution(solution)
         exploration.validate()
 
 

@@ -24,7 +24,6 @@ oppia.directive('stateEditor', [
         getStateContentPlaceholder: '&stateContentPlaceholder',
         isInteractionShown: '&interactionIsShown',
         navigateToState: '=',
-        onSaveContentIdsToAudioTranslations: '=',
         onSaveHints: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionId: '=',
@@ -33,19 +32,18 @@ oppia.directive('stateEditor', [
         onSaveSolution: '=',
         onSaveStateContent: '=',
         recomputeGraph: '=',
-        refreshWarnings: '='
+        refreshWarnings: '=',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_editor_directive.html'),
       controller: [
         '$scope', '$rootScope', 'INTERACTION_SPECS', 'StateEditorService',
         'StateContentService', 'StateHintsService', 'StateSolutionService',
-        'StateContentIdsToAudioTranslationsService',
         'StateInteractionIdService', 'StateCustomizationArgsService',
         function(
             $scope, $rootScope, INTERACTION_SPECS, StateEditorService,
             StateContentService, StateHintsService, StateSolutionService,
-            StateContentIdsToAudioTranslationsService,
             StateInteractionIdService, StateCustomizationArgsService) {
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
@@ -77,9 +75,6 @@ oppia.directive('stateEditor', [
             StateEditorService.setInteraction(stateData.interaction);
             StateContentService.init(
               $scope.stateName, stateData.content);
-            StateContentIdsToAudioTranslationsService.init(
-              $scope.stateName,
-              stateData.contentIdsToAudioTranslations);
             StateHintsService.init(
               $scope.stateName, stateData.interaction.hints);
             StateInteractionIdService.init(
