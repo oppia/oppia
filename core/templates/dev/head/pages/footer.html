@@ -30,7 +30,7 @@
       </div>
       <div class="col-sm-3">
         <h4><span translate="I18N_LANGUAGE_FOOTER_VIEW_IN"></span></h4>
-        <ul ng-controller="I18nFooter">
+        <ul ng-controller="i18n">
           <select ng-model="currentLanguageCode"
                   ng-change="changeLanguage()"
                   ng-options="language.id as language.text for language in supportedSiteLanguages"

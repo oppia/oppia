@@ -37,7 +37,7 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_SIGNUP_LOADING: 'Loading'
 });
 
-oppia.controller('I18nFooter', [
+oppia.controller('i18n', [
   '$http', '$rootScope', '$scope', '$translate', '$timeout', '$cookies',
   'UserService',
   function(

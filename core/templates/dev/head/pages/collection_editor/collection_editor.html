@@ -29,7 +29,7 @@
 {% block content %}
   <div ng-controller="CollectionEditor">
     <div ng-if="getActiveTabName() === 'main'">
-      <collection-main-tab></collection-main-tab>
+      <collection-editor-tab></collection-editor-tab>
     </div>
 
     <div ng-show="getActiveTabName() === 'settings'">
@@ -80,11 +80,14 @@
   <script src="/templates/dev/head/domain/collection/SearchExplorationsBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/QuestionUndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/BaseUndoRedoService.js"></script>
   <script src="/templates/dev/head/domain/exploration/AudioTranslationObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/state/StateObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/NumberWithUnitsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/objects/UnitsObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/AnswerGroupObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/ContentIdsToAudioTranslationsObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
@@ -114,6 +117,8 @@
   <script src="/templates/dev/head/components/loading/LoadingDotsDirective.js"></script>
 
   <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+  <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
   <script src="/templates/dev/head/components/forms/Select2DropdownDirective.js"></script>
 
   {# TODO(bhenning): Remove these once RouterServices is decoupled from the exploration editor #}

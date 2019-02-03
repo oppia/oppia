@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-oppia.factory('UndoRedoService', [
-  'BaseUndoRedoService', function(BaseUndoRedoService) {
-    var child = Object.create(BaseUndoRedoService);
-    child.init();
+oppia.factory('StateContentIdsToAudioTranslationsService', [
+  'StatePropertyService', function(StatePropertyService) {
+    var child = Object.create(StatePropertyService);
+    child.setterMethodKey = 'saveContentIdsToAudioTranslations';
     return child;
   }
 ]);

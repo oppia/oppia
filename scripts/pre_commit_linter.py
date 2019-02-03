@@ -1439,6 +1439,97 @@ def _check_directive_scope(all_files):
     return summary_messages
 
 
+def _check_js_property(all_files):
+    """This function checks that all directives have an explicit
+    scope: {} and it should not be scope: true.
+    """
+    print 'Starting js property check'
+    print '----------------------------------------'
+    # Select JS files which need to be checked.
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.js') and not filename.endswith('app.js') and not
+        filename.endswith('directives.js')]
+    failed = False
+    summary_messages = []
+    property_name = ''
+    for filename in files_to_check:
+        property_num = 0
+        # Filename without its path.
+        exact_filename = filename.split('/')[-1][:-3]
+        content = FileCache.read(filename)
+        parsed_dict = _validate_and_parse_js_file(filename, content)
+        # Parse the body of the content as nodes.
+        parsed_nodes = parsed_dict['body']
+        for parsed_node in parsed_nodes:
+            # Check the type of the node.
+            if parsed_node['type'] != 'ExpressionStatement':
+                continue
+            # Separate the expression part of the node.
+            expression = parsed_node['expression']
+            # Check whether the expression belongs to a directive.
+            expression_type_is_not_call = (
+                expression['type'] != 'CallExpression')
+            if expression_type_is_not_call:
+                continue
+            expression_callee_type_is_not_member = (
+                expression['callee']['type'] != 'MemberExpression')
+            if expression_callee_type_is_not_member:
+                continue
+            callee_property = expression['callee']['property']['name']
+            if callee_property != 'factory' and (
+                    callee_property != 'directive' and
+                    callee_property != 'controller'):
+                continue
+            propertyz = callee_property
+            # Separate the arguments of the expression.
+            arguments = expression['arguments']
+            # The first argument of the expression is the
+            # name of the property.
+            property_name = arguments[0]['value']
+            property_num += 1
+            if callee_property == 'directive':
+                if (property_name[0].upper() + property_name[1:] +
+                        'Directive' != (exact_filename)):
+                    print (
+                        'Please ensure that the %s name strictly matches the '
+                        'filename' % (callee_property))
+                    print filename
+                    failed = True
+            else:
+                if property_name != exact_filename:
+                    print (
+                        'Please ensure that the %s name strictly matches the '
+                        'filename' % (callee_property))
+                    failed = True
+                    print filename
+
+        if property_num > 1:
+            print (
+                'Please ensure that there is exactly one %s in the file'
+                % (propertyz))
+            print filename
+            failed = True
+
+    if failed:
+        summary_message = '%s  Js property check failed' % (
+            _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s  Js property check passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+
+    return summary_messages
+
+
 def _match_line_breaks_in_controller_dependencies(all_files):
     """This function checks whether the line breaks between the dependencies
     listed in the controller of a directive or service exactly match those
@@ -1737,6 +1828,7 @@ def main():
     """
     all_files = _get_all_files()
     directive_scope_messages = _check_directive_scope(all_files)
+    js_property_messages = _check_js_property(all_files)
     controller_dependency_messages = (
         _match_line_breaks_in_controller_dependencies(all_files))
     html_directive_name_messages = _check_html_directive_name(all_files)
@@ -1752,11 +1844,12 @@ def main():
     pattern_messages = _check_bad_patterns(all_files)
     copyright_notice_messages = _check_for_copyright_notice(all_files)
     all_messages = (
-        directive_scope_messages + controller_dependency_messages +
-        html_directive_name_messages + import_order_messages +
-        newline_messages + docstring_messages + comment_messages +
-        html_tag_and_attribute_messages + html_linter_messages +
-        linter_messages + pattern_messages + copyright_notice_messages)
+        directive_scope_messages + js_property_messages +
+        controller_dependency_messages + html_directive_name_messages +
+        import_order_messages + newline_messages + docstring_messages +
+        comment_messages + html_tag_and_attribute_messages +
+        html_linter_messages + linter_messages + pattern_messages +
+        copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * @fileoverview Directives for schema-based form builders.
- */
-
 // NOTE TO DEVELOPERS: This forms framework accepts an external event
 // named 'schemaBasedFormsShown'. This should be called by clients
 // when these forms first come into view.
@@ -174,69 +170,3 @@ oppia.filter('isFloat', [function() {
     }
   };
 }]);
-
-/* eslint-disable angular/directive-restrict */
-oppia.directive('applyValidation', ['$filter', function($filter) {
-  return {
-    require: 'ngModel',
-    restrict: 'A',
-    link: function(scope, elm, attrs, ctrl) {
-      // Add validators in reverse order.
-      if (scope.validators()) {
-        scope.validators().forEach(function(validatorSpec) {
-          var frontendName = $filter('underscoresToCamelCase')(
-            validatorSpec.id);
-
-          // Note that there may not be a corresponding frontend filter for
-          // each backend validator.
-          try {
-            $filter(frontendName);
-          } catch (err) {
-            return;
-          }
-
-          var filterArgs = {};
-          for (key in validatorSpec) {
-            if (key !== 'id') {
-              filterArgs[$filter('underscoresToCamelCase')(key)] =
-                angular.copy(validatorSpec[key]);
-            }
-          }
-
-          var customValidator = function(viewValue) {
-            ctrl.$setValidity(
-              frontendName, $filter(frontendName)(viewValue,
-                filterArgs));
-            return viewValue;
-          };
-
-          ctrl.$parsers.unshift(customValidator);
-          ctrl.$formatters.unshift(customValidator);
-        });
-      }
-    }
-  };
-}]);
-/* eslint-enable angular/directive-restrict */
-
-// This should come before 'apply-validation', if that is defined as
-// an attribute on the HTML tag.
-
-/* eslint-disable angular/directive-restrict */
-oppia.directive('requireIsFloat', ['$filter', function($filter) {
-  return {
-    require: 'ngModel',
-    restrict: 'A',
-    link: function(scope, elm, attrs, ctrl) {
-      var floatValidator = function(viewValue) {
-        var filteredValue = $filter('isFloat')(viewValue);
-        ctrl.$setValidity('isFloat', filteredValue !== undefined);
-        return filteredValue;
-      };
-
-      ctrl.$parsers.unshift(floatValidator);
-      ctrl.$formatters.unshift(floatValidator);
-    }
-  };
-}]);
-/* eslint-enable angular/directive-restrict */

@@ -16,7 +16,7 @@
  * @fileoverview Directive for the Roles tab in the admin panel.
  */
 
-oppia.directive('adminRolesTab', [
+oppia.directive('rolesTab', [
   '$http', 'ADMIN_ROLE_HANDLER_URL', 'AdminTaskManagerService',
   'UrlInterpolationService',
   function(

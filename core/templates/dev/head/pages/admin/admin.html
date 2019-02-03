@@ -56,9 +56,9 @@
                         set-status-message="setStatusMessage">
       </admin-config-tab>
 
-      <admin-roles-tab ng-if="isRolesTabOpen()"
-                       set-status-message="setStatusMessage">
-      </admin-roles-tab>
+      <roles-tab ng-if="isRolesTabOpen()"
+                 set-status-message="setStatusMessage">
+      </roles-tab>
 
       <admin-misc-tab ng-if="isMiscTabOpen()"
                       set-status-message="setStatusMessage">
@@ -105,6 +105,8 @@
     <script src="/templates/dev/head/services/stateful/FocusManagerService.js"></script>
 
     <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+    <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
     <script src="/templates/dev/head/components/forms/ObjectEditorDirective.js"></script>
     <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
     <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>

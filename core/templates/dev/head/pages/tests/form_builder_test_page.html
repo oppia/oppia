@@ -12,7 +12,7 @@
 {% endblock header_js %}
 
 {% block content %}
-  <div class="container" ng-controller="FormBuilderTests">
+  <div class="container" ng-controller="FormBuilderTestPage">
     <h3>Test page for object editors</h3>
 
     <h4>Editors sharing a common value</h4>
@@ -105,8 +105,11 @@
   <script src="/third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js"></script>
   {{ super() }}
   <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+  <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
   <script src="/templates/dev/head/filters.js"></script>
   <script src="/templates/dev/head/pages/tests/FormBuilderTestPage.js"></script>
+  <script src="/templates/dev/head/pages/tests/FormOverlayDirective.js"></script>
 
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>

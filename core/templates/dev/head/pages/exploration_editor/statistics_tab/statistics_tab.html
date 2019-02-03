@@ -15,7 +15,7 @@
         <div class="container">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-              <div state-graph-viz graph-data="statsGraphData"
+              <div state-graph-visualization graph-data="statsGraphData"
                    node-fill="darkseagreen"
                    highlight-states="highlightStates"
                    state-stats="stateStats"
@@ -24,7 +24,7 @@
             </div>
           </div>
           <div class="container" ng-if="playthroughsAreAvailable">
-            <playthrough-issues-directive></playthrough-issues-directive>
+            <playthrough-issues></playthrough-issues>
           </div>
         </div>
       </div>
