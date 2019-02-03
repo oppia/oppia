@@ -17,7 +17,7 @@
         <p ng-if="key === 'topic_status'"> Topic Status </p>
       </th>
     </tr>
-    <tr ng-repeat="topic in getTopicSummaries()" class="list-item">
+    <tr ng-repeat="topic in getTopicSummaries()" class="list-item protractor-test-topics-list-item">
       <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
           <span> <[topic.name]> </span>

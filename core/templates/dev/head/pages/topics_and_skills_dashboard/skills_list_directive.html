@@ -20,7 +20,7 @@
     </tr>
     <tr ng-repeat="skill in getSkillSummaries() | filter:skillFilterText"
         ng-click="isInModal() && selectSkill(skill)"
-        class="list-item"
+        class="list-item protractor-test-skills-list-item"
         ng-init="skillLink = isInModal() ? '#' : getSkillEditorUrl(skill.id)">
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
