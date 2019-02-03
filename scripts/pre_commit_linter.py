@@ -653,10 +653,10 @@ def _lint_html_files(all_files):
     print 'Starting HTML linter...'
     print '----------------------------------------'
     print ''
-    with _redirect_stdout(_TARGET_STDOUT):
-        for filename in html_files_to_lint:
-            proc_args = htmllint_cmd_args + [filename]
-            print 'Linting %s file' % filename
+    for filename in html_files_to_lint:
+        proc_args = htmllint_cmd_args + [filename]
+        print 'Linting %s file' % filename
+        with _redirect_stdout(_TARGET_STDOUT):
             proc = subprocess.Popen(
                 proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -670,6 +670,7 @@ def _lint_html_files(all_files):
                 error_summary.append(error_count)
                 print linter_stdout
 
+    with _redirect_stdout(_TARGET_STDOUT):
         print '----------------------------------------'
         for error_count in error_summary:
             total_error_count += error_count
@@ -689,6 +690,7 @@ def _lint_html_files(all_files):
         print summary_message
         print 'HTML linting finished.'
         print ''
+
     return summary_messages
 
 
@@ -1443,6 +1445,7 @@ def _check_directive_scope(all_files):
                                                 directive_name, filename))
                                         print ''
 
+    with _redirect_stdout(_TARGET_STDOUT):
         if failed:
             summary_message = '%s   Directive scope check failed' % (
                 _MESSAGE_TYPE_FAILED)
