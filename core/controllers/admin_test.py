@@ -295,3 +295,18 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'],
             'Exploration \'exp\' does not have \'state name\' state.')
+
+
+class ClearSearchIndexTest(test_utils.GenericTestBase):
+    """Tests that search index gets cleared."""
+
+    def  test_clear_search_index(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_html_response('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        generated_exps_response = self.post_json(
+            '/adminhandler', {
+                'action': 'clear_search_index'
+            },
+            csrf_token=csrf_token)
