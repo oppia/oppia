@@ -2104,6 +2104,21 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     }),
                 '')
 
+    def test_update_content_translations(self):
+        """Test update content translations."""
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                self.init_state_name, 'content_translations', {
+                    'content': {
+                        'hi': {
+                            'html': '<p>Test!</p',
+                            'needs_update': True
+                        }
+                    },
+                    'default_outcome': {}
+                }),
+            'Added text translations.')
+
 
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
     """Test the handling of commit messages."""
