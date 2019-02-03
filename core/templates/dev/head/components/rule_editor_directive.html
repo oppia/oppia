@@ -1,9 +1,6 @@
 <div style="position: relative;">
   <form class="form-inline protractor-test-rule-details" role="form" name="ruleEditForm.form">
-    <div ng-if="rule.type != 'FuzzyMatches'" style="max-height: 350px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    text-overflow: ellipsis;">
+    <div ng-if="rule.type != 'FuzzyMatches'">
       <rule-type-selector class="protractor-test-answer-description" local-value="<[rule.type]>" on-selection-change="onSelectNewRuleType">
       </rule-type-selector>
 
@@ -18,6 +15,10 @@
           </span>
         </span>
 
+        <div style="max-height: 350px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        text-overflow: ellipsis;">
         <span ng-if="item.type == 'checkboxes'" style="color: black;">
           <object-editor obj-type="SetOfHtmlString" init-args="{choices: ruleDescriptionChoices}" value="rule.inputs[item.varName]"></object-editor>
         </span>
@@ -36,6 +37,7 @@
         <span ng-if="item.type == 'noneditable'">
           <[item.text]>
         </span>
+        </>
       </span>
     </div>
   </form>
