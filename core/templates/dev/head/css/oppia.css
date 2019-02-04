@@ -2910,7 +2910,7 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 .oppia-splash-bullet-block {
-  font-family: "Rubik", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 1.17em;
   line-height: 128%;
   margin-bottom: 10px;
@@ -3249,7 +3249,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 .oppia-activity-summary-tile .objective {
   display: -webkit-box;
-  font-family: "Rubik", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   height: 70px;
   line-height: 1.26;
@@ -3270,7 +3270,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile-mobile .objective {
   height: 75px;
-  font-family: "Rubik", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   padding: 12px;
 }
