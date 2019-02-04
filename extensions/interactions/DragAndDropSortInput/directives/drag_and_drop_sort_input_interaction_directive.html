@@ -75,7 +75,7 @@
 
 
 <form ng-submit="submitAnswer()">
-  <div ui-tree="treeOptions" class="drag-and-drop-sort-container" data-max-depth="2">
+  <div ui-tree="treeOptions" class="drag-and-drop-sort-container" data-max-depth="dataMaxDepth">
     <ol ui-tree-nodes="" ng-model="list">
       <li ng-repeat="item in list" ui-tree-node data-scroll-container=".conversation-skin-interaction-container">
         <div ui-tree-handle class="drag-and-drop-item">
