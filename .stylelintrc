@@ -1,5 +1,6 @@
 { 
   "extends": "stylelint-config-recommended",
+  "plugins": ["stylelint-order"],
   "processors": ["@mapbox/stylelint-processor-arbitrary-tags"],
   "rules": {
     "no-duplicate-selectors": true,
@@ -16,5 +17,9 @@
     "block-opening-brace-newline-after": "always-multi-line",
     "block-opening-brace-space-after": "always-single-line",
     "block-opening-brace-space-before": "always",
+    "declaration-no-important": true,
+    "length-zero-no-unit": true,
+    "indentation": 2,
+    "order/properties-alphabetical-order": true,
   }
 }

@@ -209,15 +209,15 @@
     background-color: #f7f7f7;
     display: flex;
     height: 100%;
-    padding: 0px 10px;
+    padding: 0 10px;
     width: 100%;
   }
   .audioRecorder {
     align-items: center;
     display: flex;
   }
-  .audioRecorder > div:first-child {
-    width: 0 !important;
+  .audioRecorder > div:first-child { /* stylelint-disable-line */
+    width: 0 !important; /* stylelint-disable-line declaration-no-important */
   }
   .oppia-content-wrapper {
     margin: 0 10px;
@@ -243,8 +243,8 @@
   .oppia-audio-bar-button-transition {
     -moz-transition: background-color .2s cubic-bezier(.35,0,.25,1);
     -o-transition: background-color .2s cubic-bezier(.35,0,.25,1);
-    transition: background-color .2s cubic-bezier(.35,0,.25,1);
     -webkit-transition: background-color .2s cubic-bezier(.35,0,.25,1);
+    transition: background-color .2s cubic-bezier(.35,0,.25,1);
   }
   .oppia-audio-action-button {
     background-color: #009688;
@@ -319,8 +319,8 @@
     width: 100%;
   }
   audio-translation-bar .tooltip-inner {
-  max-width: none;
-  white-space: nowrap;
+    max-width: none;
+    white-space: nowrap;
   }
   audio-translation-bar md-progress-linear {
     height: 38px;
@@ -337,7 +337,7 @@
   }
   audio-translation-bar md-slider .md-track-container {
     height: 1px;
-    top: 18px !important;
+    top: 18px !important; /* stylelint-disable-line declaration-no-important */
   }
   audio-translation-bar md-slider .md-track {
     background-color: #f8f8f8;

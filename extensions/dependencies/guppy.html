@@ -17,11 +17,11 @@
     border: 1px solid black;
   }
 
-  .guppy_active .main_cursor {
-    animation: guppy-blink-animation 1s steps(2, start) infinite;
+  .guppy_active .main_cursor { /* stylelint-disable-line */
     -webkit-animation: guppy-blink-animation 1s steps(2, start) infinite;
+    animation: guppy-blink-animation 1s steps(2, start) infinite;
     /* Overrides the inline styling and sets the cursor color to black. */
-    color: black !important;
+    color: black !important; /* stylelint-disable-line declaration-no-important */
   }
 
   @keyframes guppy-blink-animation {

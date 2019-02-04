@@ -81,35 +81,35 @@ directive. -->
   html, body {
     background: #afd2eb no-repeat center center fixed;
     background-size: cover;
+    bottom:0;
     color: rgba(0, 0, 0, 0.87);
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 1.0em;
     height: 100%;
+    overflow-y:auto;
     position:fixed;
     top:0;
-    bottom:0;
     width:100%;
-    overflow-y:auto;
   }
 
   .oppia-progress-dot {
-    width: 18px;
     height: 18px;
+    width: 18px;
   }
   .oppia-progress-arrow-active {
     color: #fff;
   }
 
   .embedded-body {
-    min-height: 100%;
     display: flex;
     flex-direction: column;
+    min-height: 100%;
     position: absolute;
     width: 100%;
   }
   .bottom-nav-left {
-    display: flex;
     align-items: center;
+    display: flex;
     height: 50px;
   }
 
@@ -121,9 +121,9 @@ directive. -->
 
   .bottom-nav-row:before,
   .bottom-nav-row:after {
+    clear: both;
     content: "";
     display: table;
-    clear: both;
   }
 
   [class*='col-'] {
@@ -150,28 +150,28 @@ directive. -->
   }
 
   .logo-bottom-nav-bar {
-    max-height: 50px;
     margin: auto;
-    position: relative;
+    max-height: 50px;
     min-width: 70px;
+    position: relative;
   }
 
   .nav-bar-bottom-replay-content {
-    display: flex;
     align-items: center;
     color: white;
+    display: flex;
   }
   .nav-bar-bottom-visit-oppia {
-    display: flex;
-    justify-content: center;
     align-items: center;
     color: white;
+    display: flex;
+    justify-content: center;
   }
 
   .nav-bar-bottom-replay-content,
   .nav-bar-bottom-visit-oppia {
-    line-height: 1;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
+    line-height: 1;
   }
 
   .replay-nav-icon {
@@ -237,12 +237,12 @@ directive. -->
   }
 
   .conversation-skin-responses-dropdown-icon {
-    transition: all 0.2s;
+    font-size: 20px;
+    margin-bottom: -2px;
     -moz-transition: all 0.2s;
     -o-transition: all 0.2s;
     -webkit-transition: all 0.2s;
-    font-size: 20px;
-    margin-bottom: -2px;
+    transition: all 0.2s;
   }
 
   .conversation-skin-responses-dropdown-icon-rotated {
@@ -270,11 +270,11 @@ directive. -->
   }
 
   .conversation-skin-cards-container {
+    align-items: center;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    justify-content: center;
     height: 100%;
+    justify-content: center;
     margin: 20px auto;
     max-width: 1400px;
     width: 100%;
@@ -286,9 +286,9 @@ directive. -->
     border-radius: 2px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
     flex-shrink: 10000;
+    margin-left: 30px;
     max-width: 560px;
     min-width: 360px;
-    margin-left: 30px;
     text-align: left;
     width: 100%;
     z-index: 1;
@@ -300,9 +300,9 @@ directive. -->
     border-radius: 2px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
     flex-shrink: 10000;
-    min-width: 360px;
-    margin-top: 20px;
     margin-left: 30px;
+    margin-top: 20px;
+    min-width: 360px;
     text-align: left;
     width: 90%;
     z-index: 1;
@@ -350,8 +350,8 @@ directive. -->
   }
 
   .conversation-skin-help-card-content {
-    width: 270px;
     padding: 12px;
+    width: 270px;
   }
 
   .conversation-skin-close-help-card-button {
@@ -381,8 +381,8 @@ directive. -->
 
   .conversation-skin-oppia-feedback-container,
   .conversation-skin-learner-answer-container {
-    position: relative;
     padding: 0 20px;
+    position: relative;
   }
 
   .conversation-skin-oppia-feedback-content,
@@ -469,30 +469,30 @@ directive. -->
 
   .conversation-skin-feedback-dot-one {
     -moz-animation: dot 1.0s infinite;
-    -moz-animation-delay: 0.0s;
     -webkit-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.0s;
     animation: dot 1.0s infinite;
+    -moz-animation-delay: 0.0s;
+    -webkit-animation-delay: 0.0s;
     animation-delay: 0.0s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-two {
     -moz-animation: dot 1.0s infinite;
-    -moz-animation-delay: 0.2s;
     -webkit-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.2s;
     animation: dot 1.0s infinite;
+    -moz-animation-delay: 0.2s;
+    -webkit-animation-delay: 0.2s;
     animation-delay: 0.2s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-three {
     -moz-animation: dot 1.0s infinite;
-    -moz-animation-delay: 0.4s;
     -webkit-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.4s;
     animation: dot 1.0s infinite;
+    -moz-animation-delay: 0.4s;
+    -webkit-animation-delay: 0.4s;
     animation-delay: 0.4s;
     opacity: 0;
   }
@@ -550,9 +550,9 @@ directive. -->
     }
 
     .conversation-skin-cards-container {
+      align-items: center;
       display: flex;
       flex-direction: column;
-      align-items: center;
       height: 100%;
       max-width: 1400px;
       width: 100%;
