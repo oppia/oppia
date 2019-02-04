@@ -98,6 +98,11 @@ UI_CONFIG_SPECS = {
             'type': SCHEMA_TYPE_UNICODE,
         },
     },
+    SCHEMA_TYPE_CUSTOM: {
+        'placeholder': {
+            'type': SCHEMA_TYPE_UNICODE,
+        },
+    },
 }
 
 # Schemas for validators for the various types.
@@ -162,6 +167,9 @@ VALIDATOR_SPECS = {
         'is_nonempty': {},
         'is_regex': {},
         'is_valid_email': {},
+    },
+    SCHEMA_TYPE_CUSTOM: {
+        'is_nonempty': {},
     },
 }
 
@@ -238,7 +246,7 @@ def validate_schema(schema):
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
-            [])
+            OPTIONAL_SCHEMA_KEYS)
         assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(
