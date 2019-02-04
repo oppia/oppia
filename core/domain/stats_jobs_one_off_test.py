@@ -258,7 +258,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
 
         output = self.run_one_off_job()
 
-        self.assertEqual(len(output), 0)
+        self.assertEqual(output, [])
 
     def test_output_for_pre_release_playthrough(self):
         self.set_config_property(
