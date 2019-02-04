@@ -833,3 +833,61 @@ class InteractionCustomizationArgsValidationJob(
         # Combine all values from multiple lists into a single list
         # for that error type.
         yield (key, list(set().union(*final_values)))
+
+
+class EmptySubtitledHtmlAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """Audit job to number of explorations having empty subtitled html."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+        exp_rights = rights_manager.get_exploration_rights(item.id)
+
+        state_name_to_content_id_list = {}
+        for state_name, state in exploration.states.iteritems():
+            empty_html_content_id_list = []
+            content = state.content
+            if not (content.html).strip():
+                empty_html_content_id_list.append(content.content_id)
+
+            for answer_group in state.interaction.answer_groups:
+                feedback = answer_group.outcome.feedback
+                if not feedback.html.strip():
+                    empty_html_content_id_list.append(feedback.content_id)
+
+            default_outcome = state.interaction.default_outcome
+            if default_outcome and not default_outcome.feedback.html:
+                empty_html_content_id_list.append(
+                    default_outcome.feedback.content_id)
+
+            for hint in state.interaction.hints:
+                hint_content = hint.hint_content
+                if not hint_content.html:
+                    empty_html_content_id_list.append(hint_content.content_id)
+
+            solution = state.interaction.solution
+            if solution and not solution.explanation.html:
+                empty_html_content_id_list.append(
+                    solution.explanation.content_id)
+            if empty_html_content_id_list:
+                if state.interaction.id is not None:
+                    key = ('%s:%s' % (state_name, state.interaction.id))
+                else:
+                    key = ('%s:None' % state_name)
+                state_name_to_content_id_list[key] = empty_html_content_id_list
+
+        yield(
+            '%s:%s' % (exploration.id, exp_rights.status),
+            state_name_to_content_id_list)
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        yield (key, final_values)

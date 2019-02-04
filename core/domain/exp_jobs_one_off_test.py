@@ -1488,3 +1488,126 @@ class InteractionCustomizationArgsValidationJobTests(
         )]
 
         self.assertEqual(actual_output, expected_output)
+
+
+class EmptySubtitledHtmlAuditJobTest(test_utils.GenericTestBase):
+    """Tests for the EmptySubtitledHtmlAuditJob one off job."""
+    def setUp(self):
+        super(EmptySubtitledHtmlAuditJobTest, self).setUp()
+        self.EXP_ID_1 = 'exp1'
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_audit_job_with_empty_html_exploration_returns_content_id(self):
+
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id, end_state_name='End card')
+
+        content = {
+            'content_id': 'content',
+            'html': ''
+        }
+        default_outcome = {
+            'dest': 'End card',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+
+        answer_groups = [{
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': ''
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_misconception_id': None
+        }]
+
+        hints = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': ''
+            }
+        }, {
+            'hint_content': {
+                'content_id': 'hint_2',
+                'html': 'Non empty hint.'
+            }
+        }]
+
+        solution = {
+            'interaction_id': '',
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'content_id': 'solution',
+                'html': ''
+            }
+        }
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': content
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                'new_value': answer_groups
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                'new_value': default_outcome
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'new_value': hints
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'new_value': solution
+            })], 'Changed state.')
+
+        job_id = exp_jobs_one_off.EmptySubtitledHtmlAuditJob.create_new()
+        exp_jobs_one_off.EmptySubtitledHtmlAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        expected_output = [
+            '[u\'exp1:private\', [{'
+            'u\'End card:EndExploration\': [u\'content\'], '
+            'u\'Introduction:TextInput\': ['
+            'u\'content\', u\'feedback_1\', u\'hint_1\', u\'solution\']'
+            '}]'
+            ']'
+        ]
+        actual_output = exp_jobs_one_off.EmptySubtitledHtmlAuditJob.get_output(
+            job_id)
+        self.assertEqual(actual_output, expected_output)
