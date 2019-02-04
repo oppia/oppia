@@ -87,7 +87,10 @@ oppia.factory('AssetsBackendApiService', [
             throw exception;
           }
         }
-        assetsCache[filename] = assetBlob;
+
+        if (!assetsCache.hasOwnProperty(filename)) {
+          assetsCache[filename] = assetBlob;
+        }
         if (assetType === ASSET_TYPE_AUDIO) {
           successCallback(
             AudioFileObjectFactory.createNew(filename, assetBlob));
@@ -216,6 +219,9 @@ oppia.factory('AssetsBackendApiService', [
             ASSET_TYPE_AUDIO)) {
             _fetchFile(explorationId, filename, ASSET_TYPE_AUDIO,
               resolve, reject);
+          } else {
+            _fetchFile(explorationId, filename, ASSET_TYPE_AUDIO,
+              resolve, reject);
           }
         });
       },
@@ -226,6 +232,9 @@ oppia.factory('AssetsBackendApiService', [
               filename, assetsCache[filename]));
           } else if (!_isAssetCurrentlyBeingRequested(filename,
             ASSET_TYPE_IMAGE)) {
+            _fetchFile(explorationId, filename, ASSET_TYPE_IMAGE,
+              resolve, reject);
+          } else {
             _fetchFile(explorationId, filename, ASSET_TYPE_IMAGE,
               resolve, reject);
           }
