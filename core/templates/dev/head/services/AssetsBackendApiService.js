@@ -87,7 +87,6 @@ oppia.factory('AssetsBackendApiService', [
             throw exception;
           }
         }
-
         assetsCache[filename] = assetBlob;
         if (assetType === ASSET_TYPE_AUDIO) {
           successCallback(
