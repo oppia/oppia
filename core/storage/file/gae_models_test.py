@@ -226,14 +226,12 @@ class FileModelTest(test_utils.GenericTestBase):
         retrieved_model = file_models.FileModel.get_version(
             'exp_id1', 'path/to/file1.png', 1)
         self.assertEqual(file_model.key, retrieved_model.key)
-        self.assertEqual(retrieved_model.version, 1)
         self.assertEqual(
             retrieved_model.content, 'file_contents_after_first_commit')
 
         retrieved_model = file_models.FileModel.get_version(
             'exp_id1', 'path/to/file1.png', 2)
         self.assertEqual(file_model.key, retrieved_model.key)
-        self.assertEqual(retrieved_model.version, 2)
         self.assertEqual(
             retrieved_model.content, 'file_contents_after_second_commit')
 
