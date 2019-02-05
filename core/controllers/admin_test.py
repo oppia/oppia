@@ -17,13 +17,17 @@
 from core.controllers import base
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import search_services
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.platform import models
 from core.tests import test_utils
+from google.appengine.api import search
 import feconf
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
+gae_search_services = models.Registry.import_search_services()
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
@@ -300,7 +304,16 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
 class ClearSearchIndexTest(test_utils.GenericTestBase):
     """Tests that search index gets cleared."""
 
-    def  test_clear_search_index(self):
+    def test_clear_search_index(self):
+        doc1 = search.Document(doc_id='doc1', language='en', rank=1, fields=[
+            search.TextField(name='k', value='abc def ghi')])
+        index = search.Index(search_services.SEARCH_INDEX_EXPLORATIONS)
+        index.put([doc1])
+        result = gae_search_services.search(
+            'k:abc', search_services.SEARCH_INDEX_EXPLORATIONS)[0]
+        self.assertIn({
+            'id': 'doc1', 'k': 'abc def ghi', 'rank': 1, 'language_code': 'en'
+            }, result)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_html_response('/admin')
@@ -310,3 +323,7 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
                 'action': 'clear_search_index'
             },
             csrf_token=csrf_token)
+        self.assertEqual(generated_exps_response, {})
+        result = gae_search_services.search(
+            'k:abc', search_services.SEARCH_INDEX_EXPLORATIONS)[0]
+        self.assertEqual(result, [])

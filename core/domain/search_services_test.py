@@ -24,6 +24,7 @@ from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+from google.appengine.api import search
 
 gae_search_services = models.Registry.import_search_services()
 
@@ -298,3 +299,41 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             search_services.update_exploration_status_in_search(self.EXP_ID)
 
         self.assertEqual(delete_docs_counter.times_called, 1)
+
+    def test_clear_exploration_search_index(self):
+        doc1 = search.Document(doc_id='doc1', language='en', rank=1, fields=[
+            search.TextField(name='k', value='abc def ghi')])
+
+        index = search.Index(search_services.SEARCH_INDEX_EXPLORATIONS)
+        index.put([doc1])
+        result = gae_search_services.search(
+            'k:abc', search_services.SEARCH_INDEX_EXPLORATIONS)[0]
+
+        self.assertIn({
+            'id': 'doc1', 'k': 'abc def ghi', 'rank': 1, 'language_code': 'en'
+            }, result)
+
+        search_services.clear_exploration_search_index()
+
+        result = gae_search_services.search(
+            'k:abc', search_services.SEARCH_INDEX_EXPLORATIONS)[0]
+        self.assertEqual(result, [])
+
+    def test_clear_collection_search_index(self):
+        doc1 = search.Document(doc_id='doc1', language='en', rank=1, fields=[
+            search.TextField(name='k', value='abc def ghi')])
+
+        index = search.Index(search_services.SEARCH_INDEX_COLLECTIONS)
+        index.put([doc1])
+        result = gae_search_services.search(
+            'k:abc', search_services.SEARCH_INDEX_COLLECTIONS)[0]
+
+        self.assertIn({
+            'id': 'doc1', 'k': 'abc def ghi', 'rank': 1, 'language_code': 'en'
+            }, result)
+
+        search_services.clear_collection_search_index()
+
+        result = gae_search_services.search(
+            'k:abc', search_services.SEARCH_INDEX_COLLECTIONS)[0]
+        self.assertEqual(result, [])
