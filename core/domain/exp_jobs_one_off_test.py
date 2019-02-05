@@ -276,7 +276,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                         getattr(expected_job_output[exp_id], prop))
 
     def test_exp_summaries_creation_job_output(self):
-        """Test that ExpSummariesCreationOneOff job produces no output."""
+        """Test that ExpSummariesCreationOneOff job output is correct."""
 
         with self.swap(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS',
@@ -654,8 +654,8 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
             exp_id=exp_id)
 
     def test_exploration_contributors_summary_job_output(self):
-        """Test that ExplorationContributorsSummaryOneOff job produces
-        no output.
+        """Test that ExplorationContributorsSummaryOneOff job output is
+        correct.
         """
         self.save_new_valid_exploration(
             self.EXP_ID, self.user_a_id, title='Exploration Title')
@@ -1000,7 +1000,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
 
     def test_exploration_migration_job_output(self):
-        """Test that Exploration Migration job produces no output."""
+        """Test that Exploration Migration job output is correct."""
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1445,7 +1445,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [])
 
     def test_no_action_is_performed_when_exploration_rights_is_none(self):
-        """Test that no action is performed on deleted explorations."""
+        """Test that no action is performed when exploration rights is none."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
