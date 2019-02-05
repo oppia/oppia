@@ -61,6 +61,26 @@ describe('Learner dashboard functionality', function() {
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
   });
 
+  it('should remove a skill from list once deleted', function() {
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnpublishedSkillsTab();
+    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
+
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
+  });
+
+  it('should remove a topic from list once deleted', function() {
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
+
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+  });
+
   // TODO(aks681): Once skill editor tests are done by Nalin, add tests here
   // regarding published skills.
 

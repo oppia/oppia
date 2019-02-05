@@ -24,8 +24,12 @@ var TopicsAndSkillsDashboardPage = function() {
   var DASHBOARD_URL = '/topics_and_skills_dashboard';
   var createTopicButton = element(
     by.css('.protractor-test-create-topic-button'));
+  var deleteTopicButtons = element.all(
+    by.css('.protractor-test-delete-topic-button'));
   var createSkillButton = element(
     by.css('.protractor-test-create-skill-button'));
+  var deleteSkillButtons = element.all(
+    by.css('.protractor-test-delete-skill-button'));
   var topicsListItems = element.all(
     by.css('.protractor-test-topics-list-item'));
   var skillsListItems = element.all(
@@ -37,8 +41,14 @@ var TopicsAndSkillsDashboardPage = function() {
   var confirmTopicCreationButton = element(
     by.css('.protractor-test-confirm-topic-creation-button')
   );
+  var confirmTopicDeletionButton = element(
+    by.css('.protractor-test-confirm-topic-deletion-button')
+  );
   var confirmSkillCreationButton = element(
     by.css('.protractor-test-confirm-skill-creation-button')
+  );
+  var confirmSkillDeletionButton = element(
+    by.css('.protractor-test-confirm-skill-deletion-button')
   );
   var unpublishedSkillsTabButton = element(
     by.css('.protractor-test-unpublished-skills-tab')
@@ -60,6 +70,38 @@ var TopicsAndSkillsDashboardPage = function() {
 
     topicNameField.sendKeys(title);
     confirmTopicCreationButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.deleteTopicWithIndex = function(index) {
+    deleteTopicButtons.then(function(elems) {
+      waitFor.elementToBeClickable(
+        elems[0],
+        'Delete Topic button takes too long to be clickable');
+      elems[0].click();
+
+      waitFor.elementToBeClickable(
+        confirmTopicDeletionButton,
+        'Confirm Delete Topic button takes too long to be clickable');
+      confirmTopicDeletionButton.click();
+    });
+
+    waitFor.pageToFullyLoad();
+  };
+
+  this.deleteSkillWithIndex = function(index) {
+    deleteSkillButtons.then(function(elems) {
+      waitFor.elementToBeClickable(
+        elems[0],
+        'Delete skill button takes too long to be clickable');
+      elems[0].click();
+
+      waitFor.elementToBeClickable(
+        confirmSkillDeletionButton,
+        'Confirm Delete Skill button takes too long to be clickable');
+      confirmSkillDeletionButton.click();
+    });
+
     waitFor.pageToFullyLoad();
   };
 
