@@ -68,6 +68,15 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
 
     def test_post(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
+                '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id),
+                {}, csrf_token=csrf_token, expected_status_int=404)
+            self.logout()
+
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
@@ -75,6 +84,27 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             self.post_json(
                 '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id),
                 {}, csrf_token=csrf_token, expected_status_int=401)
+            self.logout()
+
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            incorrect_skill_id = 'abc123456789'
+            self.post_json(
+                '%s/%s' % (feconf.NEW_QUESTION_URL, incorrect_skill_id),
+                {}, csrf_token=csrf_token, expected_status_int=404)
+            self.logout()
+
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            question_dict = self.question.to_dict()
+            question_dict['id'] = 'abc123456789'
+            self.post_json(
+                '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id), {
+                    'question_dict': question_dict
+                }, csrf_token=csrf_token, expected_status_int=400)
+            all_models = question_models.QuestionModel.get_all()
             self.logout()
 
             self.login(self.ADMIN_EMAIL)
@@ -126,6 +156,17 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             self._create_valid_question_data('ABC'))
 
     def test_post(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                    self.skill_id
+                ), {}, csrf_token=csrf_token, expected_status_int=404)
+            self.logout()
+
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
@@ -135,6 +176,17 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                     self.skill_id
                 ), {}, csrf_token=csrf_token, expected_status_int=401)
+            self.logout()
+
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            incorrect_skill_id = 'abc123456789'
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                    incorrect_skill_id
+                ), {}, csrf_token=csrf_token, expected_status_int=404)
             self.logout()
 
             self.login(self.ADMIN_EMAIL)
@@ -179,6 +231,15 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             self.question_id, self.skill_id)
         question_services.create_new_question_skill_link(
             self.question_id_2, self.skill_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.login(self.ADMIN_EMAIL)
+            self.delete_json(
+                '%s/%s/%s' % (
+                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                    self.skill_id
+                ), expected_status_int=404)
+            self.logout()
+
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
             self.delete_json(
@@ -219,6 +280,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
 
 class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     """Tests get, put and delete methods of editable questions data handler."""
+
     def setUp(self):
         """Completes the setup for QuestionSkillLinkHandlerTest."""
         super(EditableQuestionDataHandlerTest, self).setUp()
@@ -229,6 +291,14 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             self.question_id, self.skill_id)
 
     def test_get(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.login(self.ADMIN_EMAIL)
+            self.get_json(
+                '%s/%s' % (
+                    feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+                expected_status_int=404)
+            self.logout()
+
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             # Check that non-admin and topic_manager cannot access the editor
             # data.
@@ -292,15 +362,41 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             self.logout()
 
     def test_delete(self):
-        self.login(self.ADMIN_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.login(self.ADMIN_EMAIL)
+            self.delete_json(
+                '%s/%s' % (
+                    feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+                expected_status_int=404)
+            self.logout()
+
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            self.login(self.ADMIN_EMAIL)
             self.delete_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
                 expected_status_int=200)
             self.logout()
 
+            self.login(self.ADMIN_EMAIL)
+            self.delete_json(
+                '%s/%s' % (
+                    feconf.QUESTION_EDITOR_DATA_URL_PREFIX, 'abc123456789'),
+                expected_status_int=404)
+            self.logout()
+
     def test_put(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            response_json = self.put_json(
+                '%s/%s' % (
+                    feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+                {},
+                csrf_token=csrf_token, expected_status_int=404)
+            self.logout()
+
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             payload = {}
             new_question_data = self._create_valid_question_data('DEF')
@@ -400,4 +496,23 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
                 new_question_data.to_dict())
             self.assertEqual(
                 response_json['question_dict']['id'], self.question_id)
+            self.logout()
+
+            payload = {}
+            new_question_data = self._create_valid_question_data('XXX')
+            change_list = [{
+                'cmd': 'create_new_fully_specified_question',
+                'question_dict': {},
+                'skill_id': 'abc123'
+            }]
+            payload['change_list'] = change_list
+            payload['commit_message'] = 'update question data'
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            response_json = self.put_json(
+                '%s/%s' % (
+                    feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+                payload,
+                csrf_token=csrf_token, expected_status_int=400)
             self.logout()
