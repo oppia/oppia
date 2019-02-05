@@ -98,7 +98,13 @@ class PromoBarHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        self.render_json({
-            'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
-            'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
-        })
+        try:
+            self.render_json({
+                'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
+                'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
+            })
+        except AttributeError:
+            self.render_json({
+                'promo_bar_enabled': False,
+                'promo_bar_message': ''
+            })

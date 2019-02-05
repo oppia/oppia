@@ -16,10 +16,10 @@
  * @fileoverview Service for Resources.
  */
 
-oppia.factory('ResourceService', ['$http',
-  function($http) {
+oppia.factory('ResourceService', [
+  '$http', function($http) {
     return {
-      getPromoBar: function() {
+      getPromoBarData: function() {
         return $http.get('/promo_bar_handler', {}).then(
           function(response) {
             return {

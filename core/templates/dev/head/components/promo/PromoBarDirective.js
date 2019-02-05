@@ -38,15 +38,15 @@ oppia.directive('promoBar', [
 
           if ($window.location.pathname.split('/')[1] === 'signup') {
             $scope.promoBarIsEnabled = false;
-            $scope.getPromoMessage = '';
+            $scope.promoBarMessage = '';
           } else if (ENABLE_PROMO_BAR) {
-            ResourceService.getPromoBar().then(function(promoBarObject) {
+            ResourceService.getPromoBarData().then(function(promoBarObject) {
               $scope.promoBarIsEnabled = promoBarObject.promoBarEnabled;
-              $scope.getPromoMessage = promoBarObject.promoBarMessage;
+              $scope.promoBarMessage = promoBarObject.promoBarMessage;
             });
           } else {
             $scope.promoBarIsEnabled = false;
-            $scope.getPromoMessage = '';
+            $scope.promoBarMessage = '';
           }
 
           // TODO(bhenning): Utilize cookies for tracking when a promo is
