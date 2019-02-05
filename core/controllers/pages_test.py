@@ -165,4 +165,3 @@ class MaintenancePageTest(test_utils.GenericTestBase):
             response = self.testapp.get('/admin')
             self.assertEqual(response.status_int, 302)
             self.assertIn('admin', response.headers['location'])
-
