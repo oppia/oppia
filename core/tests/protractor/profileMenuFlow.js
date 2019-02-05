@@ -29,10 +29,10 @@ describe('Profile menu flow', function() {
   beforeAll(function() {
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     var VISITOR_USERNAME = 'desktopAndMobileVisitor';
+    users.createAdmin(
+      'desktopAndMobileAdm@profileMenuFlow.com', 'desktopAndMobileAdm');
     users.createAndLoginUser(
       'desktopAndMobileVisitor@profileMenuFlow.com', VISITOR_USERNAME);
-    users.createAndLoginAdminUser(
-      'desktopAndMobileAdm@profileMenuFlow.com', 'desktopAndMobileAdm');
   });
 
   it('should land on the learner dashboard after successful login',
