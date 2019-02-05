@@ -47,7 +47,7 @@ oppia.directive('translationTab', [
             UrlInterpolationService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
-          $scope.showSubDirectives = false;
+          $scope.showTranslationTabSubDirectives = false;
 
           var initTranslationTab = function() {
             var stateName = StateEditorService.getActiveStateName();
