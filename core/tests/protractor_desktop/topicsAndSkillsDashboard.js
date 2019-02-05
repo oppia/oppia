@@ -26,7 +26,7 @@ var AdminPage = require('../protractor_utils/AdminPage.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 
-describe('Learner dashboard functionality', function() {
+describe('Topics and skills dashboard functionality', function() {
   var topicsAndSkillsDashboardPage = null;
 
   beforeAll(function() {
