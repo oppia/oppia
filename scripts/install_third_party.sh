@@ -40,6 +40,7 @@ install_node_module @mapbox/stylelint-processor-arbitrary-tags 0.2.0
 install_node_module postcss-syntax 0.10.0
 install_node_module stylelint 9.2.1
 install_node_module stylelint-config-standard 18.2.0
+install_node_module stylelint-order 2.0.0
 install_node_module through2 2.0.0
 install_node_module uglify-js 3.3.11
 install_node_module yargs 3.29.0
