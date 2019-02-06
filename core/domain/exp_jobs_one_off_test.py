@@ -40,6 +40,7 @@ import utils
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
         models.NAMES.classifier]))
 search_services = models.Registry.import_search_services()
+taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 def mock_get_filename_with_dimensions(filename, unused_exp_id):
@@ -85,11 +86,17 @@ def run_job_for_deleted_exp(
         self, job_class, check_error=False,
         error_type=None, error_msg=None, function_to_be_called=None,
         exp_id=None):
-    """Helper function to run job for an deleted exploration and check the
+    """Helper function to run job for a deleted exploration and check the
     output or error condition.
     """
     job_id = job_class.create_new()
+    self.assertEqual(
+        self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
     job_class.enqueue(job_id)
+    self.assertEqual(
+        self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
     self.process_and_flush_pending_tasks()
 
     if check_error:
@@ -763,7 +770,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_validation_errors_are_not_raised_for_valid_exploration(self):
-        """Checks validation errors are not present for valid exploration."""
+        """Checks validation errors are not raised for a valid exploration."""
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category',
             objective='Test Exploration')
