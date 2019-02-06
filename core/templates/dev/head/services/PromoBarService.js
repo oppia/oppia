@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for Resources.
+ * @fileoverview Service Promo bar.
  */
 
-oppia.factory('ResourceService', [
+oppia.factory('PromoBarService', [
   '$http', function($http) {
     return {
       getPromoBarData: function() {

@@ -16,12 +16,12 @@
  * @fileoverview Tests that the resource service is working as expected.
  */
 
-describe('Resource Service', function() {
-  var ResourceService;
+describe('Promo bar Service', function() {
+  var PromoBarService;
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
-    ResourceService = $injector.get('ResourceService');
+    PromoBarService = $injector.get('PromoBarService');
     $httpBackend = $injector.get('$httpBackend');
   }));
 
@@ -32,7 +32,7 @@ describe('Resource Service', function() {
       promo_bar_message: 'test message'
     });
 
-    ResourceService.getPromoBarData().then(function(data) {
+    PromoBarService.getPromoBarData().then(function(data) {
       expect(data.promoBarEnabled).toBe(true);
       expect(data.promoBarMessage).toBe('test message');
     });

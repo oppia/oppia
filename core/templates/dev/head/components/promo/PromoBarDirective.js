@@ -19,8 +19,8 @@
  */
 
 oppia.directive('promoBar', [
-  'ResourceService', 'UrlInterpolationService', 'ENABLE_PROMO_BAR',
-  function(ResourceService, UrlInterpolationService, ENABLE_PROMO_BAR) {
+  'PromoBarService', 'UrlInterpolationService', 'ENABLE_PROMO_BAR',
+  function(PromoBarService, UrlInterpolationService, ENABLE_PROMO_BAR) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -40,7 +40,7 @@ oppia.directive('promoBar', [
             $scope.promoBarIsEnabled = false;
             $scope.promoBarMessage = '';
           } else if (ENABLE_PROMO_BAR) {
-            ResourceService.getPromoBarData().then(function(promoBarObject) {
+            PromoBarService.getPromoBarData().then(function(promoBarObject) {
               $scope.promoBarIsEnabled = promoBarObject.promoBarEnabled;
               $scope.promoBarMessage = promoBarObject.promoBarMessage;
             });
