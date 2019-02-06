@@ -19,7 +19,7 @@
 from extensions.issues import base
 
 
-class CyclicStateTransitions(base.BaseExplorationIssueSpec):
+class CyclicStateTransitions(base.BasePlaythroughIssueSpec):
     """Issue that's recorded when the learner transitions between states in a
     cyclic manner multiple times.
     """

@@ -27,7 +27,7 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
    * @param {number} schemaVersion - schema version of the class instance.
    * @param {boolean} isValid - whether the issue is valid.
    */
-  var ExplorationIssue = function(
+  var PlaythroughIssue = function(
       issueType, issueCustomizationArgs, playthroughIds, schemaVersion,
       isValid) {
     /** @type {string} */
@@ -43,7 +43,7 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
   };
 
   /**
-   * @typedef ExplorationIssueBackendDict
+   * @typedef PlaythroughIssueBackendDict
    * @property {string} issueType - type of an issue.
    * @property {Object.<string, *>} issueCustomizationArgs - customization dict
    *   for an issue.
@@ -52,12 +52,12 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
    * @property {boolean} isValid - whether the issue is valid.
    */
   /**
-   * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
-   * @returns {ExplorationIssue}
+   * @param {PlaythroughIssueBackendDict} explorationIssueBackendDict
+   * @returns {PlaythroughIssue}
    */
-  ExplorationIssue.createFromBackendDict = function(
+  PlaythroughIssue.createFromBackendDict = function(
       explorationIssueBackendDict) {
-    return new ExplorationIssue(
+    return new PlaythroughIssue(
       explorationIssueBackendDict.issue_type,
       explorationIssueBackendDict.issue_customization_args,
       explorationIssueBackendDict.playthrough_ids,
@@ -66,9 +66,9 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
   };
 
   /**
-   * @returns {ExplorationIssueBackendDict}
+   * @returns {PlaythroughIssueBackendDict}
    */
-  ExplorationIssue.prototype.toBackendDict = function() {
+  PlaythroughIssue.prototype.toBackendDict = function() {
     return {
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
@@ -78,5 +78,5 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
     };
   };
 
-  return ExplorationIssue;
+  return PlaythroughIssue;
 }]);
