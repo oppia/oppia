@@ -23,15 +23,13 @@ oppia.factory('ExplorationStatesService', [
   'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
   'StateEditorService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
-  'AnswerClassificationService', 'ContextService',
-  'UrlInterpolationService',
+  'AnswerClassificationService', 'ContextService', 'UrlInterpolationService',
   function(
       $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       ExplorationInitStateNameService, AlertsService, ChangeListService,
       StateEditorService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
-      AnswerClassificationService, ContextService,
-      UrlInterpolationService) {
+      AnswerClassificationService, ContextService, UrlInterpolationService) {
     var _states = null;
 
     var stateAddedCallbacks = [];
@@ -99,6 +97,44 @@ oppia.factory('ExplorationStatesService', [
       widget_customization_args: ['interaction', 'customizationArgs']
     };
 
+    CONTENT_ID_EXTRACTORS = {
+      answer_groups: function(answerGroups) {
+        contentIds = new Set();
+        answerGroups.forEach(function(answerGroup) {
+          contentIds.add(answerGroup.outcome.feedback.getContentId());
+        });
+        return contentIds;
+      },
+      default_outcome: function(defaultOutcome) {
+        contentIds = new Set();
+        if (defaultOutcome) {
+          contentIds.add(defaultOutcome.feedback.getContentId());
+        }
+        return contentIds;
+      },
+      hints: function(hints) {
+        contentIds = new Set();
+        hints.forEach(function(hint) {
+          contentIds.add(hint.hintContent.getContentId());
+        });
+        return contentIds;
+      },
+      solution: function(solution) {
+        contentIds = new Set();
+        if (solution) {
+          contentIds.add(solution.explanation.getContentId());
+        }
+        return contentIds;
+      }
+    };
+
+    var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
+      diffList = Array.from(setA).filter(function(element) {
+        return !setB.has(element);
+      });
+      return diffList;
+    };
+
     var _setState = function(stateName, stateData, refreshGraph) {
       _states.setState(stateName, angular.copy(stateData));
       if (refreshGraph) {
@@ -144,6 +180,21 @@ oppia.factory('ExplorationStatesService', [
         var newStateData = _states.getState(stateName);
         var accessorList = PROPERTY_REF_DATA[backendName];
 
+        if (CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
+          var oldContentIds = CONTENT_ID_EXTRACTORS[backendName](oldValue);
+          var newContentIds = CONTENT_ID_EXTRACTORS[backendName](newValue);
+          var contentIdsToDelete = _getElementsInFirstSetButNotInSecond(
+            oldContentIds, newContentIds);
+          var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
+            newContentIds, oldContentIds);
+          contentIdsToDelete.forEach(function(contentId) {
+            newStateData.contentIdsToAudioTranslations.deleteContentId(
+              contentId);
+          });
+          contentIdsToAdd.forEach(function(contentId) {
+            newStateData.contentIdsToAudioTranslations.addContentId(contentId);
+          });
+        }
         var propertyRef = newStateData;
         for (var i = 0; i < accessorList.length - 1; i++) {
           propertyRef = propertyRef[accessorList[i]];
@@ -414,7 +465,7 @@ oppia.factory('ExplorationStatesService', [
       },
       registerOnStateAnswerGroupsSavedCallback: function(callback) {
         stateAnswerGroupsSavedCallbacks.push(callback);
-      },
+      }
     };
   }
 ]);

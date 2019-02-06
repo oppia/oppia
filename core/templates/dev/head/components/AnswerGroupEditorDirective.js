@@ -31,9 +31,9 @@ oppia.directive('answerGroupEditor', [
           '&onSaveAnswerGroupCorrectnessLabel'),
         getTaggedMisconceptionId: '&taggedMisconceptionId',
         isEditable: '=',
-        onSaveContentIdsToAudioTranslations: '=',
         outcome: '=',
         rules: '=',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
         suppressWarnings: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
