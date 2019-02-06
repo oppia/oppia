@@ -23,8 +23,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(classifier_models,) = models.Registry.import_models(
-    [models.NAMES.classifier])
+(classifier_models, base_models) = models.Registry.import_models(
+    [models.NAMES.classifier, models.NAMES.base_model])
 
 
 class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
@@ -176,6 +176,17 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             feconf.TRAINING_JOB_STATUS_NEW)
         self.assertEqual(training_job2.classifier_data, None)
         self.assertEqual(training_job2.data_schema_version, 1)
+
+    def test_ID_collision_exception(self):
+        base_model_initial_retries = base_models.MAX_RETRIES
+        base_models.MAX_RETRIES = 0
+        with self.assertRaisesRegexp(Exception, ('The id generator for ClassifierTrainingJobModel is producing too many collisions.')):
+            classifier_models.ClassifierTrainingJobModel._generate_id(1)
+        base_models.MAX_RETRIES = base_model_initial_retries
+
+
+
+
 
 
 class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
