@@ -41,7 +41,6 @@ oppia.factory('TrainingModalService', [
             'AnswerClassificationService', 'ContextService',
             'StateInteractionIdService', 'AngularNameService',
             'ResponsesService', 'TrainingDataService',
-            'StateContentIdsToAudioTranslationsService',
             'AnswerGroupObjectFactory', 'GraphDataService',
             'ExplorationWarningsService',
             function($scope, $injector, $uibModalInstance,
@@ -49,7 +48,6 @@ oppia.factory('TrainingModalService', [
                 AnswerClassificationService, ContextService,
                 StateInteractionIdService, AngularNameService,
                 ResponsesService, TrainingDataService,
-                StateContentIdsToAudioTranslationsService,
                 AnswerGroupObjectFactory, GraphDataService,
                 ExplorationWarningsService) {
               $scope.trainingDataAnswer = '';
@@ -64,8 +62,6 @@ oppia.factory('TrainingModalService', [
 
               var _saveNewAnswerGroup = function(newAnswerGroup) {
                 var answerGroups = ResponsesService.getAnswerGroups();
-                var translationService = (
-                  StateContentIdsToAudioTranslationsService);
                 answerGroups.push(newAnswerGroup);
                 ResponsesService.save(
                   answerGroups, ResponsesService.getDefaultOutcome(),
@@ -81,12 +77,6 @@ oppia.factory('TrainingModalService', [
                     GraphDataService.recompute();
                     ExplorationWarningsService.updateWarnings();
                   });
-                translationService.displayed.addContentId(
-                  newAnswerGroup.outcome.feedback.getContentId());
-                translationService.saveDisplayedValue();
-                ExplorationStatesService.saveContentIdsToAudioTranslations(
-                  translationService.stateName,
-                  angular.copy(translationService.displayed));
               };
 
               $scope.exitTrainer = function() {
