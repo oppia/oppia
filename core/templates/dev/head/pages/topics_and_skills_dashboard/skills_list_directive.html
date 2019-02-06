@@ -20,7 +20,7 @@
     </tr>
     <tr ng-repeat="skill in getSkillSummaries() | filter:skillFilterText"
         ng-click="isInModal() && selectSkill(skill)"
-        class="list-item"
+        class="list-item protractor-test-skills-list-item"
         ng-init="skillLink = isInModal() ? '#' : getSkillEditorUrl(skill.id)">
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
           ng-mouseover="highlightColumns($index)"
@@ -54,7 +54,7 @@
         </button>
       </td>
       <td ng-if="canDeleteSkill()" class="delete-icon">
-        <span ng-click="deleteSkill(skill.id)" class="fa fa-trash list-summary"> </span>
+        <span ng-click="deleteSkill(skill.id)" class="fa fa-trash list-summary protractor-test-delete-skill-button"> </span>
       </td>
     </tr>
   </table>

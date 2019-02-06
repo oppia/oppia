@@ -7,11 +7,15 @@
     <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
       <strong>New Skill Description</strong>
     </div>
-    <input type="text" class="form-control" placeholder="eg: Adding Fractions" ng-model="newSkillDescription" autofocus>
+    <input type="text" class="form-control protractor-test-new-skill-description-field" placeholder="eg: Adding Fractions" ng-model="newSkillDescription" autofocus>
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-success" type="submit" ng-disabled="newSkillDescription.length === 0">Save</button>
+    <button class="btn btn-success protractor-test-confirm-skill-creation-button"
+            type="submit"
+            ng-disabled="newSkillDescription.length === 0">
+            Save
+    </button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
   </div>
 </form>

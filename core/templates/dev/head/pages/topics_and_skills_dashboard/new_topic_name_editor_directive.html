@@ -7,14 +7,14 @@
   <div class="modal-body new-topic-name-editor" ng-class="{'has-error': isTopicNameEmpty(topicName)}">
     <p>
       Enter the name for the topic: &nbsp;
-      <input class="form-group" ng-model="topicName" maxlength="20" autofocus>
+      <input class="form-group protractor-test-new-topic-name-field" ng-model="topicName" maxlength="20" autofocus>
       <p style="color: red;" ng-if="topicName.length === 20">
         Topic name should be less than 20 characters.
       </p>
     </p>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-success" type="submit" ng-disabled="isTopicNameEmpty(topicName) || topicName.length >= 20">
+    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="isTopicNameEmpty(topicName) || topicName.length >= 20">
       <span>Create Topic</span>
     </button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>

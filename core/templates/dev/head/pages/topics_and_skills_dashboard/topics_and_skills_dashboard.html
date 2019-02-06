@@ -31,14 +31,14 @@
         </li>
         <li ng-if="isSkillsTabHelpTextVisible() || untriagedSkillSummaries.length > 0"
             ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_UNTRIAGED_SKILLS}">
-          <a class="dashboard-tabs-text"
+          <a class="dashboard-tabs-text protractor-test-unused-skills-tab"
              ng-click="setActiveTab(TAB_NAME_UNTRIAGED_SKILLS)">
              Unused Skills (<[untriagedSkillSummaries.length]>)
           </a>
         </li>
         <li ng-if="unpublishedSkillSummaries.length > 0"
             ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_UNPUBLISHED_SKILLS}">
-          <a class="dashboard-tabs-text"
+          <a class="dashboard-tabs-text protractor-test-unpublished-skills-tab"
              ng-click="setActiveTab(TAB_NAME_UNPUBLISHED_SKILLS)">
              Unpublished Skills (<[unpublishedSkillSummaries.length]>)
           </a>
@@ -84,13 +84,13 @@
         <p class="intro-card-message" style="padding-top: 6px;">
           No topics or skills have been created yet.
         </p>
-        <button class="btn oppia-dashboard-intro-button oppia-transition-200"
+        <button class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-topic-button"
                 style="color: white; text-decoration: none;"
                 ng-click="createTopic()"
                 ng-if="userCanCreateTopic">
           Create Topic
         </button>
-        <button class="btn oppia-dashboard-intro-button oppia-transition-200"
+        <button class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-skill-button"
                 style="color: white; text-decoration: none;"
                 ng-click="createSkill()"
                 ng-if="userCanCreateSkill">

@@ -113,19 +113,19 @@
         <hr class="oppia-top-right-menu-item-separator">
         <li>
           <a ng-click="closeSubmenuIfNotMobile($event)" href="/creator_dashboard"
-             class="protractor-test-dashboard-link protractor-test-creator-dashboard-link">
+             class="protractor-test-creator-dashboard-link">
             <span translate="I18N_TOPNAV_CREATOR_DASHBOARD"></span>
           </a>
         </li>
         <li>
           <a ng-click="closeSubmenuIfNotMobile($event)" href="/learner_dashboard"
-             class="protractor-test-dashboard-link protractor-test-learner-dashboard-link">
+             class="protractor-test-learner-dashboard-link">
             <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
           </a>
         </li>
         <li>
           <a ng-if="(isAdmin || isTopicManager) && newStructuresEnabled" ng-click="closeSubmenuIfNotMobile($event)" href="/topics_and_skills_dashboard"
-             class="protractor-test-dashboard-link">
+             class="protractor-test-topics-and-skills-dashboard-link">
             <span translate="I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD"></span>
           </a>
         </li>
