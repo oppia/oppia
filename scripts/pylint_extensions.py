@@ -805,11 +805,11 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
         'C0007': (
             'Files should end in a single newline character.',
             'newline-at-eof',
-            'Please enter a single newline at the end of the file'),
+            'Please enter a single newline at the end of the file.'),
         'C0008': (
             'Only one character in file',
             'only-one-character',
-            'Files with only one character are not allowed'),
+            'Files with only one character are not allowed.'),
     }
 
     def process_module(self, node):
