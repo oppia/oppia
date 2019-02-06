@@ -72,8 +72,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
     def test_guest_cannot_access_private_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id, expect_errors=True,
-                expected_status_int=404)
+                '/mock/%s' % self.private_exp_id, expected_status_int=404)
 
     def test_admin_can_access_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
@@ -93,8 +92,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id, expect_errors=True,
-                expected_status_int=404)
+                '/mock/%s' % self.private_exp_id, expected_status_int=404)
         self.logout()
 
 
@@ -147,8 +145,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
     def test_guest_cannot_access_private_collection(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_col_id, expect_errors=True,
-                expected_status_int=404)
+                '/mock/%s' % self.private_col_id, expected_status_int=404)
 
     def test_admin_can_access_private_collection(self):
         self.login(self.ADMIN_EMAIL)
@@ -168,8 +165,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_col_id, expect_errors=True,
-                expected_status_int=404)
+                '/mock/%s' % self.private_col_id, expected_status_int=404)
         self.logout()
 
 
@@ -220,8 +216,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
     def test_guest_cannot_edit_collection_via_json_handler(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.published_col_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.published_col_id, expected_status_int=401)
 
     def test_guest_is_redirected_when_using_html_handler(self):
         with self.swap(
@@ -235,8 +230,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_col_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.private_col_id, expected_status_int=401)
         self.logout()
 
     def test_owner_can_edit_owned_collection(self):
@@ -250,8 +244,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_col_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.private_col_id, expected_status_int=401)
         self.logout()
 
     def test_moderator_can_edit_public_collection(self):
@@ -294,8 +287,7 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
     def test_banned_user_cannot_create_exploration(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/create', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock/create', expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_create_exploration(self):
@@ -307,8 +299,7 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_create_exploration_via_json_handler(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/create', expect_errors=True,
-                          expected_status_int=401)
+            self.get_json('/mock/create', expected_status_int=401)
 
     def test_guest_is_redirected_when_using_html_handler(self):
         with self.swap(
@@ -344,8 +335,7 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_create_collection_via_json_handler(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/create', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock/create', expected_status_int=401)
 
     def test_guest_is_redirected_when_using_html_handler(self):
         with self.swap(
@@ -357,8 +347,7 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
     def test_normal_user_cannot_create_collection(self):
         self.login(self.EDITOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/create', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock/create', expected_status_int=401)
         self.logout()
 
     def test_collection_editor_can_create_collection(self):
@@ -401,8 +390,7 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
     def test_banned_user_cannot_access_editor_dashboard(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/access', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock/access', expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_access_editor_dashboard(self):
@@ -448,10 +436,10 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/exploration.%s.thread1' % self.private_exp_id,
-                expect_errors=True, expected_status_int=401)
+                expected_status_int=401)
             self.get_json(
                 '/mock/exploration.%s.thread1' % self.published_exp_id,
-                expect_errors=True, expected_status_int=401)
+                expected_status_int=401)
 
     def test_guest_is_redirected_when_using_html_handler(self):
         with self.swap(
@@ -633,8 +621,7 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
     def test_moderator_cannot_access_email_dashboard(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_admin_can_access_email_dashboard(self):
@@ -673,8 +660,7 @@ class RateExplorationTests(test_utils.GenericTestBase):
     def test_guest_cannot_give_rating(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.exp_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.exp_id, expected_status_int=401)
 
     def test_normal_user_can_give_rating(self):
         self.login(self.user_email)
@@ -708,7 +694,7 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
     def test_normal_user_cannot_access_moderator_page(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_admin_can_access_moderator_page(self):
@@ -743,8 +729,7 @@ class FlagExplorationTests(test_utils.GenericTestBase):
     def test_guest_cannot_flag_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.exp_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.exp_id, expected_status_int=401)
 
     def test_normal_user_can_flag_exploration(self):
         self.login(self.user_email)
@@ -776,7 +761,7 @@ class SubscriptionToUsersTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_subscribe_to_users(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock/', expected_status_int=401)
 
     def test_normal_user_can_subscribe_to_users(self):
         self.login(self.user_email)
@@ -811,7 +796,7 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
     def test_normal_user_cannot_send_moderator_emails(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_admin_can_send_moderator_emails(self):
@@ -879,8 +864,7 @@ class TranslateExplorationTests(test_utils.GenericTestBase):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id_1, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
         self.logout()
 
     def test_owner_can_translate_exploration(self):
@@ -901,8 +885,7 @@ class TranslateExplorationTests(test_utils.GenericTestBase):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id_1, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
         self.logout()
 
     def test_admin_can_translate_private_exploration(self):
@@ -923,8 +906,7 @@ class TranslateExplorationTests(test_utils.GenericTestBase):
         # is not assigned for.
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.published_exp_id_2, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
 
     def test_translator_can_only_translate_assigned_private_exploration(self):
@@ -938,24 +920,21 @@ class TranslateExplorationTests(test_utils.GenericTestBase):
         # is not assigned for.
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id_2, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.private_exp_id_2, expected_status_int=401)
         self.logout()
 
     def test_user_without_translator_role_of_exploration_cannot_translate_public_exploration(self): # pylint: disable=line-too-long
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.published_exp_id_1, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.published_exp_id_1, expected_status_int=401)
         self.logout()
 
     def test_user_without_translator_role_of_exploration_cannot_translate_private_exploration(self): # pylint: disable=line-too-long
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id_1, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
         self.logout()
 
 
@@ -998,8 +977,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.private_exp_id, expected_status_int=401)
         self.logout()
 
     def test_owner_can_edit_exploration(self):
@@ -1020,8 +998,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.private_exp_id, expected_status_int=401)
         self.logout()
 
     def test_admin_can_edit_private_exploration(self):
@@ -1060,8 +1037,7 @@ class ManageOwnProfileTests(test_utils.GenericTestBase):
     def test_banned_user_cannot_update_preferences(self):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_manage_preferences(self):
@@ -1119,16 +1095,14 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.published_exp_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.published_exp_id, expected_status_int=401)
         self.logout()
 
     def test_moderator_cannot_delete_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.private_exp_id, expected_status_int=401)
         self.logout()
 
 
@@ -1161,8 +1135,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.exploration_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.exploration_id, expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_suggest_changes(self):
@@ -1201,13 +1174,13 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
     def test_banned_user_cannot_suggest_changes(self):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock', expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_suggest_changes(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock', expected_status_int=200)
+            self.get_json('/mock')
         self.logout()
 
 
@@ -1262,9 +1235,7 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
     def test_author_can_resubmit_suggestion(self):
         self.login(self.author_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/mock/%s' % self.suggestion_id, expect_errors=False,
-                expected_status_int=200)
+            response = self.get_json('/mock/%s' % self.suggestion_id)
         self.assertEqual(response['suggestion_id'], self.suggestion_id)
         self.logout()
 
@@ -1272,8 +1243,7 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.suggestion_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.suggestion_id, expected_status_int=401)
         self.logout()
 
 
@@ -1319,16 +1289,14 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.public_exp_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.public_exp_id, expected_status_int=401)
         self.logout()
 
     def test_moderator_cannot_publish_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.private_exp_id, expected_status_int=401)
         self.logout()
 
     def test_admin_can_publish_any_exploration(self):
@@ -1376,8 +1344,7 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.private_exp_id, expected_status_int=401)
         self.logout()
 
     def test_admin_can_modify_roles_of_any_exploration(self):
@@ -1458,7 +1425,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_unpublish/%s' % self.published_col_id,
-                expect_errors=True, expected_status_int=401)
+                expected_status_int=401)
         self.logout()
 
     def test_moderator_can_unpublish_public_collection(self):
@@ -1480,7 +1447,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_publish/%s' % self.published_col_id, expect_errors=True,
+                '/mock_publish/%s' % self.published_col_id,
                 expected_status_int=401)
         self.logout()
 
@@ -1513,8 +1480,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
     def test_banned_user_is_redirected(self):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_exploration_editor_can_access_learner_dashboard(self):
@@ -1578,8 +1544,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.topic_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.topic_id, expected_status_int=401)
         self.logout()
 
 
@@ -1641,16 +1606,14 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.login(self.second_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.skill_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.skill_id, expected_status_int=401)
         self.logout()
 
     def test_topic_manager_can_not_edit_private_skill(self):
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.skill_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.skill_id, expected_status_int=401)
         self.logout()
 
     def test_topic_manager_can_edit_public_skill(self):
@@ -1666,8 +1629,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.skill_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.skill_id, expected_status_int=401)
 
 
 class EditQuestionDecoratorTests(test_utils.GenericTestBase):
@@ -1725,6 +1687,5 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.login('b@example.com')
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.question_id, expect_errors=True,
-                expected_status_int=401)
+                '/mock/%s' % self.question_id, expected_status_int=401)
         self.logout()

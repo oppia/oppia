@@ -21,12 +21,18 @@
  * function on Oppia-ml.
  */
 
+// Minimum confidence required for a predicted answer group to be shown to user.
+// Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,
+// however value need not be in those bounds.
+oppia.constant('CODE_REPL_PREDICTION_SERVICE_THRESHOLD', 0.7);
+
 oppia.factory('CodeReplPredictionService', [
   'WinnowingPreprocessingService', 'SVMPredictionService',
   'PythonProgramTokenizer', 'PythonProgramTokenType',
-  'CountVectorizerService', function(
+  'CountVectorizerService', 'CODE_REPL_PREDICTION_SERVICE_THRESHOLD', function(
       WinnowingPreprocessingService, SVMPredictionService,
-      PythonProgramTokenizer, PythonProgramTokenType, CountVectorizerService) {
+      PythonProgramTokenizer, PythonProgramTokenType, CountVectorizerService,
+      CODE_REPL_PREDICTION_SERVICE_THRESHOLD) {
     // The string with which all the variable and method names need to be
     // replaced.
     var TOKEN_NAME_VAR = 'V';
@@ -298,8 +304,12 @@ oppia.factory('CodeReplPredictionService', [
         var programVector = CountVectorizerService.vectorize(
           tokenizedProgram, cvVocabulary);
 
-        prediction = SVMPredictionService.predict(svmData, programVector);
-        return prediction;
+        predictionResult = SVMPredictionService.predict(svmData, programVector);
+        if (predictionResult.predictionConfidence >
+            CODE_REPL_PREDICTION_SERVICE_THRESHOLD) {
+          return predictionResult.predictionLabel;
+        }
+        return -1;
       }
     };
 

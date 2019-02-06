@@ -27,23 +27,22 @@ oppia.directive('outcomeEditor', [
         getOnSaveFeedbackFn: '&onSaveFeedback',
         getOnSaveCorrectnessLabelFn: '&onSaveCorrectnessLabel',
         outcome: '=outcome',
-        onSaveContentIdsToAudioTranslations: '=',
         areWarningsSuppressed: '&warningsAreSuppressed',
-        addState: '='
+        addState: '=',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'StateEditorService',
-        'StateContentIdsToAudioTranslationsService',
-        'StateInteractionIdService', 'INTERACTION_SPECS',
+        '$scope', 'StateEditorService', 'StateInteractionIdService',
+        'INTERACTION_SPECS',
         function(
-            $scope, $uibModal, StateEditorService,
-            StateContentIdsToAudioTranslationsService,
-            StateInteractionIdService, INTERACTION_SPECS) {
+            $scope, StateEditorService, StateInteractionIdService,
+            INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
           $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
-          $scope.canAddPrerequisiteSkill = constants.ENABLE_NEW_STRUCTURES;
+          $scope.canAddPrerequisiteSkill =
+            constants.ENABLE_NEW_STRUCTURE_EDITORS;
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
           $scope.correctnessLabelEditorIsOpen = false;
@@ -63,24 +62,6 @@ oppia.directive('outcomeEditor', [
           $scope.isCurrentInteractionLinear = function() {
             var interactionId = $scope.getCurrentInteractionId();
             return interactionId && INTERACTION_SPECS[interactionId].is_linear;
-          };
-
-          var openMarkAllAudioAsNeedingUpdateModal = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/forms/' +
-                'mark_all_audio_as_needing_update_modal_directive.html'),
-              backdrop: true,
-              resolve: {},
-              controller: 'MarkAllAudioAsNeedingUpdateController'
-            }).result.then(function() {
-              var feedbackContentId = $scope.outcome.feedback.getContentId();
-              StateContentIdsToAudioTranslationsService.displayed
-                .markAllAudioAsNeedingUpdate(feedbackContentId);
-              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations(
-                StateContentIdsToAudioTranslationsService.displayed);
-            });
           };
 
           var onExternalSave = function() {
@@ -169,10 +150,9 @@ oppia.directive('outcomeEditor', [
             $scope.savedOutcome.feedback = angular.copy(
               $scope.outcome.feedback);
             var feedbackContentId = $scope.savedOutcome.feedback.getContentId();
-            if (StateContentIdsToAudioTranslationsService.displayed
-              .hasUnflaggedAudioTranslations(feedbackContentId) &&
-              fromClickSaveFeedbackButton && contentHasChanged) {
-              openMarkAllAudioAsNeedingUpdateModal();
+            if (fromClickSaveFeedbackButton && contentHasChanged) {
+              var contentId = $scope.savedOutcome.feedback.getContentId();
+              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
             }
             $scope.getOnSaveFeedbackFn()($scope.savedOutcome);
           };

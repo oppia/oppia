@@ -54,8 +54,11 @@
       <span class="oppia-save-publish-button-label">Publish</span>
     </button>
   </li>
-  <li style="width: 40px; margin-right: 20px;" class="active" ng-class="{'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>">
-    <a href="#" uib-tooltip="Editor" class="protractor-test-main-tab">
+  <li style="width: 40px;"
+      ng-class="{'uib-dropdown': getWarningsCount(), 'active': getActiveTabName() === 'main'}"
+      ng-attr-uib-dropdown="<[getWarningsCount()]>"
+      ng-click="selectMainTab()">
+    <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
     <div ng-show="getWarningsCount()"
@@ -72,6 +75,14 @@
         <[issue]>
       </li>
     </ul>
+  </li>
+  <li class="icon"
+      style="margin-right: 20px;"
+      ng-class="{'active': getActiveTabName() === 'questions'}"
+      ng-click="selectQuestionsTab()">
+    <a uib-tooltip="Questions" tooltip-placement="bottom">
+      <i class="material-icons">library_books</i>
+    </a>
   </li>
 </ul>
 <style>

@@ -24,21 +24,23 @@ oppia.directive('editorNavigation', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_navigation_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', '$uibModal', 'ContextService',
-        'ExplorationRightsService', 'ExplorationWarningsService',
-        'RouterService', 'StateEditorTutorialFirstTimeService',
-        'SiteAnalyticsService', 'ThreadDataService', 'UserService',
-        'WindowDimensionsService',
+        '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
+        'ExplorationFeaturesService', 'ExplorationRightsService',
+        'ExplorationWarningsService', 'RouterService',
+        'SiteAnalyticsService', 'StateTutorialFirstTimeService',
+        'ThreadDataService', 'UserService', 'WindowDimensionsService',
         function(
-            $scope, $rootScope, $timeout, $uibModal, ContextService,
-            ExplorationRightsService, ExplorationWarningsService,
-            RouterService, StateEditorTutorialFirstTimeService,
-            SiteAnalyticsService, ThreadDataService, UserService,
-            WindowDimensionsService) {
+            $rootScope, $scope, $timeout, $uibModal, ContextService,
+            ExplorationFeaturesService, ExplorationRightsService,
+            ExplorationWarningsService, RouterService,
+            SiteAnalyticsService, StateTutorialFirstTimeService,
+            ThreadDataService, UserService, WindowDimensionsService) {
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
           };
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
+          $scope.isImprovementsTabEnabled =
+            ExplorationFeaturesService.isImprovementsTabEnabled;
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {
@@ -61,6 +63,8 @@ oppia.directive('editorNavigation', [
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();
             SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
+            var EDITOR_TUTORIAL_MODE = 'editor';
+            var TRANSLATION_TUTORIAL_MODE = 'translation';
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/' +
@@ -75,11 +79,18 @@ oppia.directive('editorNavigation', [
                   var explorationId = (
                     ContextService.getExplorationId());
 
-                  $scope.beginTutorial = function() {
+                  $scope.beginEditorTutorial = function() {
                     SiteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
-                    $uibModalInstance.close();
+                    $uibModalInstance.close(EDITOR_TUTORIAL_MODE);
+                  };
+
+                  $scope.beginTranslationTutorial = function() {
+                    SiteAnalyticsService
+                      .registerOpenTutorialFromHelpCenterEvent(
+                        explorationId);
+                    $uibModalInstance.close(TRANSLATION_TUTORIAL_MODE);
                   };
 
                   $scope.goToHelpCenter = function() {
@@ -92,10 +103,13 @@ oppia.directive('editorNavigation', [
               windowClass: 'oppia-help-modal'
             });
 
-            modalInstance.result.then(function() {
-              $rootScope.$broadcast('openEditorTutorial');
+            modalInstance.result.then(function(mode) {
+              if (mode === EDITOR_TUTORIAL_MODE) {
+                $rootScope.$broadcast('openEditorTutorial');
+              } else if (mode === TRANSLATION_TUTORIAL_MODE) {
+                $rootScope.$broadcast('openTranslationTutorial');
+              }
             }, function() {
-              StateEditorTutorialFirstTimeService.markTutorialFinished();
             });
           };
 
@@ -105,12 +119,14 @@ oppia.directive('editorNavigation', [
             ExplorationWarningsService.hasCriticalWarnings);
 
           $scope.ExplorationRightsService = ExplorationRightsService;
-          $scope.getTabStatuses = RouterService.getTabStatuses;
+          $scope.getActiveTabName = RouterService.getActiveTabName;
           $scope.selectMainTab = RouterService.navigateToMainTab;
           $scope.selectTranslationTab = RouterService.navigateToTranslationTab;
           $scope.selectPreviewTab = RouterService.navigateToPreviewTab;
           $scope.selectSettingsTab = RouterService.navigateToSettingsTab;
           $scope.selectStatsTab = RouterService.navigateToStatsTab;
+          $scope.selectImprovementsTab =
+            RouterService.navigateToImprovementsTab;
           $scope.selectHistoryTab = RouterService.navigateToHistoryTab;
           $scope.selectFeedbackTab = RouterService.navigateToFeedbackTab;
           $scope.getOpenThreadsCount = ThreadDataService.getOpenThreadsCount;

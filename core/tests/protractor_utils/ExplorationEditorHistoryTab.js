@@ -146,7 +146,7 @@ var ExplorationEditorHistoryTab = function() {
           expect(states.length).toEqual(expectedStates.length);
           // Note: we need to compare this way because the state graph is
           // sometimes generated with states in different configurations.
-          states.forEach(function(element){
+          states.forEach(function(element) {
             expect(expectedStates).toContain(element);
           });
         });

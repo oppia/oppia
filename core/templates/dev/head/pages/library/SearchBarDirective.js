@@ -25,11 +25,13 @@ oppia.directive('searchBar', [
         'search_bar_directive.html'),
       controller: [
         '$scope', '$rootScope', '$timeout', '$window', '$location',
-        '$translate', 'SearchService', 'DebouncerService', 'HtmlEscaperService',
+        '$translate', 'SearchService', 'NavigationService',
+        'DebouncerService', 'HtmlEscaperService',
         'UrlService', 'ConstructTranslationIdsService',
         function(
             $scope, $rootScope, $timeout, $window, $location,
-            $translate, SearchService, DebouncerService, HtmlEscaperService,
+            $translate, SearchService, NavigationService,
+            DebouncerService, HtmlEscaperService,
             UrlService, ConstructTranslationIdsService) {
           $scope.isSearchInProgress = SearchService.isSearchInProgress;
           $scope.SEARCH_DROPDOWN_CATEGORIES = (
@@ -43,18 +45,42 @@ oppia.directive('searchBar', [
               }
             )
           );
-          // TODO(sll): Remove the filter once the App Engine Search API
-          // supports 3-letter language codes.
-          $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.filter(
+          $scope.ACTION_OPEN = NavigationService.ACTION_OPEN;
+          $scope.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
+          $scope.KEYBOARD_EVENT_TO_KEY_CODES =
+          NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
+          /**
+           * Opens the submenu.
+           * @param {object} evt
+           * @param {String} menuName - name of menu, on which
+           * open/close action to be performed (category,language).
+           */
+          $scope.openSubmenu = function(evt, menuName) {
+            NavigationService.openSubmenu(evt, menuName);
+          };
+          /**
+           * Handles keydown events on menus.
+           * @param {object} evt
+           * @param {String} menuName - name of menu to perform action
+           * on(category/language)
+           * @param {object} eventsTobeHandled - Map keyboard events('Enter') to
+           * corresponding actions to be performed(open/close).
+           *
+           * @example
+           *  onMenuKeypress($event, 'category', {enter: 'open'})
+           */
+
+          $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
+            NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
+            $scope.activeMenuName = NavigationService.activeMenuName;
+          };
+          $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
             function(languageItem) {
-              return languageItem.code.length === 2;
-            }
-          ).map(function(languageItem) {
-            return {
-              id: languageItem.code,
-              text: languageItem.name
-            };
-          });
+              return {
+                id: languageItem.code,
+                text: languageItem.name
+              };
+            });
 
           $scope.searchQuery = '';
           $scope.selectionDetails = {

@@ -17,27 +17,31 @@
  */
 
 oppia.factory('RouterService', [
-  '$rootScope', '$location', '$window', '$timeout', '$interval',
-  'ExplorationInitStateNameService', 'StateEditorService',
-  'ExplorationStatesService',
+  '$interval', '$location', '$rootScope', '$timeout', '$window',
+  'ExplorationFeaturesService', 'ExplorationInitStateNameService',
+  'ExplorationStatesService', 'StateEditorService',
   function(
-      $rootScope, $location, $window, $timeout, $interval,
-      ExplorationInitStateNameService, StateEditorService,
-      ExplorationStatesService) {
-    var MAIN_TAB = 'main';
-    var TRANSLATION_TAB = 'translation';
-    var PREVIEW_TAB = 'preview';
-    var SETTINGS_TAB = 'settings';
-    var STATS_TAB = 'stats';
-    var HISTORY_TAB = 'history';
-    var FEEDBACK_TAB = 'feedback';
+      $interval, $location, $rootScope, $timeout, $window,
+      ExplorationFeaturesService, ExplorationInitStateNameService,
+      ExplorationStatesService, StateEditorService) {
+    var TABS = {
+      MAIN: {name: 'main', path: '/main'},
+      TRANSLATION: {name: 'translation', path: '/translation'},
+      PREVIEW: {name: 'preview', path: '/preview'},
+      SETTINGS: {name: 'settings', path: '/settings'},
+      STATS: {name: 'stats', path: '/stats'},
+      IMPROVEMENTS: {name: 'improvements', path: '/improvements'},
+      HISTORY: {name: 'history', path: '/history'},
+      FEEDBACK: {name: 'feedback', path: '/feedback'},
+    };
 
     var SLUG_GUI = 'gui';
     var SLUG_PREVIEW = 'preview';
 
-    var _tabs = {
-      active: MAIN_TAB
-    };
+    var activeTabName = TABS.MAIN.name;
+
+    var isImprovementsTabEnabled =
+      ExplorationFeaturesService.isImprovementsTabEnabled;
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
@@ -58,28 +62,40 @@ oppia.factory('RouterService', [
       // _savePendingChanges() is called by each of the navigateTo... functions
       $rootScope.$broadcast('externalSave');
 
-      if (newPath.indexOf('/translation') === 0) {
-        _tabs.active = TRANSLATION_TAB;
-        $rootScope.$broadcast('refreshTranslationTab');
-      } else if (newPath.indexOf('/preview/') === 0) {
-        _tabs.active = PREVIEW_TAB;
+      if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
+        activeTabName = TABS.TRANSLATION.name;
+        var waitForStatesToLoad = $interval(function() {
+          if (ExplorationStatesService.isInitialized()) {
+            $interval.cancel(waitForStatesToLoad);
+            if (!StateEditorService.getActiveStateName()) {
+              StateEditorService.setActiveStateName(
+                ExplorationInitStateNameService.savedMemento);
+            }
+            $rootScope.$broadcast('refreshTranslationTab');
+          }
+        }, 300);
+      } else if (newPath.indexOf(TABS.PREVIEW.path) === 0) {
+        activeTabName = TABS.PREVIEW.name;
         _doNavigationWithState(newPath, SLUG_PREVIEW);
-      } else if (newPath === '/settings') {
-        _tabs.active = SETTINGS_TAB;
+      } else if (newPath === TABS.SETTINGS.path) {
+        activeTabName = TABS.SETTINGS.name;
         $rootScope.$broadcast('refreshSettingsTab');
-      } else if (newPath === '/stats') {
-        _tabs.active = STATS_TAB;
+      } else if (newPath === TABS.STATS.path) {
+        activeTabName = TABS.STATS.name;
         $rootScope.$broadcast('refreshStatisticsTab');
-      } else if (newPath === '/history') {
+      } else if (newPath === TABS.IMPROVEMENTS.path &&
+                 isImprovementsTabEnabled()) {
+        activeTabName = TABS.IMPROVEMENTS.name;
+      } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
         $rootScope.$broadcast('refreshVersionHistory', {
           forceRefresh: false
         });
-        _tabs.active = HISTORY_TAB;
-      } else if (newPath === '/feedback') {
-        _tabs.active = FEEDBACK_TAB;
+        activeTabName = TABS.HISTORY.name;
+      } else if (newPath === TABS.FEEDBACK.path) {
+        activeTabName = TABS.FEEDBACK.name;
       } else if (newPath.indexOf('/gui/') === 0) {
-        _tabs.active = MAIN_TAB;
+        activeTabName = TABS.MAIN.name;
         _doNavigationWithState(newPath, SLUG_GUI);
       } else {
         if (ExplorationInitStateNameService.savedMemento) {
@@ -148,15 +164,20 @@ oppia.factory('RouterService', [
       savePendingChanges: function() {
         _savePendingChanges();
       },
-      getTabStatuses: function() {
-        return _tabs;
+      getActiveTabName: function() {
+        return activeTabName;
       },
       isLocationSetToNonStateEditorTab: function() {
         var currentPath = $location.path();
         return (
-          currentPath === '/translation' || currentPath === '/preview' ||
-          currentPath === '/stats' || currentPath === '/settings' ||
-          currentPath === '/history' || currentPath === '/feedback');
+          currentPath === TABS.TRANSLATION.path ||
+          currentPath === TABS.PREVIEW.path ||
+          currentPath === TABS.STATS.path ||
+          (isImprovementsTabEnabled() &&
+            currentPath === TABS.IMPROVEMENTS.path) ||
+          currentPath === TABS.SETTINGS.path ||
+          currentPath === TABS.HISTORY.path ||
+          currentPath === TABS.FEEDBACK.path);
       },
       getCurrentStateFromLocationPath: function() {
         return _getCurrentStateFromLocationPath();
@@ -167,7 +188,7 @@ oppia.factory('RouterService', [
           return;
         }
 
-        if (_tabs.active === MAIN_TAB) {
+        if (activeTabName === TABS.MAIN.name) {
           $('.oppia-editor-cards-container').fadeOut(function() {
             _actuallyNavigate(SLUG_GUI, stateName);
             // We need to use $apply to update all our bindings. However we
@@ -188,30 +209,34 @@ oppia.factory('RouterService', [
       },
       navigateToTranslationTab: function() {
         _savePendingChanges();
-        $location.path('/translation');
+        $location.path(TABS.TRANSLATION.path);
       },
       navigateToPreviewTab: function() {
-        if (_tabs.active !== PREVIEW_TAB) {
+        if (activeTabName !== TABS.PREVIEW.name) {
           _savePendingChanges();
           _actuallyNavigate(SLUG_PREVIEW, null);
         }
       },
       navigateToStatsTab: function() {
         _savePendingChanges();
-        $location.path('/stats');
+        $location.path(TABS.STATS.path);
+      },
+      navigateToImprovementsTab: function() {
+        _savePendingChanges();
+        $location.path(TABS.IMPROVEMENTS.path);
       },
       navigateToSettingsTab: function() {
         _savePendingChanges();
-        $location.path('/settings');
+        $location.path(TABS.SETTINGS.path);
       },
       navigateToHistoryTab: function() {
         _savePendingChanges();
-        $location.path('/history');
+        $location.path(TABS.HISTORY.path);
       },
       navigateToFeedbackTab: function() {
         _savePendingChanges();
-        $location.path('/feedback');
-      }
+        $location.path(TABS.FEEDBACK.path);
+      },
     };
 
     return RouterService;

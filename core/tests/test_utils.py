@@ -179,7 +179,7 @@ class TestBase(unittest.TestCase):
         }
     }
 
-    VERSION_25_STATE_DICT = {
+    VERSION_26_STATE_DICT = {
         'content': {'content_id': u'content', 'html': u''},
         'param_changes': [],
         'content_ids_to_audio_translations': {
@@ -224,6 +224,75 @@ class TestBase(unittest.TestCase):
         },
         'classifier_model_id': None
     }
+
+    VERSION_21_STATE_DICT = {
+        'END': {
+            'classifier_model_id': None,
+            'content': {
+                'content_id': 'content',
+                'html': 'Congratulations, you have finished!'},
+            'content_ids_to_audio_translations': {
+                'content': {}},
+            'interaction': {
+                'answer_groups': [],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'recommendedExplorationIds': {'value': []}},
+                'default_outcome': None,
+                'hints': [],
+                'id': 'EndExploration',
+                'solution': None
+            },
+            'param_changes': []
+        },
+        'Introduction': {
+            'classifier_model_id': None,
+            'content': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'content_ids_to_audio_translations': {
+                'content': {},
+                'default_outcome': {},
+                'feedback_1': {}
+            },
+            'interaction': {
+                'answer_groups': [{
+                    'outcome': {
+                        'dest': 'END',
+                        'feedback': {
+                            'content_id': 'feedback_1',
+                            'html': 'Correct!'},
+                        'labelled_as_correct': False,
+                        'missing_prerequisite_skill_id': None,
+                        'param_changes': [],
+                        'refresher_exploration_id': None},
+                    'rule_specs': [{
+                        'inputs': {'x': 'InputString'},
+                        'rule_type': 'Equals'}],
+                    'tagged_misconception_id': None,
+                    'training_data': ['answer1', 'answer2', 'answer3']}],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'placeholder': {'value': ''},
+                    'rows': {'value': 1}},
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': ''},
+                    'labelled_as_correct': False,
+                    'missing_prerequisite_skill_id': None,
+                    'param_changes': [],
+                    'refresher_exploration_id': None},
+                'hints': [],
+                'id': 'TextInput',
+                'solution': None
+            },
+            'param_changes': []
+        }
+    }
+
 
     VERSION_1_STORY_CONTENTS_DICT = {
         'nodes': [{
@@ -483,21 +552,138 @@ tags: []
         """Returns the expected logout URL."""
         return current_user_services.create_logout_url(slug)
 
-    def _parse_json_response(self, json_response, expect_errors=False):
+    def _get_response(
+            self, url, expected_content_type, params=None,
+            expected_status_int=200):
+        """Get a response, transformed to a Python object.
+
+        Args:
+            url: str. The URL to fetch the response.
+            expected_content_type: str. The content type to expect.
+            params: dict. A dictionary that will be encoded into a query string.
+            expected_status_int: int. The integer status code to expect. Will
+                be 200 if not specified.
+
+        Returns:
+            webtest.TestResponse. The test response.
+        """
+        if params is not None:
+            self.assertTrue(isinstance(params, dict))
+
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
+
+        response = self.testapp.get(
+            url, params, expect_errors=expect_errors,
+            status=expected_status_int)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        self.assertEqual(response.status_int, expected_status_int)
+        if not expect_errors:
+            self.assertTrue(response.status_int >= 200 and
+                            response.status_int < 400)
+        else:
+            self.assertTrue(response.status_int >= 400)
+        self.assertEqual(
+            response.content_type, expected_content_type)
+
+        return response
+
+    def get_html_response(self, url, params=None, expected_status_int=200):
+        """Get a HTML response, transformed to a Python object.
+
+        Args:
+            url: str. The URL to fetch the response.
+            params: dict. A dictionary that will be encoded into a query string.
+            expected_status_int: int. The integer status code to expect. Will
+                be 200 if not specified.
+
+        Returns:
+            webtest.TestResponse. The test response.
+        """
+        response = self._get_response(
+            url, 'text/html', params=params,
+            expected_status_int=expected_status_int)
+
+        return response
+
+    def get_custom_response(
+            self, url, expected_content_type, params=None,
+            expected_status_int=200):
+        """Get a response other than HTML or JSON, transformed to a Python
+        object.
+
+        Args:
+            url: str. The URL to fetch the response.
+            expected_content_type: str. The content type to expect.
+            params: dict. A dictionary that will be encoded into a query string.
+            expected_status_int: int. The integer status code to expect. Will
+                be 200 if not specified.
+
+        Returns:
+            webtest.TestResponse. The test response.
+        """
+        self.assertNotIn(
+            expected_content_type, ['text/html', 'application/json'])
+
+        response = self._get_response(
+            url, expected_content_type, params=params,
+            expected_status_int=expected_status_int)
+
+        return response
+
+    def get_response_without_checking_for_errors(
+            self, url, expected_status_int_list, params=None):
+        """Get a response, transformed to a Python object and
+        checks for a list of status codes.
+
+        Args:
+            url: str. The URL to fetch the response.
+            expected_status_int_list: list(int). A list of integer status
+                code to expect.
+            params: dict. A dictionary that will be encoded into a query string.
+
+        Returns:
+            webtest.TestResponse. The test response.
+        """
+        if params is not None:
+            self.assertTrue(isinstance(params, dict))
+
+        response = self.testapp.get(url, params, expect_errors=True)
+
+        self.assertIn(response.status_int, expected_status_int_list)
+
+        return response
+
+    def _parse_json_response(self, json_response, expect_errors):
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
             self.assertTrue(
-                json_response.status_int < 400 and
-                json_response.status_int >= 200)
+                json_response.status_int >= 200 and
+                json_response.status_int < 400)
+        else:
+            self.assertTrue(json_response.status_int >= 400)
         self.assertEqual(
             json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url, params=None, expect_errors=False,
-                 expected_status_int=200):
+    def get_json(self, url, params=None, expected_status_int=200):
         """Get a JSON response, transformed to a Python object."""
+        if params is not None:
+            self.assertTrue(isinstance(params, dict))
+
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
         json_response = self.testapp.get(
             url, params, expect_errors=expect_errors,
             status=expected_status_int)
@@ -510,16 +696,18 @@ tags: []
         # https://github.com/Pylons/webtest/blob/
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(
-            json_response, expect_errors=expect_errors)
+        return self._parse_json_response(json_response, expect_errors)
 
-    def post_json(self, url, payload, csrf_token=None, expect_errors=False,
+    def post_json(self, url, payload, csrf_token=None,
                   expected_status_int=200, upload_files=None):
         """Post an object to the server by JSON; return the received object."""
         data = {'payload': json.dumps(payload)}
         if csrf_token:
             data['csrf_token'] = csrf_token
 
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
         json_response = self._send_post_request(
             self.testapp, url, data,
             expect_errors=expect_errors,
@@ -532,14 +720,18 @@ tags: []
         # Reference URL:
         # https://github.com/Pylons/webtest/blob/
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+
         self.assertEqual(json_response.status_int, expected_status_int)
+        return self._parse_json_response(json_response, expect_errors)
 
-        return self._parse_json_response(
-            json_response, expect_errors=expect_errors)
-
-    def delete_json(self, url, params='', expect_errors=False,
-                    expected_status_int=200):
+    def delete_json(self, url, params='', expected_status_int=200):
         """Delete object on the server using a JSON call."""
+        if params:
+            self.assertTrue(isinstance(params, dict))
+
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
         json_response = self.testapp.delete(
             url, params, expect_errors=expect_errors,
             status=expected_status_int)
@@ -552,12 +744,33 @@ tags: []
         # https://github.com/Pylons/webtest/blob/
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(
-            json_response, expect_errors=expect_errors)
+        return self._parse_json_response(json_response, expect_errors)
 
     def _send_post_request(
-            self, app, url, data, expect_errors=False, expected_status_int=200,
+            self, app, url, data, expect_errors,
+            expected_status_int=200,
             upload_files=None, headers=None):
+        """Sends a post request with the data provided to the url specified.
+
+        Args:
+            app: TestApp. The WSGI application which receives the
+                request and produces response.
+            url: str. The URL to send the POST request to.
+            data: *. To be put in the body of the request. If params is an
+                iterator, it will be urlencoded. If it is a string, it will
+                not be encoded, but placed in the body directly. Can be a
+                collections.OrderedDict with webtest.forms.Upload fields
+                included.
+            expect_errors: bool. Whether errors are expected.
+            expected_status_int: int. The expected status code.
+            upload_files: list(tuple). A list of (fieldname, filename,
+                file_content). You can also use just (fieldname, filename) and
+                the file contents will be read from disk.
+            headers: dict(str, *). Extra headers to send.
+
+        Returns:
+            webtest.TestResponse: The response of the POST request.
+        """
         json_response = app.post(
             str(url), data, expect_errors=expect_errors,
             upload_files=upload_files, headers=headers,
@@ -599,13 +812,15 @@ tags: []
             expect_errors=expect_errors,
             expected_status_int=expected_status_int)
 
-    def put_json(self, url, payload, csrf_token=None, expect_errors=False,
-                 expected_status_int=200):
+    def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
         """Put an object to the server by JSON; return the received object."""
         data = {'payload': json.dumps(payload)}
         if csrf_token:
             data['csrf_token'] = csrf_token
 
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
         json_response = self.testapp.put(
             str(url), data, expect_errors=expect_errors)
 
@@ -617,8 +832,7 @@ tags: []
         # https://github.com/Pylons/webtest/blob/
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
-        return self._parse_json_response(
-            json_response, expect_errors=expect_errors)
+        return self._parse_json_response(json_response, expect_errors)
 
     def get_csrf_token_from_response(self, response):
         """Retrieve the CSRF token from a GET response."""
@@ -638,7 +852,7 @@ tags: []
         # external  calls being made to Gravatar when running the backend
         # tests.
         with self.urlfetch_mock():
-            response = self.testapp.get(feconf.SIGNUP_URL)
+            response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
             response = self.testapp.post(
@@ -659,7 +873,7 @@ tags: []
         self._stash_current_user_env()
 
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.testapp.get('/admin')
+        response = self.get_html_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             '/adminhandler', {
@@ -682,7 +896,7 @@ tags: []
         self._stash_current_user_env()
 
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.testapp.get('/admin')
+        response = self.get_html_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             '/adminrolehandler', {
@@ -808,7 +1022,7 @@ tags: []
             exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
             end_state.update_interaction_id('EndExploration')
-            end_state.interaction.default_outcome = None
+            end_state.update_interaction_default_outcome(None)
 
             # Link first state to ending state (to maintain validity).
             init_state = exploration.states[exploration.init_state_name]
@@ -895,6 +1109,72 @@ tags: []
             states_schema_version=0,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states=self.VERSION_0_STATES_DICT,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'%s\'.' % title
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title=title,
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
+        # Note: Also save state id mappping model for new exploration. If not
+        # saved, it may cause errors in test cases.
+        exploration = exp_services.get_exploration_from_model(exp_model)
+        exp_services.create_and_save_state_id_mapping_model(exploration, [])
+
+    def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
+        """Saves a new default exploration with a default version 21 states
+        dictionary. Version 21 is where training data of exploration is stored
+        with the states dict.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            title: str. The title of the exploration.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title=title,
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=21,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=self.VERSION_21_STATE_DICT,
             param_specs={},
             param_changes=[]
         )
@@ -1197,10 +1477,10 @@ tags: []
         question_services.add_question(owner_id, question)
         return question
 
-    def save_new_question_with_state_data_schema_v25(
+    def save_new_question_with_state_data_schema_v26(
             self, question_id, owner_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Saves a new default question with a default version 25 state
+        """Saves a new default question with a default version 26 state
         data dictionary.
 
         This function should only be used for creating questions in tests
@@ -1221,10 +1501,10 @@ tags: []
         question_services.create_new_question_rights(question_id, owner_id)
         question_model = question_models.QuestionModel(
             id=question_id,
-            question_state_data=self.VERSION_25_STATE_DICT,
+            question_state_data=self.VERSION_26_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_schema_version=25
+            question_state_schema_version=26
         )
         question_model.commit(
             owner_id, 'New question created',

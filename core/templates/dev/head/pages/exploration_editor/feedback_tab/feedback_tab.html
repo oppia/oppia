@@ -33,7 +33,7 @@
     <div class="row">
       <div class="col-lg-7 col-md-7 col-sm-7">
         <span class="oppia-back-arrow">
-          <button type="button" class="btn btn-default btn-xs protractor-test-oppia-feedback-back-button" ng-click="clearActiveThread()">
+          <button type="button" class="btn btn-default btn-xs protractor-test-oppia-feedback-back-button" ng-click="onBackButtonClicked()">
             <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
           </button>
         </span>
@@ -54,7 +54,7 @@
     </div>
 
     <div class="row" ng-if="activeThread.messages">
-      <div style="margin-top: 10px;" class="col-lg-12 col-md-12 col-sm-12">
+      <div style="margin-top: 10px; word-break: break-all;" class="col-lg-12 col-md-12 col-sm-12">
         <table class="table">
           <tr ng-repeat="m in activeThread.messages|orderBy:'message_id'">
             <td>

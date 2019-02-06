@@ -14,6 +14,7 @@
 
 """Build file for production version of Oppia. Minifies JS and CSS."""
 
+# pylint: disable=invalid-name
 import collections
 import fnmatch
 import hashlib

@@ -41,7 +41,6 @@ class ProfilePage(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.values.update({
-            'nav_mode': feconf.NAV_MODE_PROFILE,
             'PROFILE_USERNAME': user_settings.username,
         })
         self.render_template('pages/profile/profile.html')
@@ -106,7 +105,6 @@ class PreferencesPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_PROFILE,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
         })
@@ -260,7 +258,6 @@ class SignupPage(base.BaseHandler):
 
         self.values.update({
             'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_SIGNUP,
             'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
         })
         self.render_template('pages/signup/signup.html')
@@ -395,3 +392,28 @@ class UserInfoHandler(base.BaseHandler):
             'username': user_settings.username,
             'user_is_logged_in': True
         })
+
+
+class UrlHandler(base.BaseHandler):
+    """The handler for generating login URL."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        login_url = None
+        if self.user_id:
+            self.render_json({'login_url': None})
+        else:
+            if self.request and self.request.get('current_url'):
+                target_url = (
+                    '/' if self.request.get('current_url').endswith(
+                        feconf.SPLASH_URL)
+                    else self.request.get('current_url'))
+                login_url = (
+                    current_user_services.create_login_url(target_url))
+                self.render_json({'login_url': login_url})
+            else:
+                raise self.InvalidInputException(
+                    'Incomplete or empty GET parameters passed'
+                )

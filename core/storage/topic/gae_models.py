@@ -212,7 +212,7 @@ class SubtopicPageModel(base_models.VersionedModel):
     # The topic id that this subtopic is a part of.
     topic_id = ndb.StringProperty(required=True, indexed=True)
     # The html data of the subtopic.
-    html_data = ndb.TextProperty(required=True)
+    page_contents = ndb.JsonProperty(required=True)
     # The ISO 639-1 code for the language this subtopic page is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 

@@ -111,7 +111,7 @@ describe('ContentIdsToAudioTranslations object factory', function() {
       citat = citatof.createFromBackendDict(citatDict);
     }));
 
-    it('should get all content id', function(){
+    it('should get all content id', function() {
       var contentIdList = [
         'content', 'default_outcome', 'feedback_1', 'feedback_2', 'hint_1',
         'hint_2', 'solution'];
@@ -158,24 +158,24 @@ describe('ContentIdsToAudioTranslations object factory', function() {
       });
     });
 
-    it('should get all language code for a given content id', function(){
+    it('should get all language code for a given content id', function() {
       var LanguageCodeList = ['en', 'hi'];
       expect(citat.getAudioLanguageCodes('hint_1')).toEqual(LanguageCodeList);
     });
 
-    it('should correctly check content id has audio translations', function(){
+    it('should correctly check content id has audio translations', function() {
       expect(citat.hasAudioTranslations('content')).toBe(true);
       expect(citat.hasAudioTranslations('hint_2')).toBe(false);
     });
 
     it('should correctly check content id has unflagged audio translations',
-      function(){
+      function() {
         expect(citat.hasUnflaggedAudioTranslations('content')).toBe(true);
         citat.markAllAudioAsNeedingUpdate('solution');
         expect(citat.hasUnflaggedAudioTranslations('solution')).toBe(false);
       });
 
-    it('should add a given content id', function(){
+    it('should add a given content id', function() {
       citat.addContentId('feedback_3');
       expect(citat.getBindableAudioTranslations('feedback_3')).toEqual({});
       expect(function() {
@@ -183,7 +183,7 @@ describe('ContentIdsToAudioTranslations object factory', function() {
       }).toThrowError('Trying to add duplicate content id.');
     });
 
-    it('should delete a given content id', function(){
+    it('should delete a given content id', function() {
       citat.deleteContentId('feedback_1');
       var contentIdList = [
         'content', 'default_outcome', 'feedback_2', 'hint_1', 'hint_2',
@@ -192,13 +192,6 @@ describe('ContentIdsToAudioTranslations object factory', function() {
       expect(function() {
         citat.deleteContentId('feedback_3');
       }).toThrowError('Unable to find the given content id.');
-    });
-
-    it('should delete all feedback content id', function(){
-      citat.deleteAllFeedbackContentId();
-      var contentIdList = [
-        'content', 'default_outcome', 'hint_1', 'hint_2', 'solution'];
-      expect(citat.getAllContentId()).toEqual(contentIdList);
     });
 
     it('should check whether the text is fully translated', inject(function() {
@@ -214,7 +207,7 @@ describe('ContentIdsToAudioTranslations object factory', function() {
         'language code hi-en');
     }));
 
-    it('should add audio translation in a given content id', function(){
+    it('should add audio translation in a given content id', function() {
       citat.addAudioTranslation('hint_2', 'en', 'filename11.mp3', 1000);
       expect(citat.getBindableAudioTranslations('hint_2')).toEqual({
         en: atof.createFromBackendDict({
@@ -228,7 +221,7 @@ describe('ContentIdsToAudioTranslations object factory', function() {
       }).toThrowError('Trying to add duplicate language code.');
     });
 
-    it('should delete audio translation in a given content id', function(){
+    it('should delete audio translation in a given content id', function() {
       citat.deleteAudioTranslation('content', 'hi');
       expect(citat.getBindableAudioTranslations('content')).toEqual({
         en: atof.createFromBackendDict({
@@ -239,25 +232,16 @@ describe('ContentIdsToAudioTranslations object factory', function() {
       });
     });
 
-    it('should delete all feedback audio translation', function(){
-      var contentIdList = [
-        'content', 'default_outcome', 'feedback_1', 'feedback_2', 'hint_1',
-        'hint_2', 'solution'];
-      expect(citat.getAllContentId()).toEqual(contentIdList);
-      citat.deleteAllFeedbackContentId();
-      expect(citat.getAllContentId()).toEqual([
-        'content', 'default_outcome', 'hint_1', 'hint_2', 'solution']);
-    });
-
-    it('should toggle needs update attribute in a given content id', function(){
-      citat.toggleNeedsUpdateAttribute('content', 'hi');
-      expect(citat.getAudioTranslation('content', 'hi')).toEqual(
-        atof.createFromBackendDict({
-          filename: 'filename2.mp3',
-          file_size_bytes: 11000,
-          needs_update: true
-        }));
-    });
+    it(
+      'should toggle needs update attribute in a given content id', function() {
+        citat.toggleNeedsUpdateAttribute('content', 'hi');
+        expect(citat.getAudioTranslation('content', 'hi')).toEqual(
+          atof.createFromBackendDict({
+            filename: 'filename2.mp3',
+            file_size_bytes: 11000,
+            needs_update: true
+          }));
+      });
 
     it('should correctly convert to backend dict', function() {
       expect(citat.toBackendDict()).toEqual(citatDict);

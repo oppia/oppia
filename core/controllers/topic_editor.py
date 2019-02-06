@@ -48,7 +48,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         topic = topic_services.get_topic_by_id(topic_id)
         canonical_story_summaries = story_services.get_story_summaries_by_ids(
@@ -73,7 +73,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         Currently, this only adds the story to the canonical story id list of
         the topic.
         """
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
         title = self.payload.get('title')
@@ -103,7 +103,7 @@ class TopicEditorQuestionHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
@@ -111,15 +111,19 @@ class TopicEditorQuestionHandler(base.BaseHandler):
         topic = topic_services.get_topic_by_id(topic_id)
         skill_ids = topic.get_all_skill_ids()
 
-        question_summaries, next_start_cursor = (
-            question_services.get_question_summaries_linked_to_skills(
+        question_summaries, skill_descriptions, next_start_cursor = (
+            question_services.get_question_summaries_and_skill_descriptions(
                 constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
         )
-        question_summary_dicts = [
-            summary.to_dict() for summary in question_summaries]
+        return_dicts = []
+        for index, summary in enumerate(question_summaries):
+            return_dicts.append({
+                'summary': summary.to_dict(),
+                'skill_description': skill_descriptions[index]
+            })
 
         self.values.update({
-            'question_summary_dicts': question_summary_dicts,
+            'question_summary_dicts': return_dicts,
             'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
@@ -134,7 +138,7 @@ class TopicEditorPage(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -161,7 +165,6 @@ class TopicEditorPage(base.BaseHandler):
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
-            'nav_mode': feconf.NAV_MODE_TOPIC_EDITOR,
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
@@ -200,7 +203,7 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -241,7 +244,7 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -273,7 +276,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         subtopics), while False would mean it is for a Subtopic Page (this
         includes editing its html data as of now).
         """
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -319,7 +322,7 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_topic
     def delete(self, topic_id):
         """Handles Delete requests."""
-        if not constants.ENABLE_NEW_STRUCTURES:
+        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         topic_domain.Topic.require_valid_topic_id(topic_id)

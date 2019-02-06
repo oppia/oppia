@@ -28,7 +28,6 @@ oppia.directive('stateInteractionEditor', [
         };
       },
       scope: {
-        onSaveContentIdsToAudioTranslations: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionId: '=',
         onSaveSolution: '=',
@@ -43,7 +42,6 @@ oppia.directive('stateInteractionEditor', [
         'INTERACTION_SPECS', 'StateInteractionIdService',
         'StateCustomizationArgsService', 'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
-        'StateContentIdsToAudioTranslationsService',
         'ExplorationHtmlFormatterService', 'SubtitledHtmlObjectFactory',
         'StateSolutionService', 'StateHintsService',
         'StateContentService', function(
@@ -52,7 +50,6 @@ oppia.directive('stateInteractionEditor', [
             INTERACTION_SPECS, StateInteractionIdService,
             StateCustomizationArgsService, EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
-            StateContentIdsToAudioTranslationsService,
             ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
             StateSolutionService, StateHintsService,
             StateContentService) {
@@ -98,10 +95,23 @@ oppia.directive('stateInteractionEditor', [
               interactionCustomizationArgs, false);
           };
 
+          var _updateInteractionPreviewAndAnswerChoices = function() {
+            $scope.interactionId = StateInteractionIdService.savedMemento;
+
+            var currentCustomizationArgs =
+              StateCustomizationArgsService.savedMemento;
+            $scope.interactionPreviewHtml = _getInteractionPreviewTag(
+              currentCustomizationArgs);
+
+            $rootScope.$broadcast(
+              'updateAnswerChoices',
+              StateEditorService.getAnswerChoices(
+                $scope.interactionId, currentCustomizationArgs));
+          };
+
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
             $scope.hasLoaded = false;
             InteractionDetailsCacheService.reset();
-
             $rootScope.$broadcast('initializeAnswerGroups', {
               interactionId: stateData.interaction.id,
               answerGroups: stateData.interaction.answerGroups,
@@ -113,6 +123,8 @@ oppia.directive('stateInteractionEditor', [
             _updateInteractionPreviewAndAnswerChoices();
             $scope.hasLoaded = true;
           });
+
+          $rootScope.$broadcast('interactionEditorInitialized');
 
           // If a terminal interaction is selected for a state with no content,
           // this function sets the content to DEFAULT_TERMINAL_STATE_CONTENT.
@@ -349,8 +361,6 @@ oppia.directive('stateInteractionEditor', [
                 $scope.onCustomizationModalSavePostHook, function() {
                   StateInteractionIdService.restoreFromMemento();
                   StateCustomizationArgsService.restoreFromMemento();
-                  StateContentIdsToAudioTranslationsService
-                    .restoreFromMemento();
                 });
             }
           };
@@ -377,12 +387,6 @@ oppia.directive('stateInteractionEditor', [
             }).result.then(function() {
               StateInteractionIdService.displayed = null;
               StateCustomizationArgsService.displayed = {};
-              if (StateSolutionService.displayed) {
-                var solutionContentId =
-                  StateSolutionService.displayed.explanation.getContentId();
-                StateContentIdsToAudioTranslationsService.displayed
-                  .deleteContentId(solutionContentId);
-              }
               StateSolutionService.displayed = null;
               InteractionDetailsCacheService.removeDetails(
                 StateInteractionIdService.savedMemento);
@@ -397,31 +401,12 @@ oppia.directive('stateInteractionEditor', [
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
 
-              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations(
-                StateContentIdsToAudioTranslationsService.displayed
-              );
-
               $rootScope.$broadcast(
                 'onInteractionIdChanged',
                 StateInteractionIdService.savedMemento);
               $scope.recomputeGraph();
               _updateInteractionPreviewAndAnswerChoices();
             });
-          };
-
-          var _updateInteractionPreviewAndAnswerChoices = function() {
-            $scope.interactionId = StateInteractionIdService.savedMemento;
-
-            var currentCustomizationArgs =
-              StateCustomizationArgsService.savedMemento;
-            $scope.interactionPreviewHtml = _getInteractionPreviewTag(
-              currentCustomizationArgs);
-
-            $rootScope.$broadcast(
-              'updateAnswerChoices',
-              StateEditorService.getAnswerChoices(
-                $scope.interactionId, currentCustomizationArgs));
           };
         }
       ]

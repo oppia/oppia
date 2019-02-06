@@ -154,6 +154,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             category='Architecture', language_code='fi')
 
     def _get_all_messages_read(self, user_id, thread_id):
+        """Returns the list of the ids of all the messages corresponding to the
+        given thread id read by the user.
+        """
         feedback_thread_user_model = (
             feedback_models.GeneralFeedbackThreadUserModel.get(
                 user_id, thread_id))
@@ -163,6 +166,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             feedback_thread_user_model else [])
 
     def _run_computation(self):
+        """Runs the MockFeedbackAnalyticsAggregator computation."""
         MockFeedbackAnalyticsAggregator.start_computation()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
@@ -256,6 +260,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(1, len(threads_exp_2))
 
         def _close_thread(thread_id):
+            """Closes the thread corresponding to its thread id by updating its
+            status.
+            """
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
@@ -286,7 +293,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             id='exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID,
             entity_type='exploration', entity_id=self.EXP_ID_3,
             original_author_id=self.user_id, subject='Feedback',
-            status=feedback_models.STATUS_CHOICES_OPEN, has_suggestion=False)
+            status=feedback_models.STATUS_CHOICES_OPEN, message_count=0,
+            has_suggestion=False)
         thread_3.put()
         feedback_services.create_message(
             'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID,
@@ -939,7 +947,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
 
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_csrf_token_from_response(
-                self.testapp.get('/create/%s' % self.exploration.id))
+                self.get_html_response('/create/%s' % self.exploration.id))
             self.post_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),

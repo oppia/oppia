@@ -266,7 +266,7 @@ VMID_SHARED_SECRET_KEY_MAPPING = ConfigProperty(
 WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
     'whitelisted_exploration_ids_for_playthroughs',
     SET_OF_STRINGS_SCHEMA,
-    'The set of exploration IDs for recording issues and playthroughs', [
+    'The set of exploration IDs for recording playthrough issues', [
         'umPkwp0L1M0-', 'MjZzEVOG47_1', '9trAQhj6uUC2', 'rfX8jNkPnA-1',
         '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
         'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
@@ -274,3 +274,8 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
 RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
+
+IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
+    'is_improvements_tab_enabled', BOOL_SCHEMA,
+    'Exposes the Improvements Tab for creators in the exploration editor.',
+    False)

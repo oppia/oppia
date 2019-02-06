@@ -22,6 +22,7 @@ import datetime
 import os
 import zipfile
 
+from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
@@ -48,6 +49,15 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 def _count_at_least_editable_exploration_summaries(user_id):
+    """Counts exp summaries that are at least editable by the given user.
+
+    Args:
+        user_id: unicode. The id of the given user.
+
+    Returns:
+        int. The number of exploration summaries that are at least editable
+            by the given user.
+    """
     return len(exp_services._get_exploration_summaries_from_models(  # pylint: disable=protected-access
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id)))
@@ -86,6 +96,84 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+
+class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
+    """Test that classifier models are correctly mapped when an exploration
+    is reverted.
+    """
+
+    def test_reverting_an_exploration_maintains_classifier_models(self):
+        """Test that when exploration is reverted to previous version
+        it maintains appropriate classifier models mapping.
+        """
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id, title='Bridges in England',
+                category='Architecture', language_code='en')
+
+        interaction_answer_groups = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 'abc'},
+            }],
+            'outcome': {
+                'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Try again'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': ['answer1', 'answer2', 'answer3'],
+            'tagged_misconception_id': None
+        }]
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': interaction_answer_groups
+        })]
+
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                    exp_services.update_exploration(
+                        self.owner_id, self.EXP_ID, change_list, '')
+
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        job = classifier_services.get_classifier_training_jobs(
+            self.EXP_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+        self.assertIsNotNone(job)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'A new title'
+        })]
+
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                    exp_services.update_exploration(
+                        self.owner_id, self.EXP_ID, change_list, '')
+
+                    exp = exp_services.get_exploration_by_id(self.EXP_ID)
+                    # Revert exploration to previous version.
+                    exp_services.revert_exploration(
+                        self.owner_id, self.EXP_ID, exp.version,
+                        exp.version - 1)
+
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_job = classifier_services.get_classifier_training_jobs(
+            self.EXP_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+        self.assertIsNotNone(new_job)
+        self.assertEqual(job.job_id, new_job.job_id)
 
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
@@ -195,6 +283,17 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
     def _create_search_query(self, terms, categories, languages):
+        """Creates search query from list of arguments.
+
+        Args:
+            terms: list(str). A list of terms to be added in the query.
+            categories: list(str). A list of categories to be added in the
+                query.
+            languages: list(str). A list of languages to be added in the query.
+
+        Returns:
+            str. A search query string.
+        """
         query = ' '.join(terms)
         if categories:
             query += ' category=(' + ' OR '.join([
@@ -1297,10 +1396,17 @@ title: A title
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
-        init_interaction = init_state.interaction
-        init_interaction.default_outcome.dest = exploration.init_state_name
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': exploration.init_state_name,
+                    'new_value': default_outcome_dict
+                }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'New state',
@@ -1324,10 +1430,17 @@ title: A title
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
-        init_interaction = init_state.interaction
-        init_interaction.default_outcome.dest = exploration.init_state_name
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': exploration.init_state_name,
+                    'new_value': default_outcome_dict
+                }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'New state',
@@ -1360,9 +1473,15 @@ title: A title
         self.assertEqual(exploration.version, 1)
 
         init_state = exploration.states[exploration.init_state_name]
-        init_interaction = init_state.interaction
-        init_interaction.default_outcome.dest = exploration.init_state_name
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = exploration.init_state_name
         change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': exploration.init_state_name,
+            'new_value': default_outcome_dict
+        }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state'
         }), exp_domain.ExplorationChange({
@@ -1512,10 +1631,17 @@ param_changes: []
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
-        init_interaction = init_state.interaction
-        init_interaction.default_outcome.dest = exploration.init_state_name
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': exploration.init_state_name,
+                    'new_value': default_outcome_dict
+                }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'New state',
@@ -1538,9 +1664,15 @@ param_changes: []
         self.assertEqual(exploration.version, 1)
 
         init_state = exploration.states[exploration.init_state_name]
-        init_interaction = init_state.interaction
-        init_interaction.default_outcome.dest = exploration.init_state_name
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = exploration.init_state_name
         change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': exploration.init_state_name,
+            'new_value': default_outcome_dict
+        }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state'
         }), exp_domain.ExplorationChange({
@@ -1639,12 +1771,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'param_changes': [],
             'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None
-        }
-
-        self.content_ids_to_audio_translations = {
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {}
         }
 
     def test_add_state_cmd(self):
@@ -1822,11 +1948,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
-                    self.interaction_answer_groups) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-                    self.content_ids_to_audio_translations),
+                    self.interaction_answer_groups),
                 '')
 
     def test_update_interaction_answer_groups(self):
@@ -1858,11 +1980,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                self.interaction_default_outcome) +
-            _get_change_list(
-                self.init_state_name,
-                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-                self.content_ids_to_audio_translations),
+                self.interaction_default_outcome),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -1896,11 +2014,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-                    self.content_ids_to_audio_translations),
+                    self.interaction_default_outcome),
                 '')
 
     def test_update_state_missing_keys(self):
@@ -1921,11 +2035,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-                    self.content_ids_to_audio_translations),
+                    self.interaction_default_outcome),
                 '')
 
     def test_update_state_variable_types(self):
@@ -1946,11 +2056,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-                    self.content_ids_to_audio_translations),
+                    self.interaction_default_outcome),
                 '')
 
     def test_update_content(self):
@@ -2461,6 +2567,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         # puts to the event log are asynchronous.
         @transaction_services.toplevel_wrapper
         def populate_datastore():
+            """Populates the database according to the sequence."""
             exploration_1 = self.save_new_valid_exploration(
                 self.EXP_ID_1, self.albert_id)
 
@@ -2687,6 +2794,16 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.assertEqual([albert_id], exploration_summary.contributor_ids)
 
     def _check_contributors_summary(self, exp_id, expected):
+        """Check if contributors summary of the given exp is same as expected.
+
+        Args:
+            exp_id: str. The id of the exploration.
+            expected: dict(unicode, int). Expected summary.
+
+        Raises:
+            AssertionError: Contributors summary of the given exp is not same
+                as expected.
+        """
         contributors_summary = exp_services.get_exploration_summary_by_id(
             exp_id).contributors_summary
         self.assertEqual(expected, contributors_summary)

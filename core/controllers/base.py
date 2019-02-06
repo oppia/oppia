@@ -154,6 +154,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.user_id = current_user_services.get_current_user_id()
         self.username = None
         self.has_seen_editor_tutorial = False
+        self.has_seen_translation_tutorial = False
         self.partially_logged_in = False
 
         if self.user_id:
@@ -175,6 +176,8 @@ class BaseHandler(webapp2.RequestHandler):
                 self.values['username'] = self.username
                 if user_settings.last_started_state_editor_tutorial:
                     self.has_seen_editor_tutorial = True
+                if user_settings.last_started_state_translation_tutorial:
+                    self.has_seen_translation_tutorial = True
                 # In order to avoid too many datastore writes, we do not bother
                 # recording a log-in if the current time is sufficiently close
                 # to the last log-in time.
@@ -284,8 +287,8 @@ class BaseHandler(webapp2.RequestHandler):
     def render_downloadable_file(self, values, filename, content_type):
         """Prepares downloadable content to be sent to the client."""
         self.response.headers['Content-Type'] = content_type
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename=%s' % (filename))
+        self.response.headers['Content-Disposition'] = str(
+            'attachment; filename=%s' % filename)
         self.response.write(values)
 
     def _get_logout_url(self, redirect_url_on_logout):
@@ -334,8 +337,7 @@ class BaseHandler(webapp2.RequestHandler):
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'user_is_logged_in': user_services.has_fully_registered(
-                self.user_id),
-            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
+                self.user_id)
         })
         if feconf.ENABLE_PROMO_BAR:
             promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
@@ -359,25 +361,12 @@ class BaseHandler(webapp2.RequestHandler):
                 'Oppia is a free, open-source learning platform. Join the '
                 'community to create or try an exploration today!')
 
-        # nav_mode is used as part of the GLOBALS object in the frontend, but
-        # not every backend handler declares a nav_mode. Thus, the following
-        # code is a failsafe to ensure that the nav_mode key is added to all
-        # page requests.
-        if 'nav_mode' not in values:
-            values['nav_mode'] = ''
-
         if redirect_url_on_logout is None:
             redirect_url_on_logout = self.request.uri
 
         if self.user_id:
-            values['login_url'] = None
             values['logout_url'] = self._get_logout_url(redirect_url_on_logout)
         else:
-            target_url = (
-                '/' if self.request.uri.endswith(feconf.SPLASH_URL)
-                else self.request.uri)
-            values['login_url'] = (
-                current_user_services.create_login_url(target_url))
             values['logout_url'] = None
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
