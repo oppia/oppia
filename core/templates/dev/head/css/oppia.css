@@ -3080,7 +3080,6 @@ md-card.preview-conversation-skin-supplemental-card {
   overflow-wrap: break-word;
   padding: 0.2em;
   position: absolute;
-  word-break: break-all;
   -webkit-hyphens: auto;
 }
 .oppia-activity-summary-tile.oppia-activity-playlist-tile .activity-title {
@@ -3804,7 +3803,6 @@ md-card.preview-conversation-skin-supplemental-card {
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
   box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
   padding: 8px;
-  word-break: break-all;
 }
 
 .oppia-rte:focus {
