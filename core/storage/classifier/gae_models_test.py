@@ -177,12 +177,18 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(training_job2.classifier_data, None)
         self.assertEqual(training_job2.data_schema_version, 1)
 
-    def test_ID_collision_exception(self):
-        base_model_initial_retries = base_models.MAX_RETRIES
-        base_models.MAX_RETRIES = 0
-        with self.assertRaisesRegexp(Exception, ('The id generator for ClassifierTrainingJobModel is producing too many collisions.')):
-            classifier_models.ClassifierTrainingJobModel._generate_id(1)
-        base_models.MAX_RETRIES = base_model_initial_retries
+
+    def test_id_collisions_exception(self):
+        next_scheduled_check_time = datetime.datetime.utcnow()
+        with self.swap(base_models, 'MAX_RETRIES', 0):
+            with self.assertRaisesRegexp(Exception, (
+                'The id generator for ClassifierTrainingJobModel '
+                'is producing too many collisions.')):
+                classifier_models.ClassifierTrainingJobModel.create(
+                    'TextClassifier', 'TextInput', 'exp_id1', 1,
+                    next_scheduled_check_time,
+                    [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+                    'state_name2', feconf.TRAINING_JOB_STATUS_NEW, None, 1)
 
 
 
