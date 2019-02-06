@@ -268,7 +268,9 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.SingleCharAndNewlineAtEOFChecker)
         checker_test_object.setup_method()
-        node1 = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        node_missing_newline_at_eof = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
@@ -276,10 +278,10 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
             tmp.write(
                 """c = 'something dummy'
                 """)
-        node1.file = filename
-        node1.path = filename
+        node_missing_newline_at_eof.file = filename
+        node_missing_newline_at_eof.path = filename
 
-        checker_test_object.checker.process_module(node1)
+        checker_test_object.checker.process_module(node_missing_newline_at_eof)
 
         with checker_test_object.assertAddsMessages(
             testutils.Message(
@@ -289,16 +291,18 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
-        node2 = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        node_single_char_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with open(filename, 'w') as tmp:
             tmp.write("""1""")
-        node2.file = filename
-        node2.path = filename
+        node_single_char_file.file = filename
+        node_single_char_file.path = filename
 
-        checker_test_object.checker.process_module(node2)
+        checker_test_object.checker.process_module(node_single_char_file)
 
         with checker_test_object.assertAddsMessages(
             testutils.Message(
@@ -308,16 +312,18 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
-        node3 = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        node_no_err_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with open(filename, 'w') as tmp:
             tmp.write("""x = 'something dummy'""")
-        node3.file = filename
-        node3.path = filename
+        node_no_err_message.file = filename
+        node_no_err_message.path = filename
 
-        checker_test_object.checker.process_module(node3)
+        checker_test_object.checker.process_module(node_no_err_message)
 
         with checker_test_object.assertNoMessages():
             temp_file.close()
