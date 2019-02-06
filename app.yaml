@@ -60,6 +60,7 @@ handlers:
   upload: core/templates/dev/head/(.*directive\.html)$
   secure: always
   expiration: "0"
+  application_readable: true
 - url: /third_party/generated
   static_dir: third_party/generated
   secure: always
