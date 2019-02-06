@@ -246,7 +246,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(LearnerDashboardFeedbackThreadHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        
+
         # Load exploration 0.
         exp_services.load_demo(self.EXP_ID_1)
 
