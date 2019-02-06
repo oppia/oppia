@@ -165,3 +165,9 @@ class MaintenancePageTest(test_utils.GenericTestBase):
             response = self.testapp.get('/admin')
             self.assertEqual(response.status_int, 302)
             self.assertIn('admin', response.headers['location'])
+
+    def test_redirect_login_page_loads_correctly(self):
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            response = self.testapp.get('/admin')
+            self.assertEqual(response.status_int, 302)
+            self.assertIn('Login', response.headers['location'])
