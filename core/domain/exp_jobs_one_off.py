@@ -88,10 +88,11 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if not exploration_model.deleted:
             exp_services.create_exploration_summary(
                 exploration_model.id, None)
+            yield('SUCCESS', exploration_model.id)
 
     @staticmethod
-    def reduce(exp_id, list_of_exps):
-        pass
+    def reduce(key, values):
+        yield(key, len(values))
 
 
 class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -138,10 +139,11 @@ class ExplorationContributorsSummaryOneOffJob(
         summary.contributors_summary = (
             exp_services.compute_exploration_contributors_summary(item.id))
         exp_services.save_exploration_summary(summary)
+        yield('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
-        pass
+        yield(key, len(values))
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -255,10 +257,11 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                 'Update exploration states from schema version %d to %d.' % (
                     item.states_schema_version,
                     feconf.CURRENT_STATES_SCHEMA_VERSION))
+            yield('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        yield (key, len(values))
 
 
 class InteractionAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -666,12 +669,7 @@ class ExplorationMigrationValidationJobForCKEditor(
 
 
 class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for copying the image/audio such that the url instead of
-    {{exp_id}}/assets/image/image.png is
-    exploration/{{exp_id}}/assets/image/image.png. It also involves compressing
-    the images as well as renaming the filenames so that they have dimensions
-    as a part of their name.
-    """
+    """One-off job for verifying the image and audio urls."""
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
