@@ -1184,7 +1184,8 @@ def _check_docstrings(all_files):
                         is_class_or_function = False
 
                 # Check for space after """ in docstring.
-                if re.match(r'^""".+$', line) and is_docstring and line[3] == ' ':
+                if re.match(r'^""".+$', line) and is_docstring and (
+                        line[3] == ' '):
                     failed = True
                     print (
                         '%s --> Line %s: There should be no space after """ '
