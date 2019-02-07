@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'pages/base2.html' %}
 
 {% block maintitle %}
   About us - Oppia
@@ -593,8 +593,7 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/pages/about/About.js"></script>
-  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
+  <script src="/dist/About.js"></script>
 {% endblock footer_js %}
 
 {% block footer%}

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+require('../../domain/utilities/UrlInterpolationService.js')
+require('../../components/background/BackgroundBannerDirective.js')
 /**
  * @fileoverview Controllers for the about page.
  */
