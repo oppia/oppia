@@ -834,7 +834,9 @@ class InteractionCustomizationArgsValidationJob(
 
 
 class EmptySubtitledHtmlAuditJob(jobs.BaseMapReduceOneOffJobManager):
-    """Audit job to number of explorations having empty subtitled html."""
+    """One off job to audit explorations having empty subtitled html and outputs
+    the content_id of such object.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
