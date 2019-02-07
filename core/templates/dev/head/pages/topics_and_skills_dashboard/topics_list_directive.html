@@ -20,7 +20,7 @@
     <tr ng-repeat="topic in getTopicSummaries()" class="list-item protractor-test-topics-list-item">
       <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
-          <span> <[topic.name]> </span>
+          <span class="protractor-test-topic-name"> <[topic.name]> </span>
         </a>
       </td>
       <td>

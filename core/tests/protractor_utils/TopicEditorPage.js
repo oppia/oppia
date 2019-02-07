@@ -55,6 +55,22 @@ var TopicEditorPage = function() {
     });
   };
 
+  this.expectStoryTitleToBe = function(title, index) {
+    storyListItems.then(function(elems) {
+      expect(
+        elems[index].all(
+          by.css('.protractor-test-story-title')).first().getText()
+      ).toEqual(title);
+    });
+  };
+
+  this.navigateToStoryWithIndex = function(index) {
+    storyListItems.then(function(elems) {
+      elems[index].click();
+    });
+    waitFor.pageToFullyLoad();
+  };
+
   this.createStory = function(storyTitle) {
     waitFor.elementToBeClickable(
       createStoryButton,

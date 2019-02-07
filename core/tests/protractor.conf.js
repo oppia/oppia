@@ -143,8 +143,8 @@ exports.config = {
       'protractor/subscriptionsFlow.js'
     ],
 
-    topicEditor: [
-      'protractor_desktop/topicEditor.js'
+    topicAndStoryEditor: [
+      'protractor_desktop/topicAndStoryEditor.js'
     ],
 
     topicsAndSkillsDashboard: [

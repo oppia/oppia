@@ -26,16 +26,19 @@ var AdminPage = require('../protractor_utils/AdminPage.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
+  var storyEditorPage = null;
   var topicId = null;
 
   beforeAll(function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
     topicsAndSkillsDashboardPage.get();
@@ -55,6 +58,9 @@ describe('Topic editor functionality', function() {
     topicEditorPage.changeTopicDescription('Topic Description');
     topicEditorPage.saveTopic('Changed topic name and description.');
 
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.expectTopicNameToBe('Topic 1 edited', 0);
+
     topicEditorPage.get(topicId);
     topicEditorPage.expectTopicNameToBe('Topic 1 edited');
     topicEditorPage.expectTopicDescriptionToBe('Topic Description');
@@ -63,9 +69,25 @@ describe('Topic editor functionality', function() {
   it('should add a canonical story to topic correctly', function() {
     topicEditorPage.expectNumberOfStoriesToBe(0);
     topicEditorPage.createStory('Story Title');
-    topicEditorPage.get(topicId);
+    storyEditorPage.returnToTopic();
 
     topicEditorPage.expectNumberOfStoriesToBe(1);
+  });
+
+  it('should edit story title, description and notes correctly', function() {
+    topicEditorPage.navigateToStoryWithIndex(0);
+    storyEditorPage.changeStoryNotes(forms.toRichText('Story notes'));
+    storyEditorPage.changeStoryTitle('Story Title Edited');
+    storyEditorPage.changeStoryDescription('Story Description');
+    storyEditorPage.saveStory('Changed story title, description and notes');
+
+    storyEditorPage.returnToTopic();
+    topicEditorPage.expectStoryTitleToBe('Story Title Edited', 0);
+    topicEditorPage.navigateToStoryWithIndex(0);
+
+    storyEditorPage.expectTitleToBe('Story Title Edited');
+    storyEditorPage.expectDescriptionToBe('Story Description');
+    storyEditorPage.expectNotesToBe(forms.toRichText('Story notes'));
   });
 
   afterEach(function() {

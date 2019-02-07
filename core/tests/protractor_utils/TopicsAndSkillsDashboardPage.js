@@ -22,6 +22,7 @@ var waitFor = require('./waitFor.js');
 
 var TopicsAndSkillsDashboardPage = function() {
   var DASHBOARD_URL = '/topics_and_skills_dashboard';
+  var topicNames = element.all(by.css('.protractor-test-topic-name'));
   var createTopicButton = element(
     by.css('.protractor-test-create-topic-button'));
   var deleteTopicButtons = element.all(
@@ -59,7 +60,7 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.get = function() {
     browser.get(DASHBOARD_URL);
-    return waitFor.pageToFullyLoad();
+    waitFor.pageToFullyLoad();
   };
 
   this.createTopicWithTitle = function(title) {
@@ -127,6 +128,12 @@ var TopicsAndSkillsDashboardPage = function() {
   this.expectNumberOfTopicsToBe = function(number) {
     topicsListItems.then(function(elems) {
       expect(elems.length).toBe(number);
+    });
+  };
+
+  this.expectTopicNameToBe = function(topicName, index) {
+    topicNames.then(function(elems) {
+      expect(elems[index].getText()).toEqual(topicName);
     });
   };
 
