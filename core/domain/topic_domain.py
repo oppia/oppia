@@ -411,6 +411,15 @@ class Topic(object):
             skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
         return skill_ids
 
+    def get_all_uncategorized_skill_ids(self):
+        """Returns ids of all the uncategorized skills present in the topic.
+
+        Returns:
+            list(str). The list of all the uncategorized skill ids present
+            in the topic.
+        """
+        return self.uncategorized_skill_ids
+
     def delete_story(self, story_id):
         """Removes a story from the canonical_story_ids list.
 
@@ -656,6 +665,18 @@ class Topic(object):
                 'The skill id %s is not present in the topic.'
                 % uncategorized_skill_id)
         self.uncategorized_skill_ids.remove(uncategorized_skill_id)
+
+    def get_all_subtopics(self):
+        """Returns all subtopics in the topic.
+
+        Returns:
+            list(dict). The list of all subtopics present
+                in topic.
+        """
+        subtopics = []
+        for _, subtopic in enumerate(self.subtopics):
+            subtopics.append(subtopic.to_dict())
+        return subtopics
 
     def get_subtopic_index(self, subtopic_id):
         """Gets the index of the subtopic with the given id in the subtopics
