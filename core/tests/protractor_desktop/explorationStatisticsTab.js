@@ -60,11 +60,11 @@ describe('Issues visualization', function() {
     adminPage = new AdminPage.AdminPage();
 
     users.createUser(
-      'user2@PlaythroughIssues.com',
-      'learnerPlaythroughIssues');
+      'user2@ExplorationIssues.com',
+      'learnerExplorationIssues');
     users.createAndLoginAdminUser(
-      'user1@PlaythroughIssues.com',
-      'authorPlaythroughIssues');
+      'user1@ExplorationIssues.com',
+      'authorExplorationIssues');
 
     workflow.createExplorationAsAdmin();
     explorationEditorMainTab.exitTutorial();
@@ -133,7 +133,7 @@ describe('Issues visualization', function() {
   });
 
   it('records early quit issue.', function() {
-    users.login('user2@PlaythroughIssues.com');
+    users.login('user2@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -146,7 +146,7 @@ describe('Issues visualization', function() {
     general.acceptAlert();
     users.logout();
 
-    users.login('user1@PlaythroughIssues.com');
+    users.login('user1@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -161,7 +161,7 @@ describe('Issues visualization', function() {
   });
 
   it('records multiple incorrect issue.', function() {
-    users.login('user2@PlaythroughIssues.com');
+    users.login('user2@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -181,7 +181,7 @@ describe('Issues visualization', function() {
     general.acceptAlert();
     users.logout();
 
-    users.login('user1@PlaythroughIssues.com');
+    users.login('user1@ExplorationIssues.com');
     creatorDashboardPage.get();
     creatorDashboardPage.editExploration(EXPLORATION_TITLE);
     explorationEditorPage.navigateToStatsTab();
@@ -194,7 +194,7 @@ describe('Issues visualization', function() {
   });
 
   it('records cyclic transitions issue.', function() {
-    users.login('user2@PlaythroughIssues.com');
+    users.login('user2@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -231,7 +231,7 @@ describe('Issues visualization', function() {
     general.acceptAlert();
     users.logout();
 
-    users.login('user1@PlaythroughIssues.com');
+    users.login('user1@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);

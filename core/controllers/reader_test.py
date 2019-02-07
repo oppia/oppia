@@ -1310,7 +1310,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
                 'schema_version': 1
             }])
-        stats_models.PlaythroughIssuesModel.create(
+        stats_models.ExplorationIssuesModel.create(
             self.exp_id, 1, [{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
@@ -1365,11 +1365,11 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
 
-    def test_new_playthrough_issue_gets_created(self):
+    def test_new_exp_issue_gets_created(self):
         """Test that a new playthrough gets created and a new issue is created
         for it.
         """
@@ -1385,7 +1385,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 2)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
@@ -1411,7 +1411,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'schema_version': 1
             }])
 
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues.append({
             'issue_type': 'CyclicStateTransitions',
             'issue_customization_args': {
@@ -1454,7 +1454,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 2)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 2)
@@ -1480,7 +1480,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'schema_version': 1
             }])
 
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues.append({
             'issue_type': 'CyclicStateTransitions',
             'issue_customization_args': {
@@ -1523,7 +1523,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 3)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
@@ -1533,7 +1533,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that a playthrough is not stored when the maximum number of
         playthroughs per issue already exists.
         """
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues[0]['playthrough_ids'] = [
             'id1', 'id2', 'id3', 'id4', 'id5']
         model.put()
@@ -1547,7 +1547,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 5)
 
@@ -1591,7 +1591,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
         playthrough_id = model.unresolved_issues[0]['playthrough_ids'][1]
@@ -1623,7 +1623,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'issue_schema_version': 1,
                 'playthrough_id': playthrough_id
             }, csrf_token=self.csrf_token)
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
         playthrough_id = model.unresolved_issues[0]['playthrough_ids'][1]
@@ -1661,7 +1661,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'issue_schema_version': 1,
                 'playthrough_id': playthrough_id
             }, csrf_token=self.csrf_token)
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 2)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)

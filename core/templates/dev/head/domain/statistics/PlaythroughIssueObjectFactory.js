@@ -27,7 +27,7 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
    * @param {number} schemaVersion - schema version of the class instance.
    * @param {boolean} isValid - whether the issue is valid.
    */
-  var PlaythroughIssue = function(
+  var ExplorationIssue = function(
       issueType, issueCustomizationArgs, playthroughIds, schemaVersion,
       isValid) {
     /** @type {string} */
@@ -43,7 +43,7 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
   };
 
   /**
-   * @typedef PlaythroughIssueBackendDict
+   * @typedef ExplorationIssueBackendDict
    * @property {string} issueType - type of an issue.
    * @property {Object.<string, *>} issueCustomizationArgs - customization dict
    *   for an issue.
@@ -52,12 +52,12 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
    * @property {boolean} isValid - whether the issue is valid.
    */
   /**
-   * @param {PlaythroughIssueBackendDict} explorationIssueBackendDict
-   * @returns {PlaythroughIssue}
+   * @param {ExplorationIssueBackendDict} explorationIssueBackendDict
+   * @returns {ExplorationIssue}
    */
-  PlaythroughIssue.createFromBackendDict = function(
+  ExplorationIssue.createFromBackendDict = function(
       explorationIssueBackendDict) {
-    return new PlaythroughIssue(
+    return new ExplorationIssue(
       explorationIssueBackendDict.issue_type,
       explorationIssueBackendDict.issue_customization_args,
       explorationIssueBackendDict.playthrough_ids,
@@ -66,9 +66,9 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
   };
 
   /**
-   * @returns {PlaythroughIssueBackendDict}
+   * @returns {ExplorationIssueBackendDict}
    */
-  PlaythroughIssue.prototype.toBackendDict = function() {
+  ExplorationIssue.prototype.toBackendDict = function() {
     return {
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
@@ -78,5 +78,5 @@ oppia.factory('PlaythroughIssueObjectFactory', [function() {
     };
   };
 
-  return PlaythroughIssue;
+  return ExplorationIssue;
 }]);

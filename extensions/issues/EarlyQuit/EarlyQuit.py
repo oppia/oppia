@@ -19,7 +19,7 @@
 from extensions.issues import base
 
 
-class EarlyQuit(base.BasePlaythroughIssueSpec):
+class EarlyQuit(base.BaseExplorationIssueSpec):
     """Issue that's recorded when the learner quits the exploration early."""
 
     _customization_arg_specs = [{

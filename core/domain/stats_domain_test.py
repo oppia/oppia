@@ -273,20 +273,19 @@ class StateStatsTests(test_utils.GenericTestBase):
             state_stats.validate()
 
 
-class PlaythroughIssuesTests(test_utils.GenericTestBase):
-    """Tests the PlaythroughIssues domain object."""
+class ExplorationIssuesTests(test_utils.GenericTestBase):
+    """Tests the ExplorationIssues domain object."""
 
     def test_create_default(self):
-        playthrough_issues = (
-            stats_domain.PlaythroughIssues.create_default('exp_id1', 1))
-        self.assertEqual(playthrough_issues.exp_id, 'exp_id1')
-        self.assertEqual(playthrough_issues.exp_version, 1)
-        self.assertEqual(playthrough_issues.unresolved_issues, [])
+        exp_issues = stats_domain.ExplorationIssues.create_default('exp_id1', 1)
+        self.assertEqual(exp_issues.exp_id, 'exp_id1')
+        self.assertEqual(exp_issues.exp_version, 1)
+        self.assertEqual(exp_issues.unresolved_issues, [])
 
     def test_to_dict(self):
-        playthrough_issues = stats_domain.PlaythroughIssues(
+        exp_issues = stats_domain.ExplorationIssues(
             'exp_id1', 1, [
-                stats_domain.PlaythroughIssue.from_dict({
+                stats_domain.ExplorationIssue.from_dict({
                     'issue_type': 'EarlyQuit',
                     'issue_customization_args': {
                         'state_name': {
@@ -301,12 +300,12 @@ class PlaythroughIssuesTests(test_utils.GenericTestBase):
                     'is_valid': True})
                 ])
 
-        playthrough_issues_dict = playthrough_issues.to_dict()
+        exp_issues_dict = exp_issues.to_dict()
 
-        self.assertEqual(playthrough_issues_dict['exp_id'], 'exp_id1')
-        self.assertEqual(playthrough_issues_dict['exp_version'], 1)
+        self.assertEqual(exp_issues_dict['exp_id'], 'exp_id1')
+        self.assertEqual(exp_issues_dict['exp_version'], 1)
         self.assertEqual(
-            playthrough_issues_dict['unresolved_issues'], [{
+            exp_issues_dict['unresolved_issues'], [{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
                     'state_name': {
@@ -322,7 +321,7 @@ class PlaythroughIssuesTests(test_utils.GenericTestBase):
             }])
 
     def test_from_dict(self):
-        playthrough_issues_dict = {
+        exp_issues_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 1,
             'unresolved_issues': [{
@@ -341,13 +340,12 @@ class PlaythroughIssuesTests(test_utils.GenericTestBase):
             }]
         }
 
-        playthrough_issues = (
-            stats_domain.PlaythroughIssues.from_dict(playthrough_issues_dict))
+        exp_issues = stats_domain.ExplorationIssues.from_dict(exp_issues_dict)
 
-        self.assertEqual(playthrough_issues.exp_id, 'exp_id1')
-        self.assertEqual(playthrough_issues.exp_version, 1)
+        self.assertEqual(exp_issues.exp_id, 'exp_id1')
+        self.assertEqual(exp_issues.exp_version, 1)
         self.assertEqual(
-            playthrough_issues.unresolved_issues[0].to_dict(),
+            exp_issues.unresolved_issues[0].to_dict(),
             {
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
@@ -363,9 +361,9 @@ class PlaythroughIssuesTests(test_utils.GenericTestBase):
                 'is_valid': True})
 
     def test_validate(self):
-        playthrough_issues = stats_domain.PlaythroughIssues(
+        exp_issues = stats_domain.ExplorationIssues(
             'exp_id1', 1, [
-                stats_domain.PlaythroughIssue.from_dict({
+                stats_domain.ExplorationIssue.from_dict({
                     'issue_type': 'EarlyQuit',
                     'issue_customization_args': {
                         'state_name': {
@@ -379,13 +377,13 @@ class PlaythroughIssuesTests(test_utils.GenericTestBase):
                     'schema_version': 1,
                     'is_valid': True})
                 ])
-        playthrough_issues.validate()
+        exp_issues.validate()
 
         # Change ID to int.
-        playthrough_issues.exp_id = 5
+        exp_issues.exp_id = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected exp_id to be a string, received %s' % (type(5)))):
-            playthrough_issues.validate()
+            exp_issues.validate()
 
 
 class PlaythroughTests(test_utils.GenericTestBase):
@@ -550,8 +548,8 @@ class PlaythroughTests(test_utils.GenericTestBase):
             playthrough.validate()
 
 
-class PlaythroughIssueTests(test_utils.GenericTestBase):
-    """Tests the PlaythroughIssue domain object."""
+class ExplorationIssueTests(test_utils.GenericTestBase):
+    """Tests the ExplorationIssue domain object."""
 
     def _dummy_convert_issue_v1_dict_to_v2_dict(self, issue_dict):
         """A test implementation of schema conversion function."""
@@ -563,9 +561,8 @@ class PlaythroughIssueTests(test_utils.GenericTestBase):
         return issue_dict
 
     def test_to_dict(self):
-        playthrough_issue = (
-            stats_domain.PlaythroughIssue('EarlyQuit', {}, [], 1, True))
-        playthrough_issue_dict = playthrough_issue.to_dict()
+        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
+        exp_issue_dict = exp_issue.to_dict()
         expected_customization_args = {
             'time_spent_in_exp_in_msecs': {
                 'value': 0
@@ -575,7 +572,7 @@ class PlaythroughIssueTests(test_utils.GenericTestBase):
             }
         }
         self.assertEqual(
-            playthrough_issue_dict, {
+            exp_issue_dict, {
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': expected_customization_args,
                 'playthrough_ids': [],
@@ -587,7 +584,7 @@ class PlaythroughIssueTests(test_utils.GenericTestBase):
         """Test the from_backend_dict() method."""
         # Test that an exploration issue dict without 'issue_type' key raises
         # exception.
-        playthrough_issue_dict = {
+        exp_issue_dict = {
             'issue_customization_args': {},
             'playthrough_ids': [],
             'schema_version': 1,
@@ -596,56 +593,52 @@ class PlaythroughIssueTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'issue_type not in exploration issue dict.'):
-            stats_domain.PlaythroughIssue.from_backend_dict(
-                playthrough_issue_dict)
+            stats_domain.ExplorationIssue.from_backend_dict(exp_issue_dict)
 
-    def test_update_playthrough_issue_from_model(self):
+    def test_update_exp_issue_from_model(self):
         """Test the migration of exploration issue domain objects."""
-        playthrough_issue = (
-            stats_domain.PlaythroughIssue('EarlyQuit', {}, [], 1, True))
-        playthrough_issue_dict = playthrough_issue.to_dict()
+        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
+        exp_issue_dict = exp_issue.to_dict()
 
         with self.swap(
-            stats_domain.PlaythroughIssue,
+            stats_domain.ExplorationIssue,
             '_convert_issue_v1_dict_to_v2_dict',
             self._dummy_convert_issue_v1_dict_to_v2_dict):
-            stats_domain.PlaythroughIssue.update_playthrough_issue_from_model(
-                playthrough_issue_dict)
-        self.assertEqual(playthrough_issue_dict['issue_type'], 'EarlyQuit1')
+            stats_domain.ExplorationIssue.update_exp_issue_from_model(
+                exp_issue_dict)
+        self.assertEqual(exp_issue_dict['issue_type'], 'EarlyQuit1')
         self.assertEqual(
-            playthrough_issue_dict['issue_customization_args']['new_key'], 5)
+            exp_issue_dict['issue_customization_args']['new_key'], 5)
 
         # For other issue types, no changes happen during migration.
-        playthrough_issue1 = stats_domain.PlaythroughIssue(
+        exp_issue1 = stats_domain.ExplorationIssue(
             'MultipleIncorrectSubmissions', {}, [], 1, True)
-        playthrough_issue_dict1 = playthrough_issue1.to_dict()
+        exp_issue_dict1 = exp_issue1.to_dict()
         with self.swap(
-            stats_domain.PlaythroughIssue,
+            stats_domain.ExplorationIssue,
             '_convert_issue_v1_dict_to_v2_dict',
             self._dummy_convert_issue_v1_dict_to_v2_dict):
-            stats_domain.PlaythroughIssue.update_playthrough_issue_from_model(
-                playthrough_issue_dict1)
+            stats_domain.ExplorationIssue.update_exp_issue_from_model(
+                exp_issue_dict1)
         self.assertEqual(
-            playthrough_issue_dict1['issue_type'],
-            'MultipleIncorrectSubmissions')
+            exp_issue_dict1['issue_type'], 'MultipleIncorrectSubmissions')
 
     def test_validate(self):
-        playthrough_issue = (
-            stats_domain.PlaythroughIssue('EarlyQuit', {}, [], 1, True))
-        playthrough_issue.validate()
+        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
+        exp_issue.validate()
 
         # Change issue_type to int.
-        playthrough_issue.issue_type = 5
+        exp_issue.issue_type = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected issue_type to be a string, received %s' % (type(5)))):
-            playthrough_issue.validate()
+            exp_issue.validate()
 
         # Change schema_version to string.
-        playthrough_issue.issue_type = 'EarlyQuit'
-        playthrough_issue.schema_version = '1'
+        exp_issue.issue_type = 'EarlyQuit'
+        exp_issue.schema_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected schema_version to be an int, received %s' % (type('1')))):
-            playthrough_issue.validate()
+            exp_issue.validate()
 
 
 class LearnerActionTests(test_utils.GenericTestBase):

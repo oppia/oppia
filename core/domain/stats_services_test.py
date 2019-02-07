@@ -48,7 +48,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.stats_model_id = (
             stats_models.ExplorationStatsModel.create(
                 'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}))
-        stats_models.PlaythroughIssuesModel.create(
+        stats_models.ExplorationIssuesModel.create(
             self.exp_id, self.exp_version, [])
         self.playthrough_id = stats_models.PlaythroughModel.create(
             'exp_id1', 1, 'EarlyQuit', {}, [])
@@ -153,7 +153,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(stats_for_new_exploration_log.times_called, 1)
         self.assertEqual(stats_for_new_exp_version_log.times_called, 1)
 
-    def test_exploration_changes_effect_on_playthrough_issues_model(self):
+    def test_exploration_changes_effect_on_exp_issues_model(self):
         """Test the effect of exploration changes on exploration issues
         model.
         """
@@ -168,10 +168,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
-        playthrough_issues = (
-            stats_services.get_playthrough_issues(exp_id, exploration.version))
-        self.assertEqual(playthrough_issues.exp_version, exploration.version)
-        self.assertEqual(playthrough_issues.unresolved_issues, [])
+        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
+        self.assertEqual(exp_issues.unresolved_issues, [])
 
         # Update exploration to next version, exploration issues model also
         # created.
@@ -182,10 +181,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_services.update_exploration(
             'committer_id_v3', exploration.id, change_list, 'Added new state')
         exploration = exp_services.get_exploration_by_id(exp_id)
-        playthrough_issues = (
-            stats_services.get_playthrough_issues(exp_id, exploration.version))
-        self.assertEqual(playthrough_issues.exp_version, exploration.version)
-        self.assertEqual(playthrough_issues.unresolved_issues, [])
+        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
+        self.assertEqual(exp_issues.unresolved_issues, [])
 
         # Create a playthrough and assign it to an issue in exploration issues
         # model.
@@ -206,7 +204,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 },
                 'schema_version': 1
             }])
-        playthrough_issue1 = stats_domain.PlaythroughIssue.from_dict({
+        exp_issue1 = stats_domain.ExplorationIssue.from_dict({
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
@@ -220,9 +218,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
-        playthrough_issues.unresolved_issues.append(playthrough_issue1)
-        stats_services.save_playthrough_issues_model_transactional(
-            playthrough_issues)
+        exp_issues.unresolved_issues.append(exp_issue1)
+        stats_services.save_exp_issues_model_transactional(exp_issues)
 
         # Delete a state.
         change_list = [exp_domain.ExplorationChange({
@@ -232,10 +229,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_services.update_exploration(
             'committer_id_v3', exploration.id, change_list, 'Deleted a state')
         exploration = exp_services.get_exploration_by_id(exp_id)
-        playthrough_issues = (
-            stats_services.get_playthrough_issues(exp_id, exploration.version))
-        self.assertEqual(playthrough_issues.exp_version, exploration.version)
-        self.assertEqual(playthrough_issues.unresolved_issues[0].to_dict(), {
+        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
+        self.assertEqual(exp_issues.unresolved_issues[0].to_dict(), {
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
@@ -254,10 +250,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_services.revert_exploration(
             'committer_id_v4', exp_id, current_version=3, revert_to_version=2)
         exploration = exp_services.get_exploration_by_id(exp_id)
-        playthrough_issues = (
-            stats_services.get_playthrough_issues(exp_id, exploration.version))
-        self.assertEqual(playthrough_issues.exp_version, exploration.version)
-        self.assertEqual(playthrough_issues.unresolved_issues[0].to_dict(), {
+        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
+        self.assertEqual(exp_issues.unresolved_issues[0].to_dict(), {
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
@@ -518,8 +513,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
 
-    def test_create_playthrough_issues_for_new_exploration(self):
-        """Test the create_playthrough_issues_for_new_exploration method."""
+    def test_create_exp_issues_for_new_exploration(self):
+        """Test the create_exp_issues_for_new_exploration method."""
         # Create exploration object in datastore.
         exp_id = 'exp_id'
         test_exp_filepath = os.path.join(
@@ -531,17 +526,17 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
-        stats_services.create_playthrough_issues_for_new_exploration(
+        stats_services.create_exp_issues_for_new_exploration(
             exploration.id, exploration.version)
 
-        playthrough_issues = stats_services.get_playthrough_issues(
+        exp_issues = stats_services.get_exp_issues(
             exploration.id, exploration.version)
-        self.assertEqual(playthrough_issues.exp_id, exploration.id)
-        self.assertEqual(playthrough_issues.exp_version, exploration.version)
-        self.assertEqual(playthrough_issues.unresolved_issues, [])
+        self.assertEqual(exp_issues.exp_id, exploration.id)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
+        self.assertEqual(exp_issues.unresolved_issues, [])
 
-    def test_update_playthrough_issues_for_new_exp_version(self):
-        """Test the update_playthrough_issues_for_new_exp_version method."""
+    def test_update_exp_issues_for_new_exp_version(self):
+        """Test the update_exp_issues_for_new_exp_version method."""
         # Create exploration object in datastore.
         exp_id = 'exp_id'
         test_exp_filepath = os.path.join(
@@ -553,10 +548,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
-        playthrough_issues = stats_services.get_playthrough_issues(
+        exp_issues = stats_services.get_exp_issues(
             exploration.id, exploration.version)
-        self.assertEqual(playthrough_issues.exp_version, 1)
-        self.assertEqual(playthrough_issues.unresolved_issues, [])
+        self.assertEqual(exp_issues.exp_version, 1)
+        self.assertEqual(exp_issues.unresolved_issues, [])
 
         # Create playthrough instances for this version.
         playthrough_id1 = stats_models.PlaythroughModel.create(
@@ -593,7 +588,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 },
                 'schema_version': 1
             }])
-        playthrough_issue1 = stats_domain.PlaythroughIssue.from_dict({
+        exp_issue1 = stats_domain.ExplorationIssue.from_dict({
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
@@ -607,7 +602,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
-        playthrough_issue2 = stats_domain.PlaythroughIssue.from_dict({
+        exp_issue2 = stats_domain.ExplorationIssue.from_dict({
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
@@ -621,10 +616,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
-        playthrough_issues.unresolved_issues = [
-            playthrough_issue1, playthrough_issue2]
-        stats_services.save_playthrough_issues_model_transactional(
-            playthrough_issues)
+        exp_issues.unresolved_issues = [exp_issue1, exp_issue2]
+        stats_services.save_exp_issues_model_transactional(exp_issues)
 
         # Test renaming of states.
         exploration.rename_state('Home', 'Renamed state')
@@ -635,17 +628,17 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'new_state_name': 'Renamed state'
         })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.update_playthrough_issues_for_new_exp_version(
+        stats_services.update_exp_issues_for_new_exp_version(
             exploration, exp_versions_diff, False)
 
-        playthrough_issues = stats_services.get_playthrough_issues(
+        exp_issues = stats_services.get_exp_issues(
             exploration.id, exploration.version)
-        self.assertEqual(playthrough_issues.exp_version, 2)
+        self.assertEqual(exp_issues.exp_version, 2)
         self.assertEqual(
-            playthrough_issues.unresolved_issues[0].issue_customization_args[
+            exp_issues.unresolved_issues[0].issue_customization_args[
                 'state_name']['value'], 'Renamed state')
         self.assertEqual(
-            playthrough_issues.unresolved_issues[1].issue_customization_args[
+            exp_issues.unresolved_issues[1].issue_customization_args[
                 'state_name']['value'], 'End')
 
         playthrough1_instance = stats_models.PlaythroughModel.get(
@@ -675,20 +668,20 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'state_name': 'End'
         })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.update_playthrough_issues_for_new_exp_version(
+        stats_services.update_exp_issues_for_new_exp_version(
             exploration, exp_versions_diff, False)
 
-        playthrough_issues = stats_services.get_playthrough_issues(
+        exp_issues = stats_services.get_exp_issues(
             exploration.id, exploration.version)
-        self.assertEqual(playthrough_issues.exp_version, 3)
+        self.assertEqual(exp_issues.exp_version, 3)
         self.assertEqual(
-            playthrough_issues.unresolved_issues[0].issue_customization_args[
+            exp_issues.unresolved_issues[0].issue_customization_args[
                 'state_name']['value'], 'Renamed state')
         self.assertEqual(
-            playthrough_issues.unresolved_issues[1].issue_customization_args[
+            exp_issues.unresolved_issues[1].issue_customization_args[
                 'state_name']['value'], 'End')
         self.assertEqual(
-            playthrough_issues.unresolved_issues[1].is_valid, False)
+            exp_issues.unresolved_issues[1].is_valid, False)
 
         playthrough1_instance = stats_models.PlaythroughModel.get(
             playthrough_id1)
@@ -760,24 +753,23 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(playthroughs[1].issue_customization_args, {})
         self.assertEqual(playthroughs[1].actions, [])
 
-    def test_create_playthrough_issues_model(self):
-        """Test the create_playthrough_issues_model method."""
-        playthrough_issues = stats_domain.PlaythroughIssues(self.exp_id, 1, [])
-        stats_services.create_playthrough_issues_model(playthrough_issues)
-        playthrough_issues_instance = (
-            stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1))
-        self.assertEqual(playthrough_issues_instance.exp_id, self.exp_id)
-        self.assertEqual(playthrough_issues_instance.exp_version, 1)
-        self.assertEqual(playthrough_issues_instance.unresolved_issues, [])
+    def test_create_exp_issues_model(self):
+        """Test the create_exp_issues_model method."""
+        exp_issues = stats_domain.ExplorationIssues(self.exp_id, 1, [])
+        stats_services.create_exp_issues_model(exp_issues)
+        exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
+            self.exp_id, 1)
+        self.assertEqual(exp_issues_instance.exp_id, self.exp_id)
+        self.assertEqual(exp_issues_instance.exp_version, 1)
+        self.assertEqual(exp_issues_instance.unresolved_issues, [])
 
-    def test_get_playthrough_issues_from_model(self):
-        """Test the get_playthrough_issues_from_model method."""
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
-        playthrough_issues = (
-            stats_services.get_playthrough_issues_from_model(model))
-        self.assertEqual(playthrough_issues.exp_id, self.exp_id)
-        self.assertEqual(playthrough_issues.exp_version, 1)
-        self.assertEqual(playthrough_issues.unresolved_issues, [])
+    def test_get_exp_issues_from_model(self):
+        """Test the get_exp_issues_from_model method."""
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        exp_issues = stats_services.get_exp_issues_from_model(model)
+        self.assertEqual(exp_issues.exp_id, self.exp_id)
+        self.assertEqual(exp_issues.exp_version, 1)
+        self.assertEqual(exp_issues.unresolved_issues, [])
 
     def test_get_exploration_stats_from_model(self):
         """Test the get_exploration_stats_from_model method."""
@@ -804,13 +796,12 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(playthrough.issue_customization_args, {})
         self.assertEqual(playthrough.actions, [])
 
-    def test_get_playthrough_issues_by_id(self):
-        """Test the get_playthrough_issues_by_id method."""
-        playthrough_issues = (
-            stats_services.get_playthrough_issues(self.exp_id, 1))
-        self.assertEqual(playthrough_issues.exp_id, self.exp_id)
-        self.assertEqual(playthrough_issues.exp_version, 1)
-        self.assertEqual(playthrough_issues.unresolved_issues, [])
+    def test_get_exp_issues_by_id(self):
+        """Test the get_exp_issues_by_id method."""
+        exp_issues = stats_services.get_exp_issues(self.exp_id, 1)
+        self.assertEqual(exp_issues.exp_id, self.exp_id)
+        self.assertEqual(exp_issues.exp_version, 1)
+        self.assertEqual(exp_issues.unresolved_issues, [])
 
     def test_get_playthrough_by_id(self):
         """Test the get_playthrough_by_id method."""
@@ -885,13 +876,12 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 }
             })
 
-    def test_save_playthrough_issues_model_transactional(self):
-        """Test the save_playthrough_issues_model_transactional method."""
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
-        playthrough_issues = (
-            stats_services.get_playthrough_issues_from_model(model))
-        playthrough_issues.unresolved_issues.append(
-            stats_domain.PlaythroughIssue.from_dict({
+    def test_save_exp_issues_model_transactional(self):
+        """Test the save_exp_issues_model_transactional method."""
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        exp_issues = stats_services.get_exp_issues_from_model(model)
+        exp_issues.unresolved_issues.append(
+            stats_domain.ExplorationIssue.from_dict({
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
                     'state_name': {
@@ -905,13 +895,12 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'schema_version': 1,
                 'is_valid': True
             }))
-        stats_services.save_playthrough_issues_model_transactional(
-            playthrough_issues)
+        stats_services.save_exp_issues_model_transactional(exp_issues)
 
-        model = stats_models.PlaythroughIssuesModel.get_model(self.exp_id, 1)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(
             model.unresolved_issues[0],
-            playthrough_issues.unresolved_issues[0].to_dict())
+            exp_issues.unresolved_issues[0].to_dict())
 
     def test_save_stats_model_transactional(self):
         """Test the save_stats_model_transactional method."""
