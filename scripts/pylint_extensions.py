@@ -42,7 +42,7 @@ class KeywordArgsChecker(checkers.BaseChecker):
             'non-explicit-keyword-args',
             'All keyword arguments should be explicitly named in function call.'
         ),
-        'C0007': (
+        'C0009': (
             'Keyword argument %s should not be named explicitly in %s call of'
             ' %s.',
             'explicit-keyword-args',
