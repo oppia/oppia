@@ -19,7 +19,7 @@
 from extensions import domain
 
 
-class BasePlaythroughIssueSpec(object):
+class BaseExplorationIssueSpec(object):
     """Base issue definition class.
 
     This class is not meant to be user-editable. The only methods in it should
