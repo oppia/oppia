@@ -866,7 +866,8 @@ def _check_newline_character(all_files):
     summary_messages = []
     all_files = [
         filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+        any(fnmatch.fnmatch(filename, pattern)
+            for pattern in EXCLUDED_PATHS) and not filename.endswith('.py')]
 
     for filename in all_files:
         content = FileCache.read(filename, mode='rb')
