@@ -72,11 +72,26 @@ class PlaythroughAuditTests(OneOffJobTestBase):
             issue_customization_args={}, actions=[])
         return stats_models.PlaythroughModel.get(playthrough_id)
 
+    def create_exp_issues_with_playthroughs(playthrough_ids_list):
+        return stats_models.ExplorationIssuesModel.create(
+            self.exp.id, self.exp.version, unresolved_issues=[
+                {
+                    'issue_type': 'EarlyQuit',
+                    'issue_customization_args': {
+                        'state_name': {'value': 'state_name'},
+                        'time_spent_in_exp_in_msecs': {'value': 200},
+                    },
+                    'playthrough_ids': playthrough_ids,
+                }
+                for playthrough_ids in playthrough_ids_list
+            ])
+
     def test_empty_output_for_good_playthrough(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id])
-        self.create_playthrough()
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
 
         output = self.run_one_off_job()
 
@@ -90,6 +105,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         # Set created_on to a date which is definitely before GSoC 2018.
         playthrough.created_on = datetime.datetime(2017, 12, 31)
         playthrough.put()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
 
         output = self.run_one_off_job()
 
@@ -100,7 +116,8 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
             [self.exp.id + 'differentiated'])
-        self.create_playthrough()
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
 
         output = self.run_one_off_job()
 
@@ -114,6 +131,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         playthrough = self.create_playthrough()
         playthrough.actions.append({'bad schema key': 'bad schema value'})
         playthrough.put()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
 
         output = self.run_one_off_job()
 
