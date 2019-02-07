@@ -1807,7 +1807,6 @@ def main():
     # debug mode which when enabled prints the tag_stack for each file.
     html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
     html_linter_messages = _lint_html_files(all_files, mode)
-    html_linter_messages = _lint_html_files(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     copyright_notice_messages = _check_for_copyright_notice(all_files)
     _print_complete_summary_of_errors()
