@@ -17,11 +17,9 @@
 """Tests for Exploration models."""
 
 from constants import constants
-
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-
 from core.platform import models
 from core.tests import test_utils
 

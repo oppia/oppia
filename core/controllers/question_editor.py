@@ -112,11 +112,8 @@ class EditableQuestionDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The question with the given id doesn\'t exist.')
 
-        associated_skill_ids = [link.skill_id for link in (
-            question_services.get_question_skill_links_of_question(
-                question_id))]
-        associated_skills = skill_services.get_multi_skills(
-            associated_skill_ids)
+        associated_skills = question_services.get_skills_linked_to_question(
+            question_id)
         associated_skill_dicts = [
             skill.to_dict() for skill in associated_skills]
 

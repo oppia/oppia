@@ -19,8 +19,10 @@
 import ast
 import collections
 import copy
+import datetime
 
 from core import jobs
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
@@ -32,6 +34,231 @@ import feconf
 (exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics
 ])
+
+
+PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
+
+
+class DeleteIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for deleting illegal playthroughs.
+
+    Playthroughs were introduced as a GSoC 2018 project. During the project,
+    some playthroughs were recorded which did not satisfy the requirements we
+    now place on them. This one-off job aims to get rid of such playthroughs to
+    keep the database healthy.
+
+    Specifically, we will remove playthroughs which were:
+      - Created before the final release of the project, because these
+        playthroughs did not use validation logic before being submitted into
+        the database.
+      - Created for an exploration which is not curated for playthroughs,
+        because playthroughs have the potential to store personally-identifiable
+        information. We want to ensure that we never record playthroughs in
+        explorations with malicious interactions (for example: TextInput ->
+        "Enter your credit card number"). We currently accomplish this by only
+        recording playthroughs in explorations admins feel confident are safe.
+
+    Ensures:
+        All Playthrough models deleted are removed as a reference from their
+            associated ExplorationIssue model.
+        ExplorationIssues models without any legal playthrough references are
+            deleted.
+        Individual ExplorationIssues without any legal playthrough references
+            are deleted.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.ExplorationIssuesModel]
+
+    @classmethod
+    def is_illegal(cls, playthrough_model):
+        """Returns whether the given playthrough model is illegal.
+
+        Args:
+            playthrough_model: stats_models.PlaythroughModel | None.
+
+        Returns:
+            bool. Whether the playthrough model is illegal, and should thus be
+            deleted.
+        """
+        whitelisted_exploration_ids = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+        return (
+            playthrough_model.exp_id not in whitelisted_exploration_ids or
+            playthrough_model.created_on < PLAYTHROUGH_PROJECT_RELEASE_DATETIME)
+
+    @classmethod
+    def delete_illegal_playthroughs(cls, playthrough_issue_backend_dict):
+        """Deletes illegal playthroughs referenced by the given playthrough
+        issue.
+
+        Args:
+            playthrough_issue_backend_dict: dict(str : *). The backend dict
+                representation of a stats_domain.ExplorationIssue object.
+
+        Returns:
+            tuple(int, int). A 2-tuple with the structure:
+                (playthroughs_deleted, playthroughs_remaining).
+        """
+        playthroughs_to_remain = []
+        playthroughs_to_delete = []
+
+        ids = playthrough_issue_backend_dict['playthrough_ids']
+        for playthrough in stats_models.PlaythroughModel.get_multi(ids):
+            if playthrough is None or playthrough.deleted:
+                continue
+            target_playthrough_list = (
+                playthroughs_to_delete if cls.is_illegal(playthrough) else
+                playthroughs_to_remain)
+            target_playthrough_list.append(playthrough)
+
+        stats_models.PlaythroughModel.delete_multi(playthroughs_to_delete)
+        playthrough_issue_backend_dict['playthrough_ids'] = [
+            playthrough.id for playthrough in playthroughs_to_remain]
+
+        return (len(playthroughs_to_delete), len(playthroughs_to_remain))
+
+    @staticmethod
+    def map(playthrough_issues_model):
+        """Deletes any illegal playthroughs associated to the given issues. Must
+        be declared @staticmethod.
+
+        Args:
+            playthrough_issues_model: ExplorationIssuesModel.
+
+        Yields:
+            tuple(str, int). Returns the exploration id the given model is
+            associated to, and the number of playthroughs deleted from it.
+        """
+        if playthrough_issues_model.deleted:
+            return
+
+        remaining_issues = []
+        total_playthroughs_deleted = 0
+        for issue in playthrough_issues_model.unresolved_issues:
+            playthroughs_deleted, playthroughs_remaining = (
+                DeleteIllegalPlaythroughsOneOffJob.delete_illegal_playthroughs(
+                    issue))
+            total_playthroughs_deleted += playthroughs_deleted
+            if playthroughs_remaining:
+                remaining_issues.append(issue)
+
+        if remaining_issues:
+            playthrough_issues_model.unresolved_issues = remaining_issues
+            playthrough_issues_model.put()
+        else:
+            playthrough_issues_model.delete()
+
+        yield (playthrough_issues_model.exp_id, total_playthroughs_deleted)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        """Calculates total playthroughs deleted from a particular exploration.
+        Must be declared @staticmethod.
+
+        Args:
+            key: str. The id of the exploration.
+            stringified_values: list(str). Each item is a stringified count of
+                how many playthroughs were deleted by a map job.
+
+        Yields:
+            tuple(str). A 1-tuple containing a string which summarizes how many
+            playthroughs were deleted.
+        """
+        yield (
+            'exploration_id:%s has had %d illegal playthrough recordings '
+            'deleted.' % (key, sum(map(int, stringified_values))),)
+
+
+class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
+    """Performs a brief audit of playthrough recordings to make sure they pass
+    simple sanity checks.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.PlaythroughModel]
+
+    @staticmethod
+    def map(playthrough_model):
+        """Builds audit data for inspection. Must be declared @staticmethod.
+
+        Args:
+            playthrough_model: PlaythroughModel.
+
+        Yields:
+            A 2-tuple of the form (playthrough_model.id, audit_data), where the
+            structure of audit_data is:
+                exp_id: str. The exploration the playthrough records.
+                created_on: str. The date the model was created in YYYY-MM-DD
+                    format.
+                validate_error: str | None. Stringified exception raised by
+                    trying to create the model as a domain object, or None if no
+                    error occurred.
+        """
+        if playthrough_model.deleted:
+            return
+
+        try:
+            playthrough = (
+                stats_services.get_playthrough_from_model(playthrough_model))
+            playthrough.validate()
+        except Exception as e:
+            validate_error = str(e)
+        else:
+            validate_error = None
+
+        audit_data = {
+            'exp_id': playthrough_model.exp_id,
+            'created_on': playthrough_model.created_on.strftime('%Y-%m-%d'),
+            'validate_error': validate_error,
+        }
+        yield (playthrough_model.id, audit_data)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        """Yields errors in playthrough models. Must be declared @staticmethod.
+
+        Args:
+            key: str. The id of the playthrough.
+            stringified_values: list(str). Each string is a stringified dict
+                with the following structure:
+                    exp_id: str. The exploration the playthrough records.
+                    created_on: str. The date the model was created in
+                        YYYY-MM-DD format.
+                    validate_error: str | None. Stringified exception raised by
+                        trying to create the model as a domain object, or None
+                        if no error occurred.
+
+        Yields:
+            tuple(str). A 1-tuple whose only element is an error message.
+        """
+        whitelisted_exp_ids_for_playthroughs = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+
+        for stringified_value in stringified_values:
+            audit_data = ast.literal_eval(stringified_value)
+
+            if audit_data['validate_error'] is not None:
+                yield (
+                    'playthrough_id:%s could not be validated as a domain '
+                    'object because of the error: %s.' % (
+                        key, audit_data['validate_error']),)
+
+            if audit_data['exp_id'] not in whitelisted_exp_ids_for_playthroughs:
+                yield (
+                    'playthrough_id:%s was recorded in exploration_id:%s which '
+                    'has not been curated for recording.' % (
+                        key, audit_data['exp_id']),)
+
+            created_on_datetime = datetime.datetime.strptime(
+                audit_data['created_on'], '%Y-%m-%d')
+            if created_on_datetime < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
+                yield (
+                    'playthrough_id:%s was released on %s, which is before the '
+                    'GSoC 2018 submission deadline (2018-09-01) and should '
+                    'therefore not exist.' % (key, audit_data['created_on']),)
 
 
 class ExplorationIssuesModelCreatorOneOffJob(
