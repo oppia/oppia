@@ -27,9 +27,8 @@ oppia.factory('TranslationTabActiveContentIdService', [
       setActiveContentId: function(contentId) {
         var allContentIds = StateContentIdsToAudioTranslationsService.displayed
           .getAllContentId();
-        if (allContentIds.indexOf(contentId) < 0) {
-          $log.error('Invalid active content id: ' + contentId);
-          return;
+        if (allContentIds.indexOf(contentId) === -1) {
+          throw Error('Invalid active content id: ' + contentId);
         }
         activeContentId = contentId;
         $rootScope.$broadcast('activeContentIdChanged');
