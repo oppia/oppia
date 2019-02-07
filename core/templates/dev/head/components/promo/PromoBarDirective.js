@@ -36,10 +36,7 @@ oppia.directive('promoBar', [
             sessionStorage.promoIsDismissed = angular.toJson(promoIsDismissed);
           };
 
-          if ($window.location.pathname.split('/')[1] === 'signup') {
-            $scope.promoBarIsEnabled = false;
-            $scope.promoBarMessage = '';
-          } else if (ENABLE_PROMO_BAR) {
+          if (ENABLE_PROMO_BAR) {
             PromoBarService.getPromoBarData().then(function(promoBarObject) {
               $scope.promoBarIsEnabled = promoBarObject.promoBarEnabled;
               $scope.promoBarMessage = promoBarObject.promoBarMessage;
