@@ -72,7 +72,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
             issue_customization_args={}, actions=[])
         return stats_models.PlaythroughModel.get(playthrough_id)
 
-    def create_exp_issues_with_playthroughs(playthrough_ids_list):
+    def create_exp_issues_with_playthroughs(self, playthrough_ids_list):
         return stats_models.ExplorationIssuesModel.create(
             self.exp.id, self.exp.version, unresolved_issues=[
                 {
