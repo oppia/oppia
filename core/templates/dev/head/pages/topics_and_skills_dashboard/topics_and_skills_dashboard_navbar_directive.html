@@ -3,7 +3,7 @@
   <li ng-mouseover="blurNavigationLinks($event)">
     <div class="oppia-navbar-button-container">
       <button ng-click="createTopic()" ng-if="userCanCreateTopic"
-              class="btn oppia-navbar-button oppia-transition-200">
+              class="btn oppia-navbar-button oppia-transition-200 protractor-test-create-topic-button">
         <span class="oppia-navbar-tab-content">Create Topic</span>
       </button>
     </div>
@@ -11,7 +11,7 @@
   <li ng-mouseover="blurNavigationLinks($event)">
     <div class="oppia-navbar-button-container">
       <button ng-click="createSkill()" ng-if="userCanCreateSkill"
-              class="btn oppia-navbar-button oppia-transition-200">
+              class="btn oppia-navbar-button oppia-transition-200 protractor-test-create-skill-button">
         <span class="oppia-navbar-tab-content">Create Skill</span>
       </button>
     </div>
