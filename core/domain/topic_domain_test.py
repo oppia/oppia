@@ -79,9 +79,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_get_all_subtopics(self):
         self.topic.subtopics = [topic_domain.Subtopic(
             1, 'Title', ['skill_id_1'])]
-        subtopic = self.topic.get_all_subtopics()
+        subtopics = self.topic.get_all_subtopics()
         self.assertEqual(
-            subtopic, [{
+            subtopics, [{
                 'skill_ids': ['skill_id_1'],
                 'id': 1,
                 'title': 'Title'}])

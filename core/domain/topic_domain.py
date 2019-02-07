@@ -412,8 +412,7 @@ class Topic(object):
         return skill_ids
 
     def get_all_uncategorized_skill_ids(self):
-        """Returns all the ids of all the uncategorized skills present
-        in the topic.
+        """Returns ids of all the uncategorized skills present in the topic.
 
         Returns:
             list(str). The list of all the uncategorized skill ids present
@@ -671,7 +670,7 @@ class Topic(object):
         """Returns all subtopics in the topic.
 
         Returns:
-            list(Subtopic in dict format). The list of all subtopics present
+            list(dict). The list of all subtopics present
                 in topic.
         """
         subtopics = []
