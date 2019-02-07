@@ -77,7 +77,7 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
       },
       resolveIssue: function(issue, expId, expVersion) {
         $http.post(getFullResolveIssueUrl(expId), {
-          playthrough_issue_dict: issue.toBackendDict(),
+          exp_issue_dict: issue.toBackendDict(),
           exp_version: expVersion
         });
       },

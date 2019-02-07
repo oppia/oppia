@@ -640,18 +640,17 @@ class FetchIssuesHandler(EditorHandler):
     def get(self, exp_id):
         """Handles GET requests."""
         exp_version = self.request.get('exp_version')
-        playthrough_issues = (
-            stats_services.get_playthrough_issues(exp_id, exp_version))
-        if playthrough_issues is None:
+        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        if exp_issues is None:
             raise self.PageNotFoundException(
                 'Invalid exploration ID %s' % (exp_id))
         unresolved_issues = []
-        for issue in playthrough_issues.unresolved_issues:
+        for issue in exp_issues.unresolved_issues:
             if issue.is_valid:
                 unresolved_issues.append(issue)
-        playthrough_issues.unresolved_issues = unresolved_issues
-        playthrough_issues_dict = playthrough_issues.to_dict()
-        self.render_json(playthrough_issues_dict['unresolved_issues'])
+        exp_issues.unresolved_issues = unresolved_issues
+        exp_issues_dict = exp_issues.to_dict()
+        self.render_json(exp_issues_dict['unresolved_issues'])
 
 
 class FetchPlaythroughHandler(EditorHandler):
@@ -672,34 +671,32 @@ class FetchPlaythroughHandler(EditorHandler):
 class ResolveIssueHandler(EditorHandler):
     """Handler used for resolving an issue. Currently, when an issue is
     resolved, the issue is removed from the unresolved issues list in the
-    PlaythroughIssuesModel instance, and all corresponding playthrough
+    ExplorationIssuesModel instance, and all corresponding playthrough
     instances are deleted.
     """
 
     @acl_decorators.can_view_exploration_stats
     def post(self, exp_id):
         """Handles POST requests."""
-        playthrough_issue_dict = self.payload.get('playthrough_issue_dict')
+        exp_issue_dict = self.payload.get('exp_issue_dict')
         try:
-            unused_playthrough_issue = (
-                stats_domain.PlaythroughIssue.from_backend_dict(
-                    playthrough_issue_dict))
+            unused_exp_issue = stats_domain.ExplorationIssue.from_backend_dict(
+                exp_issue_dict)
         except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         exp_version = self.payload.get('exp_version')
 
-        playthrough_issues = (
-            stats_services.get_playthrough_issues(exp_id, exp_version))
-        if playthrough_issues is None:
+        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        if exp_issues is None:
             raise self.PageNotFoundException(
                 'Invalid exploration ID %s' % (exp_id))
 
         # Check that the passed in issue actually exists in the exploration
         # issues instance.
         issue_to_remove = None
-        for issue in playthrough_issues.unresolved_issues:
-            if issue.to_dict() == playthrough_issue_dict:
+        for issue in exp_issues.unresolved_issues:
+            if issue.to_dict() == exp_issue_dict:
                 issue_to_remove = issue
                 break
 
@@ -709,14 +706,13 @@ class ResolveIssueHandler(EditorHandler):
                 'the exploration with ID %s' % exp_id)
 
         # Remove the issue from the unresolved issues list.
-        playthrough_issues.unresolved_issues.remove(issue_to_remove)
+        exp_issues.unresolved_issues.remove(issue_to_remove)
 
         # Update the exploration issues instance and delete the playthrough
         # instances.
         stats_services.delete_playthroughs_multi(
             issue_to_remove.playthrough_ids)
-        stats_services.save_playthrough_issues_model_transactional(
-            playthrough_issues)
+        stats_services.save_exp_issues_model_transactional(exp_issues)
 
         self.render_json({})
 

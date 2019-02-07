@@ -19,7 +19,7 @@
 from extensions.issues import base
 
 
-class MultipleIncorrectSubmissions(base.BasePlaythroughIssueSpec):
+class MultipleIncorrectSubmissions(base.BaseExplorationIssueSpec):
     """Issue that's recorded when the learner answers multiple times incorrectly
     in the same card and quits the exploration.
     """
