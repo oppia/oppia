@@ -60,16 +60,16 @@ class DeleteIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     Ensures:
         All Playthrough models deleted are removed as a reference from their
-            associated PlaythroughIssue model.
-        PlaythroughIssues models without any legal playthrough references are
+            associated ExplorationIssue model.
+        ExplorationIssues models without any legal playthrough references are
             deleted.
-        Individual PlaythroughIssues without any legal playthrough references
+        Individual ExplorationIssues without any legal playthrough references
             are deleted.
     """
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [stats_models.PlaythroughIssuesModel]
+        return [stats_models.ExplorationIssuesModel]
 
     @classmethod
     def is_illegal(cls, playthrough_model):
@@ -95,7 +95,7 @@ class DeleteIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         Args:
             playthrough_issue_backend_dict: dict(str : *). The backend dict
-                representation of a stats_domain.PlaythroughIssue object.
+                representation of a stats_domain.ExplorationIssue object.
 
         Returns:
             tuple(int, int). A 2-tuple with the structure:
@@ -125,7 +125,7 @@ class DeleteIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         be declared @staticmethod.
 
         Args:
-            playthrough_issues_model: PlaythroughIssuesModel.
+            playthrough_issues_model: ExplorationIssuesModel.
 
         Yields:
             tuple(str, int). Returns the exploration id the given model is
@@ -261,10 +261,10 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     'therefore not exist.' % (key, audit_data['created_on']),)
 
 
-class PlaythroughIssuesModelCreatorOneOffJob(
+class ExplorationIssuesModelCreatorOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for creating a default ExplorationIsssues model instance
-    for all the explorations in the datastore. If an PlaythroughIssues model
+    for all the explorations in the datastore. If an ExplorationIssues model
     already exists for an exploration, it is refreshed to a default instance.
     """
 
@@ -277,23 +277,23 @@ class PlaythroughIssuesModelCreatorOneOffJob(
         if not exploration_model.deleted:
             current_version = exploration_model.version
             for exp_version in xrange(1, current_version + 1):
-                playthrough_issues_model = (
-                    stats_models.PlaythroughIssuesModel.get_model(
+                exp_issues_model = (
+                    stats_models.ExplorationIssuesModel.get_model(
                         exploration_model.id, exp_version))
-                if not playthrough_issues_model:
-                    playthrough_issues_default = (
-                        stats_domain.PlaythroughIssues.create_default(
+                if not exp_issues_model:
+                    exp_issues_default = (
+                        stats_domain.ExplorationIssues.create_default(
                             exploration_model.id, exp_version))
-                    stats_models.PlaythroughIssuesModel.create(
-                        playthrough_issues_default.exp_id,
-                        playthrough_issues_default.exp_version,
-                        playthrough_issues_default.unresolved_issues)
+                    stats_models.ExplorationIssuesModel.create(
+                        exp_issues_default.exp_id,
+                        exp_issues_default.exp_version,
+                        exp_issues_default.unresolved_issues)
                 else:
-                    playthrough_issues_model.unresolved_issues = []
-                    playthrough_issues_model.put()
+                    exp_issues_model.unresolved_issues = []
+                    exp_issues_model.put()
             yield(
                 exploration_model.id,
-                'PlaythroughIssuesModel created')
+                'ExplorationIssuesModel created')
 
     @staticmethod
     def reduce(exp_id, values):
