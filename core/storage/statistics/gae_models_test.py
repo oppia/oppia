@@ -229,15 +229,15 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(stats_models[2].exp_version, 1)
 
 
-class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
-    """Test the ExplorationIssuesModel class."""
+class PlaythroughIssuesModelUnitTests(test_utils.GenericTestBase):
+    """Test the PlaythroughIssuesModel class."""
 
-    def test_create_and_get_exp_issues_model(self):
+    def test_create_and_get_playthrough_issues_model(self):
         model_id = (
-            stat_models.ExplorationIssuesModel.create(
+            stat_models.PlaythroughIssuesModel.create(
                 'exp_id1', 1, []))
 
-        model = stat_models.ExplorationIssuesModel.get(model_id)
+        model = stat_models.PlaythroughIssuesModel.get(model_id)
 
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
