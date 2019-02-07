@@ -1370,7 +1370,7 @@ def _check_directive_scope(all_files, mode):
 
     for filename in files_to_check:
         content = FileCache.read(filename)
-        parsed_dict = _validate_and_parse_js_file(filename, content)
+        parsed_dict = _validate_and_parse_js_file(filename, content, mode)
         with _redirect_stdout(_TARGET_STDOUT):
             # Parse the body of the content as nodes.
             parsed_nodes = parsed_dict['body']
