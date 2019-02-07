@@ -1887,7 +1887,6 @@ def main():
         all_files, parsed_js_files_dict)
     sorted_dependencies_messages = _check_sorted_dependencies(
         all_files, parsed_js_files_dict)
-    directive_scope_messages = _check_directive_scope(all_files)
     controller_dependency_messages = (
         _match_line_breaks_in_controller_dependencies(all_files))
     html_directive_name_messages = _check_html_directive_name(all_files)
