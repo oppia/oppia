@@ -34,17 +34,15 @@ oppia.factory('TextInputPredictionService', [
     return {
       predict: function(classifierData, textInput) {
         var cvVocabulary = classifierData.cv_vocabulary;
-        var prediction = -1;
         var svmData = classifierData.SVM;
 
         // Tokenize the text input.
+        textInput = textInput.toLowerCase();
         var textInputTokens = TextInputTokenizer.generateTokens(textInput);
 
-        if (textInputTokens !== null) {
-          var textVector = CountVectorizerService.vectorize(
-            textInputTokens, cvVocabulary);
-          predictionResult = SVMPredictionService.predict(svmData, textVector);
-        }
+        var textVector = CountVectorizerService.vectorize(
+          textInputTokens, cvVocabulary);
+        predictionResult = SVMPredictionService.predict(svmData, textVector);
         if (predictionResult.predictionConfidence >
             TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
           return predictionResult.predictionLabel;

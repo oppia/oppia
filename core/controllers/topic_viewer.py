@@ -73,9 +73,14 @@ class TopicPageDataHandler(base.BaseHandler):
             summary.to_human_readable_dict() for summary
             in additional_story_summaries]
 
+        uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
+        subtopics = topic.get_all_subtopics()
+
         self.values.update({
             'topic_name': topic.name,
             'canonical_story_dicts': canonical_story_dicts,
-            'additional_story_dicts': additional_story_dicts
+            'additional_story_dicts': additional_story_dicts,
+            'uncategorized_skill_ids': uncategorized_skill_ids,
+            'subtopics': subtopics
         })
         self.render_json(self.values)

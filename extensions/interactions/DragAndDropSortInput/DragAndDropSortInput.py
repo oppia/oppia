@@ -61,6 +61,13 @@ class DragAndDropSortInput(base.BaseInteraction):
             }
         },
         'default_value': [''],
+    }, {
+        'name': 'allowMultipleItemsInSamePosition',
+        'description': 'Allow multiple sort items in the same position',
+        'schema': {
+            'type': 'bool'
+        },
+        'default_value': False
     }]
 
     _answer_visualization_specs = []
