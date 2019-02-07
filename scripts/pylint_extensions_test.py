@@ -136,7 +136,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.HangingIndentChecker)
         checker_test_object.setup_method()
-        node1 = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        node_break_after_hanging_indent = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
         with open(filename, 'w') as tmp:
@@ -144,10 +146,11 @@ class HangingIndentCheckerTests(unittest.TestCase):
                 """self.post_json('/ml/trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
                 """)
-        node1.file = filename
-        node1.path = filename
+        node_break_after_hanging_indent.file = filename
+        node_break_after_hanging_indent.path = filename
 
-        checker_test_object.checker.process_module(node1)
+        checker_test_object.checker.process_module(
+            node_break_after_hanging_indent)
 
         with checker_test_object.assertAddsMessages(
             testutils.Message(
@@ -157,7 +160,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
-        node2 = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        node_no_err_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
@@ -167,10 +172,10 @@ class HangingIndentCheckerTests(unittest.TestCase):
                 utils.get_file_contents(os.path.join(
                 os.getcwd(), 'assets', 'i18n', 'en.json')))
                 """)
-        node2.file = filename
-        node2.path = filename
+        node_no_err_message.file = filename
+        node_no_err_message.path = filename
 
-        checker_test_object.checker.process_module(node2)
+        checker_test_object.checker.process_module(node_no_err_message)
 
         with checker_test_object.assertNoMessages():
             temp_file.close()
@@ -298,3 +303,71 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
             ),
         ):
             checker_test_object.checker.visit_functiondef(functiondef_node2)
+
+
+class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
+
+    def test_checks_single_char_and_newline_eof(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.SingleCharAndNewlineAtEOFChecker)
+        checker_test_object.setup_method()
+        node_missing_newline_at_eof = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write(
+                """c = 'something dummy'
+                """)
+        node_missing_newline_at_eof.file = filename
+        node_missing_newline_at_eof.path = filename
+
+        checker_test_object.checker.process_module(node_missing_newline_at_eof)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='newline-at-eof',
+                line=2
+            ),
+        ):
+            temp_file.close()
+
+        node_single_char_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with open(filename, 'w') as tmp:
+            tmp.write("""1""")
+        node_single_char_file.file = filename
+        node_single_char_file.path = filename
+
+        checker_test_object.checker.process_module(node_single_char_file)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='only-one-character',
+                line=1
+            ),
+        ):
+            temp_file.close()
+
+        node_no_err_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with open(filename, 'w') as tmp:
+            tmp.write("""x = 'something dummy'""")
+        node_no_err_message.file = filename
+        node_no_err_message.path = filename
+
+        checker_test_object.checker.process_module(node_no_err_message)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()

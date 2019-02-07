@@ -18,6 +18,7 @@
 presubmit checks.
 """
 
+import re
 import astroid
 import docstrings_checker  # pylint: disable=relative-import
 
@@ -814,6 +815,39 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
             self.add_message('function-args-order-cls', node=node)
 
 
+class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
+    """Checker for single character files and newline at EOF."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'newline-at-eof'
+    priority = -1
+    msgs = {
+        'C0007': (
+            'Files should end in a single newline character.',
+            'newline-at-eof',
+            'Please enter a single newline at the end of the file.'),
+        'C0008': (
+            'Only one character in file',
+            'only-one-character',
+            'Files with only one character are not allowed.'),
+    }
+
+    def process_module(self, node):
+        """Process a module.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        file_content = node.stream().readlines()
+        file_length = len(file_content)
+
+        if file_length == 1 and len(file_content[0]) == 1:
+            self.add_message('only-one-character', line=file_length)
+        if file_length >= 2 and not re.search(r'[^\n]\n', file_content[-1]):
+            self.add_message('newline-at-eof', line=file_length)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -826,3 +860,4 @@ def register(linter):
     linter.register_checker(ImportOnlyModulesChecker(linter))
     linter.register_checker(BackslashContinuationChecker(linter))
     linter.register_checker(FunctionArgsOrderChecker(linter))
+    linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
