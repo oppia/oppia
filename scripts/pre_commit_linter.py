@@ -1169,6 +1169,14 @@ def _check_docstrings(all_files):
                     is_docstring = True
                     is_class_or_function = False
 
+            # Check for space after """ in docstring.
+            if re.match(r'^""".+$', line) and is_docstring and line[3] == ' ':
+                failed = True
+                print (
+                    '%s --> Line %s: There should be no space after """ '
+                    'in docstring.' % (filename, line_num + 1))
+                is_docstring = False
+
             # Check if single line docstring span two lines.
             if line == '"""' and prev_line.startswith('"""') and (
                     is_docstring):
@@ -1223,13 +1231,25 @@ def _check_docstrings(all_files):
     # order as they appear in the function definition.
     docstring_checker = docstrings_checker.ASTDocStringChecker()
     for filename in files_to_check:
-        ast_file = ast.walk(ast.parse(FileCache.read(filename)))
+        ast_file = list(ast.walk(ast.parse(FileCache.read(filename))))
         func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
+        class_defs = [n for n in ast_file if isinstance(n, ast.ClassDef)]
         for func in func_defs:
             func_result = docstring_checker.check_docstrings_arg_order(func)
             for error_line in func_result:
                 print '%s --> Func %s: %s' % (
                     filename, func.name, error_line)
+                failed = True
+            if not ast.get_docstring(func):
+                print (
+                    '%s : Line %s --> Please ensure that func %s has a '
+                    'docstring' % (filename, func.lineno, func.name))
+                failed = True
+        for clazz in class_defs:
+            if not ast.get_docstring(clazz):
+                print (
+                    '%s : Line %s --> Please ensure that class %s has a '
+                    'docstring' % (filename, clazz.lineno, clazz.name))
                 failed = True
 
     print ''
@@ -1503,6 +1523,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
     def __init__(self, filename, file_lines, debug, failed=False):
+        """Define various variables to parse HTML."""
         HTMLParser.HTMLParser.__init__(self)
         self.tag_stack = []
         self.debug = debug
@@ -1517,6 +1538,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             'param', 'source', 'track', 'wbr']
 
     def handle_starttag(self, tag, attrs):
+        """Handle start tag of a HTML line."""
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
         expected_indentation = self.indentation_level * self.indentation_width
@@ -1592,6 +1614,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                 self.failed = True
 
     def handle_endtag(self, tag):
+        """Handle end tag of a HTML line."""
         line_number, _ = self.getpos()
         tag_line = self.file_lines[line_number - 1]
         leading_spaces_count = len(tag_line) - len(tag_line.lstrip())
@@ -1624,6 +1647,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             print self.tag_stack
 
     def handle_data(self, data):
+        """Handle indentation level."""
         data_lines = data.split('\n')
         opening_block = tuple(['{% block', '{% macro', '{% if'])
         ending_block = tuple(['{% end', '{%- end'])
