@@ -70,6 +70,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.get_all_skill_ids(),
             ['skill_id_2', 'skill_id_3', 'skill_id_1'])
 
+    def test_get_all_uncategorized_skill_ids(self):
+        self.topic.uncategorized_skill_ids = ['skill_id_1', 'skill_id_2']
+        self.assertEqual(
+            self.topic.get_all_uncategorized_skill_ids(),
+            ['skill_id_1', 'skill_id_2'])
+
     def test_get_all_subtopics(self):
         self.topic.subtopics = [topic_domain.Subtopic(
             1, 'Title', ['skill_id_1'])]

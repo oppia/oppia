@@ -96,7 +96,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     'description': self.story.description
                 }],
                 'additional_story_dicts': [],
-                'skill_ids': [u'skill_id_1', u'skill_id_2'],
+                'uncategorized_skill_ids': [u'skill_id_1'],
                 'subtopics': [{
                     u'skill_ids': [u'skill_id_2'],
                     u'id': 1,
