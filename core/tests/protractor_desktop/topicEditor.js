@@ -30,20 +30,42 @@ var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
+  var topicId = null;
 
   beforeAll(function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
-    users.createAndLoginAdminUser('creator@topicsAndSkillsDashboard.com',
-      'creatorTopicsAndSkillsDashboard');
+    users.createAndLoginAdminUser(
+      'creator@topicEditor.com', 'creatorTopicEditor');
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createTopicWithTitle('Topic 1');
+    browser.getCurrentUrl().then(function(url) {
+      topicId = url.split('/')[4];
+    });
   });
 
   beforeEach(function() {
-    users.login('creator@topicsAndSkillsDashboard.com');
-    topicsAndSkillsDashboardPage.get();
+    users.login('creator@topicEditor.com');
+    topicEditorPage.get(topicId);
+  });
+
+  it('should edit topic name and description correctly', function() {
+    topicEditorPage.changeTopicName('Topic 1 edited');
+    topicEditorPage.changeTopicDescription('Topic Description');
+    topicEditorPage.saveTopic('Changed topic name and description.');
+
+    topicEditorPage.get(topicId);
+    topicEditorPage.expectTopicNameToBe('Topic 1 edited');
+    topicEditorPage.expectTopicDescriptionToBe('Topic Description');
+  });
+
+  it('should add a canonical story to topic correctly', function() {
+    topicEditorPage.expectNumberOfStoriesToBe(0);
+    topicEditorPage.createStory('Story Title');
+    topicEditorPage.get(topicId);
+
+    topicEditorPage.expectNumberOfStoriesToBe(1);
   });
 
   afterEach(function() {
