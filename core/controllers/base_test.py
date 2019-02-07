@@ -113,10 +113,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/library/data/extra', expected_status_int=404)
 
         self.post_json(
-            '/library/extra', payload={}, expected_status_int=404)
+            '/library/extra', {}, expected_status_int=404)
 
         self.put_json(
-            '/library/extra', payload={}, expected_status_int=404)
+            '/library/extra', {}, expected_status_int=404)
 
     def test_redirect_in_logged_out_states(self):
         """Test for a redirect in logged out state on '/'."""

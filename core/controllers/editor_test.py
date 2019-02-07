@@ -1030,11 +1030,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         """Test exploration rights handler for assign role for exploration."""
         # Create several users.
         self.signup(
-            self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
         self.signup(
-            self.COLLABORATOR2_EMAIL, username=self.COLLABORATOR2_USERNAME)
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
         self.signup(
-            self.COLLABORATOR3_EMAIL, username=self.COLLABORATOR3_USERNAME)
+            self.COLLABORATOR3_EMAIL, self.COLLABORATOR3_USERNAME)
 
         # Owner creates exploration.
         self.login(self.OWNER_EMAIL)
@@ -1217,7 +1217,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         # Create a random user.
         self.signup(
-            self.RANDOM_USER_EMAIL, username=self.RANDOM_USER_USERNAME)
+            self.RANDOM_USER_EMAIL, self.RANDOM_USER_USERNAME)
 
         # Check community_owned_status value.
         exp_summary = exp_services.get_exploration_summary_by_id(exp_id)

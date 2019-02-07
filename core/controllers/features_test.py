@@ -47,7 +47,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
     def test_can_record_playthroughs_in_whitelisted_explorations(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            new_config_value=[self.EXP_ID])
+            [self.EXP_ID])
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
@@ -55,8 +55,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
     def test_can_not_record_playthroughs_with_empty_whitelist(self):
         self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            new_config_value=[])
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS, [])
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
@@ -65,7 +64,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
     def test_can_not_record_playthroughs_for_exploration_not_in_whitelist(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            new_config_value=[self.EXP_ID + '-differentiate'])
+            [self.EXP_ID + '-differentiate'])
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
@@ -77,7 +76,7 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
 
     def test_improvements_tab_is_enabled(self):
         self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, new_config_value=True)
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, True)
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
@@ -85,7 +84,7 @@ class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
 
     def test_improvements_tab_is_disabled(self):
         self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, new_config_value=False)
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, False)
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 

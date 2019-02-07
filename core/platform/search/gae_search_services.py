@@ -86,8 +86,8 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
                     new_retries = retries - 1
                     logging.debug('%d tries left, retrying.' % (new_retries))
                     return add_documents_to_index(
-                        documents=documents,
-                        index=index.name,
+                        documents,
+                        index.name,
                         retries=new_retries)
 
         # At this pint, either we don't have any tries left, or none of the
@@ -214,8 +214,8 @@ def delete_documents_from_index(
                     new_retries = retries - 1
                     logging.debug('%d tries left, retrying.' % (new_retries))
                     delete_documents_from_index(
-                        doc_ids=doc_ids,
-                        index=index.name,
+                        doc_ids,
+                        index.name,
                         retries=new_retries)
                     return
 

@@ -61,8 +61,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_by_name(self):
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID,
-            name=self.TOPIC_NAME
+            self.TOPIC_ID,
+            self.TOPIC_NAME
         )
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         self.assertEqual(

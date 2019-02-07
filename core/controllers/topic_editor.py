@@ -87,7 +87,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
 
         new_story_id = story_services.get_new_story_id()
         story = story_domain.Story.create_default_story(
-            new_story_id, title=title)
+            new_story_id, title)
         story_services.save_new_story(self.user_id, story)
         self.render_json({
             'storyId': new_story_id

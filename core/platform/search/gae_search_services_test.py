@@ -557,7 +557,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         time.sleep(1)
         gae_search_services.add_documents_to_index([dict3], 'my_index')
         result = gae_search_services.search(
-            'k:abc', index='my_index', ids_only=True)[0]
+            'k:abc', 'my_index', ids_only=True)[0]
         self.assertEqual(result, ['doc3', 'doc2', 'doc1'])
 
     def test_search_with_custom_rank_and_language(self):
@@ -565,7 +565,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         doc2 = {'id': 'doc2', 'k': 'abc ghi', 'rank': 1, 'language_code': 'fr'}
         doc3 = {'id': 'doc3', 'k': 'abc jkl', 'rank': 2, 'language_code': 'nl'}
         gae_search_services.add_documents_to_index([doc1, doc2, doc3], 'index')
-        result = gae_search_services.search('k:abc', index='index')[0]
+        result = gae_search_services.search('k:abc', 'index')[0]
         self.assertEqual(result, [doc1, doc3, doc2])
 
     def test_search_using_single_sort_expression(self):

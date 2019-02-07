@@ -73,7 +73,7 @@ def compress_image(image_content, scaling_factor):
             new_width = int(width * new_scaling_factor)
             new_height = int(height * new_scaling_factor)
         return images.resize(
-            image_data=image_content,
+            image_content,
             width=min(new_width, MAX_RESIZE_DIMENSION_PX),
             height=min(new_height, MAX_RESIZE_DIMENSION_PX))
     else:

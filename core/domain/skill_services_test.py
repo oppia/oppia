@@ -44,8 +44,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.SKILL_ID = skill_services.get_new_skill_id()
 
         self.signup('a@example.com', 'A')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
-        self.signup('admin2@example.com', username='adm2')
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup('admin2@example.com', 'adm2')
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)

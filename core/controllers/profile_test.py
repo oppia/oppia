@@ -149,7 +149,7 @@ class SignupTests(test_utils.GenericTestBase):
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
     def test_username_check(self):
-        self.signup('abc@example.com', username='abc')
+        self.signup('abc@example.com', 'abc')
 
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response(feconf.SIGNUP_URL)
@@ -306,7 +306,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         preferences of the user.
         """
 
-        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('/preferences')
@@ -412,7 +412,7 @@ class ProfileLinkTests(test_utils.GenericTestBase):
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
     def test_preference_page_updates(self):
-        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -440,7 +440,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
             new_preferences['preferred_audio_language_code'], 'hi-en')
 
     def test_profile_data_is_independent_of_currently_logged_in_user(self):
-        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -454,7 +454,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token)
         self.logout()
 
-        self.signup(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         response = self.get_html_response('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)

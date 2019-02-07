@@ -91,7 +91,7 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         url = 'https://datastore.googleapis.com/v1/projects/%s:export' % app_id
         try:
             result = urlfetch.fetch(
-                url=url,
+                url,
                 payload=json.dumps(request),
                 method=urlfetch.POST,
                 deadline=60,

@@ -50,7 +50,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Create a new story that should not be affected by the
         # job.
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, title='A title')
+            self.STORY_ID, 'A title')
         story_services.save_new_story(self.albert_id, story)
         self.assertEqual(
             story.schema_version,
@@ -80,7 +80,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, title='A title')
+            self.STORY_ID, 'A title')
         story_services.save_new_story(self.albert_id, story)
 
         # Delete the story before migration occurs.

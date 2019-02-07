@@ -52,8 +52,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Create a new topic that should not be affected by the
         # job.
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name')
-        topic.add_subtopic(1, title='A subtitle')
+            self.TOPIC_ID, 'A name')
+        topic.add_subtopic(1, 'A subtitle')
         topic_services.save_new_topic(self.albert_id, topic)
         self.assertEqual(
             topic.subtopic_schema_version,
@@ -85,7 +85,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name')
+            self.TOPIC_ID, 'A name')
         topic_services.save_new_topic(self.albert_id, topic)
 
         # Delete the topic before migration occurs.

@@ -1646,7 +1646,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(EditQuestionDecoratorTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
