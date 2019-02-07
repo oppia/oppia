@@ -154,6 +154,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.user_id = current_user_services.get_current_user_id()
         self.username = None
         self.has_seen_editor_tutorial = False
+        self.has_seen_translation_tutorial = False
         self.partially_logged_in = False
 
         if self.user_id:
@@ -175,6 +176,8 @@ class BaseHandler(webapp2.RequestHandler):
                 self.values['username'] = self.username
                 if user_settings.last_started_state_editor_tutorial:
                     self.has_seen_editor_tutorial = True
+                if user_settings.last_started_state_translation_tutorial:
+                    self.has_seen_translation_tutorial = True
                 # In order to avoid too many datastore writes, we do not bother
                 # recording a log-in if the current time is sufficiently close
                 # to the last log-in time.
@@ -284,8 +287,8 @@ class BaseHandler(webapp2.RequestHandler):
     def render_downloadable_file(self, values, filename, content_type):
         """Prepares downloadable content to be sent to the client."""
         self.response.headers['Content-Type'] = content_type
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename=%s' % (filename))
+        self.response.headers['Content-Disposition'] = str(
+            'attachment; filename=%s' % filename)
         self.response.write(values)
 
     def _get_logout_url(self, redirect_url_on_logout):
@@ -334,8 +337,7 @@ class BaseHandler(webapp2.RequestHandler):
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'user_is_logged_in': user_services.has_fully_registered(
-                self.user_id),
-            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
+                self.user_id)
         })
         if feconf.ENABLE_PROMO_BAR:
             promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value

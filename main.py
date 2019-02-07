@@ -28,6 +28,7 @@ from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
 from core.controllers import editor
 from core.controllers import email_dashboard
+from core.controllers import features
 from core.controllers import feedback
 from core.controllers import learner_dashboard
 from core.controllers import learner_playlist
@@ -353,9 +354,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
     get_redirect_route(
-        r'/explorehandler/features/<exploration_id>',
-        editor.ExplorationFeaturesHandler),
-    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
     get_redirect_route(
@@ -367,6 +365,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_PRETESTS_URL_PREFIX,
         reader.PretestHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_FEATURES_PREFIX,
+        features.ExplorationFeaturesHandler),
     get_redirect_route(
         '/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler),
@@ -467,6 +468,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler),
+    get_redirect_route(
+        r'/createhandler/started_translation_tutorial_event/<exploration_id>',
+        translator.StartedTranslationTutorialEventHandler),
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',
         editor.EditorAutosaveHandler),
@@ -630,9 +634,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/ml/nextjobhandler', classifier.NextJobHandler),
 
-    get_redirect_route(
-        r'/playthroughdatahandler/whitelist',
-        editor.FetchPlaythroughWhitelistHandler),
     get_redirect_route(
         r'/playthroughdatahandler/<exploration_id>/<playthrough_id>',
         editor.FetchPlaythroughHandler),

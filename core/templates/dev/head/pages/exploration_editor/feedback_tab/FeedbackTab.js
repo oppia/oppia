@@ -17,17 +17,19 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$q', '$uibModal', '$timeout', '$rootScope',
-  'AlertsService', 'DateTimeFormatService', 'ThreadStatusDisplayService',
-  'ThreadDataService', 'ExplorationStatesService', 'ExplorationDataService',
-  'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
-  'UserService', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+  '$log', '$q', '$rootScope', '$scope', '$uibModal',
+  'AlertsService', 'ChangeListService', 'DateTimeFormatService',
+  'ExplorationDataService', 'ExplorationStatesService', 'StateObjectFactory',
+  'ThreadDataService', 'ThreadStatusDisplayService',
+  'UrlInterpolationService', 'UserService',
+  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-      $scope, $http, $q, $uibModal, $timeout, $rootScope,
-      AlertsService, DateTimeFormatService, ThreadStatusDisplayService,
-      ThreadDataService, ExplorationStatesService, ExplorationDataService,
-      ChangeListService, StateObjectFactory, UrlInterpolationService,
-      UserService, ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+      $log, $q, $rootScope, $scope, $uibModal,
+      AlertsService, ChangeListService, DateTimeFormatService,
+      ExplorationDataService, ExplorationStatesService, StateObjectFactory,
+      ThreadDataService, ThreadStatusDisplayService,
+      UrlInterpolationService, UserService,
+      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
     $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
@@ -38,6 +40,7 @@ oppia.controller('FeedbackTab', [
 
     $scope.activeThread = null;
     $scope.userIsLoggedIn = null;
+    $scope.threadIsUpdated = false;
     $rootScope.loadingMessage = 'Loading';
     var userInfoPromise = UserService.getUserInfoAsync();
     userInfoPromise.then(function(userInfo) {
@@ -64,6 +67,18 @@ oppia.controller('FeedbackTab', [
     $q.all([userInfoPromise, threadPromise]).then(function() {
       $rootScope.loadingMessage = '';
     });
+    // Fetches the threads again if any thread is updated.
+    $scope.fetchUpdatedThreads = function() {
+      ThreadDataService.fetchThreads();
+      $scope.threadData = ThreadDataService.data;
+      $scope.threadIsUpdated = false;
+    };
+    $scope.onBackButtonClicked = function() {
+      $scope.clearActiveThread();
+      if ($scope.threadIsUpdated) {
+        $scope.fetchUpdatedThreads();
+      }
+    };
 
     $scope.showCreateThreadModal = function() {
       $uibModal.open({
@@ -269,7 +284,7 @@ oppia.controller('FeedbackTab', [
         AlertsService.addWarning('Invalid message status: ' + tmpStatus);
         return;
       }
-
+      $scope.threadIsUpdated = true;
       $scope.messageSendingInProgress = true;
       ThreadDataService.addNewMessage(threadId, tmpText, tmpStatus, function() {
         _resetTmpMessageFields();

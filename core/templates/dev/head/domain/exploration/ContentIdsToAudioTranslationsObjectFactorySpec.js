@@ -194,13 +194,6 @@ describe('ContentIdsToAudioTranslations object factory', function() {
       }).toThrowError('Unable to find the given content id.');
     });
 
-    it('should delete all feedback content id', function() {
-      citat.deleteAllFeedbackContentId();
-      var contentIdList = [
-        'content', 'default_outcome', 'hint_1', 'hint_2', 'solution'];
-      expect(citat.getAllContentId()).toEqual(contentIdList);
-    });
-
     it('should check whether the text is fully translated', inject(function() {
       expect(citat.isFullyTranslated('content')).toBe(true);
       citat.deleteAudioTranslation('content', 'hi');
@@ -237,16 +230,6 @@ describe('ContentIdsToAudioTranslations object factory', function() {
           needs_update: false
         })
       });
-    });
-
-    it('should delete all feedback audio translation', function() {
-      var contentIdList = [
-        'content', 'default_outcome', 'feedback_1', 'feedback_2', 'hint_1',
-        'hint_2', 'solution'];
-      expect(citat.getAllContentId()).toEqual(contentIdList);
-      citat.deleteAllFeedbackContentId();
-      expect(citat.getAllContentId()).toEqual([
-        'content', 'default_outcome', 'hint_1', 'hint_2', 'solution']);
     });
 
     it(

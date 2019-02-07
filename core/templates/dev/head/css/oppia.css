@@ -345,7 +345,7 @@ p {
   margin-bottom: 18px;
   text-align: left;
   word-spacing: 0;
-  word-break: break-word;
+  word-wrap: break-word;
 }
 
 p:last-child {
@@ -825,7 +825,7 @@ textarea {
 .oppia-navbar-nav .uib-dropdown-menu {
   left: auto;
   right: 0;
-  word-break: break-all;
+  word-wrap: break-word;
 }
 
 .oppia-dropdown-submenu > .uib-dropdown-menu {
@@ -1461,7 +1461,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-editor-card-section {
   padding: 20px 50px 20px 35px;
-  word-break: break-all;
+  word-wrap: break-word;
 }
 
 .oppia-state-content {
@@ -1481,21 +1481,6 @@ pre.oppia-pre-wrapped-text {
   margin: 1.5em 0;
 }
 
-/* These rules must be kept in sync with corresponding rules in
-   pages/exploration_player/conversation_skin_directive.html
-   (those with '.rte-viewer > p' selectors specifying the same
-   line-height, margin-top and margin-bottom attributes)
-*/
-
-/* Line-height is set to 1.846 to ensure that the line-spacing inside
-   a paragraph is consistent both in the editor mode while editing and
-   after saving. The value 1.846 came from
-   /third_party/generated/css/third_party.css.
-*/
-
-.oppia-rte-editor > p {
-  line-height: 1.846;
-}
 .oppia-info-card-content p {
   display: block;
   font-size: 1.0em;
@@ -1504,7 +1489,22 @@ pre.oppia-pre-wrapped-text {
   position: relative;
   word-spacing: 0;
 }
+
+/* Line-height is set to 1.846 to ensure that the line-spacing inside
+   a paragraph is consistent both in the editor mode while editing and
+   after saving. The value 1.846 came from
+   /third_party/generated/css/third_party.css.
+*/
+
+.oppia-rte-editor > p, .oppia-rte-viewer > p {
+  line-height: 1.846;
+}
+
 .oppia-rte-content > div > p {
+  line-height: 1.846;
+}
+
+.oppia-shadow-preview-card .oppia-rte-viewer > p {
   line-height: 1.846;
 }
 
@@ -1513,17 +1513,41 @@ pre.oppia-pre-wrapped-text {
   margin-top: 10px;
 }
 
+/* The eight rules below should be in sync. */
 .oppia-rte-editor > p:first-child {
   margin-top: 0;
 }
 .oppia-rte-editor > p:last-child {
   margin-bottom: 0;
 }
+
+.oppia-rte-viewer > p:first-child {
+  margin-top: 0;
+}
+.oppia-rte-viewer > p:last-child {
+  margin-bottom: 0;
+}
+
+.oppia-shadow-preview-card .oppia-rte-viewer > p:first-child {
+  margin-top: 0;
+}
+.oppia-shadow-preview-card .oppia-rte-viewer > p:last-child {
+  margin-bottom: 0;
+}
+
 .form-control.oppia-rte-content > div > p:first-child {
   margin-top: 0;
 }
 .form-control.oppia-rte-content > div > p:last-child {
   margin-bottom: 0;
+}
+
+.oppia-rte-viewer, .oppia-shadow-preview-card .oppia-rte-viewer {
+  border-radius: 2px;
+  display: inline-block;
+  max-width: 100%;
+  position: relative;
+  text-align: left;
 }
 
 .oppia-prevent-selection {
@@ -1670,7 +1694,6 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-learner-view-card-content {
-  word-break: break-all;
   word-wrap: break-word;
 }
 
@@ -1989,7 +2012,7 @@ oppia-parameter {
   font-size: 0.9em;
   margin: 8px -18px -11px;
   padding: 10px 18px;
-  word-break: break-all;
+  word-wrap: break-word;
 }
 
 .oppia-large-modal-window .modal-dialog {
@@ -2887,7 +2910,7 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 .oppia-splash-bullet-block {
-  font-family: "Rubik", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 1.17em;
   line-height: 128%;
   margin-bottom: 10px;
@@ -3057,7 +3080,7 @@ md-card.preview-conversation-skin-supplemental-card {
   overflow-wrap: break-word;
   padding: 0.2em;
   position: absolute;
-  word-break: break-all;
+  word-wrap: break-word;
   -webkit-hyphens: auto;
 }
 .oppia-activity-summary-tile.oppia-activity-playlist-tile .activity-title {
@@ -3226,7 +3249,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 .oppia-activity-summary-tile .objective {
   display: -webkit-box;
-  font-family: "Rubik", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   height: 70px;
   line-height: 1.26;
@@ -3247,7 +3270,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile-mobile .objective {
   height: 75px;
-  font-family: "Rubik", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   padding: 12px;
 }
@@ -3781,7 +3804,7 @@ md-card.preview-conversation-skin-supplemental-card {
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
   box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
   padding: 8px;
-  word-break: break-all;
+  word-wrap: break-word;
 }
 
 .oppia-rte:focus {

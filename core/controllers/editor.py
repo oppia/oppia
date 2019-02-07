@@ -230,6 +230,8 @@ class ExplorationHandler(EditorHandler):
                 version=version)
             exploration_data['show_state_editor_tutorial_on_load'] = (
                 self.user_id and not self.has_seen_editor_tutorial)
+            exploration_data['show_state_translation_tutorial_on_load'] = (
+                self.user_id and not self.has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
 
@@ -258,6 +260,8 @@ class ExplorationHandler(EditorHandler):
                 self.user_id, exploration_id)
             exploration_data['show_state_editor_tutorial_on_load'] = (
                 self.user_id and not self.has_seen_editor_tutorial)
+            exploration_data['show_state_translation_tutorial_on_load'] = (
+                self.user_id and not self.has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
         self.values.update(exploration_data)
@@ -713,22 +717,6 @@ class ResolveIssueHandler(EditorHandler):
         self.render_json({})
 
 
-class FetchPlaythroughWhitelistHandler(EditorHandler):
-    """Handles fetching the whitelisted exploration ids which will record and
-    render playthroughs.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handle GET requests for the playthrough whitelist of explorations."""
-        self.render_json({
-            'whitelisted_exploration_ids_for_playthroughs':
-                config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value
-        })
-
-
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
@@ -798,6 +786,7 @@ class StartedTutorialEventHandler(EditorHandler):
     def post(self, unused_exploration_id):
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)
+        self.render_json({})
 
 
 class EditorAutosaveHandler(ExplorationHandler):
@@ -877,18 +866,4 @@ class TopUnresolvedAnswersHandler(EditorHandler):
 
         self.render_json({
             'unresolved_answers': unresolved_answers_with_frequency
-        })
-
-
-class ExplorationFeaturesHandler(EditorHandler):
-    """Returns features the given exploration is configured to support."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_play_exploration
-    def get(self, unused_exploration_id):
-        """Handles GET requests for an exploration's features."""
-        self.render_json({
-            'is_improvements_tab_enabled':
-                config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value,
         })

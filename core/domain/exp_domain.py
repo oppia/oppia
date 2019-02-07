@@ -643,12 +643,6 @@ class Exploration(object):
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
-        # TODO(sll): Remove this check once App Engine supports 3-letter
-        # language codes in search.
-        if len(self.language_code) != 2:
-            raise utils.ValidationError(
-                'Invalid language_code, it should have exactly 2 letters: %s' %
-                self.language_code)
 
         if not isinstance(self.tags, list):
             raise utils.ValidationError(
@@ -2082,6 +2076,32 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v25_dict_to_v26_dict(cls, states_dict):
+        """Converts from version 25 to 26. Version 26 adds a new
+        customization arg to DragAndDropSortInput interaction which allows
+        multiple sort items in the same position.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'DragAndDropSortInput':
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'allowMultipleItemsInSamePosition': {
+                        'value': False
+                    }
+                })
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2116,7 +2136,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 30
+    CURRENT_EXP_SCHEMA_VERSION = 31
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2665,6 +2685,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v30_dict_to_v31_dict(cls, exploration_dict):
+        """Converts a v30 exploration dict into a v31 exploration dict.
+
+        Adds a new customization arg to DragAndDropSortInput interactions
+        which allows multiple sort items in the same position.
+        """
+        exploration_dict['schema_version'] = 31
+
+        exploration_dict['states'] = cls._convert_states_v25_dict_to_v26_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 26
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -2846,6 +2881,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v29_dict_to_v30_dict(
                 exp_id, exploration_dict)
             exploration_schema_version = 30
+
+        if exploration_schema_version == 30:
+            exploration_dict = cls._convert_v30_dict_to_v31_dict(
+                exploration_dict)
+            exploration_schema_version = 31
 
         return (exploration_dict, initial_schema_version)
 
