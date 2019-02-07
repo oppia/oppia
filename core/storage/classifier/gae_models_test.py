@@ -18,7 +18,7 @@
 
 import datetime
 
-from core.domain import classifier_domain  # pylint: disable=invalid-import
+from core.domain import classifier_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf

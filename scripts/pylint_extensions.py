@@ -818,7 +818,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
 
         modnode = node.root()
         names = [name for name, _ in node.names]
-        if 'oppia.core.storage' in modnode.name:
+        if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
             if any('core.domain' in name for name in names):
                 self.add_message(
                     'invalid-import',
@@ -835,7 +835,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
         """
 
         modnode = node.root()
-        if 'oppia.core.storage' in modnode.name:
+        if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
             if 'core.domain' in node.modname:
                 self.add_message(
                     'invalid-import',

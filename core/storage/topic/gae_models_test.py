@@ -17,8 +17,8 @@
 """Tests for Topic model."""
 
 from constants import constants
-from core.domain import topic_domain  # pylint: disable=invalid-import
-from core.domain import topic_services  # pylint: disable=invalid-import
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
