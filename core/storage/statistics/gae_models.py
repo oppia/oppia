@@ -978,7 +978,7 @@ class ExplorationStatsModel(base_models.BaseModel):
         cls.put_multi(exploration_stats_models)
 
 
-class PlaythroughIssuesModel(base_models.BaseModel):
+class ExplorationIssuesModel(base_models.BaseModel):
     """Model for storing the list of playthroughs for an exploration grouped by
     issues.
     """
@@ -1001,13 +1001,13 @@ class PlaythroughIssuesModel(base_models.BaseModel):
             exp_version: int. Version of the exploration.
 
         Returns:
-            str. ID of the new PlaythroughIssuesModel instance.
+            str. ID of the new ExplorationIssuesModel instance.
         """
         return '%s.%s' % (exp_id, exp_version)
 
     @classmethod
     def get_model(cls, exp_id, exp_version):
-        """Retrieves PlaythroughIssuesModel given exploration ID and version.
+        """Retrieves ExplorationIssuesModel given exploration ID and version.
 
         Args:
             exp_id: str. ID of the exploration.
@@ -1018,12 +1018,12 @@ class PlaythroughIssuesModel(base_models.BaseModel):
                 datastore.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
-        playthrough_issues_model = cls.get(instance_id, strict=False)
-        return playthrough_issues_model
+        exp_issues_model = cls.get(instance_id, strict=False)
+        return exp_issues_model
 
     @classmethod
     def create(cls, exp_id, exp_version, unresolved_issues):
-        """Creates an PlaythroughIssuesModel instance and writes it to the
+        """Creates an ExplorationIssuesModel instance and writes it to the
         datastore.
 
         Args:
@@ -1034,13 +1034,13 @@ class PlaythroughIssuesModel(base_models.BaseModel):
                 represents an issue along with the associated playthroughs.
 
         Returns:
-            str. ID of the new PlaythroughIssuesModel instance.
+            str. ID of the new ExplorationIssuesModel instance.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
-        playthrough_issues_instance = cls(
+        exp_issues_instance = cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             unresolved_issues=unresolved_issues)
-        playthrough_issues_instance.put()
+        exp_issues_instance.put()
         return instance_id
 
 

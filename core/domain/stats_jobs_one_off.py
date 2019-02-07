@@ -152,10 +152,10 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     'issue. Error: %s.' % (audit_data['reference_error']),)
 
 
-class PlaythroughIssuesModelCreatorOneOffJob(
+class ExplorationIssuesModelCreatorOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for creating a default ExplorationIsssues model instance
-    for all the explorations in the datastore. If an PlaythroughIssues model
+    for all the explorations in the datastore. If an ExplorationIssues model
     already exists for an exploration, it is refreshed to a default instance.
     """
 
@@ -168,23 +168,23 @@ class PlaythroughIssuesModelCreatorOneOffJob(
         if not exploration_model.deleted:
             current_version = exploration_model.version
             for exp_version in xrange(1, current_version + 1):
-                playthrough_issues_model = (
-                    stats_models.PlaythroughIssuesModel.get_model(
+                exp_issues_model = (
+                    stats_models.ExplorationIssuesModel.get_model(
                         exploration_model.id, exp_version))
-                if not playthrough_issues_model:
-                    playthrough_issues_default = (
-                        stats_domain.PlaythroughIssues.create_default(
+                if not exp_issues_model:
+                    exp_issues_default = (
+                        stats_domain.ExplorationIssues.create_default(
                             exploration_model.id, exp_version))
-                    stats_models.PlaythroughIssuesModel.create(
-                        playthrough_issues_default.exp_id,
-                        playthrough_issues_default.exp_version,
-                        playthrough_issues_default.unresolved_issues)
+                    stats_models.ExplorationIssuesModel.create(
+                        exp_issues_default.exp_id,
+                        exp_issues_default.exp_version,
+                        exp_issues_default.unresolved_issues)
                 else:
-                    playthrough_issues_model.unresolved_issues = []
-                    playthrough_issues_model.put()
+                    exp_issues_model.unresolved_issues = []
+                    exp_issues_model.put()
             yield(
                 exploration_model.id,
-                'PlaythroughIssuesModel created')
+                'ExplorationIssuesModel created')
 
     @staticmethod
     def reduce(exp_id, values):
