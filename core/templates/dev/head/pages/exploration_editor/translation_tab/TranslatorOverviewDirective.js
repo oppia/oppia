@@ -76,7 +76,6 @@ oppia.directive('translatorOverview', [
             }
             TranslationLanguageService.setActiveLanguageCode(
               $scope.languageCode);
-            $rootScope.$broadcast('refreshAudioTranslationBar');
             $window.localStorage.setItem(
               LAST_SELECTED_TRANSLATION_LANGUAGE, $scope.languageCode);
           };

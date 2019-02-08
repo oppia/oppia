@@ -47,6 +47,7 @@ oppia.directive('translationTab', [
             UrlInterpolationService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
+          $scope.showTranslationTabSubDirectives = false;
 
           var initTranslationTab = function() {
             var stateName = StateEditorService.getActiveStateName();
@@ -54,7 +55,8 @@ oppia.directive('translationTab', [
               stateName,
               ExplorationStatesService.getContentIdsToAudioTranslationsMemento(
                 stateName));
-            $scope.$broadcast('refreshStateTranslation');
+            $scope.showTranslationTabSubDirectives = true;
+            $rootScope.loadingMessage = '';
           };
 
           $scope.$on('refreshTranslationTab', function() {
@@ -292,10 +294,6 @@ oppia.directive('translationTab', [
               StateTutorialFirstTimeService.markTranslationTutorialFinished();
             });
           };
-
-          $scope.$on('refreshTranslationTab', function() {
-            $scope.$broadcast('refreshStateTranslation');
-          });
           $scope.$on('enterTranslationForTheFirstTime',
             $scope.showWelcomeTranslationModal
           );
