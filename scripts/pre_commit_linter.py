@@ -1322,11 +1322,10 @@ def _check_html_directive_name(all_files):
     return summary_messages
 
 
-def _validate_and_parse_js_file(all_files):
-    """This function validates a JavaScript file and returns the parsed contents
-    as a Python dictionary.
+def _validate_and_parse_js_files(all_files):
+    """This function validates a JavaScript files and returns the parsed
+    contents as a Python dictionary.
     """
-    parsed_js_files_dict = dict()
     # Use Pyjsparser to parse a JS file as a Python dictionary.
     parser = pyjsparser.PyJsParser()
     # Select JS files which need to be checked.
@@ -1334,15 +1333,15 @@ def _validate_and_parse_js_file(all_files):
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.js')]
+    parsed_js_files = dict()
     for filename in files_to_check:
-        with open(filename) as f:
-            content = f.read()
         print 'Validating and parsing %s file ...' % filename
-        parsed_js_files_dict[filename] = parser.parse(content)
-    return parsed_js_files_dict
+        content = FileCache.read(filename)
+        parsed_js_files[filename] = parser.parse(content)
+    return parsed_js_files
 
 
-def _check_directive_scope(all_files, parsed_js_files_dict):
+def _check_directive_scope(all_files, parsed_js_files):
     """This function checks that all directives have an explicit
     scope: {} and it should not be scope: true.
     """
@@ -1357,7 +1356,7 @@ def _check_directive_scope(all_files, parsed_js_files_dict):
     summary_messages = []
 
     for filename in files_to_check:
-        parsed_dict = parsed_js_files_dict[filename]
+        parsed_dict = parsed_js_files[filename]
         with _redirect_stdout(_TARGET_STDOUT):
             # Parse the body of the content as nodes.
             parsed_nodes = parsed_dict['body']
@@ -1472,14 +1471,13 @@ def _check_directive_scope(all_files, parsed_js_files_dict):
     return summary_messages
 
 
-def _check_sorted_dependencies(all_files, parsed_js_files_dict):
+def _check_sorted_dependencies(all_files, parsed_js_files):
     """This function checks that the dependencies which are
-    imported in the controllers/directives/factories in js
-    files are in following pattern, first dollar imports in
-    sorted form, then regular imports in sorted form and
-    then constant imports in sorted form.
+    imported in the controllers/directives/factories in JS
+    files are in following pattern: dollar imports ,regular
+    imports and constant imports, all in sorted form.
     """
-    print 'Starting sorted dependecies check'
+    print 'Starting sorted dependencies check'
     print '----------------------------------------'
     files_to_check = [
         filename for filename in all_files if not
@@ -1488,69 +1486,70 @@ def _check_sorted_dependencies(all_files, parsed_js_files_dict):
     properties_to_check = ['controller', 'directive', 'factory']
     failed = False
     summary_messages = []
+
     for filename in files_to_check:
-        parsed_dict = parsed_js_files_dict[filename]
-        parsed_nodes = parsed_dict['body']
-        for parsed_node in parsed_nodes:
-            if parsed_node['type'] != 'ExpressionStatement':
-                continue
-            expression = parsed_node['expression']
-            if expression['type'] != 'CallExpression':
-                continue
-            if expression['callee']['type'] != 'MemberExpression':
-                continue
-            property_name = expression['callee']['property']['name']
-            if property_name not in properties_to_check:
-                continue
-            arguments = expression['arguments']
-            if arguments[0]['type'] == 'Literal':
-                property_value = str(arguments[0]['value'])
-            arguments = arguments[1:]
-            for argument in arguments:
-                if argument['type'] != 'ArrayExpression':
+        parsed_dict = parsed_js_files[filename]
+        with _redirect_stdout(_TARGET_STDOUT):
+            parsed_nodes = parsed_dict['body']
+            for parsed_node in parsed_nodes:
+                if parsed_node['type'] != 'ExpressionStatement':
                     continue
-                literal_args = []
-                function_args = []
-                dollar_imports = []
-                regular_imports = []
-                constant_imports = []
-                elements = argument['elements']
-                for element in elements:
-                    if element['type'] == 'Literal':
-                        literal_args.append(str(element['value']))
-                    elif element['type'] == 'FunctionExpression':
-                        func_args = element['params']
-                        for func_arg in func_args:
-                            function_args.append(str(func_arg['name']))
-                for arg in function_args:
-                    if arg.startswith('$'):
-                        dollar_imports.append(arg)
-                    elif re.search('[a-z]', arg):
-                        regular_imports.append(arg)
-                    else:
-                        constant_imports.append(arg)
-                dollar_imports.sort()
-                regular_imports.sort()
-                constant_imports.sort()
-                sorted_imports = (dollar_imports + regular_imports +
-                                  constant_imports)
-                if sorted_imports != function_args:
-                    failed = True
-                    print (
-                        'Please ensure that %s in %s, the injected dependecies '
-                        'should be in the following manner i.e Firstly dollar '
-                        'imports in sorted form, then regular imports in sorted'
-                        ' form and then constant imports in sorted form.\n'
-                        % (property_value, filename))
-                    print ''
-                if sorted_imports != literal_args:
-                    failed = True
-                    print (
-       	                'Please ensure that %s in %s, the dependecies literally'
-       	                ' mentioned should be in the following manner i.e '
-       	                'Firstly dollar imports in sorted form, then regular '
-       	                'imports in sorted form and then constant imports in '
-       	                'sorted form.\n' % (property_value, filename))
+                expression = parsed_node['expression']
+                if expression['type'] != 'CallExpression':
+                    continue
+                if expression['callee']['type'] != 'MemberExpression':
+                    continue
+                property_name = expression['callee']['property']['name']
+                if property_name not in properties_to_check:
+                    continue
+                arguments = expression['arguments']
+                if arguments[0]['type'] == 'Literal':
+                    property_value = str(arguments[0]['value'])
+                arguments = arguments[1:]
+                for argument in arguments:
+                    if argument['type'] != 'ArrayExpression':
+                        continue
+                    literal_args = []
+                    function_args = []
+                    dollar_imports = []
+                    regular_imports = []
+                    constant_imports = []
+                    elements = argument['elements']
+                    for element in elements:
+                        if element['type'] == 'Literal':
+                            literal_args.append(str(element['value']))
+                        elif element['type'] == 'FunctionExpression':
+                            func_args = element['params']
+                            for func_arg in func_args:
+                                function_args.append(str(func_arg['name']))
+                    for arg in function_args:
+                        if arg.startswith('$'):
+                            dollar_imports.append(arg)
+                        elif re.search('[a-z]', arg):
+                            regular_imports.append(arg)
+                        else:
+                            constant_imports.append(arg)
+                    dollar_imports.sort()
+                    regular_imports.sort()
+                    constant_imports.sort()
+                    sorted_imports = (
+                        dollar_imports + regular_imports + constant_imports)
+                    if sorted_imports != function_args:
+                        failed = True
+                        print (
+                            'Please ensure that %s in %s, the injected '
+                            'dependecies should be in the following manner:'
+                            ' dollar imports, regular imports and constant '
+                            'imports, all in sorted form.'
+                            % (property_value, filename))
+                    if sorted_imports != literal_args:
+                        failed = True
+                        print (
+       	                    'Please ensure that %s in %s, the dependecies '
+       	                    'literally mentioned should be in the following '
+       	                    ' manner: dollar imports, regular imports and '
+       	                    'constant imports, all in sorted form.'
+       	                    % (property_value, filename))
 
     if failed:
         summary_message = (
@@ -1881,12 +1880,13 @@ def main():
     files.
     """
     all_files = _get_all_files()
+    parsed_js_files = _validate_and_parse_js_files(
+        all_files)
     linter_messages = _pre_commit_linter(all_files)
-    parsed_js_files_dict = _validate_and_parse_js_file(all_files)
     directive_scope_messages = _check_directive_scope(
-        all_files, parsed_js_files_dict)
+        all_files, parsed_js_files)
     sorted_dependencies_messages = _check_sorted_dependencies(
-        all_files, parsed_js_files_dict)
+        all_files, parsed_js_files)
     controller_dependency_messages = (
         _match_line_breaks_in_controller_dependencies(all_files))
     html_directive_name_messages = _check_html_directive_name(all_files)
