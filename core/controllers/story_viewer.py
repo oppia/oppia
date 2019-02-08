@@ -17,6 +17,7 @@
 from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import story_domain
 from core.domain import story_services
 import feconf
 
@@ -27,4 +28,17 @@ class StoryPageDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_story_viewer_page
-    def get():
+    def get(self, story_id):
+        """Handles GET requests."""
+        if not constants.ENABLE_NEW_STRUCTURES_PLAYER:
+            raise self.PageNotFoundException
+
+        completed_nodes = [ completed_node.to_dict() for completed_node in story_services.get_completed_nodes_in_story(self.user_id, story_id)]
+
+        pending_nodes = [pending_node.to_dict() for pending_node in story_services.get_pending_nodes_in_story(self.user_id, story_id)]
+
+        self.values.update({
+            'completed_nodes': completed_nodes,
+            'pending_nodes': pending_nodes
+        })
+        self.render_json(self.values)

@@ -2352,6 +2352,48 @@ def can_access_topic_viewer_page(handler):
     return test_can_access
 
 
+def can_access_story_viewer_page(handler):
+    """Decorator to check whether user can access story viewer page.
+
+    Args:
+        handler: function.  The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can access the given story viewer page.
+    """
+    
+    def test_can_access(self, story_id, **kwargs):
+        """Checks if the user can access story viewer page.
+
+        Args:
+            story_id: str. The unique id of the story.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        story_id = urllib.unquote_plus(story_id)
+        story = story_services.get_story_by_id(story_id)
+
+        if story is None:
+            raise self.PageNotFoundException
+
+        story_rights = story_services.get_story_rights(
+            story_id, strict=False)
+
+        if story_rights.story_is_published:
+            return handler(self, story_id, **kwargs) 
+        else:
+            raise self.PageNotFoundException
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
 def get_decorator_for_accepting_suggestion(decorator):
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in
