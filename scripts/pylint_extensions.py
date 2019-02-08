@@ -805,10 +805,10 @@ class RestrictedImportChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0009': (
-            'Importing domain layer in storage layer is prohibited.',
+            'Importing %s layer in %s layer is prohibited.',
             'invalid-import',
-            'Storage layer(core/storage) importing domain layer(core/domain)'
-            ' is not allowed.'),
+            'Importing some layers in some specific layers is '
+            'prohibited'),
     }
 
     def visit_import(self, node):
@@ -821,11 +821,21 @@ class RestrictedImportChecker(checkers.BaseChecker):
 
         modnode = node.root()
         names = [name for name, _ in node.names]
+        # Checks import of domain layer in storage layer.
         if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
             if any('core.domain' in name for name in names):
                 self.add_message(
                     'invalid-import',
                     node=node,
+                    args=('domain', 'storage'),
+                )
+        # Checks import of controller layer in domain layer.
+        if 'oppia.core.domain' in modnode.name and not '_test' in modnode.name:
+            if any('core.controllers' in name for name in names):
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=('controller', 'domain'),
                 )
 
     def visit_importfrom(self, node):
@@ -843,6 +853,14 @@ class RestrictedImportChecker(checkers.BaseChecker):
                 self.add_message(
                     'invalid-import',
                     node=node,
+                    args=('domain', 'storage'),
+                )
+        if 'oppia.core.domain' in modnode.name and not '_test' in modnode.name:
+            if 'core.controllers' in node.modname:
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=('controller', 'domain'),
                 )
 
 

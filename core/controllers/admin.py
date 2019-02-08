@@ -20,9 +20,9 @@ import random
 from constants import constants
 from core import jobs
 from core import jobs_registry
+from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import editor
-from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
