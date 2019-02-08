@@ -16,7 +16,7 @@
  * @fileoverview Factory for handling warnings and info messages.
  */
 
-oppia.factory('AlertsService', ['$log', function($log) {
+oppia.factory('AlertsService', ['$log', '$window', function($log, $window) {
   var AlertsService = {
     /**
      * Each element in each of the arrays here is an object with two keys:
@@ -148,6 +148,15 @@ oppia.factory('AlertsService', ['$log', function($log) {
    */
   AlertsService.clearMessages = function() {
     AlertsService.messages = [];
+  };
+
+  /**
+   * Redirects to splash.
+   */
+  AlertsService.redirectToSplash = function() {
+    setTimeout(function() {
+      $window.location.href = '/splash';
+    }, 2000);
   };
 
   return AlertsService;
