@@ -314,7 +314,6 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.post_json(
             '/explorehandler/give_feedback/%s' % self.EXP_ID_1,
             {
-                'state_name': '',
                 'feedback': 'This is an anonymous feedback message.',
             }
         )
