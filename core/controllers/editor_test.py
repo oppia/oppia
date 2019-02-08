@@ -438,9 +438,6 @@ content:
 content_ids_to_audio_translations:
   content: {}
   default_outcome: {}
-content_translations:
-  content: {}
-  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -462,15 +459,15 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """),
         'State B': ("""classifier_model_id: null
 content:
   content_id: content
   html: ''
 content_ids_to_audio_translations:
-  content: {}
-  default_outcome: {}
-content_translations:
   content: {}
   default_outcome: {}
 interaction:
@@ -494,15 +491,15 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
 content:
   content_id: content
   html: ''
 content_ids_to_audio_translations:
-  content: {}
-  default_outcome: {}
-content_translations:
   content: {}
   default_outcome: {}
 interaction:
@@ -526,6 +523,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
@@ -534,9 +534,6 @@ content:
   content_id: content
   html: ''
 content_ids_to_audio_translations:
-  content: {}
-  default_outcome: {}
-content_translations:
   content: {}
   default_outcome: {}
 interaction:
@@ -560,6 +557,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """)
 
     def test_exploration_download_handler_for_default_exploration(self):

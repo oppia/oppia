@@ -47,7 +47,7 @@ STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = (
     'content_ids_to_audio_translations')
-STATE_PROPERTY_CONTENT_TRANSLATIONS = 'content_translations'
+STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
@@ -114,7 +114,7 @@ class ExplorationChange(object):
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-        STATE_PROPERTY_CONTENT_TRANSLATIONS,
+        STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
@@ -587,8 +587,9 @@ class Exploration(object):
                 } for content_id, audio_translations in (
                     sdict['content_ids_to_audio_translations'].iteritems())
             }
-            state.content_translations = state_domain.ContentTranslations(
-                sdict['content_translations'])
+            state.written_translations = (
+                state_domain.WrittenTranslations.from_dict(
+                    sdict['written_translations']))
 
             exploration.states[state_name] = state
 
@@ -721,9 +722,9 @@ class Exploration(object):
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
             if self.language_code in (
-                    state.content_translations.get_available_languages()):
+                    state.written_translations.get_available_languages()):
                 raise utils.ValidationError(
-                    'This exploration has text translation in its own '
+                    'This exploration has a text translation in its own '
                     'language.')
 
         if self.states_schema_version is None:
@@ -2112,16 +2113,14 @@ class Exploration(object):
 
     @classmethod
     def _convert_states_v26_dict_to_v27_dict(cls, states_dict):
-        """Converts from version 26 to 27. Version 27 adds content_translations
+        """Converts from version 26 to 27. Version 27 adds written_translations
         dict to the state, which will allow translators to add translation
         script for the state contents.
 
         NOTE: This migration will also filter out the content_id from
         content_ids_to_audio_translations such that the state passes the new
-        validation check safely.
-
-        Earlier state validation use to check that the set of all content ids
-        present within the state is sub-set of the
+        validation check safely. The earlier state validation used to check that
+        the set of all content ids present within the state is subset of the
         content_ids_to_audio_translations keys, but the new validation will
         check whether both are equal.
 
@@ -2133,7 +2132,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        for _, state_dict in states_dict.iteritems():
+        for state_dict in states_dict.itervalues():
             state_content_id_list = []
 
             # Add state card's content id into the state_content_id_list.
@@ -2144,10 +2143,10 @@ class Exploration(object):
                 answer_feedback = answer_group['outcome']['feedback']
                 state_content_id_list.append(answer_feedback['content_id'])
 
-            # If present add default_outcome content id into
+            # If present, add default_outcome content id into
             # state_content_id_list.
             default_outcome = state_dict['interaction']['default_outcome']
-            if default_outcome:
+            if default_outcome is not None:
                 state_content_id_list.append(
                     default_outcome['feedback']['content_id'])
 
@@ -2155,7 +2154,7 @@ class Exploration(object):
             for hint in state_dict['interaction']['hints']:
                 state_content_id_list.append(hint['hint_content']['content_id'])
 
-            # If present add solution content id into state_content_id_list.
+            # If present, add solution content id into state_content_id_list.
             solution = state_dict['interaction']['solution']
             if solution:
                 state_content_id_list.append(
@@ -2168,10 +2167,10 @@ class Exploration(object):
             for content_id in extra_content_ids_in_citat:
                 state_dict['content_ids_to_audio_translations'].pop(content_id)
 
-            # Create content_translations using the state_content_id_list.
-            state_dict['content_translations'] = {}
+            # Create written_translations using the state_content_id_list.
+            state_dict['written_translations'] = {}
             for content_id in state_content_id_list:
-                state_dict['content_translations'][content_id] = {}
+                state_dict['written_translations'][content_id] = {}
 
         return states_dict
 

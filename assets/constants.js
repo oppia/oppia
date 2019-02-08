@@ -500,7 +500,7 @@ var constants = {
           "content": {},
           "default_outcome": {}
       },
-      "content_translations": {
+      "written_translations": {
           "content": {},
           "default_outcome": {}
       }

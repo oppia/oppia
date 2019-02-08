@@ -601,8 +601,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             exploration,
-            r'Expected state content_ids_to_audio_translations to have all '
-            r'of the listed content ids \[\'content\', \'default_outcome\', '
+            r'Expected state content_ids_to_audio_translations to match '
+            r'the listed content ids \[\'content\', \'default_outcome\', '
             r'\'hint_1\'\]')
 
         # Undo above changes.
@@ -3562,10 +3562,6 @@ states:
       content: {}
       default_outcome: {}
       feedback_1: {}
-    content_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -3602,14 +3598,16 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
   END:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
     content_ids_to_audio_translations:
-      content: {}
-    content_translations:
       content: {}
     interaction:
       answer_groups: []
@@ -3622,15 +3620,14 @@ states:
       id: EndExploration
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
   New state:
     classifier_model_id: null
     content:
       content_id: content
       html: ''
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    content_translations:
       content: {}
       default_outcome: {}
     interaction:
@@ -3654,6 +3651,9 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
 states_schema_version: 27
 tags: []
 title: Title
@@ -3870,9 +3870,6 @@ states:
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
-    content_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3896,10 +3893,6 @@ states:
       content_id: content
       html: <blockquote><p>Hello, this is state1</p></blockquote>
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      solution: {}
-    content_translations:
       content: {}
       default_outcome: {}
       solution: {}
@@ -3935,13 +3928,6 @@ states:
       content_id: content
       html: <p>Hello, </p>this <i>is </i>state2
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
-      hint_1: {}
-      hint_2: {}
-    content_translations:
       content: {}
       default_outcome: {}
       feedback_1: {}
@@ -4021,10 +4007,6 @@ states:
       content: {}
       default_outcome: {}
       feedback_1: {}
-    content_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -4101,9 +4083,6 @@ states:
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
-    content_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4121,16 +4100,15 @@ states:
       id: null
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
   state1:
     classifier_model_id: null
     content:
       content_id: content
       html: <blockquote><p>Hello, this is state1</p></blockquote>
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      solution: {}
-    content_translations:
       content: {}
       default_outcome: {}
       solution: {}
@@ -4160,19 +4138,16 @@ states:
           content_id: solution
           html: <p>This is <em>solution</em> for state1</p>
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
+      solution: {}
   state2:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Hello, </p><p>this <em>is </em>state2</p>
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
-      hint_1: {}
-      hint_2: {}
-    content_translations:
       content: {}
       default_outcome: {}
       feedback_1: {}
@@ -4241,16 +4216,19 @@ states:
       id: MultipleChoiceInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      hint_1: {}
+      hint_2: {}
   state3:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Hello, this is state3</p>
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-    content_translations:
       content: {}
       default_outcome: {}
       feedback_1: {}
@@ -4304,6 +4282,10 @@ states:
       id: ItemSelectionInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
 states_schema_version: 27
 tags: []
 title: title
@@ -4328,10 +4310,6 @@ states:
       html: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>Hello this
             is test case to check image tag inside p tag</p>
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-    content_translations:
       content: {}
       default_outcome: {}
       feedback_1: {}
@@ -4378,8 +4356,6 @@ states:
       html: <p>Congratulations, you have finished!</p>
     content_ids_to_audio_translations:
       content: {}
-    content_translations:
-      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4397,9 +4373,6 @@ states:
       content_id: content
       html: ''
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    content_translations:
       content: {}
       default_outcome: {}
     interaction:
@@ -4451,10 +4424,6 @@ states:
       content: {}
       default_outcome: {}
       feedback_1: {}
-    content_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -4491,14 +4460,16 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
   END:
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
     content_ids_to_audio_translations:
-      content: {}
-    content_translations:
       content: {}
     interaction:
       answer_groups: []
@@ -4511,15 +4482,14 @@ states:
       id: EndExploration
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
   New state:
     classifier_model_id: null
     content:
       content_id: content
       html: ''
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    content_translations:
       content: {}
       default_outcome: {}
     interaction:
@@ -4543,6 +4513,9 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
 states_schema_version: 27
 tags: []
 title: Title
@@ -4597,7 +4570,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'content': {},
                     'default_outcome': {}
                 },
-                'content_translations': {
+                'written_translations': {
                     'content': {},
                     'default_outcome': {}
                 },

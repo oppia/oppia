@@ -188,7 +188,7 @@ class TestBase(unittest.TestCase):
             u'hint_1': {},
             u'solution': {}
         },
-        'content_translations': {
+        'written_translations': {
             u'content': {},
             u'default_outcome': {},
             u'hint_1': {},
@@ -346,9 +346,6 @@ states:
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
-    content_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -366,15 +363,15 @@ states:
       id: null
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
   New state:
     classifier_model_id: null
     content:
       content_id: content
       html: ''
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    content_translations:
       content: {}
       default_outcome: {}
     interaction:
@@ -394,6 +391,9 @@ states:
       id: null
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
 states_schema_version: %d
 tags: []
 title: Title

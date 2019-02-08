@@ -1251,9 +1251,6 @@ states:
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
-    content_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1275,15 +1272,15 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
   New state:
     classifier_model_id: null
     content:
       content_id: content
       html: ''
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    content_translations:
       content: {}
       default_outcome: {}
     interaction:
@@ -1307,6 +1304,9 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
 states_schema_version: %d
 tags: []
 title: A title
@@ -1337,9 +1337,6 @@ states:
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
-    content_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1361,15 +1358,15 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
   Renamed state:
     classifier_model_id: null
     content:
       content_id: content
       html: ''
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    content_translations:
       content: {}
       default_outcome: {}
     interaction:
@@ -1393,6 +1390,9 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
 states_schema_version: %d
 tags: []
 title: A title
@@ -1549,9 +1549,6 @@ content:
 content_ids_to_audio_translations:
   content: {}
   default_outcome: {}
-content_translations:
-  content: {}
-  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1573,6 +1570,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
     SAMPLE_EXPORTED_DICT = {
@@ -1582,9 +1582,6 @@ content:
   content_id: content
   html: ''
 content_ids_to_audio_translations:
-  content: {}
-  default_outcome: {}
-content_translations:
   content: {}
   default_outcome: {}
 interaction:
@@ -1608,6 +1605,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """)
     }
 
@@ -1618,9 +1618,6 @@ content:
   content_id: content
   html: ''
 content_ids_to_audio_translations:
-  content: {}
-  default_outcome: {}
-content_translations:
   content: {}
   default_outcome: {}
 interaction:
@@ -1644,6 +1641,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """)
     }
 
@@ -2104,11 +2104,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     }),
                 '')
 
-    def test_update_content_translations(self):
+    def test_update_written_translations(self):
         """Test update content translations."""
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
-                self.init_state_name, 'content_translations', {
+                self.init_state_name, 'written_translations', {
                     'content': {
                         'hi': {
                             'html': '<p>Test!</p',
@@ -3068,8 +3068,6 @@ states:
       html: <p>Congratulations, you have finished!</p>
     content_ids_to_audio_translations:
       content: {}
-    content_translations:
-      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3081,15 +3079,14 @@ states:
       id: EndExploration
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
   %s:
     classifier_model_id: null
     content:
       content_id: content
       html: ''
     content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    content_translations:
       content: {}
       default_outcome: {}
     interaction:
@@ -3111,6 +3108,9 @@ states:
       id: Continue
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
 states_schema_version: %d
 tags: []
 title: Old Title

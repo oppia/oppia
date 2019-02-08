@@ -53,7 +53,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'content': {},
                 'default_outcome': {}
             },
-            'content_translations': {
+            'written_translations': {
                 'content': {},
                 'default_outcome': {}
             },
@@ -542,11 +542,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
 
-class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
-    """Test methods operating on content transcripts."""
+class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
+    """Test methods operating on writen transcripts."""
 
     def test_get_available_languages_gives_correct_set_of_langauges(self):
-        content_translations_dict = {
+        written_translations_dict = {
             'content1': {
                 'en': {
                     'html': 'hello',
@@ -569,36 +569,47 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        content_translations = state_domain.ContentTranslations.from_dict(
-            content_translations_dict)
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
         expected_available_languages = set(['en', 'hi'])
 
         self.assertEqual(
-            content_translations.get_available_languages(),
+            written_translations.get_available_languages(),
             expected_available_languages)
 
+    def test_get_all_content_ids_for_text_translation_return_correct_list_of_content_id(self): # pylint: disable=line-too-long
+        written_translations = state_domain.WrittenTranslations.from_dict({})
+        self.assertEqual(
+            written_translations.get_all_content_ids_for_text_translation(), [])
+
+        written_translations.add_content_id_for_translation('feedback_1')
+        written_translations.add_content_id_for_translation('feedback_2')
+        self.assertEqual(
+            written_translations.get_all_content_ids_for_text_translation(), [
+                'feedback_2', 'feedback_1'])
+
     def test_add_content_id_for_translations_adds_content_id(self):
-        content_translations = state_domain.ContentTranslations.from_dict({})
+        written_translations = state_domain.WrittenTranslations.from_dict({})
         new_content_id = 'content_id'
-        content_translations.add_content_id_for_translation(new_content_id)
+        written_translations.add_content_id_for_translation(new_content_id)
 
         self.assertEqual(
-            len(content_translations.to_dict()), 1)
+            len(written_translations.to_dict()), 1)
         self.assertEqual(
-            content_translations.to_dict().keys(), ['content_id'])
+            written_translations.to_dict().keys(), ['content_id'])
 
     def test_add_content_id_for_translation_with_invalid_content_id_raise_error(
             self):
-        content_translations = state_domain.ContentTranslations.from_dict({})
+        written_translations = state_domain.WrittenTranslations.from_dict({})
         invalid_content_id = 123
         with self.assertRaisesRegexp(
             Exception, 'Expected content_id to be a string, received 123'):
-            content_translations.add_content_id_for_translation(
+            written_translations.add_content_id_for_translation(
                 invalid_content_id)
 
     def test_add_content_id_for_translation_with_existing_content_id_raise_error( # pylint: disable=line-too-long
             self):
-        content_translations_dict = {
+        written_translations_dict = {
             'feedback_1': {
                 'en': {
                     'html': 'hello!',
@@ -607,16 +618,16 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        content_translations = state_domain.ContentTranslations.from_dict(
-            content_translations_dict)
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
         existing_content_id = 'feedback_1'
         with self.assertRaisesRegexp(
             Exception, 'The content_id feedback_1 already exist.'):
-            content_translations.add_content_id_for_translation(
+            written_translations.add_content_id_for_translation(
                 existing_content_id)
 
     def test_delete_content_id_for_translations_deletes_content_id(self):
-        old_content_translations_dict = {
+        old_written_translations_dict = {
             'content': {
                 'en': {
                     'html': 'hello!',
@@ -625,45 +636,46 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        content_translations = state_domain.ContentTranslations.from_dict(
-            old_content_translations_dict)
-        content_translations.delete_content_id_for_translation('content')
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            old_written_translations_dict)
+        written_translations.delete_content_id_for_translation('content')
 
-        self.assertEqual(len(content_translations.to_dict()), 0)
+        self.assertEqual(len(written_translations.to_dict()), 0)
 
     def test_delete_content_id_for_translation_with_nonexisting_content_id_raise_error(self): # pylint: disable=line-too-long
-        content_translations_dict = {
+        written_translations_dict = {
             'content': {}
         }
-        content_translations = state_domain.ContentTranslations.from_dict(
-            content_translations_dict)
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
         nonexisting_content_id_to_delete = 'feedback_1'
         with self.assertRaisesRegexp(
             Exception, 'The content_id feedback_1 does not exist.'):
-            content_translations.delete_content_id_for_translation(
+            written_translations.delete_content_id_for_translation(
                 nonexisting_content_id_to_delete)
 
     def test_delete_content_id_for_translation_with_invalid_content_id_raise_error(self): # pylint: disable=line-too-long
-        content_translations = state_domain.ContentTranslations.from_dict({})
+        written_translations = state_domain.WrittenTranslations.from_dict({})
         invalid_content_id_to_delete = 123
         with self.assertRaisesRegexp(
             Exception, 'Expected content_id to be a string, '):
-            content_translations.delete_content_id_for_translation(
+            written_translations.delete_content_id_for_translation(
                 invalid_content_id_to_delete)
 
     def test_validation_with_invalid_content_id_raise_error(self):
-        content_translations_dict = {
+        written_translations_dict = {
             123: {}
         }
 
-        content_translations = state_domain.ContentTranslations.from_dict(
-            content_translations_dict)
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
 
-        self._assert_validation_error(
-            content_translations, 'Expected content_id to be a string, ')
+        with self.assertRaisesRegexp(
+            Exception, 'Expected content_id to be a string, '):
+            written_translations.validate([123])
 
     def test_validation_with_invalid_type_langauge_code_raise_error(self):
-        content_translations_dict = {
+        written_translations_dict = {
             'content': {
                 123: {
                     'html': 'hello!',
@@ -672,14 +684,15 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        content_translations = state_domain.ContentTranslations.from_dict(
-            content_translations_dict)
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
 
-        self._assert_validation_error(
-            content_translations, 'Expected language_code to be a string, ')
+        with self.assertRaisesRegexp(
+            Exception, 'Expected language_code to be a string, '):
+            written_translations.validate(['content'])
 
     def test_validation_with_unknown_langauge_code_raise_error(self):
-        content_translations_dict = {
+        written_translations_dict = {
             'content': {
                 'ed': {
                     'html': 'hello!',
@@ -688,8 +701,8 @@ class ContentTranscriptsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        content_translations = state_domain.ContentTranslations.from_dict(
-            content_translations_dict)
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
 
-        self._assert_validation_error(
-            content_translations, 'Invalid language_code: ed')
+        with self.assertRaisesRegexp(Exception, 'Invalid language_code: ed'):
+            written_translations.validate(['content'])

@@ -741,9 +741,8 @@ def apply_change_list(exploration_id, change_list):
                         change.new_value)
                 elif (
                         change.property_name ==
-                        exp_domain.STATE_PROPERTY_CONTENT_TRANSLATIONS):
-                    state.update_content_translations(change.new_value)
-
+                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                    state.update_written_translations(change.new_value)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -1962,7 +1961,6 @@ def get_exp_with_draft_applied(exp_id, user_id):
     Returns:
         Exploration. The exploration domain object.
     """
-
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = get_exploration_by_id(exp_id)
     if exp_user_data:
