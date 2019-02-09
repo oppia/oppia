@@ -1,4 +1,4 @@
-# Copyright 2018 The Oppia Authors. All Rights Reserved.
+	# Copyright 2018 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -604,6 +604,7 @@ def get_completed_nodes_in_story(user_id, story_id):
 
     return completed_nodes
 
+
 def get_pending_nodes_in_story(user_id, story_id):
     """Returns the nodes that are pending in a story
 
@@ -624,6 +625,7 @@ def get_pending_nodes_in_story(user_id, story_id):
             pending_nodes.append(node)
 
     return pending_nodes
+
 
 def record_completed_node_in_story_context(user_id, story_id, node_id):
     """Records a node by a given user in a given story
