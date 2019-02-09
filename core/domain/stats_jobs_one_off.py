@@ -83,7 +83,7 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
             stats_models.ExplorationIssuesModel.get_model(exp_id, exp_version))
         reference_error = (
             'This playthrough was not found as a reference in the containing '
-            'ExplorationIssuesModel (id=%s).' % (exp_issues.id))
+            'ExplorationIssuesModel (id=%s)' % (exp_issues.id))
         for exp_issue_dict in exp_issues.unresolved_issues:
             if playthrough_model.id in exp_issue_dict['playthrough_ids']:
                 reference_error = None
