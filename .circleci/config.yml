@@ -8,6 +8,7 @@ anchor_for_job_defaults: &job_defaults
 anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
+    pip install codecov
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
 
