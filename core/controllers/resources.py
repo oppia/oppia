@@ -95,17 +95,13 @@ class PromoBarHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    # This prevents partially logged in user from being logged out
+    # during user registration.
     REDIRECT_UNFINISHED_SIGNUPS = False
 
     @acl_decorators.open_access
     def get(self):
-        try:
-            self.render_json({
-                'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
-                'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
-            })
-        except AttributeError:
-            self.render_json({
-                'promo_bar_enabled': False,
-                'promo_bar_message': ''
-            })
+        self.render_json({
+            'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
+            'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
+        })

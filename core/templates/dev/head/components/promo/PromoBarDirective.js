@@ -19,16 +19,15 @@
  */
 
 oppia.directive('promoBar', [
-  'PromoBarService', 'UrlInterpolationService', 'ENABLE_PROMO_BAR',
-  function(PromoBarService, UrlInterpolationService, ENABLE_PROMO_BAR) {
+  'PromoBarService', 'UrlInterpolationService',
+  function(PromoBarService, UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/promo/' +
         'promo_bar_directive.html'),
       controller: [
-        '$scope', '$window',
-        function($scope, $window) {
+        '$scope', function($scope) {
           var isPromoDismissed = function() {
             return !!angular.fromJson(sessionStorage.promoIsDismissed);
           };
@@ -36,15 +35,10 @@ oppia.directive('promoBar', [
             sessionStorage.promoIsDismissed = angular.toJson(promoIsDismissed);
           };
 
-          if (ENABLE_PROMO_BAR) {
-            PromoBarService.getPromoBarData().then(function(promoBarObject) {
-              $scope.promoBarIsEnabled = promoBarObject.promoBarEnabled;
-              $scope.promoBarMessage = promoBarObject.promoBarMessage;
-            });
-          } else {
-            $scope.promoBarIsEnabled = false;
-            $scope.promoBarMessage = '';
-          }
+          PromoBarService.getPromoBarData().then(function(promoBarObject) {
+            $scope.promoBarIsEnabled = promoBarObject.promoBarEnabled;
+            $scope.promoBarMessage = promoBarObject.promoBarMessage;
+          });
 
           // TODO(bhenning): Utilize cookies for tracking when a promo is
           // dismissed. Cookies allow for a longer-lived memory of whether the

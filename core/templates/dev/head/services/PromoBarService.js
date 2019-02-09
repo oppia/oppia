@@ -17,15 +17,23 @@
  */
 
 oppia.factory('PromoBarService', [
-  '$http', function($http) {
+  '$http', 'ENABLE_PROMO_BAR',
+  function($http, ENABLE_PROMO_BAR) {
     return {
       getPromoBarData: function() {
         return $http.get('/promo_bar_handler', {}).then(
           function(response) {
-            return {
-              promoBarEnabled: response.data.promo_bar_enabled,
-              promoBarMessage: response.data.promo_bar_message
-            };
+            if (ENABLE_PROMO_BAR) {
+              return {
+                promoBarEnabled: response.data.promo_bar_enabled,
+                promoBarMessage: response.data.promo_bar_message
+              };
+            } else {
+              return {
+                promoBarEnabled: false,
+                promoBarMessage: ''
+              };
+            }
           }
         );
       }
