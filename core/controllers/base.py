@@ -126,9 +126,6 @@ class BaseHandler(webapp2.RequestHandler):
     # not completed signup in to the signup page. This ensures that logged-in
     # users have agreed to the latest terms.
     REDIRECT_UNFINISHED_SIGNUPS = True
-    # Whether to logout partially logged in user. Used in Dev mode. Can be
-    # overridden by subclasses if this is check is not necesarry.
-    LOGOUT_PARTIALLY_LOGGED_IN_USER = True
 
     # What format the get method returns when exception raised, json or html.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
@@ -227,8 +224,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         # In DEV_MODE, clearing cookies does not log out the user, so we
         # force-clear them by redirecting to the logout URL.
-        if (constants.DEV_MODE and self.partially_logged_in and
-                self.LOGOUT_PARTIALLY_LOGGED_IN_USER):
+        if constants.DEV_MODE and self.partially_logged_in:
             self.redirect(users.create_logout_url(self.request.uri))
             return
 

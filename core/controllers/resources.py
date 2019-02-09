@@ -94,8 +94,8 @@ class PromoBarHandler(base.BaseHandler):
     promobar message.
     """
 
-    LOGOUT_PARTIALLY_LOGGED_IN_USER = False
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    REDIRECT_UNFINISHED_SIGNUPS = False
 
     @acl_decorators.open_access
     def get(self):
