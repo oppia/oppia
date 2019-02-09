@@ -63,13 +63,17 @@ class PlaythroughAuditTests(OneOffJobTestBase):
 
     def setUp(self):
         super(PlaythroughAuditTests, self).setUp()
-        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
+        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner_id')
 
     def create_playthrough(self):
         """Helper method to create and return a simple playthrough model."""
         playthrough_id = stats_models.PlaythroughModel.create(
             self.exp.id, self.exp.version, issue_type='EarlyQuit',
-            issue_customization_args={}, actions=[])
+            issue_customization_args={
+                'state_name': {'value': 'state_name'},
+                'time_spent_in_exp_in_msecs': {'value': 200},
+            },
+            actions=[])
         return stats_models.PlaythroughModel.get(playthrough_id)
 
     def create_exp_issues_with_playthroughs(self, playthrough_ids_list):
@@ -81,7 +85,9 @@ class PlaythroughAuditTests(OneOffJobTestBase):
                         'state_name': {'value': 'state_name'},
                         'time_spent_in_exp_in_msecs': {'value': 200},
                     },
-                    'playthrough_ids': playthrough_ids,
+                    'playthrough_ids': list(playthrough_ids),
+                    'schema_version': 1,
+                    'is_valid': True,
                 }
                 for playthrough_ids in playthrough_ids_list
             ])
@@ -95,7 +101,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
 
         output = self.run_one_off_job()
 
-        self.assertEqual(len(output), 0)
+        self.assertEqual(output, [])
 
     def test_output_for_pre_release_playthrough(self):
         self.set_config_property(

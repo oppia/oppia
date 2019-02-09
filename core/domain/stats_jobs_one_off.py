@@ -72,14 +72,15 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
             playthrough = (
                 stats_services.get_playthrough_from_model(playthrough_model))
             playthrough.validate()
-        except stats_models.PlaythroughModel.EntityNotFoundError as e:
+        except Exception as e:
             validate_error = str(e)
         else:
             validate_error = None
 
         exp_id = playthrough_model.exp_id
         exp_version = playthrough_model.exp_version
-        exp_issues = stats_services.get_playthrough_issues(exp_id, exp_version)
+        exp_issues = (
+            stats_models.ExplorationIssuesModel.get_model(exp_id, exp_version))
         if exp_issues is None:
             reference_error = (
                 'There is no containing ExplorationIssuesModel instance for '
@@ -148,8 +149,8 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
 
             if audit_data['reference_error'] is not None:
                 yield (
-                    'playthrough_id:%s is dangling (not referenced by any '
-                    'issue. Error: %s.' % (audit_data['reference_error']),)
+                    'playthrough_id:%s is not referenced by any issue. '
+                    'Details: %s.' % (key, audit_data['reference_error']),)
 
 
 class ExplorationIssuesModelCreatorOneOffJob(
