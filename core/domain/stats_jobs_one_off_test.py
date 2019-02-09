@@ -58,247 +58,6 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         return self.ONE_OFF_JOB_CLASS.get_output(job_id)
 
 
-class DeleteIllegalPlaythroughsOneOffJobTests(OneOffJobTestBase):
-    ONE_OFF_JOB_CLASS = stats_jobs_one_off.DeleteIllegalPlaythroughsOneOffJob
-
-    def setUp(self):
-        super(DeleteIllegalPlaythroughsOneOffJobTests, self).setUp()
-        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
-
-    def create_playthrough_model(self):
-        """Helper method to create a simple playthrough and return its id.
-
-        Returns:
-            str. The ID of the newly created playthrough model.
-        """
-        return stats_models.PlaythroughModel.create(
-            self.exp.id, self.exp.version, issue_type='EarlyQuit',
-            issue_customization_args={}, actions=[])
-
-    def create_old_playthrough_model(self):
-        """Helper method to create a playthrough with a creation date before the
-        start of the GSoC 2018 project.
-
-        Returns:
-            str. The ID of the newly created playthrough model.
-        """
-        playthrough_id = self.create_playthrough_model()
-        playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
-        # Arbitrary date before GSoC 2018.
-        playthrough_model.created_on = datetime.datetime(2017, 12, 31)
-        playthrough_model.put()
-        return playthrough_id
-
-    def create_playthrough_issues_model(self, playthrough_ids_list):
-        """Helper method to create a playthrough issues model with multiple
-        unresolved issues and return its id.
-
-        Args:
-            playthrough_ids_list: list(list(str)). A list with the set of
-                playthrough ids each individual issue should reference.
-
-        Returns:
-            str. The ID of the new playthrough issue model.
-        """
-        return stats_models.ExplorationIssuesModel.create(
-            self.exp.id, self.exp.version, unresolved_issues=[
-                {
-                    'issue_type': 'EarlyQuit',
-                    'issue_customization_args': {
-                        'state_name': {'value': 'state_name'},
-                        'time_spent_in_exp_in_msecs': {'value': 200},
-                    },
-                    'playthrough_ids': playthrough_ids,
-                }
-                for playthrough_ids in playthrough_ids_list
-            ])
-
-    def test_playthroughs_remain_in_whitelisted_explorations(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough_ids = [
-            self.create_playthrough_model(),
-            self.create_playthrough_model(),
-        ]
-        playthrough_issues_id = (
-            self.create_playthrough_issues_model([playthrough_ids]))
-
-        self.run_one_off_job()
-
-        # Getting these models should not raise.
-        for playthrough_id in playthrough_ids:
-            stats_models.PlaythroughModel.get(playthrough_id)
-        stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
-
-    def test_playthroughs_removed_from_non_whitelisted_explorations(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id + '-differentiated'])
-        playthrough_ids = [
-            self.create_playthrough_model(),
-            self.create_playthrough_model(),
-        ]
-        playthrough_issues_id = (
-            self.create_playthrough_issues_model([playthrough_ids]))
-
-        self.run_one_off_job()
-
-        for playthrough_id in playthrough_ids:
-            with self.assertRaisesRegexp(Exception, 'not found'):
-                stats_models.PlaythroughModel.get(playthrough_id)
-        with self.assertRaisesRegexp(Exception, 'not found'):
-            stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
-
-    def test_old_playthroughs_removed(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        new_playthrough_id = self.create_playthrough_model()
-        old_playthrough_id = self.create_old_playthrough_model()
-        playthrough_issues_id = self.create_playthrough_issues_model([
-            [new_playthrough_id, old_playthrough_id],
-        ])
-
-        self.run_one_off_job()
-
-        with self.assertRaisesRegexp(Exception, 'not found'):
-            stats_models.PlaythroughModel.get(old_playthrough_id)
-        # Should not raise.
-        stats_models.PlaythroughModel.get(new_playthrough_id)
-        # The list of supporting playthroughs should only have the new one.
-        playthrough_issues_model = (
-            stats_models.ExplorationIssuesModel.get(playthrough_issues_id))
-        self.assertEqual(
-            playthrough_issues_model.unresolved_issues[0]['playthrough_ids'],
-            [new_playthrough_id])
-
-    def test_entire_issue_removed_when_all_playthroughs_are_old(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        old_playthrough_ids = [
-            self.create_old_playthrough_model(),
-            self.create_old_playthrough_model(),
-        ]
-        playthrough_issues_id = (
-            self.create_playthrough_issues_model([old_playthrough_ids]))
-
-        self.run_one_off_job()
-
-        for old_playthrough_id in old_playthrough_ids:
-            with self.assertRaisesRegexp(Exception, 'not found'):
-                stats_models.PlaythroughModel.get(old_playthrough_id)
-        with self.assertRaisesRegexp(Exception, 'not found'):
-            stats_models.ExplorationIssuesModel.get(playthrough_issues_id)
-
-    def test_issues_with_mixed_playthrough_ages(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        old_playthrough_ids = [
-            self.create_old_playthrough_model(),
-            self.create_old_playthrough_model(),
-            self.create_old_playthrough_model(),
-        ]
-        new_playthrough_ids = [
-            self.create_playthrough_model(),
-            self.create_playthrough_model(),
-            self.create_playthrough_model(),
-        ]
-        playthrough_issues_id = self.create_playthrough_issues_model([
-            [old_playthrough_ids[0], old_playthrough_ids[1]],
-            [new_playthrough_ids[0], new_playthrough_ids[1]],
-            [old_playthrough_ids[2], new_playthrough_ids[2]],
-        ])
-
-        self.run_one_off_job()
-
-        # Assert old playthroughs have been deleted.
-        for playthrough_id in old_playthrough_ids:
-            with self.assertRaisesRegexp(Exception, 'not found'):
-                stats_models.PlaythroughModel.get(playthrough_id)
-        for playthrough_id in new_playthrough_ids:
-            # Should not raise.
-            stats_models.PlaythroughModel.get(playthrough_id)
-        # Only two issues remain, because one of them only had old playthroughs.
-        playthrough_issues_model = (
-            stats_models.ExplorationIssuesModel.get(playthrough_issues_id))
-        self.assertEqual(len(playthrough_issues_model.unresolved_issues), 2)
-        # The first element should be the issue where all playthroughs are new.
-        self.assertEqual(
-            playthrough_issues_model.unresolved_issues[0]['playthrough_ids'],
-            [new_playthrough_ids[0], new_playthrough_ids[1]])
-        # The second element should be the issue where one playthrough is old
-        # and the other is new. Only the new playthrough should remain, however.
-        self.assertEqual(
-            playthrough_issues_model.unresolved_issues[1]['playthrough_ids'],
-            [new_playthrough_ids[2]])
-
-
-class PlaythroughAuditTests(OneOffJobTestBase):
-    ONE_OFF_JOB_CLASS = stats_jobs_one_off.PlaythroughAudit
-
-    def setUp(self):
-        super(PlaythroughAuditTests, self).setUp()
-        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner')
-
-    def create_playthrough(self):
-        """Helper method to create and return a simple playthrough model."""
-        playthrough_id = stats_models.PlaythroughModel.create(
-            self.exp.id, self.exp.version, issue_type='EarlyQuit',
-            issue_customization_args={}, actions=[])
-        return stats_models.PlaythroughModel.get(playthrough_id)
-
-    def test_empty_output_for_good_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        self.create_playthrough()
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 0)
-
-    def test_output_for_pre_release_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        # Set created_on to a date which is definitely before GSoC 2018.
-        playthrough.created_on = datetime.datetime(2017, 12, 31)
-        playthrough.put()
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('before the GSoC 2018 submission deadline', output[0])
-
-    def test_output_for_non_whitelisted_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id + 'differentiated'])
-        self.create_playthrough()
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('has not been curated for recording', output[0])
-
-    def test_output_for_bad_schema_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        playthrough.actions.append({'bad schema key': 'bad schema value'})
-        playthrough.put()
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('could not be validated', output[0])
-
-
 class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = (
         stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob)
@@ -369,6 +128,110 @@ class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(exp_issues2.exp_id, self.EXP_ID2)
         self.assertEqual(exp_issues2.exp_version, self.exp2.version)
         self.assertEqual(exp_issues2.unresolved_issues, [])
+
+
+class PlaythroughAuditTests(OneOffJobTestBase):
+    ONE_OFF_JOB_CLASS = stats_jobs_one_off.PlaythroughAudit
+
+    def setUp(self):
+        super(PlaythroughAuditTests, self).setUp()
+        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner_id')
+
+    def create_playthrough(self):
+        """Helper method to create and return a simple playthrough model."""
+        playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp.id, self.exp.version, issue_type='EarlyQuit',
+            issue_customization_args={
+                'state_name': {'value': 'state_name'},
+                'time_spent_in_exp_in_msecs': {'value': 200},
+            },
+            actions=[])
+        return stats_models.PlaythroughModel.get(playthrough_id)
+
+    def create_exp_issues_with_playthroughs(self, playthrough_ids_list):
+        """Helper method to create and return an ExplorationIssuesModel instance
+        with the given sets of playthrough ids as reference issues.
+        """
+        return stats_models.ExplorationIssuesModel.create(
+            self.exp.id, self.exp.version, unresolved_issues=[
+                {
+                    'issue_type': 'EarlyQuit',
+                    'issue_customization_args': {
+                        'state_name': {'value': 'state_name'},
+                        'time_spent_in_exp_in_msecs': {'value': 200},
+                    },
+                    'playthrough_ids': list(playthrough_ids),
+                    'schema_version': 1,
+                    'is_valid': True,
+                }
+                for playthrough_ids in playthrough_ids_list
+            ])
+
+    def test_empty_output_for_good_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        output = self.run_one_off_job()
+
+        self.assertEqual(output, [])
+
+    def test_output_for_pre_release_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        # Set created_on to a date which is definitely before GSoC 2018.
+        playthrough.created_on = datetime.datetime(2017, 12, 31)
+        playthrough.put()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        output = self.run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('before the GSoC 2018 submission deadline', output[0])
+
+    def test_output_for_non_whitelisted_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id + 'differentiated'])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        output = self.run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('has not been curated for recording', output[0])
+
+    def test_output_for_bad_schema_playthrough(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        playthrough.actions.append({'bad schema key': 'bad schema value'})
+        playthrough.put()
+        self.create_exp_issues_with_playthroughs([[playthrough.id]])
+
+        output = self.run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('could not be validated', output[0])
+
+    def test_output_for_missing_reference(self):
+        self.set_config_property(
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
+            [self.exp.id])
+        playthrough = self.create_playthrough()
+        self.create_exp_issues_with_playthroughs([
+            [playthrough.id + '-different'],
+        ])
+
+        output = self.run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('not found as a reference', output[0])
 
 
 class RegenerateMissingStatsModelsOneOffJobTests(OneOffJobTestBase):
