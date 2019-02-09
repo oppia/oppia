@@ -422,7 +422,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
                 expected_status_int=404)
             self.logout()
 
-    def test_delete_with_admin_email_deletes_question(self):
+    def test_delete_with_admin_email_allows_question_deletion(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.ADMIN_EMAIL)
             self.delete_json(
