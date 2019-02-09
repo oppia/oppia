@@ -59,6 +59,10 @@ jobs:
           name: Run frontend tests
           command: |
             bash -x scripts/run_frontend_tests.sh --run-minified-tests=true
+      - run:
+          name: Generate frontend coverage report
+          command: codecov --file ../karma_coverage_reports/coverage-final.json
+          when: on_success
 
   backend_tests:
     <<: *job_defaults
@@ -70,12 +74,19 @@ jobs:
           name: Run backend tests
           command: |
             bash scripts/run_backend_tests.sh --exclude_load_tests
+      - run:
+          name: Generate backend coverage report
+          command: codecov
+          when: on_success
 
 workflows:
   version: 2
   circleci_tests:
     jobs:
       - setup
+      - frontend_tests:
+          requires:
+            - setup
       - backend_tests:
           requires:
             - setup
