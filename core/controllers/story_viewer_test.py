@@ -15,28 +15,35 @@
 """Tests for the story viewer page"""
 
 from constants import constants
-from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import story_domain
 from core.domain import story_services
-from core.utils import test_utils
+from core.domain import user_services
+from core.tests import test_utils
 import feconf
 
 class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
 
+    def _record_completion(self, user_id, STORY_ID, node_id):
+        """Records the completion of a node in the context of a story."""
+        story_services.record_completed_node_in_story_context(
+            user_id, STORY_ID, node_id)
+
     def setUp(self):
         """Completes the sign up process for the various users."""
         super(BaseStoryViewerControllerTests, self).setUp()
+        self.VIEWER_EMAIL = 'viewer@example.com'
+        self.VIEWER_USERNAME = 'viewer'
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.admin = user_services.UserActionsInfo(self.admin_id)
 
+
         self.STORY_ID_1 = 'story_id_1'
         self.NODE_ID_1 = 'node_1'
         self.NODE_ID_2 = 'node_2'
-        self.USER_ID = 'user'
-        self.owner_id = 'owner'
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID_1, 'Title')
@@ -68,18 +75,20 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.nodes = story.story_contents.nodes
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_3'
-        story_services.save_new_story(self.USER_ID, story)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
- 
-class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
+        story_services.save_new_story(self.admin_id, story)
+        self.logout()
+        
+        self._record_completion(self.viewer_id, self.STORY_ID_1, self.NODE_ID_1)
 
+class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
     def test_get(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES_PLAYER', True):
+        self.login(self.VIEWER_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/%s' % (feconf.STORY_DATA_HANDLER, 'story_id_1'))
             expected_dict = {
-                'completed_nodes': [],
-                'pending_nodes':[]
+                'completed_nodes': [self.node_1],
+                'pending_nodes':[self.node_2]
             }
-            self.assertDictContainsSubset(json_response, {})
+            self.assertDictContainsSubset(expected_dict, json_response)
 

@@ -24,6 +24,7 @@ from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import skill_services
+from core.domain import story_services
 from core.domain import suggestion_services
 from core.domain import topic_services
 from core.domain import user_services

@@ -30,12 +30,16 @@ class StoryPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURES_PLAYER:
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        completed_nodes = [ completed_node.to_dict() for completed_node in story_services.get_completed_nodes_in_story(self.user_id, story_id)]
+        completed_nodes = [completed_node.to_dict()
+            for completed_node in story_services.get_completed_nodes_in_story(
+            self.user_id, story_id)]
 
-        pending_nodes = [pending_node.to_dict() for pending_node in story_services.get_pending_nodes_in_story(self.user_id, story_id)]
+        pending_nodes = [pending_node.to_dict()
+            for pending_node in story_services.get_pending_nodes_in_story(
+            self.user_id, story_id)]
 
         self.values.update({
             'completed_nodes': completed_nodes,
