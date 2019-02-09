@@ -8,7 +8,6 @@ anchor_for_job_defaults: &job_defaults
 anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
-    sudo pip install codecov
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
 
@@ -62,7 +61,9 @@ jobs:
             bash -x scripts/run_frontend_tests.sh --run-minified-tests=true
       - run:
           name: Generate frontend coverage report
-          command: codecov --file ../karma_coverage_reports/coverage-final.json
+          command: |
+            sudo pip install codecov
+            codecov --file ../karma_coverage_reports/coverage-final.json
           when: on_success
 
   backend_tests:
@@ -77,7 +78,9 @@ jobs:
             bash scripts/run_backend_tests.sh --exclude_load_tests
       - run:
           name: Generate backend coverage report
-          command: codecov
+          command: |
+            sudo pip install codecov
+            codecov
           when: on_success
 
 workflows:
