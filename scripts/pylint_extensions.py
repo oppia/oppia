@@ -807,8 +807,8 @@ class RestrictedImportChecker(checkers.BaseChecker):
         'C0009': (
             'Importing %s layer in %s layer is prohibited.',
             'invalid-import',
-            'Importing some layers in some specific layers is '
-            'prohibited'),
+            'Storage layer and domain layer must not import'
+            'domain layer and controller layer respectively.'),
     }
 
     def visit_import(self, node):
