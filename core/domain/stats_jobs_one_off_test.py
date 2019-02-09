@@ -144,17 +144,6 @@ class PlaythroughAuditTests(OneOffJobTestBase):
         self.assertEqual(len(output), 1)
         self.assertIn('could not be validated', output[0])
 
-    def test_output_for_missing_exp_issues(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        self.create_playthrough()
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('no containing ExplorationIssuesModel', output[0])
-
     def test_output_for_missing_reference(self):
         self.set_config_property(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,

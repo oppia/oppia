@@ -81,19 +81,13 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
         exp_version = playthrough_model.exp_version
         exp_issues = (
             stats_models.ExplorationIssuesModel.get_model(exp_id, exp_version))
-        if exp_issues is None:
-            reference_error = (
-                'There is no containing ExplorationIssuesModel instance for '
-                'this playthrough; one needs to be created for the exploration '
-                '(exp_id=%s, exp_version=%s).' % (exp_id, exp_version))
-        else:
-            reference_error = (
-                'This playthrough was not found as a reference in the '
-                'containing ExplorationIssuesModel (id=%s).' % (exp_issues.id))
-            for exp_issue_dict in exp_issues.unresolved_issues:
-                if playthrough_model.id in exp_issue_dict['playthrough_ids']:
-                    reference_error = None
-                    break
+        reference_error = (
+            'This playthrough was not found as a reference in the containing '
+            'ExplorationIssuesModel (id=%s).' % (exp_issues.id))
+        for exp_issue_dict in exp_issues.unresolved_issues:
+            if playthrough_model.id in exp_issue_dict['playthrough_ids']:
+                reference_error = None
+                break
 
         audit_data = {
             'exp_id': playthrough_model.exp_id,
