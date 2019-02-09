@@ -795,6 +795,104 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
             self.add_message('function-args-order-cls', node=node)
 
 
+class NewlineCountPrecedingDeclarationChecker(checkers.BaseChecker):
+    """Custom pylint checker that checks the number of newlines preceding
+    a class or a function definition.
+    """
+
+    __implements__ = interfaces.IRawChecker
+    name = 'definition-preceding-newline-count'
+    priority = -1
+    msgs = {
+        'C0010': (
+            'Exactly %s newline(s) must precede a %s definition. '
+            'Please remove the extra newlines.',
+            'definition-preceding-newline-count',
+            'The number of newlines preceding a class or function '
+            'declaration are exceeding.'),
+    }
+
+    def process_module(self, node):
+        """Process a module.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        with node.stream() as stream:
+            file_content = stream.readlines()
+            for (line_num, line) in enumerate(file_content):
+                try:
+                    # Checks newlines preceding top-level function.
+                    if (
+                            line.startswith('def ')
+                            and file_content[line_num - 1] == '\n'
+                            and file_content[line_num - 2] == '\n'
+                            and file_content[line_num - 3] == '\n'):
+                        self.add_message(
+                            'definition-preceding-newline-count',
+                            line=line_num,
+                            args=('2', 'top-level function'),)
+                    # Checks newlines preceding top-level function with
+                    # decorator.
+                    elif (
+                            line.startswith('def ')
+                            and file_content[line_num - 1].startswith('@')
+                            and file_content[line_num - 2] == '\n'
+                            and file_content[line_num - 3] == '\n'
+                            and file_content[line_num - 4] == '\n'):
+                        self.add_message(
+                            'definition-preceding-newline-count',
+                            line=line_num,
+                            args=('2', 'top-level function'),)
+                    # Checks newlines preceding function definition inside a
+                    # class.
+                    elif (
+                            line.lstrip().startswith('def ')
+                            and line.startswith('   ')
+                            and file_content[line_num - 1] == '\n'
+                            and file_content[line_num - 2] == '\n'):
+                        self.add_message(
+                            'definition-preceding-newline-count',
+                            line=line_num,
+                            args=('1', 'function'),)
+                    # Checks newlines preceding function definition inside a
+                    # class with decorator.
+                    elif (
+                            line.lstrip().startswith('def ')
+                            and line.startswith('   ')
+                            and file_content[line_num - 1].lstrip().startswith(
+                                '@')
+                            and file_content[line_num - 2] == '\n'
+                            and file_content[line_num - 3] == '\n'):
+                        self.add_message(
+                            'definition-preceding-newline-count',
+                            line=line_num,
+                            args=('1', 'function'),)
+                    # Checks newlines preceding class definitions inside
+                    # classes.
+                    elif (
+                            line.lstrip().startswith('class ')
+                            and line.startswith('   ')
+                            and file_content[line_num - 1] == '\n'
+                            and file_content[line_num - 2] == '\n'):
+                        self.add_message(
+                            'definition-preceding-newline-count',
+                            line=line_num,
+                            args=('1', 'class'),)
+                    # Checks newlines preceding top-level class definitions.
+                    elif (
+                            line.startswith('class ')
+                            and file_content[line_num - 1] == '\n'
+                            and file_content[line_num - 2] == '\n'
+                            and file_content[line_num - 3] == '\n'):
+                        self.add_message(
+                            'definition-preceding-newline-count',
+                            line=line_num,
+                            args=('2', 'top-level class'),)
+                except IndexError:
+                    continue
+
+
 class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
     """Checker for single character files and newline at EOF."""
 
@@ -840,4 +938,5 @@ def register(linter):
     linter.register_checker(ImportOnlyModulesChecker(linter))
     linter.register_checker(BackslashContinuationChecker(linter))
     linter.register_checker(FunctionArgsOrderChecker(linter))
+    linter.register_checker(NewlineCountPrecedingDeclarationChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
