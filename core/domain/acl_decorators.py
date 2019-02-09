@@ -2377,8 +2377,7 @@ def can_access_story_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        story_id = urllib.unquote_plus(story_id)
-        story = story_services.get_story_by_id(story_id)
+        story = story_services.get_story_by_id(story_id, strict=False)
 
         if story is None:
             raise self.PageNotFoundException
