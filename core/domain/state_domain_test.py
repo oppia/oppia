@@ -577,15 +577,15 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             written_translations.get_available_languages(),
             expected_available_languages)
 
-    def test_get_all_content_ids_for_text_translation_return_correct_list_of_content_id(self): # pylint: disable=line-too-long
+    def test_get_content_ids_for_text_translation_return_correct_list_of_content_id(self): # pylint: disable=line-too-long
         written_translations = state_domain.WrittenTranslations.from_dict({})
         self.assertEqual(
-            written_translations.get_all_content_ids_for_text_translation(), [])
+            written_translations.get_content_ids_for_text_translation(), [])
 
         written_translations.add_content_id_for_translation('feedback_1')
         written_translations.add_content_id_for_translation('feedback_2')
         self.assertEqual(
-            written_translations.get_all_content_ids_for_text_translation(), [
+            written_translations.get_content_ids_for_text_translation(), [
                 'feedback_2', 'feedback_1'])
 
     def test_add_content_id_for_translations_adds_content_id(self):

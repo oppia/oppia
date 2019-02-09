@@ -874,7 +874,7 @@ class WrittenTranslations(object):
                 language_codes_set.add(language_code)
         return language_codes_set
 
-    def get_all_content_ids_for_text_translation(self):
+    def get_content_ids_for_text_translation(self):
         """Returns a list of content_id available for text translation.
 
         Returns:
@@ -1337,13 +1337,14 @@ class State(object):
         """
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
+        content_ids_for_text_translations = (
+            self.written_translations.get_content_ids_for_text_translation())
         for content_id in content_ids_to_delete:
             if not content_id in self.content_ids_to_audio_translations:
                 raise Exception(
                     'The content_id %s does not exist in '
                     'content_ids_to_audio_translations.' % content_id)
-            elif not content_id in (
-                    self.written_translations.get_all_content_ids_for_translation()): # pylint: disable=line-too-long
+            elif not content_id in content_ids_for_text_translations:
                 raise Exception(
                     'The content_id %s does not exist in written_translations.'
                     % content_id)
@@ -1357,8 +1358,7 @@ class State(object):
                 raise Exception(
                     'The content_id %s already exists in '
                     'content_ids_to_audio_translations.' % content_id)
-            elif content_id in (
-                    self.written_translations.get_all_content_ids_for_translation()): # pylint: disable=line-too-long
+            elif content_id in content_ids_for_text_translations:
                 raise Exception(
                     'The content_id %s does not exist in written_translations.'
                     % content_id)
