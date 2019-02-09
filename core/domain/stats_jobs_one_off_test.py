@@ -78,7 +78,7 @@ class PlaythroughAuditTests(OneOffJobTestBase):
 
     def create_exp_issues_with_playthroughs(self, playthrough_ids_list):
         """Helper method to create and return an ExplorationIssuesModel instance
-        with the given set of playthrough ids as reference issues.
+        with the given sets of playthrough ids as reference issues.
         """
         return stats_models.ExplorationIssuesModel.create(
             self.exp.id, self.exp.version, unresolved_issues=[
