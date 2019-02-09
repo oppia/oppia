@@ -292,9 +292,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         # Tests the case wherein storage layer does not import domain layer
         # in import statements.
         node_no_err_import = astroid.extract_node("""
-            import core.domain.activity_domain #@
+            import core.platform.email.gae_email_services #@
         """)
-        node_no_err_import.root().name = 'oppia.core.platform.email'
+        node_no_err_import.root().name = 'oppia.core.storage.topic'
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_import(node_no_err_import)
 
@@ -316,9 +316,9 @@ class RestrictedImportCheckerTests(unittest.TestCase):
         # Tests the case wherein storage layer does not import domain layer
         # in import-from statements.
         node_no_err_importfrom = astroid.extract_node("""
-            from core.domain import activity_domain #@
+            from core.platform.email import gae_email_services #@
         """)
-        node_no_err_importfrom.root().name = 'oppia.core.platform.email'
+        node_no_err_importfrom.root().name = 'oppia.core.storage.topicl'
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
 
