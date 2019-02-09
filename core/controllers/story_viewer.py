@@ -17,9 +17,9 @@
 from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import story_domain
 from core.domain import story_services
 import feconf
+
 
 class StoryPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
@@ -34,12 +34,14 @@ class StoryPageDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         completed_nodes = [completed_node.to_dict()
-            for completed_node in story_services.get_completed_nodes_in_story(
-            self.user_id, story_id)]
+                           for completed_node in
+                           story_services.get_completed_nodes_in_story(
+                               self.user_id, story_id)]
 
         pending_nodes = [pending_node.to_dict()
-            for pending_node in story_services.get_pending_nodes_in_story(
-            self.user_id, story_id)]
+                         for pending_node in
+                         story_services.get_pending_nodes_in_story(
+                             self.user_id, story_id)]
 
         self.values.update({
             'completed_nodes': completed_nodes,

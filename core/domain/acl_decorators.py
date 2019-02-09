@@ -2363,7 +2363,7 @@ def can_access_story_viewer_page(handler):
         function. The newly decorated function that now checks
             if the user can access the given story viewer page.
     """
-    
+
     def test_can_access(self, story_id, **kwargs):
         """Checks if the user can access story viewer page.
 
@@ -2387,7 +2387,7 @@ def can_access_story_viewer_page(handler):
             story_id, strict=False)
 
         if story_rights.story_is_published:
-            return handler(self, story_id, **kwargs) 
+            return handler(self, story_id, **kwargs)
         else:
             raise self.PageNotFoundException
     test_can_access.__wrapped__ = True

@@ -21,6 +21,7 @@ from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
+
 class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
 
     def _record_completion(self, user_id, STORY_ID, node_id):
@@ -77,8 +78,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story.story_contents.next_node_id = 'node_3'
         story_services.save_new_story(self.admin_id, story)
         self.logout()
-        
+
         self._record_completion(self.viewer_id, self.STORY_ID_1, self.NODE_ID_1)
+
 
 class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
     def test_get(self):
@@ -88,7 +90,6 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
                 '%s/%s' % (feconf.STORY_DATA_HANDLER, 'story_id_1'))
             expected_dict = {
                 'completed_nodes': [self.node_1],
-                'pending_nodes':[self.node_2]
+                'pending_nodes': [self.node_2]
             }
             self.assertDictContainsSubset(expected_dict, json_response)
-
