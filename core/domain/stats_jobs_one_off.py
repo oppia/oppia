@@ -39,136 +39,43 @@ import feconf
 PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
 
 
-class DeleteIllegalPlaythroughsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for deleting illegal playthroughs.
-
-    Playthroughs were introduced as a GSoC 2018 project. During the project,
-    some playthroughs were recorded which did not satisfy the requirements we
-    now place on them. This one-off job aims to get rid of such playthroughs to
-    keep the database healthy.
-
-    Specifically, we will remove playthroughs which were:
-      - Created before the final release of the project, because these
-        playthroughs did not use validation logic before being submitted into
-        the database.
-      - Created for an exploration which is not curated for playthroughs,
-        because playthroughs have the potential to store personally-identifiable
-        information. We want to ensure that we never record playthroughs in
-        explorations with malicious interactions (for example: TextInput ->
-        "Enter your credit card number"). We currently accomplish this by only
-        recording playthroughs in explorations admins feel confident are safe.
-
-    Ensures:
-        All Playthrough models deleted are removed as a reference from their
-            associated PlaythroughIssue model.
-        PlaythroughIssues models without any legal playthrough references are
-            deleted.
-        Individual PlaythroughIssues without any legal playthrough references
-            are deleted.
+class ExplorationIssuesModelCreatorOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for creating a default ExplorationIsssues model instance
+    for all the explorations in the datastore. If an ExplorationIssues model
+    already exists for an exploration, it is refreshed to a default instance.
     """
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [stats_models.PlaythroughIssuesModel]
-
-    @classmethod
-    def is_illegal(cls, playthrough_model):
-        """Returns whether the given playthrough model is illegal.
-
-        Args:
-            playthrough_model: stats_models.PlaythroughModel | None.
-
-        Returns:
-            bool. Whether the playthrough model is illegal, and should thus be
-            deleted.
-        """
-        whitelisted_exploration_ids = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
-        return (
-            playthrough_model.exp_id not in whitelisted_exploration_ids or
-            playthrough_model.created_on < PLAYTHROUGH_PROJECT_RELEASE_DATETIME)
-
-    @classmethod
-    def delete_illegal_playthroughs(cls, playthrough_issue_backend_dict):
-        """Deletes illegal playthroughs referenced by the given playthrough
-        issue.
-
-        Args:
-            playthrough_issue_backend_dict: dict(str : *). The backend dict
-                representation of a stats_domain.PlaythroughIssue object.
-
-        Returns:
-            tuple(int, int). A 2-tuple with the structure:
-                (playthroughs_deleted, playthroughs_remaining).
-        """
-        playthroughs_to_remain = []
-        playthroughs_to_delete = []
-
-        ids = playthrough_issue_backend_dict['playthrough_ids']
-        for playthrough in stats_models.PlaythroughModel.get_multi(ids):
-            if playthrough is None or playthrough.deleted:
-                continue
-            target_playthrough_list = (
-                playthroughs_to_delete if cls.is_illegal(playthrough) else
-                playthroughs_to_remain)
-            target_playthrough_list.append(playthrough)
-
-        stats_models.PlaythroughModel.delete_multi(playthroughs_to_delete)
-        playthrough_issue_backend_dict['playthrough_ids'] = [
-            playthrough.id for playthrough in playthroughs_to_remain]
-
-        return (len(playthroughs_to_delete), len(playthroughs_to_remain))
+        return [exp_models.ExplorationModel]
 
     @staticmethod
-    def map(playthrough_issues_model):
-        """Deletes any illegal playthroughs associated to the given issues. Must
-        be declared @staticmethod.
-
-        Args:
-            playthrough_issues_model: PlaythroughIssuesModel.
-
-        Yields:
-            tuple(str, int). Returns the exploration id the given model is
-            associated to, and the number of playthroughs deleted from it.
-        """
-        if playthrough_issues_model.deleted:
-            return
-
-        remaining_issues = []
-        total_playthroughs_deleted = 0
-        for issue in playthrough_issues_model.unresolved_issues:
-            playthroughs_deleted, playthroughs_remaining = (
-                DeleteIllegalPlaythroughsOneOffJob.delete_illegal_playthroughs(
-                    issue))
-            total_playthroughs_deleted += playthroughs_deleted
-            if playthroughs_remaining:
-                remaining_issues.append(issue)
-
-        if remaining_issues:
-            playthrough_issues_model.unresolved_issues = remaining_issues
-            playthrough_issues_model.put()
-        else:
-            playthrough_issues_model.delete()
-
-        yield (playthrough_issues_model.exp_id, total_playthroughs_deleted)
+    def map(exploration_model):
+        if not exploration_model.deleted:
+            current_version = exploration_model.version
+            for exp_version in xrange(1, current_version + 1):
+                exp_issues_model = (
+                    stats_models.ExplorationIssuesModel.get_model(
+                        exploration_model.id, exp_version))
+                if not exp_issues_model:
+                    exp_issues_default = (
+                        stats_domain.ExplorationIssues.create_default(
+                            exploration_model.id, exp_version))
+                    stats_models.ExplorationIssuesModel.create(
+                        exp_issues_default.exp_id,
+                        exp_issues_default.exp_version,
+                        exp_issues_default.unresolved_issues)
+                else:
+                    exp_issues_model.unresolved_issues = []
+                    exp_issues_model.put()
+            yield(
+                exploration_model.id,
+                'ExplorationIssuesModel created')
 
     @staticmethod
-    def reduce(key, stringified_values):
-        """Calculates total playthroughs deleted from a particular exploration.
-        Must be declared @staticmethod.
-
-        Args:
-            key: str. The id of the exploration.
-            stringified_values: list(str). Each item is a stringified count of
-                how many playthroughs were deleted by a map job.
-
-        Yields:
-            tuple(str). A 1-tuple containing a string which summarizes how many
-            playthroughs were deleted.
-        """
-        yield (
-            'exploration_id:%s has had %d illegal playthrough recordings '
-            'deleted.' % (key, sum(map(int, stringified_values))),)
+    def reduce(exp_id, values):
+        yield '%s: %s' % (exp_id, values)
 
 
 class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
@@ -209,10 +116,23 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
         else:
             validate_error = None
 
+        exp_id = playthrough_model.exp_id
+        exp_version = playthrough_model.exp_version
+        exp_issues = (
+            stats_models.ExplorationIssuesModel.get_model(exp_id, exp_version))
+        reference_error = (
+            'This playthrough was not found as a reference in the containing '
+            'ExplorationIssuesModel (id=%s)' % (exp_issues.id))
+        for exp_issue_dict in exp_issues.unresolved_issues:
+            if playthrough_model.id in exp_issue_dict['playthrough_ids']:
+                reference_error = None
+                break
+
         audit_data = {
             'exp_id': playthrough_model.exp_id,
             'created_on': playthrough_model.created_on.strftime('%Y-%m-%d'),
             'validate_error': validate_error,
+            'reference_error': reference_error,
         }
         yield (playthrough_model.id, audit_data)
 
@@ -260,44 +180,10 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     'GSoC 2018 submission deadline (2018-09-01) and should '
                     'therefore not exist.' % (key, audit_data['created_on']),)
 
-
-class PlaythroughIssuesModelCreatorOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for creating a default ExplorationIsssues model instance
-    for all the explorations in the datastore. If an PlaythroughIssues model
-    already exists for an exploration, it is refreshed to a default instance.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exploration_model):
-        if not exploration_model.deleted:
-            current_version = exploration_model.version
-            for exp_version in xrange(1, current_version + 1):
-                playthrough_issues_model = (
-                    stats_models.PlaythroughIssuesModel.get_model(
-                        exploration_model.id, exp_version))
-                if not playthrough_issues_model:
-                    playthrough_issues_default = (
-                        stats_domain.PlaythroughIssues.create_default(
-                            exploration_model.id, exp_version))
-                    stats_models.PlaythroughIssuesModel.create(
-                        playthrough_issues_default.exp_id,
-                        playthrough_issues_default.exp_version,
-                        playthrough_issues_default.unresolved_issues)
-                else:
-                    playthrough_issues_model.unresolved_issues = []
-                    playthrough_issues_model.put()
-            yield(
-                exploration_model.id,
-                'PlaythroughIssuesModel created')
-
-    @staticmethod
-    def reduce(exp_id, values):
-        yield '%s: %s' % (exp_id, values)
+            if audit_data['reference_error'] is not None:
+                yield (
+                    'playthrough_id:%s is not referenced by any issue. '
+                    'Details: %s.' % (key, audit_data['reference_error']),)
 
 
 class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):

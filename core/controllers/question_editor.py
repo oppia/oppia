@@ -137,8 +137,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
                 'The question with the given id doesn\'t exist.')
 
         commit_message = self.payload.get('commit_message')
-        if not question_id:
-            raise self.PageNotFoundException
+
         if not commit_message:
             raise self.PageNotFoundException
         if not self.payload.get('change_list'):
