@@ -735,7 +735,7 @@ class Skill(object):
         new_content_ids = [worked_example.content_id for worked_example in (
             self.skill_contents.worked_examples)]
 
-        self._update_content_ids_in_assets(new_content_ids, old_content_ids)
+        self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 
     def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
         """Adds or deletes content ids in content_ids_to_audio_translations and

@@ -174,6 +174,9 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'content': {}
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -195,6 +198,9 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'content': {}
+                },
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -212,6 +218,9 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'content': {}
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -357,6 +366,9 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'content': {}
+                }
             }, json_response['subtopic_page']['page_contents'])
             json_response = self.get_json(
                 '%s/%s/%s' % (
@@ -376,6 +388,9 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                         }
                     }
                 },
+                'written_translations': {
+                    'content': {}
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
