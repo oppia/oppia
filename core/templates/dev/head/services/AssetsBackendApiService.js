@@ -212,8 +212,7 @@ oppia.factory('AssetsBackendApiService', [
           if (_isCached(filename)) {
             resolve(AudioFileObjectFactory.createNew(
               filename, assetsCache[filename]));
-          } else if (!_isAssetCurrentlyBeingRequested(filename,
-            ASSET_TYPE_AUDIO)) {
+          } else {
             _fetchFile(explorationId, filename, ASSET_TYPE_AUDIO,
               resolve, reject);
           }
@@ -224,8 +223,7 @@ oppia.factory('AssetsBackendApiService', [
           if (_isCached(filename)) {
             resolve(ImageFileObjectFactory.createNew(
               filename, assetsCache[filename]));
-          } else if (!_isAssetCurrentlyBeingRequested(filename,
-            ASSET_TYPE_IMAGE)) {
+          } else {
             _fetchFile(explorationId, filename, ASSET_TYPE_IMAGE,
               resolve, reject);
           }
