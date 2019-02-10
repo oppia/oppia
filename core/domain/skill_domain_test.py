@@ -34,7 +34,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml(
                 '1', 'Explanation'), [
                     state_domain.SubtitledHtml('2', 'Example 1')],
-            {'1': {}, '2': {}})
+            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+                {'1': {}, '2': {}}))
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', 'notes', 'default_feedback')]
         self.skill = skill_domain.Skill(
@@ -127,10 +128,16 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'Expected skill_contents to be a SkillContents object')
 
     def test_skill_contents_audio_validation(self):
-        self.skill.skill_contents.worked_examples = [
-            state_domain.SubtitledHtml('content_id_1', '<p>Hello</p>'),
-            state_domain.SubtitledHtml('content_id_2', '<p>Hello 2</p>')
-        ]
+        self.skill.update_worked_examples([
+            {
+                'content_id': 'content_id_1',
+                'html': '<p>Hello</p>'
+            },
+            {
+                'content_id': 'content_id_2',
+                'html': '<p>Hello 2</p>'
+            }
+        ])
         self.skill.skill_contents.content_ids_to_audio_translations = {
             'content_id_3': {}
         }
@@ -163,7 +170,12 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                     'html': feconf.DEFAULT_SKILL_EXPLANATION,
                     'content_id': 'explanation'
                 },
-                'content_ids_to_audio_translations': {},
+                'content_ids_to_audio_translations': {
+                    'explanation': {}
+                },
+                'written_translations': {
+                    'explanation': {}
+                },
                 'worked_examples': []
             },
             'misconceptions_schema_version': (
@@ -186,7 +198,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', 'Explanation'), [
-                state_domain.SubtitledHtml('2', 'Example 1')], {})
+                state_domain.SubtitledHtml('2', 'Example 1')],
+            {'1': {}, '2': {}}, state_domain.WrittenTranslations(
+                {'1': {}, '2': {}}))
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(
             skill_contents_dict)
