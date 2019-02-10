@@ -150,7 +150,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATES_SCHEMA_VERSION = 26
+CURRENT_STATES_SCHEMA_VERSION = 27
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -211,6 +211,11 @@ DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # Default content_ids_to_audio_translations dict for a default state template.
 DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
+    'content': {},
+    'default_outcome': {}
+}
+# Default written_translations dict for a default state template.
+DEFAULT_WRITTEN_TRANSLATIONS = {
     'content': {},
     'default_outcome': {}
 }
@@ -452,7 +457,7 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
 # The maximum size of an uploaded file, in bytes.
-MAX_FILE_SIZE_BYTES = 1048576
+MAX_FILE_SIZE_BYTES = 4048576
 
 # The maximum playback length of an audio file, in seconds.
 MAX_AUDIO_FILE_LENGTH_SEC = 300

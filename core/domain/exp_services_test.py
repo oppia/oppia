@@ -1272,6 +1272,9 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
   New state:
     classifier_model_id: null
     content:
@@ -1301,6 +1304,9 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
 states_schema_version: %d
 tags: []
 title: A title
@@ -1352,6 +1358,9 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
   Renamed state:
     classifier_model_id: null
     content:
@@ -1381,6 +1390,9 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
 states_schema_version: %d
 tags: []
 title: A title
@@ -1558,6 +1570,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
     SAMPLE_EXPORTED_DICT = {
@@ -1590,6 +1605,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """)
     }
 
@@ -1623,6 +1641,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """)
     }
 
@@ -2082,6 +2103,21 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                         'html': '<b>Test content</b>',
                     }),
                 '')
+
+    def test_update_written_translations(self):
+        """Test update content translations."""
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                self.init_state_name, 'written_translations', {
+                    'content': {
+                        'hi': {
+                            'html': '<p>Test!</p',
+                            'needs_update': True
+                        }
+                    },
+                    'default_outcome': {}
+                }),
+            'Added text translations.')
 
 
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
@@ -3043,6 +3079,8 @@ states:
       id: EndExploration
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
   %s:
     classifier_model_id: null
     content:
@@ -3070,6 +3108,9 @@ states:
       id: Continue
       solution: null
     param_changes: []
+    written_translations:
+      content: {}
+      default_outcome: {}
 states_schema_version: %d
 tags: []
 title: Old Title

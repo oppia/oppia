@@ -459,6 +459,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """),
         'State B': ("""classifier_model_id: null
 content:
@@ -488,6 +491,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
 content:
@@ -517,6 +523,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
@@ -548,6 +557,9 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  content: {}
+  default_outcome: {}
 """)
 
     def test_exploration_download_handler_for_default_exploration(self):
