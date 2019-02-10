@@ -854,7 +854,7 @@ class EmptySubtitledHtmlAuditJob(jobs.BaseMapReduceOneOffJobManager):
         for state_name, state in exploration.states.iteritems():
             empty_html_content_id_list = []
             content = state.content
-            if not (content.html).strip():
+            if not content.html.strip():
                 empty_html_content_id_list.append(content.content_id)
 
             for answer_group in state.interaction.answer_groups:
@@ -863,7 +863,8 @@ class EmptySubtitledHtmlAuditJob(jobs.BaseMapReduceOneOffJobManager):
                     empty_html_content_id_list.append(feedback.content_id)
 
             default_outcome = state.interaction.default_outcome
-            if default_outcome and not default_outcome.feedback.html:
+            if default_outcome is not None and not (
+                    default_outcome.feedback.html):
                 empty_html_content_id_list.append(
                     default_outcome.feedback.content_id)
 
@@ -873,7 +874,7 @@ class EmptySubtitledHtmlAuditJob(jobs.BaseMapReduceOneOffJobManager):
                     empty_html_content_id_list.append(hint_content.content_id)
 
             solution = state.interaction.solution
-            if solution and not solution.explanation.html:
+            if solution is not None and not solution.explanation.html:
                 empty_html_content_id_list.append(
                     solution.explanation.content_id)
             if empty_html_content_id_list:

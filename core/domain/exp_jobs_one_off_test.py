@@ -2707,6 +2707,9 @@ class EmptySubtitledHtmlAuditJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_audit_job_with_empty_html_exploration_returns_content_id(self):
+        """Test to check the audit job returns correct list of content id which
+        have empty html.
+        """
 
         exploration = self.save_new_valid_exploration(
             self.EXP_ID_1, self.owner_id, end_state_name='End card')
@@ -2812,8 +2815,7 @@ class EmptySubtitledHtmlAuditJobTest(test_utils.GenericTestBase):
             'u\'End card:EndExploration\': [u\'content\'], '
             'u\'Introduction:TextInput\': ['
             'u\'content\', u\'feedback_1\', u\'hint_1\', u\'solution\']'
-            '}]'
-            ']'
+            '}]]'
         ]
         actual_output = exp_jobs_one_off.EmptySubtitledHtmlAuditJob.get_output(
             job_id)
