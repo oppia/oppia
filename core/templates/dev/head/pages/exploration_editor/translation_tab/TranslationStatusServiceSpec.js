@@ -16,7 +16,7 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
-describe('Translation status service', function() {
+fdescribe('Translation status service', function() {
   beforeEach(module('oppia', function($provide) {
     $provide.value('TranslationLanguageService', {
       audioTranslation: {filename: 'content-en-1hnku9cy13.mp3',
@@ -43,10 +43,13 @@ describe('Translation status service', function() {
       },
       getContentIdsToAudioTranslationsMemento: function(stateName) {
         if (stateName === 'First') {
-          return {_contentIdsToAudioTranslations: {feedback_1: {},
-            default_outcome: {},
-            content: {en: {filename: 'content-en-1hnku9cy13.mp3',
-              fileSizeBytes: 56842, needsUpdate: true}}}};
+          return ContentIdsToAudioTranslationsObjectFactory.
+            createFromBackendDict({_contentIdsToAudioTranslations: {
+              feedback_1: {},
+              default_outcome: {},
+              content: {en: {filename: 'content-en-1hnku9cy13.mp3',
+                fileSizeBytes: 56842, needsUpdate: true}}}
+              });
         }
       },
       getInteractionIdMemento: function(stateName) {
@@ -61,11 +64,14 @@ describe('Translation status service', function() {
     var tss = null;
     beforeEach(inject(function($injector) {
       tss = $injector.get('TranslationStatusService');
+      ContentIdsToAudioTranslationsObjectFactory = $injector.get(
+        'ContentIdsToAudioTranslationsObjectFactory');
     }));
 
     it('should get state names that need audio update', function() {
+      tss.getAllStateStatusColors();
       var allStatesNeedingUpdate = tss.getAllStatesNeedUpdatewarning();
-      // expect(allStatesNeedingUpdate.First).toBe('Audio needs update!');
+      expect(allStatesNeedingUpdate.First).toBe('Audio needs update!');
     });
   });
 });
