@@ -41,6 +41,13 @@ install_node_module postcss-syntax 0.10.0
 install_node_module stylelint 9.2.1
 install_node_module stylelint-config-standard 18.2.0
 install_node_module through2 2.0.0
+install_node_module @types/angular 1.6.54
+install_node_module @types/googlemaps 3.30.16
+install_node_module @types/jasmine 3.3.8
+install_node_module @types/jquery 3.3.29
+install_node_module @types/node 10.12.24
+install_node_module @types/q 0.0.32
+install_node_module @types/selenium-webdriver 2.53.43
 install_node_module uglify-js 3.3.11
 install_node_module yargs 3.29.0
 
