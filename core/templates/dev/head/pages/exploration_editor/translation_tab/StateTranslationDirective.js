@@ -27,18 +27,20 @@ oppia.directive('stateTranslation', [
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_directive.html'),
       controller: [
-        '$scope', '$filter', '$rootScope', 'StateEditorService',
-        'ExplorationStatesService', 'ExplorationInitStateNameService',
-        'ExplorationCorrectnessFeedbackService', 'RouterService',
-        'TranslationStatusService', 'COMPONENT_NAME_CONTENT',
+        '$filter', '$rootScope', '$scope',
+        'ExplorationCorrectnessFeedbackService',
+        'ExplorationInitStateNameService', 'ExplorationStatesService',
+        'RouterService', 'StateEditorService', 'TranslationStatusService',
+        'TranslationTabActiveContentIdService', 'COMPONENT_NAME_CONTENT',
         'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
         'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
         'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
-            $scope, $filter, $rootScope, StateEditorService,
-            ExplorationStatesService, ExplorationInitStateNameService,
-            ExplorationCorrectnessFeedbackService, RouterService,
-            TranslationStatusService, COMPONENT_NAME_CONTENT,
+            $filter, $rootScope, $scope,
+            ExplorationCorrectnessFeedbackService,
+            ExplorationInitStateNameService, ExplorationStatesService,
+            RouterService, StateEditorService, TranslationStatusService,
+            TranslationTabActiveContentIdService, COMPONENT_NAME_CONTENT,
             COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
             RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
@@ -62,7 +64,6 @@ oppia.directive('stateTranslation', [
           $scope.stateDefaultOutcome = null;
           $scope.stateHints = [];
           $scope.stateSolution = null;
-          $scope.activeContentId = null;
           $scope.needsUpdateTooltipMessage = 'Audio needs update to match ' +
             'text. Please record new audio.';
 
@@ -79,25 +80,27 @@ oppia.directive('stateTranslation', [
               $rootScope.$broadcast('showTranslationTabBusyModal');
               return;
             }
+            var activecontentId = null;
             if (tabId === $scope.TAB_ID_CONTENT) {
-              $scope.activeContentId = $scope.stateContent.getContentId();
+              activeContentId = $scope.stateContent.getContentId();
             } else if (tabId === $scope.TAB_ID_FEEDBACK) {
               $scope.activeAnswerGroupIndex = 0;
               if ($scope.stateAnswerGroups.length > 0) {
-                $scope.activeContentId = $scope.stateAnswerGroups[0]
-                  .outcome.feedback.getContentId();
+                activeContentId = (
+                  $scope.stateAnswerGroups[0].outcome.feedback.getContentId());
               } else {
-                $scope.activeContentId = $scope.stateDefaultOutcome
-                  .feedback.getContentId();
+                activeContentId = (
+                  $scope.stateDefaultOutcome.feedback.getContentId());
               }
             } else if (tabId === $scope.TAB_ID_HINTS) {
               $scope.activeHintIndex = 0;
-              $scope.activeContentId = $scope.stateHints[0]
-                .hintContent.getContentId();
+              activeContentId = (
+                $scope.stateHints[0].hintContent.getContentId());
             } else if (tabId === $scope.TAB_ID_SOLUTION) {
-              $scope.activeContentId = $scope.stateSolution.explanation
-                .getContentId();
+              activeContentId = $scope.stateSolution.explanation.getContentId();
             }
+            TranslationTabActiveContentIdService.setActiveContentId(
+              activeContentId);
             $scope.activatedTabId = tabId;
           };
 
@@ -204,8 +207,10 @@ oppia.directive('stateTranslation', [
               return;
             }
             $scope.activeHintIndex = newIndex;
-            $scope.activeContentId = $scope.stateHints[newIndex]
-              .hintContent.getContentId();
+            var activeContentId = (
+              $scope.stateHints[newIndex].hintContent.getContentId());
+            TranslationTabActiveContentIdService.setActiveContentId(
+              activeContentId);
           };
 
           $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -213,16 +218,18 @@ oppia.directive('stateTranslation', [
               $rootScope.$broadcast('showTranslationTabBusyModal');
               return;
             }
-            if ($scope.activeAnswerGroupIndex === newIndex) {
-              return;
-            }
-            $scope.activeAnswerGroupIndex = newIndex;
-            if (newIndex === $scope.stateAnswerGroups.length) {
-              $scope.activeContentId = $scope.stateDefaultOutcome
-                .feedback.getContentId();
-            } else {
-              $scope.activeContentId = $scope.stateAnswerGroups[newIndex]
-                .outcome.feedback.getContentId();
+            if ($scope.activeAnswerGroupIndex !== newIndex) {
+              var activeContentId = null;
+              $scope.activeAnswerGroupIndex = newIndex;
+              if (newIndex === $scope.stateAnswerGroups.length) {
+                activeContentId = (
+                  $scope.stateDefaultOutcome.feedback.getContentId());
+              } else {
+                activeContentId = ($scope.stateAnswerGroups[newIndex]
+                  .outcome.feedback.getContentId());
+              }
+              TranslationTabActiveContentIdService.setActiveContentId(
+                activeContentId);
             }
           };
 
@@ -261,15 +268,7 @@ oppia.directive('stateTranslation', [
           });
 
           $scope.initStateTranslation = function() {
-            $scope.activatedTabId = $scope.TAB_ID_CONTENT;
-
-            if (!StateEditorService.getActiveStateName()) {
-              StateEditorService.setActiveStateName(
-                ExplorationInitStateNameService.displayed);
-            }
-
             $scope.stateName = StateEditorService.getActiveStateName();
-
             $scope.stateContent = ExplorationStatesService
               .getStateContentMemento($scope.stateName);
             $scope.stateSolution = ExplorationStatesService
@@ -284,22 +283,14 @@ oppia.directive('stateTranslation', [
               .getInteractionIdMemento($scope.stateName);
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
-
             var currentCustomizationArgs = ExplorationStatesService
               .getInteractionCustomizationArgsMemento($scope.stateName);
             $scope.answerChoices = StateEditorService.getAnswerChoices(
               $scope.stateInteractionId, currentCustomizationArgs);
+
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
-
-          // TODO(DubeySandeep): We need to call initStateTranslation() here in
-          // case the listener that receives 'refreshStateTranslation' is not
-          // set by the time it is broadcasted from ExplorationEditor.js. Figure
-          // out a solution that does not rely on covering the race condition.
-          if (ExplorationStatesService.isInitialized()) {
-            $scope.initStateTranslation();
-          }
-          $rootScope.loadingMessage = '';
+          $scope.initStateTranslation();
         }
       ]
     };

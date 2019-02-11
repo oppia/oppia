@@ -18,6 +18,7 @@ import logging
 
 # pylint: disable=relative-import
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import classifier
@@ -48,7 +49,6 @@ from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import translator
-from core.domain import acl_decorators
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -468,6 +468,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler),
+    get_redirect_route(
+        r'/createhandler/started_translation_tutorial_event/<exploration_id>',
+        translator.StartedTranslationTutorialEventHandler),
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',
         editor.EditorAutosaveHandler),

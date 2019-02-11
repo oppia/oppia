@@ -1,4 +1,8 @@
-<div class="oppia-translation-tab">
+<div class="oppia-translation-tab" ng-if="showTranslationTabSubDirectives"
+     ng-joy-ride="translationTutorial"
+     config="TRANSLATION_TUTORIAL_OPTIONS"
+     on-finish="onFinishTutorial()"
+     on-skip="onSkipTutorial()">
   <div class="oppia-translator-overview">
     <translator-overview is-translation-tab-busy="isTranslationTabBusy"></translator-overview>
   </div>
