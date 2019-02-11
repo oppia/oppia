@@ -63,7 +63,7 @@ describe('Translation status service', function() {
       tss = $injector.get('TranslationStatusService');
     }));
 
-    it('should get state names that need audio update',function() {
+    it('should get state names that need audio update', function() {
       var allStatesNeedingUpdate = tss.getAllStatesNeedUpdatewarning();
       expect(allStatesNeedingUpdate.First).toBe('Audio needs update!');
     });
