@@ -16,7 +16,7 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
-describe('Translation status service', function() {
+fdescribe('Translation status service', function() {
   beforeEach(module('oppia', function($provide) {
     $provide.value('TranslationLanguageService', {
       audioTranslation: {filename: 'content-en-1hnku9cy13.mp3',
@@ -44,9 +44,9 @@ describe('Translation status service', function() {
       getContentIdsToAudioTranslationsMemento: function(stateName) {
         if (stateName === 'First') {
           return {_contentIdsToAudioTranslations: {feedback_1: {},
-          default_outcome: {},
-          content:{en:{filename: 'content-en-1hnku9cy13.mp3',
-          fileSizeBytes: 56842, needsUpdate: true}}}};
+            default_outcome: {},
+            content:{en: {filename: 'content-en-1hnku9cy13.mp3',
+              fileSizeBytes: 56842, needsUpdate: true}}}};
         }
       },
       getInteractionIdMemento: function(stateName) {
@@ -66,8 +66,7 @@ describe('Translation status service', function() {
     it('should get all state names that need update in Audio Translations', function() {
       var allStatesNeedingUpdate = tss.getAllStatesNeedUpdatewarning();
       console.log(JSON.stringify(allStatesNeedingUpdate));
-      expect(allStatesNeedingUpdate['First']).toBe('Audio needs update!');
-      expect(allStatesNeedingUpdate['end']).toBe(undefined);
+      expect(allStatesNeedingUpdate.First).toBe('Audio needs update!');
     });
   });
 });
