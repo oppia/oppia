@@ -16,16 +16,16 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
- describe('Translation status service', function() {
+describe('Translation status service', function() {
   beforeEach(module('oppia', function($provide) {
     $provide.value('TranslationLanguageService', {
-      audioTranslation: {'filename':'content-en-1hnku9cy13.mp3',
-      fileSizeBytes: 56842, 'needsUpdate':true},
+      audioTranslation: {filename: 'content-en-1hnku9cy13.mp3',
+        fileSizeBytes: 56842, needsUpdate: true},
       getActiveLanguageCode: function() {
         return ['en'];
       },
       availableTranslationLanguageCodes: ['en'],
-      allContentId: ['content', 'default_outcome', 'feedback_1'] 
+      allContentId: ['content', 'default_outcome', 'feedback_1']
     });
     $provide.value('StateContentIdsToAudioTranslationsService', {
       displayed: {
@@ -36,18 +36,21 @@
     });
     $provide.value('ExplorationStatesService', {
       isInitialized: function() {
-      return true;
+        return true;
       },
       getStateNames: function() {
         return ['First'];
       },
       getContentIdsToAudioTranslationsMemento: function(stateName) {
-        if(stateName === 'First') {
-          return {'_contentIdsToAudioTranslations':{'feedback_1':{}, 'default_outcome':{}, 'content':{'en':{'filename':'content-en-1hnku9cy13.mp3', fileSizeBytes: 56842, 'needsUpdate':true}}}};
+        if (stateName === 'First') {
+          return {_contentIdsToAudioTranslations: {feedback_1: {},
+          default_outcome: {},
+          content:{en:{filename: content-en-1hnku9cy13.mp3,
+          fileSizeBytes: 56842, needsUpdate: true}}}};
         }
       },
       getInteractionIdMemento: function(stateName) {
-        if(stateName === 'First') {
+        if (stateName === 'First') {
           return 'MultipleChoiceInput';
         }
       }
