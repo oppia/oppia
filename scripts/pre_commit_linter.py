@@ -1537,15 +1537,15 @@ def _check_sorted_dependencies(all_files, parsed_js_files):
                     if sorted_imports != function_args:
                         failed = True
                         print (
-                            'Please ensure that %s in %s, the injected '
-                            'dependecies should be in the following manner:'
+                            'Please ensure that in %s in %s, the injected '
+                            'dependencies should be in the following manner:'
                             ' dollar imports, regular imports and constant '
                             'imports, all in sorted order.'
                             % (property_value, filename))
                     if sorted_imports != literal_args:
                         failed = True
                         print (
-       	                    'Please ensure that %s in %s, the stringfied '
+       	                    'Please ensure that in %s in %s, the stringfied '
        	                    'dependencies should be in the following '
        	                    'manner: dollar imports, regular imports and '
        	                    'constant imports, all in sorted order.'
@@ -1556,13 +1556,12 @@ def _check_sorted_dependencies(all_files, parsed_js_files):
             summary_message = (
                 '%s  Sorted dependencies check failed' % (
                     _MESSAGE_TYPE_FAILED))
-            summary_messages.append(summary_message)
         else:
             summary_message = (
                 '%s  Sorted dependencies check passed' % (
                     _MESSAGE_TYPE_SUCCESS))
-            summary_messages.append(summary_message)
 
+    summary_messages.append(summary_message)
     print summary_message
     print ''
     print '----------------------------------------'
