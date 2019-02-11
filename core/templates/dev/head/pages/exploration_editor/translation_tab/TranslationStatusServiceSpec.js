@@ -48,7 +48,7 @@ describe('Translation status service', function() {
               feedback_1: {},
               default_outcome: {},
               content: {en: {filename: 'content-en-1hnku9cy13.mp3',
-                fileSizeBytes: 56842, needsUpdate: true}}}
+              fileSizeBytes: 56842, needsUpdate: true}}}
               });
         }
       },
