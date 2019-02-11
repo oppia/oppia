@@ -266,6 +266,273 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
             checker_test_object.checker.visit_functiondef(functiondef_node2)
 
 
+class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
+
+    def test_newline_count_preceding_function_or_class(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.NewlineCountPrecedingDeclarationChecker)
+        checker_test_object.setup_method()
+        # Tests top-level functions.
+        # Case with error.
+        node_toplevel_function = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n\n\ndef dummy_def()""")
+        node_toplevel_function.file = filename
+        node_toplevel_function.path = filename
+
+        checker_test_object.checker.process_module(node_toplevel_function)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='definition-preceding-newline-count',
+                line=3,
+                args=('2', 'top-level function'),
+            ),
+        ):
+            temp_file.close()
+
+        # Case without an error.
+        node_toplevel_function = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n\ndef dummy_def()""")
+        node_toplevel_function.file = filename
+        node_toplevel_function.path = filename
+
+        checker_test_object.checker.process_module(node_toplevel_function)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()
+
+        # Tests top-level functions with decorator.
+        # Case with error.
+        node_toplevel_function_with_decorator = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n\n\n@some_decorator\ndef dummy_def()
+            """)
+        node_toplevel_function_with_decorator.file = filename
+        node_toplevel_function_with_decorator.path = filename
+
+        checker_test_object.checker.process_module(
+            node_toplevel_function_with_decorator)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='definition-preceding-newline-count',
+                line=4,
+                args=('2', 'top-level function'),
+            ),
+        ):
+            temp_file.close()
+
+        # Case without error.
+        node_toplevel_function_with_decorator = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n\n@some_decorator\ndef dummy_def()
+            """)
+        node_toplevel_function_with_decorator.file = filename
+        node_toplevel_function_with_decorator.path = filename
+
+        checker_test_object.checker.process_module(
+            node_toplevel_function_with_decorator)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()
+
+        # Tests top-level class.
+        # Case with error.
+        node_toplevel_class = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n\n\nclass dummy_class()""")
+        node_toplevel_class.file = filename
+        node_toplevel_class.path = filename
+
+        checker_test_object.checker.process_module(
+            node_toplevel_class)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='definition-preceding-newline-count',
+                line=3,
+                args=('2', 'top-level class'),
+            ),
+        ):
+            temp_file.close()
+
+        # Case without error.
+        node_toplevel_class = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n\nclass dummy_class()""")
+        node_toplevel_class.file = filename
+        node_toplevel_class.path = filename
+
+        checker_test_object.checker.process_module(
+            node_toplevel_class)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()
+
+        # Tests a function not top-layer (e.g. a class function).
+        # Case with error.
+        node_lowlevel_function = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n\n   def dummy_def()""")
+        node_lowlevel_function.file = filename
+        node_lowlevel_function.path = filename
+
+        checker_test_object.checker.process_module(
+            node_lowlevel_function)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='definition-preceding-newline-count',
+                line=2,
+                args=('1', 'function'),
+            ),
+        ):
+            temp_file.close()
+
+        # Case without error.
+        node_lowlevel_function = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n   def dummy_def()""")
+        node_lowlevel_function.file = filename
+        node_lowlevel_function.path = filename
+
+        checker_test_object.checker.process_module(
+            node_lowlevel_function)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()
+
+        # Tests a function not top-layer (e.g. a class function) with
+        # decorator.
+        # Case with error.
+        node_lowlevel_function_with_decorator = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n\n    @some_decorator\n    def dummy_def()""")
+        node_lowlevel_function_with_decorator.file = filename
+        node_lowlevel_function_with_decorator.path = filename
+
+        checker_test_object.checker.process_module(
+            node_lowlevel_function_with_decorator)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='definition-preceding-newline-count',
+                line=3,
+                args=('1', 'function'),
+            ),
+        ):
+            temp_file.close()
+
+        # Case without error.
+        node_lowlevel_function_with_decorator = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n    @some_decorator\n    def dummy_def()""")
+        node_lowlevel_function_with_decorator.file = filename
+        node_lowlevel_function_with_decorator.path = filename
+
+        checker_test_object.checker.process_module(
+            node_lowlevel_function_with_decorator)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()
+
+        # Tests classes not top-level (e.g. inside another class).
+        # Case with error.
+        node_lowlevel_class = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n\n    class dummy_class()""")
+        node_lowlevel_class.file = filename
+        node_lowlevel_class.path = filename
+
+        checker_test_object.checker.process_module(
+            node_lowlevel_class)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='definition-preceding-newline-count',
+                line=2,
+                args=('1', 'class'),
+            ),
+        ):
+            temp_file.close()
+
+        # Case without error.
+        node_lowlevel_class = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w') as tmp:
+            tmp.write("""\n    class dummy_class()""")
+        node_lowlevel_class.file = filename
+        node_lowlevel_class.path = filename
+
+        checker_test_object.checker.process_module(
+            node_lowlevel_class)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()
+
+
 class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
     def test_checks_single_char_and_newline_eof(self):

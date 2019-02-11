@@ -823,68 +823,62 @@ class NewlineCountPrecedingDeclarationChecker(checkers.BaseChecker):
             for (line_num, line) in enumerate(file_content):
                 try:
                     # Checks newlines preceding top-level function.
-                    if (
-                            line.startswith('def ')
-                            and file_content[line_num - 1] == '\n'
-                            and file_content[line_num - 2] == '\n'
-                            and file_content[line_num - 3] == '\n'):
+                    if (line.startswith('def ') and
+                            file_content[line_num - 1] == '\n' and
+                            file_content[line_num - 2] == '\n' and
+                            file_content[line_num - 3] == '\n'):
                         self.add_message(
                             'definition-preceding-newline-count',
                             line=line_num,
                             args=('2', 'top-level function'),)
                     # Checks newlines preceding top-level function with
                     # decorator.
-                    elif (
-                            line.startswith('def ')
-                            and file_content[line_num - 1].startswith('@')
-                            and file_content[line_num - 2] == '\n'
-                            and file_content[line_num - 3] == '\n'
-                            and file_content[line_num - 4] == '\n'):
+                    elif (line.startswith('def ') and
+                          file_content[line_num - 1].startswith('@') and
+                          file_content[line_num - 2] == '\n' and
+                          file_content[line_num - 3] == '\n' and
+                          file_content[line_num - 4] == '\n'):
                         self.add_message(
                             'definition-preceding-newline-count',
                             line=line_num,
                             args=('2', 'top-level function'),)
                     # Checks newlines preceding function definition inside a
                     # class.
-                    elif (
-                            line.lstrip().startswith('def ')
-                            and line.startswith('   ')
-                            and file_content[line_num - 1] == '\n'
-                            and file_content[line_num - 2] == '\n'):
+                    elif (line.lstrip().startswith('def ') and
+                          line.startswith('   ') and
+                          file_content[line_num - 1] == '\n' and
+                          file_content[line_num - 2] == '\n'):
                         self.add_message(
                             'definition-preceding-newline-count',
                             line=line_num,
                             args=('1', 'function'),)
-                    # Checks newlines preceding function definition inside a
-                    # class with decorator.
-                    elif (
-                            line.lstrip().startswith('def ')
-                            and line.startswith('   ')
-                            and file_content[line_num - 1].lstrip().startswith(
-                                '@')
-                            and file_content[line_num - 2] == '\n'
-                            and file_content[line_num - 3] == '\n'):
+                    # Checks newlines preceding function definition with a
+                    # decorator inside a class.
+                    elif (line.lstrip().startswith('def ') and
+                          line.startswith('   ') and
+                          file_content[line_num - 1].lstrip().startswith(
+                              '@') and
+                          file_content[line_num - 2] == '\n' and
+                          file_content[line_num - 3] == '\n'):
                         self.add_message(
                             'definition-preceding-newline-count',
                             line=line_num,
                             args=('1', 'function'),)
                     # Checks newlines preceding class definitions inside
                     # classes.
-                    elif (
-                            line.lstrip().startswith('class ')
-                            and line.startswith('   ')
-                            and file_content[line_num - 1] == '\n'
-                            and file_content[line_num - 2] == '\n'):
+                    elif (line.lstrip().startswith('class ') and
+                          line.startswith('   ') and
+                          file_content[line_num - 1] == '\n' and
+                          file_content[line_num - 2] == '\n'):
                         self.add_message(
                             'definition-preceding-newline-count',
                             line=line_num,
                             args=('1', 'class'),)
                     # Checks newlines preceding top-level class definitions.
-                    elif (
-                            line.startswith('class ')
-                            and file_content[line_num - 1] == '\n'
-                            and file_content[line_num - 2] == '\n'
-                            and file_content[line_num - 3] == '\n'):
+                    elif (line.startswith('class ') and
+                          file_content[line_num - 1] == '\n' and
+                          file_content[line_num - 2] == '\n' and
+                          file_content[line_num - 3] == '\n'):
                         self.add_message(
                             'definition-preceding-newline-count',
                             line=line_num,
