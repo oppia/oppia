@@ -1323,7 +1323,7 @@ def _check_html_directive_name(all_files):
 
 
 def _validate_and_parse_js_files(all_files):
-    """This function validates a JavaScript files and returns the parsed
+    """This function validates JavaScript files and returns the parsed
     contents as a Python dictionary.
     """
     # Use Pyjsparser to parse a JS file as a Python dictionary.
@@ -1475,7 +1475,7 @@ def _check_sorted_dependencies(all_files, parsed_js_files):
     """This function checks that the dependencies which are
     imported in the controllers/directives/factories in JS
     files are in following pattern: dollar imports ,regular
-    imports and constant imports, all in sorted form.
+    imports and constant imports, all in sorted order.
     """
     print 'Starting sorted dependencies check'
     print '----------------------------------------'
@@ -1540,30 +1540,30 @@ def _check_sorted_dependencies(all_files, parsed_js_files):
                             'Please ensure that %s in %s, the injected '
                             'dependecies should be in the following manner:'
                             ' dollar imports, regular imports and constant '
-                            'imports, all in sorted form.'
+                            'imports, all in sorted order.'
                             % (property_value, filename))
                     if sorted_imports != literal_args:
                         failed = True
                         print (
-       	                    'Please ensure that %s in %s, the dependecies '
-       	                    'literally mentioned should be in the following '
-       	                    ' manner: dollar imports, regular imports and '
-       	                    'constant imports, all in sorted form.'
+       	                    'Please ensure that %s in %s, the stringfied '
+       	                    'dependencies should be in the following '
+       	                    'manner: dollar imports, regular imports and '
+       	                    'constant imports, all in sorted order.'
        	                    % (property_value, filename))
 
-    if failed:
-        summary_message = (
-            '%s   Sorted dependencies check failed' % (
-                _MESSAGE_TYPE_FAILED))
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = (
-            '%s  Sorted dependencies check passed' % (
-                _MESSAGE_TYPE_SUCCESS))
-        print summary_message
-        summary_messages.append(summary_message)
+    with _redirect_stdout(_TARGET_STDOUT):
+        if failed:
+            summary_message = (
+                '%s  Sorted dependencies check failed' % (
+                    _MESSAGE_TYPE_FAILED))
+            summary_messages.append(summary_message)
+        else:
+            summary_message = (
+                '%s  Sorted dependencies check passed' % (
+                    _MESSAGE_TYPE_SUCCESS))
+            summary_messages.append(summary_message)
 
+    print summary_message
     print ''
     print '----------------------------------------'
     print ''
