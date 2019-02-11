@@ -62,18 +62,20 @@ oppia.directive('audioTranslationBar', [
         '/pages/exploration_editor/translation_tab/' +
         'audio_translation_bar_directive.html'),
       controller: [
-        '$scope', '$filter', '$timeout', '$uibModal', '$rootScope',
-        'StateContentIdsToAudioTranslationsService', 'IdGenerationService',
-        'AudioPlayerService', 'TranslationLanguageService', 'AlertsService',
-        'StateEditorService', 'ExplorationStatesService', 'EditabilityService',
-        'AssetsBackendApiService', 'recorderService', 'ContextService',
+        '$filter', '$rootScope', '$scope', '$timeout', '$uibModal',
+        'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
+        'ContextService', 'EditabilityService', 'ExplorationStatesService',
+        'IdGenerationService', 'StateContentIdsToAudioTranslationsService',
+        'StateEditorService', 'TranslationLanguageService',
+        'recorderService', 'TranslationTabActiveContentIdService',
         'RECORDING_TIME_LIMIT', 'SiteAnalyticsService',
         function(
-            $scope, $filter, $timeout, $uibModal, $rootScope,
-            StateContentIdsToAudioTranslationsService, IdGenerationService,
-            AudioPlayerService, TranslationLanguageService, AlertsService,
-            StateEditorService, ExplorationStatesService, EditabilityService,
-            AssetsBackendApiService, recorderService, ContextService,
+            $filter, $rootScope, $scope, $timeout, $uibModal,
+            AlertsService, AssetsBackendApiService, AudioPlayerService,
+            ContextService, EditabilityService, ExplorationStatesService,
+            IdGenerationService, StateContentIdsToAudioTranslationsService,
+            StateEditorService, TranslationLanguageService,
+            recorderService, TranslationTabActiveContentIdService,
             RECORDING_TIME_LIMIT, SiteAnalyticsService) {
           $scope.RECORDER_ID = 'recorderId';
           $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
