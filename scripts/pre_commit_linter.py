@@ -44,6 +44,9 @@ CUSTOMIZATION OPTIONS
 3.  To lint a specific list of files (*.js/*.py only). Separate files by spaces
         python scripts/pre_commit_linter.py --files file_1 file_2 ... file_n
 
+4.  To lint files in verbose mode
+        python scripts/pre_commit_linter.py -v
+
 Note that the root folder MUST be named 'oppia'.
  """
 
@@ -80,7 +83,7 @@ _EXCLUSIVE_GROUP.add_argument(
     action='store')
 _PARSER.add_argument(
     '-v',
-    help='v for verbose',
+    help='verbose mode. All details will be printed.',
     action='store_true')
 
 BAD_PATTERNS = {
@@ -321,6 +324,7 @@ from pylint import lint  # isort:skip
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
+_MODE = 'nv'
 _TARGET_STDOUT = StringIO.StringIO()
 
 
@@ -474,7 +478,7 @@ def _redirect_stdout(new_target):
 
 def _lint_css_files(
         node_path, stylelint_path, config_path, files_to_lint,
-        stdout, result, mode):
+        stdout, result):
     """Prints a list of lint errors in the given list of CSS files.
 
     Args:
@@ -484,7 +488,6 @@ def _lint_css_files(
         files_to_lint: list(str). A list of filepaths to lint.
         stdout:  multiprocessing.Queue. A queue to store Stylelint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
-        mode: str. v is Verbose mode.
     """
     start_time = time.time()
     num_files_with_errors = 0
@@ -499,10 +502,10 @@ def _lint_css_files(
     stylelint_cmd_args = [
         node_path, stylelint_path, '--config=' + config_path]
     result_list = []
-    if mode != 'v':
+    if _MODE != 'v':
         print 'Linting CSS files ....'
     for _, filename in enumerate(files_to_lint):
-        if mode == 'v':
+        if _MODE == 'v':
             print 'Linting: ', filename
         proc_args = stylelint_cmd_args + [filename]
         proc = subprocess.Popen(
@@ -533,7 +536,7 @@ def _lint_css_files(
 
 
 def _lint_js_files(
-        node_path, eslint_path, files_to_lint, stdout, result, mode):
+        node_path, eslint_path, files_to_lint, stdout, result):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
@@ -542,7 +545,6 @@ def _lint_js_files(
         files_to_lint: list(str). A list of filepaths to lint.
         stdout:  multiprocessing.Queue. A queue to store ESLint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
-        mode: str. v is Verbose mode.
     """
     start_time = time.time()
     num_files_with_errors = 0
@@ -556,10 +558,10 @@ def _lint_js_files(
     print 'Total js files: ', num_js_files
     eslint_cmd_args = [node_path, eslint_path, '--quiet']
     result_list = []
-    if mode != 'v':
+    if _MODE != 'v':
         print 'Linting JS files ....'
     for _, filename in enumerate(files_to_lint):
-        if mode == 'v':
+        if _MODE == 'v':
             print 'Linting: ', filename
         proc_args = eslint_cmd_args + [filename]
         proc = subprocess.Popen(
@@ -648,7 +650,7 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
     print 'Python linting finished.'
 
 
-def _lint_html_files(all_files, mode):
+def _lint_html_files(all_files):
     """This function is used to check HTML files for linting errors."""
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -666,11 +668,11 @@ def _lint_html_files(all_files, mode):
     print 'Starting HTML linter...'
     print '----------------------------------------'
     print ''
-    if mode != 'v':
+    if _MODE != 'v':
         print 'Linting HTML files ....'
     for filename in html_files_to_lint:
         proc_args = htmllint_cmd_args + [filename]
-        if mode == 'v':
+        if _MODE == 'v':
             print 'Linting %s file' % filename
         with _redirect_stdout(_TARGET_STDOUT):
             proc = subprocess.Popen(
@@ -753,7 +755,7 @@ def _get_all_files():
     return [all_files, mode]
 
 
-def _pre_commit_linter(all_files, mode):
+def _pre_commit_linter(all_files):
     """This function is used to check if node-eslint dependencies are installed
     and pass ESLint binary path.
     """
@@ -803,8 +805,7 @@ def _pre_commit_linter(all_files, mode):
             stylelint_path,
             config_path_for_css_in_html,
             html_files_to_lint_for_css, css_in_html_stdout,
-            css_in_html_result,
-            mode)))
+            css_in_html_result)))
 
     css_result = multiprocessing.Queue()
     css_stdout = multiprocessing.Queue()
@@ -815,8 +816,7 @@ def _pre_commit_linter(all_files, mode):
             stylelint_path,
             config_path_for_oppia_css,
             css_files_to_lint, css_stdout,
-            css_result,
-            mode)))
+            css_result)))
 
     js_result = multiprocessing.Queue()
     js_stdout = multiprocessing.Queue()
@@ -824,7 +824,7 @@ def _pre_commit_linter(all_files, mode):
     linting_processes.append(multiprocessing.Process(
         target=_lint_js_files, args=(
             node_path, eslint_path, js_files_to_lint,
-            js_stdout, js_result, mode)))
+            js_stdout, js_result)))
 
     py_result = multiprocessing.Queue()
 
@@ -1343,18 +1343,18 @@ def _check_html_directive_name(all_files):
     return summary_messages
 
 
-def _validate_and_parse_js_file(filename, content, mode):
+def _validate_and_parse_js_file(filename, content):
     """This function validates a JavaScript file and returns the parsed contents
     as a Python dictionary.
     """
     # Use Pyjsparser to parse a JS file as a Python dictionary.
     parser = pyjsparser.PyJsParser()
-    if mode == 'v':
+    if _MODE == 'v':
         print 'Validating and parsing %s file ...' % filename
     return parser.parse(content)
 
 
-def _check_directive_scope(all_files, mode):
+def _check_directive_scope(all_files):
     """This function checks that all directives have an explicit
     scope: {} and it should not be scope: true.
     """
@@ -1370,7 +1370,7 @@ def _check_directive_scope(all_files, mode):
 
     for filename in files_to_check:
         content = FileCache.read(filename)
-        parsed_dict = _validate_and_parse_js_file(filename, content, mode)
+        parsed_dict = _validate_and_parse_js_file(filename, content)
         with _redirect_stdout(_TARGET_STDOUT):
             # Parse the body of the content as nodes.
             parsed_nodes = parsed_dict['body']
@@ -1793,9 +1793,10 @@ def main():
     """Main method for pre commit linter script that lints Python and JavaScript
     files.
     """
-    all_files, mode = _get_all_files()
-    linter_messages = _pre_commit_linter(all_files, mode)
-    directive_scope_messages = _check_directive_scope(all_files, mode)
+    global _MODE #pylint: disable = global-statement
+    all_files, _MODE = _get_all_files()
+    linter_messages = _pre_commit_linter(all_files)
+    directive_scope_messages = _check_directive_scope(all_files)
     controller_dependency_messages = (
         _match_line_breaks_in_controller_dependencies(all_files))
     html_directive_name_messages = _check_html_directive_name(all_files)
@@ -1806,7 +1807,7 @@ def main():
     # The html tags and attributes check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
     html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
-    html_linter_messages = _lint_html_files(all_files, mode)
+    html_linter_messages = _lint_html_files(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     copyright_notice_messages = _check_for_copyright_notice(all_files)
     _print_complete_summary_of_errors()
