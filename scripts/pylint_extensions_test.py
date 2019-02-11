@@ -271,7 +271,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
     def test_newline_count_preceding_function_or_class(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.NewlineCountPrecedingDeclarationChecker)
+            pylint_extensions.SingleCharFileAndNewlineCountChecker)
         checker_test_object.setup_method()
         # Tests top-level functions.
         # Case with error.
@@ -282,7 +282,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n\n\ndef dummy_def()""")
+            tmp.write("""\n\n\ndef dummy_def()\n""")
         node_toplevel_function.file = filename
         node_toplevel_function.path = filename
 
@@ -305,7 +305,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n\ndef dummy_def()""")
+            tmp.write("""\n\ndef dummy_def()\n""")
         node_toplevel_function.file = filename
         node_toplevel_function.path = filename
 
@@ -323,8 +323,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n\n\n@some_decorator\ndef dummy_def()
-            """)
+            tmp.write("""\n\n\n@some_decorator\ndef dummy_def()\n""")
         node_toplevel_function_with_decorator.file = filename
         node_toplevel_function_with_decorator.path = filename
 
@@ -348,8 +347,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n\n@some_decorator\ndef dummy_def()
-            """)
+            tmp.write("""\n\n@some_decorator\ndef dummy_def()\n""")
         node_toplevel_function_with_decorator.file = filename
         node_toplevel_function_with_decorator.path = filename
 
@@ -368,7 +366,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n\n\nclass dummy_class()""")
+            tmp.write("""\n\n\nclass dummy_class()\n""")
         node_toplevel_class.file = filename
         node_toplevel_class.path = filename
 
@@ -392,7 +390,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n\nclass dummy_class()""")
+            tmp.write("""\n\nclass dummy_class()\n""")
         node_toplevel_class.file = filename
         node_toplevel_class.path = filename
 
@@ -411,7 +409,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n\n   def dummy_def()""")
+            tmp.write("""\n\n   def dummy_def()\n""")
         node_lowlevel_function.file = filename
         node_lowlevel_function.path = filename
 
@@ -435,7 +433,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n   def dummy_def()""")
+            tmp.write("""\n   def dummy_def()\n""")
         node_lowlevel_function.file = filename
         node_lowlevel_function.path = filename
 
@@ -455,7 +453,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n\n    @some_decorator\n    def dummy_def()""")
+            tmp.write("""\n\n    @some_decorator\n    def dummy_def()\n""")
         node_lowlevel_function_with_decorator.file = filename
         node_lowlevel_function_with_decorator.path = filename
 
@@ -479,7 +477,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n    @some_decorator\n    def dummy_def()""")
+            tmp.write("""\n    @some_decorator\n    def dummy_def()\n""")
         node_lowlevel_function_with_decorator.file = filename
         node_lowlevel_function_with_decorator.path = filename
 
@@ -498,7 +496,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n\n    class dummy_class()""")
+            tmp.write("""\n\n    class dummy_class()\n""")
         node_lowlevel_class.file = filename
         node_lowlevel_class.path = filename
 
@@ -522,7 +520,7 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
         filename = temp_file.name
 
         with open(filename, 'w') as tmp:
-            tmp.write("""\n    class dummy_class()""")
+            tmp.write("""\n    class dummy_class()\n""")
         node_lowlevel_class.file = filename
         node_lowlevel_class.path = filename
 
@@ -533,12 +531,117 @@ class NewlineCountPrecedingDeclarationCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
+class RestrictedImportCheckerTests(unittest.TestCase):
+
+    def test_detect_restricted_import(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.RestrictedImportChecker)
+        checker_test_object.setup_method()
+
+        # Tests the case wherein storage layer imports domain layer
+        # in import statements.
+        node_err_import = astroid.extract_node("""
+            import core.domain.activity_domain #@
+        """)
+        node_err_import.root().name = 'oppia.core.storage.topic'
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import',
+                node=node_err_import,
+                args=('domain', 'storage'),
+            ),
+        ):
+            checker_test_object.checker.visit_import(node_err_import)
+
+        # Tests the case wherein storage layer does not import domain layer
+        # in import statements.
+        node_no_err_import = astroid.extract_node("""
+            import core.platform.email.gae_email_services #@
+        """)
+        node_no_err_import.root().name = 'oppia.core.storage.topic'
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_import(node_no_err_import)
+
+        # Tests the case wherein storage layer imports domain layer
+        # in import-from statements.
+        node_err_importfrom = astroid.extract_node("""
+            from core.domain import activity_domain #@
+        """)
+        node_err_importfrom.root().name = 'oppia.core.storage.topic'
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import',
+                node=node_err_importfrom,
+                args=('domain', 'storage'),
+            )
+        ):
+            checker_test_object.checker.visit_importfrom(node_err_importfrom)
+
+        # Tests the case wherein storage layer does not import domain layer
+        # in import-from statements.
+        node_no_err_importfrom = astroid.extract_node("""
+            from core.platform.email import gae_email_services #@
+        """)
+        node_no_err_importfrom.root().name = 'oppia.core.storage.topicl'
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
+
+        # Tests the case wherein domain layer imports controller layer
+        # in import statements.
+        node_err_import = astroid.extract_node("""
+            import core.controllers.acl_decorators #@
+        """)
+        node_err_import.root().name = 'oppia.core.domain'
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import',
+                node=node_err_import,
+                args=('controller', 'domain'),
+            ),
+        ):
+            checker_test_object.checker.visit_import(node_err_import)
+
+        # Tests the case wherein domain layer does not import controller layer
+        # in import statements.
+        node_no_err_import = astroid.extract_node("""
+            import core.platform.email.gae_email_services_test #@
+        """)
+        node_no_err_import.root().name = 'oppia.core.domain'
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_import(node_no_err_import)
+
+        # Tests the case wherein domain layer imports controller layer
+        # in import-from statements.
+        node_err_importfrom = astroid.extract_node("""
+            from core.controllers import acl_decorators #@
+        """)
+        node_err_importfrom.root().name = 'oppia.core.domain'
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='invalid-import',
+                node=node_err_importfrom,
+                args=('controller', 'domain'),
+            )
+        ):
+            checker_test_object.checker.visit_importfrom(node_err_importfrom)
+
+        # Tests the case wherein domain layer does not import controller layer
+        # in import-from statements.
+        node_no_err_importfrom = astroid.extract_node("""
+            from core.platform.email import gae_email_services_test #@
+        """)
+        node_no_err_importfrom.root().name = 'oppia.core.domain'
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_importfrom(node_no_err_importfrom)
+
+
 class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
 
     def test_checks_single_char_and_newline_eof(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.SingleCharAndNewlineAtEOFChecker)
+            pylint_extensions.SingleCharFileAndNewlineCountChecker)
         checker_test_object.setup_method()
         node_missing_newline_at_eof = astroid.scoped_nodes.Module(
             name='test',

@@ -52,7 +52,6 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'version_string': item.get_version_string(),
             })
 
-
     @staticmethod
     def reduce(key, version_and_exp_ids):
         """Implements the reduce function for this job."""

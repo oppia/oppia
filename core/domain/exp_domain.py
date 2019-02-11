@@ -1224,7 +1224,6 @@ class Exploration(object):
 
         del self.states[state_name]
 
-
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.

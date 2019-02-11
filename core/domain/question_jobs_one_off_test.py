@@ -46,7 +46,6 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.QUESTION_ID, self.albert_id,
             self._create_valid_question_data('ABC'))
 
-
     def test_migration_job_does_not_convert_up_to_date_question(self):
         """Tests that the question migration job does not convert a
         question that is already the latest schema version.

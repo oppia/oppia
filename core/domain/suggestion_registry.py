@@ -515,7 +515,6 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Populates old value of the change."""
         pass
 
-
     def pre_update_validate(self, change):
         """Performs the pre update validation. This functions need to be called
         before updating the suggestion.

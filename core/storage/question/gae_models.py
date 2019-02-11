@@ -300,7 +300,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         cls.put_multi(question_skill_links)
 
-
     @classmethod
     def delete_multi_question_skill_links(cls, question_skill_links):
         """Deletes multiple question skill links from the datastore.

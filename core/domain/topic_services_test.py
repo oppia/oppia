@@ -400,7 +400,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, 2, strict=False)
         self.assertIsNotNone(subtopic_page)
 
-
     def test_add_uncategorized_skill(self):
         topic_services.add_uncategorized_skill(
             self.user_id_admin, self.TOPIC_ID, 'skill_id_3')

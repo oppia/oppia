@@ -165,7 +165,6 @@ class EditorTests(BaseEditorControllerTests):
             feconf.CURRENT_STATES_SCHEMA_VERSION,
             constants.CURRENT_STATES_SCHEMA_VERSION)
 
-
     def test_that_default_exploration_cannot_be_published(self):
         """Test that publishing a default exploration raises an error
         due to failing strict validation.

@@ -215,7 +215,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Cannot assign unpublished skills to a topic'):
             self.topic.add_uncategorized_skill_id('skill_a')
 
-
     def test_remove_uncategorized_skill_id(self):
         self.topic.uncategorized_skill_ids = ['skill_id_5']
         with self.assertRaisesRegexp(

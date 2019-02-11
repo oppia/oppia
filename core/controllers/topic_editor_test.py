@@ -243,7 +243,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             self.logout()
 
-
     def test_editable_topic_handler_get(self):
         # Check that non-admins cannot access the editable topic data.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):

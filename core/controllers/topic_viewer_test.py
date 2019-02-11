@@ -66,14 +66,12 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
             self.get_html_response(
                 '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'))
 
-
     def test_no_user_can_access_unpublished_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
                 '%s/%s' % (
                     feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'),
                 expected_status_int=404)
-
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):

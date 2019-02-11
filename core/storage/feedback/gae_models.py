@@ -97,7 +97,6 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
         return super(GeneralFeedbackThreadModel, self).put()
 
-
     @classmethod
     def generate_new_thread_id(cls, entity_type, entity_id):
         """Generates a new thread ID which is unique.

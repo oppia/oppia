@@ -433,7 +433,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(exp_rights.is_translator(self.user_id_d))
         self.assertFalse(exp_rights.is_translator(self.user_id_b))
 
-
     def test_get_multiple_exploration_rights(self):
         exp_ids = ['exp1', 'exp2', 'exp3', 'exp4']
 
@@ -485,7 +484,6 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.user_moderator = user_services.UserActionsInfo(
             self.user_id_moderator)
         self.system_user = user_services.get_system_user()
-
 
     def test_get_collection_rights_for_nonexistent_collection(self):
         non_col_id = 'this_collection_does_not_exist_id'

@@ -234,7 +234,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.version, 2)
         self.assertEqual(skill.all_questions_merged, True)
 
-
     def test_get_merged_skill_ids(self):
         skill_ids = skill_services.get_merged_skill_ids()
         self.assertEqual(len(skill_ids), 0)

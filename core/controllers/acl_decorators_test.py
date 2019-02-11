@@ -16,8 +16,8 @@
 
 """Tests for core.domain.acl_decorators."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_services
@@ -1304,7 +1304,6 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id)
         self.assertEqual(response['exploration_id'], self.private_exp_id)
-
 
 
 class ModifyExplorationRolesTests(test_utils.GenericTestBase):

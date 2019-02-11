@@ -460,7 +460,6 @@ class InteractionInstance(object):
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
 
-
     def get_all_html_content_strings(self):
         """Get all html content strings in the interaction.
 

@@ -339,7 +339,6 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3,
             self.COL_ID_4])
 
-
     def _create_search_query(self, terms, categories):
         """Returns the search query derived from terms and categories."""
         query = ' '.join(terms)

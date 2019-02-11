@@ -4342,7 +4342,6 @@ title: Title
 
 # pylint: enable=line-too-long
 
-
     def test_load_from_v26_textangular(self):
         """Test direct loading from a v26 yaml file."""
         with self.swap(
