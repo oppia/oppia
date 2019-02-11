@@ -14,8 +14,8 @@
 
 """Controllers related to user subscriptions."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import subscription_services
 from core.domain import user_services
 

@@ -17,8 +17,8 @@
 import logging
 
 from core import jobs
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import activity_jobs_one_off
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off

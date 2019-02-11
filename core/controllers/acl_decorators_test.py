@@ -16,8 +16,8 @@
 
 """Tests for core.domain.acl_decorators."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_services

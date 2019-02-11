@@ -14,8 +14,8 @@
 
 """Controllers for the learner dashboard."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services

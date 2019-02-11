@@ -16,8 +16,8 @@
 
 """Controllers for custom landing pages."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 
 
 class FractionLandingPage(base.BaseHandler):
