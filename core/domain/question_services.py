@@ -341,7 +341,7 @@ def get_question_summaries_and_skill_descriptions(
             The returned next cursor value is urlsafe.
     """
     if len(skill_ids) == 0:
-        return [], None
+        return [], [], None
 
     if len(skill_ids) > 3:
         raise Exception(
