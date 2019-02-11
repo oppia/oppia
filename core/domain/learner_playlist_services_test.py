@@ -80,6 +80,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             category='Welcome')
 
     def _get_all_learner_playlist_exp_ids(self, user_id):
+        """Returns the list of all the exploration ids in the learner's playlist
+        corresponding to the given user id.
+        """
         learner_playlist_model = user_models.LearnerPlaylistModel.get(
             user_id, strict=False)
 
@@ -88,6 +91,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_playlist_model else [])
 
     def _get_all_learner_playlist_collection_ids(self, user_id):
+        """Returns the list of all the collection ids in the learner's playlist
+        corresponding to the given user id.
+        """
         learner_playlist_model = user_models.LearnerPlaylistModel.get(
             user_id, strict=False)
 
@@ -202,11 +208,12 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), exp_ids)
 
-        # Now if we try to add another exploration at any given position, it
-        # shouldn't be added as the list length would exceed
+        # Now if we try to add another explorations at the end of the list, 
+        # it shouldn't be added as the list length would exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_exploration_to_be_played_later(
-            self.user_id, 'SAMPLE_EXP_ID', position_to_be_inserted=1)
+            self.user_id, 'SAPMLE_EXP_ID', 
+            position_to_be_inserted=MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
 
         # The list still remains the same.
         self.assertEqual(
@@ -319,11 +326,12 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), collection_ids)
 
-        # Now if we try to add another exploration at any given position, it
-        # shouldn't be added as the list length would exceed
+        # Now if we try to add another explorations at the end of the list, 
+        # it shouldn't be added as the list length would exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_collection_to_be_played_later(
-            self.user_id, 'SAMPLE_COLLECTION_ID', position_to_be_inserted=1)
+            self.user_id, 'SAPMLE_COLLECTION_ID', 
+            position_to_be_inserted=MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
 
         # The list still remains the same.
         self.assertEqual(
