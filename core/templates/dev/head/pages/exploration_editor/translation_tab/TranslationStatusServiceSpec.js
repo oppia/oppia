@@ -45,7 +45,7 @@ describe('Translation status service', function() {
         if (stateName === 'First') {
           return {_contentIdsToAudioTranslations: {feedback_1: {},
           default_outcome: {},
-          content:{en:{filename: content-en-1hnku9cy13.mp3,
+          content:{en:{filename: 'content-en-1hnku9cy13.mp3',
           fileSizeBytes: 56842, needsUpdate: true}}}};
         }
       },
