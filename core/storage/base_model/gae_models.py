@@ -689,8 +689,10 @@ class VersionedModel(BaseModel):
         cls.get(entity_id)._require_not_marked_deleted()
 
         snapshot_id = cls._get_snapshot_id(entity_id, version_number)
-        return cls(id=entity_id)._reconstitute_from_snapshot_id(
-            snapshot_id)
+
+        return cls(
+            id=entity_id,
+            version=version_number)._reconstitute_from_snapshot_id(snapshot_id)
         # pylint: enable=protected-access
 
     @classmethod

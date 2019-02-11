@@ -22,8 +22,8 @@ import logging
 import re
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import email_manager
@@ -230,6 +230,8 @@ class ExplorationHandler(EditorHandler):
                 version=version)
             exploration_data['show_state_editor_tutorial_on_load'] = (
                 self.user_id and not self.has_seen_editor_tutorial)
+            exploration_data['show_state_translation_tutorial_on_load'] = (
+                self.user_id and not self.has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
 
@@ -258,6 +260,8 @@ class ExplorationHandler(EditorHandler):
                 self.user_id, exploration_id)
             exploration_data['show_state_editor_tutorial_on_load'] = (
                 self.user_id and not self.has_seen_editor_tutorial)
+            exploration_data['show_state_translation_tutorial_on_load'] = (
+                self.user_id and not self.has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
         self.values.update(exploration_data)
@@ -782,6 +786,7 @@ class StartedTutorialEventHandler(EditorHandler):
     def post(self, unused_exploration_id):
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)
+        self.render_json({})
 
 
 class EditorAutosaveHandler(ExplorationHandler):
