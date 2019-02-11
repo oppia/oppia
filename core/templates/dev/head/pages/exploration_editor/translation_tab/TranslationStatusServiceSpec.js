@@ -45,7 +45,7 @@ fdescribe('Translation status service', function() {
         if (stateName === 'First') {
           return {_contentIdsToAudioTranslations: {feedback_1: {},
             default_outcome: {},
-            content:{en: {filename: 'content-en-1hnku9cy13.mp3',
+            content: {en: {filename: 'content-en-1hnku9cy13.mp3',
               fileSizeBytes: 56842, needsUpdate: true}}}};
         }
       },
@@ -63,9 +63,8 @@ fdescribe('Translation status service', function() {
       tss = $injector.get('TranslationStatusService');
     }));
 
-    it('should get all state names that need update in Audio Translations', function() {
+    it('should get state names that need audio update',function() {
       var allStatesNeedingUpdate = tss.getAllStatesNeedUpdatewarning();
-      console.log(JSON.stringify(allStatesNeedingUpdate));
       expect(allStatesNeedingUpdate.First).toBe('Audio needs update!');
     });
   });
