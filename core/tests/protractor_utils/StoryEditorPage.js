@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,6 +39,18 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-commit-message-input'));
   var closeSaveModalButton = element(
     by.css('.protractor-test-close-save-modal-button'));
+  var createInitialChapterButton = element(
+    by.css('.protractor-test-create-chapter-button'));
+  var newChapterTitleField = element(
+    by.css('.protractor-test-new-chapter-title-field'));
+  var confirmChapterCreationButton = element(
+    by.css('.protractor-test-confirm-chapter-creation-button'));
+
+  this.createInitialChapter = function(title) {
+    createInitialChapterButton.click();
+    newChapterTitleField.sendKeys(title);
+    confirmChapterCreationButton.click();
+  };
 
   this.expectNotesToBe = function(richTextInstructions) {
     forms.expectRichText(storyNotes).toMatch(richTextInstructions);

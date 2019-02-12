@@ -61,8 +61,8 @@ exports.config = {
     // them. Therefore, we mention the complete directory
     // in 'full'.
     full: [
-      'protractor/*.js',
-      'protractor_desktop/*.js'
+      // 'protractor/*.js',
+      'protractor_desktop/topicAndStoryEditor.js'
     ],
 
     // Unfortunately, adding more than one file to a test suite results in

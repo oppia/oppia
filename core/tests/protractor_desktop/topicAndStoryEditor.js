@@ -90,6 +90,12 @@ describe('Topic editor functionality', function() {
     storyEditorPage.expectNotesToBe(forms.toRichText('Story notes'));
   });
 
+  it('should add, edit and remove nodes (chapters) from a story', function() {
+    topicEditorPage.navigateToStoryWithIndex(0);
+    storyEditorPage.createInitialChapter('Chapter 1');
+    storyEditorPage.returnToTopic();
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
     users.logout();
