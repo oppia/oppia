@@ -65,7 +65,8 @@ oppia.directive('hintEditor', [
           };
 
           $scope.cancelThisHintEdit = function() {
-            $scope.hint = angular.copy($scope.hintMemento);
+            $scope.hint.hintContent._html =
+              $scope.hintMemento.hintContent._html;
             $scope.hintMemento = null;
             $scope.hintEditorIsOpen = false;
           };
