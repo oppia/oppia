@@ -26,10 +26,12 @@ import re
 def parse_json_from_js(js_file):
     """Extracts JSON object from JS file."""
     text = js_file.read()
-    text = re.sub(r'//.*\n', r'\n', text)
-    first_bracket_index = text.find('= {')
-    last_bracket_index = text.rfind('}')
-    json_text = text[first_bracket_index + 2:last_bracket_index + 1]
+    text_without_comments = re.sub(r'//.*\n', r'\n', text)
+    first_bracket_index = text_without_comments.find('= {')
+    last_bracket_index = text_without_comments.rfind('}')
+    json_text = (
+        text_without_comments[first_bracket_index + 2:last_bracket_index + 1]
+    )
     return json.loads(json_text)
 
 
