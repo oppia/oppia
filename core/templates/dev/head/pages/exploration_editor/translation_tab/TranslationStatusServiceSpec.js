@@ -16,11 +16,11 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
-describe('Translation status service', function() {
+fdescribe('Translation status service', function() {
   beforeEach(module('oppia', function($provide) {
     $provide.value('TranslationLanguageService', {
       getActiveLanguageCode: function() {
-        return ['en'];
+        return 'en';
       },
       availableTranslationLanguageCodes: ['en'],
       allContentId: ['content', 'default_outcome', 'feedback_1']
@@ -50,11 +50,11 @@ describe('Translation status service', function() {
       getContentIdsToAudioTranslationsMemento: function(stateName) {
         if (stateName === 'First') {
           return ContentIdsToAudioTranslationsObjectFactory.
-            createFromBackendDict({_contentIdsToAudioTranslations: {
-              feedback_1: {},
-              default_outcome: {},
+            createFromBackendDict({
               content: {en: {filename: 'test_audio_1_en.mp3',
-                fileSizeBytes: 95426, needsUpdate: true}}}
+                fileSizeBytes: 95426, needsUpdate: true}},
+              default_outcome: {},
+              feedback_1: {}
             });
         }
       },
@@ -83,6 +83,8 @@ describe('Translation status service', function() {
     it('should get state names that need audio update', function() {
       // To call _computeAllStatesStatus() function of TranslationStatusService.
       tss.getAllStateStatusColors();
+
+      var statesNeedingAudioUpdate = tss.getAllStatesNeedUpdatewarning();
     });
   });
 });
