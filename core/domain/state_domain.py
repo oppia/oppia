@@ -786,7 +786,8 @@ class WrittenTranslations(object):
         """Returns a dict representing this WrittenTranslations domain object.
 
         Returns:
-            dict. A dict, mapping all fields of WrittenTranslations instance.
+            dict. A dict, mapping content_id to a dict containing language_code
+            as a key and written translation dict as a value.
         """
         written_translations_dict = {}
         for (content_id, language_code_to_written_translation) in (

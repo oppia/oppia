@@ -545,6 +545,35 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on writen transcripts."""
 
+    def test_from_and_to_dict_wroks_correctly(self):
+        written_translations_dict = {
+            'content1': {
+                'en': {
+                    'html': 'hello',
+                    'needs_update': True
+                },
+                'hi': {
+                    'html': 'Hey!',
+                    'needs_update': False
+                }
+            },
+            'feedback_1': {
+                'hi': {
+                    'html': 'Testing!',
+                    'needs_update': False
+                },
+                'en': {
+                    'html': 'hello!',
+                    'needs_update': False
+                }
+            }
+        }
+
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        self.assertEqual(
+            written_translations.to_dict(), written_translations_dict)
+
     def test_get_available_languages_gives_correct_set_of_langauges(self):
         written_translations_dict = {
             'content1': {

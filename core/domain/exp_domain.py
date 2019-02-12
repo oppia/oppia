@@ -2161,6 +2161,9 @@ class Exploration(object):
                     solution['explanation']['content_id'])
 
             # Filter content_ids_to_audio_translations with unwanted content id.
+            # These are the extra content id present within the
+            # content_ids_to_audio_translations dict which is of no use as html
+            # linked to these content_ids are not available in the state.
             citat = state_dict['content_ids_to_audio_translations']
             extra_content_ids_in_citat = (
                 set(citat.keys()) - set(state_content_id_list))
