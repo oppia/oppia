@@ -915,6 +915,7 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
                     state_dict['content_ids_to_audio_translations'].keys()) != (
                         state_content_id_list):
                 yield ('Error when validating exploration in dict.', item.id)
+
             new_states[state_name] = state_domain.State.from_dict(state_dict)
 
         exploration.states = new_states

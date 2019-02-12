@@ -2710,7 +2710,7 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.process_and_flush_pending_tasks()
 
-    def test_state_migration_to_v27(self):
+    def test_exploration_migration_can_be_carried_out_successfully(self):
         exp_id = 'Exp_1'
         self.save_new_valid_exploration(
             exp_id, self.admin_id, end_state_name='End card',
