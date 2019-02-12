@@ -19,8 +19,6 @@
 describe('Translation status service', function() {
   beforeEach(module('oppia', function($provide) {
     $provide.value('TranslationLanguageService', {
-      audioTranslation: {filename: 'content-en-1hnku9cy13.mp3',
-        fileSizeBytes: 56842, needsUpdate: true},
       getActiveLanguageCode: function() {
         return ['en'];
       },
@@ -31,6 +29,14 @@ describe('Translation status service', function() {
       displayed: {
         getAllContentId: function() {
           return ['content', 'default_outcome', 'feedback_1'];
+        },
+        getAudioTranslation: function(contentId, langCode) {
+          if(contentId === 'content') {
+            return {filename: 'test_audio_1_en.mp3',
+            fileSizeBytes: 95426, needsUpdate: true};
+          } else {
+            return {};
+          } 
         }
       }
     });
@@ -47,8 +53,8 @@ describe('Translation status service', function() {
             createFromBackendDict({_contentIdsToAudioTranslations: {
               feedback_1: {},
               default_outcome: {},
-              content: {en: {filename: 'content-en-1hnku9cy13.mp3',
-                fileSizeBytes: 56842, needsUpdate: true}}}
+              content: {en: {filename: 'test_audio_1_en.mp3',
+                fileSizeBytes: 95426, needsUpdate: true}}}
             });
         }
       },
@@ -56,6 +62,12 @@ describe('Translation status service', function() {
         if (stateName === 'First') {
           return 'MultipleChoiceInput';
         }
+      }
+    });
+    $provide.constant('INTERACTION_SPECS', {
+      MultipleChoiceInput: {
+        is_linear: false,
+        is_terminal: false
       }
     });
   }));
@@ -69,9 +81,8 @@ describe('Translation status service', function() {
     }));
 
     it('should get state names that need audio update', function() {
+      // To call _computeAllStatesStatus() function of TranslationStatusService.
       tss.getAllStateStatusColors();
-      var allStatesNeedingUpdate = tss.getAllStatesNeedUpdatewarning();
-      // expect(allStatesNeedingUpdate.First).toBe('Audio needs update!');
     });
   });
 });
