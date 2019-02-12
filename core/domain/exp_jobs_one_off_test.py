@@ -2792,7 +2792,6 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
                 'new_value': content_ids_to_audio_translations
             })], 'Changed Introduction state.')
 
-
         job_id = exp_jobs_one_off.ExplorationMigrationValidationJob.create_new()
         exp_jobs_one_off.ExplorationMigrationValidationJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
