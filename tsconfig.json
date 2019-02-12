@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["jasmine", "node", "angular", "jquery", "googlemaps", "q", "selenium-webdriver"]
+  }
+}
