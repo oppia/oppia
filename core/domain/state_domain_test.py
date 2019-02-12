@@ -543,7 +543,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
-    """Test methods operating on writen transcripts."""
+    """Test methods operating on written transcripts."""
 
     def test_from_and_to_dict_wroks_correctly(self):
         written_translations_dict = {
