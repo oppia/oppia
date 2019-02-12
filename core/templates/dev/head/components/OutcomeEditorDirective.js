@@ -158,6 +158,9 @@ oppia.directive('outcomeEditor', [
           };
 
           $scope.saveThisDestination = function() {
+            if (!$scope.outcome.missingPrerequisiteSkillId) {
+              $scope.outcome.missingPrerequisiteSkillId = null;
+            }
             $scope.$broadcast('saveOutcomeDestDetails');
             $scope.destinationEditorIsOpen = false;
             $scope.savedOutcome.dest = angular.copy($scope.outcome.dest);

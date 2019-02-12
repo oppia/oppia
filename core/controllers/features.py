@@ -33,9 +33,7 @@ class ExplorationFeaturesHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         whitelisted_exploration_ids_for_playthroughs = (
-            config_domain.
-            WHITELISTED_EXPLORATION_IDS_FOR_ADDING_PREREQUISITE_SKILLS.
-            value)
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         self.render_json({
             'is_improvements_tab_enabled':
                 config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value,

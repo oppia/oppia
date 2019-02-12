@@ -323,6 +323,9 @@ oppia.directive('stateResponses', [
 
                     EditorFirstTimeEventsService.registerFirstSaveRuleEvent();
 
+                    if (!$scope.tmpOutcome.missingPrerequisiteSkillId) {
+                      $scope.tmpOutcome.missingPrerequisiteSkillId = null;
+                    }
                     // Close the modal and save it afterwards.
                     $uibModalInstance.close({
                       tmpRule: angular.copy($scope.tmpRule),
