@@ -31,12 +31,12 @@ describe('Translation status service', function() {
           return ['content', 'default_outcome', 'feedback_1'];
         },
         getAudioTranslation: function(contentId, langCode) {
-          if(contentId === 'content') {
+          if (contentId === 'content') {
             return {filename: 'test_audio_1_en.mp3',
-            fileSizeBytes: 95426, needsUpdate: true};
+              fileSizeBytes: 95426, needsUpdate: true};
           } else {
             return {};
-          } 
+          }
         }
       }
     });
