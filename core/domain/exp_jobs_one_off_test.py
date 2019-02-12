@@ -2695,3 +2695,112 @@ class InteractionCustomizationArgsValidationJobTests(
         run_job_for_deleted_exp(
             self,
             exp_jobs_one_off.InteractionCustomizationArgsValidationJob)
+
+
+class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
+    """Tests for ExplorationMigrationValidationJob."""
+
+    def setUp(self):
+        super(ExplorationMigrationValidationJobTest, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_state_migration_to_v27(self):
+        exp_id = 'Exp_1'
+        self.save_new_valid_exploration(
+            exp_id, self.admin_id, end_state_name='End card',
+            interaction_id='TextInput')
+
+        answer_groups = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': '<p>This is value1 for ItemSelection</p>'}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': '<p>This is value2 for ItemSelection</p>'}
+            }],
+            'outcome': {
+                'dest': 'End card',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_misconception_id': None
+        }]
+        hints = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>Hello, this is hint 1.</p>'
+            }
+        }, {
+            'hint_content': {
+                'content_id': 'hint_2',
+                'html': '<p>Hello, this is hint 2.</p>'
+            }
+        }]
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': 'hello_world is a string'
+            }
+        }
+        content_ids_to_audio_translations = {
+            'content': {},
+            'default_outcome': {},
+            'feedback_1': {},
+            # Adding unwanted content_id which will get removed after migration.
+            'feedback_2': {},
+            'hint_1': {},
+            'hint_2': {},
+            'solution': {}
+        }
+        exp_services.update_exploration(
+            self.admin_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                'state_name': 'Introduction',
+                'new_value': answer_groups
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'state_name': 'Introduction',
+                'new_value': hints
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'state_name': 'Introduction',
+                'new_value': solution
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS), # pylint: disable=line-too-long
+                'state_name': 'Introduction',
+                'new_value': content_ids_to_audio_translations
+            })], 'Changed Introduction state.')
+
+
+        job_id = exp_jobs_one_off.ExplorationMigrationValidationJob.create_new()
+        exp_jobs_one_off.ExplorationMigrationValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationMigrationValidationJob.get_output(
+                job_id))
+        expected_output = [
+            u'[u\'Successfully migrated exploration\', [u\'Exp_1\']]']
+
+        self.assertEqual(actual_output, expected_output)

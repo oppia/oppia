@@ -29,6 +29,7 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.platform import models
 import feconf
 import utils
@@ -831,3 +832,99 @@ class InteractionCustomizationArgsValidationJob(
         # Combine all values from multiple lists into a single list
         # for that error type.
         yield (key, list(set().union(*final_values)))
+
+
+class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job to validate exploration migration can be carried out
+    successfully.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted or item.states_schema_version != (
+                feconf.CURRENT_STATES_SCHEMA_VERSION):
+            return
+
+        try:
+            exploration = exp_services.get_exploration_from_model(item)
+            exp_rights = rights_manager.get_exploration_rights(item.id)
+        except Exception as e:
+            yield('Error %s when loading exploration' % str(e), item.id)
+            return
+
+        try:
+            if exp_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+                exploration.validate()
+            else:
+                exploration.validate(strict=True)
+        except Exception as e:
+            yield('Error %s when validating current exploration' % str(e),
+                  item.id)
+            return
+
+
+        states = exploration.states
+        new_states = {}
+        for state_name, state in states.iteritems():
+            state_dict = state.to_dict()
+            state_content_id_list = []
+
+            # Add state card's content id into the state_content_id_list.
+            state_content_id_list.append(state_dict['content']['content_id'])
+
+            # Add answer_groups content id into the state_content_id_list.
+            for answer_group in state_dict['interaction']['answer_groups']:
+                answer_feedback = answer_group['outcome']['feedback']
+                state_content_id_list.append(answer_feedback['content_id'])
+
+            # If present, add default_outcome content id into
+            # state_content_id_list.
+            default_outcome = state_dict['interaction']['default_outcome']
+            if default_outcome is not None:
+                state_content_id_list.append(
+                    default_outcome['feedback']['content_id'])
+
+            # Add hints content id into state_content_id_list.
+            for hint in state_dict['interaction']['hints']:
+                state_content_id_list.append(hint['hint_content']['content_id'])
+
+            # If present, add solution content id into state_content_id_list.
+            solution = state_dict['interaction']['solution']
+            if solution:
+                state_content_id_list.append(
+                    solution['explanation']['content_id'])
+
+            # Filter content_ids_to_audio_translations with unwanted
+            # content id.
+            citat = state_dict['content_ids_to_audio_translations']
+            extra_content_ids_in_citat = (
+                set(citat.keys()) - set(state_content_id_list))
+            for content_id in extra_content_ids_in_citat:
+                state_dict['content_ids_to_audio_translations'].pop(content_id)
+
+            # Create written_translations using the state_content_id_list.
+            state_dict['written_translations'] = {}
+            for content_id in state_content_id_list:
+                state_dict['written_translations'][content_id] = {}
+
+            if state_dict['written_translations'].keys() != (
+                    state_dict['content_ids_to_audio_translations'].keys()) != (
+                        state_content_id_list):
+                yield ('Error when validating exploration in dict.', item.id)
+            new_states[state_name] = state_domain.State.from_dict(state_dict)
+
+        exploration.states = new_states
+        try:
+            exploration.validate()
+            yield ('Successfully migrated exploration', item.id)
+        except Exception as e:
+            yield ('Error %s while validating new exploration' % str(e),
+                   item.id)
+
+    @staticmethod
+    def reduce(key, value):
+        yield (key, value)
