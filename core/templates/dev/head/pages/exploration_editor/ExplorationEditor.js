@@ -182,6 +182,9 @@ oppia.controller('ExplorationEditor', [
           EditabilityService.markTranslatable();
         }
 
+        StateEditorService.setCanAddPrerequisiteSkill(
+          featuresData.can_add_prerequisite_skill_to_state);
+
         GraphDataService.recompute();
 
         if (!StateEditorService.getActiveStateName() ||

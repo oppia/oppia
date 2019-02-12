@@ -37,7 +37,7 @@ oppia.directive('outcomeDestinationEditor', [
             EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
           var currentStateName = null;
           $scope.canAddPrerequisiteSkill =
-            constants.ENABLE_NEW_STRUCTURE_EDITORS;
+            StateEditorService.getCanAddPrerequisiteSkill();
 
           $scope.$on('saveOutcomeDestDetails', function() {
             // Create new state if specified.

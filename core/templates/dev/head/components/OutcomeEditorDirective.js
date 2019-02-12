@@ -42,7 +42,7 @@ oppia.directive('outcomeEditor', [
           $scope.editOutcomeForm = {};
           $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
           $scope.canAddPrerequisiteSkill =
-            constants.ENABLE_NEW_STRUCTURE_EDITORS;
+            StateEditorService.getCanAddPrerequisiteSkill();
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
           $scope.correctnessLabelEditorIsOpen = false;

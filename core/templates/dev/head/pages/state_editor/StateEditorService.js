@@ -31,6 +31,7 @@ oppia.factory('StateEditorService', [
     // interaction.
     var interaction = null;
     var misconceptions = [];
+    var canAddPrerequisiteSkill = false;
 
     return {
       getActiveStateName: function() {
@@ -42,6 +43,12 @@ oppia.factory('StateEditorService', [
           return;
         }
         activeStateName = newActiveStateName;
+      },
+      getCanAddPrerequisiteSkill: function() {
+        return canAddPrerequisiteSkill;
+      },
+      setCanAddPrerequisiteSkill: function(value) {
+        canAddPrerequisiteSkill = value;
       },
       setMisconceptions: function(newMisconceptions) {
         misconceptions = newMisconceptions;
