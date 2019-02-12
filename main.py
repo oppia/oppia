@@ -282,6 +282,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
+    get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
 
     get_redirect_route(
         r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
