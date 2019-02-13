@@ -1537,18 +1537,20 @@ def _check_sorted_dependencies(all_files, parsed_js_files):
                     if sorted_imports != function_args:
                         failed = True
                         print (
-                            'Please ensure that in %s in %s, the injected '
-                            'dependencies should be in the following manner:'
-                            ' dollar imports, regular imports and constant '
-                            'imports, all in sorted order.'
+                            'Please ensure that in %s in file %s, the '
+                            'injected dependencies should be in the '
+                            'following manner: dollar imports, regular '
+                            'imports and constant imports, all in sorted '
+                            'order.'
                             % (property_value, filename))
                     if sorted_imports != literal_args:
                         failed = True
                         print (
-       	                    'Please ensure that in %s in %s, the stringfied '
-       	                    'dependencies should be in the following '
-       	                    'manner: dollar imports, regular imports and '
-       	                    'constant imports, all in sorted order.'
+       	                    'Please ensure that in %s in file %s, the '
+       	                    'stringfied dependencies should be in the '
+       	                    'following manner: dollar imports, regular '
+       	                    'imports and constant imports, all in sorted '
+       	                    'order.'
        	                    % (property_value, filename))
 
     with _redirect_stdout(_TARGET_STDOUT):
