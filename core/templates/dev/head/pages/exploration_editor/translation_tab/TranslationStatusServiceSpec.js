@@ -156,16 +156,17 @@ describe('Translation status service', function() {
       expect(activeStateComponentStatus).toBe('#16A765');
     });
 
-    it('should get active state component needs update status correctly',function() {
-      StateContentIdsToAudioTranslationsService.init(
-        'First', ess.getContentIdsToAudioTranslationsMemento('First'));
-      var activeStateComponentNeedsUpdateStatus = tss.
-        getActiveStateComponentNeedsUpdateStatus('content');
-      expect(activeStateComponentNeedsUpdateStatus).toBe(true);
-      activeStateComponentNeedsUpdateStatus = tss.
-      getActiveStateComponentNeedsUpdateStatus('feedback');
-      expect(activeStateComponentNeedsUpdateStatus).toBe(false);
-    });
+    it('should get active state component needs update status correctly',
+      function() {
+        StateContentIdsToAudioTranslationsService.init(
+          'First', ess.getContentIdsToAudioTranslationsMemento('First'));
+        var activeStateComponentNeedsUpdateStatus = tss.
+          getActiveStateComponentNeedsUpdateStatus('content');
+        expect(activeStateComponentNeedsUpdateStatus).toBe(true);
+        activeStateComponentNeedsUpdateStatus = tss.
+          getActiveStateComponentNeedsUpdateStatus('feedback');
+        expect(activeStateComponentNeedsUpdateStatus).toBe(false);
+      });
 
     it('should get active state contentId status color correctly', function() {
       StateContentIdsToAudioTranslationsService.init(
@@ -177,7 +178,7 @@ describe('Translation status service', function() {
         'Second', ess.getContentIdsToAudioTranslationsMemento('Second'));
       activeStateContentIdStatusColor = tss.
         getActiveStateContentIdStatusColor('content');
-      expect(activeStateContentIdStatusColor).toBe('#D14836'); 
+      expect(activeStateContentIdStatusColor).toBe('#D14836');
     });
 
     it('should get active state contentId needs update status', function() {
