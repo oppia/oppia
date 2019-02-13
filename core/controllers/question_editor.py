@@ -17,8 +17,8 @@ and are created.
 """
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -137,8 +137,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
                 'The question with the given id doesn\'t exist.')
 
         commit_message = self.payload.get('commit_message')
-        if not question_id:
-            raise self.PageNotFoundException
+
         if not commit_message:
             raise self.PageNotFoundException
         if not self.payload.get('change_list'):
