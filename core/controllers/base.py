@@ -233,7 +233,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
-                if not self.user_id:
+                if 'signup' in self.request.uri and not self.user_id:
                     raise self.LoggedOutInNewTabException(
                         'Sorry, you have been logged out '
                         '[probably in another window]. Please log in again. '
