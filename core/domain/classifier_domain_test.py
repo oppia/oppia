@@ -103,6 +103,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         }
         training_job_obj = self._get_training_job_from_dict(
             training_job_dict)
+        training_job_obj.update_status(training_job_dict['status'])
         data_dict = training_job_obj.to_dict()
         self.assertTrue(data_dict['status'])
         
