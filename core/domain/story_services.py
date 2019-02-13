@@ -613,8 +613,8 @@ def get_pending_nodes_in_story(user_id, story_id):
         story_id: str. The id of the story.
 
     Returns:
-        list(StoryNode): The list of the story nodes that are pending
-        of an user.
+        list(StoryNode): The list of story nodes, pending
+        for the user.
     """
     story = get_story_by_id(story_id)
     pending_nodes = []
