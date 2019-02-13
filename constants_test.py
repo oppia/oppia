@@ -15,7 +15,6 @@
 """Tests for Constants object and cosntants.json file."""
 
 import os
-import re
 
 import constants  # pylint: disable=relative-import
 from core.tests import test_utils  # pylint: disable=relative-import
@@ -48,7 +47,19 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_all_comments_are_removed_from_json_text(self):
         """Tests if comments are removed from json text."""
-        with open(os.path.join('assets', 'constants.js'), 'r') as f:
-            text_without_comments = constants.remove_comments(f.read())
+        with open(os.path.join(
+            feconf.TESTS_DATA_DIR, 'dummy_constants.js'), 'r') as f:
+            actual_text_without_comments = constants.remove_comments(f.read())
+            expected_text_without_comments = (
+                'var dummy_constants = {\n'
+                '  "File_purpose": "This file is for testing comments '
+                'removal",\n\n'
+                '  "Dummy_constant": "Simple constant",\n\n'
+                '  "Dummy_list_constant": ["List", "of", "dummy", '
+                '"constants"],\n\n'
+                '  "Dummy_constant_without_comment": '
+                '"Dummy constant with no comment"\n'
+                '};\n')
+
             self.assertEqual(
-                re.findall(r'  //.*\n', text_without_comments), [])
+                actual_text_without_comments, expected_text_without_comments)
