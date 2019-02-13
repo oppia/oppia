@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/change_file_ext.py."""
+"""Unit tests for scripts/change_file_extensions.py."""
 
 import os
 import shutil
 import tempfile
 
 from core.tests import test_utils
-from scripts import change_file_ext
+from scripts import change_file_extensions
 
 
 class ChangeExtensionsTest(test_utils.GenericTestBase):
@@ -84,7 +84,7 @@ class ChangeExtensionsTest(test_utils.GenericTestBase):
         with open('%s/%s' % (self.non_rename_dir, self.ts_test_file), 'w') as f:
             f.write(self.ts_test_file_content)
 
-        change_file_ext.change_extension(
+        change_file_extensions.change_extension(
             [self.rename_dir],
             '.js',
             '.ts')
