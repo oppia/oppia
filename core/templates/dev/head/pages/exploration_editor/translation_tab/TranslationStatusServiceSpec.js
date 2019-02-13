@@ -42,7 +42,7 @@ describe('Translation status service', function() {
           audio.addAudioTranslation('content', 'en', 'test_audio_1_en.mp3',
             96426);
           audio.toggleNeedsUpdateAttribute('content', 'en');
-           return audio;
+          return audio;
         } else if (stateName === 'Second') {
           var audio = ContentIdsToAudioTranslationsObjectFactory.
             createFromBackendDict({
@@ -106,17 +106,18 @@ describe('Translation status service', function() {
         tss.getAllStateStatusColors();
 
         var explorationAudioRequiredCount = tss.
-        getExplorationAudioRequiredCount();
+          getExplorationAudioRequiredCount();
         expect(explorationAudioRequiredCount).toBe(7);
       });
 
     it('should get count of audio translations not available correctly',
       function() {
-        // To call _computeAllStatesStatus() function of TranslationStatusService.
+        // To call _computeAllStatesStatus() function of
+        // TranslationStatusService.
         tss.getAllStateStatusColors();
 
         var explorationAudioNotAvailableCount = tss.
-        getExplorationAudioNotAvailableCount();
+          getExplorationAudioNotAvailableCount();
         expect(explorationAudioNotAvailableCount).toBe(5);
       });
 
