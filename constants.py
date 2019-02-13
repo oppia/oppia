@@ -26,7 +26,7 @@ import re
 def parse_json_from_js(js_file):
     """Extracts JSON object from JS file."""
     text = js_file.read()
-    text_without_comments = re.sub(r'//.*\n', r'\n', text)
+    text_without_comments = remove_comments(text)
     first_bracket_index = text_without_comments.find('= {')
     last_bracket_index = text_without_comments.rfind('}')
     json_text = (
@@ -34,6 +34,9 @@ def parse_json_from_js(js_file):
     )
     return json.loads(json_text)
 
+def remove_comments(text):
+	"""Removes comments from given text."""
+	return re.sub(r'  //.*\n', r'', text)
 
 class Constants(dict):
     """Transforms dict to object, attributes can be accessed by dot notation."""
