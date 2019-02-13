@@ -33,6 +33,8 @@ class StoryPageDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
+        story = story_services.get_story_by_id(story_id)
+
         completed_nodes = [completed_node.to_dict()
                            for completed_node in
                            story_services.get_completed_nodes_in_story(
@@ -44,6 +46,8 @@ class StoryPageDataHandler(base.BaseHandler):
                              self.user_id, story_id)]
 
         self.values.update({
+            'story_title': story.title,
+            'story_description': story.description,
             'completed_nodes': completed_nodes,
             'pending_nodes': pending_nodes
         })

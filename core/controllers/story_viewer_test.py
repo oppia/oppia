@@ -94,6 +94,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             json_response = self.get_json(
                 '%s/%s' % (feconf.STORY_DATA_HANDLER, 'story_id_1'))
             expected_dict = {
+                'story_title': 'Title',
+                'story_description': 'Description',
                 'completed_nodes': [self.node_1],
                 'pending_nodes': [self.node_2]
             }
