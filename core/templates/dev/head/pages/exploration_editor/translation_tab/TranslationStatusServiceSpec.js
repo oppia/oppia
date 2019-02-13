@@ -42,7 +42,7 @@ describe('Translation status service', function() {
             });
           audio.addAudioTranslation('content', 'en', 'test_audio_1_en.mp3',
             96426);
-          audio.addAudioTranslation('feedback_2', 'en', 'test_audio_2_en',
+          audio.addAudioTranslation('feedback_2', 'en', 'test_audio_2_en.mp3',
             80000);
           audio.toggleNeedsUpdateAttribute('content', 'en');
           return audio;
