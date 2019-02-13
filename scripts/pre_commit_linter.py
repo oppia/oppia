@@ -1249,9 +1249,8 @@ def _check_docstrings(all_files):
 
         docstring_checker = docstrings_checker.ASTDocStringChecker()
         for filename in files_to_check:
-            ast_file = list(ast.walk(ast.parse(FileCache.read(filename))))
+            ast_file = ast.walk(ast.parse(FileCache.read(filename)))
             func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
-            class_defs = [n for n in ast_file if isinstance(n, ast.ClassDef)]
             for func in func_defs:
                 # Check that the args in the docstring are listed in the same
                 # order as they appear in the function definition.
@@ -1259,19 +1258,7 @@ def _check_docstrings(all_files):
                 for error_line in func_result:
                     print '%s --> Func %s: %s' % (
                         filename, func.name, error_line)
-                    failed = True
-                # Check that the function contains a docstring.
-                if not ast.get_docstring(func):
-                    print (
-                        '%s : Line %s --> Please ensure that func %s has a '
-                        'docstring' % (filename, func.lineno, func.name))
-                    failed = True
-            for clazz in class_defs:
-                # Check that the class contains a docstring.
-                if not ast.get_docstring(clazz):
-                    print (
-                        '%s : Line %s --> Please ensure that class %s has a '
-                        'docstring' % (filename, clazz.lineno, clazz.name))
+                    print ''
                     failed = True
 
         print ''

@@ -177,7 +177,7 @@ class DiskBackedFileSystemUnitTests(test_utils.GenericTestBase):
 
 
 class GcsFileSystemUnitTests(test_utils.GenericTestBase):
-    """ Tests for the GCS file system."""
+    """Tests for the GCS file system."""
 
     def setUp(self):
         super(GcsFileSystemUnitTests, self).setUp()
