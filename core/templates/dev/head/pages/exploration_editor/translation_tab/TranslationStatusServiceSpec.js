@@ -16,7 +16,7 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
-fdescribe('Translation status service', function() {
+describe('Translation status service', function() {
   beforeEach(module('oppia', function($provide) {
     $provide.value('TranslationLanguageService', {
       getActiveLanguageCode: function() {
