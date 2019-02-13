@@ -37,10 +37,13 @@ describe('Translation status service', function() {
             createFromBackendDict({
               content: {},
               default_outcome: {},
-              feedback_1: {}
+              feedback_1: {},
+              feedback_2: {}
             });
           audio.addAudioTranslation('content', 'en', 'test_audio_1_en.mp3',
             96426);
+          audio.addAudioTranslation('feedback_2', 'en', 'test_audio_2_en',
+            80000);
           audio.toggleNeedsUpdateAttribute('content', 'en');
           return audio;
         } else if (stateName === 'Second') {
@@ -56,8 +59,12 @@ describe('Translation status service', function() {
             createFromBackendDict({
               content: {}
             });
-          audio.addAudioTranslation('content', 'en', 'test_audio_2_en.mp3',
+          audio.addAudioTranslation('content', 'en', 'test_audio_3_en.mp3',
             90000);
+          return audio;
+        } else {
+          var audio = ContentIdsToAudioTranslationsObjectFactory.
+            createFromBackendDict({});
           return audio;
         }
       },
@@ -85,14 +92,18 @@ describe('Translation status service', function() {
     var tss = null;
     beforeEach(inject(function($injector) {
       tss = $injector.get('TranslationStatusService');
+      ess = $injector.get('ExplorationStatesService');
       ContentIdsToAudioTranslationsObjectFactory = $injector.get(
         'ContentIdsToAudioTranslationsObjectFactory');
+      StateContentIdsToAudioTranslationsService = $injector.get(
+        'StateContentIdsToAudioTranslationsService');
+
+      // To call _computeAllStatesStatus() function of
+      // TranslationStatusService.
+      tss.getAllStateStatusColors();
     }));
 
     it('should get state names that need audio update correctly', function() {
-      // To call _computeAllStatesStatus() function of TranslationStatusService.
-      tss.getAllStateStatusColors();
-
       var statesNeedingAudioUpdate = tss.getAllStatesNeedUpdatewarning();
       expect(statesNeedingAudioUpdate.First.
         indexOf('Audio needs update!')).toBe(0);
@@ -102,20 +113,13 @@ describe('Translation status service', function() {
 
     it('should get count of required audio translations correctly',
       function() {
-      // To call _computeAllStatesStatus() function of TranslationStatusService.
-        tss.getAllStateStatusColors();
-
         var explorationAudioRequiredCount = tss.
           getExplorationAudioRequiredCount();
-        expect(explorationAudioRequiredCount).toBe(7);
+        expect(explorationAudioRequiredCount).toBe(8);
       });
 
     it('should get count of audio translations not available correctly',
       function() {
-        // To call _computeAllStatesStatus() function of
-        // TranslationStatusService.
-        tss.getAllStateStatusColors();
-
         var explorationAudioNotAvailableCount = tss.
           getExplorationAudioNotAvailableCount();
         expect(explorationAudioNotAvailableCount).toBe(5);
@@ -126,6 +130,67 @@ describe('Translation status service', function() {
       expect(stateWiseStatusColor.First).toBe('#E9B330');
       expect(stateWiseStatusColor.Second).toBe('#D14836');
       expect(stateWiseStatusColor.Third).toBe('#16A765');
+    });
+
+    it('should get active state component status color correctly', function() {
+      StateContentIdsToAudioTranslationsService.init(
+        'First', ess.getContentIdsToAudioTranslationsMemento('First'));
+      var activeStateComponentStatus = tss.
+        getActiveStateComponentStatusColor('content');
+      expect(activeStateComponentStatus).toBe('#16A765');
+      activeStateComponentStatus = tss.
+        getActiveStateComponentStatusColor('feedback');
+      expect(activeStateComponentStatus).toBe('#E9B330');
+      StateContentIdsToAudioTranslationsService.init(
+        'Second', ess.getContentIdsToAudioTranslationsMemento('Second'));
+      activeStateComponentStatus = tss.
+        getActiveStateComponentStatusColor('content');
+      expect(activeStateComponentStatus).toBe('#D14836');
+      activeStateComponentStatus = tss.
+        getActiveStateComponentStatusColor('feedback');
+      expect(activeStateComponentStatus).toBe('#D14836');
+      StateContentIdsToAudioTranslationsService.init(
+        'Third', ess.getContentIdsToAudioTranslationsMemento('Third'));
+      activeStateComponentStatus = tss.
+        getActiveStateComponentStatusColor('content');
+      expect(activeStateComponentStatus).toBe('#16A765');
+    });
+
+    it('should get active state component needs update status correctly',function() {
+      StateContentIdsToAudioTranslationsService.init(
+        'First', ess.getContentIdsToAudioTranslationsMemento('First'));
+      var activeStateComponentNeedsUpdateStatus = tss.
+        getActiveStateComponentNeedsUpdateStatus('content');
+      expect(activeStateComponentNeedsUpdateStatus).toBe(true);
+      activeStateComponentNeedsUpdateStatus = tss.
+      getActiveStateComponentNeedsUpdateStatus('feedback');
+      expect(activeStateComponentNeedsUpdateStatus).toBe(false);
+    });
+
+    it('should get active state contentId status color correctly', function() {
+      StateContentIdsToAudioTranslationsService.init(
+        'First', ess.getContentIdsToAudioTranslationsMemento('First'));
+      var activeStateContentIdStatusColor = tss.
+        getActiveStateContentIdStatusColor('content');
+      expect(activeStateContentIdStatusColor).toBe('#16A765');
+      StateContentIdsToAudioTranslationsService.init(
+        'Second', ess.getContentIdsToAudioTranslationsMemento('Second'));
+      activeStateContentIdStatusColor = tss.
+        getActiveStateContentIdStatusColor('content');
+      expect(activeStateContentIdStatusColor).toBe('#D14836'); 
+    });
+
+    it('should get active state contentId needs update status', function() {
+      StateContentIdsToAudioTranslationsService.init(
+        'First', ess.getContentIdsToAudioTranslationsMemento('First'));
+      var activeStateContentIdNeedsUpdateStatus = tss.
+        getActiveStateContentIdNeedsUpdateStatus('content');
+      expect(activeStateContentIdNeedsUpdateStatus).toBe(true);
+      StateContentIdsToAudioTranslationsService.init(
+        'Third', ess.getContentIdsToAudioTranslationsMemento('Third'));
+      activeStateContentIdNeedsUpdateStatus = tss.
+        getActiveStateContentIdNeedsUpdateStatus('content');
+      expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
     });
   });
 });
