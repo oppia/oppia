@@ -18,9 +18,10 @@
 
 import os
 import shutil
+import tempfile
 
-import change_file_ext # pylint: disable=relative-import
 from core.tests import test_utils
+from scripts import change_file_ext
 
 
 class ChangeExtensionsTest(test_utils.GenericTestBase):
@@ -32,11 +33,10 @@ class ChangeExtensionsTest(test_utils.GenericTestBase):
         """
         super(ChangeExtensionsTest, self).setUp()
 
-        self.rename_dir = 'dir_used_in_renaming'
-        self.non_rename_dir = 'dir_not_used_in_renaming'
+        self.rename_dir = tempfile.mkdtemp(suffix='dir_used_in_renaming')
+        self.non_rename_dir = tempfile.mkdtemp(
+            suffix='dir_not_used_in_renaming')
 
-        os.mkdir(self.rename_dir)
-        os.mkdir(self.non_rename_dir)
         os.mkdir('%s/subdir' % self.rename_dir)
         os.mkdir('%s/subdir' % self.non_rename_dir)
 
@@ -85,7 +85,7 @@ class ChangeExtensionsTest(test_utils.GenericTestBase):
             f.write(self.ts_test_file_content)
 
         change_file_ext.change_extension(
-            ['./dir_used_in_renaming'],
+            [self.rename_dir],
             '.js',
             '.ts')
 
@@ -100,10 +100,10 @@ class ChangeExtensionsTest(test_utils.GenericTestBase):
                 actual_files_in_dir_used_in_renaming.append(
                     os.path.join(dirpath, filename))
         expected_files_in_dir_used_in_renaming = [
-            'dir_used_in_renaming/python_test_file.py',
-            'dir_used_in_renaming/js_file_in_dir.ts',
-            'dir_used_in_renaming/ts_test_file.ts',
-            'dir_used_in_renaming/subdir/js_file_in_subdir.ts']
+            '%s/python_test_file.py' % self.rename_dir,
+            '%s/js_file_in_dir.ts' % self.rename_dir,
+            '%s/ts_test_file.ts' % self.rename_dir,
+            '%s/subdir/js_file_in_subdir.ts' % self.rename_dir]
 
         self.assertEqual(
             set(actual_files_in_dir_used_in_renaming),
@@ -115,10 +115,10 @@ class ChangeExtensionsTest(test_utils.GenericTestBase):
                 actual_files_in_dir_not_used_in_renaming.append(
                     os.path.join(dirpath, filename))
         expected_files_in_dir_not_used_in_renaming = [
-            'dir_not_used_in_renaming/python_test_file.py',
-            'dir_not_used_in_renaming/js_file_in_dir.js',
-            'dir_not_used_in_renaming/ts_test_file.ts',
-            'dir_not_used_in_renaming/subdir/js_file_in_subdir.js']
+            '%s/python_test_file.py' % self.non_rename_dir,
+            '%s/js_file_in_dir.js' % self.non_rename_dir,
+            '%s/ts_test_file.ts' % self.non_rename_dir,
+            '%s/subdir/js_file_in_subdir.js' % self.non_rename_dir]
 
         self.assertEqual(
             set(actual_files_in_dir_not_used_in_renaming),
