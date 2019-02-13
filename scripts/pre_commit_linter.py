@@ -1793,7 +1793,7 @@ def main():
     """Main method for pre commit linter script that lints Python and JavaScript
     files.
     """
-    global _MODE #pylint: disable = global-statement
+    global _MODE # pylint: disable = global-statement
     all_files, _MODE = _get_all_files()
     linter_messages = _pre_commit_linter(all_files)
     directive_scope_messages = _check_directive_scope(all_files)
