@@ -34,9 +34,11 @@ def parse_json_from_js(js_file):
     )
     return json.loads(json_text)
 
+
 def remove_comments(text):
-	"""Removes comments from given text."""
-	return re.sub(r'  //.*\n', r'', text)
+    """Removes comments from given text."""
+    return re.sub(r'  //.*\n', r'', text)
+
 
 class Constants(dict):
     """Transforms dict to object, attributes can be accessed by dot notation."""
