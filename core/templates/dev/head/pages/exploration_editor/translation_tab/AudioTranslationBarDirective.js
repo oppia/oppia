@@ -23,7 +23,6 @@ oppia.directive('audioTranslationBar', [
     return {
       restrict: 'E',
       scope: {
-        contentId: '=',
         isTranslationTabBusy: '='
       },
       link: function(scope, elm) {
@@ -62,18 +61,20 @@ oppia.directive('audioTranslationBar', [
         '/pages/exploration_editor/translation_tab/' +
         'audio_translation_bar_directive.html'),
       controller: [
-        '$scope', '$filter', '$timeout', '$uibModal', '$rootScope',
-        'StateContentIdsToAudioTranslationsService', 'IdGenerationService',
-        'AudioPlayerService', 'TranslationLanguageService', 'AlertsService',
-        'StateEditorService', 'ExplorationStatesService', 'EditabilityService',
-        'AssetsBackendApiService', 'recorderService', 'ContextService',
+        '$filter', '$rootScope', '$scope', '$timeout', '$uibModal',
+        'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
+        'ContextService', 'EditabilityService', 'ExplorationStatesService',
+        'IdGenerationService', 'StateContentIdsToAudioTranslationsService',
+        'StateEditorService', 'TranslationLanguageService',
+        'recorderService', 'TranslationTabActiveContentIdService',
         'RECORDING_TIME_LIMIT',
         function(
-            $scope, $filter, $timeout, $uibModal, $rootScope,
-            StateContentIdsToAudioTranslationsService, IdGenerationService,
-            AudioPlayerService, TranslationLanguageService, AlertsService,
-            StateEditorService, ExplorationStatesService, EditabilityService,
-            AssetsBackendApiService, recorderService, ContextService,
+            $filter, $rootScope, $scope, $timeout, $uibModal,
+            AlertsService, AssetsBackendApiService, AudioPlayerService,
+            ContextService, EditabilityService, ExplorationStatesService,
+            IdGenerationService, StateContentIdsToAudioTranslationsService,
+            StateEditorService, TranslationLanguageService,
+            recorderService, TranslationTabActiveContentIdService,
             RECORDING_TIME_LIMIT) {
           $scope.RECORDER_ID = 'recorderId';
           $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
@@ -250,11 +251,7 @@ oppia.directive('audioTranslationBar', [
             $scope.audioBlob = null;
           });
 
-          $scope.$watch('contentId', function() {
-            $scope.initAudioBar();
-          });
-
-          $scope.$on('refreshAudioTranslationBar', function() {
+          $scope.$on('activeContentIdChanged', function() {
             $scope.initAudioBar();
           });
 
@@ -362,6 +359,8 @@ oppia.directive('audioTranslationBar', [
             $scope.languageCode = TranslationLanguageService
               .getActiveLanguageCode();
             $scope.canTranslate = EditabilityService.isTranslatable();
+            $scope.contentId = (
+              TranslationTabActiveContentIdService.getActiveContentId());
             var audioTranslationObject = getAvailableAudio(
               $scope.contentId, $scope.languageCode);
             if (audioTranslationObject) {
@@ -374,7 +373,6 @@ oppia.directive('audioTranslationBar', [
               $scope.audioBlob = null;
               $scope.selectedRecording = false;
             }
-            $rootScope.loadingMessage = '';
           };
 
           $scope.track = {
@@ -514,9 +512,7 @@ oppia.directive('audioTranslationBar', [
               $scope.initAudioBar();
             });
           };
-          $scope.$on('refreshAudioTranslationBar', function() {
-            $scope.initAudioBar();
-          });
+          $scope.initAudioBar();
         }]
     };
   }]);
