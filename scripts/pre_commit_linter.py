@@ -1159,7 +1159,7 @@ def _check_docstrings(all_files):
     previous_line_message = (
         'There should not be any empty lines before the end of '
         'the multi-line docstring.')
-    space_in_docstring_message = (
+    space_after_triple_quotes_in_docstring_message = (
         'There should be no space after """ in docstring.')
     failed = False
     is_docstring = False
@@ -1190,7 +1190,8 @@ def _check_docstrings(all_files):
                         line[3] == ' '):
                     failed = True
                     print '%s --> Line %s: %s' % (
-                        filename, line_num + 1, space_in_docstring_message)
+                        filename, line_num + 1,
+                        space_after_triple_quotes_in_docstring_message)
                     print ''
                     is_docstring = False
 
