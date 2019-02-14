@@ -1,6 +1,101 @@
 # Per-directory ownership and automatic assignment for pull requests.
+
+# Audio and Translation team.
+/core/templates/dev/head/exploration_editor/translation_tab/ @DubeySandeep
+/core/controllers/translator*.py @DubeySandeep
+
+
+# Collection project.
+/core/domain/collection_*.py @kevinlee12
+/core/template/dev/head/collection_editor/ @kevinlee12
+/core/template/dev/head/collection_player/ @kevinlee12
+
+
+# Dev workflow team.
+/core/tests/ @apb7
+/scripts/ @apb7
+
+
+# Lesson Analytics team.
+/core/domain/stats_*.py @brianrodri
+/core/storage/statistics/ @brianrodri
+/core/templates/exploration_editor/stats_tab/ @brianrodri
+/extensions/actions/ @brianrodri
+/extensions/visualizations/ @brianrodri
+/extensions/issues/ @brianrodri
+
+
+# Library page.
+/core/template/dev/head/library/ @kevinlee12
+/core/domain/library_services.py @kevinlee12
+
+
+# New structures team.
+# Qestion project.
+/core/controllers/question_*.py @aks681
+/core/domain/question_*.py  @aks681
+/core/storage/question/ @aks681
+/core/templates/dev/head/domain/question/ @aks681
+/core/templates/dev/head/pages/question_editor/ @aks681
+/core/templates/dev/head/pages/questions_list/ @aks681
+
+# Skill project.
+/core/controllers/skill_*.py @aks681
+/core/domain/skill_*.py  @aks681
+/core/storage/skill/ @aks681
+/core/templates/dev/head/domain/skill/ @aks681
+/core/templates/dev/head/pages/skill_*/ @aks681
+
+# Story project.
+/core/controllers/story_*.py @aks681
+/core/domain/story_*.py  @aks681
+/core/storage/story/ @aks681
+/core/templates/dev/head/domain/story/ @aks681
+/core/templates/dev/head/pages/story_*/ @aks681
+
+# Topic project.
+/core/controllers/topic_*.py @aks681
+/core/domain/topic_*.py @aks681
+/core/storage/topic/ @aks681
+/core/templates/dev/head/domain/topic/ @aks681
+/core/templates/dev/head/pages/topic_*/ @aks681
+
+# Topics and skills dashboard project.
+/core/controllers/topics_and_skills_dashboard.py @aks681
+/core/templates/dev/head/pages/topics_and_skills_dashboard/ @aks681
+
+
+# Infrastructure.
+/core/storage/ @seanlip
+
+
+# Miscellaneous.
 /core/domain/html_cleaner.py @seanlip
-/core/storage/ @BenHenning @seanlip
-/core/tests/ @apb7 @seanlip
-manifest.json @vojtechjelinek @hoangviet1993 @seanlip
-/scripts/ @apb7 @seanlip @BenHenning @nithusha21
+
+
+# Rich text editor:
+/extension/rich_text_components @AllanYangZhou, @bansalnitish
+/extension/ckeditor_plugins @AllanYangZhou, @bansalnitish
+
+
+# Suggestion and feedback team.
+#Suggestion project.
+/core/domain/suggestion_*.py
+/core/storage/suggestion/
+/core/templates/dev/head/domain/suggestion/
+
+# Feedback project.
+/core/domain/feedback_*.py @nithusha21
+/core/storage/feedback/ @nithusha21
+/core/templates/dev/head/domain/feedback_message/ @nithusha21
+/core/templates/dev/head/domain/feedback_thread/ @nithusha21
+/core/templates/dev/head/pages/exploration_editor/feedback_tab/ @nithusha21
+
+
+# Speed Improvement team (Vojta)
+app.yaml @vojtechjelinek
+manifest.json @vojtechjelinek
+/core/templates/dev/head/pages/base.html @vojtechjelinek
+/core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
+/core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
+/core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
