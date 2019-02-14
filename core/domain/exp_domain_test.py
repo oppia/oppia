@@ -3622,8 +3622,8 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      translations_mapping
-      content: {}
+      translations_mapping:
+        content: {}
   New state:
     classifier_model_id: null
     content:

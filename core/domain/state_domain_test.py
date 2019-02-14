@@ -736,8 +736,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation_with_invalid_type_langauge_code_raise_error(self):
         written_translations_dict = {
-            'content': {
-                'translations_mapping': {
+            'translations_mapping': {
+                'content': {
                     123: {
                         'html': 'hello!',
                         'needs_update': False

@@ -395,7 +395,7 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      translations_mapping
+      translations_mapping:
         content: {}
         default_outcome: {}
 states_schema_version: %d
