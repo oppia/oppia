@@ -18,15 +18,6 @@ anchor_for_restoring_cache: &restore_cache
 
 version: 2
 jobs:
-  branches:
-    only:
-      # TODO (apb7): Remove circle-ci-integration before merging.
-      - circle-ci-integration
-      - master
-      - develop
-      - /^release-\d+\.\d+\.\d+$/
-      - /^release-\d+\.\d+\.\d+-hotfix-\d+$/
-
   setup:
     <<: *job_defaults
     steps:
