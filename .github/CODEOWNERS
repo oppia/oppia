@@ -79,7 +79,7 @@
 
 
 # Suggestion and feedback team.
-#Suggestion project. @nithusha21
+#Suggestion project.
 /core/domain/suggestion_*.py @nithusha21
 /core/storage/suggestion/ @nithusha21
 /core/templates/dev/head/domain/suggestion/ @nithusha21
