@@ -29,7 +29,7 @@ NAMES = utils.create_enum(
 GAE_PLATFORM = 'gae'
 
 
-class _Platform(object):
+class Platform(object):
     """A base class for platform-specific imports related to GAE."""
 
     @classmethod
@@ -44,7 +44,7 @@ class _Platform(object):
         raise NotImplementedError
 
 
-class _Gae(_Platform):
+class _Gae(Platform):
     """Provides platform-specific imports related to
     GAE (Google App Engine).
     """
@@ -239,7 +239,7 @@ class Registry(object):
     """
 
     # Maps platform names to the corresponding module registry classes.
-    _PLATFORM_MAPPING = {
+    PLATFORM_MAPPING = {
         _Gae.NAME: _Gae,
     }
 
@@ -251,7 +251,7 @@ class Registry(object):
         Returns:
             class: The corresponding platform-specific interface class.
         """
-        return cls._PLATFORM_MAPPING.get(GAE_PLATFORM)
+        return cls.PLATFORM_MAPPING.get(GAE_PLATFORM)
 
     @classmethod
     def import_models(cls, model_names):
