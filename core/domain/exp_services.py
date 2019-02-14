@@ -42,6 +42,7 @@ from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
@@ -742,7 +743,14 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-                    state.update_written_translations(change.new_value)
+                    if not isinstance(change.new_value, dict):
+                        raise Exception(
+                            'Expected written_translations to be a dict, '
+                            'received %s' % change.new_value)
+                    written_translations = (
+                        state_domain.WrittenTranslations.from_dict(
+                            change.new_value))
+                    state.update_written_translations(written_translations)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)

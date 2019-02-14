@@ -501,8 +501,10 @@ var constants = {
           "default_outcome": {}
       },
       "written_translations": {
-          "content": {},
-          "default_outcome": {}
+          "translations_mapping": {
+            "content": {},
+            "default_outcome": {}
+          }
       }
   },
 

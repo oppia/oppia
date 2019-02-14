@@ -1273,8 +1273,9 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
   New state:
     classifier_model_id: null
     content:
@@ -1305,8 +1306,9 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: A title
@@ -1359,8 +1361,9 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
   Renamed state:
     classifier_model_id: null
     content:
@@ -1391,8 +1394,9 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: A title
@@ -1571,8 +1575,9 @@ interaction:
   solution: null
 param_changes: []
 written_translations:
-  content: {}
-  default_outcome: {}
+  translations_mapping:
+    content: {}
+    default_outcome: {}
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
     SAMPLE_EXPORTED_DICT = {
@@ -1606,8 +1611,9 @@ interaction:
   solution: null
 param_changes: []
 written_translations:
-  content: {}
-  default_outcome: {}
+  translations_mapping:
+    content: {}
+    default_outcome: {}
 """)
     }
 
@@ -1642,8 +1648,9 @@ interaction:
   solution: null
 param_changes: []
 written_translations:
-  content: {}
-  default_outcome: {}
+  translations_mapping:
+    content: {}
+    default_outcome: {}
 """)
     }
 
@@ -2106,18 +2113,34 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_written_translations(self):
         """Test update content translations."""
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>Test!</p>',
+                        'needs_update': True
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
-                self.init_state_name, 'written_translations', {
-                    'content': {
-                        'hi': {
-                            'html': '<p>Test!</p',
-                            'needs_update': True
-                        }
-                    },
-                    'default_outcome': {}
-                }),
-            'Added text translations.')
+                self.init_state_name, 'written_translations',
+                written_translations_dict), 'Added text translations.')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.written_translations.to_dict(),
+            written_translations_dict)
+
+    def test_update_written_translations_with_list_fails(self):
+        """Test update content translation with a list fails."""
+        with self.assertRaisesRegexp(
+            Exception, 'Expected written_translations to be a dict, received '):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, _get_change_list(
+                    self.init_state_name, 'written_translations',
+                    [1, 2]), 'Added fake text translations.')
 
 
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
@@ -3080,7 +3103,8 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
+      translations_mapping:
+        content: {}
   %s:
     classifier_model_id: null
     content:
@@ -3109,8 +3133,9 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: Old Title

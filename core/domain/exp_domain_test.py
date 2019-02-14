@@ -603,7 +603,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration,
             r'Expected state content_ids_to_audio_translations to match '
             r'the listed content ids \[\'content\', \'default_outcome\', '
-            r'\'hint_1\'\]')
+            r'\'hint_1\'\], found \[\'content\', \'default_outcome\'\]')
 
         # Undo above changes.
         init_state.content_ids_to_audio_translations['hint_1'] = {}
@@ -3599,9 +3599,10 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   END:
     classifier_model_id: null
     content:
@@ -3621,6 +3622,7 @@ states:
       solution: null
     param_changes: []
     written_translations:
+      translations_mapping
       content: {}
   New state:
     classifier_model_id: null
@@ -3652,8 +3654,9 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
 states_schema_version: 27
 tags: []
 title: Title
@@ -3835,13 +3838,13 @@ title: Title
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v30(self):
-        """Test direct loading from a v29 yaml file."""
+        """Test direct loading from a v30 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V30)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v31(self):
-        """Test direct loading from a v29 yaml file."""
+        """Test direct loading from a v31 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V31)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
@@ -4101,8 +4104,9 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
   state1:
     classifier_model_id: null
     content:
@@ -4139,9 +4143,10 @@ states:
           html: <p>This is <em>solution</em> for state1</p>
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
-      solution: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        solution: {}
   state2:
     classifier_model_id: null
     content:
@@ -4217,12 +4222,13 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
-      hint_1: {}
-      hint_2: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        hint_1: {}
+        hint_2: {}
   state3:
     classifier_model_id: null
     content:
@@ -4283,9 +4289,10 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
 states_schema_version: 27
 tags: []
 title: title
@@ -4461,9 +4468,10 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   END:
     classifier_model_id: null
     content:
@@ -4483,7 +4491,8 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
+      translations_mapping:
+        content: {}
   New state:
     classifier_model_id: null
     content:
@@ -4514,8 +4523,9 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
 states_schema_version: 27
 tags: []
 title: Title
@@ -4571,8 +4581,10 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'default_outcome': {}
                 },
                 'written_translations': {
-                    'content': {},
-                    'default_outcome': {}
+                    'translations_mapping': {
+                        'content': {},
+                        'default_outcome': {}
+                    }
                 },
                 'interaction': {
                     'answer_groups': [],

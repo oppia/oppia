@@ -786,16 +786,16 @@ class WrittenTranslations(object):
         """Returns a dict representing this WrittenTranslations domain object.
 
         Returns:
-            dict. A dict, mapping content_id to a dict containing language_code
-            as a key and written translation dict as a value.
+            dict. A dict, mapping all fields of WrittenTranslations instance.
         """
-        written_translations_dict = {}
+        written_translations_dict = {'translations_mapping': {}}
+        translations_mapping = written_translations_dict['translations_mapping']
         for (content_id, language_code_to_written_translation) in (
                 self.translations_mapping.iteritems()):
-            written_translations_dict[content_id] = {}
+            translations_mapping[content_id] = {}
             for (language_code, written_translation) in (
                     language_code_to_written_translation.iteritems()):
-                written_translations_dict[content_id][language_code] = (
+                translations_mapping[content_id][language_code] = (
                     written_translation.to_dict())
 
         return written_translations_dict
@@ -814,7 +814,7 @@ class WrittenTranslations(object):
         """
         translations_mapping = {}
         for (content_id, language_code_to_written_translation) in (
-                written_translations_dict.iteritems()):
+                written_translations_dict['translations_mapping'].iteritems()):
             translations_mapping[content_id] = {}
             for (language_code, written_translation) in (
                     language_code_to_written_translation.iteritems()):
@@ -825,6 +825,10 @@ class WrittenTranslations(object):
 
     def validate(self, expected_content_id_list):
         """Validates properties of the WrittenTranslations.
+
+        Args:
+            expected_content_id_list: A list of content id which are expected to
+            be inside they WrittenTranslations.
 
         Raises:
             ValidationError: One or more attributes of the WrittenTranslations
@@ -1141,8 +1145,8 @@ class State(object):
                 associated with this state.
             content_ids_to_audio_translations: dict. A dict representing audio
                 translations for corresponding content_id.
-            written_translations: dict. A dict representing translation script
-                for corresponding content_id.
+            written_translations: WrittenTranslations. The written translations
+                for the state contents.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -1599,19 +1603,14 @@ class State(object):
                 content_ids_to_audio_translations_dict.iteritems())
         }
 
-    def update_written_translations(self, written_translations_dict):
+    def update_written_translations(self, written_translations):
         """Update the written_translations of a state.
 
         Args:
-            written_translations_dict: dict. The dict representation of
-                written_translations.
+            written_translations: WrittenTranslations. The new
+                WrittenTranslations object for the state.
         """
-        if not isinstance(written_translations_dict, dict):
-            raise Exception(
-                'Expected written_translations to be a dict, received %s'
-                % written_translations_dict)
-        self.written_translations = WrittenTranslations.from_dict(
-            written_translations_dict)
+        self.written_translations = written_translations
 
     def to_dict(self):
         """Returns a dict representing this State domain object.
@@ -1691,7 +1690,7 @@ class State(object):
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),
             copy.deepcopy(feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS),
-            WrittenTranslations(
+            WrittenTranslations.from_dict(
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)))
 
     @classmethod

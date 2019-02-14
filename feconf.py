@@ -216,8 +216,10 @@ DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
 }
 # Default written_translations dict for a default state template.
 DEFAULT_WRITTEN_TRANSLATIONS = {
-    'content': {},
-    'default_outcome': {}
+    'translations_mapping': {
+        'content': {},
+        'default_outcome': {}
+    }
 }
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
