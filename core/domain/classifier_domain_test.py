@@ -21,7 +21,6 @@ import datetime
 from core.domain import classifier_domain
 from core.tests import test_utils
 import utils
-# import feconf
 
 
 class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
@@ -397,7 +396,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             training_job.validate()
 
         # Verify validation error is raised when int is provided
-        # for state_name instead of string
+        # For state_name instead of string.
         training_job_dict['state_name'] = 1
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (
