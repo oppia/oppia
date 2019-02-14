@@ -18,6 +18,16 @@ anchor_for_restoring_cache: &restore_cache
 
 version: 2
 jobs:
+  build:
+    branches:
+      only:
+      # TODO (apb7): Remove circle-ci-integration before merging.
+      - circle-ci-integration
+      - master
+      - develop
+      - /^release-\d+\.\d+\.\d+$/
+      - /^release-\d+\.\d+\.\d+-hotfix-\d+$/
+
   setup:
     <<: *job_defaults
     steps:
@@ -75,7 +85,7 @@ jobs:
       - run:
           name: Run backend tests
           command: |
-            bash scripts/run_backend_tests.sh --exclude_load_tests
+            bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests
       - run:
           name: Generate backend coverage report
           command: |
