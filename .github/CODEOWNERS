@@ -79,10 +79,10 @@
 
 
 # Suggestion and feedback team.
-#Suggestion project.
-/core/domain/suggestion_*.py
-/core/storage/suggestion/
-/core/templates/dev/head/domain/suggestion/
+#Suggestion project. @nithusha21
+/core/domain/suggestion_*.py @nithusha21
+/core/storage/suggestion/ @nithusha21
+/core/templates/dev/head/domain/suggestion/ @nithusha21
 
 # Feedback project.
 /core/domain/feedback_*.py @nithusha21
@@ -92,7 +92,7 @@
 /core/templates/dev/head/pages/exploration_editor/feedback_tab/ @nithusha21
 
 
-# Speed Improvement team (Vojta)
+# Speed Improvement team.
 app.yaml @vojtechjelinek
 manifest.json @vojtechjelinek
 /core/templates/dev/head/pages/base.html @vojtechjelinek
