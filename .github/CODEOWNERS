@@ -73,7 +73,7 @@
 /core/domain/html_cleaner.py @seanlip
 
 
-# Rich text editor:
+# Rich text editor team.
 /extension/rich_text_components @AllanYangZhou, @bansalnitish
 /extension/ckeditor_plugins @AllanYangZhou, @bansalnitish
 
