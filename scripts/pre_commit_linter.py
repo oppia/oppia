@@ -1159,6 +1159,8 @@ def _check_docstrings(all_files):
     previous_line_message = (
         'There should not be any empty lines before the end of '
         'the multi-line docstring.')
+    space_in_docstring_message = (
+        'There should be no space after """ in docstring.')
     failed = False
     is_docstring = False
     is_class_or_function = False
@@ -1187,9 +1189,9 @@ def _check_docstrings(all_files):
                 if re.match(r'^""".+$', line) and is_docstring and (
                         line[3] == ' '):
                     failed = True
-                    print (
-                        '%s --> Line %s: There should be no space after """ '
-                        'in docstring.' % (filename, line_num + 1))
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1, space_in_docstring_message)
+                    print ''
                     is_docstring = False
 
                 # Check if single line docstring span two lines.
