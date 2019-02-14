@@ -26,7 +26,7 @@
             </div>
           </div>
         </div>
-        <div style="position: absolute; top: 50px">
+        <div class="oppia-stewards-landing-background-icon-row-container">
           <div class="oppia-stewards-landing-background-icon-row" style="margin-top: 20px">
             <img ng-src="<[getStaticSubjectImageUrl('Humor')]>" class="oppia-stewards-landing-background-icon" alt="">
             <img ng-src="<[getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-stewards-landing-background-icon" alt="">
@@ -323,6 +323,10 @@
   </div>
 
   <style>
+    .oppia-stewards-landing-background-icon-row-container {
+      position: absolute;
+      top: 50px;
+    }
     .oppia-stewards-sidebar {
       float: left;
       margin-right: 80px;
@@ -496,15 +500,14 @@
     }
     .oppia-stewards-landing-background-icon-row {
       margin-bottom: 0;
-      margin-left: -webkit-calc((100% - 2700px) / 2);
-      margin-left: -moz-calc((100% - 2700px) / 2);
-      margin-left: -o-calc((100% - 2700px) / 2);
-      margin-left: calc((100% - 2700px) / 2);
-      margin-right: -webkit-calc((100% - 2700px) / 2);
-      margin-right: -moz-calc((100% - 2700px) / 2);
-      margin-right: -o-calc((100% - 2700px) / 2);
-      margin-right: calc((100% - 2700px) / 2);
-      margin-top: 0;
+      margin-left: -webkit-calc((100vw - 2700px) / 2);
+      margin-left: -moz-calc((100vw - 2700px) / 2);
+      margin-left: -o-calc((100vw - 2700px) / 2);
+      margin-left: calc((100vw - 2700px) / 2);
+      margin-right: -webkit-calc((100vw - 2700px) / 2);
+      margin-right: -moz-calc((100vw - 2700px) / 2);
+      margin-right: -o-calc((100vw - 2700px) / 2);
+      margin-right: calc((100vw - 2700px) / 2);
       opacity: 0.4;
       position: relative;
       text-align: center;
@@ -520,6 +523,11 @@
        landing_page_stewards.html.
     */
     @media screen and (max-width: 890px) {
+      .oppia-stewards-landing-background-icon-row-container {
+        max-width: 100vw;
+        overflow: hidden;
+        margin-left: -54px;
+      }
       .oppia-stewards-landing-section-inner,
       .oppia-stewards-landing-section {
         height: auto;
@@ -544,7 +552,9 @@
         margin-left: auto;
       }
       .oppia-stewards-button {
-        font-size: 1em;
+        /* This font size is used in oppia.css for the button in splash page in
+           mobile view. */
+        font-size: 3.6vw;
         margin-bottom: 30px;
         width: auto;
       }
@@ -554,7 +564,9 @@
     }
     @media screen and (max-width: 320px) {
       .oppia-stewards-button {
-        font-size: 2.8vmax;
+        /* This font size is used in oppia.css for the button in splash page in
+           mobile view. */
+        font-size: 3.6vw;
       }
       .oppia-stewards-landing-h1 {
         white-space: normal;

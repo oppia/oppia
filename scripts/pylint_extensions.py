@@ -18,6 +18,7 @@
 presubmit checks.
 """
 
+import re
 import astroid
 import docstrings_checker  # pylint: disable=relative-import
 
@@ -696,8 +697,8 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
         modules are imported. It then adds a message accordingly.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node for a function or method
-                definition in AST.
+            node: astroid.node_classes.ImportFrom. Node for a import-from
+                statement in the AST.
         """
 
         try:
@@ -794,6 +795,108 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
             self.add_message('function-args-order-cls', node=node)
 
 
+class RestrictedImportChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks layers importing modules
+    from their respective restricted layers.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+    name = 'invalid-import'
+    priority = -1
+    msgs = {
+        'C0009': (
+            'Importing %s layer in %s layer is prohibited.',
+            'invalid-import',
+            'Storage layer and domain layer must not import'
+            'domain layer and controller layer respectively.'),
+    }
+
+    def visit_import(self, node):
+        """Visits every import statement in the file.
+
+        Args:
+         node: astroid.node_classes.Import. Node for a import statement
+                 in the AST.
+        """
+
+        modnode = node.root()
+        names = [name for name, _ in node.names]
+        # Checks import of domain layer in storage layer.
+        if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
+            if any('core.domain' in name for name in names):
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=('domain', 'storage'),
+                )
+        # Checks import of controller layer in domain layer.
+        if 'oppia.core.domain' in modnode.name and not '_test' in modnode.name:
+            if any('core.controllers' in name for name in names):
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=('controller', 'domain'),
+                )
+
+    def visit_importfrom(self, node):
+        """Visits all import-from statements in a python file and checks that
+        modules are imported. It then adds a message accordingly.
+
+        Args:
+            node: astroid.node_classes.ImportFrom. Node for a import-from
+                statement in the AST.
+        """
+
+        modnode = node.root()
+        if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
+            if 'core.domain' in node.modname:
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=('domain', 'storage'),
+                )
+        if 'oppia.core.domain' in modnode.name and not '_test' in modnode.name:
+            if 'core.controllers' in node.modname:
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=('controller', 'domain'),
+                )
+
+
+class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
+    """Checker for single character files and newline at EOF."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'newline-at-eof'
+    priority = -1
+    msgs = {
+        'C0007': (
+            'Files should end in a single newline character.',
+            'newline-at-eof',
+            'Please enter a single newline at the end of the file.'),
+        'C0008': (
+            'Only one character in file',
+            'only-one-character',
+            'Files with only one character are not allowed.'),
+    }
+
+    def process_module(self, node):
+        """Process a module.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        file_content = node.stream().readlines()
+        file_length = len(file_content)
+
+        if file_length == 1 and len(file_content[0]) == 1:
+            self.add_message('only-one-character', line=file_length)
+        if file_length >= 2 and not re.search(r'[^\n]\n', file_content[-1]):
+            self.add_message('newline-at-eof', line=file_length)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -806,3 +909,5 @@ def register(linter):
     linter.register_checker(ImportOnlyModulesChecker(linter))
     linter.register_checker(BackslashContinuationChecker(linter))
     linter.register_checker(FunctionArgsOrderChecker(linter))
+    linter.register_checker(RestrictedImportChecker(linter))
+    linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
