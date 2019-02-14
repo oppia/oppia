@@ -65,7 +65,7 @@ GCS_AUDIO_ID_REGEX = re.compile(
 GCS_IMAGE_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
         ALLOWED_IMAGE_EXTENSIONS) + '))$')
-SUCCESSFULL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
+SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -934,14 +934,14 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
             # includes the validation checks for written_translations as they
             # are excluded while creating new state object out of the dict.
             exploration.validate()
-            yield (SUCCESSFULL_EXPLORATION_MIGRATION, item.id)
+            yield (SUCCESSFUL_EXPLORATION_MIGRATION, item.id)
         except Exception as e:
             yield ('Error %s while validating new exploration' % str(e),
                    item.id)
 
     @staticmethod
     def reduce(key, value):
-        if key == SUCCESSFULL_EXPLORATION_MIGRATION:
+        if key == SUCCESSFUL_EXPLORATION_MIGRATION:
             yield (key, len(value))
         else:
             yield (key, value)
