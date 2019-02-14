@@ -91,9 +91,7 @@
         logoutUrl: JSON.parse('{{logout_url|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
         username: JSON.parse('{{username|js_string}}'),
-        allowYamlFileUpload: JSON.parse('{{allow_yaml_file_upload|js_string}}'),
-        PROMO_BAR_IS_ENABLED: JSON.parse('{{promo_bar_enabled|js_string}}'),
-        PROMO_BAR_MESSAGE: JSON.parse('{{promo_bar_message|js_string}}')
+        allowYamlFileUpload: JSON.parse('{{allow_yaml_file_upload|js_string}}')
       };
     </script>
 
@@ -110,7 +108,7 @@
     </div>
     <div ng-if="!iframed">
       <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
-      <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
+      <promo-bar>
       </promo-bar>
       <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
       </div>
@@ -195,6 +193,7 @@
     <script src="/templates/dev/head/services/StateRulesStatsService.js"></script>
     <script src="/templates/dev/head/services/ConstructTranslationIdsService.js"></script>
     <script src="/templates/dev/head/services/UserService.js"></script>
+    <script src="/templates/dev/head/services/PromoBarService.js"></script>
     <script src="/templates/dev/head/services/contextual/DeviceInfoService.js"></script>
     <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
     <script src="/templates/dev/head/services/contextual/WindowDimensionsService.js"></script>

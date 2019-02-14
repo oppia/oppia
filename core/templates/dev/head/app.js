@@ -100,6 +100,12 @@ oppia.constant('SITE_NAME', 'Oppia.org');
 
 oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
 
+// Whether to enable the promo bar functionality. This does not actually turn on
+// the promo bar, as that is gated by a config value (see config_domain). This
+// merely avoids checking for whether the promo bar is enabled for every Oppia
+// page visited.
+oppia.constant('ENABLE_PROMO_BAR', true);
+
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([
   '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
