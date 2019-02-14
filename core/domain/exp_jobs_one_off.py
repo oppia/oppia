@@ -65,6 +65,7 @@ GCS_AUDIO_ID_REGEX = re.compile(
 GCS_IMAGE_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
         ALLOWED_IMAGE_EXTENSIONS) + '))$')
+SUCCESSFULL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -845,8 +846,7 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.deleted or item.states_schema_version != (
-                feconf.CURRENT_STATES_SCHEMA_VERSION):
+        if item.deleted:
             return
 
         try:
@@ -905,27 +905,43 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
                 set(citat.keys()) - set(state_content_id_list))
             for content_id in extra_content_ids_in_citat:
                 state_dict['content_ids_to_audio_translations'].pop(content_id)
+                yield('Deleted extra content_id from '
+                      'content_ids_to_audio_translations of %s state in %s'
+                      % (state_name, item.id), content_id)
 
             # Create written_translations using the state_content_id_list.
             state_dict['written_translations'] = {}
+            translations_mapping = {}
             for content_id in state_content_id_list:
-                state_dict['written_translations'][content_id] = {}
+                translations_mapping[content_id] = {}
+            state_dict['written_translations']['translations_mapping'] = (
+                translations_mapping)
 
-            if state_dict['written_translations'].keys() != (
-                    state_dict['content_ids_to_audio_translations'].keys()) != (
-                        state_content_id_list):
+            if set(state_dict['content_ids_to_audio_translations'].keys()) != (
+                    set(state_content_id_list)):
+                yield ('Error when validating exploration in dict.', item.id)
+            if set(translations_mapping.keys()) != set(state_content_id_list):
                 yield ('Error when validating exploration in dict.', item.id)
 
-            new_states[state_name] = state_domain.State.from_dict(state_dict)
+            # Creating a State domain object out of the new state dict, this
+            # conversion will not include written_translations into the object.
+            new_state = state_domain.State.from_dict(state_dict)
+            new_states[state_name] = new_state
 
         exploration.states = new_states
         try:
+            # Validating exploration after migration, this validation doesn't
+            # includes the validation checks for written_translations as they
+            # are excluded while creating new state object out of the dict.
             exploration.validate()
-            yield ('Successfully migrated exploration', item.id)
+            yield (SUCCESSFULL_EXPLORATION_MIGRATION, item.id)
         except Exception as e:
             yield ('Error %s while validating new exploration' % str(e),
                    item.id)
 
     @staticmethod
     def reduce(key, value):
-        yield (key, value)
+        if key == SUCCESSFULL_EXPLORATION_MIGRATION:
+            yield (key, len(value))
+        else:
+            yield (key, value)

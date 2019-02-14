@@ -2800,6 +2800,10 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
             exp_jobs_one_off.ExplorationMigrationValidationJob.get_output(
                 job_id))
         expected_output = [
-            u'[u\'Successfully migrated exploration\', [u\'Exp_1\']]']
+            u'[u\'Deleted extra content_id from '
+            'content_ids_to_audio_translations of Introduction state in Exp_1\''
+            ', [u\'feedback_2\']]', u'[u\'Successfully migrated exploration\', '
+            '1]'
+        ]
 
         self.assertEqual(actual_output, expected_output)
