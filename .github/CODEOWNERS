@@ -6,7 +6,7 @@
 
 
 # Collection project.
-/core/domain/collection_*.py @kevinlee12
+/core/domain/collection*.py @kevinlee12
 /core/template/dev/head/collection_editor/ @kevinlee12
 /core/template/dev/head/collection_player/ @kevinlee12
 
@@ -17,7 +17,7 @@
 
 
 # Lesson Analytics team.
-/core/domain/stats_*.py @brianrodri
+/core/domain/stats*.py @brianrodri
 /core/storage/statistics/ @brianrodri
 /core/templates/exploration_editor/stats_tab/ @brianrodri
 /extensions/actions/ @brianrodri
@@ -31,31 +31,31 @@
 
 
 # New structures team.
-# Qestion project.
-/core/controllers/question_*.py @aks681
-/core/domain/question_*.py  @aks681
+# Question project.
+/core/controllers/question*.py @aks681
+/core/domain/question*.py  @aks681
 /core/storage/question/ @aks681
 /core/templates/dev/head/domain/question/ @aks681
 /core/templates/dev/head/pages/question_editor/ @aks681
 /core/templates/dev/head/pages/questions_list/ @aks681
 
 # Skill project.
-/core/controllers/skill_*.py @aks681
-/core/domain/skill_*.py  @aks681
+/core/controllers/skill*.py @aks681
+/core/domain/skill*.py  @aks681
 /core/storage/skill/ @aks681
 /core/templates/dev/head/domain/skill/ @aks681
-/core/templates/dev/head/pages/skill_*/ @aks681
+/core/templates/dev/head/pages/skill*/ @aks681
 
 # Story project.
-/core/controllers/story_*.py @aks681
-/core/domain/story_*.py  @aks681
+/core/controllers/story*.py @aks681
+/core/domain/story*.py  @aks681
 /core/storage/story/ @aks681
 /core/templates/dev/head/domain/story/ @aks681
-/core/templates/dev/head/pages/story_*/ @aks681
+/core/templates/dev/head/pages/story*/ @aks681
 
 # Topic project.
 /core/controllers/topic_*.py @aks681
-/core/domain/topic_*.py @aks681
+/core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
 /core/templates/dev/head/domain/topic/ @aks681
 /core/templates/dev/head/pages/topic_*/ @aks681
@@ -74,18 +74,18 @@
 
 
 # Rich text editor team.
-/extension/rich_text_components @AllanYangZhou, @bansalnitish
-/extension/ckeditor_plugins @AllanYangZhou, @bansalnitish
+/extension/rich_text_components @AllanYangZhou @bansalnitish
+/extension/ckeditor_plugins @AllanYangZhou @bansalnitish
 
 
 # Suggestion and feedback team.
-#Suggestion project.
-/core/domain/suggestion_*.py @nithusha21
+# Suggestion project.
+/core/domain/suggestion*.py @nithusha21
 /core/storage/suggestion/ @nithusha21
 /core/templates/dev/head/domain/suggestion/ @nithusha21
 
 # Feedback project.
-/core/domain/feedback_*.py @nithusha21
+/core/domain/feedback*.py @nithusha21
 /core/storage/feedback/ @nithusha21
 /core/templates/dev/head/domain/feedback_message/ @nithusha21
 /core/templates/dev/head/domain/feedback_thread/ @nithusha21
