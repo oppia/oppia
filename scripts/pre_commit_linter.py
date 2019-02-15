@@ -1495,10 +1495,11 @@ def _match_line_breaks_in_controller_dependencies(all_files):
                 if stringfied_dependencies != function_parameters:
                     failed = True
                     print (
-                        'Please ensure that in %s file the line breaks pattern '
-                        'between the stringfied dependencies:\n[%s]\nand the '
-                        'function parameters:\n(%s)\nfor the corresponding '
-                        'controller should exactly match.' % (
+                        'Please ensure that in file %s the line breaks pattern '
+                        'between the dependencies mentioned as strings:\n[%s]\n'
+                        'and the dependencies mentioned as function parameters:'
+                        '\n(%s)\nfor the corresponding controller should '
+                        'exactly match.' % (
                             filename, stringfied_dependencies,
                             function_parameters))
                     print ''
