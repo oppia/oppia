@@ -339,16 +339,6 @@ class BaseHandler(webapp2.RequestHandler):
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id)
         })
-        if feconf.ENABLE_PROMO_BAR:
-            promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
-            promo_bar_message = config_domain.PROMO_BAR_MESSAGE.value
-        else:
-            promo_bar_enabled = False
-            promo_bar_message = ''
-        values.update({
-            'promo_bar_enabled': promo_bar_enabled,
-            'promo_bar_message': promo_bar_message,
-        })
 
         if 'status_code' not in values:
             values['status_code'] = 200
