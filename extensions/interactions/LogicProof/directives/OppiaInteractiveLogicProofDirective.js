@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * Directive for the LogicProof Interaction.
+ */
+
 oppia.directive('oppiaInteractiveLogicProof', [
   'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
@@ -278,49 +282,3 @@ oppia.directive('oppiaInteractiveLogicProof', [
     };
   }
 ]);
-
-oppia.directive('oppiaResponseLogicProof', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/LogicProof/directives/' +
-        'logic_proof_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      }]
-    };
-  }
-]);
-
-oppia.directive('oppiaShortResponseLogicProof', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/LogicProof/directives/' +
-        'logic_proof_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      }]
-    };
-  }
-]);
-
-oppia.factory('logicProofRulesService', [function() {
-  return {
-    Correct: function(answer) {
-      return answer.correct;
-    },
-    NotCorrect: function(answer) {
-      return !answer.correct;
-    },
-    NotCorrectByCategory: function(answer, inputs) {
-      return !answer.correct && answer.error_category === inputs.c;
-    }
-  };
-}]);
