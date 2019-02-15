@@ -81,7 +81,7 @@
   <div ng-if="isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
     <div class="conversation-skin-final-ratings-header" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
-    <div popover-placement="bottom" uib-popover-template="'popover/feedback'" popover-trigger="click">
+    <div popover-placement="bottom" uib-popover-template="'feedback_popup_container.html'" popover-trigger="click">
       <rating-display rating-value="userRating" is-editable="true" on-edit="submitUserRating"
                       class="conversation-skin-final-ratings-display">
       </rating-display>

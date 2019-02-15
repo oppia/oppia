@@ -248,11 +248,12 @@ oppia.directive('conversationSkin', [
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-        '$location', '$q', 'MessengerService', 'AlertsService',
-        'ExplorationEngineService', 'UrlService', 'FocusManagerService',
-        'LearnerViewRatingService', 'WindowDimensionsService',
-        'EditableExplorationBackendApiService', 'PlayerTranscriptService',
-        'LearnerParamsService', 'ExplorationRecommendationsService',
+        '$location', '$q', '$templateCache', 'MessengerService',
+        'AlertsService', 'ExplorationEngineService', 'UrlService',
+        'FocusManagerService', 'LearnerViewRatingService',
+        'WindowDimensionsService', 'EditableExplorationBackendApiService',
+        'PlayerTranscriptService', 'LearnerParamsService',
+        'ExplorationRecommendationsService',
         'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
         'StatsReportingService', 'SiteAnalyticsService',
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
@@ -274,11 +275,12 @@ oppia.directive('conversationSkin', [
         'CurrentInteractionService', 'UserService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
-            $location, $q, MessengerService, AlertsService,
-            ExplorationEngineService, UrlService, FocusManagerService,
-            LearnerViewRatingService, WindowDimensionsService,
-            EditableExplorationBackendApiService, PlayerTranscriptService,
-            LearnerParamsService, ExplorationRecommendationsService,
+            $location, $q, $templateCache, MessengerService,
+            AlertsService, ExplorationEngineService, UrlService,
+            FocusManagerService, LearnerViewRatingService,
+            WindowDimensionsService, EditableExplorationBackendApiService,
+            PlayerTranscriptService, LearnerParamsService,
+            ExplorationRecommendationsService,
             ReadOnlyExplorationBackendApiService, PlayerPositionService,
             StatsReportingService, SiteAnalyticsService,
             PretestQuestionBackendApiService, StateCardObjectFactory,
@@ -309,6 +311,8 @@ oppia.directive('conversationSkin', [
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.isLoggedIn = userInfo.isLoggedIn();
           });
+          $templateCache.put('feedback_popup_container.html',
+            '<feedback-popup></feedback-popup>');
 
           var hasInteractedAtLeastOnce = false;
           $scope.answerIsBeingProcessed = false;
