@@ -19,6 +19,7 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
 oppia.directive('oppiaInteractiveCodeRepl', [
   'HtmlEscaperService', 'codeReplRulesService', 'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE',
@@ -252,94 +253,6 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             submitAnswer, null);
         }
       ]
-    };
-  }
-]);
-
-oppia.directive('oppiaResponseCodeRepl', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/CodeRepl/directives/' +
-        'code_repl_response_directive.html'),
-      controller: [
-        '$scope', '$attrs', 'FocusManagerService',
-        function($scope, $attrs, FocusManagerService) {
-          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-
-          if ($scope.answer.error) {
-            $scope.errorFocusLabel = FocusManagerService.generateFocusLabel();
-            FocusManagerService.setFocus($scope.errorFocusLabel);
-          }
-        }
-      ]
-    };
-  }
-]);
-
-oppia.directive('oppiaShortResponseCodeRepl', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/CodeRepl/directives/' +
-        'code_repl_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      }]
-    };
-  }
-]);
-
-oppia.factory('codeReplRulesService', [
-  '$filter', 'CodeNormalizerService',
-  function($filter, CodeNormalizerService) {
-    return {
-      CodeEquals: function(answer, inputs) {
-        var normalizedCode =
-          CodeNormalizerService.getNormalizedCode(answer.code);
-        var normalizedExpectedCode =
-          CodeNormalizerService.getNormalizedCode(inputs.x);
-        return normalizedCode === normalizedExpectedCode;
-      },
-      CodeContains: function(answer, inputs) {
-        var normalizedCode =
-          CodeNormalizerService.getNormalizedCode(answer.code);
-        var normalizedSnippet =
-          CodeNormalizerService.getNormalizedCode(inputs.x);
-        return normalizedCode.indexOf(normalizedSnippet) !== -1;
-      },
-      CodeDoesNotContain: function(answer, inputs) {
-        var normalizedCode =
-          CodeNormalizerService.getNormalizedCode(answer.code);
-        var normalizedSnippet =
-          CodeNormalizerService.getNormalizedCode(inputs.x);
-        return normalizedCode.indexOf(normalizedSnippet) === -1;
-      },
-      OutputContains: function(answer, inputs) {
-        var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
-        var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-        return normalizedOutput.indexOf(normalizedSnippet) !== -1;
-      },
-      OutputEquals: function(answer, inputs) {
-        var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
-        var normalizedExpectedOutput =
-          $filter('normalizeWhitespace')(inputs.x);
-        return normalizedOutput === normalizedExpectedOutput;
-      },
-      ResultsInError: function(answer) {
-        return !!(answer.error.trim());
-      },
-      ErrorContains: function(answer, inputs) {
-        var normalizedError = $filter('normalizeWhitespace')(answer.error);
-        var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-        return normalizedError.indexOf(normalizedSnippet) !== -1;
-      }
     };
   }
 ]);
