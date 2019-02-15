@@ -96,23 +96,3 @@ oppia.directive('oppiaInteractiveEndExploration', [
     };
   }
 ]);
-
-oppia.directive('oppiaResponseEndExploration', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    template: ''
-  };
-}]);
-
-oppia.directive('oppiaShortResponseEndExploration', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    template: ''
-  };
-}]);
-
-oppia.factory('endExplorationRulesService', [function() {
-  return {};
-}]);
