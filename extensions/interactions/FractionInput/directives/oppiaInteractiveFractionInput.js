@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * Directive for the interactive fraction input.
+ */
+
 oppia.directive('oppiaInteractiveFractionInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
@@ -141,94 +145,6 @@ oppia.directive('oppiaInteractiveFractionInput', [
             submitAnswerFn, $scope.isAnswerValid);
         }
       ]
-    };
-  }
-]);
-
-oppia.directive('oppiaResponseFractionInput', [
-  'FractionObjectFactory', 'HtmlEscaperService', 'UrlInterpolationService',
-  function(
-      FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/FractionInput/directives/' +
-        'fraction_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = FractionObjectFactory.fromDict(answer).toString();
-      }]
-    };
-  }
-]);
-
-oppia.directive('oppiaShortResponseFractionInput', [
-  'FractionObjectFactory', 'HtmlEscaperService', 'UrlInterpolationService',
-  function(
-      FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/FractionInput/directives/' +
-        'fraction_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = FractionObjectFactory.fromDict(answer).toString();
-      }]
-    };
-  }
-]);
-
-/**
- * Rule evaluation for the fraction input.
- */
-oppia.factory('fractionInputRulesService', [
-  'FractionObjectFactory',
-  function(FractionObjectFactory) {
-    var toFloat = function(fractionDict) {
-      return FractionObjectFactory.fromDict(fractionDict).toFloat();
-    };
-
-    return {
-      IsEquivalentTo: function(answer, inputs) {
-        return toFloat(answer) === toFloat(inputs.f);
-      },
-      IsEquivalentToAndInSimplestForm: function(answer, inputs) {
-        var simplestForm =
-          FractionObjectFactory.fromDict(inputs.f).convertToSimplestForm();
-        return toFloat(answer) === toFloat(inputs.f) &&
-          angular.equals(answer, simplestForm);
-      },
-      IsExactlyEqualTo: function(answer, inputs) {
-        // Only returns true if both answers are structurally equal.
-        return angular.equals(answer, inputs.f);
-      },
-      IsLessThan: function(answer, inputs) {
-        return toFloat(answer) < toFloat(inputs.f);
-      },
-      IsGreaterThan: function(answer, inputs) {
-        return toFloat(answer) > toFloat(inputs.f);
-      },
-      HasIntegerPartEqualTo: function(answer, inputs) {
-        var answerFraction = FractionObjectFactory.fromDict(answer);
-        return answerFraction.getIntegerPart() === inputs.x;
-      },
-      HasNumeratorEqualTo: function(answer, inputs) {
-        return answer.numerator === inputs.x;
-      },
-      HasDenominatorEqualTo: function(answer, inputs) {
-        return answer.denominator === inputs.x;
-      },
-      HasNoFractionalPart: function(answer) {
-        return answer.numerator === 0;
-      },
-      HasFractionalPartExactlyEqualTo: function(answer, inputs) {
-        return (
-          answer.numerator === inputs.f.numerator &&
-          answer.denominator === inputs.f.denominator);
-      },
     };
   }
 ]);
