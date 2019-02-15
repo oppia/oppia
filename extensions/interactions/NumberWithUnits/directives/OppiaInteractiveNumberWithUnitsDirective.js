@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * Directive for the NumberWithUnits interaction.
+ */
+
 oppia.directive('oppiaInteractiveNumberWithUnits', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
@@ -106,86 +110,6 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
             }).result.then(function() {});
           };
         }]
-    };
-  }
-]);
-
-oppia.directive('oppiaResponseNumberWithUnits', [
-  'NumberWithUnitsObjectFactory', 'HtmlEscaperService',
-  'UrlInterpolationService', function(NumberWithUnitsObjectFactory,
-      HtmlEscaperService, UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/NumberWithUnits/directives/' +
-        'number_with_units_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = NumberWithUnitsObjectFactory.fromDict(
-          answer).toString();
-      }]
-    };
-  }
-]);
-
-oppia.directive('oppiaShortResponseNumberWithUnits', [
-  'NumberWithUnitsObjectFactory', 'HtmlEscaperService',
-  'UrlInterpolationService', function(NumberWithUnitsObjectFactory,
-      HtmlEscaperService, UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/NumberWithUnits/directives/' +
-        'number_with_units_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = NumberWithUnitsObjectFactory.fromDict(
-          answer).toString();
-      }]
-    };
-  }
-]);
-
-// Rules service for number with units interaction.
-oppia.factory('numberWithUnitsRulesService', [
-  'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
-  function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
-    try {
-      NumberWithUnitsObjectFactory.createCurrencyUnits();
-    } catch (parsingError) {}
-
-    return {
-      IsEqualTo: function(answer, inputs) {
-        // Returns true only if input is exactly equal to answer.
-        answer = NumberWithUnitsObjectFactory.fromDict(answer);
-        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
-
-        answerString = answer.toMathjsCompatibleString();
-        inputsString = inputs.toMathjsCompatibleString();
-
-        answerList = NumberWithUnitsObjectFactory.fromRawInputString(
-          answerString).toDict();
-        inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
-          inputsString).toDict();
-        return angular.equals(answerList, inputsList);
-      },
-      IsEquivalentTo: function(answer, inputs) {
-        answer = NumberWithUnitsObjectFactory.fromDict(answer);
-        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
-        if (answer.type === 'fraction') {
-          answer.type = 'real';
-          answer.real = answer.fraction.toFloat();
-        }
-        if (inputs.type === 'fraction') {
-          inputs.type = 'real';
-          inputs.real = inputs.fraction.toFloat();
-        }
-        answerString = answer.toMathjsCompatibleString();
-        inputsString = inputs.toMathjsCompatibleString();
-        return math.unit(answerString).equals(math.unit(inputsString));
-      }
     };
   }
 ]);
