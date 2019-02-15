@@ -605,6 +605,28 @@ def get_completed_nodes_in_story(user_id, story_id):
     return completed_nodes
 
 
+def get_pending_nodes_in_story(user_id, story_id):
+    """Returns the nodes that are pending in a story
+
+    Args:
+        user_id: str. The user id of the user.
+        story_id: str. The id of the story.
+
+    Returns:
+        list(StoryNode): The list of story nodes, pending
+        for the user.
+    """
+    story = get_story_by_id(story_id)
+    pending_nodes = []
+
+    completed_node_ids = get_completed_node_ids(user_id, story_id)
+    for node in story.story_contents.nodes:
+        if node.id not in completed_node_ids:
+            pending_nodes.append(node)
+
+    return pending_nodes
+
+
 def record_completed_node_in_story_context(user_id, story_id, node_id):
     """Records a node by a given user in a given story
     context as having been played.
