@@ -1,5 +1,68 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.7.3 (16 February 2019)
+------------------------
+
+Infrastructural changes
+* Improvements to PlaythroughAudit (#6239)
+* Add None/deleted checks to DeleteIllegalPlaythroughsOneOffJob (#6195)
+* Fix Content-Disposition headers being unicode instead of str (#6192)
+* Fix check for clean working tree in common.py (#6191)
+* Fix #4666: Fixes correctness test for Text Input Prediction Service  (#6120)
+* Fix #5975: Create One-off Job to Remove Invalid Playthroughs (#6131)
+* Fix #5371: One Off Job to populate message_count in GeneralFeedbackThreadModel (#5999)
+* Fix #6104: Use sub-process in pre_push_hook (#6114)
+* Fix part of #5591: Migrate Playthrough Feature Data into ExplorationFeaturesService (#6044)
+* Fix part of #5002: Move ALLOW_YAML_FILE_UPLOAD from feconf to constants (#5989)
+* Fix part of #5002: Remove GLOBALS from HTML (#6050)
+* Add audio translation schema for subtopic pages (#5823)
+* Remove automatic backups script. (#5956)
+* Fix classifier models when exploration is reverted and add test case for auto migrations (#5888)
+
+Improvements to the editors and players
+* Fix#6188: Fix word-break in explorations (#6187)
+* Changed word-break to word-wrap (#6189)
+* Fix #5745: Redesign audio bar of the translation tab. (#6167)
+* Fix #5822: Add customization option to allow multiple sort items in the same position in Drag and drop interaction (#6177)
+* UI changes to topic and skill editor (#6091)
+* Fix #5019 : The continue button is now visible with long feedback (#6136)
+* Fix #6122: Add $log service to prevent the error arising on rejecting suggestions (#6124)
+* Fix #4407: KaTeX text no longer goes outside text container in MathExpressionInput (#6130)
+* Fix #4833: prevents text overflow  in answer statistics page (#6137)
+* Fix #6078: Updating publish button after modal is dismissed (#6096)
+* Fix #5729: Adds a numerical progress status in the translation tab (#6097)
+* Fix #6055: Prevents content overflow in save draft modal (#6079)
+* Fix #5771: Ensure that the active tab of translation tab is maintained every time save draft/publish changes is clicked (#6076)
+* Fix #3074: Added height limit warning for card content (#5997)
+* Fix bugs in new structure editors (#6084)
+* Fix #6064: Changes backdrop controls to static for exploration publish modal (#6071)
+
+Improvements to testing suites
+* Reorder e2e test suites into more logical categorization (#6036)
+* Fix part of #5134: Adding tests for core.domain.collection_jobs_one_off (#6061)
+* Fix part of #4057: Adding tests to increase coverage of OutcomeObjectFactory.js (#6098)
+* Fix part of #5134 : Making the coverage of email_jobs_one_off to 100% (#6026)
+* Fix #5839: Filter slow network logs for mobile tests on Browserstack (#6090)
+* Fix #5923: Refactoring and clean up backend tests (#6074)
+* Fix part of #5134: Added test for fs_domain.py (#5988)
+* Fix #4829: Reduce code redundancy in backend testing (#5838)
+* Fixes error in backend tests redirection when trying to test a specific module within a test file (#6054)
+
+Documentation and development workflow
+* Fixes part of #4374: Update docstrings in the python backend code (#6028)
+* Enable missing docstrings check (#6073)
+
+Miscellaneous bug fixes and updates
+* Fix #6128: Successfully load mobile view in '/parents' page (#6259)
+* Fix #6118: Improved spacing between reload buttons on admin page (#6123)
+* Fix #6089: Moved common css to oppia.css and removed extra comments for sync (#6107)
+* Fix #6117: The Role tab tooltip on the admin page is now placed correctly (#6119)
+* Fix #5678: Add swipeable carousel to Library page in mobile view (#6087)
+* Fix #5751: remove G+ from the sharing icons. (#6058)
+* Fix #6056: Makes the resize of text box vertical (#6057)
+* Routine update to translations. (#6164)
+
+
 v2.7.2 (14 January 2019)
 ------------------------
 Updates to landing pages
