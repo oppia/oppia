@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,33 +13,28 @@
 // limitations under the License.
 
 /**
- * Directive for the CodeRepl response.
+ * Directive for the ImageClickInput short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
-oppia.directive('oppiaResponseCodeRepl', [
+oppia.directive('oppiaShortResponseImageClickInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/CodeRepl/directives/' +
-        'code_repl_response_directive.html'),
-      controller: [
-        '$scope', '$attrs', 'FocusManagerService',
-        function($scope, $attrs, FocusManagerService) {
-          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-
-          if ($scope.answer.error) {
-            $scope.errorFocusLabel = FocusManagerService.generateFocusLabel();
-            FocusManagerService.setFocus($scope.errorFocusLabel);
-          }
-        }
-      ]
+        '/interactions/ImageClickInput/directives/' +
+        'image_click_input_short_response_directive.html'),
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        $scope.clickRegionLabel = (
+          _answer.clickedRegions.length > 0 ? _answer.clickedRegions[0] :
+          'Clicked on image');
+      }]
     };
   }
 ]);

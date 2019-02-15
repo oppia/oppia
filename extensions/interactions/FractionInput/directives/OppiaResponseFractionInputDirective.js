@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,24 +13,22 @@
 // limitations under the License.
 
 /**
- * Directive for the CodeRepl short response.
- *
- * IMPORTANT NOTE: The naming convention for customization args that are passed
- * into the directive is: the name of the parameter, followed by 'With',
- * followed by the name of the arg.
+ * Directive for the FractionInput response.
  */
 
-oppia.directive('oppiaShortResponseCodeRepl', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+oppia.directive('oppiaResponseFractionInput', [
+  'FractionObjectFactory', 'HtmlEscaperService', 'UrlInterpolationService',
+  function(
+      FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/CodeRepl/directives/' +
-        'code_repl_short_response_directive.html'),
+        '/interactions/FractionInput/directives/' +
+        'fraction_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        $scope.answer = FractionObjectFactory.fromDict(answer).toString();
       }]
     };
   }

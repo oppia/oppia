@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,11 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the ImageClickInput rules and service.
- *
- * IMPORTANT NOTE: The naming convention for customization args that are passed
- * into the directive is: the name of the parameter, followed by 'With',
- * followed by the name of the arg.
+ * @fileoverview Rules service for the interaction.
  */
 
 oppia.factory('imageClickInputRulesService', [function() {
