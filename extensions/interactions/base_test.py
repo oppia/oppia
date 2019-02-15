@@ -307,7 +307,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # The directives directory should contain the following files:
             #  Required:
-            #    * A JS file called {InteractionName}.js.
+            #    * A JS file called
+            #    OppiaInteractive{InteractionName}Directive.js.
+            #    * A JS file called OppiaResponse{InteractionName}Directive.js.
+            #    * A JS file called
+            #    OppiaShortResponse{InteractionName}Directive.js.
+            #    * A JS file called {InteractionName}RulesService.js.
             #    * A JS file called {InteractionName}ValidationService.js.
             #    * A HTML file called
             #      {InteractionName}_interaction_directive.html.
@@ -322,7 +327,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             snakecase_interaction_id = (
                 utils.camelcase_to_snakecase(interaction_id))
 
-            js_file = os.path.join(directives_dir, '%s.js' % interaction_id)
+            interaction_directive_js_file = os.path.join(
+                directives_dir, 'OppiaInteractive%sDirective.js' % (
+                    interaction_id))
+            response_directive_js_file = os.path.join(
+                directives_dir, 'OppiaResponse%sDirective.js' % interaction_id)
+            short_response_directive_js_file = os.path.join(
+                directives_dir, 'OppiaShortResponse%sDirective.js' % (
+                    interaction_id))
+            rules_service_js_file = os.path.join(
+                directives_dir, '%sRulesService.js' % interaction_id)
             validation_service_js_file = os.path.join(
                 directives_dir, '%sValidationService.js' % interaction_id)
             interaction_directive_html = os.path.join(
@@ -335,7 +349,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 directives_dir,
                 '%s_short_response_directive.html' % snakecase_interaction_id)
 
-            self.assertTrue(os.path.isfile(js_file))
+            self.assertTrue(os.path.isfile(interaction_directive_js_file))
+            self.assertTrue(os.path.isfile(response_directive_js_file))
+            self.assertTrue(os.path.isfile(short_response_directive_js_file))
+            self.assertTrue(os.path.isfile(rules_service_js_file))
             self.assertTrue(os.path.isfile(validation_service_js_file))
             self.assertTrue(os.path.isfile(interaction_directive_html))
             self.assertTrue(os.path.isfile(response_directive_html))
@@ -354,31 +371,71 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
                 self.assertEqual(int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
-            js_file_content = utils.get_file_contents(js_file)
+            interaction_directive_js_file_content = utils.get_file_contents(
+                interaction_directive_js_file)
+            response_directive_js_file_content = utils.get_file_contents(
+                response_directive_js_file)
+            short_response_directive_js_file_content = utils.get_file_contents(
+                short_response_directive_js_file)
             html_file_content = utils.get_file_contents(html_file)
+            rules_service_js_file_content = utils.get_file_contents(
+                rules_service_js_file)
             validation_service_js_file_content = utils.get_file_contents(
                 validation_service_js_file)
 
             self.assertIn(
-                'oppiaInteractive%s' % interaction_id, js_file_content)
-            self.assertIn('oppiaResponse%s' % interaction_id, js_file_content)
+                'oppiaInteractive%s' % interaction_id,
+                interaction_directive_js_file_content)
+            self.assertIn('oppiaResponse%s' % interaction_id,
+                response_directive_js_file_content)
+            self.assertIn('oppiaShortResponse%s' % interaction_id,
+                short_response_directive_js_file_content)
+            self.assertIn(
+                '%sRulesService' % (
+                    interaction_id[0].lower() + interaction_id[1:]),
+                rules_service_js_file_content)
+            self.assertIn(
+                '%sValidationService' % interaction_id,
+                validation_service_js_file_content)
+
             # Check that the html template includes js script for the
             # interaction.
             self.assertIn(
                 '<script src="/extensions/interactions/%s/'
-                'directives/%s.js">'
+                'directives/OppiaInteractive%sDirective.js">'
                 '</script>' % (interaction_id, interaction_id),
+                html_file_content)
+            self.assertIn(
+                '<script src="/extensions/interactions/%s/'
+                'directives/OppiaResponse%sDirective.js">'
+                '</script>' % (interaction_id, interaction_id),
+                html_file_content)
+            self.assertIn(
+                '<script src="/extensions/interactions/%s/'
+                'directives/OppiaShortResponse%sDirective.js">'
+                '</script>' % (interaction_id, interaction_id),
+                html_file_content)
+            self.assertIn(
+                '<script src="/extensions/interactions/%s/'
+                'directives/%sRulesService.js"></script>' % (
+                    interaction_id, interaction_id),
                 html_file_content)
             self.assertIn(
                 '<script src="/extensions/interactions/%s/'
                 'directives/%sValidationService.js"></script>' % (
                     interaction_id, interaction_id),
                 html_file_content)
-            self.assertNotIn('<script>', js_file_content)
-            self.assertNotIn('</script>', js_file_content)
-            self.assertIn(
-                '%sValidationService' % interaction_id,
-                validation_service_js_file_content)
+
+            self.assertNotIn('<script>', interaction_directive_js_file_content)
+            self.assertNotIn('</script>', interaction_directive_js_file_content)
+            self.assertNotIn('<script>', response_directive_js_file_content)
+            self.assertNotIn('</script>', response_directive_js_file_content)
+            self.assertNotIn(
+                '<script>', short_response_directive_js_file_content)
+            self.assertNotIn(
+                '</script>', short_response_directive_js_file_content)
+            self.assertNotIn('<script>', rules_service_js_file_content)
+            self.assertNotIn('</script>', rules_service_js_file_content)
             self.assertNotIn('<script>', validation_service_js_file_content)
             self.assertNotIn('</script>', validation_service_js_file_content)
 
