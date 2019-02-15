@@ -90,11 +90,11 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if not exploration_model.deleted:
             exp_services.create_exploration_summary(
                 exploration_model.id, None)
-            yield('SUCCESS', exploration_model.id)
+            yield ('SUCCESS', exploration_model.id)
 
     @staticmethod
     def reduce(key, values):
-        yield(key, len(values))
+        yield (key, len(values))
 
 
 class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -141,11 +141,11 @@ class ExplorationContributorsSummaryOneOffJob(
         summary.contributors_summary = (
             exp_services.compute_exploration_contributors_summary(item.id))
         exp_services.save_exploration_summary(summary)
-        yield('SUCCESS', item.id)
+        yield ('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield(key, len(values))
+        yield (key, len(values))
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -259,7 +259,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                 'Update exploration states from schema version %d to %d.' % (
                     item.states_schema_version,
                     feconf.CURRENT_STATES_SCHEMA_VERSION))
-            yield('SUCCESS', item.id)
+            yield ('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
@@ -853,7 +853,7 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
             exploration = exp_services.get_exploration_from_model(item)
             exp_rights = rights_manager.get_exploration_rights(item.id)
         except Exception as e:
-            yield('Error %s when loading exploration' % str(e), item.id)
+            yield ('Error %s when loading exploration' % str(e), item.id)
             return
 
         try:
@@ -862,8 +862,8 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
             else:
                 exploration.validate(strict=True)
         except Exception as e:
-            yield('Error %s when validating current exploration' % str(e),
-                  item.id)
+            yield ('Error %s when validating current exploration' % str(e),
+                   item.id)
             return
 
 
@@ -905,9 +905,9 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
                 set(citat.keys()) - set(state_content_id_list))
             for content_id in extra_content_ids_in_citat:
                 state_dict['content_ids_to_audio_translations'].pop(content_id)
-                yield('Deleted extra content_id from '
-                      'content_ids_to_audio_translations of %s state in %s'
-                      % (state_name, item.id), content_id)
+                yield ('Deleted extra content_id from '
+                       'content_ids_to_audio_translations of %s state in %s'
+                       % (state_name, item.id), content_id)
 
             # Create written_translations using the state_content_id_list.
             state_dict['written_translations'] = {}
@@ -919,9 +919,11 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
 
             if set(state_dict['content_ids_to_audio_translations'].keys()) != (
                     set(state_content_id_list)):
-                yield ('Error when validating exploration in dict.', item.id)
+                yield ('Error when validating content_ids_to_audio_translations'
+                       ' in the state dict of %s' % state_name, item.id)
             if set(translations_mapping.keys()) != set(state_content_id_list):
-                yield ('Error when validating exploration in dict.', item.id)
+                yield ('Error when validating written_translations in the '
+                       'state dict of %s' % state_name, item.id)
 
             # Creating a State domain object out of the new state dict, this
             # conversion will not include written_translations into the object.
