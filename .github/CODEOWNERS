@@ -58,7 +58,7 @@
 /core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
 /core/templates/dev/head/domain/topic/ @aks681
-# Instead of * we have used _* to avoid topics_and_skills_dashboar related files.
+# Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
 /core/templates/dev/head/pages/topic_*/ @aks681
 
 # Topics and skills dashboard project.
