@@ -40,7 +40,7 @@ describe('Player position service', function() {
     expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(false);
   });
 
-  it('should set display index card to given value', function() {
+  it('should set displayed index card to given value', function() {
     callBack = function() {};
     expect(pps.getDisplayedCardIndex()).toBe(null);
     pps.init(callBack);
