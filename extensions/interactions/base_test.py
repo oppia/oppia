@@ -386,9 +386,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertIn(
                 'oppiaInteractive%s' % interaction_id,
                 interaction_directive_js_file_content)
-            self.assertIn('oppiaResponse%s' % interaction_id,
+            self.assertIn(
+                'oppiaResponse%s' % interaction_id,
                 response_directive_js_file_content)
-            self.assertIn('oppiaShortResponse%s' % interaction_id,
+            self.assertIn(
+                'oppiaShortResponse%s' % interaction_id,
                 short_response_directive_js_file_content)
             self.assertIn(
                 '%sRulesService' % (
