@@ -316,7 +316,6 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
 
 
 
-
     def test_validation(self):
         """Tests to verify validate method of ClassifierTrainingJob domain."""
 
@@ -385,7 +384,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'Expected next_scheduled_check_time to be datetime')):
             training_job.validate()
 
-        # Verify validation error is raised when invalid state_name is provided.
+        # Verify validation error is raised when invalid state_name is provided
+        # for state_name.
         training_job_dict['next_scheduled_check_time'] = (
             datetime.datetime.strptime(
                 '2017-08-11 12:42:31', '%Y-%m-%d %H:%M:%S'))
@@ -396,38 +396,42 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             training_job.validate()
 
         # Verify validation error is raised when int is provided
-        # For state_name instead of string.
+        # for state_name instead of string.
         training_job_dict['state_name'] = 1
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected state to be a string')):
             training_job.validate()
 
-        # Verify validation error
-        # training_job_dict['state_name'] = 'some state'
-        # training_job_dict['status'] = 'status1.SOME_RANDOM_STRING'
-        # training_job = self._get_training_job_from_dict(training_job_dict)
-        # with self.assertRaisesRegexp(utils.ValidationError, (
-        #     'Expected status to be in %s' %
-        #      feconf.ALLOWED_TRAINING_JOB_STATUSES)):
-        #     training_job.validate()
+        # Verify validation error is raised when invalid status is
+        # provided instead of NEW/PENDING/COMPLETE/FAILED.
+        training_job_dict['state_name'] = 'some state'
+        training_job_dict['status'] = 'status1.SOME_RANDOM_STRING'
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected status value not passed')):
+            training_job.validate()
 
-        # Verify
-        # training_job_dict['state_name'] = 'some state'
-        # training_job_dict['interaction_id'] = 1
-        # training_job = self._get_training_job_from_dict(training_job_dict)
-        # with self.assertRaisesRegexp(utils.ValidationError, (
-        #     'Expected interaction_id to be a string')):
-        #     training_job.validate()
+        # Verify validation error is raised when int is provided as
+        # interaction_id instead of string.
+        training_job_dict['status'] = 'NEW'
+        training_job_dict['interaction_id'] = 1
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected interaction_id to be a string')):
+            training_job.validate()
 
-        # training_job_dict['state_name'] = 'some state'
-        # training_job_dict['interaction_id'] = 'abc'
-        # training_job = self._get_training_job_from_dict(training_job_dict)
-        # with self.assertRaisesRegexp(utils.ValidationError, (
-        #     'Invalid interaction id')):
-        #     training_job.validate()
+        # Verify validation error is raised when invalid interaction
+        # id is provided.
+        training_job_dict['interaction_id'] = 'abc'
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Invalid interaction id')):
+            training_job.validate()
 
-        training_job_dict['state_name'] = 'a state name'
+        # Verify validation error is raised when int is provided as
+        # algorithm_id instead of string.
+        training_job_dict['interaction_id'] = 'TextInput'
         training_job_dict['algorithm_id'] = 1
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (
@@ -451,6 +455,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'Expected training_data to be a list')):
             training_job.validate()
 
+        # Verify validation error is raised when string is provided for
+        # classifier_data instead of a dict.
         training_job_dict['training_data'] = training_data
         training_job_dict['classifier_data'] = 'abc'
         training_job = self._get_training_job_from_dict(training_job_dict)
@@ -458,6 +464,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'Expected classifier_data to be a dict')):
             training_job.validate()
 
+        # Verify validation error is raised when string is provided for
+        # data_schema_version instead of an int.
         training_job_dict['classifier_data'] = None
         training_job_dict['data_schema_version'] = 'some random version'
         training_job = self._get_training_job_from_dict(training_job_dict)
@@ -465,7 +473,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'Expected data_schema_version to be an int')):
             training_job.validate()
 
-
+        # Verify validation error is raised when answer_group_index is
+        # not a key in training_data.
         training_data = [
             {
                 'answers': ['a1', 'a2']
@@ -480,6 +489,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'Expected answer_group_index to be a key in training_data')):
             training_job.validate()
 
+        # Verify validation error is raised when answers is
+        # not a key in training_data.
         training_data = [
             {
                 'answer_group_index': 1
@@ -494,6 +505,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'Expected answers to be a key in training_data')):
             training_job.validate()
 
+        # Verify validation error is raised when answer_group_index in
+        # training data is not an int.
         training_data = [
             {
                 'answer_group_index': 'some string',
@@ -510,6 +523,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'Expected answer_group_index to be an int')):
             training_job.validate()
 
+        # Verify validation error is raised when answers in training_data
+        # Is not a list.
         training_data = [
             {
                 'answer_group_index': 1,
