@@ -311,6 +311,8 @@ oppia.directive('conversationSkin', [
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.isLoggedIn = userInfo.isLoggedIn();
           });
+          // This loads html as a template in cache so that it can be retreived
+          // later by uib-popover-template.
           $templateCache.put(
             'feedback_popup_container.html', FEEDBACK_POPOVER_HTML);
 

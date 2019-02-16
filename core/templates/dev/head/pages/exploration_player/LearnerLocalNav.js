@@ -39,6 +39,8 @@ oppia.controller('LearnerLocalNav', [
       $scope.username = userInfo.getUsername();
       $rootScope.loadingMessage = '';
     });
+    // This loads html as a template in cache so that it can be retreived
+    // later by uib-popover-template.
     $templateCache.put('feedback_popup_container.html', FEEDBACK_POPOVER_HTML);
     $scope.showLearnerSuggestionModal = function() {
       ShowSuggestionModalForLearnerLocalViewService.showSuggestionModal(
