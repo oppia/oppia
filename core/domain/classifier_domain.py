@@ -331,9 +331,10 @@ class ClassifierTrainingJob(object):
 
         if self.status not in feconf.ALLOWED_TRAINING_JOB_STATUSES:
             raise utils.ValidationError(
-                'Expected status to be in %s, received %s' %
-                feconf.ALLOWED_TRAINING_JOB_STATUSES,
-                self.exp_version)
+                'Expected status value not passed, it should be one'
+                'of [NEW, FAILED, COMPLETE, PENDING] received %s' %
+                self.status)
+
 
         if not isinstance(self.interaction_id, basestring):
             raise utils.ValidationError(
