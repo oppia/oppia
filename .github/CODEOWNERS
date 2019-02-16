@@ -76,8 +76,8 @@
 
 
 # Rich text editor team.
-/extensions/rich_text_components @AllanYangZhou @bansalnitish
-/extensions/ckeditor_plugins @AllanYangZhou @bansalnitish
+/extensions/rich_text_components/ @AllanYangZhou @bansalnitish
+/extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
 
 
 # Suggestion and feedback team.
