@@ -29,6 +29,7 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.platform import models
 import feconf
 import utils
@@ -64,6 +65,7 @@ GCS_AUDIO_ID_REGEX = re.compile(
 GCS_IMAGE_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
         ALLOWED_IMAGE_EXTENSIONS) + '))$')
+SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -88,11 +90,11 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if not exploration_model.deleted:
             exp_services.create_exploration_summary(
                 exploration_model.id, None)
-            yield('SUCCESS', exploration_model.id)
+            yield ('SUCCESS', exploration_model.id)
 
     @staticmethod
     def reduce(key, values):
-        yield(key, len(values))
+        yield (key, len(values))
 
 
 class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -139,11 +141,11 @@ class ExplorationContributorsSummaryOneOffJob(
         summary.contributors_summary = (
             exp_services.compute_exploration_contributors_summary(item.id))
         exp_services.save_exploration_summary(summary)
-        yield('SUCCESS', item.id)
+        yield ('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield(key, len(values))
+        yield (key, len(values))
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -257,7 +259,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                 'Update exploration states from schema version %d to %d.' % (
                     item.states_schema_version,
                     feconf.CURRENT_STATES_SCHEMA_VERSION))
-            yield('SUCCESS', item.id)
+            yield ('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
@@ -831,6 +833,120 @@ class InteractionCustomizationArgsValidationJob(
         # Combine all values from multiple lists into a single list
         # for that error type.
         yield (key, list(set().union(*final_values)))
+
+
+class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job to validate exploration migration can be carried out
+    successfully.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        try:
+            exploration = exp_services.get_exploration_from_model(item)
+            exp_rights = rights_manager.get_exploration_rights(item.id)
+        except Exception as e:
+            yield ('Error %s when loading exploration' % str(e), item.id)
+            return
+
+        try:
+            if exp_rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+                exploration.validate()
+            else:
+                exploration.validate(strict=True)
+        except Exception as e:
+            yield ('Error %s when validating current exploration' % str(e),
+                   item.id)
+            return
+
+
+        states = exploration.states
+        new_states = {}
+        for state_name, state in states.iteritems():
+            state_dict = state.to_dict()
+            state_content_id_list = []
+
+            # Add state card's content id into the state_content_id_list.
+            state_content_id_list.append(state_dict['content']['content_id'])
+
+            # Add answer_groups content id into the state_content_id_list.
+            for answer_group in state_dict['interaction']['answer_groups']:
+                answer_feedback = answer_group['outcome']['feedback']
+                state_content_id_list.append(answer_feedback['content_id'])
+
+            # If present, add default_outcome content id into
+            # state_content_id_list.
+            default_outcome = state_dict['interaction']['default_outcome']
+            if default_outcome is not None:
+                state_content_id_list.append(
+                    default_outcome['feedback']['content_id'])
+
+            # Add hints content id into state_content_id_list.
+            for hint in state_dict['interaction']['hints']:
+                state_content_id_list.append(hint['hint_content']['content_id'])
+
+            # If present, add solution content id into state_content_id_list.
+            solution = state_dict['interaction']['solution']
+            if solution:
+                state_content_id_list.append(
+                    solution['explanation']['content_id'])
+
+            # Filter content_ids_to_audio_translations with unwanted
+            # content id.
+            citat = state_dict['content_ids_to_audio_translations']
+            extra_content_ids_in_citat = (
+                set(citat.keys()) - set(state_content_id_list))
+            for content_id in extra_content_ids_in_citat:
+                state_dict['content_ids_to_audio_translations'].pop(content_id)
+                yield ('Deleted extra content_id from '
+                       'content_ids_to_audio_translations of %s state in %s'
+                       % (state_name, item.id), content_id)
+
+            # Create written_translations using the state_content_id_list.
+            state_dict['written_translations'] = {}
+            translations_mapping = {}
+            for content_id in state_content_id_list:
+                translations_mapping[content_id] = {}
+            state_dict['written_translations']['translations_mapping'] = (
+                translations_mapping)
+
+            if set(state_dict['content_ids_to_audio_translations'].keys()) != (
+                    set(state_content_id_list)):
+                yield ('Error when validating content_ids_to_audio_translations'
+                       ' in the state dict of %s' % state_name, item.id)
+            if set(translations_mapping.keys()) != set(state_content_id_list):
+                yield ('Error when validating written_translations in the '
+                       'state dict of %s' % state_name, item.id)
+
+            # Creating a State domain object out of the new state dict, this
+            # conversion will not include written_translations into the object.
+            new_state = state_domain.State.from_dict(state_dict)
+            new_states[state_name] = new_state
+
+        exploration.states = new_states
+        try:
+            # Validating exploration after migration, this validation doesn't
+            # includes the validation checks for written_translations as they
+            # are excluded while creating new state object out of the dict.
+            exploration.validate()
+            yield (SUCCESSFUL_EXPLORATION_MIGRATION, item.id)
+        except Exception as e:
+            yield ('Error %s while validating new exploration' % str(e),
+                   item.id)
+
+    @staticmethod
+    def reduce(key, value):
+        if key == SUCCESSFUL_EXPLORATION_MIGRATION:
+            yield (key, len(value))
+        else:
+            yield (key, value)
 
 
 class EmptySubtitledHtmlAuditJob(jobs.BaseMapReduceOneOffJobManager):
