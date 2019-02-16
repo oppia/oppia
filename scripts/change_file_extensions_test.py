@@ -84,15 +84,15 @@ class ChangeExtensionsTest(test_utils.GenericTestBase):
         with open('%s/%s' % (self.non_rename_dir, self.ts_test_file), 'w') as f:
             f.write(self.ts_test_file_content)
 
-        change_file_extensions.change_extension(
-            [self.rename_dir],
-            '.js',
-            '.ts')
-
     def test_extensions_are_changed_only_in_specified_directory(self):
         """Test that change extensions method renames only js file in the
         specified directory.
         """
+
+        change_file_extensions.change_extension(
+            [self.rename_dir],
+            '.js',
+            '.ts')
 
         actual_files_in_dir_used_in_renaming = []
         for (dirpath, _, filenames) in os.walk(self.rename_dir):
@@ -126,6 +126,11 @@ class ChangeExtensionsTest(test_utils.GenericTestBase):
 
     def test_no_change_made_is_to_file_contents_after_renaming(self):
         """Test that file content remains unchanged."""
+
+        change_file_extensions.change_extension(
+            [self.rename_dir],
+            '.js',
+            '.ts')
 
         with open(
             '%s/js_file_in_dir.ts' % self.rename_dir, 'r') as f:
