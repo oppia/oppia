@@ -23,13 +23,13 @@ oppia.controller('LearnerLocalNav', [
   '$scope', '$rootScope', '$http', '$uibModal', '$templateCache',
   'AlertsService', 'ExplorationEngineService', 'ExplorationPlayerStateService',
   'FocusManagerService', 'UrlInterpolationService', 'UserService',
-  'FLAG_EXPLORATION_URL_TEMPLATE',
+  'FEEDBACK_POPOVER_HTML', 'FLAG_EXPLORATION_URL_TEMPLATE',
   'ShowSuggestionModalForLearnerLocalViewService',
   function(
       $scope, $rootScope, $http, $uibModal, $templateCache,
       AlertsService, ExplorationEngineService, ExplorationPlayerStateService,
       FocusManagerService, UrlInterpolationService, UserService,
-      FLAG_EXPLORATION_URL_TEMPLATE,
+      FEEDBACK_POPOVER_HTML, FLAG_EXPLORATION_URL_TEMPLATE,
       ShowSuggestionModalForLearnerLocalViewService) {
     $scope.explorationId = ExplorationEngineService.getExplorationId();
     $scope.canEdit = GLOBALS.canEdit;
@@ -39,8 +39,7 @@ oppia.controller('LearnerLocalNav', [
       $scope.username = userInfo.getUsername();
       $rootScope.loadingMessage = '';
     });
-    $templateCache.put('feedback_popup_container.html',
-      '<feedback-popup></feedback-popup>');
+    $templateCache.put('feedback_popup_container.html', FEEDBACK_POPOVER_HTML);
     $scope.showLearnerSuggestionModal = function() {
       ShowSuggestionModalForLearnerLocalViewService.showSuggestionModal(
         'edit_exploration_state_content', {});

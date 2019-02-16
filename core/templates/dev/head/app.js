@@ -106,6 +106,12 @@ oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
 // page visited.
 oppia.constant('ENABLE_PROMO_BAR', true);
 
+oppia.constant('FEEDBACK_POPOVER_HTML', '<feedback-popup></feedback-popup>');
+oppia.constant('ANSWER_POPOVER_HTML',
+  '<div style="max-height: 300px; overflow-y: scroll;">' +
+  '<angular-html-bind html-data="getAnswerHtml()">' +
+  '</angular-html-bind></div>');
+
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([
   '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
