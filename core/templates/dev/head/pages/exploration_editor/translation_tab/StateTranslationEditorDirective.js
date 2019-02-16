@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the state content editor.
+ * @fileoverview Directive for the state translation editor.
  */
 
-oppia.directive('stateContentEditor', [
+oppia.directive('stateTranslationEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -33,13 +33,11 @@ oppia.directive('stateContentEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state_editor/state_content_editor_directive.html'),
+        '/pages/exploration_editor/translation_tab/' +
+        'state_translation_editor_directive.html'),
       controller: [
-        '$scope', 'StateContentService', 'EditabilityService',
-        'EditorFirstTimeEventsService',
-        function(
-            $scope, StateContentService, EditabilityService,
-            EditorFirstTimeEventsService) {
+        '$scope', 'StateContentService', 'EditabilityService', function(
+            $scope, StateContentService, EditabilityService) {
           $scope.HTML_SCHEMA = {
             type: 'unicode'
           };
@@ -51,19 +49,6 @@ oppia.directive('stateContentEditor', [
 
           $scope.contentEditorIsOpen = false;
           $scope.isEditable = EditabilityService.isEditable;
-          $scope.cardHeightLimitWarningIsShown = true;
-
-          $scope.isCardHeightLimitReached = function() {
-            var shadowPreviewCard = $(
-              '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
-            );
-            var height = shadowPreviewCard.height();
-            return (height > 630);
-          };
-
-          $scope.hideCardHeightLimitWarning = function() {
-            $scope.cardHeightLimitWarningIsShown = false;
-          };
 
           var saveContent = function() {
             StateContentService.saveDisplayedValue();
@@ -79,7 +64,6 @@ oppia.directive('stateContentEditor', [
 
           $scope.openStateContentEditor = function() {
             if ($scope.isEditable()) {
-              EditorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
               $scope.contentEditorIsOpen = true;
             }
           };
