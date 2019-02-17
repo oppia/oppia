@@ -701,8 +701,10 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
 
 class SignUpTests(test_utils.GenericTestBase):
 
-    def test_redirect_on_opening_new_tab_during_signup(self):
-
+    def test_error_is_raised_on_opening_new_tab_during_signup(self):
+        """ Test that error is raised if user opens a new tab
+        during signup.
+        """
         self.login('abc@example.com')
         response = self.get_html_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -728,8 +730,10 @@ class SignUpTests(test_utils.GenericTestBase):
             '[probably in another window]. Please log in again. '
             'You will be redirected to main page in a while!'))
 
-    def test_no_redirect_on_opening_new_tab_after_signup(self):
-
+    def test_no_error_is_raised_on_opening_new_tab_after_signup(self):
+        """ Test that no error is raised if user opens a new tab
+        after signup.
+        """
         self.login('abc@example.com')
         response = self.get_html_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
