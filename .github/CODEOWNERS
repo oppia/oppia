@@ -1,7 +1,7 @@
 # Per-directory ownership and automatic assignment for pull requests.
 
 # Answer classification team.
-/core/controllers/classifier*.py @DubeySandeep
+/core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08
 /core/storage/classifier/ @prasanna08
 /core/templates/dev/head/domain/classifier/ @prasanna08
