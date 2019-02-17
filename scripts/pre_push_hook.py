@@ -300,11 +300,11 @@ def run_frontend_tests_status(files_to_lint):
     """Checks if frontend tests needs to be run."""
 
     excluded_paths = (
-    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
-    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
-    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4')
+        'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
+        'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
+        '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+        'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
+        '*.mp3', '*.mp4')
 
     js_files_to_check = [
         filename for filename in files_to_lint if not
