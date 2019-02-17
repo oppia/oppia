@@ -349,7 +349,7 @@ def main():
                     print 'Push failed, please correct the linting issues above'
                     sys.exit(1)
             frontend_status = 0
-            if  run_frontend_tests_status(files_to_lint):
+            if run_frontend_tests_status(files_to_lint):
                 frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'
