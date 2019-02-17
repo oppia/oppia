@@ -136,7 +136,7 @@ describe('Exploration translation', function() {
     users.logout();
   });
 
-  fit('should contain accessibility elements', function() {
+  it('should contain accessibility elements', function() {
     users.createUser('user2@translationTab.com', 'user2TranslationTab');
     users.login('user2@translationTab.com');
     workflow.createExploration();
