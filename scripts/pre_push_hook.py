@@ -31,7 +31,6 @@ but it will have no effect.
 # pylint: disable=wrong-import-order
 import argparse
 import collections
-import fnmatch
 import os
 import pprint
 import shutil
