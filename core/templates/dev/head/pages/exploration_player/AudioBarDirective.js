@@ -39,7 +39,7 @@ oppia.directive('audioBar', [
             WindowDimensionsService, AudioTranslationManagerService,
             EVENT_AUTOPLAY_AUDIO, BrowserCheckerService) {
           $scope.audioBarIsExpanded = false;
-          $scope.showProgressBar = true;
+          $scope.showProgressBar = false;
 
           $scope.languagesInExploration =
             AudioTranslationLanguageService.getLanguageOptionsForDropdown();
