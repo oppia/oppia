@@ -114,9 +114,9 @@ states:
     classifier_model_id: null
     content:
       audio_translations: {}
-      html: "<div>Let\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;x=11&amp;quot;\"\
-        ></oppia-noninteractive-math>. What is the value of\_<oppia-noninteractive-math\
-        \ raw_latex-with-value=\"&amp;quot;x^2&amp;quot;\"></oppia-noninteractive-math>?</div><div><br></div>"
+      html: "<div>Let\_<math raw_latex-with-value=\"&amp;quot;x=11&amp;quot;\"\
+        ></math>. What is the value of\_<math\
+        \ raw_latex-with-value=\"&amp;quot;x^2&amp;quot;\"></math>?</div><div><br></div>"
     interaction:
       answer_groups:
       - correct: false
@@ -192,8 +192,8 @@ states:
         check out the Library. You can also create new explorations, like this one,
         by clicking on the "Create" button in the top right of the page.</p><br><div>We
         hope you enjoy using Oppia. If you have feedback, please let us know at our
-        <oppia-noninteractive-link text-with-value="&amp;quot;discussion forum&amp;quot;"
-        url-with-value="&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;"></oppia-noninteractive-link>!</div><p></p>
+        <link text-with-value="&amp;quot;discussion forum&amp;quot;"
+        url-with-value="&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;"></link>!</div><p></p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -212,8 +212,8 @@ states:
     classifier_model_id: null
     content:
       audio_translations: {}
-      html: <p>Hi, welcome to Oppia! <oppia-noninteractive-link text-with-value="&amp;quot;Oppia&amp;quot;"
-        url-with-value="&amp;quot;https://oppia.github.io&amp;quot;"></oppia-noninteractive-link>
+      html: <p>Hi, welcome to Oppia! <link text-with-value="&amp;quot;Oppia&amp;quot;"
+        url-with-value="&amp;quot;https://oppia.github.io&amp;quot;"></link>
         is a tool that helps you create interactive learning activities that can be
         continually improved over time.<br><br>Incidentally, do you know where the
         name 'Oppia' comes from?<br></p>
@@ -262,14 +262,14 @@ states:
     content:
       audio_translations: {}
       html: In fact, the word Oppia means 'learn'. Can you guess which language it
-        comes from?<br><br><oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:&amp;quot;Here
+        comes from?<br><br><tabs tab_contents-with-value="[{&amp;quot;content&amp;quot;:&amp;quot;Here
         are some hints. The first hint narrows down the continent, the second tells
         you the geographical region, and the last gives away the answer.&amp;lt;br&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;Hints&amp;quot;},{&amp;quot;content&amp;quot;:&amp;quot;This
         language is spoken in a European country.&amp;lt;br&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;Hint
         1&amp;quot;},{&amp;quot;content&amp;quot;:&amp;quot;This country is located
         in Northern Europe.&amp;lt;br&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;Hint
         2&amp;quot;},{&amp;quot;content&amp;quot;:&amp;quot;Oppia is a Finnish word.&amp;lt;br&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;quot;Hint
-        3&amp;quot;}]"></oppia-noninteractive-tabs><br>
+        3&amp;quot;}]"></tabs><br>
     interaction:
       answer_groups:
       - correct: false

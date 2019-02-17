@@ -20,10 +20,10 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveMathExpressionInput', [
-  'HtmlEscaperService', 'mathExpressionInputRulesService',
+  'HtmlEscaperService', 'MathExpressionInputRulesService',
   'UrlInterpolationService',
   function(
-      HtmlEscaperService, mathExpressionInputRulesService,
+      HtmlEscaperService, MathExpressionInputRulesService,
       UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -205,7 +205,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             answer.latex = guppyInstance.latex();
             answer.ascii = guppyInstance.text();
             CurrentInteractionService.onSubmit(
-              answer, mathExpressionInputRulesService);
+              answer, MathExpressionInputRulesService);
           };
 
           CurrentInteractionService.registerCurrentInteraction(

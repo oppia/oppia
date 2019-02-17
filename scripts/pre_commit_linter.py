@@ -1464,8 +1464,9 @@ def _check_directive_scope(all_files):
 
 
 def _check_js_property(all_files):
-    """This function checks that all directives have an explicit
-    scope: {} and it should not be scope: true.
+    """This function ensures that all JS files has exactly
+    one component and the name of the component should match
+    the filename.
     """
     print 'Starting js property check'
     print '----------------------------------------'
@@ -1473,8 +1474,7 @@ def _check_js_property(all_files):
     files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.js') and not filename.endswith('app.js') and not
-        filename.endswith('directives.js')]
+        and filename.endswith('.js') and not filename.endswith('app.js')]
     failed = False
     summary_messages = []
     property_name = ''
@@ -1484,72 +1484,70 @@ def _check_js_property(all_files):
         exact_filename = filename.split('/')[-1][:-3]
         content = FileCache.read(filename)
         parsed_dict = _validate_and_parse_js_file(filename, content)
-        # Parse the body of the content as nodes.
-        parsed_nodes = parsed_dict['body']
-        for parsed_node in parsed_nodes:
-            # Check the type of the node.
-            if parsed_node['type'] != 'ExpressionStatement':
-                continue
-            # Separate the expression part of the node.
-            expression = parsed_node['expression']
-            # Check whether the expression belongs to a directive.
-            expression_type_is_not_call = (
-                expression['type'] != 'CallExpression')
-            if expression_type_is_not_call:
-                continue
-            expression_callee_type_is_not_member = (
-                expression['callee']['type'] != 'MemberExpression')
-            if expression_callee_type_is_not_member:
-                continue
-            callee_property = expression['callee']['property']['name']
-            if callee_property != 'factory' and (
-                    callee_property != 'directive' and
-                    callee_property != 'controller'):
-                continue
-            propertyz = callee_property
-            # Separate the arguments of the expression.
-            arguments = expression['arguments']
-            # The first argument of the expression is the
-            # name of the property.
-            property_name = arguments[0]['value']
-            property_num += 1
-            if callee_property == 'directive':
-                if (property_name[0].upper() + property_name[1:] +
-                        'Directive' != (exact_filename)):
-                    print (
-                        'Please ensure that the %s name strictly matches the '
-                        'filename' % (callee_property))
-                    print filename
-                    failed = True
-            else:
-                if property_name != exact_filename:
-                    print (
-                        'Please ensure that the %s name strictly matches the '
-                        'filename' % (callee_property))
-                    failed = True
-                    print filename
+        with _redirect_stdout(_TARGET_STDOUT):
+            # Parse the body of the content as nodes.
+            parsed_nodes = parsed_dict['body']
+            for parsed_node in parsed_nodes:
+                # Check the type of the node.
+                if parsed_node['type'] != 'ExpressionStatement':
+                    continue
+                # Separate the expression part of the node.
+                expression = parsed_node['expression']
+                # Check whether the expression belongs to a directive.
+                expression_type_is_not_call = (
+                    expression['type'] != 'CallExpression')
+                if expression_type_is_not_call:
+                    continue
+                expression_callee_type_is_not_member = (
+                    expression['callee']['type'] != 'MemberExpression')
+                if expression_callee_type_is_not_member:
+                    continue
+                callee_property = expression['callee']['property']['name']
+                if callee_property != 'factory' and (
+                        callee_property != 'directive' and
+                        callee_property != 'controller' and
+                        callee_property != 'filter'):
+                    continue
+                propertyz = callee_property
+                # Separate the arguments of the expression.
+                arguments = expression['arguments']
+                # The first argument of the expression is the
+                # name of the property.
+                property_name = arguments[0]['value']
+                property_num += 1
+                if callee_property == 'directive':
+                    if (property_name[0].upper() + property_name[1:] +
+                            'Directive' != (exact_filename)):
+                        print (
+                            '%s -> Please ensure that the %s name strictly matches the '
+                            'filename' % (filename, callee_property))
+                        failed = True
+                else:
+                    if property_name != exact_filename:
+                        print (
+                            '%s -> Please ensure that the %s name strictly matches the '
+                            'filename' % (filename, callee_property))
+                        failed = True
 
-        if property_num > 1:
-            print (
-                'Please ensure that there is exactly one %s in the file'
-                % (propertyz))
-            print filename
-            failed = True
+            if property_num > 1:
+                print (
+                    '%s -> Please ensure that there is exactly one %s in the file'
+                    % (filename, propertyz))
+                failed = True
 
-    if failed:
-        summary_message = '%s  Js property check failed' % (
-            _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = '%s  Js property check passed' % (
-            _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
+    with _redirect_stdout(_TARGET_STDOUT):
+        if failed:
+            summary_message = '%s  Js property check failed' % (
+                _MESSAGE_TYPE_FAILED)
+            print summary_message
+            summary_messages.append(summary_message)
+        else:
+            summary_message = '%s  Js property check passed' % (
+                _MESSAGE_TYPE_SUCCESS)
+            print summary_message
+            summary_messages.append(summary_message)
 
-    print ''
-    print '----------------------------------------'
-    print ''
+        print ''
 
     return summary_messages
 

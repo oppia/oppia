@@ -980,10 +980,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'content_id': 'content',
             'html': (
                 '<blockquote>Hello, this is state1</blockquote><p>'
-                '<oppia-noninteractive-image filepath-with-value='
+                '<image filepath-with-value='
                 '"&amp;quot;s1Content.png&amp;quot;" caption-with-value='
                 '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;">'
-                '</oppia-noninteractive-image></p>')
+                '</image></p>')
         }
         content2_dict = {
             'content_id': 'content',
@@ -1023,17 +1023,17 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'choices': {'value': [
                 (
                     '<p>This is value1 for MultipleChoice'
-                    '<oppia-noninteractive-image filepath-with-value='
+                    '<image filepath-with-value='
                     '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
+                    '"&amp;quot;&amp;quot;"></image></p>'
                 ),
                 (
                     '<p>This is value2 for MultipleChoice'
-                    '<oppia-noninteractive-image filepath-with-value='
+                    '<image filepath-with-value='
                     '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;&amp;quot;"></image>'
                     '</p></p>')
             ]}
         }
@@ -1041,24 +1041,24 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'choices': {'value': [
                 (
                     '<p>This is value1 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
+                    '<image filepath-with-value='
                     '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;&amp;quot;"></image>'
                     '</p>'),
                 (
                     '<p>This is value2 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
+                    '<image filepath-with-value='
                     '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;&amp;quot;"></image>'
                     '</p>'),
                 (
                     '<p>This is value3 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
+                    '<image filepath-with-value='
                     '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;&amp;quot;"></image>'
                     '</p>')
             ]}
         }
@@ -1084,10 +1084,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 'content_id': 'hint_1',
                 'html': (
                     '<p>Hello, this is html1 for state2'
-                    '<oppia-noninteractive-image filepath-with-value="'
+                    '<image filepath-with-value="'
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '"&amp;quot;&amp;quot;"></image>'
                     '</p>')
             }
         }, {
@@ -1111,12 +1111,12 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': (
-                        '<p>Outcome1 for state2<oppia-noninteractive-image'
+                        '<p>Outcome1 for state2<image'
                         ' filepath-with-value='
                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;"'
                         ' alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image></p>')
+                        '</image></p>')
                 },
                 'param_changes': [],
                 'labelled_as_correct': False,
@@ -1150,22 +1150,22 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 'inputs': {'x': [
                     (
                         '<p>This is value1 for ItemSelection'
-                        '<oppia-noninteractive-image filepath-with-value='
+                        '<image filepath-with-value='
                         '"&amp;quot;s3Choice1.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;" '
                         'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image></p>')
+                        '</image></p>')
                 ]}
             }, {
                 'rule_type': 'Equals',
                 'inputs': {'x': [
                     (
                         '<p>This is value3 for ItemSelection'
-                        '<oppia-noninteractive-image filepath-with-value='
+                        '<image filepath-with-value='
                         '"&amp;quot;s3Choice3.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;" '
                         'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image></p>')
+                        '</image></p>')
                 ]}
             }],
             'outcome': {

@@ -35,7 +35,14 @@
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
-  <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+  <script src="/templates/dev/head/components/forms/convertUnicodeWithParamsToHtml.js"></script>
+  <script src="/templates/dev/head/components/forms/convertHtmlToUnicode.js"></script>
+  <script src="/templates/dev/head/components/forms/convertUnicodeToHtml.js"></script>
+  <script src="/templates/dev/head/components/forms/isAtLeast.js"></script>
+  <script src="/templates/dev/head/components/forms/isAtMost.js"></script>
+  <script src="/templates/dev/head/components/forms/isFloat.js"></script>
+  <script src="/templates/dev/head/components/forms/isInteger.js"></script>
+  <script src="/templates/dev/head/components/forms/isNonempty.js"></script>
   <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
   <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
@@ -55,9 +62,9 @@
   <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
 
-  <script src="/extensions/objects/templates/MathLatexStringEditor.js"></script>
-  <script src="/extensions/objects/templates/SanitizedUrlEditor.js"></script>
-  <script src="/extensions/objects/templates/ListOfTabsEditor.js"></script>
+  <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ListOfTabsEditorDirective.js"></script>
 
   <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
   <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>

@@ -22,13 +22,13 @@
 
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ContextService',
-  'imageClickInputRulesService', 'UrlInterpolationService',
+  'ImageClickInputRulesService', 'UrlInterpolationService',
   'ImagePreloaderService', 'AssetsBackendApiService',
   'EXPLORATION_EDITOR_TAB_CONTEXT', 'EVENT_NEW_CARD_AVAILABLE',
   'LOADING_INDICATOR_URL',
   function(
       $sce, HtmlEscaperService, ContextService,
-      imageClickInputRulesService, UrlInterpolationService,
+      ImageClickInputRulesService, UrlInterpolationService,
       ImagePreloaderService, AssetsBackendApiService,
       EXPLORATION_EDITOR_TAB_CONTEXT, EVENT_NEW_CARD_AVAILABLE,
       LOADING_INDICATOR_URL) {
@@ -189,7 +189,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               clickedRegions: $scope.currentlyHoveredRegions
             };
             CurrentInteractionService.onSubmit(
-              answer, imageClickInputRulesService);
+              answer, ImageClickInputRulesService);
           };
 
           CurrentInteractionService.registerCurrentInteraction(null, null);

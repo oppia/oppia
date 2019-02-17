@@ -20,10 +20,10 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveInteractiveMap', [
-  'HtmlEscaperService', 'interactiveMapRulesService', 'UrlInterpolationService',
+  'HtmlEscaperService', 'InteractiveMapRulesService', 'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE',
   function(
-      HtmlEscaperService, interactiveMapRulesService, UrlInterpolationService,
+      HtmlEscaperService, InteractiveMapRulesService, UrlInterpolationService,
       EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
@@ -125,7 +125,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             }));
 
             CurrentInteractionService.onSubmit(
-              [ll.lat(), ll.lng()], interactiveMapRulesService);
+              [ll.lat(), ll.lng()], InteractiveMapRulesService);
           };
 
           refreshMap();

@@ -21,7 +21,7 @@ describe('Code REPL rules service', function() {
 
   var crrs = null;
   beforeEach(inject(function($injector) {
-    crrs = $injector.get('codeReplRulesService');
+    crrs = $injector.get('CodeReplRulesService');
   }));
 
   describe('\'equals\' rule', function() {

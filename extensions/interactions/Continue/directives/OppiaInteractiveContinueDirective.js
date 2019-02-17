@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveContinue', [
-  'HtmlEscaperService', 'continueRulesService', 'UrlInterpolationService',
-  function(HtmlEscaperService, continueRulesService, UrlInterpolationService) {
+  'HtmlEscaperService', 'ContinueRulesService', 'UrlInterpolationService',
+  function(HtmlEscaperService, ContinueRulesService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -54,7 +54,7 @@ oppia.directive('oppiaInteractiveContinue', [
             }
 
             CurrentInteractionService.onSubmit(
-              humanReadableAnswer, continueRulesService);
+              humanReadableAnswer, ContinueRulesService);
           };
 
           CurrentInteractionService.registerCurrentInteraction(

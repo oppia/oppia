@@ -16,21 +16,6 @@
 // named 'schemaBasedFormsShown'. This should be called by clients
 // when these forms first come into view.
 
-oppia.filter('convertHtmlToUnicode', [function() {
-  return function(html) {
-    return angular.element('<div>' + html + '</div>').text();
-  };
-}]);
-
-oppia.filter('convertUnicodeToHtml', [
-  '$sanitize', 'HtmlEscaperService',
-  function($sanitize, HtmlEscaperService) {
-    return function(text) {
-      return $sanitize(HtmlEscaperService.unescapedStrToEscapedStr(text));
-    };
-  }
-]);
-
 // Converts {{name}} substrings to <oppia-parameter>name</oppia-parameter> tags
 // and unescapes the {, } and \ characters. This is done by reading the given
 // string from left to right: if we see a backslash, we use the following
@@ -106,67 +91,5 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
         '</oppia-parameter>');
     });
     return result;
-  };
-}]);
-
-// The names of these filters must correspond to the names of the backend
-// validators (with underscores converted to camelcase).
-// WARNING: These filters do not validate the arguments supplied with the
-// validator definitions in the schema; these are assumed to be correct.
-oppia.filter('isAtLeast', [function() {
-  return function(input, args) {
-    return (input >= args.minValue);
-  };
-}]);
-
-oppia.filter('isAtMost', [function() {
-  return function(input, args) {
-    return (input <= args.maxValue);
-  };
-}]);
-
-oppia.filter('isNonempty', [function() {
-  return function(input) {
-    return Boolean(input);
-  };
-}]);
-
-oppia.filter('isInteger', [function() {
-  return function(input) {
-    return Number.isInteger(Number(input));
-  };
-}]);
-
-oppia.filter('isFloat', [function() {
-  return function(input) {
-    var FLOAT_REGEXP = /(?=.*\d)^\-?\d*(\.|\,)?\d*\%?$/;
-    // This regex accepts floats in the following formats:
-    // 0.
-    // 0.55..
-    // -0.55..
-    // .555..
-    // -.555..
-    // All examples above with '.' replaced with ',' are also valid.
-    // Expressions containing % are also valid (5.1% etc).
-
-    var viewValue = '';
-    try {
-      var viewValue = input.toString().trim();
-    } catch (e) {
-      return undefined;
-    }
-
-    if (viewValue !== '' && FLOAT_REGEXP.test(viewValue)) {
-      if (viewValue.slice(-1) === '%') {
-        // This is a percentage, so the input needs to be divided by 100.
-        return parseFloat(
-          viewValue.substring(0, viewValue.length - 1).replace(',', '.')
-        ) / 100.0;
-      } else {
-        return parseFloat(viewValue.replace(',', '.'));
-      }
-    } else {
-      return undefined;
-    }
   };
 }]);

@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('imageClickInputRulesService', [function() {
+oppia.factory('ImageClickInputRulesService', [function() {
   return {
     IsInRegion: function(answer, inputs) {
       return answer.clickedRegions.indexOf(inputs.x) !== -1;

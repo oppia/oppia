@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('codeReplRulesService', [
+oppia.factory('CodeReplRulesService', [
   '$filter', 'CodeNormalizerService',
   function($filter, CodeNormalizerService) {
     return {

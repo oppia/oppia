@@ -62,10 +62,10 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         }]
         invalid_items = [{
             'content-with-value': (
-                '<oppia-noninteractive-collapsible content-with-value='
+                '<collapsible content-with-value='
                 '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
                 'quot;" heading-with-value="&amp;quot;SubCollapsible&amp;'
-                'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>'
+                'quot;"></collapsible><p>&nbsp;</p>'
             ),
             'heading-with-value': 'Collaspible'
         }, {
@@ -146,10 +146,10 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                 'content': '<p>hello</p>', 'title': 'Tabs'
             }, {
                 'content': (
-                    '<p><oppia-noninteractive-link text-with-value="&amp;'
+                    '<p><link text-with-value="&amp;'
                     'quot;What is a link?&amp;quot;" url-with-value="'
                     '&amp;quot;https://link.com&amp;quot;">'
-                    '</oppia-noninteractive-link></p>'
+                    '</link></p>'
                 ), 'title': 'Tabs'
             }]
         }]

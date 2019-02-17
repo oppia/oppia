@@ -194,7 +194,7 @@ def convert_to_textangular(html_data):
         # the same appearance.
         elif tag.name == 'hr':
             tag.name = 'br'
-        # 'a' tag is to be replaced with oppia-noninteractive-link.
+        # 'a' tag is to be replaced with link.
         # For this the attributes and text within a tag is used to
         # create new link tag which is wrapped as parent of a and then
         # a tag is removed.
@@ -205,11 +205,11 @@ def convert_to_textangular(html_data):
             if tag.has_attr('href') and tag.get_text():
                 children = tag.findChildren()
                 for child in children:
-                    if child.name == 'oppia-noninteractive-link':
+                    if child.name == 'link':
                         tag.unwrap()
                         replace_with_link = False
                 if replace_with_link:
-                    link = soup.new_tag('oppia-noninteractive-link')
+                    link = soup.new_tag('link')
                     url = tag['href']
                     text = tag.get_text()
                     link['url-with-value'] = escape_html(json.dumps(url))
@@ -279,7 +279,7 @@ def convert_to_textangular(html_data):
     # Ensure that b and i tags are wrapped in an allowed parent.
     for tag_name in ['b', 'i']:
         for tag in soup.findAll(name=tag_name):
-            if tag.parent.name == 'oppia-noninteractive-link':
+            if tag.parent.name == 'link':
                 tag.parent.wrap(soup.new_tag(tag_name))
                 parent = tag.parent.parent
                 tag.unwrap()
@@ -298,8 +298,8 @@ def convert_to_textangular(html_data):
                 wrap_with_siblings(tag, soup.new_tag('p'))
 
     # Ensure oppia link component is not a child of another link component.
-    for link in soup.findAll(name='oppia-noninteractive-link'):
-        if link.parent.name == 'oppia-noninteractive-link':
+    for link in soup.findAll(name='link'):
+        if link.parent.name == 'link':
             link.unwrap()
 
     # Ensure that oppia block components are wrapped in an allowed parent.
@@ -497,7 +497,7 @@ def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
     """
     soup = bs4.BeautifulSoup(html_data.encode(encoding='utf-8'), 'html.parser')
 
-    for collapsible in soup.findAll(name='oppia-noninteractive-collapsible'):
+    for collapsible in soup.findAll(name='collapsible'):
         # To ensure that collapsible tags have content-with-value attribute.
         if 'content-with-value' not in collapsible.attrs or (
                 collapsible['content-with-value'] == ''):
@@ -512,7 +512,7 @@ def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
         if 'heading-with-value' not in collapsible.attrs:
             collapsible['heading-with-value'] = escape_html(json.dumps(''))
 
-    for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
+    for tabs in soup.findAll(name='tabs'):
         tab_content_json = unescape_html(tabs['tab_contents-with-value'])
         tab_content_list = json.loads(tab_content_json)
         for index, tab_content in enumerate(tab_content_list):
@@ -567,7 +567,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
             err_dict['strings'].append(html_data)
 
         for collapsible in soup.findAll(
-                name='oppia-noninteractive-collapsible'):
+                name='collapsible'):
             if 'content-with-value' not in collapsible.attrs or (
                     collapsible['content-with-value'] == ''):
                 is_invalid = True
@@ -581,7 +581,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
             if is_invalid:
                 err_dict['strings'].append(html_data)
 
-        for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
+        for tabs in soup.findAll(name='tabs'):
             tab_content_json = unescape_html(tabs['tab_contents-with-value'])
             tab_content_list = json.loads(tab_content_json)
             for tab_content in tab_content_list:
@@ -649,7 +649,7 @@ def _validate_soup_for_rte(soup, rte_format, err_dict):
 
 
 def add_caption_attr_to_image(html_string):
-    """Adds caption attribute to all oppia-noninteractive-image tags.
+    """Adds caption attribute to all image tags.
 
     Args:
         html_string: str. HTML string in which the caption attribute is to be
@@ -657,12 +657,12 @@ def add_caption_attr_to_image(html_string):
 
     Returns:
         str. Updated HTML string with the caption attribute for all
-            oppia-noninteractive-image tags.
+            image tags.
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
 
-    for image in soup.findAll(name='oppia-noninteractive-image'):
+    for image in soup.findAll(name='image'):
         attrs = image.attrs
         if 'caption-with-value' not in attrs:
             image['caption-with-value'] = escape_html(json.dumps(''))
@@ -731,7 +731,7 @@ def _validate_customization_args_in_tag(tag):
 
     try:
         component_types_to_component_classes[tag_name].validate(value_dict)
-        if tag_name == 'oppia-noninteractive-collapsible':
+        if tag_name == 'collapsible':
             content_html = value_dict['content-with-value']
             soup_for_collapsible = bs4.BeautifulSoup(
                 content_html, 'html.parser')
@@ -742,7 +742,7 @@ def _validate_customization_args_in_tag(tag):
                             component_tag):
                         yield err_msg
 
-        elif tag_name == 'oppia-noninteractive-tabs':
+        elif tag_name == 'tabs':
             tab_content_list = value_dict['tab_contents-with-value']
             for tab_content in tab_content_list:
                 content_html = tab_content['content']
@@ -777,7 +777,7 @@ def regenerate_image_filename_using_dimensions(filename, height, width):
 
 
 def add_dimensions_to_image_tags(exp_id, html_string):
-    """Adds dimensions to all oppia-noninteractive-image tags. Removes image
+    """Adds dimensions to all image tags. Removes image
     tags that have no filepath.
 
     Args:
@@ -786,10 +786,10 @@ def add_dimensions_to_image_tags(exp_id, html_string):
 
     Returns:
         str. Updated HTML string with the dimensions for all
-            oppia-noninteractive-image tags.
+            image tags.
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
-    for image in soup.findAll(name='oppia-noninteractive-image'):
+    for image in soup.findAll(name='image'):
         if (not image.has_attr('filepath-with-value') or
                 image['filepath-with-value'] == ''):
             image.decompose()

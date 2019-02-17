@@ -92,9 +92,9 @@ class Collapsible(BaseRteComponent):
             content.encode(encoding='utf-8'),
             'html.parser')
         collapsible = inner_soup.findAll(
-            name='oppia-noninteractive-collapsible')
+            name='collapsible')
         tabs = inner_soup.findAll(
-            name='oppia-noninteractive-tabs')
+            name='tabs')
         if len(collapsible) or len(tabs):
             raise Exception('Nested tabs and collapsible')
 
@@ -133,9 +133,9 @@ class Tabs(BaseRteComponent):
                 tab_content['content'].encode(encoding='utf-8'),
                 'html.parser')
             collapsible = inner_soup.findAll(
-                name='oppia-noninteractive-collapsible')
+                name='collapsible')
             tabs = inner_soup.findAll(
-                name='oppia-noninteractive-tabs')
+                name='tabs')
             if len(collapsible) or len(tabs):
                 raise Exception('Nested tabs and collapsible')
 

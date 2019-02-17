@@ -41,11 +41,11 @@ oppia.directive('graphViz', [
         'graph_viz_directive.html'),
       controller: [
         '$scope', '$element', '$attrs', '$document', '$timeout',
-        'FocusManagerService', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
+        'FocusManagerService', 'GraphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
         'EVENT_NEW_CARD_AVAILABLE', 'DeviceInfoService',
         function(
             $scope, $element, $attrs, $document, $timeout,
-            FocusManagerService, graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
+            FocusManagerService, GraphDetailService, GRAPH_INPUT_LEFT_MARGIN,
             EVENT_NEW_CARD_AVAILABLE, DeviceInfoService) {
           var _MODES = {
             MOVE: 0,
@@ -79,8 +79,8 @@ oppia.directive('graphViz', [
             mouseDragStartY: 0
           };
 
-          $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
-          $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
+          $scope.VERTEX_RADIUS = GraphDetailService.VERTEX_RADIUS;
+          $scope.EDGE_WIDTH = GraphDetailService.EDGE_WIDTH;
           $scope.selectedEdgeWeightValue = 0;
           $scope.shouldShowWrongWeightWarning = false;
 
@@ -572,11 +572,11 @@ oppia.directive('graphViz', [
             }
           };
           $scope.getDirectedEdgeArrowPoints = function(index) {
-            return graphDetailService.getDirectedEdgeArrowPoints(
+            return GraphDetailService.getDirectedEdgeArrowPoints(
               $scope.graph, index);
           };
           $scope.getEdgeCentre = function(index) {
-            return graphDetailService.getEdgeCentre($scope.graph, index);
+            return GraphDetailService.getEdgeCentre($scope.graph, index);
           };
 
           // Initial value of SVG view box.

@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('musicNotesInputRulesService', [
+oppia.factory('MusicNotesInputRulesService', [
   'NOTE_NAMES_TO_MIDI_VALUES', function(NOTE_NAMES_TO_MIDI_VALUES) {
     var _getMidiNoteValue = function(note) {
       if (NOTE_NAMES_TO_MIDI_VALUES.hasOwnProperty(note.readableNoteName)) {

@@ -16,7 +16,7 @@
  * @fileoverview Detail service for the interaction.
  */
 
-oppia.factory('graphDetailService', [function() {
+oppia.factory('GraphDetailService', [function() {
   return {
     VERTEX_RADIUS: 6,
     EDGE_WIDTH: 3,

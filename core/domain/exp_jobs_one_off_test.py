@@ -2001,9 +2001,9 @@ class ExplorationMigrationValidationJobForTextAngularTests(
             'content_id': 'content',
             'html': (
                 'Here is test case <a href="https://github.com">'
-                '<oppia-noninteractive-link url-with-value="&amp;quot;'
+                '<link url-with-value="&amp;quot;'
                 'https://github.com&amp;quot;" text-with-value="abc">'
-                '</oppia-noninteractive-link><p> testing in progress</p>'
+                '</link><p> testing in progress</p>'
             )
         }
         state1.update_content(content1_dict)
@@ -2018,9 +2018,9 @@ class ExplorationMigrationValidationJobForTextAngularTests(
                     '</span>prints output</p>.<blockquote><p> Could you get '
                     'it to do something?</p></blockquote> Can do this by '
                     'using statement like prints. <br> You can ask any if you '
-                    'have<oppia-noninteractive-link url-with-value="&amp;quot;'
+                    'have<link url-with-value="&amp;quot;'
                     'https://www.example.com&amp;quot;" text-with-value="'
-                    '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
+                    '&amp;quot;Here&amp;quot;"></link>.'
                 )
             },
             'labelled_as_correct': False,
@@ -2033,9 +2033,9 @@ class ExplorationMigrationValidationJobForTextAngularTests(
             'feedback': {
                 'content_id': 'default_outcome',
                 'html': (
-                    '<ol><li>This is last case</li><oppia-noninteractive-image '
+                    '<ol><li>This is last case</li><image '
                     'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
-                    '</oppia-noninteractive-image></ol>'
+                    '</image></ol>'
                 )
             },
             'labelled_as_correct': False,
@@ -2059,12 +2059,12 @@ class ExplorationMigrationValidationJobForTextAngularTests(
             exp_jobs_one_off
             .ExplorationMigrationValidationJobForTextAngular.get_output(job_id))
         expected_output = [
-            '[u\'oppia-noninteractive-image\', [u\'ol\']]',
+            '[u\'image\', [u\'ol\']]',
             (
                 '[u\'strings\', '
-                '[u\'<ol><li>This is last case</li><oppia-noninteractive-image '
+                '[u\'<ol><li>This is last case</li><image '
                 'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
-                '</oppia-noninteractive-image></ol>\']]'
+                '</image></ol>\']]'
             )
         ]
         self.assertEqual(actual_output, expected_output)
@@ -2158,20 +2158,20 @@ class ExplorationContentValidationJobForCKEditorTests(
         content2_dict = {
             'content_id': 'content',
             'html': (
-                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
-                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                '<p><image filepath-with-value="amp;quot;'
+                'random.png&amp;quot;"></image>Hello this '
                 'is test case to check image tag inside p tag</p>'
             )
         }
         content3_dict = {
             'content_id': 'content',
             'html': (
-                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                '<collapsible content-with-value="&amp;'
                 'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&'
                 'amp;lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
                 '&amp;quot;" heading-with-value="&amp;quot;'
                 'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
-                '</oppia-noninteractive-collapsible>'
+                '</collapsible>'
             )
         }
         state1.update_content(content1_dict)
@@ -2197,8 +2197,8 @@ class ExplorationContentValidationJobForCKEditorTests(
                 'content_id': 'default_outcome',
                 'html': (
                     '<pre>Hello this is <b> testing '
-                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
-                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
+                    '<image filepath-with-value="amp;quot;'
+                    'random.png&amp;quot;"></image> in '
                     '</b>progress</pre>'
 
                 )
@@ -2227,26 +2227,26 @@ class ExplorationContentValidationJobForCKEditorTests(
         expected_output = [
             '[u\'invalidTags\', [u\'span\', u\'code\', u\'b\']]',
             '[u\'ol\', [u\'ol\']]',
-            '[u\'oppia-noninteractive-image\', [u\'p\', u\'b\']]',
+            '[u\'image\', [u\'p\', u\'b\']]',
             '[u\'p\', [u\'pre\']]',
             (
                 '[u\'strings\', '
                 '[u\'<p>Lorem <span>ipsum </span></p> Hello this is <code>'
                 'oppia </code>\', u\'<pre>Hello this is <b> testing <oppia-'
                 'noninteractive-image filepath-with-value="amp;quot;random.'
-                'png&amp;quot;"></oppia-noninteractive-image>'
+                'png&amp;quot;"></image>'
                 ' in </b>progress</pre>\', '
                 'u\'<ol><ol><li>Item1</li></ol><li>Item2</li></ol>\', '
-                'u\'<p><oppia-noninteractive-image filepath-with-value="'
-                'amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>'
+                'u\'<p><image filepath-with-value="'
+                'amp;quot;random.png&amp;quot;"></image>'
                 'Hello this is test case to check '
                 'image tag inside p tag</p>\', '
-                'u\'<oppia-noninteractive-collapsible content-'
+                'u\'<collapsible content-'
                 'with-value="&amp;quot;&amp;lt;pre&amp;gt;&amp;lt;'
                 'p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;lt;/pre&amp;'
                 'gt;&amp;quot;" heading-with-value="&amp;quot;lorem '
                 'ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
-                '</oppia-noninteractive-collapsible>\']]'
+                '</collapsible>\']]'
             )
         ]
 
@@ -2315,20 +2315,20 @@ class ExplorationMigrationValidationJobForCKEditorTests(
         content2_dict = {
             'content_id': 'content',
             'html': (
-                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
-                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                '<p><image filepath-with-value="amp;quot;'
+                'random.png&amp;quot;"></image>Hello this '
                 'is test case to check image tag inside p tag</p>'
             )
         }
         content3_dict = {
             'content_id': 'content',
             'html': (
-                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                '<collapsible content-with-value="&amp;'
                 'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
                 'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
                 '&amp;quot;" heading-with-value="&amp;quot;'
                 'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
-                '</oppia-noninteractive-collapsible>'
+                '</collapsible>'
             )
         }
         state1.update_content(content1_dict)
@@ -2354,9 +2354,9 @@ class ExplorationMigrationValidationJobForCKEditorTests(
                 'content_id': 'default_outcome',
                 'html': (
                     '<pre>Hello this is <b> testing '
-                    '<oppia-noninteractive-image filepath-with-value='
+                    '<image filepath-with-value='
                     '"&amp;quot;random.png&amp;quot;">'
-                    '</oppia-noninteractive-image> in </b>progress</pre>'
+                    '</image> in </b>progress</pre>'
                 )
             },
             'labelled_as_correct': False,
@@ -2596,14 +2596,14 @@ class InteractionCustomizationArgsValidationJobTests(
         content1_dict = {
             'content_id': 'content',
             'html': (
-                '<oppia-noninteractive-tabs tab_contents-with-value="'
+                '<tabs tab_contents-with-value="'
                 '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
                 'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
                 'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
                 'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
                 'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
                 'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
-                '</oppia-noninteractive-tabs>'
+                '</tabs>'
             )
         }
         default_outcome_dict2 = {
@@ -2611,10 +2611,10 @@ class InteractionCustomizationArgsValidationJobTests(
             'feedback': {
                 'content_id': 'default_outcome',
                 'html': (
-                    '<p><oppia-noninteractive-link text-with-value="'
+                    '<p><link text-with-value="'
                     '&amp;quot;What is a link?&amp;quot;" url-with-'
                     'value="&amp;quot;htt://link.com&amp'
-                    ';quot;"></oppia-noninteractive-link></p>'
+                    ';quot;"></link></p>'
                 )
             },
             'labelled_as_correct': False,
@@ -2625,11 +2625,11 @@ class InteractionCustomizationArgsValidationJobTests(
         content3_dict = {
             'content_id': 'content',
             'html': (
-                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+                '<image alt-with-value="&amp;quot;A '
                 'circle divided into equal fifths.&amp;quot;" '
                 'caption-with-value="&amp;quot;Hello&amp;quot;" '
                 'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
-                '</oppia-noninteractive-image>'
+                '</image>'
             )
         }
         state1.update_content(content1_dict)
@@ -2652,16 +2652,16 @@ class InteractionCustomizationArgsValidationJobTests(
 
         expected_output = [(
             '[u\'Invalid filepath\', '
-            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            '[u\'<image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" caption-with-value'
             '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
-            'png&amp;quot;"></oppia-noninteractive-image>\']]'
+            'png&amp;quot;"></image>\']]'
         ), (
             '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
             'https://\'; received htt://link.com", '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
+            '[u\'<p><link text-with-value="&amp;quot;What '
             'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
-            '&amp;quot;"></oppia-noninteractive-link></p>\']]'
+            '&amp;quot;"></link></p>\']]'
         )]
 
         self.assertEqual(actual_output, expected_output)
@@ -2676,10 +2676,10 @@ class InteractionCustomizationArgsValidationJobTests(
 
         content_dict = {
             'html': (
-                '<p><oppia-noninteractive-link text-with-value="'
+                '<p><link text-with-value="'
                 '&amp;quot;What is a link?&amp;quot;" url-with-'
                 'value="&amp;quot;htt://link.com&amp'
-                ';quot;"></oppia-noninteractive-link></p>'
+                ';quot;"></link></p>'
             ),
             'content_id': 'content'
         }

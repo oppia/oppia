@@ -111,7 +111,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
 
     /**
      * Extracts the filepath object from the filepath-value attribute of the
-     * oppia-noninteractive-image tags in the strHtml(given string).
+     * image tags in the strHtml(given string).
      * @param {string} strHtml - The string from which the object of
      *                           filepath should be extracted.
      */
@@ -123,9 +123,9 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         HtmlEscaperService.escapedStrToUnescapedStr(strHtml));
 
       var imageTagList = dummyElement.getElementsByTagName(
-        'oppia-noninteractive-image');
+        'image');
       for (i = 0; i < imageTagList.length; i++) {
-        // We have the attribute of filepath in oppia-noninteractive-image tag.
+        // We have the attribute of filepath in image tag.
         // But it actually contains the filename only. We use the variable
         // filename instead of filepath since in the end we are retrieving the
         // filenames in the exploration.

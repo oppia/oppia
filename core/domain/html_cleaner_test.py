@@ -81,14 +81,14 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
 
     def test_oppia_custom_tags(self):
         test_data = [(
-            '<oppia-noninteractive-image filepath-with-value="1"/>',
-            '<oppia-noninteractive-image filepath-with-value="1">'
-            '</oppia-noninteractive-image>'
+            '<image filepath-with-value="1"/>',
+            '<image filepath-with-value="1">'
+            '</image>'
         ), (
-            '<oppia-noninteractive-image filepath-with-value="1">'
-            '</oppia-noninteractive-image>',
-            '<oppia-noninteractive-image filepath-with-value="1">'
-            '</oppia-noninteractive-image>'
+            '<image filepath-with-value="1">'
+            '</image>',
+            '<image filepath-with-value="1">'
+            '</image>'
         ), (
             '<oppia-fake-tag></oppia-fake-tag>',
             ''
@@ -134,19 +134,19 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
     def test_get_rte_components(self):
         test_data = (
             '<p>Test text&nbsp;'
-            '<oppia-noninteractive-math '
+            '<math '
             'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
-            '</oppia-noninteractive-math></p><p>&nbsp;'
-            '<oppia-noninteractive-link '
+            '</math></p><p>&nbsp;'
+            '<link '
             'text-with-value="&amp;quot;Link&amp;quot;" '
             'url-with-value="&amp;quot;https://www.example.com&amp;quot;">'
-            '</oppia-noninteractive-link>.</p>'
+            '</link>.</p>'
             '<p>Video</p>'
-            '<p><oppia-noninteractive-video autoplay-with-value="false" '
+            '<p><video autoplay-with-value="false" '
             'end-with-value="0" start-with-value="0" '
             'video_id-with-value="&amp;quot;'
             'https://www.youtube.com/watch?v=Ntcw0H0hwPU&amp;quot;">'
-            '</oppia-noninteractive-video><br></p>'
+            '</video><br></p>'
         )
 
         expected_components = [
@@ -154,7 +154,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
                 'customization_args': {
                     'text-with-value': u'Link',
                     'url-with-value': u'https://www.example.com'},
-                'id': 'oppia-noninteractive-link'
+                'id': 'link'
             },
             {
                 'customization_args': {
@@ -165,13 +165,13 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
                         u'v=Ntcw0H0hwPU'),
                     'autoplay-with-value': False
                 },
-                'id': 'oppia-noninteractive-video'
+                'id': 'video'
             },
             {
                 'customization_args': {
                     'raw_latex-with-value': u'\\frac{x}{y}'
                 },
-                'id': 'oppia-noninteractive-math'
+                'id': 'math'
             }
         ]
 

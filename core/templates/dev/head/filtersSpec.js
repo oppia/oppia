@@ -280,7 +280,7 @@ describe('Testing filters', function() {
       var OPPIA_TABS = ('<img src="data:image/png;base64,' +
       'iVBORw0KGgoAAAANSUhEUgAABNQAAAFgCAIAAAD8SbMaAAAM' +
       'FWlDQ1BJQ0MgUHJvZmlsZQAASImV%0AlwdUk8kWx" ' +
-      'class="oppia-noninteractive-tabs block-element" ' +
+      'class="tabs block-element" ' +
       'tab_contents-with-value="[{&amp;quot;title&amp;quot;:&amp;quot;' +
       'Hint introduction&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;' +
       'This set of tabs shows some hints.' +
@@ -291,13 +291,13 @@ describe('Testing filters', function() {
       '&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;' +
       'Stuff and things&amp;lt;/p&amp;gt;&amp;quot;}]">');
       var OPPIA_IMG = ('<img src="image.png" ' +
-      'class="oppia-noninteractive-image block-element" ' +
+      'class="image block-element" ' +
       'alt-with-value="&amp;quot;&amp;quot;" ' +
       'caption-with-value="&amp;quot;&amp;quot;" ' +
       'filepath-with-value="&amp;quot;DearIDPodcast_sm.png&amp;quot;">');
       var OPPIA_VIDEO = ('<img ' +
       'src="https://img.youtube.com/vi/JcPwIQ6GCj8/hqdefault.jpg" ' +
-      'class="oppia-noninteractive-video block-element" ' +
+      'class="video block-element" ' +
       'video_id-with-value="" start-with-value="0" end-with-value="0" ' +
       'autoplay-with-value="false" exploration-id-with-value="">');
       var IMG_HTML = ('<a ' +
@@ -315,7 +315,7 @@ describe('Testing filters', function() {
       '</scr</script>ipt>');
       var NO_TAG = ('The quick brown fox jumps over the lazy dog.');
       var NON_IMAGE = ('<a href="example.com" ' +
-      'class="oppia-noninteractive-link">Example.com</a>');
+      'class="link">Example.com</a>');
       var IMAGE_INVALID = ('<img src="linkimage.jpg" class="invalid-tag">');
       var BOLD_TEXT = ('In baseball, the Chicago Cubs defeat the Cleveland ' +
       'Indians to win the <b style="box-sizing: border-box; ' +
@@ -370,12 +370,12 @@ describe('Testing filters', function() {
       'oration-style: initial; text-decoration-color: initial;">that educate ' +
       'and engage.</p>');
       var whitelistedImgClasses = [
-        'oppia-noninteractive-collapsible',
-        'oppia-noninteractive-image',
-        'oppia-noninteractive-link',
-        'oppia-noninteractive-math',
-        'oppia-noninteractive-tabs',
-        'oppia-noninteractive-video',
+        'collapsible',
+        'image',
+        'link',
+        'math',
+        'tabs',
+        'video',
         'other-tag'
       ];
 
@@ -484,25 +484,25 @@ describe('Testing filters', function() {
         filter('<p>Text input</p>')
       ).toEqual('Text input');
       expect(
-        filter('<p><oppia-noninteractive-math attr1=value1></oppia-' +
+        filter('<p><math attr1=value1></oppia-' +
         'noninteractive-math>Text input</p>')
       ).toEqual('[Math] Text input');
       expect(
-        filter('<p><oppia-noninteractive-math></oppia-noninteractive-math>' +
-        'Text input<oppia-noninteractive-collapsible></oppia-noninteractive' +
+        filter('<p><math></math>' +
+        'Text input<collapsible></oppia-noninteractive' +
         '-collapsible>Text input 2</p>')
       ).toEqual('[Math] Text input [Collapsible] Text input 2');
       expect(
-        filter('<p><oppia-noninteractive-math></oppia-noninteractive-math>' +
-        'Text&nbsp;input<sample_tag><oppia-noninteractive-collapsible>' +
-        '</oppia-noninteractive-collapsible><a><sample_tag>Text input 2' +
+        filter('<p><math></math>' +
+        'Text&nbsp;input<sample_tag><collapsible>' +
+        '</collapsible><a><sample_tag>Text input 2' +
         '</sample_tag></a></p>')
       ).toEqual('[Math] Text input [Collapsible] Text input 2');
       expect(
-        filter('<oppia-noninteractive-math></oppia-noninteractive-math>' +
-        'Text input<oppia-noninteractive-collapsible></oppia-noninteractive' +
-        '-collapsible>Text input 2<oppia-noninteractive-image>' +
-        '</oppia-noninteractive-image> Text Input 3 ')
+        filter('<math></math>' +
+        'Text input<collapsible></oppia-noninteractive' +
+        '-collapsible>Text input 2<image>' +
+        '</image> Text Input 3 ')
       ).toEqual('[Math] Text input [Collapsible] Text input 2 [Image]  ' +
       'Text Input 3');
     }));
@@ -518,23 +518,23 @@ describe('Testing filters', function() {
       var interactionIdMath = 'TextInput';
       var choicesMath = [
         {
-          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
-            'x^3 - a x^2 - b x - c&amp;quot;"></oppia-noninteractive-math>',
+          label: '<math raw_latex-with-value="&amp;quot;' +
+            'x^3 - a x^2 - b x - c&amp;quot;"></math>',
           val: 0
         }, {
-          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+          label: '<math raw_latex-with-value="&amp;quot;' +
             'x^3 + (a+b+c)x^2 + (ab+bc+ca)x + abc&amp;quot;">' +
-            '</oppia-noninteractive-math>',
+            '</math>',
           val: 1
         }, {
-          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+          label: '<math raw_latex-with-value="&amp;quot;' +
             'x^3 - (a+b+c)x^2 + (ab+bc+ca)x - abc&amp;quot;">' +
-            '</oppia-noninteractive-math>',
+            '</math>',
           val: 2
         }, {
-          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+          label: '<math raw_latex-with-value="&amp;quot;' +
             'x^3 + (a+b+c)x^2 - (ab+bc+ca)x + abc&amp;quot;">' +
-            '</oppia-noninteractive-math>',
+            '</math>',
           val: 3
         },
       ];
@@ -548,23 +548,23 @@ describe('Testing filters', function() {
       var interactionIdMixed = 'TextInput';
       var choicesMixed = [
         {
-          label: '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+          label: '<p><image alt-with-value="&amp;' +
             'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
             'filepath-with-value="&amp;quot;img_20180112_170413_5jxq15ngmd' +
-            '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
-            'input.</p><p><oppia-noninteractive-image alt-with-value="&amp;' +
+            '.png&amp;quot;"></image>This is a text ' +
+            'input.</p><p><image alt-with-value="&amp;' +
             'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
             'filepath-with-value="&amp;quot;img_20180112_170436_k7sz3xtvyy.' +
-            'png&amp;quot;"></oppia-noninteractive-image></p><p><oppia-' +
+            'png&amp;quot;"></image></p><p><oppia-' +
             'noninteractive-link text-with-value="&amp;quot;&amp;quot;"' +
             'url-with-value="&amp;quot;https://www.example.com&amp;quot;">' +
-            '</oppia-noninteractive-link><br><br></p>',
+            '</link><br><br></p>',
           val: 0
         }, {
-          label: '<p><oppia-noninteractive-image alt-with-value="&amp;quot;' +
+          label: '<p><image alt-with-value="&amp;quot;' +
             'g&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-' +
             'with-value="&amp;quot;img_20180112_170500_926cssn398.png&amp;' +
-            'quot;"></oppia-noninteractive-image><br></p>',
+            'quot;"></image><br></p>',
           val: 1
         }
       ];

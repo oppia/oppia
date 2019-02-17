@@ -27,10 +27,10 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
         'number_with_units_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
-        'numberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
+        'NumberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
         'CurrentInteractionService', function(
             $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
-            numberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
+            NumberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
             CurrentInteractionService) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
@@ -70,7 +70,7 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
               var numberWithUnits =
                 NumberWithUnitsObjectFactory.fromRawInputString(answer);
               CurrentInteractionService.onSubmit(
-                numberWithUnits, numberWithUnitsRulesService);
+                numberWithUnits, NumberWithUnitsRulesService);
             } catch (parsingError) {
               errorMessage = parsingError.message;
               $scope.NumberWithUnitsForm.answer.$setValidity(

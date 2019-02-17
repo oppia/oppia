@@ -106,7 +106,14 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+  <script src="/templates/dev/head/components/forms/convertUnicodeWithParamsToHtml.js"></script>
+  <script src="/templates/dev/head/components/forms/convertHtmlToUnicode.js"></script>
+  <script src="/templates/dev/head/components/forms/convertUnicodeToHtml.js"></script>
+  <script src="/templates/dev/head/components/forms/isAtLeast.js"></script>
+  <script src="/templates/dev/head/components/forms/isAtMost.js"></script>
+  <script src="/templates/dev/head/components/forms/isFloat.js"></script>
+  <script src="/templates/dev/head/components/forms/isInteger.js"></script>
+  <script src="/templates/dev/head/components/forms/isNonempty.js"></script>
   <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
   <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
   <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>

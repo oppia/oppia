@@ -17,10 +17,10 @@
  */
 
 oppia.directive('oppiaInteractiveDragAndDropSortInput', [
-  'dragAndDropSortInputRulesService', 'HtmlEscaperService',
+  'DragAndDropSortInputRulesService', 'HtmlEscaperService',
   'UrlInterpolationService',
   function(
-      dragAndDropSortInputRulesService, HtmlEscaperService,
+      DragAndDropSortInputRulesService, HtmlEscaperService,
       UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -77,7 +77,7 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
             }
 
             CurrentInteractionService.onSubmit(
-              answers, dragAndDropSortInputRulesService);
+              answers, DragAndDropSortInputRulesService);
           };
 
           CurrentInteractionService.registerCurrentInteraction(

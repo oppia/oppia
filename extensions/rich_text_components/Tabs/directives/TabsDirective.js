@@ -19,7 +19,7 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('oppiaNoninteractiveTabs', [
+oppia.directive('tabs', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {

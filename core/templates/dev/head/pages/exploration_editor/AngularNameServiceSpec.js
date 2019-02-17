@@ -28,7 +28,7 @@ describe('Angular names service', function() {
 
     it('should map interaction ID to correct RulesService', function() {
       expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(
-        'textInputRulesService');
+        'TextInputRulesService');
     });
   });
 });

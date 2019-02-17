@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('textInputRulesService', ['$filter', function($filter) {
+oppia.factory('TextInputRulesService', ['$filter', function($filter) {
   return {
     Equals: function(answer, inputs) {
       var normalizedAnswer = $filter('normalizeWhitespace')(answer);
