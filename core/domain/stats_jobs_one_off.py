@@ -39,45 +39,6 @@ import feconf
 PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
 
 
-class ExplorationIssuesModelCreatorOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for creating a default ExplorationIsssues model instance
-    for all the explorations in the datastore. If an ExplorationIssues model
-    already exists for an exploration, it is refreshed to a default instance.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exploration_model):
-        if not exploration_model.deleted:
-            current_version = exploration_model.version
-            for exp_version in xrange(1, current_version + 1):
-                exp_issues_model = (
-                    stats_models.ExplorationIssuesModel.get_model(
-                        exploration_model.id, exp_version))
-                if not exp_issues_model:
-                    exp_issues_default = (
-                        stats_domain.ExplorationIssues.create_default(
-                            exploration_model.id, exp_version))
-                    stats_models.ExplorationIssuesModel.create(
-                        exp_issues_default.exp_id,
-                        exp_issues_default.exp_version,
-                        exp_issues_default.unresolved_issues)
-                else:
-                    exp_issues_model.unresolved_issues = []
-                    exp_issues_model.put()
-            yield(
-                exploration_model.id,
-                'ExplorationIssuesModel created')
-
-    @staticmethod
-    def reduce(exp_id, values):
-        yield '%s: %s' % (exp_id, values)
-
-
 class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
     """Performs a brief audit of playthrough recordings to make sure they pass
     simple sanity checks.
