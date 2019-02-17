@@ -82,6 +82,7 @@ else:
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 CURRENT_BRANCH_NAME = common.get_current_branch_name()
+RELEASE_BRANCH_NAME_PREFIX = 'release-'
 
 RELEASE_DIR_NAME = 'deploy-%s-%s-%s' % (
     '-'.join('-'.join(APP_NAME.split('.')).split(':')),
@@ -190,11 +191,11 @@ def _get_current_release_version():
     Returns:
         (str): The current (local) Oppia release version.
     """
-    release_branch_name_prefix = 'release-'
-    if not CURRENT_BRANCH_NAME.startswith(release_branch_name_prefix):
-        raise Exception('Deploy script must be run from a release branch.')
+    if not CURRENT_BRANCH_NAME.startswith(RELEASE_BRANCH_NAME_PREFIX):
+        raise Exception(
+            'The deployment script must be run from a release branch.')
     return CURRENT_BRANCH_NAME[len(
-        release_branch_name_prefix):].replace('-', '.')
+        RELEASE_BRANCH_NAME_PREFIX):].replace('-', '.')
 
 
 def _execute_deployment():
@@ -203,6 +204,17 @@ def _execute_deployment():
     common.require_cwd_to_be_oppia()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
     common.require_gcloud_to_be_available()
+    if APP_NAME in [APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER]:
+        if not CURRENT_BRANCH_NAME.startswith(RELEASE_BRANCH_NAME_PREFIX):
+            raise Exception(
+                'The deployment script must be run from a release branch.')
+    if APP_NAME == APP_NAME_OPPIASERVER:
+        with open('./feconf.py', 'r') as f:
+            feconf_contents = f.read()
+            if ('MAILGUN_API_KEY' not in feconf_contents or
+                    'MAILGUN_API_KEY = None' in feconf_contents):
+                raise Exception(
+                    'The mailgun API key must be added before deployment.')
 
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
