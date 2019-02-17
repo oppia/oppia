@@ -439,6 +439,7 @@
 	"I18N_PREFERENCES_USERNAME": "Text displayed in the preferences page. - Text shown at the left of the text entry where the user can change his username.\n{{Identical|Username}}",
 	"I18N_PREFERENCES_USERNAME_NOT_SELECTED": "Text displayed in the preferences page. - Text shown in the text entry for the username when there is no username assigned to the user.",
 	"I18N_PROFILE_NO_EXPLORATIONS": "Text displayed on the Profile page. - This message is shown on a user's profile when the user has zero created/edited explorations.",
+	"I18N_REDIRECT_TO_LOGIN": "Text displayed on a button clicking on which redirects to login page",
 	"I18N_SIDEBAR_ABOUT_LINK": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the about page.\n{{Identical|About}}",
 	"I18N_SIDEBAR_BLOG": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Oppia blog.\n{{Identical|Blog}}",
 	"I18N_SIDEBAR_CONTACT_US": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Contact Us page.\n{{Identical|Contact us}}",

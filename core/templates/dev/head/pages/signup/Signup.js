@@ -173,8 +173,47 @@ oppia.controller('Signup', [
       $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
         window.location = window.decodeURIComponent(
           UrlService.getUrlParams().return_url);
-      }, function() {
+      }, function(rejection) {
+        var loggedOutInNewTabErrorMessage = (
+          'Sorry, you have been logged out [probably in another ' +
+          'window]. Please log in again. You will be redirected ' +
+          'to main page in a while!');
+        if (
+          rejection.data && (
+            rejection.data.error === loggedOutInNewTabErrorMessage)) {
+          $scope.showRedirectToLoginModal();
+        }
         $scope.submissionInProcess = false;
+      });
+    };
+
+    $scope.showRedirectToLoginModal = function() {
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/signup/redirect_to_login_directive.html'),
+        backdrop: true,
+        resolve: {},
+        controller: [
+          '$scope', '$uibModalInstance', 'SiteAnalyticsService',
+          'UserService', '$timeout', '$window',
+          function($scope, $uibModalInstance, SiteAnalyticsService,
+              UserService, $timeout, $window) {
+            $scope.redirectToLogin = function() {
+              SiteAnalyticsService.registerStartLoginEvent(
+                'loginButton');
+              UserService.getLoginAndLogoutUrls().then(
+                function(urlObject) {
+                  if (urlObject.login_url) {
+                    $timeout(function() {
+                      $window.location = urlObject.login_url;
+                    }, 150);
+                  }
+                }
+              );
+              $uibModalInstance.dismiss('cancel');
+            };
+          }
+        ]
       });
     };
   }

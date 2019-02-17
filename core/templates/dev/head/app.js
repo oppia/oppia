@@ -334,16 +334,6 @@ oppia.config([
                 warningMessage = rejection.data.error;
               }
               AlertsService.addWarning(warningMessage);
-
-              var loggedOutInNewTabErrorMessage = (
-                'Sorry, you have been logged out [probably in another ' +
-                'window]. Please log in again. You will be redirected ' +
-                'to main page in a while!');
-              if (
-                rejection.data && (
-                  rejection.data.error === loggedOutInNewTabErrorMessage)) {
-                AlertsService.redirectToSplash();
-              }
             }
             return $q.reject(rejection);
           }

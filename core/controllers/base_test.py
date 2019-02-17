@@ -697,3 +697,53 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                                         msg=error_message)
 
         self.assertGreater(num_handlers_checked, 150)
+
+
+class SignUpTests(test_utils.GenericTestBase):
+
+    def test_redirect_on_opening_new_tab_during_signup(self):
+
+        self.login('abc@example.com')
+        response = self.get_html_response(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        os.environ['USER_ID'] = ''
+
+        response = self.testapp.post(
+            feconf.SIGNUP_DATA_URL, params={
+                'csrf_token': csrf_token,
+                'payload': json.dumps({
+                    'username': 'abc',
+                    'agreed_to_terms': True
+                })
+            }, expect_errors=True,
+            )
+
+        self.assertEqual(response.status_int, 401)
+
+        response_output = json.loads(response.body[response.body.find('{'):])
+
+        self.assertEqual(response_output['error'], (
+            'Sorry, you have been logged out '
+            '[probably in another window]. Please log in again. '
+            'You will be redirected to main page in a while!'))
+
+    def test_no_redirect_on_opening_new_tab_after_signup(self):
+
+        self.login('abc@example.com')
+        response = self.get_html_response(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        response = self.testapp.post(
+            feconf.SIGNUP_DATA_URL, params={
+                'csrf_token': csrf_token,
+                'payload': json.dumps({
+                    'username': 'abc',
+                    'agreed_to_terms': True
+                })
+            }
+            )
+
+        self.assertEqual(response.status_int, 200)
+
+        response = self.get_html_response('/about')
