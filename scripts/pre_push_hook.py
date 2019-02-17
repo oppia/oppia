@@ -298,7 +298,7 @@ def _install_hook():
 
 def run_frontend_tests_status(files_to_lint):
     """Checks if frontend tests needs to be run."""
-    
+
     excluded_paths = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
@@ -310,13 +310,13 @@ def run_frontend_tests_status(files_to_lint):
         filename for filename in files_to_lint if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.js')]
-    
+
     if js_files_to_check == []:
         return False
     else:
         return True
 
-    
+
 def main():
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
