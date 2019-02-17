@@ -182,8 +182,8 @@ oppia.controller('ExplorationEditor', [
           EditabilityService.markTranslatable();
         }
 
-        StateEditorService.setCanAddPrerequisiteSkill(
-          featuresData.can_add_prerequisite_skill_to_state);
+        StateEditorService.setExplorationIsWhitelisted(
+          featuresData.is_exploration_whitelisted);
 
         GraphDataService.recompute();
 

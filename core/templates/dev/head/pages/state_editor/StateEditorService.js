@@ -31,7 +31,7 @@ oppia.factory('StateEditorService', [
     // interaction.
     var interaction = null;
     var misconceptions = [];
-    var canAddPrerequisiteSkill = false;
+    var explorationIsWhitelisted = false;
 
     return {
       getActiveStateName: function() {
@@ -44,11 +44,11 @@ oppia.factory('StateEditorService', [
         }
         activeStateName = newActiveStateName;
       },
-      getCanAddPrerequisiteSkill: function() {
-        return canAddPrerequisiteSkill;
+      isExplorationWhitelisted: function() {
+        return explorationIsWhitelisted;
       },
-      setCanAddPrerequisiteSkill: function(value) {
-        canAddPrerequisiteSkill = value;
+      setExplorationIsWhitelisted: function(value) {
+        explorationIsWhitelisted = value;
       },
       setMisconceptions: function(newMisconceptions) {
         misconceptions = newMisconceptions;

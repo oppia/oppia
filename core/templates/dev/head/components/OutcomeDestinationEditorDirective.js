@@ -38,7 +38,7 @@ oppia.directive('outcomeDestinationEditor', [
           var currentStateName = null;
           $scope.canAddPrerequisiteSkill =
             constants.ENABLE_NEW_STRUCTURE_EDITORS &&
-            StateEditorService.getCanAddPrerequisiteSkill();
+            StateEditorService.isExplorationWhitelisted();
 
           $scope.$on('saveOutcomeDestDetails', function() {
             // Create new state if specified.

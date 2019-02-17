@@ -37,8 +37,6 @@ class ExplorationFeaturesHandler(base.BaseHandler):
         self.render_json({
             'is_improvements_tab_enabled':
                 config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value,
-            'is_playthrough_recording_enabled':
-                exploration_id in whitelisted_exploration_ids_for_playthroughs,
-            'can_add_prerequisite_skill_to_state':
+            'is_exploration_whitelisted':
                 exploration_id in whitelisted_exploration_ids_for_playthroughs
         })
