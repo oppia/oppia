@@ -746,4 +746,4 @@ class SignUpTests(test_utils.GenericTestBase):
 
         self.assertEqual(response.status_int, 200)
 
-        response = self.get_html_response('/about')
+        self.get_html_response('/about')
