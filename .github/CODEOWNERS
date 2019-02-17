@@ -1,14 +1,14 @@
 # Per-directory ownership and automatic assignment for pull requests.
 
 # Audio and Translation team.
-/core/templates/dev/head/exploration_editor/translation_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/translation_tab/ @DubeySandeep
 /core/controllers/translator*.py @DubeySandeep
 
 
 # Collection project.
 /core/domain/collection*.py @kevinlee12
-/core/template/dev/head/collection_editor/ @kevinlee12
-/core/template/dev/head/collection_player/ @kevinlee12
+/core/templates/dev/head/pages/collection_editor/ @kevinlee12
+/core/templates/dev/head/pages/collection_player/ @kevinlee12
 
 
 # Dev workflow team.
@@ -19,15 +19,15 @@
 # Lesson Analytics team.
 /core/domain/stats*.py @brianrodri
 /core/storage/statistics/ @brianrodri
-/core/templates/exploration_editor/stats_tab/ @brianrodri
+/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @brianrodri
 /extensions/actions/ @brianrodri
 /extensions/visualizations/ @brianrodri
 /extensions/issues/ @brianrodri
 
 
 # Library page.
-/core/template/dev/head/library/ @kevinlee12
-/core/domain/library_services.py @kevinlee12
+/core/controllers/library*.py @kevinlee12
+/core/templates/dev/head/pages/library/ @kevinlee12
 
 
 # New structures team.
@@ -44,22 +44,23 @@
 /core/domain/skill*.py  @aks681
 /core/storage/skill/ @aks681
 /core/templates/dev/head/domain/skill/ @aks681
-/core/templates/dev/head/pages/skill*/ @aks681
+/core/templates/dev/head/pages/skill_editor/ @aks681
 
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py  @aks681
 /core/storage/story/ @aks681
 /core/templates/dev/head/domain/story/ @aks681
-/core/templates/dev/head/pages/story*/ @aks681
+/core/templates/dev/head/pages/story_editor/ @aks681
 
 # Topic project.
+# Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
 /core/controllers/topic_*.py @aks681
 /core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
 /core/templates/dev/head/domain/topic/ @aks681
-# Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
-/core/templates/dev/head/pages/topic_*/ @aks681
+/core/templates/dev/head/pages/topic_editor/ @aks681
+/core/templates/dev/head/pages/topic_viewer/ @aks681
 
 # Topics and skills dashboard project.
 /core/controllers/topics_and_skills_dashboard.py @aks681
@@ -71,21 +72,24 @@
 
 
 # Miscellaneous.
-/core/domain/html_cleaner.py @seanlip
+/core/domain/html*.py @seanlip
 
 
 # Rich text editor team.
-/extension/rich_text_components @AllanYangZhou @bansalnitish
-/extension/ckeditor_plugins @AllanYangZhou @bansalnitish
+/extensions/rich_text_components/ @AllanYangZhou @bansalnitish
+/extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
 
 
 # Suggestion and feedback team.
 # Suggestion project.
+/core/controllers/suggestion*.py @nithusha21
 /core/domain/suggestion*.py @nithusha21
 /core/storage/suggestion/ @nithusha21
 /core/templates/dev/head/domain/suggestion/ @nithusha21
+/core/templates/dev/head/pages/suggestion_editor/ @nithusha21
 
 # Feedback project.
+/core/controllers/feedback*.py @nithusha21
 /core/domain/feedback*.py @nithusha21
 /core/storage/feedback/ @nithusha21
 /core/templates/dev/head/domain/feedback_message/ @nithusha21
