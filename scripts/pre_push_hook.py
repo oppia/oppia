@@ -31,6 +31,7 @@ but it will have no effect.
 # pylint: disable=wrong-import-order
 import argparse
 import collections
+import fnmatch
 import os
 import pprint
 import shutil
@@ -295,6 +296,27 @@ def _install_hook():
         print 'Copied file to .git/hooks directory'
 
 
+def run_frontend_tests_status(files_to_lint):
+    """Checks if frontend tests needs to be run"""
+    
+    excluded_paths = (
+    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
+    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
+    '*.mp3', '*.mp4')
+
+    js_files_to_check = [
+        filename for filename in files_to_lint if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.js')]
+    
+    if js_files_to_check == []:
+        return False
+    else:
+        return True
+
+    
 def main():
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
@@ -326,9 +348,9 @@ def main():
                 if lint_status != 0:
                     print 'Push failed, please correct the linting issues above'
                     sys.exit(1)
-            print '**********************************'
-            print files_to_lint
-            frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
+            frontend_status = 0
+            if  run_frontend_tests_status(files_to_lint):
+                frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'
                 sys.exit(1)
