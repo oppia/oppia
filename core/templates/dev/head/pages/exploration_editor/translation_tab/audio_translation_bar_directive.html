@@ -23,20 +23,25 @@
     </div>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-translation-start-record-accessibility"
             uib-tooltip="Record"
             tooltip-placement="above"
             ng-click="checkAndStartRecording()"
-            ng-disabled="!canTranslate || cannotRecord">
+            ng-disabled="!canTranslate || cannotRecord"
+            aria-label="Start Recording"
+            role="button"
+            for="Recording">
       <i class="material-icons">&#xE029;</i>
     </button>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-translation-upload-audio-accessibility"
             uib-tooltip="Upload"
             tooltip-placement="above"
             ng-click="openAddAudioTranslationModal()"
-            ng-disabled="!canTranslate">
+            ng-disabled="!canTranslate"
+            aria-label="Upload Translated file"
+            role="button">
       <i class="material-icons">&#xE2C6;</i>
     </button>
   </div>
@@ -48,9 +53,11 @@
                      audio-model="audioBlob"
                      time-limit="recordingTimeLimit">
     <div class="oppia-content-wrapper">
-      <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+      <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-translation-play-recorded-audio-accessibility"
               ng-click="recorder.status.isPlaying ? recorder.playbackPause() : recorder.playbackResume()"
-              ng-disabled="recorder.status.isRecording || !recorder.audioModel">
+              ng-disabled="recorder.status.isRecording || !recorder.audioModel"
+              aria-label="Play recorded audio"
+              role="button">
         <i class="material-icons">
           {{recorder.status.isStopped || recorder.status.isPaused ? 'play_arrow' : 'pause']>
         </i>
@@ -77,30 +84,38 @@
       </div>
     </div>
     <div class="oppia-content-wrapper" ng-if="recorder.status.isRecording">
-      <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+      <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-translation-stop-recording-accessibility"
               uib-tooltip="Stop"
               tooltip-placement="above"
-              ng-click="recorder.stopRecord()">
+              ng-click="recorder.stopRecord()"
+              aria-label="Stop recording"
+              role="button">
         <i class="material-icons">stop</i>
       </button>
     </div>
   </ng-audio-recorder>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition protractor-test-translation-re-recording-accessibility"
             ng-if="!recorder.status.isRecording && audioBlob"
-            ng-click="reRecord()">
+            ng-click="reRecord()"
+            aria-label="Record again"
+            role="button">
       Re-take
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="!recorder.status.isRecording && audioBlob">
-    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition"
-            ng-click="saveRecordedAudio()">
+    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition protractor-test-translation-save-recording-accessibility"
+            ng-click="saveRecordedAudio()"
+            aria-label="Save the recorded audio"
+            role="button">
       Confirm
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="!recorder.status.isRecording && audioBlob">
-    <button class="btn oppia-cancel-button oppia-audio-bar-button-transition"
-            ng-click="cancelRecording()">
+    <button class="btn oppia-cancel-button oppia-audio-bar-button-transition protractor-test-translation-cancel-recording-accessibility"
+            ng-click="cancelRecording()"
+            aria-label="Cancel the recorded audio"
+            role="button">
       Cancel
     </button>
   </div>

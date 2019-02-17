@@ -139,8 +139,44 @@ var ExplorationEditorTranslationTab = function() {
   var numericalStatus = element(
     by.css('.protractor-test-translation-numerical-status'));
 
+  var numericalStatusAccessibility = element(
+    by.css('.protractor-test-translation-numerical-status'));
+
+  var translationTabContentAccessibility = element(
+    by.css('.protractor-test-translation-content-accessibility'));
+
+  var translationTabFeedbackAccessibility = element(
+    by.css('.protractor-test-translation-feedback-accessibility'));
+
+  var translationTabHintAccessibility = element(
+    by.css('.protractor-test-translation-hint-accessibility'));
+
+  var translationTabSolutionAccessibility = element(
+    by.css('.protractor-test-translation-solution-accessibility'));
+
+  var translationTabStartRecordingAccessibility = element(
+    by.css('.protractor-test-translation-start-record-accessibility'));
+
+  var translationTabUploadRecordingAccessibility = element(
+    by.css('.protractor-test-translation-upload-audio-accessibility'));
+
+  var translationTabPlayRecordingAccessibility = element(
+    by.css('.protractor-test-translation-play-recorded-audio-accessibility'));
+
+  var translationTabStopRecordingAccessibility = element(
+    by.css('.protractor-test-translation-stop-recording-accessibility'));
+
+  var translationTabReRecordingAccessibility = element(
+    by.css('.protractor-test-translation-re-recording-accessibility'));
+
+  var translationTabSaveRecordingAccessibility = element(
+    by.css('.protractor-test-translation-save-recording-accessibility'));
+
+  var translationTabCancelRecordingAccessibility = element(
+    by.css('.protractor-test-translation-cancel-recording-accessibility'));
+
   var _selectLanguage = function(language) {
-    element(by.css('.protractor-test-translation-language-selector')).
+    element(by.css('protractor-test-translation-language-selector')).
       element(by.cssContainingText('option', language)).click();
   };
 
@@ -182,6 +218,54 @@ var ExplorationEditorTranslationTab = function() {
   this.expectNumericalStatusToMatch = function(content) {
     expect(numericalStatus.getText()).toMatch(content);
   };
+
+  this.expectNumericalStatusAccessibilityToMatch =
+    function(content) {
+      expect(numericalStatusAccessibility.getAttribute(
+        'aria-label')).toMatch(content);
+    };
+
+  this.expectTranslationTabContentAccessibilityToMatch =
+    function(content) {
+      expect(translationTabContentAccessibility.getAttribute(
+        'aria-label')).toMatch(content);
+    };
+
+  this.expectTranslationTabFeedbackAccessibilityToMatch =
+    function(content) {
+      expect(translationTabFeedbackAccessibility.getAttribute(
+        'aria-label')).toMatch(content);
+    };
+
+  this.expectTranslationTabHintAccessibilityToMatch =
+    function(content) {
+      expect(translationTabHintAccessibility.getAttribute(
+        'aria-label')).toMatch(content);
+    };
+
+  this.expectTranslationTabSolutionAccessibilityToMatch =
+    function(content) {
+      expect(translationTabSolutionAccessibility.getAttribute(
+        'aria-label')).toMatch(content);
+    };
+
+  this.expectTranslationTabStartRecordingAccessibilityToMatch =
+    function(content) {
+      expect(translationTabStartRecordingAccessibility.getAttribute(
+        'aria-label')).toMatch(content);
+    };
+
+  this.expectTranslationTabUploadRecordingAccessibilityToMatch =
+    function(content) {
+      expect(translationTabUploadRecordingAccessibility.getAttribute(
+        'aria-label')).toMatch(content);
+    };
+
+  this.expectTranslationTabPlayRecordingAccessibilityToMatch =
+    function(content) {
+      expect(translationTabPlayRecordingAccessibility.getAttribute(
+        'aria-label')).toMatch(content);
+    };
 
   this.changeTranslationLanguage = function(language) {
     _selectLanguage(language);

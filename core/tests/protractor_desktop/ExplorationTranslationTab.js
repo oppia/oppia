@@ -136,6 +136,66 @@ describe('Exploration translation', function() {
     users.logout();
   });
 
+  fit('should contain accessibility elements', function() {
+    users.createUser('user2@translationTab.com', 'user2TranslationTab');
+    users.login('user2@translationTab.com');
+    workflow.createExploration();
+
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'This is first card.'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('This is feedback1.'),
+      'second', true, 'Equals', 6);
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
+    explorationEditorMainTab.addHint('This is hint1.');
+    explorationEditorMainTab.addHint('This is hint2.');
+    explorationEditorMainTab.addSolution('NumericInput', {
+      correctAnswer: 6,
+      explanation: 'This is solution.'
+    });
+    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('This is second card.'));
+    explorationEditorMainTab.setInteraction('Continue');
+    responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setDestination('final card', true, null);
+    // Setup a terminating state.
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorMainTab.moveToState('first');
+    explorationEditorPage.saveChanges();
+
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.
+      expectNumericalStatusAccessibilityToMatch(
+        'n item translated out of m items');
+    explorationEditorTranslationTab.
+      expectTranslationTabContentAccessibilityToMatch(
+        'Contents of Lesson');
+    explorationEditorTranslationTab.
+      expectTranslationTabFeedbackAccessibilityToMatch(
+        'Feedbacks');
+    explorationEditorTranslationTab.
+      expectTranslationTabHintAccessibilityToMatch(
+        'Hints for the lesson');
+    explorationEditorTranslationTab.
+      expectTranslationTabSolutionAccessibilityToMatch(
+        'Solutions of the lesson');
+    explorationEditorTranslationTab.
+      expectTranslationTabStartRecordingAccessibilityToMatch(
+        'Start Recording');
+    explorationEditorTranslationTab.
+      expectTranslationTabUploadRecordingAccessibilityToMatch(
+        'Upload Translated file');
+    explorationEditorTranslationTab.
+      expectTranslationTabPlayRecordingAccessibilityToMatch(
+        'Play recorded audio');
+    users.logout();
+  });
+
   it(
     'should maintain its active sub-tab on saving draft and publishing changes',
     function() {

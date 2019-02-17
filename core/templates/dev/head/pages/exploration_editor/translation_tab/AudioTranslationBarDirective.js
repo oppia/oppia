@@ -94,6 +94,12 @@ oppia.directive('audioTranslationBar', [
           $scope.audioTimerIsShown = true;
           $scope.audioIsCurrentlyBeingSaved = false;
 
+          document.body.onkeyup = function(e) {
+            if (e.keyCode === 32) {
+              shortcutkeyForRecording();
+            }
+          };
+
           var saveContentIdsToAudioTranslationChanges = function() {
             StateContentIdsToAudioTranslationsService.saveDisplayedValue();
             var stateName = StateEditorService.getActiveStateName();
@@ -237,6 +243,13 @@ oppia.directive('audioTranslationBar', [
               AlertsService.addWarning(errorResponse.error);
               $scope.initAudioBar();
             });
+          };
+          var shortcutkeyForRecording = function() {
+            if (!$scope.recorder.status.isRecording) {
+              $scope.checkAndStartRecording();
+            } else {
+              $scope.recorder.stopRecord();
+            }
           };
 
           $scope.$on('externalSave', function() {
