@@ -308,7 +308,7 @@ def run_frontend_tests_status(files_to_lint):
 
     js_files_to_check = [
         filename for filename in files_to_lint if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        any(fnmatch.fnmatch(filename, pattern) for pattern in excluded_paths)
         and filename.endswith('.js')]
 
     if js_files_to_check == []:
