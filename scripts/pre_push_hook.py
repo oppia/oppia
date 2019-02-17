@@ -299,7 +299,7 @@ def run_frontend_tests_status(files_to_lint):
     """Checks if frontend tests needs to be run."""
 
     js_files_to_check = [
-        filename for filename in files_to_lint if not
+        filename for filename in files_to_lint if
         filename.endswith('.js')]
 
     if js_files_to_check == []:
