@@ -297,7 +297,7 @@ def _install_hook():
 
 
 def run_frontend_tests_status(files_to_lint):
-    """Checks if frontend tests needs to be run"""
+    """Checks if frontend tests needs to be run."""
     
     excluded_paths = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
