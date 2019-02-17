@@ -38,7 +38,7 @@ oppia.constant(
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
 oppia.controller('ExplorationEditor', [
-  '$http', '$log', '$rootScope', '$scope', '$templateCache', '$timeout',
+  '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache', '$timeout',
   '$uibModal', '$window', 'AutosaveInfoModalsService', 'ChangeListService',
   'ContextService', 'EditabilityService',
   'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
@@ -56,7 +56,7 @@ oppia.controller('ExplorationEditor', [
   'StateTutorialFirstTimeService', 'ThreadDataService',
   'UrlInterpolationService', 'UserEmailPreferencesService',
   function(
-      $http, $log, $rootScope, $scope, $templateCache, $timeout,
+      $http, $log, $q, $rootScope, $scope, $templateCache, $timeout,
       $uibModal, $window, AutosaveInfoModalsService, ChangeListService,
       ContextService, EditabilityService,
       ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
@@ -111,7 +111,7 @@ oppia.controller('ExplorationEditor', [
     // Initializes the exploration page using data from the backend. Called on
     // page load.
     $scope.initExplorationPage = function(successCallback) {
-      Promise.all([
+      $q.all([
         ExplorationDataService.getData(function(explorationId, lostChanges) {
           if (!AutosaveInfoModalsService.isModalOpen()) {
             AutosaveInfoModalsService.showLostChangesModal(
