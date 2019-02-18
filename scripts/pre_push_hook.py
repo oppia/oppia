@@ -295,17 +295,14 @@ def _install_hook():
         print 'Copied file to .git/hooks directory'
 
 
-def run_frontend_tests_status(files_to_lint):
+def does_diff_include_js_files(files_to_lint):
     """Checks if frontend tests needs to be run."""
 
     js_files_to_check = [
         filename for filename in files_to_lint if
         filename.endswith('.js')]
 
-    if js_files_to_check == []:
-        return False
-    else:
-        return True
+    return bool(js_files _to_check)
 
 
 def main():
@@ -340,7 +337,7 @@ def main():
                     print 'Push failed, please correct the linting issues above'
                     sys.exit(1)
             frontend_status = 0
-            if run_frontend_tests_status(files_to_lint):
+            if does_diff_include_js_files(files_to_lint):
                 frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'
