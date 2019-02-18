@@ -174,9 +174,10 @@ def edit_suggestion(suggestion_id, new_change):
         new_change: dict(str, str). Dictionary contains the new suggestion.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
-    old_change = suggestion.change.to_dict()
-    old_change = new_change
-    suggestion.change = exp_domain.ExplorationChange(old_change)
+    change_cls = type(suggestion.change)
+    change_object = change_cls(new_change)
+    suggestion.pre_update_validate(change_object)
+    suggestion.change = change_object
     _update_suggestion(suggestion)
 
 
