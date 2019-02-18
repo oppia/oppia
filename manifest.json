@@ -107,7 +107,7 @@
         "downloadFormat": "zip",
         "url": "https://github.com/danielstern/ngAudio/archive/f403ea9e86de141278d410bade8ef1f43e6d188c.zip",
         "rootDirPrefix": "ngAudio-",
-        "targetDirPrefix": "angular-audio-",
+        "targetDir": "angular-audio-f403ea",
         "bundle": {
           "js": ["app/angular.audio.js"]
         }
