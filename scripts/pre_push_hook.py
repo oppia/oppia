@@ -302,7 +302,7 @@ def does_diff_include_js_files(files_to_lint):
         filename for filename in files_to_lint if
         filename.endswith('.js')]
 
-    return bool(js_files _to_check)
+    return bool(js_files_to_check)
 
 
 def main():
