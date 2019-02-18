@@ -296,7 +296,7 @@ def _install_hook():
 
 
 def does_diff_include_js_files(files_to_lint):
-    """Checks if frontend tests needs to be run."""
+    """Returns true if diff includes JS files."""
 
     js_files_to_check = [
         filename for filename in files_to_lint if
