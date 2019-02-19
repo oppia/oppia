@@ -22,15 +22,17 @@ oppia.constant(
 oppia.controller('LearnerLocalNav', [
   '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
   'ExplorationEngineService', 'ExplorationPlayerStateService',
-  'FocusManagerService', 'UrlInterpolationService', 'UserService',
-  'FLAG_EXPLORATION_URL_TEMPLATE',
+  'FocusManagerService',
   'ShowSuggestionModalForLearnerLocalViewService',
+  'UrlInterpolationService', 'UserService',
+  'FLAG_EXPLORATION_URL_TEMPLATE',
   function(
       $http, $rootScope, $scope, $uibModal, AlertsService,
       ExplorationEngineService, ExplorationPlayerStateService,
-      FocusManagerService, UrlInterpolationService, UserService,
-      FLAG_EXPLORATION_URL_TEMPLATE,
-      ShowSuggestionModalForLearnerLocalViewService) {
+      FocusManagerService,
+      ShowSuggestionModalForLearnerLocalViewService,
+      UrlInterpolationService, UserService,
+      FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationEngineService.getExplorationId();
     $scope.canEdit = GLOBALS.canEdit;
     $scope.username = '';
