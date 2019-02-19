@@ -6,11 +6,13 @@
     resize: none;
     width: 200px;
   }
-  .oppia-popover-checkbox {
+  .checkbox {
     font-size: 0.9em;
-    line-height: 1.825;
     margin: 12px 0 4px 0;
 }
+  .oppia-align-checkbox {
+    line-height: 1.745;
+  }
 </style>
 <div style="min-width: 200px;">
   <div ng-show="!feedbackSubmitted">
@@ -32,7 +34,7 @@
                ng-disabled="!feedbackText"
                translate="I18N_PLAYER_SUBMIT_BUTTON">
     </md-button>
-    <div class="oppia-popover-checkbox" ng-show="isLoggedIn">
+    <div class="checkbox oppia-align-checkbox" ng-show="isLoggedIn">
       <label>
         <input type="checkbox" ng-model="isSubmitterAnonymized">
         <span translate="I18N_PLAYER_STAY_ANONYMOUS"></span>
