@@ -1349,9 +1349,9 @@ def _check_directive_scope(all_files, parsed_js_files):
     print '----------------------------------------'
     # Select JS files which need to be checked.
     files_to_check = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.js')]
+        filename for filename in all_files if filename.endswith('.js') and
+        not any(fnmatch.fnmatch(filename, pattern) for pattern in
+        EXCLUDED_PATHS)]
     failed = False
     summary_messages = []
 
@@ -1474,15 +1474,15 @@ def _check_directive_scope(all_files, parsed_js_files):
 def _check_sorted_dependencies(all_files, parsed_js_files):
     """This function checks that the dependencies which are
     imported in the controllers/directives/factories in JS
-    files are in following pattern: dollar imports ,regular
-    imports and constant imports, all in sorted order.
+    files are in following pattern: dollar imports, regular
+    imports, and constant imports, all in sorted order.
     """
     print 'Starting sorted dependencies check'
     print '----------------------------------------'
     files_to_check = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.js')]
+        filename for filename in all_files if filename.endswith('.js') and
+        not any(fnmatch.fnmatch(filename, pattern) for pattern in
+        EXCLUDED_PATHS)]
     properties_to_check = ['controller', 'directive', 'factory']
     failed = False
     summary_messages = []
