@@ -189,10 +189,12 @@ class TestBase(unittest.TestCase):
             u'solution': {}
         },
         'written_translations': {
-            u'content': {},
-            u'default_outcome': {},
-            u'hint_1': {},
-            u'solution': {}
+            'translations_mapping': {
+                u'content': {},
+                u'default_outcome': {},
+                u'hint_1': {},
+                u'solution': {}
+            }
         },
         'interaction': {
             'solution': {
@@ -364,8 +366,9 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
   New state:
     classifier_model_id: null
     content:
@@ -392,8 +395,9 @@ states:
       solution: null
     param_changes: []
     written_translations:
-      content: {}
-      default_outcome: {}
+      translations_mapping:
+        content: {}
+        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: Title

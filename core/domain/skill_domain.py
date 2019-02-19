@@ -617,7 +617,9 @@ class Skill(object):
                 explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
             {explanation_content_id: {}},
             state_domain.WrittenTranslations.from_dict({
-                explanation_content_id: {}
+                'translations_mapping': {
+                    explanation_content_id: {}
+                }
             }))
         return cls(
             skill_id, description, [], skill_contents,

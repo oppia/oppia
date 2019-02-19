@@ -35,7 +35,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 '1', 'Explanation'), [
                     state_domain.SubtitledHtml('2', 'Example 1')],
             {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
-                {'1': {}, '2': {}}))
+                {'translations_mapping': {'1': {}, '2': {}}}))
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', 'notes', 'default_feedback')]
         self.skill = skill_domain.Skill(
@@ -174,7 +174,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                     'explanation': {}
                 },
                 'written_translations': {
-                    'explanation': {}
+                    'translations_mapping': {
+                        'explanation': {}
+                    }
                 },
                 'worked_examples': []
             },
@@ -199,8 +201,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', 'Explanation'), [
                 state_domain.SubtitledHtml('2', 'Example 1')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations(
-                {'1': {}, '2': {}}))
+            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+                {'translations_mapping': {'1': {}, '2': {}}}))
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(
             skill_contents_dict)

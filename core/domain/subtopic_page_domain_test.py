@@ -47,7 +47,9 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'content': {}
                 },
                 'written_translations': {
-                    'content': {}
+                    'translations_mapping': {
+                        'content': {}
+                    }
                 }
             },
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
@@ -74,7 +76,9 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'content': {}
                 },
                 'written_translations': {
-                    'content': {}
+                    'translations_mapping': {
+                        'content': {}
+                    }
                 }
             },
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
@@ -129,7 +133,9 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 'content_ids_to_audio_translations':
                     content_ids_to_audio_translations_dict,
                 'written_translations': {
-                    'content': {}
+                    'translations_mapping': {
+                        'content': {}
+                    }
                 }
             },
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
@@ -153,7 +159,9 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'content': {}
                 },
                 'written_translations': {
-                    'content': {}
+                    'translations_mapping': {
+                        'content': {}
+                    }
                 }
             },
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
@@ -168,10 +176,12 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_written_translations(self):
         written_translations_dict = {
-            'content': {
-                'en': {
-                    'html': 'Translation in hindi.',
-                    'needs_update': False
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': 'Translation in hindi.',
+                        'needs_update': False
+                    }
                 }
             }
         }
@@ -224,7 +234,9 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                 'content': {}
             },
             'written_translations': {
-                'content': {}
+                'translations_mapping': {
+                    'content': {}
+                }
             }
         }
         self.assertEqual(subtopic_page_contents.to_dict(),
@@ -260,10 +272,12 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                 }
             },
             'written_translations': {
-                'content': {
-                    'en': {
-                        'html': 'Translation.',
-                        'needs_update': False
+                'translations_mapping': {
+                    'content': {
+                        'en': {
+                            'html': 'Translation.',
+                            'needs_update': False
+                        }
                     }
                 }
             }

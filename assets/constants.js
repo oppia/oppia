@@ -8,7 +8,7 @@
  *    functions.
  */
 var constants = {
-  "//": "Whether to allow custom event reporting to Google Analytics.",
+  // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
@@ -30,14 +30,12 @@ var constants = {
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
 
-  "//": "The default language code for an exploration.",
+  // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
-  "//": [
-    "List of supported default categories. For now, each category has a specific ",
-    "color associated with it. Each category also has a thumbnail icon whose ",
-    "filename is '{{CategoryName}}.svg'."
-  ],
+  // List of supported default categories. For now, each category has a specific
+  // color associated with it. Each category also has a thumbnail icon whose
+  // filename is '{{CategoryName}}.svg'.
   "CATEGORIES_TO_COLORS": {
     "Mathematics": "#cd672b",
     "Algebra": "#cd672b",
@@ -89,11 +87,9 @@ var constants = {
     "Welcome": "#992a2b"
   },
 
-  "//": [
-    "List of supported language codes. Each description has a ",
-    "parenthetical part that may be stripped out to give a shorter ",
-    "description."
-  ],
+  // List of supported language codes. Each description has a
+  // parenthetical part that may be stripped out to give a shorter
+  // description.
   "ALL_LANGUAGE_CODES": [{
     "code": "en",
     "description": "English"
@@ -216,10 +212,8 @@ var constants = {
     "description": "Tiếng Việt (Vietnamese)"
   }],
 
-  "//": [
-    "NOTE TO DEVELOPERS: While adding another language, please ensure that the ",
-    "languages are in alphabetical order."
-  ],
+  // NOTE TO DEVELOPERS: While adding another language, please ensure that the
+  // languages are in alphabetical order.
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "id",
     "text": "Bahasa Indonesia"
@@ -255,10 +249,8 @@ var constants = {
     "text": "中文(繁體)"
   }],
 
-  "//": [
-    "Related languages are used to prioritize an exploration's language when ",
-    "setting the default audio language."
-  ],
+  // Related languages are used to prioritize an exploration's language when
+  // setting the default audio language.
   "SUPPORTED_AUDIO_LANGUAGES": [{
     "id": "en",
     "description": "English",
@@ -433,7 +425,7 @@ var constants = {
     "speech_synthesis_code_mobile": "en_US"
   }],
 
-  "//" : "Types of view in creator dashboard page.",
+  // Types of view in creator dashboard page.
   "ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS": {
     "CARD": "card",
     "LIST": "list"
@@ -448,13 +440,11 @@ var constants = {
 
   "SYSTEM_USER_IDS": ["admin", "OppiaMigrationBot"],
 
-  "//": [
-    "A string containing the disallowed characters in state or exploration",
-    "names. The underscore is needed because spaces in names must be converted",
-    "to underscores when displayed as part of a URL or key. The other",
-    "conventions here are derived from the Wikipedia guidelines for naming",
-    "articles."
-  ],
+  // A string containing the disallowed characters in state or exploration
+  // names. The underscore is needed because spaces in names must be converted
+  // to underscores when displayed as part of a URL or key. The other
+  // conventions here are derived from the Wikipedia guidelines for naming
+  // articles.
   "INVALID_NAME_CHARS": [
     ":", "#", "/", "|", "_", "%", "<", ">", "[", "]", "{", "}", "\\ufffd",
     "\\\\", "\\u007f", "\\u0000", "\\u0001", "\\u0002", "\\u0003", "\\u0004",
@@ -501,8 +491,10 @@ var constants = {
           "default_outcome": {}
       },
       "written_translations": {
-          "content": {},
-          "default_outcome": {}
+          "translations_mapping": {
+            "content": {},
+            "default_outcome": {}
+          }
       }
   },
 

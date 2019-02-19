@@ -14,8 +14,8 @@
 
 """Controllers for incoming email handlers."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import email_services
 from core.domain import feedback_services
 from google.appengine.api import mail

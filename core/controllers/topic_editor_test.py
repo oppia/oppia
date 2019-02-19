@@ -175,7 +175,9 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'content': {}
                 },
                 'written_translations': {
-                    'content': {}
+                    'translations_mapping': {
+                        'content': {}
+                    }
                 }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
@@ -199,7 +201,9 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'content': {}
                 },
                 'written_translations': {
-                    'content': {}
+                    'translations_mapping': {
+                        'content': {}
+                    }
                 },
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
@@ -219,7 +223,9 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'content': {}
                 },
                 'written_translations': {
-                    'content': {}
+                    'translations_mapping': {
+                        'content': {}
+                    }
                 }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
@@ -367,7 +373,9 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                     'content': {}
                 },
                 'written_translations': {
-                    'content': {}
+                    'translations_mapping': {
+                        'content': {}
+                    }
                 }
             }, json_response['subtopic_page']['page_contents'])
             json_response = self.get_json(
@@ -389,7 +397,9 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                     }
                 },
                 'written_translations': {
-                    'content': {}
+                    'translations_mapping': {
+                        'content': {}
+                    }
                 }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()

@@ -40,8 +40,10 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
                 '1', 'Skill Explanation'), [
                     state_domain.SubtitledHtml('2', 'Example 1'),
                     state_domain.SubtitledHtml('3', 'Example 2')],
-            {'1': {}, '2': {}, '3': {}}, state_domain.WrittenTranslations(
-                {'1': {}, '2': {}, '3': {}}))
+            {'1': {}, '2': {}, '3': {}},
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {'1': {}, '2': {}, '3': {}}
+            }))
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(

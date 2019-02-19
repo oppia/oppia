@@ -216,8 +216,10 @@ DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
 }
 # Default written_translations dict for a default state template.
 DEFAULT_WRITTEN_TRANSLATIONS = {
-    'content': {},
-    'default_outcome': {}
+    'translations_mapping': {
+        'content': {},
+        'default_outcome': {}
+    }
 }
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
@@ -366,11 +368,6 @@ DUPLICATE_EMAIL_INTERVAL_MINS = 2
 # Number of digits after decimal to which the average ratings value in the
 # dashboard is rounded off to.
 AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
-# Whether to enable the promo bar functionality. This does not actually turn on
-# the promo bar, as that is gated by a config value (see config_domain). This
-# merely avoids checking for whether the promo bar is enabled for every Oppia
-# page visited.
-ENABLE_PROMO_BAR = True
 # Whether to enable maintenance mode on the site. For non-admins, this redirects
 # all HTTP requests to the maintenance page. This is the only check which
 # determines whether the site is in maintenance mode to avoid queries to the
@@ -461,7 +458,7 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
 # The maximum size of an uploaded file, in bytes.
-MAX_FILE_SIZE_BYTES = 4048576
+MAX_FILE_SIZE_BYTES = 1048576
 
 # The maximum playback length of an audio file, in seconds.
 MAX_AUDIO_FILE_LENGTH_SEC = 300
@@ -695,6 +692,7 @@ SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SPLASH_URL = '/splash'
+STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'

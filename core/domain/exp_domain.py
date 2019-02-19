@@ -2161,6 +2161,9 @@ class Exploration(object):
                     solution['explanation']['content_id'])
 
             # Filter content_ids_to_audio_translations with unwanted content id.
+            # These are the extra content id present within the
+            # content_ids_to_audio_translations dict which is of no use as html
+            # linked to these content_ids are not available in the state.
             citat = state_dict['content_ids_to_audio_translations']
             extra_content_ids_in_citat = (
                 set(citat.keys()) - set(state_content_id_list))
@@ -2168,9 +2171,13 @@ class Exploration(object):
                 state_dict['content_ids_to_audio_translations'].pop(content_id)
 
             # Create written_translations using the state_content_id_list.
-            state_dict['written_translations'] = {}
+            translations_mapping = {}
             for content_id in state_content_id_list:
-                state_dict['written_translations'][content_id] = {}
+                translations_mapping[content_id] = {}
+
+            state_dict['written_translations'] = {}
+            state_dict['written_translations']['translations_mapping'] = (
+                translations_mapping)
 
         return states_dict
 

@@ -186,7 +186,8 @@ class SubtopicPageContents(object):
         return cls(
             state_domain.SubtitledHtml.create_default_subtitled_html(
                 content_id), {content_id: {}},
-            state_domain.WrittenTranslations.from_dict({content_id: {}}))
+            state_domain.WrittenTranslations.from_dict(
+                {'translations_mapping': {content_id: {}}}))
 
     def to_dict(self):
         """Returns a dict representing this SubtopicPageContents domain object.

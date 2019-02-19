@@ -54,8 +54,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {}
             },
             'written_translations': {
-                'content': {},
-                'default_outcome': {}
+                'translations_mapping': {
+                    'content': {},
+                    'default_outcome': {}
+                }
             },
             'interaction': {
                 'answer_groups': [],
@@ -543,28 +545,61 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
-    """Test methods operating on writen transcripts."""
+    """Test methods operating on written transcripts."""
+
+    def test_from_and_to_dict_wroks_correctly(self):
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': 'hello',
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        self.assertEqual(
+            written_translations.to_dict(), written_translations_dict)
 
     def test_get_available_languages_gives_correct_set_of_langauges(self):
         written_translations_dict = {
-            'content1': {
-                'en': {
-                    'html': 'hello',
-                    'needs_update': True
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': 'hello',
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
                 },
-                'hi': {
-                    'html': 'Hey!',
-                    'needs_update': False
-                }
-            },
-            'content2': {
-                'hi': {
-                    'html': 'Testing!',
-                    'needs_update': False
-                },
-                'en': {
-                    'html': 'hello!',
-                    'needs_update': False
+                'content2': {
+                    'hi': {
+                        'html': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
                 }
             }
         }
@@ -578,7 +613,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             expected_available_languages)
 
     def test_get_content_ids_for_text_translation_return_correct_list_of_content_id(self): # pylint: disable=line-too-long
-        written_translations = state_domain.WrittenTranslations.from_dict({})
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {}
+        })
         self.assertEqual(
             written_translations.get_content_ids_for_text_translation(), [])
 
@@ -589,18 +626,27 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                 'feedback_2', 'feedback_1'])
 
     def test_add_content_id_for_translations_adds_content_id(self):
-        written_translations = state_domain.WrittenTranslations.from_dict({})
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {}
+        })
+
+        self.assertEqual(
+            len(written_translations.get_content_ids_for_text_translation()), 0)
+
         new_content_id = 'content_id'
         written_translations.add_content_id_for_translation(new_content_id)
 
         self.assertEqual(
-            len(written_translations.to_dict()), 1)
+            len(written_translations.get_content_ids_for_text_translation()), 1)
         self.assertEqual(
-            written_translations.to_dict().keys(), ['content_id'])
+            written_translations.get_content_ids_for_text_translation(),
+            ['content_id'])
 
     def test_add_content_id_for_translation_with_invalid_content_id_raise_error(
             self):
-        written_translations = state_domain.WrittenTranslations.from_dict({})
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {}
+        })
         invalid_content_id = 123
         with self.assertRaisesRegexp(
             Exception, 'Expected content_id to be a string, received 123'):
@@ -610,10 +656,12 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     def test_add_content_id_for_translation_with_existing_content_id_raise_error( # pylint: disable=line-too-long
             self):
         written_translations_dict = {
-            'feedback_1': {
-                'en': {
-                    'html': 'hello!',
-                    'needs_update': False
+            'translations_mapping': {
+                'feedback_1': {
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
                 }
             }
         }
@@ -628,23 +676,31 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
     def test_delete_content_id_for_translations_deletes_content_id(self):
         old_written_translations_dict = {
-            'content': {
-                'en': {
-                    'html': 'hello!',
-                    'needs_update': False
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
                 }
             }
         }
 
         written_translations = state_domain.WrittenTranslations.from_dict(
             old_written_translations_dict)
+        self.assertEqual(
+            len(written_translations.get_content_ids_for_text_translation()), 1)
+
         written_translations.delete_content_id_for_translation('content')
 
-        self.assertEqual(len(written_translations.to_dict()), 0)
+        self.assertEqual(
+            len(written_translations.get_content_ids_for_text_translation()), 0)
 
     def test_delete_content_id_for_translation_with_nonexisting_content_id_raise_error(self): # pylint: disable=line-too-long
         written_translations_dict = {
-            'content': {}
+            'translations_mapping': {
+                'content': {}
+            }
         }
         written_translations = state_domain.WrittenTranslations.from_dict(
             written_translations_dict)
@@ -655,7 +711,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                 nonexisting_content_id_to_delete)
 
     def test_delete_content_id_for_translation_with_invalid_content_id_raise_error(self): # pylint: disable=line-too-long
-        written_translations = state_domain.WrittenTranslations.from_dict({})
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {}
+        })
         invalid_content_id_to_delete = 123
         with self.assertRaisesRegexp(
             Exception, 'Expected content_id to be a string, '):
@@ -664,7 +722,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation_with_invalid_content_id_raise_error(self):
         written_translations_dict = {
-            123: {}
+            'translations_mapping': {
+                123: {}
+            }
         }
 
         written_translations = state_domain.WrittenTranslations.from_dict(
@@ -676,10 +736,12 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation_with_invalid_type_langauge_code_raise_error(self):
         written_translations_dict = {
-            'content': {
-                123: {
-                    'html': 'hello!',
-                    'needs_update': False
+            'translations_mapping': {
+                'content': {
+                    123: {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
                 }
             }
         }
@@ -693,10 +755,12 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation_with_unknown_langauge_code_raise_error(self):
         written_translations_dict = {
-            'content': {
-                'ed': {
-                    'html': 'hello!',
-                    'needs_update': False
+            'translations_mapping': {
+                'content': {
+                    'ed': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
                 }
             }
         }
