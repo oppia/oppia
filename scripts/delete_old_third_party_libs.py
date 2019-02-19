@@ -20,6 +20,7 @@ import shutil
 
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 
+
 def remove_beautiful_soup():
     """ Finds libraries in third party folder and deletes old version of
     beautiful soup.
