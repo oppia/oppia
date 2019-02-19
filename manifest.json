@@ -66,7 +66,7 @@
       "beautifulSoup": {
         "version": "4.7.1",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/80/f2/f6aca7f1b209bb9a7ef069d68813b091c8c3620642b568dac4eb0e507748/beautifulsoup4-4.7.1.tar.gz",
+        "url": "https://pypi.python.org/packages/80/f2/f6aca7f1b209bb9a7ef069d68813b091c8c3620642b568dac4eb0e507748/beautifulsoup4-4.7.1.tar.gz#md5=321d73746d06bd9a8fcc3787b3fb7598",
         "tarRootDirPrefix": "beautifulsoup4-",
         "rootDirPrefix": "beautifulsoup4-",
         "targetDirPrefix": "beautifulsoup4-"
