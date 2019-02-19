@@ -108,9 +108,7 @@ oppia.constant('ENABLE_PROMO_BAR', true);
 
 oppia.constant('FEEDBACK_POPOVER_HTML', '<feedback-popup></feedback-popup>');
 oppia.constant('ANSWER_POPOVER_HTML',
-  '<div style="max-height: 300px; overflow-y: scroll;">' +
-  '<angular-html-bind html-data="getAnswerHtml()">' +
-  '</angular-html-bind></div>');
+  '<answer-popup get-answer-html="getAnswerHtml()"></answer-popup>');
 
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([
