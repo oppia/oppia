@@ -1330,9 +1330,9 @@ def _validate_and_parse_js_files(all_files):
     parser = pyjsparser.PyJsParser()
     # Select JS files which need to be checked.
     files_to_check = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.js')]
+        filename for filename in all_files if filename.endswith('.js') and
+        not any(fnmatch.fnmatch(filename, pattern) for pattern in
+        EXCLUDED_PATHS)]
     parsed_js_files = dict()
     for filename in files_to_check:
         print 'Validating and parsing %s file ...' % filename
