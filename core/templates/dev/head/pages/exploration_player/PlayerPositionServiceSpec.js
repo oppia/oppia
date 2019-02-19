@@ -71,5 +71,7 @@ describe('Player position service', function() {
     pps.setDisplayedCardIndex(4);
     pps.setDisplayedCardIndex(4);
     expect(pps.getDisplayedCardIndex()).toBe(4);
+    pps.setDisplayedCardIndex(5);
+    expect(pps.getDisplayedCardIndex()).toBe(5);
   });
 });
