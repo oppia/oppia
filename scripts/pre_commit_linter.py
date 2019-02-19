@@ -1332,7 +1332,7 @@ def _validate_and_parse_js_files(all_files):
     files_to_check = [
         filename for filename in all_files if filename.endswith('.js') and
         not any(fnmatch.fnmatch(filename, pattern) for pattern in
-        EXCLUDED_PATHS)]
+                EXCLUDED_PATHS)]
     parsed_js_files = dict()
     for filename in files_to_check:
         print 'Validating and parsing %s file ...' % filename
@@ -1351,7 +1351,7 @@ def _check_directive_scope(all_files, parsed_js_files):
     files_to_check = [
         filename for filename in all_files if filename.endswith('.js') and
         not any(fnmatch.fnmatch(filename, pattern) for pattern in
-        EXCLUDED_PATHS)]
+                EXCLUDED_PATHS)]
     failed = False
     summary_messages = []
 
@@ -1482,7 +1482,7 @@ def _check_sorted_dependencies(all_files, parsed_js_files):
     files_to_check = [
         filename for filename in all_files if filename.endswith('.js') and
         not any(fnmatch.fnmatch(filename, pattern) for pattern in
-        EXCLUDED_PATHS)]
+                EXCLUDED_PATHS)]
     properties_to_check = ['controller', 'directive', 'factory']
     failed = False
     summary_messages = []
