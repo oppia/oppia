@@ -277,4 +277,4 @@ class RegistryUnitTest(test_utils.GenericTestBase):
     def test_import_models_not_implemented_has_not_implemented_error(self):
         """Tests NotImplementedError of Platform."""
         with self.assertRaises(NotImplementedError):
-            _platform_instance = models.Platform().import_models()
+            models.Platform().import_models()
