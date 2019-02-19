@@ -19,6 +19,7 @@ source $(dirname $0)/setup.sh || exit 1
 
 # Download and install required JS and zip files.
 echo Installing third-party JS libraries and zip files.
+$PYTHON_CMD scripts/delete_old_third_party_libs.py
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
