@@ -16,6 +16,12 @@
  * @fileoverview CamelCaseToHyphens filter for Oppia.
  */
 
+oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
+
+oppia.constant(
+  'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
+  constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);
+
 oppia.filter('camelCaseToHyphens', [function() {
   return function(input) {
     var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
