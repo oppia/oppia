@@ -223,7 +223,6 @@ class ExplorationHandler(EditorHandler):
         # are not used by that tab.
         version = self.request.get('v', default_value=None)
         apply_draft = self.request.get('apply_draft', default_value=False)
-
         try:
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id, apply_draft=apply_draft,

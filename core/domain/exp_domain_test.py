@@ -234,8 +234,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         init_state = exploration.states[exploration.init_state_name]
-        default_outcome = init_state.interaction.default_outcome
-        default_outcome.dest = exploration.init_state_name
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = exploration.init_state_name
+        init_state.update_interaction_default_outcome(default_outcome_dict)
         exploration.validate()
 
         # Ensure an invalid destination can also be detected for answer groups.
@@ -428,7 +429,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Terminal interactions must not have a default outcome.')
 
         interaction.id = 'TextInput'
-        interaction.default_outcome = None
+        init_state.update_interaction_default_outcome(None)
         self._assert_validation_error(
             exploration,
             'Non-terminal interactions must have a default outcome.')
@@ -440,25 +441,28 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # A terminal interaction without a default outcome or answer group is
         # valid. This resets the exploration back to a valid state.
-        interaction.answer_groups = []
+        init_state.update_interaction_answer_groups([])
         exploration.validate()
 
         # Restore a valid exploration.
         interaction.id = 'TextInput'
-        interaction.answer_groups = answer_groups
-        interaction.default_outcome = default_outcome
+        answer_groups_list = [
+            answer_group.to_dict() for answer_group in answer_groups]
+        init_state.update_interaction_answer_groups(answer_groups_list)
+        init_state.update_interaction_default_outcome(default_outcome.to_dict())
         exploration.validate()
 
         interaction.hints = {}
         self._assert_validation_error(
             exploration, 'Expected hints to be a list')
+        interaction.hints = []
 
         # Validate AnswerGroup.
-        answer_group.rule_specs = {}
+        init_state.interaction.answer_groups[0].rule_specs = {}
         self._assert_validation_error(
             exploration, 'Expected answer group rules to be a list')
 
-        answer_group.rule_specs = []
+        init_state.interaction.answer_groups[0].rule_specs = []
         self._assert_validation_error(
             exploration,
             'There must be at least one rule or training data for each'
@@ -503,7 +507,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('EndExploration')
-        init_state.interaction.default_outcome = None
+        init_state.update_interaction_default_outcome(None)
         exploration.validate()
 
         exploration.tags = 'this should be a list'
@@ -591,17 +595,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         })
         init_state.update_interaction_hints(hints_list)
 
-        # Changing content id directly for testing validation error.
-        init_state.interaction.hints[0].hint_content.content_id = 'hint_2'
+        # Removing content id directly from content_ids_to_audio_translation for
+        # testing validation error.
+        init_state.content_ids_to_audio_translations.pop('hint_1')
 
         self._assert_validation_error(
             exploration,
-            r'Expected state content_ids_to_audio_translations to have all '
-            r'of the listed content ids \[\'content\', \'default_outcome\', '
-            r'\'hint_2\'\]')
+            r'Expected state content_ids_to_audio_translations to match '
+            r'the listed content ids \[\'content\', \'default_outcome\', '
+            r'\'hint_1\'\], found \[\'content\', \'default_outcome\'\]')
 
         # Undo above changes.
-        init_state.interaction.hints[0].hint_content.content_id = 'hint_1'
+        init_state.content_ids_to_audio_translations['hint_1'] = {}
 
         hints_list.append({
             'hint_content': {
@@ -3536,7 +3541,127 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V31
+    YAML_CONTENT_V32 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 32
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 27
+tags: []
+title: Title
+""")
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V32
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -3712,6 +3837,18 @@ title: Title
             'eid', self.YAML_CONTENT_V29)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v30(self):
+        """Test direct loading from a v30 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V30)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v31(self):
+        """Test direct loading from a v31 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V31)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class HTMLMigrationUnitTests(test_utils.GenericTestBase):
     """Test HTML migration."""
@@ -3735,6 +3872,7 @@ states:
       html: ''
     content_ids_to_audio_translations:
       content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3759,6 +3897,8 @@ states:
       html: <blockquote><p>Hello, this is state1</p></blockquote>
     content_ids_to_audio_translations:
       content: {}
+      default_outcome: {}
+      solution: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3792,12 +3932,17 @@ states:
       html: <p>Hello, </p>this <i>is </i>state2
     content_ids_to_audio_translations:
       content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      hint_1: {}
+      hint_2: {}
     interaction:
       answer_groups:
       - outcome:
           dest: state1
           feedback:
-            content_id: outcome
+            content_id: feedback_1
             html: <div>Outcome1 for state2</div>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -3815,7 +3960,7 @@ states:
       - outcome:
           dest: state3
           feedback:
-            content_id: outcome
+            content_id: feedback_2
             html: <pre>Outcome2 <br>for state2</pre>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -3844,10 +3989,10 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hints
+          content_id: hint_1
           html: <p>Hello, this is<div> html1<b> for </b></div>state2</p>
       - hint_content:
-          content_id: hints
+          content_id: hint_2
           html: Here is link 2 <oppia-noninteractive-link
                 text-with-value="&amp;quot;discussion forum&amp;quot;"
                 url-with-value="&amp;quot;https://groups.google.com/
@@ -3863,12 +4008,14 @@ states:
       html: <p>Hello, this is state3</p>
     content_ids_to_audio_translations:
       content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
           dest: state1
           feedback:
-            content_id: outcome
+            content_id: feedback_1
             html: Here is the image1 <i><oppia-noninteractive-image
                 filepath-with-value="&amp;quot;startBlue.png&amp;quot;">
                 </oppia-noninteractive-image></i>Here is the image2
@@ -3919,7 +4066,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long
-    YAML_CONTENT_V31_IMAGE_DIMENSIONS = ("""author_notes: ''
+    YAML_CONTENT_V32_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -3929,7 +4076,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 31
+schema_version: 32
 states:
   Introduction:
     classifier_model_id: null
@@ -3938,6 +4085,7 @@ states:
       html: ''
     content_ids_to_audio_translations:
       content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3955,6 +4103,10 @@ states:
       id: null
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
   state1:
     classifier_model_id: null
     content:
@@ -3962,6 +4114,8 @@ states:
       html: <blockquote><p>Hello, this is state1</p></blockquote>
     content_ids_to_audio_translations:
       content: {}
+      default_outcome: {}
+      solution: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3988,6 +4142,11 @@ states:
           content_id: solution
           html: <p>This is <em>solution</em> for state1</p>
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        solution: {}
   state2:
     classifier_model_id: null
     content:
@@ -3995,12 +4154,17 @@ states:
       html: <p>Hello, </p><p>this <em>is </em>state2</p>
     content_ids_to_audio_translations:
       content: {}
+      default_outcome: {}
+      feedback_1: {}
+      feedback_2: {}
+      hint_1: {}
+      hint_2: {}
     interaction:
       answer_groups:
       - outcome:
           dest: state1
           feedback:
-            content_id: outcome
+            content_id: feedback_1
             html: <p>Outcome1 for state2</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -4018,7 +4182,7 @@ states:
       - outcome:
           dest: state3
           feedback:
-            content_id: outcome
+            content_id: feedback_2
             html: "<pre>Outcome2 \\nfor state2</pre>"
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -4047,16 +4211,24 @@ states:
         refresher_exploration_id: null
       hints:
       - hint_content:
-          content_id: hints
+          content_id: hint_1
           html: <p>Hello, this is</p><p> html1<strong> for </strong></p><p>state2</p>
       - hint_content:
-          content_id: hints
+          content_id: hint_2
           html: <p>Here is link 2 <oppia-noninteractive-link text-with-value="&amp;quot;discussion
             forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/
             forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
       id: MultipleChoiceInput
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        hint_1: {}
+        hint_2: {}
   state3:
     classifier_model_id: null
     content:
@@ -4064,12 +4236,14 @@ states:
       html: <p>Hello, this is state3</p>
     content_ids_to_audio_translations:
       content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
           dest: state1
           feedback:
-            content_id: outcome
+            content_id: feedback_1
             html: <p>Here is the image1 </p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
               filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
               </oppia-noninteractive-image><p>Here is the image2 </p><oppia-noninteractive-image
@@ -4114,7 +4288,12 @@ states:
       id: ItemSelectionInput
       solution: null
     param_changes: []
-states_schema_version: 26
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+states_schema_version: 27
 tags: []
 title: title
 """)
@@ -4229,7 +4408,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V31_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V32_WITH_IMAGE_CAPTION = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4239,7 +4418,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 31
+schema_version: 32
 states:
   (untitled state):
     classifier_model_id: null
@@ -4288,6 +4467,11 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
   END:
     classifier_model_id: null
     content:
@@ -4306,6 +4490,9 @@ states:
       id: EndExploration
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
   New state:
     classifier_model_id: null
     content:
@@ -4335,7 +4522,11 @@ states:
       id: TextInput
       solution: null
     param_changes: []
-states_schema_version: 26
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 27
 tags: []
 title: Title
 """)
@@ -4352,7 +4543,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V31_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V32_IMAGE_DIMENSIONS)
 
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
@@ -4363,7 +4554,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V31_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V32_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -4388,6 +4579,12 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 'content_ids_to_audio_translations': {
                     'content': {},
                     'default_outcome': {}
+                },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {},
+                        'default_outcome': {}
+                    }
                 },
                 'interaction': {
                     'answer_groups': [],
