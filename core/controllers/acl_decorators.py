@@ -2394,6 +2394,17 @@ def can_access_story_viewer_page(handler):
     return test_can_access
 
 
+def can_access_subtopic_viewer_page(handler):
+    """Decorator to check whether user can access subtopic page viewer.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can access the give subtopic viewer page.
+    """
+    
 def get_decorator_for_accepting_suggestion(decorator):
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in
