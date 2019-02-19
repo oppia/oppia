@@ -1687,6 +1687,10 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                 self.indentation_level -= 1
 
 
+class LintsCheckManager():
+    def __init__(self, mode):
+        self.mode = mode
+    def 
 def _check_html_tags_and_attributes(all_files, debug=False):
     """This function checks the indentation of lines in HTML files."""
 
@@ -1793,7 +1797,7 @@ def main():
     """Main method for pre commit linter script that lints Python and JavaScript
     files.
     """
-    global _MODE #pylint: disable = global-statement
+    global _MODE # pylint: disable=global-statement
     all_files, _MODE = _get_all_files()
     linter_messages = _pre_commit_linter(all_files)
     directive_scope_messages = _check_directive_scope(all_files)
