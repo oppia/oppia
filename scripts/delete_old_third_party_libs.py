@@ -12,16 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+""" Scripts that deletes old third party libs. """
+
 import os
 import shutil
 
+
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 
-def remove_BeautifulSoup():
-	libraries = os.listdir(THIRD_PARTY_DIR)
-	if 'beautifulsoup4-4.6.0' in libraries:
-		shutil.rmtree(THIRD_PARTY_DIR + '/beautifulsoup4-4.6.0', ignore_errors=False, onerror=None)
+def remove_beautiful_soup():
+    """ Finds libraries in third party folder and deletes old version of
+    beautiful soup.
+    """
+    libraries = os.listdir(THIRD_PARTY_DIR)
+    if 'beautifulsoup4-4.6.0' in libraries:
+        shutil.rmtree(THIRD_PARTY_DIR + '/beautifulsoup4-4.6.0',
+                      ignore_errors=False, onerror=None)
+        return
+    return
 
 
 if __name__ == '__main__':
-	remove_BeautifulSoup()
+    remove_beautiful_soup()
