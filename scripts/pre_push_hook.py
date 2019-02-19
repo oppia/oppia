@@ -297,11 +297,14 @@ def _install_hook():
 
 def does_diff_include_js_files(files_to_lint):
     """Returns true if diff includes JS files.
+
     Args:
-        files_to_lint: list of files to be linted.
+        files_to_lint: list(str). List of files to be linted.
+
     Returns:
-        bool: status of JS files in diff.
+        bool. Status of JS files in diff.
     """
+
     js_files_to_check = [
         filename for filename in files_to_lint if
         filename.endswith('.js')]
