@@ -20,16 +20,16 @@ oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$rootScope', '$http', '$uibModal', '$templateCache',
-  'AlertsService', 'ExplorationEngineService', 'ExplorationPlayerStateService',
+  '$scope', '$rootScope', '$http', '$uibModal', 'AlertsService',
+  'ExplorationEngineService', 'ExplorationPlayerStateService',
   'FocusManagerService', 'UrlInterpolationService', 'UserService',
-  'FEEDBACK_POPOVER_HTML', 'FLAG_EXPLORATION_URL_TEMPLATE',
+  'FLAG_EXPLORATION_URL_TEMPLATE',
   'ShowSuggestionModalForLearnerLocalViewService',
   function(
-      $scope, $rootScope, $http, $uibModal, $templateCache,
-      AlertsService, ExplorationEngineService, ExplorationPlayerStateService,
+      $scope, $rootScope, $http, $uibModal, AlertsService,
+      ExplorationEngineService, ExplorationPlayerStateService,
       FocusManagerService, UrlInterpolationService, UserService,
-      FEEDBACK_POPOVER_HTML, FLAG_EXPLORATION_URL_TEMPLATE,
+      FLAG_EXPLORATION_URL_TEMPLATE,
       ShowSuggestionModalForLearnerLocalViewService) {
     $scope.explorationId = ExplorationEngineService.getExplorationId();
     $scope.canEdit = GLOBALS.canEdit;
@@ -39,9 +39,10 @@ oppia.controller('LearnerLocalNav', [
       $scope.username = userInfo.getUsername();
       $rootScope.loadingMessage = '';
     });
-    // This loads html as a template in cache so that it can be retreived
-    // later by uib-popover-template.
-    $templateCache.put('feedback_popup_container.html', FEEDBACK_POPOVER_HTML);
+    $scope.getFeedbackPopoverUrl = function() {
+      return UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_player/feedback_popup_container_directive.html');
+    };
     $scope.showLearnerSuggestionModal = function() {
       ShowSuggestionModalForLearnerLocalViewService.showSuggestionModal(
         'edit_exploration_state_content', {});

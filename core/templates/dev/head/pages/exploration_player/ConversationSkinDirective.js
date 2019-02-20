@@ -248,18 +248,17 @@ oppia.directive('conversationSkin', [
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-        '$location', '$q', '$templateCache', 'MessengerService',
-        'AlertsService', 'ExplorationEngineService', 'UrlService',
-        'FocusManagerService', 'LearnerViewRatingService',
-        'WindowDimensionsService', 'EditableExplorationBackendApiService',
-        'PlayerTranscriptService', 'LearnerParamsService',
-        'ExplorationRecommendationsService',
+        '$location', '$q', 'MessengerService', 'AlertsService',
+        'ExplorationEngineService', 'UrlService', 'FocusManagerService',
+        'LearnerViewRatingService', 'WindowDimensionsService',
+        'EditableExplorationBackendApiService', 'PlayerTranscriptService',
+        'LearnerParamsService', 'ExplorationRecommendationsService',
         'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
         'StatsReportingService', 'SiteAnalyticsService',
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'EVENT_NEW_CARD_AVAILABLE', 'FEEDBACK_POPOVER_HTML',
+        'EVENT_NEW_CARD_AVAILABLE',
         'FatigueDetectionService', 'NumberAttemptsService',
         'PlayerCorrectnessFeedbackEnabledService', 'ContextService',
         'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
@@ -275,18 +274,17 @@ oppia.directive('conversationSkin', [
         'CurrentInteractionService', 'UserService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
-            $location, $q, $templateCache, MessengerService,
-            AlertsService, ExplorationEngineService, UrlService,
-            FocusManagerService, LearnerViewRatingService,
-            WindowDimensionsService, EditableExplorationBackendApiService,
-            PlayerTranscriptService, LearnerParamsService,
-            ExplorationRecommendationsService,
+            $location, $q, MessengerService, AlertsService,
+            ExplorationEngineService, UrlService, FocusManagerService,
+            LearnerViewRatingService, WindowDimensionsService,
+            EditableExplorationBackendApiService, PlayerTranscriptService,
+            LearnerParamsService, ExplorationRecommendationsService,
             ReadOnlyExplorationBackendApiService, PlayerPositionService,
             StatsReportingService, SiteAnalyticsService,
             PretestQuestionBackendApiService, StateCardObjectFactory,
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            EVENT_NEW_CARD_AVAILABLE, FEEDBACK_POPOVER_HTML,
+            EVENT_NEW_CARD_AVAILABLE,
             FatigueDetectionService, NumberAttemptsService,
             PlayerCorrectnessFeedbackEnabledService, ContextService,
             ConceptCardBackendApiService, ConceptCardObjectFactory,
@@ -311,10 +309,12 @@ oppia.directive('conversationSkin', [
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.isLoggedIn = userInfo.isLoggedIn();
           });
-          // This loads html as a template in cache so that it can be retreived
-          // later by uib-popover-template.
-          $templateCache.put(
-            'feedback_popup_container.html', FEEDBACK_POPOVER_HTML);
+
+          $scope.getFeedbackPopoverUrl = function() {
+            return UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_player/' +
+              'feedback_popup_container_directive.html');
+          };
 
           var hasInteractedAtLeastOnce = false;
           $scope.answerIsBeingProcessed = false;
