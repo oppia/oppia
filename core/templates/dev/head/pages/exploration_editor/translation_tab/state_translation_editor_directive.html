@@ -1,0 +1,62 @@
+<div class="oppia-translation-editor">
+  <div class="oppia-state-translation-editor-drag-bar"></div>
+  <div class="oppia-state-translation-editor-section">
+    <div ng-if="!translationEditorIsOpen">
+      <div class="protractor-test-edit-content"
+           ng-class="{'oppia-editable-section': isTranslatable()}"
+           ng-click="openTranslationEditor()">
+        <i ng-if="isTranslatable()" class="material-icons oppia-editor-edit-icon"
+           title="Edit translation">&#xE254;
+        </i>
+        <div class="oppia-state-content-display oppia-transition-200"
+             ng-class="{'oppia-prevent-selection': isTranslatable()}"
+             title="Card Content">
+          <span  class="oppia-placeholder">
+            No translation available. Click to add new!
+          </span>
+          <span>
+            <angular-html-bind html-data="Data here"
+                               class="oppia-rte-editor protractor-test-state-content-display">
+            </angular-html-bind>
+          </span>
+        </div>
+        <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
+        <div class="oppia-editable-section-mask protractor-test-state-edit-content">
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="translationEditorIsOpen">
+      <schema-based-editor schema="HTML_SCHEMA" local-value="">
+      </schema-based-editor>
+      <div style="margin-top: 2px;">
+        <button type="button"
+                class="btn btn-success oppia-save-state-item-button"
+                ng-click="onSaveTranslationButtonClicked()">
+          Save
+        </button>
+        <button type="button" class="btn btn-default pull-right" ng-click="cancelEdit()">Cancel</button>
+        <div style="clear: both;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .oppia-state-translation-editor-drag-bar {
+    height: 30px;
+    background-color: grey;
+  }
+  .oppia-state-translation-editor-section {
+
+  }
+  .oppia-translation-editor {
+    border: 1px solid grey;
+    bottom: 380px;
+    background-color: white;
+    left: 140px;
+    min-width: 450px;
+    min-height: 200px;
+    position: absolute;
+    z-index: 1000;
+  }
+</style>

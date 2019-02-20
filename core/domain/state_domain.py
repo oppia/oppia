@@ -788,8 +788,7 @@ class WrittenTranslations(object):
         Returns:
             dict. A dict, mapping all fields of WrittenTranslations instance.
         """
-        written_translations_dict = {'translations_mapping': {}}
-        translations_mapping = written_translations_dict['translations_mapping']
+        translations_mapping = {}
         for (content_id, language_code_to_written_translation) in (
                 self.translations_mapping.iteritems()):
             translations_mapping[content_id] = {}
@@ -797,6 +796,9 @@ class WrittenTranslations(object):
                     language_code_to_written_translation.iteritems()):
                 translations_mapping[content_id][language_code] = (
                     written_translation.to_dict())
+        written_translations_dict = {
+            'translations_mapping': translations_mapping
+        }
 
         return written_translations_dict
 

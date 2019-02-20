@@ -20,70 +20,80 @@ oppia.directive('stateTranslationEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      link: function(scope, element) {
-        // This allows the scope to be retrievable during Karma unit testing.
-        // See http://stackoverflow.com/a/29833832 for more details.
-        element[0].getControllerScope = function() {
-          return scope;
-        };
+      link: function(scope, elm, attrs) {
+        elm.draggable({
+          handle: '.oppia-state-translation-editor-drag-bar',
+        });
       },
-      scope: {
-        getStateContentPlaceholder: '&stateContentPlaceholder',
-        onSaveStateContent: '=',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_editor_directive.html'),
       controller: [
-        '$scope', 'StateContentService', 'EditabilityService', function(
-            $scope, StateContentService, EditabilityService) {
+        '$scope', 'StateWrittenTranslationsService', 'EditabilityService',
+        'TranslationTabActiveContentIdService',
+          function(
+            $scope, StateWrittenTranslationsService, EditabilityService,
+            TranslationTabActiveContentIdService) {
           $scope.HTML_SCHEMA = {
-            type: 'unicode'
+            type: 'html',
+            'ui_config': {
+              'hide_complex_extensions': 'true'
+            }
           };
           $scope.contentId = null;
-          $scope.StateContentService = StateContentService;
-          if (StateContentService.displayed) {
-            $scope.contentId = StateContentService.displayed.getContentId();
+          $scope.translationHtml = null;
+          $scope.contentId = (
+            TranslationTabActiveContentIdService.getActiveContentId());
+
+          $scope.translationEditorIsOpen = false;
+          $scope.isTranslatable = EditabilityService.isTranslatable;
+
+          $scope.getTranslationHtml = function() {
+            var langaugeCode = TranslationLanguageService
+              .getActiveLanguageCode();
+            if (StateWrittenTranslationsService.displayed.hasWrittenTranslation(
+              $scope.contentId, langaugeCode)) {
+              $scope.translationHtml = StateWrittenTranslationsService.displayed
+                .getWrittenTranslation(
+                  $scope.contentId, langaugeCode).getHtml();
+              return $scope.translationHtml;
+            }
           }
-
-          $scope.contentEditorIsOpen = false;
-          $scope.isEditable = EditabilityService.isEditable;
-
-          var saveContent = function() {
+          var saveTranslation = function() {
             StateContentService.saveDisplayedValue();
-            $scope.onSaveStateContent(StateContentService.displayed);
-            $scope.contentEditorIsOpen = false;
+            $scope.translationEditorIsOpen = false;
           };
 
           $scope.$on('externalSave', function() {
-            if ($scope.contentEditorIsOpen) {
-              saveContent();
+            if ($scope.translationEditorIsOpen) {
+              saveTranslation();
             }
           });
 
-          $scope.openStateContentEditor = function() {
-            if ($scope.isEditable()) {
-              $scope.contentEditorIsOpen = true;
+          $scope.openTranslationEditor = function() {
+            if ($scope.isTranslatable()) {
+              $scope.translationEditorIsOpen = true;
             }
           };
 
-          $scope.onSaveContentButtonClicked = function() {
-            EditorFirstTimeEventsService.registerFirstSaveContentEvent();
-            var savedContent = StateContentService.savedMemento;
+          $scope.onSaveTranslationButtonClicked = function() {
+            if (!StateWrittenTranslationsService.savedMemento
+              .hasWrittenTranslation($scope.contentId, langaugeCode)) {
+
+            }
             var contentHasChanged = (
               savedContent.getHtml() !==
               StateContentService.displayed.getHtml());
             if (contentHasChanged) {
               var contentId = StateContentService.displayed.getContentId();
-              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
             }
-            saveContent();
+            saveTranslation();
           };
 
           $scope.cancelEdit = function() {
             StateContentService.restoreFromMemento();
-            $scope.contentEditorIsOpen = false;
+            $scope.translationEditorIsOpen = false;
           };
         }
       ]

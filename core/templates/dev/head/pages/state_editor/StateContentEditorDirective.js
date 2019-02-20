@@ -41,7 +41,7 @@ oppia.directive('stateContentEditor', [
             $scope, StateContentService, EditabilityService,
             EditorFirstTimeEventsService) {
           $scope.HTML_SCHEMA = {
-            type: 'unicode'
+            type: 'html'
           };
           $scope.contentId = null;
           $scope.StateContentService = StateContentService;
@@ -65,7 +65,7 @@ oppia.directive('stateContentEditor', [
             $scope.cardHeightLimitWarningIsShown = false;
           };
 
-          var saveContent = function() {
+          var saveTranslation = function() {
             StateContentService.saveDisplayedValue();
             $scope.onSaveStateContent(StateContentService.displayed);
             $scope.contentEditorIsOpen = false;

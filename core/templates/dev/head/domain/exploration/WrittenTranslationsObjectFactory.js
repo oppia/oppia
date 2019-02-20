@@ -31,7 +31,7 @@ oppia.factory('WrittenTranslationsObjectFactory', [
 
     WrittenTranslations.prototype.getWrittenTranslation = function(
         contentId, langCode) {
-      return this.translationsMapping[contentId][langCode];
+      return this.translationsMapping[contentId][langCode].getHtml();
     };
 
     WrittenTranslations.prototype.markAllTranslationsAsNeedingUpdate = (
@@ -48,8 +48,10 @@ oppia.factory('WrittenTranslationsObjectFactory', [
       return Object.keys(this.translationsMapping[contentId]);
     };
 
-    WrittenTranslations.prototype.hasWrittenTranslations = function(contentId) {
-      return this.getTranslationsLanguageCodes(contentId).length > 0;
+    WrittenTranslations.prototype.hasWrittenTranslation = function(
+      contentId, langaugeCode) {
+      return this.getTranslationsLanguageCodes(
+        contentId).indexOf(langaugeCode) !== -1;
     };
 
     WrittenTranslations.prototype.hasUnflaggedWrittenTranslations = function(
@@ -85,17 +87,6 @@ oppia.factory('WrittenTranslationsObjectFactory', [
       }
       writtenTranslations[languageCode] = (
         WrittenTranslationObjectFactory.createNew(html));
-    };
-
-    WrittenTranslations.prototype.deleteAudioTranslation = function(
-        contentId, languageCode) {
-      var writtenTranslations = this.translationsMapping[contentId];
-      if (!writtenTranslations.hasOwnProperty(languageCode)) {
-        throw Error(
-          'Trying to remove non-existing translation for language code ' +
-          languageCode);
-      }
-      delete writtenTranslations[languageCode];
     };
 
     WrittenTranslations.prototype.toggleNeedsUpdateAttribute = (
