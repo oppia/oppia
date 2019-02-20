@@ -20,10 +20,10 @@ describe('EndExplorationValidationService', function() {
   var validator, customizationArguments;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('EndExplorationValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 

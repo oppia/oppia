@@ -20,10 +20,10 @@ describe('MusicNotesInputValidationService', function() {
   var oof, agof;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('MusicNotesInputValidationService');
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');

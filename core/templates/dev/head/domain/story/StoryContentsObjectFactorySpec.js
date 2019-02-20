@@ -21,9 +21,9 @@ describe('Story contents object factory', function() {
   var _sampleSubtopic = null;
   var _sampleStoryContents = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     StoryContentsObjectFactory = $injector.get('StoryContentsObjectFactory');
 
     var sampleStoryContentsBackendDict = {

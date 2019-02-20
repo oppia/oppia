@@ -17,13 +17,13 @@
  */
 
 describe('Stopwatch object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('stopwatch object factory', function() {
     var StopwatchObjectFactory = null;
     var errorLog = [];
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       StopwatchObjectFactory = $injector.get('StopwatchObjectFactory');
       spyOn($injector.get('$log'), 'error').and.callFake(
         function(errorMessage) {

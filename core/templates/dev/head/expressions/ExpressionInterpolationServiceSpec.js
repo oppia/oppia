@@ -17,12 +17,12 @@
  */
 
 describe('Expression interpolation service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('expression interpolation service', function() {
     var ExpressionInterpolationService = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       ExpressionInterpolationService = $injector.get(
         'ExpressionInterpolationService');
     }));

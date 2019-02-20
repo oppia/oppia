@@ -20,9 +20,9 @@ describe('Signup controller', function() {
   describe('SignupCtrl', function() {
     var scope, ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
 
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(inject(function($controller, $http, _$httpBackend_, $rootScope) {
+    beforeEach(angular.mock.inject(function($controller, $http, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/signuphandler/data').respond({
         username: 'myUsername',
@@ -118,7 +118,7 @@ describe('Signup controller', function() {
         };
         $httpBackend.expectPOST('/signuphandler/data').respond(
           401, errorResponseObject);
-        scope.submitPrerequisitesForm(true, 'myUsername', false);
+        scope.submitPrerequisitesForm(true, 'myUsername', 'no');
         $httpBackend.flush();
         expect(scope.showRegistrationSessionExpiredModal).toHaveBeenCalled();
       });

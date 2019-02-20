@@ -237,13 +237,19 @@ oppia.factory('CollectionObjectFactory', [
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // collection python dict.
-    Collection.create = function(collectionBackendObject) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Collection['create'] = function(collectionBackendObject) {
+    /* eslint-enable dot-notation */
       return new Collection(collectionBackendObject);
     };
 
     // Create a new, empty collection. This is not guaranteed to pass validation
     // tests.
-    Collection.createEmptyCollection = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Collection['createEmptyCollection'] = function() {
+    /* eslint-enable dot-notation */
       return new Collection({
         nodes: [],
       });

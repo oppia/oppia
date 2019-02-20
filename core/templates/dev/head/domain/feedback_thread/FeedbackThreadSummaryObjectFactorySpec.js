@@ -19,9 +19,9 @@
 describe('Feedback thread object factory', function() {
   var FeedbackThreadSummaryObjectFactory = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     FeedbackThreadSummaryObjectFactory = $injector.get(
       'FeedbackThreadSummaryObjectFactory');
   }));

@@ -21,9 +21,9 @@ describe('Concept card backend API service', function() {
   var $httpBackend = null;
   var sampleResponse = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ConceptCardBackendApiService = $injector.get(
       'ConceptCardBackendApiService');
     $httpBackend = $injector.get('$httpBackend');

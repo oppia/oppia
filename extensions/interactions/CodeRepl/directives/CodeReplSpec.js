@@ -21,10 +21,10 @@ describe('CodeRepl interaction', function() {
     var $httpBackend, $templateCache;
     var elt, scope;
 
-    beforeEach(module('directiveTemplates'));
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('directiveTemplates'));
+    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(inject(function($compile, $rootScope, _$templateCache_) {
+    beforeEach(angular.mock.inject(function($compile, $rootScope, _$templateCache_) {
       $templateCache = _$templateCache_;
       var templatesHtml = $templateCache.get(
         '/extensions/interactions/CodeRepl/directives/' +
@@ -33,7 +33,7 @@ describe('CodeRepl interaction', function() {
       $rootScope.$digest();
     }));
 
-    beforeEach(inject(function($compile, _$httpBackend_, $rootScope) {
+    beforeEach(angular.mock.inject(function($compile, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
 
       var TAG_NAME = 'oppia-interactive-code-repl';

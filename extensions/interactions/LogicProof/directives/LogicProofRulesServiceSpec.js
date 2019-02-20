@@ -17,10 +17,10 @@
  */
 
 describe('Logic Proof rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var lprs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     lprs = $injector.get('LogicProofRulesService');
   }));
 

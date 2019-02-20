@@ -23,9 +23,9 @@ describe('Guest collection progress object factory', function() {
   var _expId0 = null;
   var _expId1 = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     GuestCollectionProgressObjectFactory = (
       $injector.get('GuestCollectionProgressObjectFactory'));
 

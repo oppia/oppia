@@ -56,12 +56,10 @@ oppia.run([
             inline: isInline,
             template: componentTemplate,
             draggable: false,
-            edit: function(event) {
+            edit: function() {
               editor.fire('lockSnapshot', {
                 dontUpdate: true
               });
-              // Prevent default action since we are using our own edit modal.
-              event.cancel();
               // Save this for creating the widget later.
               var container = this.wrapper.getParent(true);
               var that = this;
@@ -131,7 +129,7 @@ oppia.run([
             downcast: function(element) {
               // Clear the angular rendering content, which we don't
               // want in the output.
-              element.children[0].setHtml('');
+              (<CKEDITOR.htmlParser.element>element.children[0]).setHtml('');
               // Return just the rich text component, without its wrapper.
               return element.children[0];
             },
@@ -143,7 +141,9 @@ oppia.run([
             upcast: function(element) {
               return (element.name !== 'p' &&
                       element.children.length > 0 &&
-                      element.children[0].name === tagName);
+                      (
+                        <CKEDITOR.htmlParser.element>element.children[0]
+                      ).name === tagName);
             },
             data: function() {
               var that = this;

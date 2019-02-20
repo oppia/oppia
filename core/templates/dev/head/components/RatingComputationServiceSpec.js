@@ -19,8 +19,8 @@
 describe('Rating computation service', function() {
   var RatingComputationService;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     RatingComputationService = $injector.get('RatingComputationService');
   }));
 

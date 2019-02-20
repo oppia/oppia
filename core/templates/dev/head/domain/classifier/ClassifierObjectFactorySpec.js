@@ -19,9 +19,9 @@
 describe('Classifier Object Factory', function() {
   var ClassifierObjectFactory;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ClassifierObjectFactory = $injector.get('ClassifierObjectFactory');
   }));
 

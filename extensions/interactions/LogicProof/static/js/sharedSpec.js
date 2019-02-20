@@ -17,7 +17,8 @@
  * interaction.
  */
 
-var errorWrapper = function(dubiousFunction, input, parameter = null) {
+var errorWrapperForSharedSpec = function(
+    dubiousFunction, input, parameter = null) {
   return function() {
     try {
       if (parameter === null) {
@@ -26,9 +27,9 @@ var errorWrapper = function(dubiousFunction, input, parameter = null) {
         dubiousFunction(input, parameter);
       }
     } catch (err) {
-      throw logicProofShared.renderError(
+      throw new Error(logicProofShared.renderError(
         err, logicProofData.BASE_GENERAL_MESSAGES,
-        logicProofData.BASE_STUDENT_LANGUAGE);
+        logicProofData.BASE_STUDENT_LANGUAGE));
     }
   };
 };
@@ -84,13 +85,13 @@ describe('Pre-parse lines', function() {
 
   it('should reject lines that are entirely whitespace', function() {
     expect(
-      errorWrapper(preParse, '   ', false)
+      errorWrapperForSharedSpec(preParse, '   ', false)
     ).toThrowError('This line is blank.');
   });
 
   it('should reject unknown symbols', function() {
     expect(
-      errorWrapper(preParse, 'from p and p{q we see q', false)
+      errorWrapperForSharedSpec(preParse, 'from p and p{q we see q', false)
     ).toThrowError('The symbol { was not recognised.');
   });
 });
@@ -211,7 +212,7 @@ describe('Parse lines', function() {
 
   it('should reject unknown phrases', function() {
     expect(
-      errorWrapper(parse, 'from p we havw p\u2227q')
+      errorWrapperForSharedSpec(parse, 'from p we havw p\u2227q')
     ).toThrowError(
       'The phrase starting \'we\' could not be identified; ' +
       'please make sure you are only using phrases from the given list of ' +
@@ -221,7 +222,7 @@ describe('Parse lines', function() {
 
   it('should reject consecutive expressions', function() {
     expect(
-      errorWrapper(parse, 'from A=>B B have B')
+      errorWrapperForSharedSpec(parse, 'from A=>B B have B')
     ).toThrowError(
       'We could not identify \'B\'; please make sure you are using ' +
       'vocabulary from the given list, and don\'t have two consecutive ' +
@@ -333,20 +334,20 @@ describe('Assign types to expressions', function() {
 
   it('should reject type mismatches', function() {
     expect(
-      errorWrapper(assignTypes, 'p<=>2+x', ['variable'])
+      errorWrapperForSharedSpec(assignTypes, 'p<=>2+x', ['variable'])
     ).toThrowError(
       'addition yields a element but you are trying to use it to give a ' +
       'boolean.');
 
     expect(
-      errorWrapper(
+      errorWrapperForSharedSpec(
         assignTypes, 'x\u2227f(x)',
         ['variable', 'prefix_function', 'constant'])
     ).toThrowError(
       'x yields a boolean but you are trying to use it to give a element.');
 
     expect(
-      errorWrapper(
+      errorWrapperForSharedSpec(
         assignTypesControl, '\'a\'=2', ['prefix_function', 'constant'])
     ).toThrowError(
       '2 yields a integer but you are trying to use it to give a string.');
@@ -354,7 +355,7 @@ describe('Assign types to expressions', function() {
 
   it('should forbid quantification over pre-existing variables', function() {
     expect(
-      errorWrapper(
+      errorWrapperForSharedSpec(
         assignTypes, 'a\u2227\u2203a.f(2)',
         ['variable', 'prefix_function', 'constant'])
     ).toThrowError(
@@ -364,19 +365,19 @@ describe('Assign types to expressions', function() {
 
   it('should reject kind mismatches', function() {
     expect(
-      errorWrapper(
+      errorWrapperForSharedSpec(
         assignTypes, 'f(f)', ['variable', 'prefix_function', 'constant'])
     ).toThrowError('f is supposed to be a prefix_function.');
   });
 
   it('should reject unknown operators of an un-addable kind', function() {
     expect(
-      errorWrapper(
+      errorWrapperForSharedSpec(
         assignTypes, '\u2200m<n.A(n)',
         ['variable', 'prefix_function', 'constant'])
     ).toThrowError('The operator bounded_for_all could not be identified.');
     expect(
-      errorWrapper(
+      errorWrapperForSharedSpec(
         assignTypes, '\u2203x.A(x)<=>x=2', ['prefix_function', 'constant'])
     ).toThrowError('The operator x could not be identified.');
   });

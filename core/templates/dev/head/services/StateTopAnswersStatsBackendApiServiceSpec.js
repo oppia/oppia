@@ -17,9 +17,9 @@
  */
 
 describe('StateTopAnswersStatsBackendApiService', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     this.StateTopAnswersStatsBackendApiService =
       $injector.get('StateTopAnswersStatsBackendApiService');
     this.$httpBackend = $injector.get('$httpBackend');

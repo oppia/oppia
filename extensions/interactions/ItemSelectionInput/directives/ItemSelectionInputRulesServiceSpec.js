@@ -17,10 +17,10 @@
  */
 
 describe('Item Selection rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var isirs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     isirs = $injector.get('ItemSelectionInputRulesService');
   }));
 

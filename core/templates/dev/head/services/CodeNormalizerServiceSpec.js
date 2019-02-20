@@ -17,10 +17,10 @@
  */
 
 describe('Code Normalization', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var cns = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     cns = $injector.get('CodeNormalizerService');
   }));
 

@@ -19,9 +19,9 @@
 describe('Admin task manager service', function() {
   var AdminTaskManagerService = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     AdminTaskManagerService = $injector.get('AdminTaskManagerService');
   }));
 

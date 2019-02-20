@@ -150,86 +150,96 @@ var expressionU = {
 
 var sampleControlLanguage = logicProofData.BASE_CONTROL_LANGUAGE;
 var sampleControlModel = logicProofStudent.BASE_CONTROL_MODEL;
-sampleControlLanguage.operators.scoper = {
-  kind: 'prefix_function',
-  typing: [{
-    arguments: [{
-      type: 'integer',
-      arbitrarily_many: false
-    }],
-    dummies: [],
-    output: 'integer'
-  }]
-};
-sampleControlModel.evaluation_rules.scoper = {
-  format: 'definition',
-  evaluateExpression: function(expression, inputs, model, parameters, cache) {
-    return logicProofStudent.evaluate({
-      top_kind_name: 'ranged_function',
-      top_operator_name: 'max',
-      arguments: [{
-        top_kind_name: 'binary_relation',
-        top_operator_name: 'less_than',
+sampleControlLanguage.operators = Object.assign(sampleControlLanguage.operators,
+  {
+    scoper: {
+      kind: 'prefix_function',
+      typing: [{
         arguments: [{
-          top_kind_name: 'variable',
-          top_operator_name: 'k',
-          arguments: [],
-          dummies: [],
-          type: 'integer'
-        }, {
-          top_kind_name: 'variable',
-          top_operator_name: 'n',
-          arguments: [],
-          dummies: [],
-          type: 'integer'
+          type: 'integer',
+          arbitrarily_many: false
         }],
         dummies: [],
-        type: 'boolean'
-      }, {
-        top_kind_name: 'binary_relation',
-        top_operator_name: 'less_than',
-        arguments: [{
-          top_kind_name: 'prefix_function',
-          top_operator_name: 'indentation',
+        output: 'integer'
+      }]
+    }
+  }
+);
+sampleControlModel.evaluation_rules = Object.assign(
+  sampleControlModel.evaluation_rules,
+  {
+    scoper: {
+      format: 'definition',
+      evaluateExpression: function(expression, inputs, model, parameters, cache) {
+        return logicProofStudent.evaluate({
+          top_kind_name: 'ranged_function',
+          top_operator_name: 'max',
           arguments: [{
+            top_kind_name: 'binary_relation',
+            top_operator_name: 'less_than',
+            arguments: [{
+              top_kind_name: 'variable',
+              top_operator_name: 'k',
+              arguments: [],
+              dummies: [],
+              type: 'integer'
+            }, {
+              top_kind_name: 'variable',
+              top_operator_name: 'n',
+              arguments: [],
+              dummies: [],
+              type: 'integer'
+            }],
+            dummies: [],
+            type: 'boolean'
+          }, {
+            top_kind_name: 'binary_relation',
+            top_operator_name: 'less_than',
+            arguments: [{
+              top_kind_name: 'prefix_function',
+              top_operator_name: 'indentation',
+              arguments: [{
+                top_kind_name: 'variable',
+                top_operator_name: 'k',
+                arguments: [],
+                dummies: [],
+                type: 'integer'
+              }],
+              dummies: [],
+              type: 'integer'
+            }, {
+              top_kind_name: 'prefix_function',
+              top_operator_name: 'indentation',
+              arguments: [{
+                top_kind_name: 'variable',
+                top_operator_name: 'n',
+                arguments: [],
+                dummies: [],
+                type: 'integer'
+              }],
+              dummies: [],
+              type: 'integer'
+            }],
+            dummies: [],
+            integer: 'boolean'
+          }],
+          dummies: [{
             top_kind_name: 'variable',
             top_operator_name: 'k',
             arguments: [],
             dummies: [],
             type: 'integer'
-          }],
-          dummies: [],
-          type: 'integer'
+          }]
         }, {
-          top_kind_name: 'prefix_function',
-          top_operator_name: 'indentation',
-          arguments: [{
-            top_kind_name: 'variable',
-            top_operator_name: 'n',
-            arguments: [],
-            dummies: [],
-            type: 'integer'
-          }],
-          dummies: [],
-          type: 'integer'
-        }],
-        dummies: [],
-        integer: 'boolean'
-      }],
-      dummies: [{
-        top_kind_name: 'variable',
-        top_operator_name: 'k',
-        arguments: [],
-        dummies: [],
-        type: 'integer'
-      }]
-    }, {
-      n: logicProofStudent.evaluate(
-        expression.arguments[0], inputs, model, parameters, cache)
-    }, model, parameters, cache);
-  },
-  description: 'The most recent line (not including n) in whose scope line n is'
-};
+          n: logicProofStudent.evaluate(
+            expression.arguments[0], inputs, model, parameters, cache)
+        }, model, parameters, cache);
+      },
+      description: 'The most recent line (not including n) ' +
+      'in whose scope line n is'
+    }
+  }
+);
 
 var sampleInteraction = {
   assumptions: [],

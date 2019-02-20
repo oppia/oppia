@@ -18,13 +18,13 @@
  */
 
 describe('Context service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('behavior in the exploration learner view', function() {
     var ecs = null;
 
     beforeEach(function() {
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/explore/123';
@@ -33,9 +33,10 @@ describe('Context service', function() {
       });
     });
 
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(
+      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       ecs = $injector.get('ContextService');
     }));
 
@@ -57,7 +58,7 @@ describe('Context service', function() {
     var ecs = null;
 
     beforeEach(function() {
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/create/123';
@@ -69,7 +70,7 @@ describe('Context service', function() {
       });
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       ecs = $injector.get('ContextService');
     }));
 
@@ -90,7 +91,7 @@ describe('Context service', function() {
     var ecs = null;
 
     beforeEach(function() {
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/question_editor/123';
@@ -99,7 +100,7 @@ describe('Context service', function() {
       });
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       ecs = $injector.get('ContextService');
     }));
 
@@ -125,7 +126,7 @@ describe('Context service', function() {
     var ecs = null;
 
     beforeEach(function() {
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/about';
@@ -134,7 +135,7 @@ describe('Context service', function() {
       });
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       ecs = $injector.get('ContextService');
     }));
 

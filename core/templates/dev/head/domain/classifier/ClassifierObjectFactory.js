@@ -24,7 +24,10 @@ oppia.factory('ClassifierObjectFactory', [function() {
     this.dataSchemaVersion = dataSchemaVersion;
   };
 
-  Classifier.create = function(
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  Classifier['create'] = function(
+  /* eslint-enable dot-notation */
       algorithmId, classifierData, dataSchemaVersion) {
     return new Classifier(algorithmId, classifierData, dataSchemaVersion);
   };

@@ -17,7 +17,7 @@
  */
 
 describe('Datetime Formatter', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('datetimeformatter', function() {
     // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
@@ -25,7 +25,7 @@ describe('Datetime Formatter', function() {
     var df = null;
     var OldDate = Date;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       df = $injector.get('DateTimeFormatService');
 
       // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there

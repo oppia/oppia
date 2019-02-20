@@ -29,9 +29,9 @@ describe('Interaction object factory', function() {
   var hintsDict = null;
   var interactionDict = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     iof = $injector.get('InteractionObjectFactory');
     oof = $injector.get('OutcomeObjectFactory');
     agof = $injector.get('AnswerGroupObjectFactory');
@@ -161,7 +161,7 @@ describe('Interaction object factory', function() {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     };
-    newDefaultOutcome = oof.createFromBackendDict(newDefaultOutcomeDict);
+    var newDefaultOutcome = oof.createFromBackendDict(newDefaultOutcomeDict);
     expect(testInteraction.defaultOutcome).toEqual(
       oof.createFromBackendDict({
         dest: 'dest_default',
@@ -202,7 +202,7 @@ describe('Interaction object factory', function() {
         html: 'This is the new explanation to the answer'
       }
     };
-    newSolution = sof.createFromBackendDict(newSolutionDict);
+    var newSolution = sof.createFromBackendDict(newSolutionDict);
     expect(testInteraction.solution).toEqual(
       sof.createFromBackendDict({
         answer_is_exclusive: false,
@@ -223,7 +223,7 @@ describe('Interaction object factory', function() {
         content_id: 'content_id_new'
       }
     };
-    newHint = hof.createFromBackendDict(newHintDict);
+    var newHint = hof.createFromBackendDict(newHintDict);
     expect(testInteraction.hints).toEqual(hintsDict.map(function(hintDict) {
       return hof.createFromBackendDict(hintDict);
     }));

@@ -72,7 +72,12 @@ oppia.factory('StatsReportingService', [
     // The following dict will contain all stats data accumulated over the
     // interval time and will be reset when the dict is sent to backend for
     // recording.
-    var aggregatedStats = {};
+    var aggregatedStats = {
+      num_starts: null,
+      num_completions: null,
+      num_actual_starts: null,
+      state_stats_mapping: null
+    };
 
     var refreshAggregatedStats = function() {
       aggregatedStats = {

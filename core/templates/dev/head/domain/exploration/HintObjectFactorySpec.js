@@ -17,10 +17,10 @@
  */
 
 describe('Hint object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
   var hof = null;
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     hof = $injector.get('HintObjectFactory');
   }));
 

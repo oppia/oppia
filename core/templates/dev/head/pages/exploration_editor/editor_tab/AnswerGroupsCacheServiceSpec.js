@@ -15,10 +15,11 @@
 /**
  * @fileoverview Unit tests for Answer Groups Cache Service.
  */
+
 describe('Answer Groups Cache Service', function() {
   describe('AnswerGroupsCache', function() {
     beforeEach(function() {
-      module('oppia');
+      angular.mock.module('oppia');
     });
 
 
@@ -37,7 +38,7 @@ describe('Answer Groups Cache Service', function() {
     };
 
     var scope, agcs;
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(angular.mock.inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       agcs = $injector.get('AnswerGroupsCacheService');
     }));

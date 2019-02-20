@@ -17,10 +17,10 @@
  */
 
 describe('Multiple choice input rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var mcirs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     mcirs = $injector.get('MultipleChoiceInputRulesService');
   }));
 

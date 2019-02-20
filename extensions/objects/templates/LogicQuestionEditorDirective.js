@@ -55,7 +55,7 @@ oppia.directive('logicQuestionEditor', [
 
         $scope.convertThenBuild = function(elementID, nameOfString) {
           var element = document.getElementById(elementID);
-          var cursorPosition = element.selectionEnd;
+          var cursorPosition = (<HTMLInputElement>element).selectionEnd;
           $scope.localValue[nameOfString] =
             logicProofConversion.convertToLogicCharacters(
               $scope.localValue[nameOfString]);
@@ -63,7 +63,7 @@ oppia.directive('logicQuestionEditor', [
           // NOTE: angular will reset the position of the cursor after this
           // function runs, so we need to delay our re-resetting.
           setTimeout(function() {
-            element.selectionEnd = cursorPosition;
+            (<HTMLInputElement>element).selectionEnd = cursorPosition;
           }, 2);
         };
 

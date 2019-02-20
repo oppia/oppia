@@ -46,12 +46,15 @@ FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
 
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('extensions', ''),
+    'compiled_js_dir': os.path.join('local_compiled_js', 'extensions', ''),
     'staging_dir': os.path.join('backend_prod_files', 'extensions', ''),
     'out_dir': os.path.join('build', 'extensions', '')
 }
 TEMPLATES_DEV_DIR = os.path.join('templates', 'dev', 'head', '')
 TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('core', 'templates', 'dev', 'head', ''),
+    'compiled_js_dir': os.path.join(
+        'local_compiled_js', 'core', 'templates', 'dev', 'head', ''),
     'staging_dir': os.path.join('backend_prod_files', 'templates', 'head', ''),
     'out_dir': os.path.join('build', 'templates', 'head', '')
 }
@@ -70,7 +73,7 @@ UGLIFY_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
 # Files with these extensions shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
+FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
 # Files with these name patterns shouldn't be moved to build directory, and will
 # not be served in production. (This includes protractor.js files in
 # /extensions.)
@@ -263,14 +266,19 @@ def _compare_file_count(first_dir_path, second_dir_path):
     """Ensure that two dir's file counts match.
 
     Args:
-       first_dir_path: str. First directory to compare.
+       first_dir_path: str/list. First directory to compare.
        second_dir_path: str. Second directory to compare.
 
     Raises:
         ValueError: The source directory does not have the same file count as
             the target directory.
     """
-    first_dir_file_count = get_file_count(first_dir_path)
+    first_dir_file_count = 0
+    if isinstance(first_dir_path, list):
+        for dir_path in first_dir_path:
+            first_dir_file_count += get_file_count(dir_path)
+    else:
+        first_dir_file_count = get_file_count(first_dir_path)
     second_dir_file_count = get_file_count(second_dir_path)
     if first_dir_file_count != second_dir_file_count:
         print 'Comparing %s vs %s' % (first_dir_path, second_dir_path)
@@ -510,6 +518,7 @@ def should_file_be_built(filepath):
         JS_FILENAME_SUFFIXES_TO_IGNORE, else returns True.
         - Python files: Returns False if filepath ends with _test.py, else
         returns True
+        - TS files: Returns False.
         - Other files: Returns False if filepath matches with pattern in
         GENERAL_FILENAMES_TO_IGNORE, else returns True.
 
@@ -523,6 +532,8 @@ def should_file_be_built(filepath):
         return not any(
             filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
     elif filepath.endswith('_test.py'):
+        return False
+    elif filepath.endswith('.ts'):
         return False
     else:
         return not any(
@@ -892,6 +903,8 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         dirnames_dict: dict(str, str). This dict should contain three keys,
             with corresponding values as follows:
             - 'dev_dir': the directory that contains source files to be built.
+            - 'compiled_js_dir': the directory that contains compiled js files
+                to be built.
             - 'staging_dir': the directory that contains minified files waiting
                 for final copy process.
             - 'out_dir': the final directory that contains built files with hash
@@ -904,6 +917,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             to be processed.
     """
     source_dir = dirnames_dict['dev_dir']
+    compiled_js_dir = dirnames_dict['compiled_js_dir']
     staging_dir = dirnames_dict['staging_dir']
     out_dir = dirnames_dict['out_dir']
     build_tasks = collections.deque()
@@ -913,6 +927,8 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         ensure_directory_exists(staging_dir)
         build_tasks += generate_build_tasks_to_build_all_files_in_directory(
             source_dir, staging_dir, file_hashes)
+        build_tasks += generate_build_tasks_to_build_all_files_in_directory(
+            compiled_js_dir, staging_dir, file_hashes)
     else:
         # If staging dir exists, rebuild all HTML and Python files.
         file_extensions_to_always_rebuild = ('.html', '.py',)
@@ -926,10 +942,17 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             source_dir, staging_dir, filenames_to_always_rebuild, file_hashes)
 
         dev_dir_hashes = get_file_hashes(source_dir)
+
+        compiled_js_dir_hashes = get_file_hashes(compiled_js_dir)
+
+        source_hashes = {}
+        source_hashes.update(dev_dir_hashes)
+        source_hashes.update(compiled_js_dir_hashes)
+
         # Clean up files in staging directory that cannot be found in file
         # hashes dictionary.
         _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
-            dev_dir_hashes, staging_dir))
+            source_hashes, staging_dir))
 
         print 'Getting files that have changed between %s and %s' % (
             source_dir, out_dir)
@@ -939,6 +962,18 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             print 'Re-building recently changed files at %s' % source_dir
             build_tasks += generate_build_tasks_to_build_files_from_filepaths(
                 source_dir, staging_dir, recently_changed_filenames,
+                file_hashes)
+        else:
+            print 'No changes detected. Using previously built files.'
+
+        print 'Getting files that have changed between %s and %s' % (
+            compiled_js_dir, out_dir)
+        recently_changed_filenames = get_recently_changed_filenames(
+            compiled_js_dir_hashes, out_dir)
+        if recently_changed_filenames:
+            print 'Re-building recently changed files at %s' % source_dir
+            build_tasks += generate_build_tasks_to_build_files_from_filepaths(
+                compiled_js_dir, staging_dir, recently_changed_filenames,
                 file_hashes)
         else:
             print 'No changes detected. Using previously built files.'
@@ -1052,7 +1087,9 @@ def generate_build_directory():
     # Create hashes for all directories and files.
     HASH_DIRS = [
         ASSETS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
+        EXTENSIONS_DIRNAMES_TO_DIRPATHS['compiled_js_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir'],
         THIRD_PARTY_GENERATED_DEV_DIR]
     for HASH_DIR in HASH_DIRS:
         hashes.update(get_file_hashes(HASH_DIR))
@@ -1092,13 +1129,31 @@ def generate_build_directory():
     _execute_tasks(copy_tasks)
 
     SOURCE_DIRS = [
-        ASSETS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
+        ASSETS_DEV_DIR, [
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS['compiled_js_dir']
+        ], [
+            TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
+            TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir']
+        ],
         THIRD_PARTY_GENERATED_DEV_DIR]
     _verify_build(SOURCE_DIRS, COPY_OUTPUT_DIRS, hashes)
     # Clean up un-hashed hashes.js.
     safe_delete_file(HASHES_JS_FILEPATH)
     print 'Build completed.'
+
+
+def compile_typescript_files(project_dir):
+    """Compiles typescript files to produce javascript files in
+    local_compiled_js folder.
+
+    Args:
+        project_dir: str. The project directory which contains the ts files
+            to be compiled.
+    """
+    print 'Compiling ts files...'
+    cmd = '../node_modules/typescript/bin/tsc --project %s' % project_dir
+    subprocess.check_call(cmd, shell=True)
 
 
 def build():
@@ -1118,6 +1173,8 @@ def build():
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+
+    compile_typescript_files('.')
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.

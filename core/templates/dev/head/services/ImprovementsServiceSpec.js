@@ -13,8 +13,8 @@
 // limitations under the License.
 
 describe('ImprovementsService', function() {
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     this.ImprovementsService = $injector.get('ImprovementsService');
   }));
 

@@ -1,3 +1,5 @@
+// Any property defined on scope used in link function needs to be specified
+// in this typing file and the scope needs to be typed as ICustomScope.
 interface ICustomScope extends ng.IScope {
     // CkEditorRteDirective.ts
     uiConfig?: any;
@@ -45,6 +47,8 @@ interface ICustomScope extends ng.IScope {
     showDropArea?: boolean;
     getRecorderController?: (() => void);
     openAddAudioTranslationModal?: ((files: any) => void);
+    userIsGuest?: boolean;
+    dropAreaIsAccessible?: boolean;
 
     // ConversationSkinDirective.ts
     directiveTemplate?: string;

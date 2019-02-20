@@ -17,12 +17,12 @@
  */
 
 describe('Current Interaction Service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var DUMMY_ANSWER = 'dummy_answer';
 
   var CurrentInteractionService;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     CurrentInteractionService = $injector.get('CurrentInteractionService');
   }));
 

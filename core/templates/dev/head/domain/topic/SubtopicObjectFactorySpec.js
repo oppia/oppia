@@ -20,9 +20,9 @@ describe('Subtopic object factory', function() {
   var SubtopicObjectFactory = null;
   var _sampleSubtopic = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
 
     var sampleSubtopicBackendObject = {

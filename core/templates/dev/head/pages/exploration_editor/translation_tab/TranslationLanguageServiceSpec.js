@@ -17,7 +17,7 @@
  */
 
 describe('Translation language service', function() {
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', {
       getAllAudioLanguageCodes: function() {
         return ['en', 'hi'];
@@ -28,7 +28,7 @@ describe('Translation language service', function() {
   describe('Translation language service', function() {
     var tls = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       tls = $injector.get('TranslationLanguageService');
     }));
 

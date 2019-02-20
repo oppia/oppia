@@ -186,7 +186,7 @@ oppia.directive('schemaBasedListEditor', [
                * If form submission happens on existing element remove focus
                * from it
                */
-              document.activeElement.blur();
+              (<HTMLElement>document.activeElement).blur();
             }
             evt.stopPropagation();
           };

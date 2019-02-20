@@ -17,11 +17,11 @@
  */
 
 describe('SVM prediction functions', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Test SVM prediction functions', function() {
     var service;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       service = $injector.get('SVMPredictionService');
     }));
 

@@ -47,21 +47,30 @@ oppia.factory('ParamChangeObjectFactory', [function() {
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
   };
 
-  ParamChange.createFromBackendDict = function(paramChangeBackendDict) {
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  ParamChange['createFromBackendDict'] = function(paramChangeBackendDict) {
+  /* eslint-enable dot-notation */
     return new ParamChange(
       paramChangeBackendDict.customization_args,
       paramChangeBackendDict.generator_id,
       paramChangeBackendDict.name);
   };
 
-  ParamChange.createEmpty = function(paramName) {
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  ParamChange['createEmpty'] = function(paramName) {
+  /* eslint-enable dot-notation */
     return new ParamChange({
       parse_with_jinja: true,
       value: ''
     }, 'Copier', paramName);
   };
 
-  ParamChange.createDefault = function(paramName) {
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  ParamChange['createDefault'] = function(paramName) {
+  /* eslint-enable dot-notation */
     return new ParamChange(
       angular.copy(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
   };

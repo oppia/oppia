@@ -66,10 +66,11 @@ describe('Creator Dashboard backend API service', function() {
   var CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data';
   var ERROR_STATUS_CODE = 500;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module(
+    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     CreatorDashboardBackendApiService = $injector.get(
       'CreatorDashboardBackendApiService');
     UrlInterpolationService = $injector.get('UrlInterpolationService');

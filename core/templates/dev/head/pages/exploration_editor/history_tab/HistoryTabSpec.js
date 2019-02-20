@@ -17,12 +17,12 @@
  */
 
 describe('HistoryTab controller', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('HistoryTab', function() {
     var $scope, historyTabCtrl;
 
-    beforeEach(inject(function($controller, $rootScope) {
+    beforeEach(angular.mock.inject(function($controller, $rootScope) {
       $scope = $rootScope.$new();
       historyTabCtrl = $controller('HistoryTab', {$scope: $scope});
     }));

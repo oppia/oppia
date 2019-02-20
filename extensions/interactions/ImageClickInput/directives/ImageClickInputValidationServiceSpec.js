@@ -21,10 +21,10 @@ describe('ImageClickInputValidationService', function() {
   var oof;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     var filter = $injector.get('$filter');
     validatorService = $injector.get('ImageClickInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');

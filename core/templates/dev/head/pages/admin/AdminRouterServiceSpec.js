@@ -19,9 +19,9 @@
 describe('Admin router service', function() {
   var AdminRouterService = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     AdminRouterService = $injector.get('AdminRouterService');
   }));
 

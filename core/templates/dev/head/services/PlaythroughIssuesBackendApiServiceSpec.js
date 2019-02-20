@@ -17,9 +17,9 @@
  */
 
 describe('PlaythroughIssuesBackendApiService', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     this.PlaythroughIssuesBackendApiService =
       $injector.get('PlaythroughIssuesBackendApiService');
     this.$httpBackend = $injector.get('$httpBackend');

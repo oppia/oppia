@@ -18,10 +18,10 @@
  */
 
 describe('Exploration Html Formatter Service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
   var ehfs = null;
 
-  beforeEach(module(function($provide) {
+  beforeEach(angular.mock.module(function($provide) {
     $provide.constant('INTERACTION_SPECS', {
       sampleId: {
         show_generic_submit_button: true
@@ -29,7 +29,7 @@ describe('Exploration Html Formatter Service', function() {
     });
   }));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ehfs = $injector.get('ExplorationHtmlFormatterService');
   }));
 
@@ -57,9 +57,10 @@ describe('Exploration Html Formatter Service', function() {
   it('should set answer HTML correctly', function() {
     var interactionId = 'sampleId';
     var answer = 'sampleAnswer';
-    var interactionCustomizationArgs = {};
-    interactionCustomizationArgs.choices = {
-      value: 'sampleChoice'
+    var interactionCustomizationArgs = {
+      choices: {
+        value: 'sampleChoice'
+      }
     };
     var expectedHtmlTag = '<oppia-response-sample-id ' +
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +
@@ -73,9 +74,10 @@ describe('Exploration Html Formatter Service', function() {
   it('should set short answer HTML correctly', function() {
     var interactionId = 'sampleId';
     var answer = 'sampleAnswer';
-    var interactionCustomizationArgs = {};
-    interactionCustomizationArgs.choices = {
-      value: 'sampleChoice'
+    var interactionCustomizationArgs = {
+      choices: {
+        value: 'sampleChoice'
+      }
     };
     var expectedHtmlTag = '<oppia-short-response-sample-id ' +
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +

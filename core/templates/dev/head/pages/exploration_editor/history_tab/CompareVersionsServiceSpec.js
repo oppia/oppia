@@ -17,7 +17,7 @@
  */
 
 describe('Compare versions service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('compare versions service', function() {
     var cvs = null;
@@ -26,17 +26,17 @@ describe('Compare versions service', function() {
     var $httpBackend = null;
     var mockExplorationData = null;
 
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
     beforeEach(function() {
       mockExplorationData = {
         explorationId: '0'
       };
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       cvs = $injector.get('CompareVersionsService');
       vts = $injector.get('VersionTreeService');
       $httpBackend = $injector.get('$httpBackend');

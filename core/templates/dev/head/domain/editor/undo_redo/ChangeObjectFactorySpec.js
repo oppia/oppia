@@ -19,9 +19,9 @@
 describe('Factory for Change domain objects', function() {
   var ChangeObjectFactory = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ChangeObjectFactory = $injector.get('ChangeObjectFactory');
   }));
 

@@ -44,7 +44,11 @@ oppia.factory('ParamMetadataObjectFactory', [
      * @param {String} sourceInd - index of this parameter in a set of changes
      * @returns {ParamMetadata} - A new ParamMetadata instance
      */
-    ParamMetadata.createWithSetAction = function(paramName, source, sourceInd) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    ParamMetadata['createWithSetAction'] = function(
+    /* eslint-enable dot-notation */
+        paramName, source, sourceInd) {
       return new ParamMetadata(PARAM_ACTION_SET, paramName, source, sourceInd);
     };
 
@@ -56,7 +60,11 @@ oppia.factory('ParamMetadataObjectFactory', [
      * @param {String} sourceInd - index of this parameter in a set of changes
      * @returns {ParamMetadata} - A new ParamMetadata instance
      */
-    ParamMetadata.createWithGetAction = function(paramName, source, sourceInd) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    ParamMetadata['createWithGetAction'] = function(
+    /* eslint-enable dot-notation */
+        paramName, source, sourceInd) {
       return new ParamMetadata(PARAM_ACTION_GET, paramName, source, sourceInd);
     };
 

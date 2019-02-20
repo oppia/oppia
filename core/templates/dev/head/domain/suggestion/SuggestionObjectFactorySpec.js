@@ -18,12 +18,12 @@
 
 describe('Suggestion object factory', function() {
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
   var SuggestionObjectFactory = null;
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     SuggestionObjectFactory = $injector.get('SuggestionObjectFactory');
   }));
 

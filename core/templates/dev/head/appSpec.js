@@ -17,10 +17,10 @@
  */
 
 describe('Constants Generating', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var $injector = null;
-  beforeEach(inject(function(_$injector_) {
+  beforeEach(angular.mock.inject(function(_$injector_) {
     $injector = _$injector_.get('$injector');
   }));
 

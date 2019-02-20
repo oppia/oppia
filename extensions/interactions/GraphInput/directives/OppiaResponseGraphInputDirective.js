@@ -21,10 +21,10 @@
  */
 
 oppia.directive('oppiaResponseGraphInput', [
-  'HtmlEscaperService', 'UrlInterpolationService', 'graphDetailService',
+  'GraphDetailService', 'HtmlEscaperService', 'UrlInterpolationService',
   'GRAPH_INPUT_LEFT_MARGIN',
   function(
-      HtmlEscaperService, UrlInterpolationService, graphDetailService,
+      GraphDetailService, HtmlEscaperService, UrlInterpolationService,
       GRAPH_INPUT_LEFT_MARGIN) {
     return {
       restrict: 'E',

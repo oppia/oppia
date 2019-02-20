@@ -17,7 +17,7 @@
  */
 
 describe('Versions tree service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('versions tree service', function() {
     var vts = null;
@@ -92,7 +92,7 @@ describe('Versions tree service', function() {
       version_number: 8
     }];
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       vts = $injector.get('VersionTreeService');
     }));
 

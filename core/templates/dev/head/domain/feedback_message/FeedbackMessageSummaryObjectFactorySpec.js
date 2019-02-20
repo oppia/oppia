@@ -19,9 +19,9 @@
 describe('Feedback message object factory', function() {
   var FeedbackMessageSummaryObjectFactory = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     FeedbackMessageSummaryObjectFactory = $injector.get(
       'FeedbackMessageSummaryObjectFactory');
   }));

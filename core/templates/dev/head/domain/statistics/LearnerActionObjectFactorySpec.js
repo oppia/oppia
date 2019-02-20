@@ -17,9 +17,9 @@
  */
 
 describe('Learner Action Object Factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     this.LearnerActionObjectFactory =
         $injector.get('LearnerActionObjectFactory');
     this.LEARNER_ACTION_SCHEMA_LATEST_VERSION =

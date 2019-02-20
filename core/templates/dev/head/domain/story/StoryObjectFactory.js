@@ -101,7 +101,10 @@ oppia.factory('StoryObjectFactory', ['StoryContentsObjectFactory',
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // story python dict.
-    Story.createFromBackendDict = function(storyBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Story['createFromBackendDict'] = function(storyBackendDict) {
+    /* eslint-enable dot-notation */
       return new Story(
         storyBackendDict.id, storyBackendDict.title,
         storyBackendDict.description, storyBackendDict.notes,
@@ -114,7 +117,10 @@ oppia.factory('StoryObjectFactory', ['StoryContentsObjectFactory',
 
     // Create an interstitial story that would be displayed in the editor until
     // the actual story is fetched from the backend.
-    Story.createInterstitialStory = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Story['createInterstitialStory'] = function() {
+    /* eslint-enable dot-notation */
       return new Story(
         null, 'Story title loading', 'Story description loading',
         'Story notes loading', null, 'en', 1

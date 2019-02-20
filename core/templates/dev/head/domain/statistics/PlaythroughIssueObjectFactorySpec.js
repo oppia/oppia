@@ -17,9 +17,9 @@
  */
 
 describe('Playthrough Issue Object Factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     this.piof = $injector.get('PlaythroughIssueObjectFactory');
   }));
 

@@ -65,7 +65,10 @@ oppia.factory('TopicRightsObjectFactory', [
 
     // This function takes a JSON object which represents a backend
     // topic python dict.
-    TopicRights.createFromBackendDict = function(topicRightsBackendObject) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    TopicRights['createFromBackendDict'] = function(topicRightsBackendObject) {
+    /* eslint-enable dot-notation */
       return new TopicRights(
         topicRightsBackendObject.published,
         topicRightsBackendObject.can_publish_topic,
@@ -86,7 +89,10 @@ oppia.factory('TopicRightsObjectFactory', [
     // placeholder until the actual topic rights object is fetched from
     // the backend. Since it is acting as a placeholder, it should be valid and
     // hence the most restrictive rights are given to the object.
-    TopicRights.createInterstitialRights = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    TopicRights['createInterstitialRights'] = function() {
+    /* eslint-enable dot-notation */
       return new TopicRights(false, false, false);
     };
 

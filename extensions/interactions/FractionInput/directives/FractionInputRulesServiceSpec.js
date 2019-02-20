@@ -17,10 +17,10 @@
  */
 
 describe('Fraction Input rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var firs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     firs = $injector.get('FractionInputRulesService');
   }));
 

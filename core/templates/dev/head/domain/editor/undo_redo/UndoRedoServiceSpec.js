@@ -20,9 +20,9 @@ describe('Undo/Redo Service', function() {
   var UndoRedoService = null;
   var ChangeObjectFactory = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     UndoRedoService = $injector.get('UndoRedoService');
     ChangeObjectFactory = $injector.get('ChangeObjectFactory');
   }));

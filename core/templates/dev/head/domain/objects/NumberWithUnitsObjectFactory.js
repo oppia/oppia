@@ -130,13 +130,19 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       };
     };
 
-    NumberWithUnits.createCurrencyUnits = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    NumberWithUnits['createCurrencyUnits'] = function() {
+    /* eslint-enable dot-notation */
       try {
         UnitsObjectFactory.createCurrencyUnits();
       } catch (parsingError) {}
     };
 
-    NumberWithUnits.fromRawInputString = function(rawInput) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    NumberWithUnits['fromRawInputString'] = function(rawInput) {
+    /* eslint-enable dot-notation */
       rawInput = rawInput.trim();
       var type = '';
       var real = 0.0;
@@ -242,7 +248,10 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       return new NumberWithUnits(type, real, fractionObj, unitsObj);
     };
 
-    NumberWithUnits.fromDict = function(numberWithUnitsDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    NumberWithUnits['fromDict'] = function(numberWithUnitsDict) {
+    /* eslint-enable dot-notation */
       return new NumberWithUnits(
         numberWithUnitsDict.type,
         numberWithUnitsDict.real,

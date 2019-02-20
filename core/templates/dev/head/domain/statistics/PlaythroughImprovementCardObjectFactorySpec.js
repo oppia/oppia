@@ -17,8 +17,8 @@
  */
 
 describe('PlaythroughImprovementCardObjectFactory', function() {
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     this.PlaythroughImprovementCardObjectFactory =
       $injector.get('PlaythroughImprovementCardObjectFactory');
     this.PlaythroughIssueObjectFactory =

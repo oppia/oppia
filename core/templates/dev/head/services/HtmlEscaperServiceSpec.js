@@ -17,12 +17,12 @@
  */
 
 describe('HTML escaper', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('HTML escaper service', function() {
     var ohe = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       ohe = $injector.get('HtmlEscaperService');
     }));
 

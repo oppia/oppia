@@ -46,7 +46,7 @@ oppia.factory('ThreadDataService', [
     // Number of open threads that need action
     var _openThreadsCount = 0;
 
-    var _fetchThreads = function(successCallback) {
+    var _fetchThreads = function(successCallback = function() {}) {
       var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
       var params = {
         target_type: 'exploration',
@@ -81,9 +81,7 @@ oppia.factory('ThreadDataService', [
             }
           }
         }
-        if (successCallback) {
-          successCallback();
-        }
+        successCallback();
       });
     };
 
@@ -196,10 +194,11 @@ oppia.factory('ThreadDataService', [
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
           onSuccess, onFailure) {
         var payload = {
-          action: action
+          action: action,
+          review_message: reviewMsg,
+          commit_message: null
         };
 
-        payload.review_message = reviewMsg;
         if (action === ACTION_ACCEPT_SUGGESTION) {
           payload.commit_message = commitMsg;
         }

@@ -104,7 +104,11 @@ oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
         // Protractor tests may prepend a / to this hash, which we remove:
         var hash = (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
         var hashParts = hash.split('&');
-        var hashDict = {};
+        var hashDict = {
+          version: null,
+          secret: null,
+          tagid: null
+        };
         for (var i = 0; i < hashParts.length; i++) {
           if (hashParts[i].indexOf('=') === -1) {
             $log.error('Invalid hash for embedding: ' + hash);
@@ -134,7 +138,9 @@ oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
 
           var objToSendToParent = {
             title: messageTitle,
-            payload: payload
+            payload: payload,
+            sourceTagId: null,
+            secret: null
           };
           if (hashDict.version === '0.0.0') {
             // Ensure backwards-compatibility.

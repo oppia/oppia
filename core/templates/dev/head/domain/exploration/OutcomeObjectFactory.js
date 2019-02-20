@@ -61,7 +61,10 @@ oppia.factory('OutcomeObjectFactory', [
       return this.feedback.getHtml().trim() !== '';
     };
 
-    Outcome.createNew = function(dest, feedbackTextId, feedbackText,
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Outcome['createNew'] = function(dest, feedbackTextId, feedbackText,
+    /* eslint-enable dot-notation */
         paramChanges) {
       return new Outcome(
         dest,
@@ -72,7 +75,10 @@ oppia.factory('OutcomeObjectFactory', [
         null);
     };
 
-    Outcome.createFromBackendDict = function(outcomeDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Outcome['createFromBackendDict'] = function(outcomeDict) {
+    /* eslint-enable dot-notation */
       return new Outcome(
         outcomeDict.dest,
         SubtitledHtmlObjectFactory.createFromBackendDict(outcomeDict.feedback),

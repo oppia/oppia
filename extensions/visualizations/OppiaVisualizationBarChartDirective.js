@@ -47,9 +47,7 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
             title: 'Number of times answer was submitted',
             minValue: 0
           },
-          legend: {
-            position: 'none'
-          },
+          legend: null,
           vAxis: {
             title: 'Answer choice'
           }

@@ -21,14 +21,14 @@ describe('MusicNotesInput interaction', function() {
     var $httpBackend, $templateCache;
     var elt, scope, ctrlScope;
 
-    beforeEach(module('directiveTemplates'));
-    beforeEach(module(
+    beforeEach(angular.mock.module('directiveTemplates'));
+    beforeEach(angular.mock.module(
       'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS, function($provide) {
         $provide.value('ExplorationEngineService', {});
       }
     ));
 
-    beforeEach(inject(function($compile, $rootScope, _$templateCache_) {
+    beforeEach(angular.mock.inject(function($compile, $rootScope, _$templateCache_) {
       $templateCache = _$templateCache_;
       var templatesHtml = $templateCache.get(
         '/extensions/interactions/MusicNotesInput/MusicNotesInput.html');
@@ -36,7 +36,7 @@ describe('MusicNotesInput interaction', function() {
       $rootScope.$digest();
     }));
 
-    beforeEach(inject(function($compile, _$httpBackend_, $rootScope) {
+    beforeEach(angular.mock.inject(function($compile, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
 
       var TAG_NAME = 'oppia-interactive-music-notes-input';
@@ -217,8 +217,8 @@ describe('MusicNotesInput interaction', function() {
 describe('Music phrase player service', function() {
   describe('music phrase player service', function() {
     var mpps = null;
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-    beforeEach(inject(function($injector, $window) {
+    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.inject(function($injector, $window) {
       mpps = $injector.get('MusicPhrasePlayerService');
       // This is here so that, if the test environment is modified
       // to include MIDI in the future, we will remember to swap
@@ -239,7 +239,7 @@ describe('Music phrase player service', function() {
       spyOn($window.MIDI, 'chordOff');
     }));
 
-    afterEach(inject(function($window) {
+    afterEach(angular.mock.inject(function($window) {
       $window.MIDI = undefined;
     }));
 
@@ -251,7 +251,7 @@ describe('Music phrase player service', function() {
     );
 
     it('should play all the notes in a music phrase',
-      inject(function($timeout) {
+      angular.mock.inject(function($timeout) {
         mpps.playMusicPhrase([{
           midiValue: 69,
           duration: 2,

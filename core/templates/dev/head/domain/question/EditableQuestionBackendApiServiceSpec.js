@@ -23,10 +23,11 @@ describe('Editable question backend API service', function() {
   var $scope = null;
   var $httpBackend = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module(
+    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     EditableQuestionBackendApiService = $injector.get(
       'EditableQuestionBackendApiService');
     $rootScope = $injector.get('$rootScope');

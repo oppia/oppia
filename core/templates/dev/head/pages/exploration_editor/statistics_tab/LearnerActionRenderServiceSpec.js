@@ -20,10 +20,10 @@
  */
 
 describe('Learner Action Render Service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Test learner action render service functions', function() {
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       this.$sce = $injector.get('$sce');
       this.LearnerActionObjectFactory =
         $injector.get('LearnerActionObjectFactory');

@@ -364,19 +364,20 @@ var logicProofTeacher2 = (function() {
    * @throws if the mistake entry contains incorrect typings.
    */
   var validateAndTypeMistakeEntry = function(mistakeEntry, language) {
-    var availableOperators = [];
+    var availableOperators = {
+      // This is available to refer to the line number
+      n: {
+        kind: 'variable',
+        typing: [{
+          arguments: [],
+          dummies: [],
+          output: 'integer'
+        }]
+      }
+    };
     for (var key in language.operators) {
       availableOperators[key] = language.operators[key];
     }
-    // This is available to refer to the line number
-    availableOperators.n = {
-      kind: 'variable',
-      typing: [{
-        arguments: [],
-        dummies: [],
-        output: 'integer'
-      }]
-    };
     var newLanguage = {
       operators: availableOperators,
       types: language.types,

@@ -17,12 +17,12 @@
  */
 
 describe('Email Dashboard Services', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Email Dashboard Services', function() {
     var service, $httpBackend, recentQueries;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       $httpBackend = $injector.get('$httpBackend');
       service = $injector.get('EmailDashboardDataService');
     }));

@@ -36,7 +36,11 @@ oppia.factory('FeedbackThreadObjectFactory', [function() {
     this.messages = messages;
   };
 
-  FeedbackThread.createFromBackendDict = function(feedbackThreadBackendDict) {
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  FeedbackThread['createFromBackendDict'] = function(
+  /* eslint-enable dot-notation */
+      feedbackThreadBackendDict) {
     return new FeedbackThread(
       feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,

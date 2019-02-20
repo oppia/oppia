@@ -53,7 +53,10 @@ oppia.factory('QuestionObjectFactory', [
       return this._version;
     };
 
-    Question.createDefaultQuestion = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Question['createDefaultQuestion'] = function() {
+    /* eslint-enable dot-notation */
       return new Question(
         null, StateObjectFactory.createDefaultState(null),
         constants.DEFAULT_LANGUAGE_CODE, 1);
@@ -109,7 +112,10 @@ oppia.factory('QuestionObjectFactory', [
       return false;
     };
 
-    Question.createFromBackendDict = function(questionBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Question['createFromBackendDict'] = function(questionBackendDict) {
+    /* eslint-enable dot-notation */
       return new Question(
         questionBackendDict.id,
         StateObjectFactory.createFromBackendDict(

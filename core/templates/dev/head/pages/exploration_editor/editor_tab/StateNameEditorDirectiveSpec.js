@@ -27,9 +27,9 @@ describe('Sidebar state name controller', function() {
       is_version_of_draft_valid: true
     };
 
-    beforeEach(module('directiveTemplates'));
+    beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(function() {
-      module('oppia');
+      angular.mock.module('oppia');
     });
 
     beforeEach(function() {
@@ -37,14 +37,14 @@ describe('Sidebar state name controller', function() {
         explorationId: 0,
         autosaveChangeList: function() {}
       };
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
         $provide.constant('INVALID_NAME_CHARS', '#@&^%$');
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function(
+    beforeEach(angular.mock.inject(function(
         $compile, $filter, $injector, $rootScope, $templateCache) {
       filter = $filter;
       rootScope = $rootScope;

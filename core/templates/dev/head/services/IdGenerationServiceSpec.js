@@ -19,8 +19,8 @@
 describe('IdGenerationService', function() {
   var IdGenerationService = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     IdGenerationService = $injector.get('IdGenerationService');
   }));
 

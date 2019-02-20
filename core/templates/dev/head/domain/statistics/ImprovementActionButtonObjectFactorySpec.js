@@ -17,8 +17,8 @@
  */
 
 describe('ImprovementActionButtonObjectFactory', function() {
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     this.ImprovementActionButtonObjectFactory =
       $injector.get('ImprovementActionButtonObjectFactory');
   }));

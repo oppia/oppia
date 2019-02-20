@@ -28,7 +28,7 @@ oppia.directive('audioFileUploader', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/audio_file_uploader_directive.html'),
-      link: function(scope, elt) {
+      link: function(scope: ICustomScope, elt) {
         var ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
 
 
@@ -75,7 +75,8 @@ oppia.directive('audioFileUploader', [
               // Only fire this event if validations pass.
               scope.onFileChanged(file);
             } else {
-              document.getElementById(scope.inputFieldFormId).reset();
+              (<HTMLFormElement>document.getElementById(
+                scope.inputFieldFormId)).val('');
               scope.onFileCleared();
             }
             scope.$apply();
@@ -84,7 +85,9 @@ oppia.directive('audioFileUploader', [
         if (scope.droppedFile) {
           if (scope.droppedFile.length === 1) {
             angular.element(document).ready(function() {
-              $('.' + scope.inputFieldClassName)[0].files = scope.droppedFile;
+              (
+                <HTMLInputElement>$('.' + scope.inputFieldClassName)[0]
+              ).files = scope.droppedFile;
             });
           } else {
             scope.errorMessage = 'Please drop one file at a time.';

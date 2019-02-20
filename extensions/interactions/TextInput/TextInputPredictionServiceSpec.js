@@ -20,11 +20,11 @@ describe('Text Input Prediction Service', function() {
   var $rootScope = null;
   var $scope = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Test text prediction service', function() {
     var predictionService;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       predictionService = $injector.get('TextInputPredictionService');
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();

@@ -32,10 +32,10 @@ describe('Interaction validator', function() {
   var agof, oof;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector, $rootScope) {
+  beforeEach(angular.mock.inject(function($injector, $rootScope) {
     scope = $rootScope.$new();
     filter = $injector.get('$filter');
     bivs = $injector.get('baseInteractionValidationService');

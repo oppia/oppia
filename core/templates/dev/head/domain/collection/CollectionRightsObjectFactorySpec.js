@@ -19,9 +19,9 @@
 describe('Collection rights object factory', function() {
   var CollectionRightsObjectFactory = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     CollectionRightsObjectFactory = $injector.get(
       'CollectionRightsObjectFactory');
   }));

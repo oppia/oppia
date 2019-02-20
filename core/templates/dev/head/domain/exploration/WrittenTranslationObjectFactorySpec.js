@@ -17,12 +17,13 @@
  */
 
 describe('WrittenTranslation object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('WrittenTranslationObjectFactory', function() {
-    var wtof, writtenTranslation;
+    var wtof = null;
+    var writtenTranslation = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       wtof = $injector.get('WrittenTranslationObjectFactory');
       writtenTranslation = wtof.createFromBackendDict({
         html: '<p>HTML</p>',

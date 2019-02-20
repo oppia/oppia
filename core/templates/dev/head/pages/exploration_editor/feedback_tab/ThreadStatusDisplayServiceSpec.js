@@ -19,9 +19,9 @@
  */
 
 describe('Thread Status Display Service', function() {
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   var ThreadStatusDisplayService;
-  beforeEach(inject(function(_ThreadStatusDisplayService_) {
+  beforeEach(angular.mock.inject(function(_ThreadStatusDisplayService_) {
     ThreadStatusDisplayService = _ThreadStatusDisplayService_;
   }));
 

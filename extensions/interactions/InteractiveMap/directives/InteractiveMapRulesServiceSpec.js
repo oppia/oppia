@@ -17,10 +17,10 @@
  */
 
 describe('Numeric Input service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var imrs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     imrs = $injector.get('InteractiveMapRulesService');
   }));
 

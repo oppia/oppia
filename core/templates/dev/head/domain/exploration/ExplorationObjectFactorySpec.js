@@ -17,11 +17,11 @@
  */
 
 describe('Exploration object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('ExplorationObjectFactory', function() {
     var scope, eof, atof, sof, explorationDict, exploration;
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(angular.mock.inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       eof = $injector.get('ExplorationObjectFactory');
       sof = $injector.get('StateObjectFactory');

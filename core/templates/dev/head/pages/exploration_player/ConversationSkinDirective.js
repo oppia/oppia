@@ -235,7 +235,7 @@ oppia.directive('conversationSkin', [
     return {
       restrict: 'E',
       scope: {},
-      link: function(scope) {
+      link: function(scope: ICustomScope) {
         var isIframed = UrlService.isIframed();
         scope.directiveTemplate = isIframed ?
           UrlInterpolationService.getDirectiveTemplateUrl(

@@ -45,9 +45,9 @@ describe('Subtopic page contents object factory', function() {
     }
   };
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     SubtopicPageContentsObjectFactory =
       $injector.get('SubtopicPageContentsObjectFactory');
   }));

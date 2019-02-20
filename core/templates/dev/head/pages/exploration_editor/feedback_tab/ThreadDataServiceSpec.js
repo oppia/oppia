@@ -19,10 +19,10 @@
 
 describe('retrieving threads service', function() {
   var expId = '12345';
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(function() {
-    module('oppia');
-    module(function($provide) {
+    angular.mock.module('oppia');
+    angular.mock.module(function($provide) {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
@@ -30,7 +30,7 @@ describe('retrieving threads service', function() {
   });
 
   var ThreadDataService, httpBackend;
-  beforeEach(inject(function($httpBackend, _ThreadDataService_) {
+  beforeEach(angular.mock.inject(function($httpBackend, _ThreadDataService_) {
     ThreadDataService = _ThreadDataService_;
     httpBackend = $httpBackend;
   }));
@@ -96,7 +96,7 @@ describe('retrieving threads service', function() {
       }
     ];
     httpBackend.whenGET('/threadlisthandler/' + expId).respond({
-      threads: mockFeedbackThreads.join(feedbackThreadsForSuggestionThreads)
+      threads: mockFeedbackThreads.concat(feedbackThreadsForSuggestionThreads)
     });
 
     httpBackend.whenGET(

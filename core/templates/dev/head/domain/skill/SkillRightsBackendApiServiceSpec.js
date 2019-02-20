@@ -22,9 +22,9 @@ describe('Skill rights backend API service', function() {
   var $scope = null;
   var $httpBackend = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     SkillRightsBackendApiService = $injector.get(
       'SkillRightsBackendApiService');
     $rootScope = $injector.get('$rootScope');

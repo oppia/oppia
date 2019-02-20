@@ -18,10 +18,10 @@ describe('GraphInputValidationService', function() {
   var oof, agof, rof;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     validatorService = $injector.get('GraphInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');

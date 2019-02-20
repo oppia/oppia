@@ -56,7 +56,10 @@ oppia.factory('PlaythroughObjectFactory', [
      * @param {LearnerAction[]} actions - list of learner actions.
      * @returns {Playthrough}
      */
-    Playthrough.createNew = function(
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Playthrough['createNew'] = function(
+    /* eslint-enable dot-notation */
         playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
         actions) {
       return new Playthrough(
@@ -79,7 +82,10 @@ oppia.factory('PlaythroughObjectFactory', [
      * @param {PlaythroughBackendDict} playthroughBackendDict
      * @returns {Playthrough}
      */
-    Playthrough.createFromBackendDict = function(playthroughBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Playthrough['createFromBackendDict'] = function(playthroughBackendDict) {
+    /* eslint-enable dot-notation */
       var actions = playthroughBackendDict.actions.map(
         LearnerActionObjectFactory.createFromBackendDict);
 

@@ -134,7 +134,7 @@ var logicProofShared = (function() {
    * @return {string} A string representing the expression.
    */
   var displayExpressionHelper = function(
-      expression, operators, desirabilityOfBrackets) {
+      expression, operators, desirabilityOfBrackets = 0) {
     var desirabilityOfBracketsBelow = (
       expression.top_kind_name === 'binary_connective' ||
       expression.top_kind_name === 'binary_relation' ||
@@ -162,6 +162,7 @@ var logicProofShared = (function() {
         expression.top_operator_name :
         operators[expression.top_operator_name].symbols[0];
 
+    var output = null;
     if (expression.top_kind_name === 'binary_connective' ||
         expression.top_kind_name === 'binary_relation' ||
         expression.top_kind_name === 'binary_function') {
@@ -170,13 +171,13 @@ var logicProofShared = (function() {
           '(' + processedArguments.join(symbol) + ')' :
           processedArguments.join(symbol));
     } else if (expression.top_kind_name === 'unary_connective') {
-      var output = symbol + processedArguments[0];
+      output = symbol + processedArguments[0];
       return (desirabilityOfBrackets === 2) ? '(' + output + ')' : output;
     } else if (expression.top_kind_name === 'quantifier') {
-      var output = symbol + processedDummies[0] + '.' + processedArguments[0];
+      output = symbol + processedDummies[0] + '.' + processedArguments[0];
       return (desirabilityOfBrackets === 2) ? '(' + output + ')' : output;
     } else if (expression.top_kind_name === 'bounded_quantifier') {
-      var output = symbol + processedArguments[0] + '.' + processedArguments[1];
+      output = symbol + processedArguments[0] + '.' + processedArguments[1];
       return (desirabilityOfBrackets === 2) ? '(' + output + ')' : output;
     } else if (expression.top_kind_name === 'prefix_relation' ||
         expression.top_kind_name === 'prefix_function') {
@@ -324,7 +325,7 @@ var logicProofShared = (function() {
    *         what the user intended and did wrong.
    */
   var parseLineString = function(
-      inputString, operators, vocabulary, isTemplate) {
+      inputString, operators, vocabulary, isTemplate = false) {
     var unparsedArray = preParseLineString(inputString, operators, isTemplate);
 
     // We compile all words occurring in the vocabulary, to help us identify
@@ -558,11 +559,11 @@ var logicProofShared = (function() {
    *         largest (in lexicographic ordering) as this is likely to be closest
    *         to what the user intended.
    */
-  var assignTypesToExpression = function(untypedExpression, possibleTopTypes,
-      language, newKindsPermitted, permitDuplicateDummyNames) {
+  var assignTypesToExpression = function(
+      untypedExpression, possibleTopTypes,
+      language, newKindsPermitted = ['constant', 'variable'],
+      permitDuplicateDummyNames = false) {
     var operators = language.operators;
-    newKindsPermitted = newKindsPermitted || ['constant', 'variable'];
-    permitDuplicateDummyNames = permitDuplicateDummyNames || false;
 
     var _attemptTyping = function(topType, typingRule) {
       if (!operatorIsNew &&
@@ -722,11 +723,11 @@ var logicProofShared = (function() {
               }
             }
             var typedArguments = [];
-            for (var l = untypedExpression.dummies.length;
-              l < untypedExpression.dummies.length +
+            for (var m = untypedExpression.dummies.length;
+              m < untypedExpression.dummies.length +
                      untypedExpression.arguments.length;
-              l++) {
-              typedArguments.push(newAttempts[k].typedArray[l]);
+              m++) {
+              typedArguments.push(newAttempts[k].typedArray[m]);
             }
 
             results.push({
@@ -774,11 +775,11 @@ var logicProofShared = (function() {
    *          }
    * @raises: as before
    */
-  var assignTypesToExpressionArray = function(untypedArray, topTypes, language,
-      newKindsPermitted, isTemplate, numDummies) {
-    newKindsPermitted = newKindsPermitted || ['constant', 'variable'];
-    isTemplate = isTemplate || false;
-    numDummies = numDummies || 0;
+
+  var assignTypesToExpressionArray = function(
+      untypedArray, topTypes, language,
+      newKindsPermitted = ['constant', 'variable'], isTemplate = false,
+      numDummies = 0) {
     var partiallyTypedArrays = [[[]]];
     var partiallyUpdatedOperators = [[{}]];
     for (var key in language.operators) {
@@ -896,18 +897,16 @@ var logicProofShared = (function() {
   // Returns a list of all the names of operators in an expression. kinds is an
   // array specifying which kinds of operators to return; if it is not supplied
   // then all are returned
-  var getOperatorsFromExpression = function(expression, kinds) {
-    kinds = kinds || false;
+  var getOperatorsFromExpression = function(expression, kinds = null) {
     var output = getOperatorsFromExpressionArray(
       expression.arguments.concat(expression.dummies), kinds);
     return (output.indexOf(expression.top_operator_name) === -1 &&
-        (kinds === false || kinds.indexOf(expression.top_kind_name) !== -1)) ?
+        (kinds === null || kinds.indexOf(expression.top_kind_name) !== -1)) ?
       output.concat([expression.top_operator_name]) :
       output;
   };
 
-  var getOperatorsFromExpressionArray = function(array, kinds) {
-    kinds = kinds || false;
+  var getOperatorsFromExpressionArray = function(array, kinds = null) {
     var output = [];
     for (var i = 0; i < array.length; i++) {
       var newOutput = getOperatorsFromExpression(array[i], kinds);

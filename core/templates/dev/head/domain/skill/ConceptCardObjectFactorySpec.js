@@ -17,14 +17,14 @@
 */
 
 describe('Concept card object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('ConceptCardObjectFactory', function() {
     var ConceptCardObjectFactory;
     var conceptCardDict;
     var SubtitledHtmlObjectFactory;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       ConceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');
       SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 

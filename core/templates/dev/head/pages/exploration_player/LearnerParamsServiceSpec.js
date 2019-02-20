@@ -17,12 +17,12 @@
  */
 
 describe('Learner parameters service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('learner params service', function() {
     var LearnerParamsService = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       LearnerParamsService = $injector.get('LearnerParamsService');
     }));
 

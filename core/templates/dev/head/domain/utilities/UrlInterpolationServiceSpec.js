@@ -19,11 +19,11 @@
 describe('URL Interpolation Service', function() {
   var uis = null;
 
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.constant('DEV_MODE', false);
   }));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     uis = $injector.get('UrlInterpolationService');
   }));
 

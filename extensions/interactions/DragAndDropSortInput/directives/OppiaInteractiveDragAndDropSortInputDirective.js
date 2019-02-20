@@ -17,11 +17,11 @@
  */
 
 oppia.directive('oppiaInteractiveDragAndDropSortInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  'dragAndDropSortInputRulesService',
+  'DragAndDropSortInputRulesService', 'HtmlEscaperService',
+  'UrlInterpolationService',
   function(
-      HtmlEscaperService, UrlInterpolationService,
-      dragAndDropSortInputRulesService) {
+      DragAndDropSortInputRulesService, HtmlEscaperService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

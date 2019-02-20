@@ -18,7 +18,7 @@
  */
 
 describe('Change list service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('change list service', function() {
     var cls = null;
@@ -35,7 +35,7 @@ describe('Change list service', function() {
       mockWarningsData = {
         addWarning: function() {}
       };
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value('AlertsService', [mockWarningsData][0]);
       });
       spyOn(mockWarningsData, 'addWarning');
@@ -44,13 +44,13 @@ describe('Change list service', function() {
         autosaveChangeList: function() {},
         discardDraft: function() {}
       };
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       cls = $injector.get('ChangeListService');
       $httpBackend = $injector.get('$httpBackend');
     }));
@@ -201,7 +201,7 @@ describe('Change list service', function() {
 });
 
 describe('Exploration title service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('exploration title service', function() {
     var ets = null;
@@ -218,14 +218,14 @@ describe('Exploration title service', function() {
         explorationId: 0,
         autosaveChangeList: function() {}
       };
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
         $provide.constant('INVALID_NAME_CHARS', '#@&^%$');
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       ets = $injector.get('ExplorationTitleService');
       $httpBackend = $injector.get('$httpBackend');
     }));

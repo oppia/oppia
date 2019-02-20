@@ -17,9 +17,9 @@
  */
 
 describe('Playthrough Object Factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     this.pof = $injector.get('PlaythroughObjectFactory');
     this.laof = $injector.get('LearnerActionObjectFactory');
   }));

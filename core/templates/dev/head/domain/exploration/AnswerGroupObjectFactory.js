@@ -41,13 +41,19 @@ oppia.factory('AnswerGroupObjectFactory', [
 
     // Static class methods. Note that "this" is not available in
     // static contexts.
-    AnswerGroup.createNew = function(
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    AnswerGroup['createNew'] = function(
+    /* eslint-enable dot-notation */
         rules, outcome, trainingData, taggedMisconceptionId) {
       return new AnswerGroup(
         rules, outcome, trainingData, taggedMisconceptionId);
     };
 
-    AnswerGroup.createFromBackendDict = function(answerGroupBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    AnswerGroup['createFromBackendDict'] = function(answerGroupBackendDict) {
+    /* eslint-enable dot-notation */
       return new AnswerGroup(
         generateRulesFromBackend(answerGroupBackendDict.rule_specs),
         OutcomeObjectFactory.createFromBackendDict(

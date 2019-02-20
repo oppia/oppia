@@ -24,9 +24,9 @@ describe('Skill update service', function() {
     UndoRedoService;
   var skillDict;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     SkillUpdateService = $injector.get('SkillUpdateService');
     SkillObjectFactory = $injector.get('SkillObjectFactory');
     SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');

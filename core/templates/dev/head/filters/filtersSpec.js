@@ -36,13 +36,13 @@ describe('Testing filters', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  it('should have all expected filters', inject(function($filter) {
+  it('should have all expected filters', angular.mock.inject(function($filter) {
     angular.forEach(filterNames, function(filterName) {
       expect($filter(filterName)).not.toEqual(null);
     });
   }));
 
-  it('should convert underscores to camelCase properly', inject(
+  it('should convert underscores to camelCase properly', angular.mock.inject(
     function($filter) {
       var filter = $filter('underscoresToCamelCase');
       expect(filter('Test')).toEqual('Test');
@@ -59,30 +59,34 @@ describe('Testing filters', function() {
     }
   ));
 
-  it('should convert camelCase to hyphens properly', inject(function($filter) {
-    var filter = $filter('camelCaseToHyphens');
-    expect(filter('test')).toEqual('test');
-    expect(filter('testTest')).toEqual('test-test');
-    expect(filter('testTestTest')).toEqual('test-test-test');
-    expect(filter('aBaBCa')).toEqual('a-ba-b-ca');
-    expect(filter('AbcDefGhi')).toEqual('abc-def-ghi');
-  }));
-
-  it('should convert {{...}} tags to ...', inject(function($filter) {
-    var filter = $filter('replaceInputsWithEllipses');
-
-    expect(filter('')).toEqual('');
-    expect(filter(null)).toEqual('');
-    expect(filter(undefined)).toEqual('');
-
-    expect(filter('hello')).toEqual('hello');
-    expect(filter('{{hello}}')).toEqual('...');
-    expect(filter('{{hello}} and {{goodbye}}')).toEqual('... and ...');
-    expect(filter('{{}}{{hello}}')).toEqual('{{}}...');
-  }));
-
-  it('should truncate a string when it first sees a \'...\'', inject(
+  it('should convert camelCase to hyphens properly', angular.mock.inject(
     function($filter) {
+      var filter = $filter('camelCaseToHyphens');
+      expect(filter('test')).toEqual('test');
+      expect(filter('testTest')).toEqual('test-test');
+      expect(filter('testTestTest')).toEqual('test-test-test');
+      expect(filter('aBaBCa')).toEqual('a-ba-b-ca');
+      expect(filter('AbcDefGhi')).toEqual('abc-def-ghi');
+    }
+  ));
+
+  it('should convert {{...}} tags to ...', angular.mock.inject(
+    function($filter) {
+      var filter = $filter('replaceInputsWithEllipses');
+
+      expect(filter('')).toEqual('');
+      expect(filter(null)).toEqual('');
+      expect(filter(undefined)).toEqual('');
+
+      expect(filter('hello')).toEqual('hello');
+      expect(filter('{{hello}}')).toEqual('...');
+      expect(filter('{{hello}} and {{goodbye}}')).toEqual('... and ...');
+      expect(filter('{{}}{{hello}}')).toEqual('{{}}...');
+    }
+  ));
+
+  it('should truncate a string when it first sees a \'...\'',
+    angular.mock.inject(function($filter) {
       var filter = $filter('truncateAtFirstEllipsis');
 
       expect(filter('')).toEqual('');
@@ -94,10 +98,9 @@ describe('Testing filters', function() {
       expect(filter('say ... and ...')).toEqual('say ');
       expect(filter('... and ...')).toEqual('');
       expect(filter('{{}}...')).toEqual('{{}}');
-    }
-  ));
+    }));
 
-  it('should wrap text with ellipses based on its length', inject(
+  it('should wrap text with ellipses based on its length', angular.mock.inject(
     function($filter) {
       var filter = $filter('wrapTextWithEllipsis');
 
@@ -122,25 +125,27 @@ describe('Testing filters', function() {
     }
   ));
 
-  it('should correctly normalize whitespace', inject(function($filter) {
-    var filter = $filter('normalizeWhitespace');
-
-    expect(filter('')).toEqual('');
-    expect(filter(null)).toEqual(null);
-    expect(filter(undefined)).toEqual(undefined);
-
-    expect(filter('a')).toEqual('a');
-    expect(filter('a  ')).toEqual('a');
-    expect(filter('  a')).toEqual('a');
-    expect(filter('  a  ')).toEqual('a');
-
-    expect(filter('a  b ')).toEqual('a b');
-    expect(filter('  a  b ')).toEqual('a b');
-    expect(filter('  ab c ')).toEqual('ab c');
-  }));
-
-  it('should truncate multi-line text to the first non-empty line', inject(
+  it('should correctly normalize whitespace', angular.mock.inject(
     function($filter) {
+      var filter = $filter('normalizeWhitespace');
+
+      expect(filter('')).toEqual('');
+      expect(filter(null)).toEqual(null);
+      expect(filter(undefined)).toEqual(undefined);
+
+      expect(filter('a')).toEqual('a');
+      expect(filter('a  ')).toEqual('a');
+      expect(filter('  a')).toEqual('a');
+      expect(filter('  a  ')).toEqual('a');
+
+      expect(filter('a  b ')).toEqual('a b');
+      expect(filter('  a  b ')).toEqual('a b');
+      expect(filter('  ab c ')).toEqual('ab c');
+    }
+  ));
+
+  it('should truncate multi-line text to the first non-empty line',
+    angular.mock.inject(function($filter) {
       var filter = $filter('truncateAtFirstLine');
 
       expect(filter('')).toEqual('');
@@ -195,12 +200,11 @@ describe('Testing filters', function() {
       // Paragraph Separator
       expect(filter('Paragraph Separator\u2029EOL')).toEqual(
         'Paragraph Separator...');
-    }
-  ));
+    }));
 
   it(
     'should summarize large number to at most 4 s.f. and append metric prefix',
-    inject(function($filter) {
+    angular.mock.inject(function($filter) {
       var filter = $filter('summarizeNonnegativeNumber');
 
       expect(filter(100)).toEqual(100);
@@ -215,7 +219,7 @@ describe('Testing filters', function() {
 
   it(
     'should capitalize first letter and truncate string at a word break',
-    inject(function($filter) {
+    angular.mock.inject(function($filter) {
       var filter = $filter('truncateAndCapitalize');
 
       // The first word always appears in the result.
@@ -253,52 +257,58 @@ describe('Testing filters', function() {
     })
   );
 
-  it('should correctly capitalize strings', inject(function($filter) {
-    var filter = $filter('capitalize');
+  it('should correctly capitalize strings', angular.mock.inject(
+    function($filter) {
+      var filter = $filter('capitalize');
 
-    expect(filter('')).toEqual('');
-    expect(filter(null)).toEqual(null);
-    expect(filter(undefined)).toEqual(undefined);
+      expect(filter('')).toEqual('');
+      expect(filter(null)).toEqual(null);
+      expect(filter(undefined)).toEqual(undefined);
 
-    expect(filter('a')).toEqual('A');
-    expect(filter('a  ')).toEqual('A');
-    expect(filter('  a')).toEqual('A');
-    expect(filter('  a  ')).toEqual('A');
+      expect(filter('a')).toEqual('A');
+      expect(filter('a  ')).toEqual('A');
+      expect(filter('  a')).toEqual('A');
+      expect(filter('  a  ')).toEqual('A');
 
-    expect(filter('a  b ')).toEqual('A  b');
-    expect(filter('  a  b ')).toEqual('A  b');
-    expect(filter('  ab c ')).toEqual('Ab c');
-    expect(filter('  only First lettEr is  Affected ')).toEqual(
-      'Only First lettEr is  Affected');
-  }));
+      expect(filter('a  b ')).toEqual('A  b');
+      expect(filter('  a  b ')).toEqual('A  b');
+      expect(filter('  ab c ')).toEqual('Ab c');
+      expect(filter('  only First lettEr is  Affected ')).toEqual(
+        'Only First lettEr is  Affected');
+    }
+  ));
 
-  it('should not shorten the length of text', inject(function($filter) {
-    expect($filter('getAbbreviatedText')('It will remain unchanged.', 50))
-      .toBe('It will remain unchanged.');
-    expect($filter('getAbbreviatedText')(
-      'Itisjustaverylongsinglewordfortesting',
-      50)).toBe('Itisjustaverylongsinglewordfortesting');
-  }));
+  it('should not shorten the length of text', angular.mock.inject(
+    function($filter) {
+      expect($filter('getAbbreviatedText')('It will remain unchanged.', 50))
+        .toBe('It will remain unchanged.');
+      expect($filter('getAbbreviatedText')(
+        'Itisjustaverylongsinglewordfortesting',
+        50)).toBe('Itisjustaverylongsinglewordfortesting');
+    }
+  ));
 
-  it('should shorten the length of text', inject(function($filter) {
-    expect($filter('getAbbreviatedText')(
-      'It has to convert to a substring as it exceeds the character limit.',
-      50)).toBe('It has to convert to a substring as it exceeds...');
-    expect($filter('getAbbreviatedText')(
-      'ItisjustaverylongsinglewordfortestinggetAbbreviatedText',
-      50)).toBe('ItisjustaverylongsinglewordfortestinggetAbbreviate...');
-    expect($filter('getAbbreviatedText')(
-      'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; /⏬®;😁☕😁:☝)😁😁😍1!@#',
-      50)).toBe('â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...');
-    expect($filter('getAbbreviatedText')(
-      'It is just a very long singlewordfortestinggetAbbreviatedText',
-      50)).toBe('It is just a very long...');
-  }));
+  it('should shorten the length of text', angular.mock.inject(
+    function($filter) {
+      expect($filter('getAbbreviatedText')(
+        'It has to convert to a substring as it exceeds the character limit.',
+        50)).toBe('It has to convert to a substring as it exceeds...');
+      expect($filter('getAbbreviatedText')(
+        'ItisjustaverylongsinglewordfortestinggetAbbreviatedText',
+        50)).toBe('ItisjustaverylongsinglewordfortestinggetAbbreviate...');
+      expect($filter('getAbbreviatedText')(
+        'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; /⏬®;😁☕😁:☝)😁😁😍1!@#',
+        50)).toBe('â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...');
+      expect($filter('getAbbreviatedText')(
+        'It is just a very long singlewordfortestinggetAbbreviatedText',
+        50)).toBe('It is just a very long...');
+    }
+  ));
 
 
 
   it('should get correct list of RTE components from HTML input',
-    inject(function($filter) {
+    angular.mock.inject(function($filter) {
       var filter = $filter('formatRtePreview');
       expect(
         filter('<p>Text input</p>')
@@ -329,7 +339,7 @@ describe('Testing filters', function() {
     }));
 
   it('should correctly display RTE components in Answer Group Header',
-    inject(function($filter) {
+    angular.mock.inject(function($filter) {
       var ruleMath = {
         type: 'Equals',
         inputs: {
@@ -404,7 +414,7 @@ describe('Testing filters', function() {
   );
 
   it('should correctly parameterize rule description filter',
-    inject(function($filter) {
+    angular.mock.inject(function($filter) {
       var ruleMultipleChoice = {
         type: 'Equals',
         inputs: {
