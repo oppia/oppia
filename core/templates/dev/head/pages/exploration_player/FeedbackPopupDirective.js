@@ -20,7 +20,7 @@
 // follows:
 //
 // <some-html-element popover-placement="bottom"
-//                    uib-popover-template="'feedback_popup_container.html'"
+//                    uib-popover-template="'<[getFeedbackPopoverUrl()]>'"
 //                    popover-trigger="click" state-name="<[STATE_NAME]>">
 // </some-html-element>
 //
