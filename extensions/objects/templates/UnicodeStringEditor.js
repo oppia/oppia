@@ -24,7 +24,9 @@ oppia.directive('unicodeStringEditor', [
       scope: {
         getAlwaysEditable: '&',
         getInitArgs: '&',
-        value: '='
+        value: '=',
+        validators: '&',
+        uiConfig: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/unicode_string_editor_directive.html'),
@@ -67,6 +69,19 @@ oppia.directive('unicodeStringEditor', [
             };
             $scope.value = newValue;
             $scope.closeEditor();
+          };
+
+          $scope.getPlaceholder = function() {
+            if (!$scope.uiConfig()) {
+              return '';
+            } else {
+              if (!$scope.uiConfig().placeholder &&
+                  DeviceInfoService.hasTouchEvents()) {
+                return $translate.instant(
+                  'I18N_PLAYER_DEFAULT_MOBILE_PLACEHOLDER');
+              }
+              return $scope.uiConfig().placeholder;
+            }
           };
 
           $scope.$on('externalSave', function() {
