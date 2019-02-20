@@ -726,9 +726,7 @@ class SignUpTests(test_utils.GenericTestBase):
         response_output = json.loads(response.body[response.body.find('{'):])
 
         self.assertEqual(response_output['error'], (
-            'Sorry, you have been logged out '
-            '[probably in another window]. Please log in again. '
-            'You will be redirected to main page in a while!'))
+            'Registration session expired.'))
 
     def test_no_error_is_raised_on_opening_new_tab_after_signup(self):
         """ Test that no error is raised if user opens a new tab

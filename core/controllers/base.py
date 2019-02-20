@@ -114,9 +114,6 @@ class UserFacingExceptions(object):
     class InternalErrorException(Exception):
         """Error class for an internal server side error (error code 500)."""
 
-    class LoggedOutInNewTabException(Exception):
-        """Error class for users who are logged out due to opening a new tab."""
-
 
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
@@ -234,10 +231,8 @@ class BaseHandler(webapp2.RequestHandler):
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
                 if 'signup' in self.request.uri and not self.user_id:
-                    raise self.LoggedOutInNewTabException(
-                        'Sorry, you have been logged out '
-                        '[probably in another window]. Please log in again. '
-                        'You will be redirected to main page in a while!')
+                    raise self.UnauthorizedUserException(
+                        'Registration session expired.')
                 csrf_token = self.request.get('csrf_token')
                 if not csrf_token:
                     raise Exception(
@@ -510,11 +505,6 @@ class BaseHandler(webapp2.RequestHandler):
             self._render_exception(500, {'error': unicode(exception)})
             return
 
-        if isinstance(exception, self.LoggedOutInNewTabException):
-            self.error(401)
-            self._render_exception(401, {'error': unicode(exception)})
-            return
-
         self.error(500)
         self._render_exception(500, {'error': unicode(exception)})
 
@@ -523,7 +513,6 @@ class BaseHandler(webapp2.RequestHandler):
     NotLoggedInException = UserFacingExceptions.NotLoggedInException
     PageNotFoundException = UserFacingExceptions.PageNotFoundException
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
-    LoggedOutInNewTabException = UserFacingExceptions.LoggedOutInNewTabException
 
 
 class Error404Handler(BaseHandler):

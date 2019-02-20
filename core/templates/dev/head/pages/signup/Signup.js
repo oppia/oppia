@@ -174,31 +174,27 @@ oppia.controller('Signup', [
         window.location = window.decodeURIComponent(
           UrlService.getUrlParams().return_url);
       }, function(rejection) {
-        var loggedOutInNewTabErrorMessage = (
-          'Sorry, you have been logged out [probably in another ' +
-          'window]. Please log in again. You will be redirected ' +
-          'to main page in a while!');
         if (
-          rejection.data && (
-            rejection.data.error === loggedOutInNewTabErrorMessage)) {
-          $scope.showRedirectToLoginModal();
+          rejection.data && rejection.data.status_code === 401) {
+          $scope.showContinueRegistrationModal();
         }
         $scope.submissionInProcess = false;
       });
     };
 
-    $scope.showRedirectToLoginModal = function() {
+    $scope.showContinueRegistrationModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/signup/redirect_to_login_directive.html'),
-        backdrop: true,
+        backdrop: 'static',
+        keyboard: false,
         resolve: {},
         controller: [
           '$scope', '$uibModalInstance', 'SiteAnalyticsService',
           'UserService', '$timeout', '$window',
           function($scope, $uibModalInstance, SiteAnalyticsService,
               UserService, $timeout, $window) {
-            $scope.redirectToLogin = function() {
+            $scope.continueRegistration = function() {
               SiteAnalyticsService.registerStartLoginEvent(
                 'loginButton');
               UserService.getLoginAndLogoutUrls().then(

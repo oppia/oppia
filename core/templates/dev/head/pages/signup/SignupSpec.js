@@ -104,9 +104,11 @@ describe('Signup controller', function() {
         'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN');
     });
 
-    it('should show redirect to signup modal if user is logged out in new tab',
+    it(
+      'should show continue registration modal if user is logged ' +
+      'out in new tab',
       function() {
-        spyOn(scope, 'showRedirectToLoginModal');
+        spyOn(scope, 'showContinueRegistrationModal');
         var errorResponseObject = {
           status_code: 401,
           error: (
@@ -118,7 +120,7 @@ describe('Signup controller', function() {
           401, errorResponseObject);
         scope.submitPrerequisitesForm(true, 'myUsername', false);
         $httpBackend.flush();
-        expect(scope.showRedirectToLoginModal).toHaveBeenCalled();
+        expect(scope.showContinueRegistrationModal).toHaveBeenCalled();
       });
   });
 });
