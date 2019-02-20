@@ -711,22 +711,14 @@ class SignUpTests(test_utils.GenericTestBase):
 
         os.environ['USER_ID'] = ''
 
-        response = self.testapp.post(
-            feconf.SIGNUP_DATA_URL, params={
-                'csrf_token': csrf_token,
-                'payload': json.dumps({
-                    'username': 'abc',
-                    'agreed_to_terms': True
-                })
-            }, expect_errors=True,
-            )
+        response = self.post_json(
+            feconf.SIGNUP_DATA_URL, {
+                'username': 'abc',
+                'agreed_to_terms': True
+            }, csrf_token=csrf_token, expected_status_int=401,
+        )
 
-        self.assertEqual(response.status_int, 401)
-
-        response_output = json.loads(response.body[response.body.find('{'):])
-
-        self.assertEqual(response_output['error'], (
-            'Registration session expired.'))
+        self.assertEqual(response['error'], ('Registration session expired.'))
 
     def test_no_error_is_raised_on_opening_new_tab_after_signup(self):
         """ Test that no error is raised if user opens a new tab
@@ -736,16 +728,11 @@ class SignUpTests(test_utils.GenericTestBase):
         response = self.get_html_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        response = self.testapp.post(
-            feconf.SIGNUP_DATA_URL, params={
-                'csrf_token': csrf_token,
-                'payload': json.dumps({
-                    'username': 'abc',
-                    'agreed_to_terms': True
-                })
-            }
-            )
-
-        self.assertEqual(response.status_int, 200)
+        self.post_json(
+            feconf.SIGNUP_DATA_URL, {
+                'username': 'abc',
+                'agreed_to_terms': True
+            }, csrf_token=csrf_token,
+        )
 
         self.get_html_response('/about')
