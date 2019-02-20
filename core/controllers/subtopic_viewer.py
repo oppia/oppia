@@ -27,8 +27,11 @@ class SubtopicPageDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_subtopic_viewer_page
-    def get(self, subtopic_id):
+    def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
+        
+        subtopic_page = subtopic_page_services.get_subtopic_by_id(topic_id, subtopic_id)
+        
         

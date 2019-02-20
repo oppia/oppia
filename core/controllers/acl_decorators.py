@@ -2405,6 +2405,20 @@ def can_access_subtopic_viewer_page(handler):
             if the user can access the give subtopic viewer page.
     """
     
+    def test_can_access(self, topic_id, subtopic_id, **kwargs):
+        """Checks if the user can access subtopic viewer page.
+
+        Args:
+            subtopic_id: str. The id of the Subtopic.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        subtopic = 
 def get_decorator_for_accepting_suggestion(decorator):
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in
