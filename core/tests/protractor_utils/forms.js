@@ -85,6 +85,7 @@ var GraphEditor = function(graphInputContainer) {
         by.css('.protractor-test-Delete-button'));
       deleteButton.click();
       // Sample graph comes with 3 vertices.
+      var i;
       for (i = 2; i >= 0; i--) {
         vertexElement(i).click();
       }
@@ -125,10 +126,10 @@ var ListEditor = function(elem) {
   // by calling setValue() on it). Clients should ensure the given objectType
   // corresponds to the type of elements in the list.
   // If objectType is not specified, this function returns nothing.
-  var addItem = function(objectType) {
+  var addItem = function(objectType = null) {
     var listLength = _getLength();
     elem.element(by.css('.protractor-test-add-list-entry')).click();
-    if (objectType) {
+    if (objectType !== null) {
       return getEditor(objectType)(
         elem.element(
           by.repeater('item in localValue track by $index').row(listLength)));

@@ -124,6 +124,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
 
       var imageTagList = dummyElement.getElementsByTagName(
         'oppia-noninteractive-image');
+      var i;
       for (i = 0; i < imageTagList.length; i++) {
         // We have the attribute of filepath in oppia-noninteractive-image tag.
         // But it actually contains the filename only. We use the variable
@@ -151,7 +152,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
         filenamesInState.push(filename);
       }
-      allHtmlOfState = _getAllHtmlOfState(state);
+      var allHtmlOfState = _getAllHtmlOfState(state);
       allHtmlOfState.forEach(function(htmlStr) {
         filenamesInState = filenamesInState.concat(
           _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));

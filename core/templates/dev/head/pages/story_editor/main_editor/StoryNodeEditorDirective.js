@@ -43,6 +43,7 @@ oppia.directive('storyNodeEditor', [
           var _recalculateAvailableNodes = function() {
             $scope.newNodeId = null;
             $scope.availableNodes = [];
+            var i;
             for (i = 0; i < $scope.storyNodeIds.length; i++) {
               if ($scope.storyNodeIds[i] === $scope.getId()) {
                 continue;

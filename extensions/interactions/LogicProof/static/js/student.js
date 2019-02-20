@@ -33,7 +33,7 @@ var logicProofStudent = (function() {
   // and A(3)=error will return true rather than error. The default control
   // functions rely heavily on this functionality and will need to be rewritten
   // if it is changed.
-  BASE_CONTROL_MODEL = {
+  var BASE_CONTROL_MODEL = {
     evaluation_rules: {
       and: {
         format: 'bottom_up',
@@ -561,7 +561,7 @@ var logicProofStudent = (function() {
    * @throws If the expression cannot be viewed as an instance of the template.
    */
   var matchExpression = function(expression, template, oldMatchings) {
-    matchings = {};
+    var matchings = {};
     for (var key in oldMatchings) {
       matchings[key] = oldMatchings[key];
     }
@@ -1110,9 +1110,9 @@ var logicProofStudent = (function() {
             expression.top_operator_name +
             ' to be evaluated bottom-up but it has dummies');
         }
-        var arguments = [];
+        var argumentsList = [];
         for (var i = 0; i < expression.arguments.length; i++) {
-          arguments.push(
+          argumentsList.push(
             evaluate(
               expression.arguments[i], inputs, model, evaluationRuleParameters,
               cache));
@@ -1122,7 +1122,7 @@ var logicProofStudent = (function() {
           types.push(expression.arguments[i].type);
         }
         var answer = evaluationRule.evaluateExpression(
-          arguments, types, evaluationRuleParameters);
+          argumentsList, types, evaluationRuleParameters);
       } else {
         throw Error('Unknown evaluation rule format (' +
           evaluationRule.format + ') sent to evaluate().');
@@ -1157,8 +1157,8 @@ var logicProofStudent = (function() {
     var renderedMessages = [];
     for (var i = 0; i < mistake.message.length; i++) {
       try {
-        message = mistake.message[i];
-        renderedMessage = '';
+        var message = mistake.message[i];
+        var renderedMessage = '';
         for (var j = 0; j < message.length; j++) {
           if (message[j].format === 'string') {
             renderedMessage += message[j].content;

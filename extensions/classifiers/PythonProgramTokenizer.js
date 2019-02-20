@@ -153,7 +153,9 @@ oppia.factory('PythonProgramTokenizer', [
     return {
       generateTokens: function(program) {
         var tokenizedProgram = [];
-        var lnum = parenlev = continued = 0;
+        var lnum = 0;
+        var parenlev = 0;
+        var continued = 0;
         var namechars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
         var numchars = '0123456789';
         var contstr = '';
@@ -177,7 +179,7 @@ oppia.factory('PythonProgramTokenizer', [
               $log.error('EOF in multi-line string');
             }
 
-            endmatch = endprog.exec(line);
+            var endmatch = endprog.exec(line);
             if (endmatch && endmatch.index === 0) {
               token = endmatch[0];
               pos = pos + token.length;
@@ -204,7 +206,7 @@ oppia.factory('PythonProgramTokenizer', [
               break;
             }
 
-            column = 0;
+            var column = 0;
             // Measure leading whitespace.
             while (pos < max) {
               if (line[pos] === ' ') {
@@ -226,8 +228,8 @@ oppia.factory('PythonProgramTokenizer', [
             // Skip comments or blank lines.
             if (('#\r\n').indexOf(line[pos]) !== -1) {
               if (line[pos] === '#') {
-                commentToken = line.slice(pos).replace('\\r\\n', '');
-                nlPos = pos + commentToken.length;
+                var commentToken = line.slice(pos).replace('\\r\\n', '');
+                var nlPos = pos + commentToken.length;
                 tokenizedProgram.push(
                   [PythonProgramTokenType.COMMENT, commentToken]);
                 tokenizedProgram.push(
@@ -264,7 +266,7 @@ oppia.factory('PythonProgramTokenizer', [
           }
 
           while (pos < max) {
-            pseudomatch = pseudoprog.exec(line.slice(pos));
+            var pseudomatch = pseudoprog.exec(line.slice(pos));
             // Scan for tokens.
             if (pseudomatch && pseudomatch.index === 0) {
               var start = pos + pseudomatch[0].indexOf(pseudomatch[1]);
@@ -343,7 +345,7 @@ oppia.factory('PythonProgramTokenizer', [
         }
 
         // Pop remaining indent levels
-        for (indent in indents.slice(1)) {
+        for (var indent in indents.slice(1)) {
           tokenizedProgram.push([PythonProgramTokenType.DEDENT, '']);
         }
 

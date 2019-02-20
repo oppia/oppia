@@ -173,12 +173,12 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           scope.VERTICAL_GRID_SPACING = scope.CONTAINER_HEIGHT /
             verticalGridKeys.length;
 
-          staffTop = computeStaffTop();
-          staffBottom = computeStaffBottom();
+          var staffTop = computeStaffTop();
+          var staffBottom = computeStaffBottom();
 
           // The farthest edge of the staff. If a note is placed beyond this
           // position, it will be discarded.
-          RIGHT_EDGE_OF_STAFF_POSITION =
+          var RIGHT_EDGE_OF_STAFF_POSITION =
             element.find('.oppia-music-input-valid-note-area').width();
 
           clearNotesFromStaff();
@@ -595,8 +595,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         var isCloneOffStaff = function(helperClone) {
-          return (!(helperClone.position().top > staffTop &&
-                  helperClone.position().top < staffBottom));
+          return (!(helperClone.position().top > scope.staffTop &&
+                  helperClone.position().top < scope.staffBottom));
         };
 
         var isLedgerLineNote = function(lineValue) {

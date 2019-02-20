@@ -44,11 +44,13 @@ describe('Image preloader service', function() {
 
   var abas, ips, eof, ecs;
   var $httpBackend = null;
+  var UrlInterpolationService;
   var $rootScope = null;
   var explorationDict;
   var requestUrl1, requestUrl2, requestUrl3, requestUrl4, requestUrl5;
   beforeEach(inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
+    UrlInterpolationService = $injector.get('UrlInterpolationService');
     ips = $injector.get('ImagePreloaderService');
     eof = $injector.get('ExplorationObjectFactory');
     ecs = $injector.get('ContextService');
@@ -385,7 +387,7 @@ describe('Image preloader service', function() {
       abas.getAssetsFilesCurrentlyBeingRequested().image
     );
     $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
-    for (x in filenamesOfImageCurrentlyDownloading) {
+    for (var x in filenamesOfImageCurrentlyDownloading) {
       expect(filenamesOfImageCurrentlyDownloading[x]).toBe(
         imageFilesCurrentlyBeingRequested[x].filename);
     }
@@ -411,11 +413,11 @@ describe('Image preloader service', function() {
     });
 
   it('should calculate the dimensions of the image file', function() {
-    dimensions1 = ips.getDimensionsOfImage(
+    var dimensions1 = ips.getDimensionsOfImage(
       'sIOFeedback_height_50_width_50.png');
     expect(dimensions1.width).toBe(50);
     expect(dimensions1.height).toBe(50);
-    dimensions2 = ips.getDimensionsOfImage(
+    var dimensions2 = ips.getDimensionsOfImage(
       'sIOFeedback_height_30_width_45_height_56_width_56.png');
     expect(dimensions2.width).toBe(56);
     expect(dimensions2.height).toBe(56);

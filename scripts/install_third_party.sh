@@ -23,6 +23,7 @@ $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
 install_node_module ajv 5.0.0
+install_node_module babel-eslint 10.0.1
 install_node_module browserstack-local 1.3.3
 install_node_module dotenv 6.0.0
 install_node_module eslint 4.19.0
@@ -43,11 +44,16 @@ install_node_module stylelint-config-standard 18.2.0
 install_node_module through2 2.0.0
 install_node_module typescript 3.3.3
 install_node_module @types/angular 1.6.54
+install_node_module @types/ckeditor 4.9.7
+install_node_module @types/d3 5.7.1
 install_node_module @types/googlemaps 3.30.16
 install_node_module @types/jasmine 3.3.8
 install_node_module @types/jquery 3.3.29
+install_node_module @types/mathjax 0.0.35
+install_node_module @types/mathjs 5.0.0
+install_node_module @types/mousetrap 1.6.1
 install_node_module @types/node 10.12.24
-install_node_module @types/q 0.0.32
+install_node_module @types/q 1.5.1
 install_node_module @types/selenium-webdriver 2.53.43
 install_node_module uglify-js 3.3.11
 install_node_module yargs 3.29.0
@@ -166,14 +172,14 @@ if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
   rm pycodestyle-2.3.1.tar.gz
 fi
 
-# Install pyjsparser.
-echo Checking if pyjsparser is installed in third_party
-if [ ! -d "$TOOLS_DIR/pyjsparser-2.5.2" ]; then
-  echo Installing pyjsparser
+# Install esprima.
+echo Checking if esprima is installed in third_party
+if [ ! -d "$TOOLS_DIR/esprima-4.0.1" ]; then
+  echo Installing esprima
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o pyjsparser-2.5.2.tar.gz -L https://pypi.python.org/packages/17/3d/59f7f0cd6a7cdab611b36d8921c9d2d6c5564033d938ec2eb934cdca0e48/pyjsparser-2.5.2.tar.gz
-  tar xzf pyjsparser-2.5.2.tar.gz -C $TOOLS_DIR
-  rm pyjsparser-2.5.2.tar.gz
+  curl -o esprima-4.0.1.tar.gz -L https://files.pythonhosted.org/packages/cc/a1/50fccd68a12bcfc27adfc9969c090286670a9109a0259f3f70943390b721/esprima-4.0.1.tar.gz
+  tar xzf esprima-4.0.1.tar.gz -C $TOOLS_DIR
+  rm esprima-4.0.1.tar.gz
 fi
 
 # Python API for browsermob-proxy.
