@@ -16,6 +16,9 @@
  * @fileoverview Page object for Collection Editor Page, for use in Protractor
  * tests.
  */
+
+import {element, browser, by, protractor} from 'protractor';
+
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
@@ -72,7 +75,7 @@ var CollectionEditorPage = function() {
       return dropdownResult.getText();
     }).then(function(listOfResult) {
       listOfResult.forEach(function(element, index) {
-        if (element.indexOf(query) >= 0) {
+        if ((<string>element).indexOf(query) >= 0) {
           // Selects the exploration from dropdown.
           dropdownResultElements.get(index).click();
           matched = true;

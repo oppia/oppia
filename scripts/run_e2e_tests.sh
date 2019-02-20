@@ -137,6 +137,9 @@ else
   constants_env_variable="\"DEV_MODE\": true"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
   $PYTHON_CMD scripts/build.py
+  # Compile typescript files
+  echo "Compiling typescript for test..."
+  $NODE_MODULE_DIR/typescript/bin/tsc
 fi
 
 # Delete the modified feconf.py file(-i.bak)

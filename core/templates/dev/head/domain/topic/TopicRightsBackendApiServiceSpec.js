@@ -16,16 +16,17 @@
  * @fileoverview Unit tests for TopicRightsBackendApiService.
  */
 
+
 describe('Topic rights backend API service', function() {
   var TopicRightsBackendApiService = null;
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     TopicRightsBackendApiService = $injector.get(
       'TopicRightsBackendApiService');
     $rootScope = $injector.get('$rootScope');

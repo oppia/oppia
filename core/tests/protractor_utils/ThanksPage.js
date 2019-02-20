@@ -16,6 +16,9 @@
  * @fileoverview Page object for the thanks page, for use in Protractor
  * tests.
  */
+
+import {browser} from 'protractor';
+
 var waitFor = require('./waitFor.js');
 
 var ThanksPage = function() {

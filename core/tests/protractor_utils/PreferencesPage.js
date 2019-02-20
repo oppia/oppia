@@ -17,6 +17,8 @@
  * tests.
  */
 
+import {element, browser, by} from 'protractor';
+
 var waitFor = require('./waitFor.js');
 
 var PreferencesPage = function() {

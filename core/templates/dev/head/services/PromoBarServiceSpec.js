@@ -16,11 +16,12 @@
  * @fileoverview Tests that the resource service is working as expected.
  */
 
+
 describe('Promo bar Service', function() {
   var PromoBarService, $httpBackend;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     PromoBarService = $injector.get('PromoBarService');
     $httpBackend = $injector.get('$httpBackend');
   }));

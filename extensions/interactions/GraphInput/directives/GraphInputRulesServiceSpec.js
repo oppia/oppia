@@ -16,17 +16,18 @@
  * @fileoverview Unit tests for Graph Input rules.
  */
 
+
 describe('Graph Input service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var girs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     girs = $injector.get('graphInputRulesService');
   }));
 
   describe('graph utilities', function() {
     var utils = null;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       utils = $injector.get('graphUtilsService');
     }));
 

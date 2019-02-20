@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 describe('LogicProofValidationService', function() {
   var validatorService, WARNING_TYPES;
 
@@ -20,10 +21,10 @@ describe('LogicProofValidationService', function() {
   var oof, agof;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('LogicProofValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 

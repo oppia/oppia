@@ -17,11 +17,13 @@
  * Protractor tests.
  */
 
+import {element, browser, by} from 'protractor';
+
 var forms = require('./forms.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var ruleTemplates = require(
-  '../../../extensions/interactions/rule_templates.json');
+  '../../../../extensions/interactions/rule_templates.json');
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
@@ -441,7 +443,7 @@ var ExplorationEditorMainTab = function() {
     var targetOption = null;
     if (createNewDest) {
       targetOption = _NEW_STATE_OPTION;
-    } else if (destName === null | destName === '(try again)') {
+    } else if (destName === null || destName === '(try again)') {
       targetOption = _CURRENT_STATE_OPTION;
     } else {
       targetOption = destName;

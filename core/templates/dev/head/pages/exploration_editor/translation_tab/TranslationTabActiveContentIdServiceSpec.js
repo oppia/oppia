@@ -16,8 +16,9 @@
  * @fileoverview Unit test for the Translation tab active content id service.
  */
 
+
 describe('Translation tab active content id service', function() {
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('StateContentIdsToAudioTranslationsService', {
       displayed: {
         getAllContentId: function() {
@@ -28,7 +29,7 @@ describe('Translation tab active content id service', function() {
   }));
   var ttacis = null;
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ttacis = $injector.get('TranslationTabActiveContentIdService');
   }));
 

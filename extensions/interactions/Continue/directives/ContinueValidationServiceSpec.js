@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 describe('ContinueValidationService', function() {
   var validatorService, WARNING_TYPES;
 
@@ -21,10 +22,10 @@ describe('ContinueValidationService', function() {
   var oof, agof;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('ContinueValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     oof = $injector.get('OutcomeObjectFactory');

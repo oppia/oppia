@@ -16,12 +16,13 @@
  * @fileoverview Unit tests to check that all the relevant rules exist.
  */
 
+
 describe('Rule spec services', function() {
   var rulesServices = {};
   var ruleTemplates;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
   var getRulesServiceName = function(interactionId) {
@@ -30,7 +31,7 @@ describe('Rule spec services', function() {
     );
   };
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ruleTemplates =
       window.__fixtures__['extensions/interactions/rule_templates'];
     Object.keys(ruleTemplates).forEach(function(interactionId) {

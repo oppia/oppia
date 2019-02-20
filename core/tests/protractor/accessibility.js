@@ -17,6 +17,8 @@
  * and check for any console errors
  */
 
+import {element, browser, by, protractor} from 'protractor';
+
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 

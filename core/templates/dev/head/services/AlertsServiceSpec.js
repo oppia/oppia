@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for the Alerts Service.
  */
 
+
 describe('Alerts Service', function() {
   var AlertsService;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     AlertsService = $injector.get('AlertsService');
   }));
 

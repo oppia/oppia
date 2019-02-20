@@ -16,11 +16,12 @@
  * @fileoverview Tests for SidebarStatusService.
  */
 
+
 describe('SidebarStatusService', function() {
   var SidebarStatusService, $window;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector, _$window_) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector, _$window_) {
     $window = _$window_;
     $window.innerWidth = 600;
     SidebarStatusService = $injector.get('SidebarStatusService');

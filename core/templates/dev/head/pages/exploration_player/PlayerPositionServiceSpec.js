@@ -16,8 +16,9 @@
 * @fileoverview Unit tests for the player position service.
 */
 
+
 describe('Player position service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var pts = null;
   var pps = null;

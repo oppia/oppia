@@ -99,7 +99,7 @@ oppia.factory('WrittenTranslationsObjectFactory', [
 
     WrittenTranslations.prototype.toBackendDict = function() {
       var translationsMappingDict = {};
-      for (contentId in this.translationsMapping) {
+      for (var contentId in this.translationsMapping) {
         var langaugeToWrittenTranslation = this.translationsMapping[contentId];
         var langaugeToWrittenTranslationDict = {};
         Object.keys(langaugeToWrittenTranslation).forEach(function(lang) {
@@ -112,7 +112,9 @@ oppia.factory('WrittenTranslationsObjectFactory', [
       return {translations_mapping: translationsMappingDict};
     };
 
-    WrittenTranslations.createFromBackendDict = function(
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    WrittenTranslations['createFromBackendDict'] = function(
         writtenTranslationsDict) {
       var translationsMapping = {};
       Object.keys(writtenTranslationsDict.translations_mapping).forEach(
@@ -130,7 +132,9 @@ oppia.factory('WrittenTranslationsObjectFactory', [
       return new WrittenTranslations(translationsMapping);
     };
 
-    WrittenTranslations.createEmpty = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    WrittenTranslations['createEmpty'] = function() {
       return new WrittenTranslations({});
     };
 

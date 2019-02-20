@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for Pencil Code Editor rules.
  */
 
+
 describe('Pencil Code Editor rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var pcers = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     pcers = $injector.get('pencilCodeEditorRulesService');
   }));
 

@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for the PlaythroughIssueObjectFactory.
  */
 
-describe('Playthrough Issue Object Factory', function() {
-  beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+describe('Playthrough Issue Object Factory', function() {
+  beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.inject(function($injector) {
     this.piof = $injector.get('PlaythroughIssueObjectFactory');
   }));
 

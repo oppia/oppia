@@ -16,11 +16,12 @@
  * @fileoverview Tests that average ratings are being computed correctly.
  */
 
+
 describe('Search service', function() {
   var SearchService;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     SearchService = $injector.get('SearchService');
   }));
 

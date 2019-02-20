@@ -29,7 +29,7 @@ oppia.directive('ckEditorRte', [
                 '</div></div>',
       require: '?ngModel',
 
-      link: function(scope, el, attr, ngModel) {
+      link: function(scope: ICustomScope, el, attr, ngModel) {
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
@@ -99,7 +99,7 @@ oppia.directive('ckEditorRte', [
           startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
         }
         // Initialize CKEditor.
-        var ck = CKEDITOR.inline(el[0].children[0].children[1], {
+        var ck = CKEDITOR.inline(<HTMLElement>(el[0].children[0].children[1]), {
           extraPlugins: 'pre,sharedspace,' + pluginNames,
           startupFocus: startupFocusEnabled,
           removePlugins: 'indentblock',
@@ -107,7 +107,7 @@ oppia.directive('ckEditorRte', [
           floatSpaceDockedOffsetY: 15,
           extraAllowedContent: extraAllowedContentRules,
           sharedSpaces: {
-            top: el[0].children[0].children[0]
+            top: <HTMLElement>el[0].children[0].children[0]
           },
           skin: 'bootstrapck,/third_party/static/ckeditor-bootstrapck-1.0/',
           toolbar: [

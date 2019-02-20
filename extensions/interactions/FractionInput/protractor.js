@@ -16,6 +16,8 @@
  * @fileoverview End-to-end testing utilities for the Fraction interaction.
  */
 
+import {element, by} from 'protractor';
+
 var objects = require('../../objects/protractor.js');
 
 var customizeInteraction = function(elem, requireSimplestForm) {

@@ -17,7 +17,8 @@
  * interaction.
  */
 
-var errorWrapper = function(dubiousFunction, input, parameter = null) {
+errorWrapper = function(
+    dubiousFunction, input, parameter = null) {
   return function() {
     try {
       if (parameter === null) {
@@ -32,6 +33,7 @@ var errorWrapper = function(dubiousFunction, input, parameter = null) {
     }
   };
 };
+
 
 describe('Parse then display expressions', function() {
   var parseThenDisplay = function(expressionString) {

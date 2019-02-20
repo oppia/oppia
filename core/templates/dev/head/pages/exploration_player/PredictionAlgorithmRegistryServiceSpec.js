@@ -16,14 +16,15 @@
  * @fileoverview Unit tests for the prediction algorithm registry service.
  */
 
+
 describe('Prediction algorithm registry service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Test prediction algorithm registry functions', function() {
     var registryService, predictionService;
 
     beforeEach(function() {
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.factory('PredictionSampleService', [function() {
           return {
             predict: function(classifierData, answer) {
@@ -34,7 +35,7 @@ describe('Prediction algorithm registry service', function() {
       });
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       registryService = $injector.get('PredictionAlgorithmRegistryService');
       predictionService = $injector.get('PredictionSampleService');
 

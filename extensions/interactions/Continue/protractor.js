@@ -17,6 +17,8 @@
  * interaction.
  */
 
+import {element, by} from 'protractor';
+
 var objects = require('../../objects/protractor.js');
 var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 

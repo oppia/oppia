@@ -162,6 +162,7 @@ var logicProofShared = (function() {
         expression.top_operator_name :
         operators[expression.top_operator_name].symbols[0];
 
+    var output = null;
     if (expression.top_kind_name === 'binary_connective' ||
         expression.top_kind_name === 'binary_relation' ||
         expression.top_kind_name === 'binary_function') {
@@ -170,13 +171,13 @@ var logicProofShared = (function() {
           '(' + processedArguments.join(symbol) + ')' :
           processedArguments.join(symbol));
     } else if (expression.top_kind_name === 'unary_connective') {
-      var output = symbol + processedArguments[0];
+      output = symbol + processedArguments[0];
       return (desirabilityOfBrackets === 2) ? '(' + output + ')' : output;
     } else if (expression.top_kind_name === 'quantifier') {
-      var output = symbol + processedDummies[0] + '.' + processedArguments[0];
+      output = symbol + processedDummies[0] + '.' + processedArguments[0];
       return (desirabilityOfBrackets === 2) ? '(' + output + ')' : output;
     } else if (expression.top_kind_name === 'bounded_quantifier') {
-      var output = symbol + processedArguments[0] + '.' + processedArguments[1];
+      output = symbol + processedArguments[0] + '.' + processedArguments[1];
       return (desirabilityOfBrackets === 2) ? '(' + output + ')' : output;
     } else if (expression.top_kind_name === 'prefix_relation' ||
         expression.top_kind_name === 'prefix_function') {
@@ -722,11 +723,11 @@ var logicProofShared = (function() {
               }
             }
             var typedArguments = [];
-            for (var l = untypedExpression.dummies.length;
-              l < untypedExpression.dummies.length +
+            for (var m = untypedExpression.dummies.length;
+              m < untypedExpression.dummies.length +
                      untypedExpression.arguments.length;
-              l++) {
-              typedArguments.push(newAttempts[k].typedArray[l]);
+              m++) {
+              typedArguments.push(newAttempts[k].typedArray[m]);
             }
 
             results.push({
@@ -895,16 +896,16 @@ var logicProofShared = (function() {
   // Returns a list of all the names of operators in an expression. kinds is an
   // array specifying which kinds of operators to return; if it is not supplied
   // then all are returned
-  var getOperatorsFromExpression = function(expression, kinds = false) {
+  var getOperatorsFromExpression = function(expression, kinds = null) {
     var output = getOperatorsFromExpressionArray(
       expression.arguments.concat(expression.dummies), kinds);
     return (output.indexOf(expression.top_operator_name) === -1 &&
-        (kinds === false || kinds.indexOf(expression.top_kind_name) !== -1)) ?
+        (kinds === null || kinds.indexOf(expression.top_kind_name) !== -1)) ?
       output.concat([expression.top_operator_name]) :
       output;
   };
 
-  var getOperatorsFromExpressionArray = function(array, kinds = false) {
+  var getOperatorsFromExpressionArray = function(array, kinds = null) {
     var output = [];
     for (var i = 0; i < array.length; i++) {
       var newOutput = getOperatorsFromExpression(array[i], kinds);

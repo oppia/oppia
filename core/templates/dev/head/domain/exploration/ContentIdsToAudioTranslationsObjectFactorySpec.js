@@ -16,8 +16,9 @@
  * @fileoverview Unit tests for ContentIdsToAudioTranslations object factory.
  */
 
+
 describe('ContentIdsToAudioTranslations object factory', function() {
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', {
       getAudioLanguagesCount: function() {
         return 2;
@@ -105,7 +106,7 @@ describe('ContentIdsToAudioTranslations object factory', function() {
       }
     };
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       citatof = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
       atof = $injector.get('AudioTranslationObjectFactory');
       citat = citatof.createFromBackendDict(citatDict);
@@ -194,7 +195,7 @@ describe('ContentIdsToAudioTranslations object factory', function() {
       }).toThrowError('Unable to find the given content id.');
     });
 
-    it('should check whether the text is fully translated', inject(function() {
+    it('should check whether the text is fully translated', angular.mock.inject(function() {
       expect(citat.isFullyTranslated('content')).toBe(true);
       citat.deleteAudioTranslation('content', 'hi');
       expect(citat.isFullyTranslated('content')).toBe(false);

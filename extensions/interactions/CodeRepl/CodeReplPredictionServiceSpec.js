@@ -17,11 +17,11 @@
  */
 
 describe('CodeRepl prediction service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('CodeRepl prediction service test', function() {
     var service, tokenizer;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       service = $injector.get('CodeReplPredictionService');
       tokenizer = $injector.get('PythonProgramTokenizer');
     }));

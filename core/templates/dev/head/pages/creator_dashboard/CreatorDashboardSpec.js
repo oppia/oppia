@@ -17,12 +17,13 @@
  * user's explorations.
  */
 
+
 describe('Creator dashboard controller', function() {
   describe('CreatorDashboard', function() {
     var scope, ctrl;
     var mockDashboardBackendApiService;
     var dashboardData = {
-      explorationsList: [{
+      explorations_list: [{
         category: 'Featured category',
         id: 'featured_exp_id',
         num_open_threads: 2,
@@ -37,14 +38,14 @@ describe('Creator dashboard controller', function() {
         status: 'private',
         title: 'Private exploration'
       }],
-      collectionsList: [],
-      dashboardStats: {
+      collections_list: [],
+      dashboard_stats: {
         total_plays: 2,
         average_ratings: 3,
         num_ratings: 2,
         total_open_feedback: 1
       },
-      lastWeekStats: {
+      last_week_stats: {
         total_plays: 1,
         average_ratings: 4,
         num_ratings: 1,
@@ -52,11 +53,11 @@ describe('Creator dashboard controller', function() {
       }
     };
 
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(function() {
-      module('oppia');
-      module(function($provide) {
+      angular.mock.module('oppia');
+      angular.mock.module(function($provide) {
         $provide.factory(
           'CreatorDashboardBackendApiService', ['$q', function($q) {
             var fetchDashboardData = function() {
@@ -69,7 +70,7 @@ describe('Creator dashboard controller', function() {
       });
     });
 
-    beforeEach(inject(
+    beforeEach(angular.mock.inject(
       function($controller, $rootScope, CreatorDashboardBackendApiService) {
         mockDashboardBackendApiService = CreatorDashboardBackendApiService;
         spyOn(mockDashboardBackendApiService, 'fetchDashboardData')

@@ -16,14 +16,15 @@
  * @fileoverview Unit tests for the Param Specs object factory.
  */
 
+
 describe('ParamSpecs', function() {
   var ParamSpecsObjectFactory = null;
   var ParamSpecObjectFactory = null;
   var emptyParamSpecs = null;
   var paramName = 'x';
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     ParamSpecsObjectFactory = $injector.get('ParamSpecsObjectFactory');
     ParamSpecObjectFactory = $injector.get('ParamSpecObjectFactory');
     emptyParamSpecs = ParamSpecsObjectFactory.createFromBackendDict({});

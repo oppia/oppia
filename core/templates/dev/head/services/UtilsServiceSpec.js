@@ -16,11 +16,12 @@
  * @fileoverview Tests that the utility functions are working as expected.
  */
 
+
 describe('Utils Service', function() {
   var UtilsService;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     UtilsService = $injector.get('UtilsService');
   }));
 

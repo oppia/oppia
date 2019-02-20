@@ -16,13 +16,14 @@
  * @fileoverview Tests for TopicRightsObjectFactory.
  */
 
+
 describe('Topic rights object factory', function() {
   var TopicRightsObjectFactory = null;
   var sampleTopicRights = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     TopicRightsObjectFactory = $injector.get('TopicRightsObjectFactory');
     var initialTopicRightsBackendObject = {
       published: false,

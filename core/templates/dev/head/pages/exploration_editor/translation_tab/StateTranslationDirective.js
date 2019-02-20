@@ -81,6 +81,7 @@ oppia.directive('stateTranslation', [
               return;
             }
             var activeContentId = null;
+
             if (tabId === $scope.TAB_ID_CONTENT) {
               activeContentId = $scope.stateContent.getContentId();
             } else if (tabId === $scope.TAB_ID_FEEDBACK) {

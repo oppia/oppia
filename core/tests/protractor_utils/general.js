@@ -17,6 +17,8 @@
  * with protractor.
  */
 
+import {element, browser, by} from 'protractor';
+
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var waitFor = require('./waitFor.js');

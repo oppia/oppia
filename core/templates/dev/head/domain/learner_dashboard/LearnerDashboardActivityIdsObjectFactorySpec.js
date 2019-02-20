@@ -16,12 +16,13 @@
  * @fileoverview Tests for LearnerDashboardActivityIdsObjectFactory.
  */
 
+
 describe('Learner dashboard activity ids object factory', function() {
   var LearnerDashboardActivityIdsObjectFactory = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     LearnerDashboardActivityIdsObjectFactory = $injector.get(
       'LearnerDashboardActivityIdsObjectFactory');
   }));

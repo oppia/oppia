@@ -16,6 +16,8 @@
  * @fileoverview Protractor configuration to run tests on Browserstack.
  */
 
+import {browser} from 'protractor'
+
 var browserstack = require('browserstack-local');
 var dotenv = require('dotenv');
 
@@ -83,36 +85,36 @@ exports.config = {
     // in 'full' individually. This is to parallelize the suites on
     // browserstack.
     full: [
-      'protractor/accessibility.js',
-      'protractor/learnerFlow.js',
-      'protractor/libraryFlow.js',
-      'protractor_mobile/navigation.js',
-      'protractor/profileMenuFlow.js',
-      'protractor/subscriptionsFlow.js'
+      '../../local_compiled_js/core/tests/protractor/accessibility.js',
+      '../../local_compiled_js/core/tests/protractor/learnerFlow.js',
+      '../../local_compiled_js/core/tests/protractor/libraryFlow.js',
+      '../../local_compiled_js/core/tests/protractor_mobile/navigation.js',
+      '../../local_compiled_js/core/tests/protractor/profileMenuFlow.js',
+      '../../local_compiled_js/core/tests/protractor/subscriptionsFlow.js'
     ],
 
     accessibility: [
-      'protractor/accessibility.js'
+      '../../local_compiled_js/core/tests/protractor/accessibility.js'
     ],
 
     learner: [
-      'protractor/learnerFlow.js'
+      '../../local_compiled_js/core/tests/protractor/learnerFlow.js'
     ],
 
     library: [
-      'protractor/libraryFlow.js'
+      '../../local_compiled_js/core/tests/protractor/libraryFlow.js'
     ],
 
     navigation: [
-      'protractor_mobile/navigation.js'
+      '../../local_compiled_js/core/tests/protractor_mobile/navigation.js'
     ],
 
     profileMenu: [
-      'protractor/profileMenuFlow.js'
+      '../../local_compiled_js/core/tests/protractor/profileMenuFlow.js'
     ],
 
     subscriptions: [
-      'protractor/subscriptionsFlow.js'
+      '../../local_compiled_js/core/tests/protractor/subscriptionsFlow.js'
     ]
   },
 

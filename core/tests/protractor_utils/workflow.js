@@ -17,6 +17,8 @@
  * carrrying out end-to-end testing with protractor.
  */
 
+import {element, by} from 'protractor';
+
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');

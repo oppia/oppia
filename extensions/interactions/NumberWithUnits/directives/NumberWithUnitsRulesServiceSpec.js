@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for Number with Units rules.
  */
 
+
 describe('Number with Units rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var nurs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     nurs = $injector.get('numberWithUnitsRulesService');
   }));
 

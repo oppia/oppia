@@ -38,6 +38,6 @@ def change_extension(path_list, current_extension, new_extension):
 if __name__ == '__main__':
     change_extension(
         ['./core', './extensions'],
-        '.js',
-        '.ts'
+        '.ts',
+        '.js'
     )

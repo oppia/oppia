@@ -17,6 +17,8 @@
  * in Protractor tests.
  */
 
+import {element, browser, by} from 'protractor';
+
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
@@ -203,7 +205,7 @@ var SkillEditorPage = function() {
   };
 
   this.expectWorkedExampleSummariesToMatch = function(examples) {
-    for (index in examples) {
+    for (var index in examples) {
       expect(workedExampleSummary(index).getText()).toMatch(examples[index]);
     }
   };

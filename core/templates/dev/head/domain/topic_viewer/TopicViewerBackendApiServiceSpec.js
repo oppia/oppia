@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for TopicViewerBackendApiService.
  */
 
+
 describe('Topic viewer backend API service', function() {
   var TopicViewerBackendApiService = null;
   var sampleDataResults = null;
@@ -24,9 +25,9 @@ describe('Topic viewer backend API service', function() {
   var $httpBackend = null;
   var UndoRedoService = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     TopicViewerBackendApiService = $injector.get(
       'TopicViewerBackendApiService');
     $rootScope = $injector.get('$rootScope');

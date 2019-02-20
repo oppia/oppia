@@ -16,12 +16,13 @@
  * @fileoverview Unit tests text input tokenizer.
  */
 
+
 describe('Text Input tokenizer', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Test text input tokenizer', function() {
     var tokenizer;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       tokenizer = $injector.get('TextInputTokenizer');
     }));
     it('should generate correct tokens for a text', function() {

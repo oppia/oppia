@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 describe('ImageClickInputValidationService', function() {
   var WARNING_TYPES, validatorService;
 
@@ -21,10 +22,10 @@ describe('ImageClickInputValidationService', function() {
   var oof;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     var filter = $injector.get('$filter');
     validatorService = $injector.get('ImageClickInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');

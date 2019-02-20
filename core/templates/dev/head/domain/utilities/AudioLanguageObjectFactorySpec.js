@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for AudioLanguageObjectFactory.
  */
 
+
 describe('AudioLanguage object factory', function() {
   var audioLanguage = null;
   var alof = null;
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     alof = $injector.get('AudioLanguageObjectFactory');
 
     audioLanguage = alof.createFromDict({

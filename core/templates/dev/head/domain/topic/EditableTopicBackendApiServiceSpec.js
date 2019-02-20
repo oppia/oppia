@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for EditableTopicBackendApiService.
  */
 
+
 describe('Editable topic backend API service', function() {
   var EditableTopicBackendApiService = null;
   var sampleDataResults = null;
@@ -24,10 +25,10 @@ describe('Editable topic backend API service', function() {
   var $httpBackend = null;
   var UndoRedoService = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     EditableTopicBackendApiService = $injector.get(
       'EditableTopicBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');

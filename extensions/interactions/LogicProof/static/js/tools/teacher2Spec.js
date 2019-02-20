@@ -42,6 +42,7 @@ var errorWrapper2 = function(
   };
 };
 
+
 describe('Build line templates', function() {
   var buildThenDisplay = function(nameString, readerViewString,
       antecedentsString, resultsString, variablesString, errorStrings) {

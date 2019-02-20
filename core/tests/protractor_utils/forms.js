@@ -17,6 +17,8 @@
  * out end-to-end testing with protractor.
  */
 
+import {element, browser, by, protractor} from 'protractor';
+
 var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
@@ -633,8 +635,9 @@ var CodeMirrorChecker = function(elem) {
       // codemirror has loaded. The (2i)th line contains a line number and the
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
+      var lineNumber = null;
       for (var i = 0; i < textArray.length; i += 2) {
-        var lineNumber = textArray[i];
+        lineNumber = textArray[i];
         var lineText = textArray[i + 1];
         if (!compareDict.hasOwnProperty(lineNumber)) {
           throw Error('Line ' + lineNumber + ' not found in CodeMirror');
@@ -649,7 +652,7 @@ var CodeMirrorChecker = function(elem) {
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
           compareDict);
       } else {
-        for (var lineNumber in compareDict) {
+        for (lineNumber in compareDict) {
           if (compareDict[lineNumber].checked !== true) {
             throw Error('Expected line ' + lineNumber + ': \'' +
               compareDict[lineNumber].text + '\' to be found in CodeMirror');

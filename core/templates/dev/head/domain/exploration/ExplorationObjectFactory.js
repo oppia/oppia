@@ -165,7 +165,9 @@ oppia.factory('ExplorationObjectFactory', [
 
     // Static class methods. Note that "this" is not available in
     // static contexts.
-    Exploration.createFromBackendDict = function(explorationBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Exploration['createFromBackendDict'] = function(explorationBackendDict) {
       return new Exploration(
         explorationBackendDict.init_state_name,
         ParamChangesObjectFactory.createFromBackendList(

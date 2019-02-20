@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for Code REPL rules.
  */
 
+
 describe('Code REPL rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var crrs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     crrs = $injector.get('codeReplRulesService');
   }));
 

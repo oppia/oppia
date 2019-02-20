@@ -16,14 +16,15 @@
  * @fileoverview Tests for StoryContentsObjectFactory.
  */
 
+
 describe('Story node object factory', function() {
   var StoryNodeObjectFactory = null;
   var _sampleSubtopic = null;
   var _sampleStoryNode = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     StoryNodeObjectFactory = $injector.get('StoryNodeObjectFactory');
 
     var sampleStoryNodeBackendDict = {

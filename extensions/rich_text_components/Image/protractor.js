@@ -17,6 +17,8 @@
  * testing with Protractor.js
  */
 
+import {element, by} from 'protractor';
+
 var objects = require('../../objects/protractor.js');
 
 var customizeComponent = function(modal, filepath, name) {

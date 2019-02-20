@@ -42,11 +42,15 @@ oppia.factory('WrittenTranslationObjectFactory', [function() {
     };
   };
 
-  WrittenTranslation.createNew = function(html) {
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  WrittenTranslation['createNew'] = function(html) {
     return new WrittenTranslation(html, false);
   };
 
-  WrittenTranslation.createFromBackendDict = function(translationBackendDict) {
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  WrittenTranslation['createFromBackendDict'] = function(translationBackendDict) {
     return new WrittenTranslation(
       translationBackendDict.html,
       translationBackendDict.needs_update);

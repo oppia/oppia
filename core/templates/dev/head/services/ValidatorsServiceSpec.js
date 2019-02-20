@@ -16,17 +16,18 @@
  * @fileoverview Unit tests for Validators Service.
  */
 
+
 describe('Validators service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('validators service', function() {
-    beforeEach(module(function($provide) {
+    beforeEach(angular.mock.module(function($provide) {
       $provide.constant('INVALID_NAME_CHARS', '#xyz');
     }));
 
     var vs = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       vs = $injector.get('ValidatorsService');
     }));
 

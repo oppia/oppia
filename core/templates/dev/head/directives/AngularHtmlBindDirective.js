@@ -33,7 +33,7 @@ oppia.directive('angularHtmlBind', ['$compile', function($compile) {
         }
         elm.empty();
         newScope = scope.$new();
-        elm.html(newValue);
+        elm.html(<string>newValue);
         $compile(elm.contents())(newScope);
       });
     }

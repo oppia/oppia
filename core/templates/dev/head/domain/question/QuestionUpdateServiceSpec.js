@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for question update service.
  */
 
+
 describe('Question update service', function() {
   var QuestionUpdateService = null;
   var QuestionObjectFactory = null;
@@ -29,9 +30,9 @@ describe('Question update service', function() {
   var expectedOutputState = null;
   var sampleQuestionBackendObject = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     QuestionUpdateService = $injector.get('QuestionUpdateService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');

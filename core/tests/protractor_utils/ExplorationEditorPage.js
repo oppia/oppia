@@ -16,6 +16,9 @@
  * @fileoverview Page object for the exploration editor, for use in Protractor
  * tests.
  */
+
+import {element, by} from 'protractor';
+
 var waitFor = require('./waitFor.js');
 
 var ExplorationEditorFeedbackTab = require(

@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the Hints/Solution Manager service.
  */
 
+
 describe('HintsAndSolutionManager service', function() {
   var $timeout;
   var $rootScope;
@@ -24,8 +25,8 @@ describe('HintsAndSolutionManager service', function() {
   var sof;
   var EVENT_NEW_CARD_AVAILABLE;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     $timeout = $injector.get('$timeout');
     $rootScope = $injector.get('$rootScope');
     hasms = $injector.get('HintsAndSolutionManagerService');

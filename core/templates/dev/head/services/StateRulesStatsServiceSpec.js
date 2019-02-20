@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for state rules stats service.
  */
 
+
 describe('State Rules Stats Service', function() {
   var StateRulesStatsService = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     StateRulesStatsService = $injector.get('StateRulesStatsService');
   }));
 
@@ -38,7 +39,7 @@ describe('State Rules Stats Service', function() {
 
   describe('Stats Computation', function() {
     var $httpBackend = null;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       $httpBackend = $injector.get('$httpBackend');
     }));
     afterEach(function() {
@@ -47,7 +48,7 @@ describe('State Rules Stats Service', function() {
     });
 
     var EXPLORATION_ID = '7';
-    beforeEach(inject(function(ContextService) {
+    beforeEach(angular.mock.inject(function(ContextService) {
       spyOn(
         ContextService, 'getExplorationId'
       ).and.returnValue(EXPLORATION_ID);

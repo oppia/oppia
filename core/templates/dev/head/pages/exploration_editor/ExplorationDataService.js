@@ -58,6 +58,7 @@ oppia.factory('ExplorationDataService', [
     // Put exploration variables here.
     var explorationData = {
       explorationId: explorationId,
+      data: null,
       // Note that the changeList is the full changeList since the last
       // committed version (as opposed to the most recent autosave).
       autosaveChangeList: function(

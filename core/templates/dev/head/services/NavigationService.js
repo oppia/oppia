@@ -17,23 +17,27 @@
  * tab and shift-tab.
  */
 oppia.factory('NavigationService', [function() {
-  var navigation = {};
-  navigation.activeMenuName = '';
-  navigation.ACTION_OPEN = 'open';
-  navigation.ACTION_CLOSE = 'close';
-  navigation.KEYBOARD_EVENT_TO_KEY_CODES = {
-    enter: {
-      shiftKeyIsPressed: false,
-      keyCode: 13
+  var navigation = {
+    activeMenuName: '',
+    ACTION_OPEN: 'open',
+    ACTION_CLOSE: 'close',
+    KEYBOARD_EVENT_TO_KEY_CODES: {
+      enter: {
+        shiftKeyIsPressed: false,
+        keyCode: 13
+      },
+      tab: {
+        shiftKeyIsPressed: false,
+        keyCode: 9
+      },
+      shiftTab: {
+        shiftKeyIsPressed: true,
+        keyCode: 9
+      }
     },
-    tab: {
-      shiftKeyIsPressed: false,
-      keyCode: 9
-    },
-    shiftTab: {
-      shiftKeyIsPressed: true,
-      keyCode: 9
-    }
+    openSubmenu: null,
+    closeSubmenu: null,
+    onMenuKeypress: null
   };
   /**
   * Opens the submenu.

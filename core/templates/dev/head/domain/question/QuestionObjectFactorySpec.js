@@ -16,16 +16,17 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
+
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
   var _sampleQuestion = null;
   var _sampleQuestionBackendDict = null;
   var MisconceptionObjectFactory = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
-    module(function($provide) {
+    angular.mock.module(function($provide) {
       $provide.constant('INTERACTION_SPECS', {
         TextInput: {
           can_have_solution: true
@@ -34,7 +35,7 @@ describe('Question object factory', function() {
     });
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 

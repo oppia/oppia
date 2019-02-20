@@ -30,7 +30,15 @@ oppia.factory('SpeechSynthesisChunkerService', [
 
     var _speechSynthesis = window.speechSynthesis;
 
-    var RTE_COMPONENT_NAMES = {};
+    var RTE_COMPONENT_NAMES = {
+      Collapsible: '',
+      Image: '',
+      Link: '',
+      Math: '',
+      Tabs: '',
+      Video: ''
+    }
+
     Object.keys(RTE_COMPONENT_SPECS).forEach(function(componentSpec) {
       RTE_COMPONENT_NAMES[componentSpec] =
         RTE_COMPONENT_SPECS[componentSpec].frontend_id;
@@ -112,18 +120,22 @@ oppia.factory('SpeechSynthesisChunkerService', [
       // Convert links into speakable text by extracting the readable value.
       elt.find('oppia-noninteractive-' + RTE_COMPONENT_NAMES.Link)
         .replaceWith(function() {
-          if (this.attributes['text-with-value'] !== undefined) {
-            return this.attributes['text-with-value'].textContent
-              .replace(/&quot;/g, '');
+          if ((<HTMLElement><any>this).attributes[
+            'text-with-value'] !== undefined) {
+            return (<HTMLElement><any>this).attributes[
+          'text-with-value'].textContent.replace(/&quot;/g, '');
           }
         });
 
       // Convert LaTeX to speakable text.
       elt.find('oppia-noninteractive-' + RTE_COMPONENT_NAMES.Math)
         .replaceWith(function() {
-          if (this.attributes['raw_latex-with-value'] !== undefined) {
+          if (
+            (<HTMLElement><any>this).attributes[
+              'raw_latex-with-value'] !== undefined) {
             return _formatLatexToSpeakableText(
-              this.attributes['raw_latex-with-value'].textContent);
+              (<HTMLElement><any>this).attributes[
+                'raw_latex-with-value'].textContent);
           }
         });
 

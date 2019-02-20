@@ -16,6 +16,7 @@
  * @fileoverview Tests for CollectionValidationService.
  */
 
+
 describe('Collection validation service', function() {
   var CollectionValidationService = null;
   var CollectionObjectFactory = null;
@@ -28,9 +29,9 @@ describe('Collection validation service', function() {
   var PUBLIC_STATUS = true;
   var PRIVATE_STATUS = false;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     CollectionValidationService = $injector.get('CollectionValidationService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');

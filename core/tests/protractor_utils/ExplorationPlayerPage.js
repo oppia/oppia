@@ -17,6 +17,8 @@
  * tests.
  */
 
+import {element, by} from 'protractor';
+
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/protractor.js');

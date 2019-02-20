@@ -16,6 +16,8 @@
  * @fileoverview End-to-end tests for collections.
  */
 
+import {browser} from 'protractor';
+
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');

@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
+
 describe('States object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('StatesObjectFactory', function() {
     var scope, sof, ssof, statesDict, statesWithAudioDict, atof;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       ssof = $injector.get('StatesObjectFactory');
       sof = $injector.get('StateObjectFactory');
       atof = $injector.get('AudioTranslationObjectFactory');
@@ -53,18 +54,34 @@ describe('States object factory', function() {
               content_id: 'default_outcome',
               html: ''
             },
-            param_changes: []
+            param_changes: [],
+            labelled_as_correct: false,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           hints: [],
+          solution: null,
           id: 'TextInput'
         },
         param_changes: [],
+<<<<<<< HEAD
+<<<<<<< HEAD
         written_translations: {
           translations_mapping: {
             content: {},
             default_outcome: {}
           }
         },
+=======
+>>>>>>> 0a4fae6... Fix remaining errors
+=======
+        written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+        }
+>>>>>>> a946972... Remove final errors
       };
 
       statesDict = {
@@ -321,7 +338,10 @@ describe('States object factory', function() {
                 content_id: 'default_outcome',
                 html: ''
               },
-              param_changes: []
+              param_changes: [],
+              labelled_as_correct: false,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             hints: [],
             id: 'TextInput'

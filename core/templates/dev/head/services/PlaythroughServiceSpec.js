@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for the playthrough service.
  */
 
+
 describe('PlaythroughService', function() {
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     this.PlaythroughService = $injector.get('PlaythroughService');
     this.LearnerActionObjectFactory =
       $injector.get('LearnerActionObjectFactory');

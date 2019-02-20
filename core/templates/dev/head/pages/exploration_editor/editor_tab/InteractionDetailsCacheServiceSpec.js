@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for Interaction Details Cache Service.
  */
 
+
 describe('Interaction Details Cache Service', function() {
   describe('InteractionDetailsCache', function() {
     beforeEach(function() {
-      module('oppia');
+      angular.mock.module('oppia');
     });
 
     var interactionCustomizationArgs = {
@@ -33,7 +34,7 @@ describe('Interaction Details Cache Service', function() {
     };
 
     var scope = null, idcs = null;
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(angular.mock.inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       idcs = $injector.get('InteractionDetailsCacheService');
     }));

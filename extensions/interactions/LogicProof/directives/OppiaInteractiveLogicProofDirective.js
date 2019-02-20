@@ -229,7 +229,14 @@ oppia.directive('oppiaInteractiveLogicProof', [
               target_string: $scope.targetString,
               proof_string: $scope.proofString,
               proof_num_lines: $scope.proofString.split('\n').length,
-              displayed_question: $scope.questionString
+              displayed_question: $scope.questionString,
+              correct: null,
+              error_category: null,
+              error_code: null,
+              error_message: null,
+              error_line_number: null,
+              displayed_message: null,
+              displayed_proof: null
             };
             try {
               var proof = logicProofStudent.buildProof(

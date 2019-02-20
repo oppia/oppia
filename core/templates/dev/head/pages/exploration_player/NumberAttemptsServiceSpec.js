@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for the number attempts service.
  */
 
+
 describe('Number attempts service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var NumberAttemptsService = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     NumberAttemptsService = $injector.get('NumberAttemptsService');
   }));
 

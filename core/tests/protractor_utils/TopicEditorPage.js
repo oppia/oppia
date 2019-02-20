@@ -17,6 +17,8 @@
  * in Protractor tests.
  */
 
+import {element, browser, by} from 'protractor';
+
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 

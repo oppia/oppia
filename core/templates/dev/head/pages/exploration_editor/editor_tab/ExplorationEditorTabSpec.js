@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+
 describe('Exploration editor tab controller', function() {
   describe('ExplorationEditorTab', function() {
     var scope, ecs, ess, scs, rootScope;
 
-    beforeEach(module('oppia'));
-    beforeEach(inject(function($controller, $injector, $rootScope) {
+    beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.inject(function($controller, $injector, $rootScope) {
       scope = $rootScope.$new();
       rootScope = $injector.get('$rootScope');
       spyOn(rootScope, '$broadcast');

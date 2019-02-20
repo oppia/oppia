@@ -16,6 +16,7 @@
  * @fileoverview Tests for Collection update service.
  */
 
+
 describe('Collection update service', function() {
   var CollectionUpdateService = null;
   var CollectionObjectFactory = null;
@@ -26,9 +27,9 @@ describe('Collection update service', function() {
     status: 'public'
   };
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     CollectionUpdateService = $injector.get('CollectionUpdateService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');

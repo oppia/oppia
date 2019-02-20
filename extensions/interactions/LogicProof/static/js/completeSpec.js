@@ -16,7 +16,7 @@
  * @fileoverview Complete tests for LogicProof interaction JS.
  */
 
-var errorWrapper = function(
+errorWrapper = function(
     dubiousFunction, input1 = null, input2 = null, input3 = null,
     input4 = null, input5 = null, input6 = null) {
   return function() {
@@ -52,6 +52,7 @@ var sharedErrorWrapper = function(message, line, code, category) {
     category: category
   };
 };
+
 
 describe('Full system', function() {
   var completeCheck = function(assumptionsString, targetString, proofString) {

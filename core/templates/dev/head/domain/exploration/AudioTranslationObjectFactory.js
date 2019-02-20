@@ -45,11 +45,15 @@ oppia.factory('AudioTranslationObjectFactory', [function() {
     };
   };
 
-  AudioTranslation.createNew = function(filename, fileSizeBytes) {
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  AudioTranslation['createNew'] = function(filename, fileSizeBytes) {
     return new AudioTranslation(filename, fileSizeBytes, false);
   };
 
-  AudioTranslation.createFromBackendDict = function(translationBackendDict) {
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  AudioTranslation['createFromBackendDict'] = function(translationBackendDict) {
     return new AudioTranslation(
       translationBackendDict.filename,
       translationBackendDict.file_size_bytes,

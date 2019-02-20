@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for EditabilityService.
  */
 
+
 describe('EditabilityService', function() {
   var EditabilityService = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     EditabilityService = $injector.get('EditabilityService');
   }));
 

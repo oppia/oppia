@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 describe('Expression type parser service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var etps = null;
   var eps = null;
   var ests = null;
   var isString = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     etps = $injector.get('ExpressionTypeParserService');
     eps = $injector.get('ExpressionParserService');
     ests = $injector.get('ExpressionSyntaxTreeService');

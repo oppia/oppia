@@ -16,11 +16,12 @@
  * @fileoverview Description of this file.
  */
 
+
 describe('ParamType objects', function() {
   var ParamType = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     ParamType = $injector.get('ParamTypeObjectFactory');
   }));
 

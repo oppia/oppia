@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 describe('NumberWithUnitsValidationService', function() {
   var validatorService, WARNING_TYPES;
 
@@ -22,10 +23,10 @@ describe('NumberWithUnitsValidationService', function() {
   var createNumberWithUnitsDict;
   var oof, agof, rof;
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('NumberWithUnitsValidationService');
     oof = $injector.get('OutcomeObjectFactory');
     agof = $injector.get('AnswerGroupObjectFactory');

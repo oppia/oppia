@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for CollectionEditorStateService.
  */
 
+
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;
   var CollectionObjectFactory = null;
@@ -27,10 +28,16 @@ describe('Collection editor state service', function() {
   var unpublishablePublicCollectionRightsObject = null;
   var $rootScope = null;
   var $scope = null;
+  var $q = null;
 
   // TODO(bhenning): Consider moving this to a more shareable location.
   var FakeEditableCollectionBackendApiService = function() {
-    var self = {};
+    var self = {
+      newBackendCollectionObject: null,
+      failure: null,
+      fetchCollection: null,
+      updateCollection: null
+    };
 
     var _fetchOrUpdateCollection = function() {
       return $q(function(resolve, reject) {
@@ -51,7 +58,11 @@ describe('Collection editor state service', function() {
   };
 
   var FakeCollectionRightsBackendApiService = function() {
-    var self = {};
+    var self = {
+      backendCollectionRightsObject: null,
+      failure: null,
+      fetchCollectionRights: null,
+    };
 
     var _fetchCollectionRights = function() {
       return $q(function(resolve, reject) {
@@ -70,23 +81,23 @@ describe('Collection editor state service', function() {
     return self;
   };
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableCollectionBackendApiService = (
-      new FakeEditableCollectionBackendApiService());
+      FakeEditableCollectionBackendApiService());
     $provide.value(
       'EditableCollectionBackendApiService',
       [fakeEditableCollectionBackendApiService][0]);
 
     fakeCollectionRightsBackendApiService = (
-      new FakeCollectionRightsBackendApiService());
+      FakeCollectionRightsBackendApiService());
     $provide.value(
       'CollectionRightsBackendApiService',
       [fakeCollectionRightsBackendApiService][0]);
   }));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     CollectionEditorStateService = $injector.get(
       'CollectionEditorStateService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');

@@ -29,7 +29,7 @@ oppia.directive('imageUploader', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/image_uploader_directive.html'),
-      link: function(scope, elt) {
+      link: function(scope: ICustomScope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();
           $('.image-uploader-drop-area').removeClass(
@@ -66,7 +66,7 @@ oppia.directive('imageUploader', [
 
         $(elt).bind('drop', function(e) {
           onDragEnd(e);
-          var file = e.originalEvent.dataTransfer.files[0];
+          var file = (<DragEvent>e.originalEvent).dataTransfer.files[0];
           scope.errorMessage = validateUploadedFile(file, file.name);
           if (!scope.errorMessage) {
             // Only fire this event if validations pass.

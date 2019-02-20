@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for ReadOnlyExplorationBackendApiService.
  */
 
+
 describe('Read only exploration backend API service', function() {
   var ReadOnlyExplorationBackendApiService = null;
   var sampleDataResults = null;
@@ -24,10 +25,10 @@ describe('Read only exploration backend API service', function() {
   var $httpBackend = null;
   var shof;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ReadOnlyExplorationBackendApiService = $injector.get(
       'ReadOnlyExplorationBackendApiService');
     $rootScope = $injector.get('$rootScope');

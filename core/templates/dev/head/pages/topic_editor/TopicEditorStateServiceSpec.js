@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
+
 describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
@@ -29,9 +30,19 @@ describe('Topic editor state service', function() {
   var secondTopicRightsObject = null;
   var $rootScope = null;
   var $scope = null;
+  var $q = null;
 
   var FakeEditableTopicBackendApiService = function() {
-    var self = {};
+    var self = {
+      newBackendSubtopicPageObject: null,
+      newBackendTopicObject: null,
+      backendStorySummariesObject: null,
+      failure: null,
+      fetchTopic: null,
+      fetchSubtopicPage: null,
+      updateTopic: null,
+      fetchStories: null
+    };
 
     var _fetchOrUpdateTopic = function() {
       return $q(function(resolve, reject) {
@@ -76,7 +87,11 @@ describe('Topic editor state service', function() {
   };
 
   var FakeTopicRightsBackendApiService = function() {
-    var self = {};
+    var self = {
+      backendTopicRightsObject: null,
+      failure: null,
+      fetchTopicRights: null
+    };
 
     var _fetchTopicRights = function() {
       return $q(function(resolve, reject) {
@@ -95,23 +110,23 @@ describe('Topic editor state service', function() {
     return self;
   };
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableTopicBackendApiService = (
-      new FakeEditableTopicBackendApiService());
+      FakeEditableTopicBackendApiService());
     $provide.value(
       'EditableTopicBackendApiService',
       [fakeEditableTopicBackendApiService][0]);
 
     fakeTopicRightsBackendApiService = (
-      new FakeTopicRightsBackendApiService());
+      FakeTopicRightsBackendApiService());
     $provide.value(
       'TopicRightsBackendApiService',
       [fakeTopicRightsBackendApiService][0]);
   }));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     TopicEditorStateService = $injector.get(
       'TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');

@@ -16,13 +16,14 @@
  * @fileoverview Unit tests for the audio translation manager service.
  */
 
+
 describe('Audio translation manager service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var atms, atof;
   var testAudioTranslations;
   var testAudioTranslations2;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     atms = $injector.get('AudioTranslationManagerService');
     atof = $injector.get('AudioTranslationObjectFactory');
 

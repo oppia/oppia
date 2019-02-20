@@ -171,8 +171,10 @@ oppia.directive('imageWithRegionsEditor', [
               // width and height.
               $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).on(
                 'load', function() {
-                  $scope.originalImageWidth = this.width;
-                  $scope.originalImageHeight = this.height;
+                  $scope.originalImageWidth = (
+                    <HTMLCanvasElement><any>this).width;
+                  $scope.originalImageHeight = (
+                    <HTMLCanvasElement><any>this).height;
                   $scope.$apply();
                 }
               );

@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for AssetsBackendApiService
  */
 
+
 describe('Assets Backend API Service', function() {
   var AssetsBackendApiService = null;
   var FileDownloadRequestObjectFactory = null;
@@ -24,9 +25,9 @@ describe('Assets Backend API Service', function() {
   var $rootScope = null;
   var $q = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     AssetsBackendApiService = $injector.get(
       'AssetsBackendApiService');
     FileDownloadRequestObjectFactory = $injector.get(

@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for the audio translation language service.
  */
 
+
 describe('Audio translation language service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var atls;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     atls = $injector.get('AudioTranslationLanguageService');
   }));
 

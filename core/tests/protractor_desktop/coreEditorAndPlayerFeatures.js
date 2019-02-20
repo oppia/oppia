@@ -19,6 +19,8 @@
  * oppia's feedback and customization_args.
  */
 
+import {element, by} from 'protractor';
+
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');

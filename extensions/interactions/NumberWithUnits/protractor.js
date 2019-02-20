@@ -17,6 +17,8 @@
  * Interaction.
  */
 
+import {element, by} from 'protractor';
+
 var objects = require('../../objects/protractor.js');
 
 var customizeInteraction = function() {

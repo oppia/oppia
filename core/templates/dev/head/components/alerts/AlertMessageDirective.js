@@ -31,7 +31,7 @@ oppia.directive('alertMessage', [function() {
         $scope.toastr = toastr;
       }
     ],
-    link: function(scope) {
+    link: function(scope: ICustomScope) {
       var message = scope.getMessage();
       if (message.type === 'info') {
         scope.toastr.info(message.content, {

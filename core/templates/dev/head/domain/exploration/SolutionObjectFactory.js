@@ -38,7 +38,9 @@ oppia.factory('SolutionObjectFactory', [
       };
     };
 
-    Solution.createFromBackendDict = function(solutionBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Solution['createFromBackendDict'] = function(solutionBackendDict) {
       return new Solution(
         solutionBackendDict.answer_is_exclusive,
         solutionBackendDict.correct_answer,
@@ -46,7 +48,9 @@ oppia.factory('SolutionObjectFactory', [
           solutionBackendDict.explanation));
     };
 
-    Solution.createNew = function(
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Solution['createNew'] = function(
         answerIsExclusive, correctAnswer, explanationHtml, explanationId) {
       return new Solution(
         answerIsExclusive,

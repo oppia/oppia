@@ -35,7 +35,9 @@ oppia.factory('SkillObjectFactory', [
       this._allQuestionsMerged = allQuestionsMerged;
     };
 
-    Skill.hasValidDescription = function(description) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Skill['hasValidDescription'] = function(description) {
       var allowDescriptionToBeBlank = false;
       var showWarnings = true;
       return ValidatorsService.isValidEntityName(
@@ -79,7 +81,9 @@ oppia.factory('SkillObjectFactory', [
       this._allQuestionsMerged = skill.getAllQuestionsMerged();
     };
 
-    Skill.createFromBackendDict = function(skillBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Skill['createFromBackendDict'] = function(skillBackendDict) {
       return new Skill(
         skillBackendDict.id,
         skillBackendDict.description,
@@ -96,7 +100,9 @@ oppia.factory('SkillObjectFactory', [
 
     // Create an interstitial skill that would be displayed in the editor until
     // the actual skill is fetched from the backend.
-    Skill.createInterstitialSkill = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Skill['createInterstitialSkill'] = function() {
       return new Skill(null, 'Skill description loading',
         [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en', 1,
         0, null, false);

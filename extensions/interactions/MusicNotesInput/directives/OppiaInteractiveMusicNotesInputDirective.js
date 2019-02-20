@@ -55,7 +55,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MusicNotesInput/directives/' +
         'music_notes_input_interaction_directive.html'),
-      link: function(scope, element, attrs) {
+      link: function(scope: ICustomScope, element, attrs) {
         // This is needed in order for the scope to be retrievable during Karma
         // unit testing. See http://stackoverflow.com/a/29833832 for more
         // details.
@@ -195,11 +195,13 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         var initializeNoteSequence = function(initialNotesToAdd) {
           for (var i = 0; i < initialNotesToAdd.length; i++) {
             var initialNote = _convertReadableNoteToNote(initialNotesToAdd[i]);
-            initialNote.noteId = scope.generateNoteId();
-            initialNote.noteStart = {
-              num: i,
-              den: 1
-            };
+            initialNote = Object.assign(initialNote, {
+              noteId: scope.generateNoteId(),
+              noteStart: {
+                num: i,
+                den: 1
+              }
+            });
             scope._addNoteToNoteSequence(initialNote);
           }
         };
@@ -253,12 +255,16 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           var validNoteArea = element.find(
             '.oppia-music-input-valid-note-area');
           for (var i = 0; i < NOTE_TYPES.length; i++) {
+            var className = 'oppia-music-input-natural-note';
             var innerDiv = $('<div></div>')
               .data('noteType', NOTE_TYPES[i])
-              .addClass(function() {
+              .addClass(function(index, currentClassName) {
+                var addedClass = null;
                 if ($(this).data('noteType') === NOTE_TYPE_NATURAL) {
+                  addedClass = 'oppia-music-input-natural-note';
                   $(this).addClass('oppia-music-input-natural-note');
                 }
+                return addedClass;
               });
             if (scope.interactionIsActive) {
               innerDiv.draggable({
@@ -422,7 +428,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                   var note = {
                     baseNoteMidiNumber: NOTE_NAMES_TO_MIDI_VALUES[lineValue],
                     offset: parseInt(noteType, 10),
-                    noteId: noteId
+                    noteId: noteId,
+                    noteStart: null
                   };
 
                   // When a note is moved, its previous state must be removed
@@ -544,10 +551,11 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             // is less than 2, then they are close enough to set a position.
             // This gives some wiggle room for rounding differences.
             if (Math.abs(leftPos - getHorizontalPosition(i)) < 2) {
-              var note = {};
-              note.noteStart = {
-                num: i,
-                den: 1
+              var note = {
+                noteStart: {
+                  num: i,
+                  den: 1
+                }
               };
               return {
                 note: note

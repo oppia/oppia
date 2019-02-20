@@ -32,7 +32,17 @@ oppia.factory('AlertsService', ['$log', function($log) {
     /**
      * Array of "success" or "info" messages.
      */
-    messages: []
+    messages: [],
+
+    addWarning: null,
+    fatalWarning: null,
+    deleteWarning: null,
+    clearWarnings: null,
+    addMessage: null,
+    deleteMessage: null,
+    addInfoMessage: null,
+    addSuccessMessage: null,
+    clearMessages: null
   };
 
   // This is to prevent infinite loops.

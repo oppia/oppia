@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for EditableSkillBackendApiService.
  */
 
+
 describe('Editable skill backend API service', function() {
   var EditableSkillBackendApiService = null;
   var UndoRedoService = null;
   var $httpBackend = null;
   var sampleResponse = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     EditableSkillBackendApiService = $injector.get(
       'EditableSkillBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');

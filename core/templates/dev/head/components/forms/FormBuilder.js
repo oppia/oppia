@@ -180,7 +180,7 @@ oppia.directive('applyValidation', ['$filter', function($filter) {
   return {
     require: 'ngModel',
     restrict: 'A',
-    link: function(scope, elm, attrs, ctrl) {
+    link: function(scope: ICustomScope, elm, attrs, ctrl) {
       // Add validators in reverse order.
       if (scope.validators()) {
         scope.validators().forEach(function(validatorSpec) {
@@ -227,7 +227,7 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
   return {
     require: 'ngModel',
     restrict: 'A',
-    link: function(scope, elm, attrs, ctrl) {
+    link: function(scope: ICustomScope, elm, attrs, ctrl) {
       var floatValidator = function(viewValue) {
         var filteredValue = $filter('isFloat')(viewValue);
         ctrl.$setValidity('isFloat', filteredValue !== undefined);

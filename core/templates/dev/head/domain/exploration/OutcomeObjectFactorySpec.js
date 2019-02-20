@@ -16,10 +16,11 @@
  * @fileoverview unit tests for outcome object factory.
  */
 
+
 describe('Outcome object factory', function() {
   var oof;
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     oof = $injector.get('OutcomeObjectFactory');
   }));
 

@@ -16,11 +16,12 @@
  * @fileoverview Unit tests for Music Notes rules.
  */
 
+
 describe('Music Notes Input rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var mnirs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     mnirs = $injector.get('musicNotesInputRulesService');
   }));
 

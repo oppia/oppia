@@ -19,10 +19,11 @@
 
 var joC = jasmine.objectContaining;
 
-describe('StateTopAnswersStatsService', function() {
-  beforeEach(module('oppia'));
 
-  beforeEach(inject(function($injector) {
+describe('StateTopAnswersStatsService', function() {
+  beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.inject(function($injector) {
     this.stass = $injector.get('StateTopAnswersStatsService');
     this.ess = $injector.get('ExplorationStatesService');
 
@@ -200,7 +201,7 @@ describe('StateTopAnswersStatsService', function() {
   });
 
   describe('Cache Maintenance', function() {
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       // ChangeListService will need its calls mocked out since it isn't
       // configured correctly in, or interesting to, the tests of this block.
       this.cls = $injector.get('ChangeListService');
@@ -286,7 +287,7 @@ describe('StateTopAnswersStatsService', function() {
         // Disable ChangeListService.editStateProperty.
         spyOn(this.cls, 'editStateProperty');
       });
-      beforeEach(inject(function($injector) {
+      beforeEach(angular.mock.inject(function($injector) {
         this.rof = $injector.get('RuleObjectFactory');
       }));
 

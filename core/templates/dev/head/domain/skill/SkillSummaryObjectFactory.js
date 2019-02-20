@@ -34,8 +34,9 @@ oppia.factory('SkillSummaryObjectFactory', [
       return this._description;
     };
 
-
-    SkillSummary.create = function(skillId, skillDescription) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    SkillSummary['create'] = function(skillId, skillDescription) {
       return new SkillSummary(skillId, skillDescription);
     };
 

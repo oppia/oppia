@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
+
 describe('Answer classification service with string classifier disabled',
   function() {
-    beforeEach(module('oppia'));
+    beforeEach(angular.mock.module('oppia'));
 
     beforeEach(function() {
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           RuleTest: {
             is_trainable: false
@@ -31,11 +32,11 @@ describe('Answer classification service with string classifier disabled',
       });
     });
 
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION;
     var acs, sof, oof, acrof, stateName, state;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       acs = $injector.get('AnswerClassificationService');
       sof = $injector.get('StateObjectFactory');
       oof = $injector.get('OutcomeObjectFactory');
@@ -249,10 +250,10 @@ describe('Answer classification service with string classifier disabled',
 
 describe('Answer classification service with string classifier enabled',
   function() {
-    beforeEach(module('oppia'));
+    beforeEach(angular.mock.module('oppia'));
 
     beforeEach(function() {
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           TrainableInteraction: {
             is_trainable: true
@@ -272,13 +273,13 @@ describe('Answer classification service with string classifier enabled',
       });
     });
 
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
       STATISTICAL_CLASSIFICATION;
     var acs, scms, sof, oof, acrof, stateName, state, state2,
       registryService, stateClassifierMapping;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       acs = $injector.get('AnswerClassificationService');
       scms = $injector.get('StateClassifierMappingService');
       sof = $injector.get('StateObjectFactory');
@@ -429,10 +430,10 @@ describe('Answer classification service with string classifier enabled',
 
 describe('Answer classification service with training data classification',
   function() {
-    beforeEach(module('oppia'));
+    beforeEach(angular.mock.module('oppia'));
 
     beforeEach(function() {
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           TrainableInteraction: {
             is_trainable: true
@@ -443,12 +444,12 @@ describe('Answer classification service with training data classification',
       });
     });
 
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     var EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION;
     var acs, sof, oof, acrof, stateName, state, state2,
       registryService, stateClassifierMapping;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       acs = $injector.get('AnswerClassificationService');
       sof = $injector.get('StateObjectFactory');
       oof = $injector.get('OutcomeObjectFactory');
