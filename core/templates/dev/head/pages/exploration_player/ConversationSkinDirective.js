@@ -258,7 +258,7 @@ oppia.directive('conversationSkin', [
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'EVENT_NEW_CARD_AVAILABLE',
+        'EVENT_NEW_CARD_AVAILABLE', 'FEEDBACK_POPOVER_PATH',
         'FatigueDetectionService', 'NumberAttemptsService',
         'PlayerCorrectnessFeedbackEnabledService', 'ContextService',
         'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
@@ -284,7 +284,7 @@ oppia.directive('conversationSkin', [
             PretestQuestionBackendApiService, StateCardObjectFactory,
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            EVENT_NEW_CARD_AVAILABLE,
+            EVENT_NEW_CARD_AVAILABLE, FEEDBACK_POPOVER_PATH,
             FatigueDetectionService, NumberAttemptsService,
             PlayerCorrectnessFeedbackEnabledService, ContextService,
             ConceptCardBackendApiService, ConceptCardObjectFactory,
@@ -312,8 +312,7 @@ oppia.directive('conversationSkin', [
 
           $scope.getFeedbackPopoverUrl = function() {
             return UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_player/' +
-              'feedback_popup_container_directive.html');
+              FEEDBACK_POPOVER_PATH);
           };
 
           var hasInteractedAtLeastOnce = false;
