@@ -22,8 +22,6 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - restore_cache:
-          <<: *restore_cache
       - run:
           <<: *install_dependencies
       - save_cache:
@@ -39,8 +37,6 @@ jobs:
       - restore_cache:
           <<: *restore_cache
       - run:
-          <<: *install_dependencies
-      - run:
           name: Run lint tests
           command: |
             bash scripts/install_third_party.sh
@@ -50,10 +46,6 @@ jobs:
           key: third-party-cache
           paths:
             - third_party/
-          key: setup-files-cache
-          paths:
-            - ../node_modules/
-            - ../oppia_tools/
 
   frontend_tests:
     <<: *job_defaults
