@@ -55,6 +55,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
       - run:
@@ -72,6 +73,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
       - run:
