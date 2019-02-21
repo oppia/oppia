@@ -433,6 +433,55 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             with self.assertRaises((AssertionError, KeyError)):
                 validate_schema(schema)
 
+    def test_is_regex_raises_not_implemented_error(self):
+        """Test if is_regex(obj) raises NotImplementedError."""
+        with self.assertRaises(NotImplementedError):
+            schema_utils._Validators.is_regex('string') # pylint: disable=protected-access
+
+    def test_matches_regex_raises_not_implemented_error(self):
+        """Test if matches_regex(obj) raises NotImplementedError."""
+        with self.assertRaises(NotImplementedError):
+            schema_utils._Validators.matches_regex('s1', 's2') # pylint: disable=protected-access
+
+    def test_normalize_against_schema_raises_exception(self):
+        """Tests if normalize against schema raises exception
+        for invalid key.
+        """
+        with self.assertRaises(Exception):
+            schema = {SCHEMA_KEY_TYPE: 'invalid'}
+            schema_utils.normalize_against_schema('obj', schema)
+
+    def test_is_nonempty(self):
+        """Tests if static method is_nonempty returns true iff obj
+        is not empty str.
+        """
+        is_nonempty = schema_utils._Validators.get('is_nonempty') # pylint: disable=protected-access
+        self.assertTrue(is_nonempty('non-empty string'))
+        self.assertFalse(is_nonempty(''))
+
+    def test_is_at_most(self):
+        """Tests if static method is_at_most returns true iff obj
+        is at most a value.
+        """
+        is_at_most = schema_utils._Validators.get('is_at_most') # pylint: disable=protected-access
+        self.assertTrue(is_at_most(2, 3))
+        self.assertFalse(is_at_most(2, 1))
+
+    def test_has_length_at_least(self):
+        """Tests if static method has_length_at_least returns true iff
+        given list has length of at least the given value.
+        """
+        has_len_at_least = schema_utils._Validators.get('has_length_at_least') # pylint: disable=protected-access
+        self.assertTrue(has_len_at_least(['elem'], 0))
+        self.assertFalse(has_len_at_least(['elem'], 2))
+
+    def test_get_raises_invalid_validator_id(self):
+        """Test if class method get in _Validator raises exception
+        for invalid validator id.
+        """
+        with self.assertRaises(Exception):
+            schema_utils._Validators.get('some invalid validator method name') # pylint: disable=protected-access
+
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
@@ -479,6 +528,29 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             (['adaA13', '13'], ['adaA13', '13'])]
         invalid_vals = [['1', 13], {'a': 'b'}, {}, None, 123, 'abc', ['c'], []]
         self.check_normalization(schema, mappings, invalid_vals)
+
+    def test_html_schema(self):
+        """Tests for valid html schema, an html string. Note that
+        html.cleaner() is called in normalize_against_schema.
+        """
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_HTML,
+        }
+        mappings = [('', '')]
+        invalid_vals = []
+        self.check_normalization(schema, mappings, invalid_vals)
+
+    def test_schema_key_post_normalizers(self):
+        """Test post normalizers in schema using basic html schema."""
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_HTML,
+            'post_normalizers': [
+                {'id': 'normalize_spaces'},  # html strings with no extra spaces
+            ]
+        }
+        obj = 'a     a'
+        normalized_obj = schema_utils.normalize_against_schema(obj, schema)
+        self.assertEqual(u'a a', normalized_obj)
 
     def test_list_schema(self):
         schema = {
@@ -581,3 +653,42 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_vals = [[u'admin@oppia'], big_email_list,
                         [u'admin@oppia.commmm'], [u'a@.com']]
         self.check_normalization(schema, mappings, invalid_vals)
+
+    def test_normalize_spaces(self):
+        """Test static method normalize_spaces; should collapse multiple
+        spaces.
+        """
+        normalize_spaces = schema_utils.Normalizers.get('normalize_spaces')
+        self.assertEqual('dog cat', normalize_spaces('dog     cat'))
+
+    def test_normalizer_get(self):
+        """Tests the class method get of Normalizers, should return the
+        normalizer method corresponding to the given normalizer id.
+        """
+
+        # Will test .get on the normalize_spaces method.
+        normalize_spaces = schema_utils.Normalizers.get('normalize_spaces')
+        self.assertEqual('normalize_spaces', normalize_spaces.__name__)
+
+    def test_normalizer_get_raises_exception_for_invalid_id(self):
+        """Tests if class method get of Normalizers raises exception when given
+        an invalid normalizer id.
+        """
+        with self.assertRaises(Exception):
+            schema_utils.Normalizers.get('some invalid normalizer method name')
+
+    def test_sanitize_url_functionality(self):
+        """Tests if static method sanitize_url of Normalizers correctly
+        sanitizes a URL when given its string representation.
+        """
+        sanitize_url_fn = schema_utils.Normalizers.get('sanitize_url')
+        (self.assertEqual('https://www.oppia.org/splash/',
+                          sanitize_url_fn('https://www.oppia.org/splash/')))
+
+    def test_sanitize_url_raises_error_for_invalid_url(self):
+        """Tests if static method sanitize_url of Normalizers raises error
+        for invalid URL.
+        """
+        sanitize_url_fn = schema_utils.Normalizers.get('sanitize_url')
+        with self.assertRaises(AssertionError):
+            sanitize_url_fn('oppia.org') # missing https:// throws assert error
