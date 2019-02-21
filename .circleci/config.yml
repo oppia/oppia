@@ -50,6 +50,10 @@ jobs:
           key: third-party-cache
           paths:
             - third_party/
+          key: setup-files-cache
+          paths:
+            - ../node_modules/
+            - ../oppia_tools/
 
   frontend_tests:
     <<: *job_defaults
@@ -90,7 +94,9 @@ workflows:
   circleci_tests:
     jobs:
       - setup
-      - lint_tests
+      - lint_tests:
+          requires:
+            - setup
       - frontend_tests:
           requires:
             - setup
