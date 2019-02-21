@@ -19,8 +19,10 @@
 import ast
 import collections
 import copy
+import datetime
 
 from core import jobs
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
@@ -34,43 +36,115 @@ import feconf
 ])
 
 
-class ExplorationIssuesModelCreatorOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for creating a default ExplorationIsssues model instance
-    for all the explorations in the datastore. If an ExplorationIssues model
-    already exists for an exploration, it is refreshed to a default instance.
+PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
+
+
+class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
+    """Performs a brief audit of playthrough recordings to make sure they pass
+    simple sanity checks.
     """
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
+        return [stats_models.PlaythroughModel]
 
     @staticmethod
-    def map(exploration_model):
-        if not exploration_model.deleted:
-            current_version = exploration_model.version
-            for exp_version in xrange(1, current_version + 1):
-                exp_issues_model = (
-                    stats_models.ExplorationIssuesModel.get_model(
-                        exploration_model.id, exp_version))
-                if not exp_issues_model:
-                    exp_issues_default = (
-                        stats_domain.ExplorationIssues.create_default(
-                            exploration_model.id, exp_version))
-                    stats_models.ExplorationIssuesModel.create(
-                        exp_issues_default.exp_id,
-                        exp_issues_default.exp_version,
-                        exp_issues_default.unresolved_issues)
-                else:
-                    exp_issues_model.unresolved_issues = []
-                    exp_issues_model.put()
-            yield(
-                exploration_model.id,
-                'ExplorationIssuesModel created')
+    def map(playthrough_model):
+        """Builds audit data for inspection. Must be declared @staticmethod.
+
+        Args:
+            playthrough_model: PlaythroughModel.
+
+        Yields:
+            A 2-tuple of the form (playthrough_model.id, audit_data), where the
+            structure of audit_data is:
+                exp_id: str. The exploration the playthrough records.
+                created_on: str. The date the model was created in YYYY-MM-DD
+                    format.
+                validate_error: str | None. Stringified exception raised by
+                    trying to create the model as a domain object, or None if no
+                    error occurred.
+        """
+        if playthrough_model.deleted:
+            return
+
+        try:
+            playthrough = (
+                stats_services.get_playthrough_from_model(playthrough_model))
+            playthrough.validate()
+        except Exception as e:
+            validate_error = str(e)
+        else:
+            validate_error = None
+
+        exp_id = playthrough_model.exp_id
+        exp_version = playthrough_model.exp_version
+        exp_issues = (
+            stats_models.ExplorationIssuesModel.get_model(exp_id, exp_version))
+        reference_error = (
+            'This playthrough was not found as a reference in the containing '
+            'ExplorationIssuesModel (id=%s)' % (exp_issues.id))
+        for exp_issue_dict in exp_issues.unresolved_issues:
+            if playthrough_model.id in exp_issue_dict['playthrough_ids']:
+                reference_error = None
+                break
+
+        audit_data = {
+            'exp_id': playthrough_model.exp_id,
+            'created_on': playthrough_model.created_on.strftime('%Y-%m-%d'),
+            'validate_error': validate_error,
+            'reference_error': reference_error,
+        }
+        yield (playthrough_model.id, audit_data)
 
     @staticmethod
-    def reduce(exp_id, values):
-        yield '%s: %s' % (exp_id, values)
+    def reduce(key, stringified_values):
+        """Yields errors in playthrough models. Must be declared @staticmethod.
+
+        Args:
+            key: str. The id of the playthrough.
+            stringified_values: list(str). Each string is a stringified dict
+                with the following structure:
+                    exp_id: str. The exploration the playthrough records.
+                    created_on: str. The date the model was created in
+                        YYYY-MM-DD format.
+                    validate_error: str | None. Stringified exception raised by
+                        trying to create the model as a domain object, or None
+                        if no error occurred.
+
+        Yields:
+            tuple(str). A 1-tuple whose only element is an error message.
+        """
+        whitelisted_exp_ids_for_playthroughs = (
+            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
+
+        for stringified_value in stringified_values:
+            audit_data = ast.literal_eval(stringified_value)
+
+            if audit_data['validate_error'] is not None:
+                yield (
+                    'playthrough_id:%s could not be validated as a domain '
+                    'object because of the error: %s.' % (
+                        key, audit_data['validate_error']),)
+
+            if audit_data['exp_id'] not in whitelisted_exp_ids_for_playthroughs:
+                yield (
+                    'playthrough_id:%s was recorded in exploration_id:%s which '
+                    'has not been curated for recording.' % (
+                        key, audit_data['exp_id']),)
+
+            created_on_datetime = datetime.datetime.strptime(
+                audit_data['created_on'], '%Y-%m-%d')
+            if created_on_datetime < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
+                yield (
+                    'playthrough_id:%s was released on %s, which is before the '
+                    'GSoC 2018 submission deadline (2018-09-01) and should '
+                    'therefore not exist.' % (key, audit_data['created_on']),)
+
+            if audit_data['reference_error'] is not None:
+                yield (
+                    'playthrough_id:%s is not referenced by any issue. '
+                    'Details: %s.' % (key, audit_data['reference_error']),)
 
 
 class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):

@@ -138,16 +138,6 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             'property_name': (
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
             'new_value': interaction_answer_groups
-        }), exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS),
-            'new_value': {
-                'content': {},
-                'feedback_1': {},
-                'default_outcome': {}
-            }
         })]
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
@@ -1282,6 +1272,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
   New state:
     classifier_model_id: null
     content:
@@ -1311,6 +1305,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: A title
@@ -1362,6 +1360,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
   Renamed state:
     classifier_model_id: null
     content:
@@ -1391,6 +1393,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: A title
@@ -1406,10 +1412,17 @@ title: A title
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
-        init_interaction = init_state.interaction
-        init_interaction.default_outcome.dest = exploration.init_state_name
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': exploration.init_state_name,
+                    'new_value': default_outcome_dict
+                }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'New state',
@@ -1433,10 +1446,17 @@ title: A title
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
-        init_interaction = init_state.interaction
-        init_interaction.default_outcome.dest = exploration.init_state_name
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': exploration.init_state_name,
+                    'new_value': default_outcome_dict
+                }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'New state',
@@ -1469,9 +1489,15 @@ title: A title
         self.assertEqual(exploration.version, 1)
 
         init_state = exploration.states[exploration.init_state_name]
-        init_interaction = init_state.interaction
-        init_interaction.default_outcome.dest = exploration.init_state_name
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = exploration.init_state_name
         change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': exploration.init_state_name,
+            'new_value': default_outcome_dict
+        }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state'
         }), exp_domain.ExplorationChange({
@@ -1548,6 +1574,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  translations_mapping:
+    content: {}
+    default_outcome: {}
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
     SAMPLE_EXPORTED_DICT = {
@@ -1580,6 +1610,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  translations_mapping:
+    content: {}
+    default_outcome: {}
 """)
     }
 
@@ -1613,6 +1647,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  translations_mapping:
+    content: {}
+    default_outcome: {}
 """)
     }
 
@@ -1621,10 +1659,17 @@ param_changes: []
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
-        init_interaction = init_state.interaction
-        init_interaction.default_outcome.dest = exploration.init_state_name
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                    'state_name': exploration.init_state_name,
+                    'new_value': default_outcome_dict
+                }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'New state',
@@ -1647,9 +1692,15 @@ param_changes: []
         self.assertEqual(exploration.version, 1)
 
         init_state = exploration.states[exploration.init_state_name]
-        init_interaction = init_state.interaction
-        init_interaction.default_outcome.dest = exploration.init_state_name
+        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
+        default_outcome_dict['dest'] = exploration.init_state_name
         change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': exploration.init_state_name,
+            'new_value': default_outcome_dict
+        }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state'
         }), exp_domain.ExplorationChange({
@@ -1748,12 +1799,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'param_changes': [],
             'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None
-        }
-
-        self.content_ids_to_audio_translations = {
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {}
         }
 
     def test_add_state_cmd(self):
@@ -1931,11 +1976,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
-                    self.interaction_answer_groups) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-                    self.content_ids_to_audio_translations),
+                    self.interaction_answer_groups),
                 '')
 
     def test_update_interaction_answer_groups(self):
@@ -1967,11 +2008,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                self.interaction_default_outcome) +
-            _get_change_list(
-                self.init_state_name,
-                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-                self.content_ids_to_audio_translations),
+                self.interaction_default_outcome),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -2005,11 +2042,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-                    self.content_ids_to_audio_translations),
+                    self.interaction_default_outcome),
                 '')
 
     def test_update_state_missing_keys(self):
@@ -2030,11 +2063,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-                    self.content_ids_to_audio_translations),
+                    self.interaction_default_outcome),
                 '')
 
     def test_update_state_variable_types(self):
@@ -2055,11 +2084,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-                    self.content_ids_to_audio_translations),
+                    self.interaction_default_outcome),
                 '')
 
     def test_update_content(self):
@@ -2085,6 +2110,37 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                         'html': '<b>Test content</b>',
                     }),
                 '')
+
+    def test_update_written_translations(self):
+        """Test update content translations."""
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>Test!</p>',
+                        'needs_update': True
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                self.init_state_name, 'written_translations',
+                written_translations_dict), 'Added text translations.')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.written_translations.to_dict(),
+            written_translations_dict)
+
+    def test_update_written_translations_with_list_fails(self):
+        """Test update content translation with a list fails."""
+        with self.assertRaisesRegexp(
+            Exception, 'Expected written_translations to be a dict, received '):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, _get_change_list(
+                    self.init_state_name, 'written_translations',
+                    [1, 2]), 'Added fake text translations.')
 
 
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
@@ -3046,6 +3102,9 @@ states:
       id: EndExploration
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
   %s:
     classifier_model_id: null
     content:
@@ -3073,6 +3132,10 @@ states:
       id: Continue
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: Old Title

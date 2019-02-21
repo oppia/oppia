@@ -307,22 +307,10 @@ class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
         expected_object_dict = {
             'question_id': 'testquestion',
             'skill_id': 'testskill',
+            'skill_description': 'testskilldescription'
         }
         observed_object = question_domain.QuestionSkillLink(
-            'testquestion', 'testskill')
-        self.assertEqual(expected_object_dict, observed_object.to_dict())
-
-    def test_update_skill_id(self):
-        """Test to verify update_skill_id method of the
-        Question Skill Link Domain object.
-        """
-        expected_object_dict = {
-            'question_id': 'testquestion',
-            'skill_id': 'testskill2',
-        }
-        observed_object = question_domain.QuestionSkillLink(
-            'testquestion', 'testskill')
-        observed_object.update_skill_id('testskill2')
+            'testquestion', 'testskill', 'testskilldescription')
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
 

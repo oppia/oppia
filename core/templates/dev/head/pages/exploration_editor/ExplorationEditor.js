@@ -38,7 +38,7 @@ oppia.constant(
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
 oppia.controller('ExplorationEditor', [
-  '$http', '$log', '$rootScope', '$scope', '$templateCache', '$timeout',
+  '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache', '$timeout',
   '$uibModal', '$window', 'AutosaveInfoModalsService', 'ChangeListService',
   'ContextService', 'EditabilityService',
   'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
@@ -52,11 +52,11 @@ oppia.controller('ExplorationEditor', [
   'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
   'StateClassifierMappingService', 'StateEditorService',
-  'StateEditorTutorialFirstTimeService',
   'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
-  'ThreadDataService', 'UrlInterpolationService', 'UserEmailPreferencesService',
+  'StateTutorialFirstTimeService', 'ThreadDataService',
+  'UrlInterpolationService', 'UserEmailPreferencesService',
   function(
-      $http, $log, $rootScope, $scope, $templateCache, $timeout,
+      $http, $log, $q, $rootScope, $scope, $templateCache, $timeout,
       $uibModal, $window, AutosaveInfoModalsService, ChangeListService,
       ContextService, EditabilityService,
       ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
@@ -70,9 +70,9 @@ oppia.controller('ExplorationEditor', [
       ParamChangesObjectFactory, ParamSpecsObjectFactory,
       PlaythroughIssuesService, RouterService, SiteAnalyticsService,
       StateClassifierMappingService, StateEditorService,
-      StateEditorTutorialFirstTimeService,
       StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
-      ThreadDataService, UrlInterpolationService, UserEmailPreferencesService) {
+      StateTutorialFirstTimeService, ThreadDataService,
+      UrlInterpolationService, UserEmailPreferencesService) {
     $scope.EditabilityService = EditabilityService;
     $scope.StateEditorService = StateEditorService;
 
@@ -111,7 +111,7 @@ oppia.controller('ExplorationEditor', [
     // Initializes the exploration page using data from the backend. Called on
     // page load.
     $scope.initExplorationPage = function(successCallback) {
-      Promise.all([
+      $q.all([
         ExplorationDataService.getData(function(explorationId, lostChanges) {
           if (!AutosaveInfoModalsService.isModalOpen()) {
             AutosaveInfoModalsService.showLostChangesModal(
@@ -233,7 +233,7 @@ oppia.controller('ExplorationEditor', [
           successCallback();
         }
 
-        StateEditorTutorialFirstTimeService.init(
+        StateTutorialFirstTimeService.initEditor(
           explorationData.show_state_editor_tutorial_on_load,
           $scope.explorationId);
 
@@ -395,7 +395,7 @@ oppia.controller('ExplorationEditor', [
     var leaveTutorial = function() {
       EditabilityService.onEndTutorial();
       $scope.$apply();
-      StateEditorTutorialFirstTimeService.markTutorialFinished();
+      StateTutorialFirstTimeService.markEditorTutorialFinished();
       $scope.tutorialInProgress = false;
     };
 
@@ -459,7 +459,7 @@ oppia.controller('ExplorationEditor', [
       modalInstance.result.then(function() {
         $scope.startTutorial();
       }, function() {
-        StateEditorTutorialFirstTimeService.markTutorialFinished();
+        StateTutorialFirstTimeService.markEditorTutorialFinished();
       });
     };
 

@@ -1,6 +1,5 @@
 <div class="oppia-editor-cards-container" ng-if="stateEditorInitialized">
   <state-editor on-save-state-content="saveStateContent"
-                on-save-content-ids-to-audio-translations="saveContentIdsToAudioTranslations"
                 on-save-interaction-customization-args="saveInteractionCustomizationArgs"
                 on-save-interaction-id="saveInteractionId"
                 on-save-interaction-default-outcome="saveInteractionDefaultOutcome"
@@ -8,6 +7,7 @@
                 on-save-solution="saveSolution"
                 on-save-hints="saveHints"
                 state-content-placeholder="getStateContentPlaceholder()"
+                show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired"
                 interaction-is-shown="interactionIsShown"
                 recompute-graph="recomputeGraph"
                 navigate-to-state="navigateToState"
