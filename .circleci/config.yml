@@ -22,6 +22,11 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      -run:
+          name: Delete existing setup cache
+          command: |
+            rm -r ../node_modules
+            rm -r ../oppia_tools
       - run:
           <<: *install_dependencies
       - save_cache:
@@ -36,6 +41,10 @@ jobs:
       - checkout
       - restore_cache:
           <<: *restore_cache
+      - run:
+          name: Delete existing third party cache
+          command: |
+            rm -r third_party/
       - run:
           name: Run lint tests
           command: |
@@ -89,9 +98,9 @@ workflows:
       - lint_tests:
           requires:
             - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - backend_tests:
-          requires:
-            - setup
+      # - frontend_tests:
+      #     requires:
+      #       - setup
+      # - backend_tests:
+      #     requires:
+      #       - setup
