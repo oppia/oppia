@@ -39,6 +39,8 @@ jobs:
       - restore_cache:
           <<: *restore_cache
       - run:
+          <<: *install_dependencies
+      - run:
           name: Run lint tests
           command: |
             bash scripts/install_third_party.sh
@@ -88,6 +90,7 @@ workflows:
   circleci_tests:
     jobs:
       - setup
+      - lint tests
       - frontend_tests:
           requires:
             - setup
