@@ -22,7 +22,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      -run:
+      - run:
           name: Delete existing setup cache
           command: |
             rm -r ../node_modules
