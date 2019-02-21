@@ -13,8 +13,8 @@ anchor_for_installing_dependencies: &install_dependencies
 
 anchor_for_restoring_cache: &restore_cache
   keys:
-    - setup-files-cache
-    - third-party-cache
+    - setup-files-cache-{{ checksum "date" }}
+    - third-party-cache-{{ checksum "date" }}
 
 version: 2
 jobs:
@@ -22,18 +22,13 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
       - run:
-          name: Delete all existing cache
-          command: |
-            rm -r /home/circleci/node_modules
-            rm -r /home/circleci/oppia_tools
-            rm -r /home/circlci/oppia/third_party
-      - run:
           <<: *install_dependencies
       - save_cache:
-          key: setup-files-cache
+          key: setup-files-cache-{{ checksum "date" }}
           paths:
             - ../node_modules/
             - ../oppia_tools/
@@ -42,6 +37,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
       - run:
@@ -51,7 +47,7 @@ jobs:
             python scripts/third_party_size_check.py
             python scripts/pre_commit_linter.py --path=.
       - save_cache:
-          key: third-party-cache
+          key: third-party-cache-{{ checksum "date" }}
           paths:
             - third_party/
 
