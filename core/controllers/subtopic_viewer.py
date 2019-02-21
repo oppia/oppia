@@ -30,6 +30,6 @@ class SubtopicViewerPage(base.BaseHandler):
             raise self.PageNotFoundException
         
         subtopic_page_contents = subtopic_page_services.get_subtopic_page_contents_by_id(topic_id, subtopic_id)
-        
-        
-        
+        self.values.update({
+            'page_contents': subtopic_page_contents
+        })        

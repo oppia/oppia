@@ -25,6 +25,7 @@ from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_services
+from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_services
 from core.domain import user_services
@@ -2418,7 +2419,17 @@ def can_access_subtopic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        #subtopic = 
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(topic_id, subtopic_id)
+
+        if subtopic_page is None:
+            raise self.PageNotFoundException
+        else:
+            return handler(self, topic_id, subtopic_id, **kwargs)
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
 def get_decorator_for_accepting_suggestion(decorator):
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in
