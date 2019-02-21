@@ -98,9 +98,10 @@ install:
 - pushd $TRAVIS_BUILD_DIR
 - source scripts/setup.sh || exit 1
 - source scripts/setup_gae.sh || exit 1
+- source scripts/install_third_party.sh || exit 1
 
 script:
-- if [ "$RUN_LINT" == 'true' ]; then bash scripts/install_third_party.sh; python scripts/third_party_size_check.py; python scripts/pre_commit_linter.py --path=.; fi
+# - if [ "$RUN_LINT" == 'true' ]; then bash scripts/install_third_party.sh; python scripts/third_party_size_check.py; python scripts/pre_commit_linter.py --path=.; fi
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
 # - if [ "$RUN_FRONTEND_TESTS" == 'true' ]; then travis_retry bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
