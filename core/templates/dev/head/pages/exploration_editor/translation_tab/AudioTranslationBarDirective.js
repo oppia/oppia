@@ -48,7 +48,8 @@ oppia.directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('drop', function(evt) {
           evt.preventDefault();
-          if (evt.target.classList.contains('oppia-drop-area-message')) {
+          if (evt.target.classList.contains('oppia-drop-area-message') && 
+            GLOBALS.can_translate) {
             files = evt.originalEvent.dataTransfer.files;
             scope.openAddAudioTranslationModal(files);
           }
@@ -93,6 +94,8 @@ oppia.directive('audioTranslationBar', [
           $scope.checkingMicrophonePermission = false;
           $scope.audioTimerIsShown = true;
           $scope.audioIsCurrentlyBeingSaved = false;
+          $scope.disallowed = !GLOBALS.can_translate;
+          $scope.guest = !GLOBALS.userIsLoggedIn;
 
           var saveContentIdsToAudioTranslationChanges = function() {
             StateContentIdsToAudioTranslationsService.saveDisplayedValue();
