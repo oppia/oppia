@@ -101,92 +101,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_playlist_model.collection_ids if
             learner_playlist_model else [])
 
-    def test_mark_exploration_to_be_played_later(self):
+    def test_already_subscribed_to_exploration(self):
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), [])
-
-        # Add an exploration to the learner playlist.
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_0)
-        self.assertEqual(
-            self._get_all_learner_playlist_exp_ids(self.user_id),
-            [self.EXP_ID_0])
-
-        # Add another exploration.
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_1)
-        self.assertEqual(
-            self._get_all_learner_playlist_exp_ids(
-                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
-
-        # Add the first exploration in a different position.
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_0,
-            position_to_be_inserted=1)
-        self.assertEqual(
-            self._get_all_learner_playlist_exp_ids(
-                self.user_id), [self.EXP_ID_1, self.EXP_ID_0])
-
-        # Add the first exploration in the first position.
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_0,
-            position_to_be_inserted=0)
-        self.assertEqual(
-            self._get_all_learner_playlist_exp_ids(
-                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
-
-        # Add an exploration to the in progress list of the user.
-        state_name = 'state_name'
-        version = 1
-        learner_progress_services.mark_exploration_as_incomplete(
-            self.user_id, self.EXP_ID_3, state_name, version)
-
-        # Test that the exploration added to the in progress list doesn't get
-        # added to the learner playlist.
-        learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_3)
-        self.assertEqual(
-            self._get_all_learner_playlist_exp_ids(
-                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
-
-        # Empty the learner playlist.
-        learner_playlist_services.remove_exploration_from_learner_playlist(
-            self.user_id, self.EXP_ID_0)
-        learner_playlist_services.remove_exploration_from_learner_playlist(
-            self.user_id, self.EXP_ID_1)
-        self.assertEqual(
-            self._get_all_learner_playlist_exp_ids(
-                self.user_id), [])
-
-        # Test that the length of the learner playlist doesn't exceed
-        # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
-        # List of explorations to be added.
-        exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(
-            0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
-        for exp_id in exp_ids:
-            learner_progress_services.add_exp_to_learner_playlist(
-                self.user_id, exp_id)
-        self.assertEqual(
-            self._get_all_learner_playlist_exp_ids(
-                self.user_id), exp_ids)
-
-        # Now if we try adding another exploration, it shouldn't be added as the
-        # list length would exceed MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
-        learner_playlist_services.mark_exploration_to_be_played_later(
-            self.user_id, 'SAMPLE_EXP_ID')
-
-        # The list still remains the same.
-        self.assertEqual(
-            self._get_all_learner_playlist_exp_ids(
-                self.user_id), exp_ids)
-
-        # Empty the learner playlist again.
-        for exp_id in exp_ids:
-            learner_playlist_services.remove_exploration_from_learner_playlist(
-                self.user_id, exp_id)
-        self.assertEqual(
-            self._get_all_learner_playlist_exp_ids(
-                self.user_id), [])
 
         # Subscribe to exploration.
         subscription_services.subscribe_to_exploration(
@@ -199,112 +116,84 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [])
 
+
+    def test_mark_exploration_to_be_played_later_with_position(self):
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(self.user_id), [])
+
+        # Test adding the exploration_id if it is already in 
+	# learner_playlist.exploration_ids 
+	# Add two explorations to the learner playlist.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_0)
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_1)
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
+        # Add the first exploration to the second position.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_0,
+            position_to_be_inserted=1)
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), [self.EXP_ID_1, self.EXP_ID_0]) 
+
+        # Clear the playlist.
+        learner_playlist_services.remove_exploration_from_learner_playlist(
+	    self.user_id, self.EXP_ID_0)
+        learner_playlist_services.remove_exploration_from_learner_playlist(
+	    self.user_id, self.EXP_ID_1)
+	self.assertEqual(
+	    self._get_all_learner_playlist_exp_ids(
+	        self.user_id), [])
+
         # Add MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT explorations at given
         # positions.
+        exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(
+            0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
         for i in range(0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT):
             learner_progress_services.add_exp_to_learner_playlist(
                 self.user_id, exp_ids[i], position_to_be_inserted=i)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), exp_ids)
-
         # Now if we try to add another exploration at the end of the list,
         # it shouldn't be added as the list length would exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, 'SAPMLE_EXP_ID',
             position_to_be_inserted=MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
-
-        # The list still remains the same.
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), exp_ids)
 
-    def test_mark_collection_to_be_played_later(self):
+    def test_mark_exploration_to_be_played_later_without_position(self):
         self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(self.user_id), [])
-
-        # Add a collection to the learner playlist.
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_0)
-        self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(
-                self.user_id), [self.COL_ID_0])
-
-        # Add another collection.
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_1)
-        self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(
-                self.user_id), [self.COL_ID_0, self.COL_ID_1])
-
-        # Add the first collection in a different position.
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_0,
-            position_to_be_inserted=1)
-        self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(
-                self.user_id), [self.COL_ID_1, self.COL_ID_0])
-
-        # Add the first collection in the first position.
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_0,
-            position_to_be_inserted=0)
-        self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(
-                self.user_id), [self.COL_ID_0, self.COL_ID_1])
-
-        # Add a collection to the in progress list of the user.
-        learner_progress_services.mark_collection_as_incomplete(
-            self.user_id, self.COL_ID_3)
-
-        # Test that the collection added to the in progress list doesn't get
-        # added to the learner playlist.
-        learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_3)
-        self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(
-                self.user_id), [self.COL_ID_0, self.COL_ID_1])
-
-        # Empty the learner playlist.
-        learner_playlist_services.remove_collection_from_learner_playlist(
-            self.user_id, self.COL_ID_0)
-        learner_playlist_services.remove_collection_from_learner_playlist(
-            self.user_id, self.COL_ID_1)
-        self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(
-                self.user_id), [])
+            self._get_all_learner_playlist_exp_ids(self.user_id), [])
 
         # Test that the length of the learner playlist doesn't exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
-        # List of collections to be added.
-        collection_ids = (
-            ['SAMPLE_COLLECTION_ID_%s' % index for index in range(
-                0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)])
-        for collection_id in collection_ids:
-            learner_progress_services.add_collection_to_learner_playlist(
-                self.user_id, collection_id)
+        # List of explorations to be added.
+        exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(
+            0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
+        for exp_id in exp_ids:
+            learner_progress_services.add_exp_to_learner_playlist(
+                self.user_id, exp_id)
         self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(
-                self.user_id), collection_ids)
-
-        # Now if we try adding another collection, it shouldn't be added as the
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), exp_ids)
+        # Now if we try adding another exploration, it shouldn't be added as the
         # list length would exceed MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
-        learner_playlist_services.mark_collection_to_be_played_later(
-            self.user_id, 'SAMPLE_COLLECTION_ID')
-
-        # The list still remains the same.
+        learner_playlist_services.mark_exploration_to_be_played_later(
+            self.user_id, 'SAMPLE_EXP_ID')
         self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(
-                self.user_id), collection_ids)
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), exp_ids)
 
-        # Empty the learner playlist again.
-        for collection_id in collection_ids:
-            learner_playlist_services.remove_collection_from_learner_playlist(
-                self.user_id, collection_id)
+    def test_already_subscribed_to_collection(self):
         self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(
-                self.user_id), [])
+            self._get_all_learner_playlist_collection_ids(self.user_id), [])
 
         # Subscribe to collection.
         subscription_services.subscribe_to_collection(
@@ -317,26 +206,80 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [])
 
-        # Add MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT collections at given
-        # positions.
-        for i in range(0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT):
-            learner_progress_services.add_collection_to_learner_playlist(
-                self.user_id, collection_ids[i], position_to_be_inserted=i)
+
+    def test_mark_collection_to_be_played_later_with_position(self):
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(self.user_id), [])
+
+        # Test adding the collection_id if it is already in 
+	# learner_playlist.collection_ids 
+	# Add two collections to the learner playlist.
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_0)
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_1)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
-                self.user_id), collection_ids)
+                self.user_id), [self.COL_ID_0, self.COL_ID_1])
+        # Add the first collection to the second position.
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_0,
+            position_to_be_inserted=1)
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), [self.COL_ID_1, self.COL_ID_0]) 
 
+        # Clear the playlist.
+        learner_playlist_services.remove_collection_from_learner_playlist(
+	    self.user_id, self.COL_ID_0)
+        learner_playlist_services.remove_collection_from_learner_playlist(
+	    self.user_id, self.COL_ID_1)
+	self.assertEqual(
+	    self._get_all_learner_playlist_collection_ids(
+	        self.user_id), [])
+
+        # Add MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT collections at given
+        # positions.
+        col_ids = ['SAMPLE_COL_ID_%s' % index for index in range(
+            0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
+        for i in range(0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT):
+            learner_progress_services.add_collection_to_learner_playlist(
+                self.user_id, col_ids[i], position_to_be_inserted=i)
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), col_ids)
         # Now if we try to add another collection at the end of the list,
         # it shouldn't be added as the list length would exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_collection_to_be_played_later(
-            self.user_id, 'SAPMLE_COLLECTION_ID',
+            self.user_id, 'SAMPLE_COL_ID',
             position_to_be_inserted=MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
-
-        # The list still remains the same.
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
-                self.user_id), collection_ids)
+                self.user_id), col_ids)
+
+    def test_mark_collection_to_be_played_later_without_position(self):
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(self.user_id), [])
+
+        # Test that the length of the learner playlist doesn't exceed
+        # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
+        # List of collections to be added.
+        col_ids = ['SAMPLE_COL_ID_%s' % index for index in range(
+            0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
+        for col_id in col_ids:
+            learner_progress_services.add_collection_to_learner_playlist(
+                self.user_id, col_id)
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), col_ids)
+        # Now if we try adding another collection, it shouldn't be added as the
+        # list length would exceed MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
+        learner_playlist_services.mark_collection_to_be_played_later(
+            self.user_id, 'SAMPLE_COL_ID')
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), col_ids)
 
     def test_remove_exploration_from_learner_playlist(self):
         self.assertEqual(self._get_all_learner_playlist_exp_ids(
