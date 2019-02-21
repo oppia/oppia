@@ -2418,7 +2418,7 @@ def can_access_subtopic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        subtopic = 
+        #subtopic = 
 def get_decorator_for_accepting_suggestion(decorator):
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in
