@@ -246,24 +246,11 @@ def _execute_deployment():
         print 'Preprocessing release...'
         preprocess_release()
 
-        # Do a build, while outputting to the terminal.
-        print 'Building and minifying scripts...'
-        build_process = subprocess.Popen(
-            ['python', 'scripts/build.py', '--prod_env'],
-            stdout=subprocess.PIPE)
-        while True:
-            line = build_process.stdout.readline().strip()
-            if not line:
-                break
-            print line
-
-        # Wait for process to terminate, then check return code.
-        build_process.communicate()
-        if build_process.returncode > 0:
-            raise Exception('Build failed.')
-
         # Update indexes, then prompt for a check that they are all serving
         # before continuing with the deployment.
+        # NOTE: This assumes that the build process does not modify the
+        # index.yaml file or create a different version of it to use in
+        # production.
         assert os.path.isfile(INDEX_YAML_PATH)
         subprocess.check_output([
             common.GCLOUD_PATH, '--quiet', 'datastore', 'indexes', 'create',
@@ -284,6 +271,22 @@ def _execute_deployment():
                 raise Exception(
                     'Please wait for all indexes to serve, then run this '
                     'script again to complete the deployment. Exiting.')
+
+        # Do a build, while outputting to the terminal.
+        print 'Building and minifying scripts...'
+        build_process = subprocess.Popen(
+            ['python', 'scripts/build.py', '--prod_env'],
+            stdout=subprocess.PIPE)
+        while True:
+            line = build_process.stdout.readline().strip()
+            if not line:
+                break
+            print line
+
+        # Wait for process to terminate, then check return code.
+        build_process.communicate()
+        if build_process.returncode > 0:
+            raise Exception('Build failed.')
 
         # Deploy export service to GAE.
         subprocess.check_output([
