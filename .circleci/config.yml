@@ -27,9 +27,9 @@ jobs:
       - run:
           name: Delete all existing cache
           command: |
-            rm -r ../node_modules
-            rm -r ../oppia_tools
-            rm -r third_party/
+            rm -r /home/circleci/node_modules
+            rm -r /home/circleci/oppia_tools
+            rm -r /home/circlci/oppia/third_party
       - run:
           <<: *install_dependencies
       - save_cache:
