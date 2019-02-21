@@ -29,7 +29,7 @@ NAMES = utils.create_enum(
 GAE_PLATFORM = 'gae'
 
 
-class _Platform(object):
+class Platform(object):
     """A base class for platform-specific imports related to GAE."""
 
     @classmethod
@@ -44,7 +44,7 @@ class _Platform(object):
         raise NotImplementedError
 
 
-class _Gae(_Platform):
+class _Gae(Platform):
     """Provides platform-specific imports related to
     GAE (Google App Engine).
     """
