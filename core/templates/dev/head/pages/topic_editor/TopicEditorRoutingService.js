@@ -17,9 +17,9 @@
  */
 
 oppia.factory('TopicEditorRoutingService', [
-  '$rootScope', '$location', '$window', '$timeout', '$interval',
+  '$interval', '$location', '$rootScope', '$timeout', '$window',
   function(
-      $rootScope, $location, $window, $timeout, $interval) {
+      $interval, $location, $rootScope, $timeout, $window) {
     var MAIN_TAB = 'main';
     var SUBTOPICS_TAB = 'subtopics';
     var QUESTIONS_TAB = 'questions';

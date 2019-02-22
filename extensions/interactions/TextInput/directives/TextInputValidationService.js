@@ -17,8 +17,8 @@
  */
 
 oppia.factory('TextInputValidationService', [
-  'INTERACTION_SPECS', 'WARNING_TYPES', 'baseInteractionValidationService',
-  function(INTERACTION_SPECS, WARNING_TYPES, baseInteractionValidationService) {
+  'baseInteractionValidationService', 'INTERACTION_SPECS', 'WARNING_TYPES',
+  function(baseInteractionValidationService, INTERACTION_SPECS, WARNING_TYPES) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];

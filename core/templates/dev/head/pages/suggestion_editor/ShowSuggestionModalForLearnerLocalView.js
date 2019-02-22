@@ -17,12 +17,12 @@
  */
 
 oppia.controller('ShowSuggestionModalForLearnerLocalView', [
-  '$scope', '$uibModalInstance', '$timeout', 'PlayerPositionService',
-  'ExplorationEngineService', 'PlayerTranscriptService',
+  '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
+  'PlayerPositionService', 'PlayerTranscriptService',
   'SuggestionModalService',
   function(
-      $scope, $uibModalInstance, $timeout, PlayerPositionService,
-      ExplorationEngineService, PlayerTranscriptService,
+      $scope, $timeout, $uibModalInstance, ExplorationEngineService,
+      PlayerPositionService, PlayerTranscriptService,
       SuggestionModalService) {
     var stateName = PlayerPositionService.getCurrentStateName();
     var displayedCard = PlayerTranscriptService.getCard(

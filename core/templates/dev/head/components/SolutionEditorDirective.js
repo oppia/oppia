@@ -17,16 +17,16 @@
  */
 
 oppia.directive('solutionEditor', [
-  '$uibModal', 'UrlInterpolationService', 'StateSolutionService',
-  'StateEditorService', 'AlertsService',
-  'SolutionObjectFactory', 'SolutionVerificationService',
-  'ContextService', 'ExplorationHtmlFormatterService',
-  'StateInteractionIdService', 'StateCustomizationArgsService',
-  function($uibModal, UrlInterpolationService, StateSolutionService,
-      StateEditorService, AlertsService,
-      SolutionObjectFactory, SolutionVerificationService,
-      ContextService, ExplorationHtmlFormatterService,
-      StateInteractionIdService, StateCustomizationArgsService) {
+  '$uibModal', 'AlertsService', 'ContextService',
+  'ExplorationHtmlFormatterService', 'SolutionObjectFactory',
+  'SolutionVerificationService', 'StateCustomizationArgsService',
+  'StateEditorService', 'StateInteractionIdService',
+  'StateSolutionService', 'UrlInterpolationService',
+  function($uibModal, AlertsService, ContextService,
+      ExplorationHtmlFormatterService, SolutionObjectFactory,
+      SolutionVerificationService, StateCustomizationArgsService,
+      StateEditorService, StateInteractionIdService,
+      StateSolutionService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {

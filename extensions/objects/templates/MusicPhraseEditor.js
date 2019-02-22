@@ -15,8 +15,8 @@
 // This directive is always editable.
 
 oppia.directive('musicPhraseEditor', [
-  'UrlInterpolationService', 'AlertsService', 'OBJECT_EDITOR_URL_PREFIX',
-  function(UrlInterpolationService, AlertsService, OBJECT_EDITOR_URL_PREFIX) {
+  'AlertsService', 'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
+  function(AlertsService, UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
       scope: {

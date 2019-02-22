@@ -19,17 +19,17 @@
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 oppia.factory('PretestEngineService', [
-  '$http', '$rootScope', '$q', 'AlertsService', 'AnswerClassificationService',
+  '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
-  'ExpressionInterpolationService', 'INTERACTION_SPECS',
-  'QuestionObjectFactory', 'INTERACTION_DISPLAY_MODE_INLINE',
-  'FocusManagerService', 'StateCardObjectFactory',
+  'ExpressionInterpolationService', 'FocusManagerService',
+  'QuestionObjectFactory', 'StateCardObjectFactory',
+  'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
   function(
-      $http, $rootScope, $q, AlertsService, AnswerClassificationService,
+      $http, $q, $rootScope, AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
-      ExpressionInterpolationService, INTERACTION_SPECS,
-      QuestionObjectFactory, INTERACTION_DISPLAY_MODE_INLINE,
-      FocusManagerService, StateCardObjectFactory) {
+      ExpressionInterpolationService, FocusManagerService,
+      QuestionObjectFactory, StateCardObjectFactory,
+      INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
     var _explorationId = ContextService.getExplorationId();
 
     var version = GLOBALS.explorationVersion;

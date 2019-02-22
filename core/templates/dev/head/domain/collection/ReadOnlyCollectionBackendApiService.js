@@ -22,8 +22,8 @@
 // the collection instead. This file should not be included on the page in that
 // scenario.
 oppia.factory('ReadOnlyCollectionBackendApiService', [
-  '$http', '$q', 'COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-  function($http, $q, COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService) {
+  '$http', '$q', 'UrlInterpolationService', 'COLLECTION_DATA_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService, COLLECTION_DATA_URL_TEMPLATE) {
     // Maps previously loaded collections to their IDs.
     var _collectionCache = [];
 

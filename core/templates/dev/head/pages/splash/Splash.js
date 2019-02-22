@@ -17,9 +17,9 @@
  */
 
 oppia.controller('Splash', [
-  '$scope', '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
+  '$rootScope', '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'UserService',
-  function($scope, $rootScope, $timeout, $window, SiteAnalyticsService,
+  function($rootScope, $scope, $timeout, $window, SiteAnalyticsService,
       UrlInterpolationService, UserService) {
     $scope.userIsLoggedIn = null;
     $rootScope.loadingMessage = 'Loading';

@@ -17,11 +17,11 @@
  */
 
 oppia.factory('StoryCreationService', [
-  '$http', '$window', '$uibModal', '$rootScope', '$timeout', 'AlertsService',
-  'UrlInterpolationService', 'TopicUpdateService', 'TopicEditorStateService',
+  '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
+  'TopicEditorStateService', 'TopicUpdateService', 'UrlInterpolationService',
   function(
-      $http, $window, $uibModal, $rootScope, $timeout, AlertsService,
-      UrlInterpolationService, TopicUpdateService, TopicEditorStateService) {
+      $http, $rootScope, $timeout, $uibModal, $window, AlertsService,
+      TopicEditorStateService, TopicUpdateService, UrlInterpolationService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<topic_id>/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
     var storyCreationInProgress = false;

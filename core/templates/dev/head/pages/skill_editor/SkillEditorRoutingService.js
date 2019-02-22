@@ -17,9 +17,9 @@
  */
 
 oppia.factory('SkillEditorRoutingService', [
-  '$rootScope', '$location', '$window', '$timeout', '$interval',
+  '$interval', '$location', '$rootScope', '$timeout', '$window',
   function(
-      $rootScope, $location, $window, $timeout, $interval) {
+      $interval, $location, $rootScope, $timeout, $window) {
     var MAIN_TAB = 'main';
     var QUESTIONS_TAB = 'questions';
 

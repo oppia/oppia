@@ -17,11 +17,11 @@
  */
 
 oppia.directive('skillDescriptionEditor', [
-  'UrlInterpolationService', 'SkillUpdateService', 'SkillEditorStateService',
-  'SkillObjectFactory',
+  'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
+  'UrlInterpolationService',
   function(
-      UrlInterpolationService, SkillUpdateService, SkillEditorStateService,
-      SkillObjectFactory) {
+      SkillEditorStateService, SkillObjectFactory, SkillUpdateService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

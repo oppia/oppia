@@ -18,10 +18,10 @@
  */
 
 oppia.controller('LearnerViewInfo', [
-  '$scope', '$uibModal', '$http', '$log', 'ContextService',
-  'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-  function($scope, $uibModal, $http, $log, ContextService,
-      EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, UrlInterpolationService) {
+  '$http', '$log', '$scope', '$uibModal', 'ContextService',
+  'UrlInterpolationService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+  function($http, $log, $scope, $uibModal, ContextService,
+      UrlInterpolationService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
     var explorationId = ContextService.getExplorationId();
     var expInfo = null;
 

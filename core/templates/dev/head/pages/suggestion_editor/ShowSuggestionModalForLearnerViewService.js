@@ -17,9 +17,9 @@
  */
 
 oppia.factory('ShowSuggestionModalForLearnerViewService', [
-  '$uibModal', '$rootScope',
+  '$rootScope', '$uibModal',
   'UrlInterpolationService',
-  function($uibModal, rootScope,
+  function($rootScope, $uibModal,
       UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +

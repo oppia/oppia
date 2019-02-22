@@ -17,10 +17,10 @@
  */
 
 oppia.factory('CollectionRightsBackendApiService', [
-  '$http', '$log', '$q', 'COLLECTION_RIGHTS_URL_TEMPLATE',
-  'UrlInterpolationService',
-  function($http, $log, $q, COLLECTION_RIGHTS_URL_TEMPLATE,
-      UrlInterpolationService) {
+  '$http', '$log', '$q', 'UrlInterpolationService',
+  'COLLECTION_RIGHTS_URL_TEMPLATE',
+  function($http, $log, $q, UrlInterpolationService,
+      COLLECTION_RIGHTS_URL_TEMPLATE) {
     // Maps previously loaded collection rights to their IDs.
     var collectionRightsCache = {};
 

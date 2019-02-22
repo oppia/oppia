@@ -18,11 +18,11 @@
 
 // TODO(czx): Uniquify the labels of image regions
 oppia.directive('imageWithRegionsEditor', [
-  '$sce', 'UrlInterpolationService', 'AlertsService', '$document',
-  'ContextService', 'AssetsBackendApiService',
+  '$document', '$sce', 'AlertsService', 'AssetsBackendApiService',
+  'ContextService', 'UrlInterpolationService',
   'OBJECT_EDITOR_URL_PREFIX',
-  function($sce, UrlInterpolationService, AlertsService, $document,
-      ContextService, AssetsBackendApiService,
+  function($document, $sce, AlertsService, AssetsBackendApiService,
+      ContextService, UrlInterpolationService,
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',

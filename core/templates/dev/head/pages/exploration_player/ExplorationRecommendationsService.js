@@ -18,11 +18,11 @@
  */
 
 oppia.factory('ExplorationRecommendationsService', [
-  '$http', 'UrlService', 'ContextService', 'PAGE_CONTEXT',
-  'EXPLORATION_EDITOR_TAB_CONTEXT',
+  '$http', 'ContextService', 'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT',
+  'PAGE_CONTEXT',
   function(
-      $http, UrlService, ContextService, PAGE_CONTEXT,
-      EXPLORATION_EDITOR_TAB_CONTEXT) {
+      $http, ContextService, UrlService, EXPLORATION_EDITOR_TAB_CONTEXT,
+      PAGE_CONTEXT) {
     var isIframed = UrlService.isIframed();
     var isInEditorPage = (
       ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR);

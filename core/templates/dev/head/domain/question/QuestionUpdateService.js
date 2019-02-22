@@ -22,13 +22,13 @@ oppia.constant('QUESTION_PROPERTY_QUESTION_STATE_DATA', 'question_state_data');
 oppia.constant('CMD_UPDATE_QUESTION_PROPERTY', 'update_question_property');
 
 oppia.factory('QuestionUpdateService', [
-  'QuestionObjectFactory', 'ChangeObjectFactory', 'QuestionUndoRedoService',
-  'QUESTION_PROPERTY_LANGUAGE_CODE', 'QUESTION_PROPERTY_QUESTION_STATE_DATA',
-  'CMD_UPDATE_QUESTION_PROPERTY',
+  'ChangeObjectFactory', 'QuestionObjectFactory', 'QuestionUndoRedoService',
+  'CMD_UPDATE_QUESTION_PROPERTY', 'QUESTION_PROPERTY_LANGUAGE_CODE',
+  'QUESTION_PROPERTY_QUESTION_STATE_DATA',
   function(
-      QuestionObjectFactory, ChangeObjectFactory, QuestionUndoRedoService,
-      QUESTION_PROPERTY_LANGUAGE_CODE, QUESTION_PROPERTY_QUESTION_STATE_DATA,
-      CMD_UPDATE_QUESTION_PROPERTY) {
+      ChangeObjectFactory, QuestionObjectFactory, QuestionUndoRedoService,
+      CMD_UPDATE_QUESTION_PROPERTY, QUESTION_PROPERTY_LANGUAGE_CODE,
+      QUESTION_PROPERTY_QUESTION_STATE_DATA) {
     var _applyChange = function(question, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;

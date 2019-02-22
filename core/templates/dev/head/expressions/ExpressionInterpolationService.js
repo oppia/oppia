@@ -30,10 +30,10 @@
 //   processUnicode('{[a}}', [{'a': '<button></button>'}]) returns
 //     '<button></button>'.
 oppia.factory('ExpressionInterpolationService', [
-  '$filter', 'ExpressionParserService', 'ExpressionEvaluatorService',
+  '$filter', 'ExpressionEvaluatorService', 'ExpressionParserService',
   'ExpressionSyntaxTreeService', 'HtmlEscaperService',
   function(
-      $filter, ExpressionParserService, ExpressionEvaluatorService,
+      $filter, ExpressionEvaluatorService, ExpressionParserService,
       ExpressionSyntaxTreeService, HtmlEscaperService) {
     return {
       // This method should only be used if its result would immediately be

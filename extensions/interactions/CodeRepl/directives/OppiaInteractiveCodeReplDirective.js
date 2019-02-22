@@ -21,10 +21,10 @@
  */
 
 oppia.directive('oppiaInteractiveCodeRepl', [
-  'HtmlEscaperService', 'codeReplRulesService', 'UrlInterpolationService',
+  'HtmlEscaperService', 'UrlInterpolationService', 'codeReplRulesService',
   'EVENT_NEW_CARD_AVAILABLE',
   function(
-      HtmlEscaperService, codeReplRulesService, UrlInterpolationService,
+      HtmlEscaperService, UrlInterpolationService, codeReplRulesService,
       EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',

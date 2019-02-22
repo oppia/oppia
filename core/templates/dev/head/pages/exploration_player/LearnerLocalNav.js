@@ -20,17 +20,17 @@ oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$rootScope', '$http', '$uibModal', 'AlertsService',
+  '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
   'ExplorationEngineService', 'ExplorationPlayerStateService',
-  'FocusManagerService', 'UrlInterpolationService', 'UserService',
-  'FEEDBACK_POPOVER_PATH', 'FLAG_EXPLORATION_URL_TEMPLATE',
-  'ShowSuggestionModalForLearnerLocalViewService',
+  'FocusManagerService', 'ShowSuggestionModalForLearnerLocalViewService',
+  'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
+  'FLAG_EXPLORATION_URL_TEMPLATE',
   function(
-      $scope, $rootScope, $http, $uibModal, AlertsService,
+      $http, $rootScope, $scope, $uibModal, AlertsService,
       ExplorationEngineService, ExplorationPlayerStateService,
-      FocusManagerService, UrlInterpolationService, UserService,
-      FEEDBACK_POPOVER_PATH, FLAG_EXPLORATION_URL_TEMPLATE,
-      ShowSuggestionModalForLearnerLocalViewService) {
+      FocusManagerService, ShowSuggestionModalForLearnerLocalViewService,
+      UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
+      FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationEngineService.getExplorationId();
     $scope.canEdit = GLOBALS.canEdit;
     $scope.username = '';

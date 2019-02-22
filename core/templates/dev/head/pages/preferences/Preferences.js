@@ -17,12 +17,12 @@
  */
 
 oppia.controller('Preferences', [
-  '$scope', '$http', '$q', '$rootScope', '$uibModal', '$timeout', '$translate',
+  '$http', '$q', '$rootScope', '$scope', '$timeout', '$translate', '$uibModal',
   'AlertsService', 'UrlInterpolationService', 'UserService', 'UtilsService',
   'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
   'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
   function(
-      $scope, $http, $q, $rootScope, $uibModal, $timeout, $translate,
+      $http, $q, $rootScope, $scope, $timeout, $translate, $uibModal,
       AlertsService, UrlInterpolationService, UserService, UtilsService,
       DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
       SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {

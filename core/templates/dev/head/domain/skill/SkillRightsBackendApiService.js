@@ -17,10 +17,10 @@
  */
 
 oppia.factory('SkillRightsBackendApiService', [
-  '$http', '$q', 'SKILL_RIGHTS_URL_TEMPLATE',
-  'SKILL_PUBLISH_URL_TEMPLATE', 'UrlInterpolationService',
-  function($http, $q, SKILL_RIGHTS_URL_TEMPLATE,
-      SKILL_PUBLISH_URL_TEMPLATE, UrlInterpolationService) {
+  '$http', '$q', 'UrlInterpolationService',
+  'SKILL_PUBLISH_URL_TEMPLATE', 'SKILL_RIGHTS_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService,
+      SKILL_PUBLISH_URL_TEMPLATE, SKILL_RIGHTS_URL_TEMPLATE) {
     // Maps previously loaded skill rights to their IDs.
     var skillRightsCache = {};
 

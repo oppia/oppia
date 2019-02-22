@@ -30,8 +30,8 @@ oppia.constant('EXPLORATION_EDITOR_TAB_CONTEXT', {
 });
 
 oppia.factory('ContextService', [
-  'UrlService', 'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
-  function(UrlService, PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT) {
+  'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT', 'PAGE_CONTEXT',
+  function(UrlService, EXPLORATION_EDITOR_TAB_CONTEXT, PAGE_CONTEXT) {
     var pageContext = null;
     var explorationId = null;
     var questionId = null;

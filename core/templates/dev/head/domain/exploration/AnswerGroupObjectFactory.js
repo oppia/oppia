@@ -18,8 +18,8 @@
  */
 
 oppia.factory('AnswerGroupObjectFactory', [
-  'RuleObjectFactory', 'OutcomeObjectFactory',
-  function(RuleObjectFactory, OutcomeObjectFactory) {
+  'OutcomeObjectFactory', 'RuleObjectFactory',
+  function(OutcomeObjectFactory, RuleObjectFactory) {
     var AnswerGroup = function(
         rules, outcome, trainingData, taggedMisconceptionId) {
       this.rules = rules;

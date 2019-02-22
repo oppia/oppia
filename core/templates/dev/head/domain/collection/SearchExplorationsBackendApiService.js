@@ -17,11 +17,11 @@
  */
 
 oppia.factory('SearchExplorationsBackendApiService', [
-  '$http', '$q', 'AlertsService', 'SEARCH_EXPLORATION_URL_TEMPLATE',
-  'UrlInterpolationService',
+  '$http', '$q', 'AlertsService', 'UrlInterpolationService',
+  'SEARCH_EXPLORATION_URL_TEMPLATE',
   function(
-      $http, $q, AlertsService, SEARCH_EXPLORATION_URL_TEMPLATE,
-      UrlInterpolationService) {
+      $http, $q, AlertsService, UrlInterpolationService,
+      SEARCH_EXPLORATION_URL_TEMPLATE) {
     var _fetchExplorations = function(
         searchQuery, successCallback, errorCallback) {
       queryUrl = UrlInterpolationService.interpolateUrl(

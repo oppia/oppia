@@ -72,7 +72,7 @@ oppia.directive('selectOnClick', [function() {
 // A popover that is shown when its label is hovered or clicked upon, and
 // disappears when focus moves away from its label.
 oppia.directive('customPopover', [
-  'UrlInterpolationService', '$sce', function(UrlInterpolationService, $sce) {
+  '$sce', 'UrlInterpolationService', function($sce, UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

@@ -18,15 +18,15 @@
 
 // TODO(Allan): Implement ability to edit suggestions before applying.
 oppia.controller('ShowSuggestionModalForEditorView', [
-  '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
-  'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
-  'description', 'currentContent', 'newContent', 'EditabilityService',
-  'SuggestionModalService',
+  '$log', '$scope', '$uibModalInstance', 'EditabilityService',
+  'SuggestionModalService', 'currentContent', 'description',
+  'newContent', 'suggestionIsHandled', 'suggestionIsValid', 'suggestionStatus',
+  'unsavedChangesExist',
   function(
-      $scope, $log, $uibModalInstance, suggestionIsHandled,
-      suggestionIsValid, unsavedChangesExist, suggestionStatus,
-      description, currentContent, newContent, EditabilityService,
-      SuggestionModalService) {
+      $log, $scope, $uibModalInstance, EditabilityService,
+      SuggestionModalService, currentContent, description,
+      newContent, suggestionIsHandled, suggestionIsValid, suggestionStatus,
+      unsavedChangesExist) {
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canEdit = EditabilityService.isEditable();
     $scope.canReject = $scope.canEdit && $scope.isNotHandled;

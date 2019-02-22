@@ -20,8 +20,8 @@ oppia.constant(
   'CONCEPT_CARD_DATA_URL_TEMPLATE', '/concept_card_handler/<skill_id>');
 
 oppia.factory('ConceptCardBackendApiService', [
-  '$http', '$q', 'CONCEPT_CARD_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-  function($http, $q, CONCEPT_CARD_DATA_URL_TEMPLATE, UrlInterpolationService) {
+  '$http', '$q', 'UrlInterpolationService', 'CONCEPT_CARD_DATA_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService, CONCEPT_CARD_DATA_URL_TEMPLATE) {
     // Maps previously loaded concept cards to their IDs.
     var _conceptCardCache = [];
 

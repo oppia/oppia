@@ -21,11 +21,11 @@
 // ExplorationCreationService.
 
 oppia.factory('CollectionCreationService', [
-  '$http', '$window', '$rootScope', '$timeout', 'AlertsService',
-  'UrlInterpolationService', 'SiteAnalyticsService',
+  '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
+  'SiteAnalyticsService', 'UrlInterpolationService',
   function(
-      $http, $window, $rootScope, $timeout, AlertsService,
-      UrlInterpolationService, SiteAnalyticsService) {
+      $http, $rootScope, $timeout, $window, AlertsService,
+      SiteAnalyticsService, UrlInterpolationService) {
     var CREATE_NEW_COLLECTION_URL_TEMPLATE = (
       '/collection_editor/create/<collection_id>');
     var collectionCreationInProgress = false;

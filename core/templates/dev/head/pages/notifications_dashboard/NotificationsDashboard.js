@@ -17,8 +17,8 @@
  */
 
 oppia.controller('DashboardNotifications', [
-  '$scope', '$http', '$rootScope', 'DateTimeFormatService',
-  function($scope, $http, $rootScope, DateTimeFormatService) {
+  '$http', '$rootScope', '$scope', 'DateTimeFormatService',
+  function($http, $rootScope, $scope, DateTimeFormatService) {
     $scope.getItemUrl = function(activityId, notificationType) {
       return (
         '/create/' + activityId + (

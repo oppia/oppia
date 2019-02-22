@@ -18,8 +18,8 @@
  */
 
 oppia.directive('audioBar', [
-  'UrlInterpolationService', 'AudioPreloaderService',
-  function(UrlInterpolationService, AudioPreloaderService) {
+  'AudioPreloaderService', 'UrlInterpolationService',
+  function(AudioPreloaderService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

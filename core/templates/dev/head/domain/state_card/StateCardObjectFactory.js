@@ -18,11 +18,11 @@
  */
 
 oppia.factory('StateCardObjectFactory', [
-  'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-  'ExplorationHtmlFormatterService', 'AudioTranslationLanguageService',
+  'AudioTranslationLanguageService', 'ExplorationHtmlFormatterService',
+  'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
   function(
-      INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
-      ExplorationHtmlFormatterService, AudioTranslationLanguageService) {
+      AudioTranslationLanguageService, ExplorationHtmlFormatterService,
+      INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
     var StateCard = function(
         stateName, contentHtml, interactionHtml, interaction,
         inputResponsePairs, contentIdsToAudioTranslations, contentId) {

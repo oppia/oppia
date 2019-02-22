@@ -21,11 +21,11 @@
  */
 
 oppia.factory('FocusManagerService', [
-  '$rootScope', '$timeout', 'DeviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
-  'IdGenerationService',
+  '$rootScope', '$timeout', 'DeviceInfoService', 'IdGenerationService',
+  'LABEL_FOR_CLEARING_FOCUS',
   function(
-      $rootScope, $timeout, DeviceInfoService, LABEL_FOR_CLEARING_FOCUS,
-      IdGenerationService) {
+      $rootScope, $timeout, DeviceInfoService, IdGenerationService,
+      LABEL_FOR_CLEARING_FOCUS) {
     var _nextLabelToFocusOn = null;
     return {
       clearFocus: function() {

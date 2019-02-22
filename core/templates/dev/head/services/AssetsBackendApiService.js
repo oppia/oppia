@@ -18,11 +18,11 @@
  */
 
 oppia.factory('AssetsBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'AudioFileObjectFactory',
-  'ImageFileObjectFactory', 'FileDownloadRequestObjectFactory', 'DEV_MODE',
+  '$http', '$q', 'AudioFileObjectFactory', 'FileDownloadRequestObjectFactory',
+  'ImageFileObjectFactory', 'UrlInterpolationService', 'DEV_MODE',
   function(
-      $http, $q, UrlInterpolationService, AudioFileObjectFactory,
-      ImageFileObjectFactory, FileDownloadRequestObjectFactory, DEV_MODE) {
+      $http, $q, AudioFileObjectFactory, FileDownloadRequestObjectFactory,
+      ImageFileObjectFactory, UrlInterpolationService, DEV_MODE) {
     if (!DEV_MODE && !GLOBALS.GCS_RESOURCE_BUCKET_NAME) {
       throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }

@@ -17,11 +17,11 @@
  */
 
 oppia.factory('GraphDataService', [
-  'ExplorationStatesService', 'ExplorationInitStateNameService',
-  'ComputeGraphService',
+  'ComputeGraphService', 'ExplorationInitStateNameService',
+  'ExplorationStatesService',
   function(
-      ExplorationStatesService, ExplorationInitStateNameService,
-      ComputeGraphService) {
+      ComputeGraphService, ExplorationInitStateNameService,
+      ExplorationStatesService) {
     var _graphData = null;
 
     // Returns an object which can be treated as the input to a visualization

@@ -18,9 +18,9 @@
  */
 
 oppia.factory('AudioTranslationLanguageService', [
-  'LanguageUtilService', 'BrowserCheckerService',
+  'BrowserCheckerService', 'LanguageUtilService',
   function(
-      LanguageUtilService, BrowserCheckerService) {
+      BrowserCheckerService, LanguageUtilService) {
     var _currentAudioLanguageCode = null;
     var _allAudioLanguageCodesInExploration = null;
     var _explorationLanguageCode = null;

@@ -17,13 +17,13 @@
  */
 
 oppia.controller('ExplorationGraph', [
-  '$scope', '$uibModal', 'StateEditorService', 'AlertsService',
-  'ExplorationStatesService', 'EditabilityService', 'RouterService',
-  'GraphDataService', 'UrlInterpolationService',
+  '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
+  'ExplorationStatesService', 'GraphDataService', 'RouterService',
+  'StateEditorService', 'UrlInterpolationService',
   function(
-      $scope, $uibModal, StateEditorService, AlertsService,
-      ExplorationStatesService, EditabilityService, RouterService,
-      GraphDataService, UrlInterpolationService) {
+      $scope, $uibModal, AlertsService, EditabilityService,
+      ExplorationStatesService, GraphDataService, RouterService,
+      StateEditorService, UrlInterpolationService) {
     $scope.getGraphData = GraphDataService.getGraphData;
     $scope.isEditable = EditabilityService.isEditable;
 

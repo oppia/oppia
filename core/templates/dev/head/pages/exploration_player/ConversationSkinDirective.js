@@ -230,8 +230,8 @@ oppia.animation('.conversation-skin-animate-cards', function() {
 });
 
 oppia.directive('conversationSkin', [
-  'UrlService', 'UrlInterpolationService',
-  function(UrlService, UrlInterpolationService) {
+  'UrlInterpolationService', 'UrlService',
+  function(UrlInterpolationService, UrlService) {
     return {
       restrict: 'E',
       scope: {},
