@@ -352,6 +352,12 @@ p:last-child {
   margin: 0px;
 }
 
+/* This will prevent the enlargment of the text that is nested inside the p
+  and span tag. !important is added to override the inline css.*/
+p span {
+  font-size: 1em !important;
+}
+
 .oppia-long-text p {
   line-height: 1.4;
   /* The following should be the same as the line-height (1.4). */
