@@ -258,7 +258,7 @@ oppia.directive('conversationSkin', [
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'EVENT_NEW_CARD_AVAILABLE',
+        'EVENT_NEW_CARD_AVAILABLE', 'FEEDBACK_POPOVER_PATH',
         'FatigueDetectionService', 'NumberAttemptsService',
         'PlayerCorrectnessFeedbackEnabledService', 'ContextService',
         'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
@@ -284,7 +284,7 @@ oppia.directive('conversationSkin', [
             PretestQuestionBackendApiService, StateCardObjectFactory,
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            EVENT_NEW_CARD_AVAILABLE,
+            EVENT_NEW_CARD_AVAILABLE, FEEDBACK_POPOVER_PATH,
             FatigueDetectionService, NumberAttemptsService,
             PlayerCorrectnessFeedbackEnabledService, ContextService,
             ConceptCardBackendApiService, ConceptCardObjectFactory,
@@ -309,6 +309,11 @@ oppia.directive('conversationSkin', [
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.isLoggedIn = userInfo.isLoggedIn();
           });
+
+          $scope.getFeedbackPopoverUrl = function() {
+            return UrlInterpolationService.getDirectiveTemplateUrl(
+              FEEDBACK_POPOVER_PATH);
+          };
 
           var hasInteractedAtLeastOnce = false;
           $scope.answerIsBeingProcessed = false;

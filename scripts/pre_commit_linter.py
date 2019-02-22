@@ -179,12 +179,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': r'text\/ng-template',
         'message': 'The directives must be directly referenced.',
-        'excluded_files': (
-            'core/templates/dev/head/pages/exploration_player/'
-            'feedback_popup_container_directive.html',
-            'core/templates/dev/head/pages/exploration_player/'
-            'input_response_pair_directive.html'
-        ),
+        'excluded_files': (),
         'excluded_dirs': (
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
