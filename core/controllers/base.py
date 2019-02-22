@@ -230,6 +230,12 @@ class BaseHandler(webapp2.RequestHandler):
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
+                # If user opens a new tab during signup process, the user_id
+                # parameter is set to None and this causes the signup session
+                # to expire. The code here checks if user is on the signup
+                # page and the user_id is None, if that is the case an exception
+                # is raised which is handled by the frontend by showing a
+                # continue to registration modal.
                 if 'signup' in self.request.uri and not self.user_id:
                     raise self.UnauthorizedUserException(
                         'Registration session expired.')

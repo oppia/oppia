@@ -108,7 +108,7 @@ describe('Signup controller', function() {
       'should show continue registration modal if user is logged ' +
       'out in new tab',
       function() {
-        spyOn(scope, 'showContinueRegistrationModal');
+        spyOn(scope, 'showRegistrationSessionExpiredModal');
         var errorResponseObject = {
           status_code: 401,
           error: (
@@ -120,7 +120,7 @@ describe('Signup controller', function() {
           401, errorResponseObject);
         scope.submitPrerequisitesForm(true, 'myUsername', false);
         $httpBackend.flush();
-        expect(scope.showContinueRegistrationModal).toHaveBeenCalled();
+        expect(scope.showRegistrationSessionExpiredModal).toHaveBeenCalled();
       });
   });
 });

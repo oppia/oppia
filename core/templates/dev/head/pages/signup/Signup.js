@@ -176,16 +176,16 @@ oppia.controller('Signup', [
       }, function(rejection) {
         if (
           rejection.data && rejection.data.status_code === 401) {
-          $scope.showContinueRegistrationModal();
+          $scope.showRegistrationSessionExpiredModal();
         }
         $scope.submissionInProcess = false;
       });
     };
 
-    $scope.showContinueRegistrationModal = function() {
+    $scope.showRegistrationSessionExpiredModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/signup/redirect_to_login_directive.html'),
+          '/pages/signup/registration_session_expired_modal_directive.html'),
         backdrop: 'static',
         keyboard: false,
         resolve: {},
@@ -195,14 +195,14 @@ oppia.controller('Signup', [
           function($scope, $uibModalInstance, SiteAnalyticsService,
               UserService, $timeout, $window) {
             $scope.continueRegistration = function() {
-              SiteAnalyticsService.registerStartLoginEvent(
-                'loginButton');
               UserService.getLoginAndLogoutUrls().then(
                 function(urlObject) {
                   if (urlObject.login_url) {
                     $timeout(function() {
                       $window.location = urlObject.login_url;
                     }, 150);
+                  } else {
+                    throw Error('Login url not found.');
                   }
                 }
               );

@@ -718,7 +718,7 @@ class SignUpTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=401,
         )
 
-        self.assertEqual(response['error'], ('Registration session expired.'))
+        self.assertEqual(response['error'], 'Registration session expired.')
 
     def test_no_error_is_raised_on_opening_new_tab_after_signup(self):
         """ Test that no error is raised if user opens a new tab
