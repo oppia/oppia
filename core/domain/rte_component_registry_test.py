@@ -88,6 +88,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                     self.assertEqual(
                         ca_spec['default_value'],
                         obj_class.normalize(ca_spec['default_value']))
+            else:
+                self.assertEqual(ca_spec['default_value'], '')
 
     def _listdir_omit_ignored(self, directory):
         """List all files and directories within 'directory', omitting the ones
