@@ -10,7 +10,6 @@ anchor_for_installing_dependencies: &install_dependencies
   command: |
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
-    sudo pip install codecov
 
 anchor_for_restoring_cache: &restore_cache
   keys:
@@ -66,6 +65,7 @@ jobs:
       - run:
           name: Generate frontend coverage report
           command: |
+            sudo pip install codecov
             codecov --file ../karma_coverage_reports/coverage-final.json
           when: on_success
 
@@ -83,6 +83,7 @@ jobs:
       - run:
           name: Generate backend coverage report
           command: |
+            sudo pip install codecov
             codecov
           when: on_success
 
