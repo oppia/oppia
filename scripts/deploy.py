@@ -95,6 +95,7 @@ APPCFG_PATH = os.path.join(
     'appcfg.py')
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
+INDEX_YAML_PATH = os.path.join('.', 'index.yaml')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 DEPLOY_DATA_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', APP_NAME)
@@ -245,6 +246,32 @@ def _execute_deployment():
         print 'Preprocessing release...'
         preprocess_release()
 
+        # Update indexes, then prompt for a check that they are all serving
+        # before continuing with the deployment.
+        # NOTE: This assumes that the build process does not modify the
+        # index.yaml file or create a different version of it to use in
+        # production.
+        assert os.path.isfile(INDEX_YAML_PATH)
+        subprocess.check_output([
+            common.GCLOUD_PATH, '--quiet', 'datastore', 'indexes', 'create',
+            INDEX_YAML_PATH, '--project=%s' % APP_NAME])
+        datastore_indexes_url = (
+            'https://console.cloud.google.com/datastore/indexes?project=%s' %
+            APP_NAME)
+        common.open_new_tab_in_browser_if_possible(datastore_indexes_url)
+        while True:
+            print '******************************************************'
+            print (
+                'PLEASE CONFIRM: are all datastore indexes serving? See %s '
+                '(y/n)' % datastore_indexes_url)
+            answer = raw_input().lower()
+            if answer in ['y', 'ye', 'yes']:
+                break
+            elif answer:
+                raise Exception(
+                    'Please wait for all indexes to serve, then run this '
+                    'script again to complete the deployment. Exiting.')
+
         # Do a build, while outputting to the terminal.
         print 'Building and minifying scripts...'
         build_process = subprocess.Popen(
@@ -263,7 +290,7 @@ def _execute_deployment():
 
         # Deploy export service to GAE.
         subprocess.check_output([
-            common.GCLOUD_PATH, 'app', 'deploy', 'export/app.yaml',
+            common.GCLOUD_PATH, '--quiet', 'app', 'deploy', 'export/app.yaml',
             '--project=%s' % APP_NAME])
 
         # Deploy app to GAE.
@@ -285,11 +312,11 @@ def _execute_deployment():
     if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
             _get_served_version() == _get_current_release_version()):
         common.open_new_tab_in_browser_if_possible(
+            'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
+        common.open_new_tab_in_browser_if_possible(
             'https://console.cloud.google.com/logs/viewer?'
             'project=%s&key1=default&minLogLevel=500'
             % APP_NAME_OPPIATESTSERVER)
-        common.open_new_tab_in_browser_if_possible(
-            'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
 
     print 'Done!'
 
