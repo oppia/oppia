@@ -17,11 +17,13 @@
  */
 
 oppia.controller('TopicViewer', [
-  '$scope', '$rootScope', '$window', 'UrlService', 'FATAL_ERROR_CODES',
-  'AlertsService', 'TopicViewerBackendApiService',
+  '$rootScope', '$scope', '$window', 'AlertsService',
+  'TopicViewerBackendApiService',
+  'UrlService', 'FATAL_ERROR_CODES',
   function(
-      $scope, $rootScope, $window, UrlService, FATAL_ERROR_CODES,
-      AlertsService, TopicViewerBackendApiService) {
+      $rootScope, $scope, $window, AlertsService,
+      TopicViewerBackendApiService,
+      UrlService, FATAL_ERROR_CODES) {
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
     };

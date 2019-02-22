@@ -17,8 +17,8 @@
 */
 
 oppia.controller('Moderator', [
-  '$scope', '$http', '$rootScope', 'DateTimeFormatService', 'AlertsService',
-  function($scope, $http, $rootScope, DateTimeFormatService, AlertsService) {
+  '$http', '$rootScope', '$scope', 'AlertsService', 'DateTimeFormatService',
+  function($http, $rootScope, $scope, AlertsService, DateTimeFormatService) {
     $rootScope.loadingMessage = 'Loading';
     $scope.getDatetimeAsString = function(millisSinceEpoch) {
       return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(

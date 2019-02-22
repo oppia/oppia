@@ -20,10 +20,10 @@ oppia.constant(
   '/story_editor_handler/data/<topic_id>/<story_id>');
 
 oppia.factory('EditableStoryBackendApiService', [
-  '$http', '$q', 'EDITABLE_STORY_DATA_URL_TEMPLATE',
-  'UrlInterpolationService',
-  function($http, $q, EDITABLE_STORY_DATA_URL_TEMPLATE,
-      UrlInterpolationService) {
+  '$http', '$q', 'UrlInterpolationService',
+  'EDITABLE_STORY_DATA_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService,
+      EDITABLE_STORY_DATA_URL_TEMPLATE) {
     var _fetchStory = function(
         topicId, storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
