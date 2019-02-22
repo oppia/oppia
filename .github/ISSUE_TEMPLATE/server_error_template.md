@@ -1,6 +1,6 @@
 ---
 name: Server error
-about: Report a production bug
+about: Report a production bug from the server logs
 ---
 <!--
   - Before filing a new issue, please do a quick search to check that it hasn't
@@ -13,7 +13,7 @@ This error occurred recently in production
 Add error logs here.
 ```
 
-**Additional context** Add details from the logs, like the page the error occurred on. 
+**Additional context** Add details from the logs, like the page the error occurred on.
 
 **General instructions**
 There are no specific repro steps available for this bug report. The general procedure to fix server errors should be the following:
