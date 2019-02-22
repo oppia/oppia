@@ -16,9 +16,7 @@
 
 ONLY RELEASE COORDINATORS SHOULD USE THIS SCRIPT.
 
-Usage: Run this script from your oppia root folder:
-
-    python scripts/update_indexes.py
+Make sure to run this script from the oppia/ root folder:
 """
 
 import argparse
