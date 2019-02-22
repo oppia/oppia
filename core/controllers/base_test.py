@@ -702,7 +702,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
 class SignUpTests(test_utils.GenericTestBase):
 
     def test_error_is_raised_on_opening_new_tab_during_signup(self):
-        """ Test that error is raised if user opens a new tab
+        """Test that error is raised if user opens a new tab
         during signup.
         """
         self.login('abc@example.com')
@@ -721,7 +721,7 @@ class SignUpTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Registration session expired.')
 
     def test_no_error_is_raised_on_opening_new_tab_after_signup(self):
-        """ Test that no error is raised if user opens a new tab
+        """Test that no error is raised if user opens a new tab
         after signup.
         """
         self.login('abc@example.com')
