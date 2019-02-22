@@ -66,8 +66,6 @@ else:
 
 # Construct the new branch name.
 NEW_BRANCH_NAME = 'release-%s' % TARGET_VERSION
-NEW_APP_YAML_VERSION = TARGET_VERSION.replace('.', '-')
-assert '.' not in NEW_APP_YAML_VERSION
 
 
 def _verify_target_branch_does_not_already_exist(remote_alias):
@@ -145,11 +143,8 @@ def _verify_target_version_is_consistent_with_latest_released_version():
 
 
 def _execute_branch_cut():
-    """Pushes the new release branch to Github.
+    """Pushes the new release branch to Github."""
 
-    Raises:
-         AssertionError: 'version: default' was not found in app.yaml.
-    """
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
     common.verify_local_repo_is_clean()

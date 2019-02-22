@@ -20,26 +20,14 @@ the uploaded files to a deployment folder in the parent directory of the oppia/
 folder. It then pushes this build to the production server.
 
 IMPORTANT NOTES:
-1.  You will need to first create a folder called ../deploy_data/[APP_NAME],
-    where [APP_NAME] is the name of your app as defined in app.yaml. This
-    folder should contain a folder called /images, which in turn should
-    contain:
-    - four folders: /avatar, /general, /logo and /sidebar, containing
-        images used for the avatar, general-purpose usage, logo and sidebar,
-        respectively.
-    The folder should also contain:
-    - favicon.ico and robots.txt.
-    - one folder images/general which contains:
-        - warning.png
-
-2.  Before running this script, you must install third-party dependencies by
+1.  Before running this script, you must install third-party dependencies by
     running
 
         bash scripts/start.sh
 
     at least once.
 
-3.  This script should be run from the oppia root folder:
+2.  This script should be run from the oppia root folder:
 
         python scripts/deploy.py --app_name=[APP_NAME]
 
@@ -110,18 +98,9 @@ def preprocess_release():
     This function should be called from within RELEASE_DIR_NAME. Currently it
     does the following:
 
-    (1) Changes the app name in app.yaml to APP_NAME.
-    (2) Substitutes files from the per-app deployment data.
-    (3) Change the DEV_MODE constant in assets/constants.js.
+    (1) Substitutes files from the per-app deployment data.
+    (2) Change the DEV_MODE constant in assets/constants.js.
     """
-    # Change the app name in app.yaml.
-    with open('app.yaml', 'r') as app_yaml_file:
-        content = app_yaml_file.read()
-    os.remove('app.yaml')
-    content = content.replace('oppiaserver', APP_NAME)
-    with open('app.yaml', 'w+') as new_app_yaml_file:
-        new_app_yaml_file.write(content)
-
     if not os.path.exists(DEPLOY_DATA_PATH):
         raise Exception(
             'Could not find deploy_data directory at %s' % DEPLOY_DATA_PATH)
