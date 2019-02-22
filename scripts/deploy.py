@@ -166,21 +166,14 @@ def preprocess_release():
         new_assets_file.write(content)
 
 
-def _get_current_release_version():
-    """Retrieves the current branch's release version.
+def _execute_deployment():
+    """Executes the deployment process after doing the prerequisite checks."""
 
-    Returns:
-        str: The current (local) Oppia release version.
-    """
     if not common.is_current_branch_a_release_branch():
         raise Exception(
             'The deployment script must be run from a release branch.')
-    return CURRENT_BRANCH_NAME[len(
-        common.RELEASE_BRANCH_NAME_PREFIX):].replace('-', '.')
-
-
-def _execute_deployment():
-    """Executes the deployment process after doing the prerequisite checks."""
+    current_release_version = CURRENT_BRANCH_NAME[len(
+        common.RELEASE_BRANCH_NAME_PREFIX):].replace('.', '-')
 
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
@@ -267,7 +260,8 @@ def _execute_deployment():
         # Deploy export service to GAE.
         gcloud_adapter.deploy_application('export/app.yaml', APP_NAME)
         # Deploy app to GAE.
-        gcloud_adapter.deploy_application('./app.yaml', APP_NAME)
+        gcloud_adapter.deploy_application(
+            './app.yaml', APP_NAME, version=current_release_version)
 
         # Writing log entry.
         common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
@@ -283,9 +277,9 @@ def _execute_deployment():
     # already serving, open the library page (for sanity checking) and the GAE
     # error logs.
     currently_served_version = (
-        gcloud_adapter.get_currently_served_version(APP_NAME).replace('-', '.'))
+        gcloud_adapter.get_currently_served_version(APP_NAME))
     if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
-            currently_served_version == _get_current_release_version()):
+            currently_served_version == current_release_version):
         common.open_new_tab_in_browser_if_possible(
             'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
         common.open_new_tab_in_browser_if_possible(

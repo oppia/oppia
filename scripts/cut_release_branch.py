@@ -25,7 +25,6 @@ where x.y.z is the new version of Oppia, e.g. 2.5.3.
 
 import argparse
 import json
-import os
 import re
 import subprocess
 import sys
@@ -182,24 +181,6 @@ def _execute_branch_cut():
     # Cut a new release branch.
     print 'Cutting a new release branch: %s' % NEW_BRANCH_NAME
     subprocess.call(['git', 'checkout', '-b', NEW_BRANCH_NAME])
-
-    # Update the version in app.yaml.
-    print 'Updating the version number in app.yaml ...'
-    with open('app.yaml', 'r') as f:
-        content = f.read()
-        assert content.count('version: default') == 1
-    os.remove('app.yaml')
-    content = content.replace(
-        'version: default', 'version: %s' % NEW_APP_YAML_VERSION)
-    with open('app.yaml', 'w+') as f:
-        f.write(content)
-    print 'Version number updated.'
-
-    # Make a commit.
-    print 'Committing the change.'
-    subprocess.call([
-        'git', 'commit', '-a', '-m',
-        '"Update version number to %s"' % TARGET_VERSION])
 
     # Push the new release branch to GitHub.
     print 'Pushing new release branch to GitHub.'

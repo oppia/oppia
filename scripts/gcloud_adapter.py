@@ -65,13 +65,17 @@ def get_currently_served_version(app_name):
     return listed_versions[:listed_versions.index(' ')]
 
 
-def deploy_application(app_yaml_path, app_name):
+def deploy_application(app_yaml_path, app_name, version=None):
     """Deploys the service corresponding to the given app.yaml path to GAE.
 
     Args:
         app_yaml_path: str. The path to the app.yaml file.
         app_name: str. The name of the GCloud project.
+        version: str or None. If provided, the version to use.
     """
-    subprocess.check_output([
+    args = [
         GCLOUD_PATH, '--quiet', 'app', 'deploy', app_yaml_path,
-        '--project=%s' % app_name])
+        '--project=%s' % app_name]
+    if version is not None:
+        args.append('--version=%s' % version)
+    subprocess.check_output(args)
