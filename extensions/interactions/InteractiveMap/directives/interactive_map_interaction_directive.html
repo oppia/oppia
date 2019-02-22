@@ -36,9 +36,6 @@
 
 <div class="interactive-map-container">
   <div ng-style="overlayStyle">
-    <div id="map_canvas" ng-style="mapStyle" ui-map="map" ui-options="mapOptions"
-         ui-event="{'map-click': 'registerClick($event, $params)', 'map-mouseover': 'onMouseOver()',
-                   'map-mouseout': 'onMouseOut()'}">
-    </div>
+    <leaflet lf-center="mapOptions.center" markers="mapMarkers" event-broadcast="mapOptions.events" height="480px" width="100%"></leaflet>
   </div>
 </div>

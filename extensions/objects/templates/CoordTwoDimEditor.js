@@ -17,81 +17,54 @@ oppia.directive('coordTwoDimEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       controller: ['$scope', '$timeout', function($scope, $timeout) {
-        $scope.schemaLatitude = {
-          type: 'float',
-          validators: [{
-            id: 'is_at_least',
-            min_value: -90.0
-          }, {
-            id: 'is_at_most',
-            max_value: 90.0
-          }]
-        };
-
-        $scope.schemaLongitude = {
-          type: 'float',
-          validators: [{
-            id: 'is_at_least',
-            min_value: -180.0
-          }, {
-            id: 'is_at_most',
-            max_value: 180.0
-          }]
-        };
-
-        var updateMarker = function(lat, lng) {
-          var latLng = new google.maps.LatLng(lat, lng);
-
-          $timeout(function() {
-            if ($scope.mapMarker) {
-              $scope.mapMarker.setPosition(latLng);
-            } else {
-              $scope.mapMarker = new google.maps.Marker({
-                map: $scope.map,
-                position: latLng
-              });
+        angular.extend($scope, {
+          center: {
+            lat: $scope.value[0],
+            lng: $scope.value[1],
+            zoom: 0
+          },
+          markers: {
+            markersmarkers: {
+              lat: $scope.value[0],
+              lng: $scope.value[1],
+              focus: true,
+              draggable: true,
+              icon: {
+                iconUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-icon.png'),
+                shadowUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-shadow.png'),
+                iconAnchor: [12, 41],
+                shadowAnchor: [13, 41],
+                shadowSize: [41, 41],
+                iconSize: [25, 41]
+              },
             }
-          }, 10);
-        };
-
-        $scope.$watch('value', function(newValue, oldValue) {
-          // A new rule has just been created.
-          if ($scope.value === '') {
-            $scope.value = [0.0, 0.0];
-          }
-
-          if (!angular.equals(newValue, oldValue)) {
-            updateMarker(newValue[0], newValue[1]);
+          },
+          events: {
+            map: {
+              enable: ['click'],
+              logic: 'emit'
+            },
+            markers: {
+              enable: ['dragend']
+            }
           }
         });
 
-        // A new rule has just been created.
-        if ($scope.value === '') {
-          $scope.value = [0.0, 0.0];
-        }
+        $scope.$on('leafletDirectiveMap.click', function(event, args) {
+          var newLat = args.leafletEvent.latlng.lat;
+          var newLng = args.leafletEvent.latlng.lng;
+          $scope.value = [newLat, newLng];
+          updateMarker(newLat, newLng);
+        });
+        $scope.$on('leafletDirectiveMarker.dragend', function(event, args) {
+          $scope.value = [args.model.lat, args.model.lng];
+        });
 
-        // This is required in order to avoid the following bug:
-        //   http://stackoverflow.com/q/18769287
-        $timeout(function() {
-          updateMarker($scope.value[0], $scope.value[1]);
-          if ($scope.map) {
-            google.maps.event.trigger($scope.map, 'resize');
-          }
-        }, 100);
-
-        $scope.mapOptions = {
-          center: new google.maps.LatLng(
-            $scope.value[0],
-            $scope.value[1]
-          ),
-          mapTypeId: google.maps.MapTypeId.ROADMAP,
-          zoom: 0
-        };
-
-        $scope.registerClick = function($event, $params) {
-          var latLng = $params[0].latLng;
-          updateMarker(latLng.lat(), latLng.lng());
-          $scope.value = [latLng.lat(), latLng.lng()];
+        var updateMarker = function(lat, lng) {
+          $scope.markers.markersmarkers.lat = lat;
+          $scope.markers.markersmarkers.lng = lng;
         };
       }],
       restrict: 'E',

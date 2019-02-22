@@ -34,10 +34,12 @@ oppia.directive('oppiaResponseInteractiveMap', [
 
         var latLongPair = _answer[0] + ',' + _answer[1];
         $scope.staticMapUrl =
-          'https://maps.googleapis.com/maps/api/staticmap?' +
-          'center=' + latLongPair + '&zoom=4&size=500x400' +
-          '&maptype=roadmap&visual_refresh=true&markers=color:red|' +
-          latLongPair + '&sensor=false';
+          'https://staticmap.openstreetmap.de/staticmap.php?center=' +
+          latLongPair + '&zoom=14&size=865x512&maptype=mapnik';
+        // 'https://maps.googleapis.com/maps/api/staticmap?' +
+        // 'center=' + latLongPair + '&zoom=4&size=500x400' +
+        // '&maptype=roadmap&visual_refresh=true&markers=color:red|' +
+        // latLongPair + '&sensor=false';
       }]
     };
   }

@@ -43,6 +43,8 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             HtmlEscaperService.escapedJsonToObj($attrs.zoomWithValue));
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.mapMarkers = [];
+          var coords = $scope.coords || [0, 0];
+          var zoomLevel = parseInt($scope.zoom, 10) || 0;
 
           $scope.setOverlay = function() {
             $scope.overlayStyle = {
@@ -51,6 +53,20 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             $scope.mapStyle = {
               opacity: '0.8'
             };
+          };
+          var ICON = {
+            iconUrl: UrlInterpolationService.getExtensionResourceUrl(
+              '/interactions/InteractiveMap/static/marker-icon.png'),
+            shadowUrl: UrlInterpolationService.getExtensionResourceUrl(
+              '/interactions/InteractiveMap/static/marker-shadow.png'),
+            iconRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
+              '/interactions/InteractiveMap/static/marker-icon-2x.png'),
+            shadowRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
+              '/interactions/InteractiveMap/static/marker-shadow.png'),
+            iconAnchor: [12, 41],
+            shadowAnchor: [13, 41],
+            shadowSize: [41, 41],
+            iconSize: [25, 41]
           };
 
           $scope.hideOverlay = function() {
@@ -62,6 +78,14 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             };
           };
 
+          var addNewMarker = function(lat, lng) {
+            var newMarker = {
+              lat: lat,
+              lng: lng,
+              icon: ICON
+            };
+            $scope.mapMarkers.push(angular.copy(newMarker));
+          };
 
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
@@ -72,61 +96,44 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             refreshMap();
           });
 
-          // This is required in order to avoid the following bug:
-          //   http://stackoverflow.com/questions/18769287
           var refreshMap = function() {
-            $timeout(function() {
-              google.maps.event.trigger($scope.map, 'resize');
-              $scope.map.setCenter({
+            $scope.mapOptions = {
+              center: {
                 lat: coords[0],
-                lng: coords[1]
-              });
-              if (!$scope.interactionIsActive) {
-                $scope.mapMarkers.push(new google.maps.Marker({
-                  map: $scope.map,
-                  position: new google.maps.LatLng(
-                    $scope.getLastAnswer()[0], $scope.getLastAnswer()[1])
-                }));
-              }
-            }, 100);
+                lng: coords[1],
+                zoom: zoomLevel
+              },
+              events: {}
+            };
+            if (!$scope.interactionIsActive) {
+              addNewMarker(scope.getLastAnswer()[0], $scope.getLastAnswer()[1]);
+            }
           };
 
-          var coords = $scope.coords || [0, 0];
-          var zoomLevel = parseInt($scope.zoom, 10) || 0;
-          $scope.mapOptions = {
-            center: new google.maps.LatLng(coords[0], coords[1]),
-            zoom: zoomLevel,
-            mapTypeId: google.maps.MapTypeId.ROADMAP,
-            draggable: $scope.interactionIsActive
-          };
-
-          $scope.onMouseOver = function() {
+          $scope.$on('leafletDirectiveMap.mouseover', function(event) {
             if ($scope.interactionIsActive) {
               return;
             }
             $scope.setOverlay();
-          };
+          });
 
-          $scope.onMouseOut = function() {
+          $scope.$on('leafletDirectiveMap.mouseout', function(event) {
             if ($scope.interactionIsActive) {
               return;
             }
-            $scope.hideOverlay();
-          };
+            $scope.setOverlay();
+          });
 
-          $scope.registerClick = function($event, $params) {
+          $scope.$on('leafletDirectiveMap.click', function(event, args) {
             if (!$scope.interactionIsActive) {
               return;
             }
-            var ll = $params[0].latLng;
-            $scope.mapMarkers.push(new google.maps.Marker({
-              map: $scope.map,
-              position: ll
-            }));
-
+            var newLat = args.leafletEvent.latlng.lat;
+            var newLng = args.leafletEvent.latlng.lng;
+            addNewMarker(newLat, newLng);
             CurrentInteractionService.onSubmit(
-              [ll.lat(), ll.lng()], interactiveMapRulesService);
-          };
+              [newLat, newLng], interactiveMapRulesService);
+          });
 
           refreshMap();
         }
