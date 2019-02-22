@@ -54,6 +54,8 @@ import gcloud_adapter  # pylint: disable=relative-import
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--app_name', help='name of the app to deploy to', type=str)
+_PARSER.add_argument(
+    '--version', help='version to deploy', type=str)
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
 APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
@@ -65,6 +67,10 @@ if PARSED_ARGS.app_name:
             APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER] and (
                 'migration' not in APP_NAME):
         raise Exception('Invalid app name: %s' % APP_NAME)
+    if PARSED_ARGS.version and APP_NAME == APP_NAME_OPPIASERVER:
+        raise Exception('Cannot use custom version with production app.')
+    # Note that CUSTOM_VERSION may be None.
+    CUSTOM_VERSION = PARSED_ARGS.version
 else:
     raise Exception('No app name specified.')
 
@@ -240,7 +246,8 @@ def _execute_deployment():
         gcloud_adapter.deploy_application('export/app.yaml', APP_NAME)
         # Deploy app to GAE.
         gcloud_adapter.deploy_application(
-            './app.yaml', APP_NAME, version=current_release_version)
+            './app.yaml', APP_NAME, version=(
+                CUSTOM_VERSION if CUSTOM_VERSION else current_release_version))
 
         # Writing log entry.
         common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
