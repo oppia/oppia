@@ -22,12 +22,12 @@ oppia.constant('EVENT_STORY_INITIALIZED', 'storyInitialized');
 oppia.constant('EVENT_STORY_REINITIALIZED', 'storyReinitialized');
 
 oppia.factory('StoryEditorStateService', [
-  '$rootScope', 'AlertsService', 'StoryObjectFactory',
-  'UndoRedoService', 'EditableStoryBackendApiService',
+  '$rootScope', 'AlertsService', 'EditableStoryBackendApiService',
+  'StoryObjectFactory', 'UndoRedoService',
   'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
   function(
-      $rootScope, AlertsService, StoryObjectFactory,
-      UndoRedoService, EditableStoryBackendApiService,
+      $rootScope, AlertsService, EditableStoryBackendApiService,
+      StoryObjectFactory, UndoRedoService,
       EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
     var _story = StoryObjectFactory.createInterstitialStory();
     var _storyIsInitialized = false;
