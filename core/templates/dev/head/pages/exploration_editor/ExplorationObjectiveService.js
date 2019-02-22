@@ -18,11 +18,11 @@
  */
 
 oppia.factory('ExplorationObjectiveService', [
-  'ExplorationPropertyService', '$filter', 'ValidatorsService',
-  'ExplorationRightsService',
+  '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
+  'ValidatorsService',
   function(
-      ExplorationPropertyService, $filter, ValidatorsService,
-      ExplorationRightsService) {
+      $filter, ExplorationPropertyService, ExplorationRightsService,
+      ValidatorsService) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'objective';
     child._normalize = $filter('normalizeWhitespace');

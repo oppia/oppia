@@ -17,7 +17,7 @@
  */
 
 oppia.directive('searchResults', [
-  'UrlInterpolationService', '$q', function(UrlInterpolationService, $q) {
+  '$q', 'UrlInterpolationService', function($q, UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
