@@ -75,6 +75,7 @@ def deploy_application(app_yaml_path, app_name, version=None):
     """
     args = [
         GCLOUD_PATH, '--quiet', 'app', 'deploy', app_yaml_path,
+        '--no-promote', '--no-stop-previous-version',
         '--project=%s' % app_name]
     if version is not None:
         args.append('--version=%s' % version)
