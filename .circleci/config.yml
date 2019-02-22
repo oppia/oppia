@@ -79,7 +79,7 @@ jobs:
       - run:
           name: Run backend tests
           command: |
-            bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests
+            bash scripts/run_backend_tests.sh --exclude_load_tests
       - run:
           name: Generate backend coverage report
           command: |
