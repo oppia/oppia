@@ -17,9 +17,9 @@
  */
 
 oppia.directive('oppiaResponseNumberWithUnits', [
-  'NumberWithUnitsObjectFactory', 'HtmlEscaperService',
-  'UrlInterpolationService', function(NumberWithUnitsObjectFactory,
-      HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
+  'UrlInterpolationService', function(HtmlEscaperService,
+      NumberWithUnitsObjectFactory, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
