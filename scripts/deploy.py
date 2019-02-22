@@ -58,6 +58,7 @@ import string
 import subprocess
 
 import common  # pylint: disable=relative-import
+import gcloud_adapter  # pylint: disable=relative-import
 
 # pylint: enable=wrong-import-order
 
@@ -82,17 +83,12 @@ else:
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 CURRENT_BRANCH_NAME = common.get_current_branch_name()
-RELEASE_BRANCH_NAME_PREFIX = 'release-'
 
 RELEASE_DIR_NAME = 'deploy-%s-%s-%s' % (
     '-'.join('-'.join(APP_NAME.split('.')).split(':')),
     CURRENT_BRANCH_NAME,
     CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
-
-APPCFG_PATH = os.path.join(
-    '..', 'oppia_tools', 'google_appengine_1.9.67', 'google_appengine',
-    'appcfg.py')
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 INDEX_YAML_PATH = os.path.join('.', 'index.yaml')
@@ -170,43 +166,28 @@ def preprocess_release():
         new_assets_file.write(content)
 
 
-def _get_served_version():
-    """Retrieves the default version being served on the specified application
-    being served on app engine.
-
-    Returns:
-        (str): The current serving version.
-    """
-    listed_versions = subprocess.check_output(
-        [APPCFG_PATH, '--application=%s' % APP_NAME, 'list_versions'])
-    default_version_line_start_str = 'default: ['
-    listed_versions = listed_versions[
-        listed_versions.index(default_version_line_start_str) + len(
-            default_version_line_start_str):]
-    return listed_versions[:listed_versions.index(',')].replace('-', '.')
-
-
 def _get_current_release_version():
     """Retrieves the current branch's release version.
 
     Returns:
-        (str): The current (local) Oppia release version.
+        str: The current (local) Oppia release version.
     """
-    if not CURRENT_BRANCH_NAME.startswith(RELEASE_BRANCH_NAME_PREFIX):
+    if not common.is_current_branch_a_release_branch():
         raise Exception(
             'The deployment script must be run from a release branch.')
     return CURRENT_BRANCH_NAME[len(
-        RELEASE_BRANCH_NAME_PREFIX):].replace('-', '.')
+        common.RELEASE_BRANCH_NAME_PREFIX):].replace('-', '.')
 
 
 def _execute_deployment():
     """Executes the deployment process after doing the prerequisite checks."""
+
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
-    common.require_gcloud_to_be_available()
+    gcloud_adapter.require_gcloud_to_be_available()
     if APP_NAME in [APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER]:
-        if not CURRENT_BRANCH_NAME.startswith(RELEASE_BRANCH_NAME_PREFIX):
+        if not common.is_current_branch_a_release_branch():
             raise Exception(
                 'The deployment script must be run from a release branch.')
     if APP_NAME == APP_NAME_OPPIASERVER:
@@ -216,14 +197,13 @@ def _execute_deployment():
                     'MAILGUN_API_KEY = None' in feconf_contents):
                 raise Exception(
                     'The mailgun API key must be added before deployment.')
-
-    current_git_revision = subprocess.check_output(
-        ['git', 'rev-parse', 'HEAD']).strip()
-
     if not os.path.exists(THIRD_PARTY_DIR):
         raise Exception(
             'Could not find third_party directory at %s. Please run start.sh '
             'prior to running this script.' % THIRD_PARTY_DIR)
+
+    current_git_revision = subprocess.check_output(
+        ['git', 'rev-parse', 'HEAD']).strip()
 
     # Create a folder in which to save the release candidate.
     print 'Ensuring that the release directory parent exists'
@@ -251,10 +231,7 @@ def _execute_deployment():
         # NOTE: This assumes that the build process does not modify the
         # index.yaml file or create a different version of it to use in
         # production.
-        assert os.path.isfile(INDEX_YAML_PATH)
-        subprocess.check_output([
-            common.GCLOUD_PATH, '--quiet', 'datastore', 'indexes', 'create',
-            INDEX_YAML_PATH, '--project=%s' % APP_NAME])
+        gcloud_adapter.update_indexes(INDEX_YAML_PATH, APP_NAME)
         datastore_indexes_url = (
             'https://console.cloud.google.com/datastore/indexes?project=%s' %
             APP_NAME)
@@ -282,19 +259,15 @@ def _execute_deployment():
             if not line:
                 break
             print line
-
         # Wait for process to terminate, then check return code.
         build_process.communicate()
         if build_process.returncode > 0:
             raise Exception('Build failed.')
 
         # Deploy export service to GAE.
-        subprocess.check_output([
-            common.GCLOUD_PATH, '--quiet', 'app', 'deploy', 'export/app.yaml',
-            '--project=%s' % APP_NAME])
-
+        gcloud_adapter.deploy_application('export/app.yaml', APP_NAME)
         # Deploy app to GAE.
-        subprocess.check_output([APPCFG_PATH, 'update', '.'])
+        gcloud_adapter.deploy_application('./app.yaml', APP_NAME)
 
         # Writing log entry.
         common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
@@ -309,8 +282,10 @@ def _execute_deployment():
     # If this is a test server deployment and the current release version is
     # already serving, open the library page (for sanity checking) and the GAE
     # error logs.
+    currently_served_version = (
+        gcloud_adapter.get_currently_served_version(APP_NAME).replace('-', '.'))
     if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
-            _get_served_version() == _get_current_release_version()):
+            currently_served_version == _get_current_release_version()):
         common.open_new_tab_in_browser_if_possible(
             'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
         common.open_new_tab_in_browser_if_possible(
