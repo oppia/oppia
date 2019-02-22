@@ -191,7 +191,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
-    def test_that_email_not_sent_if_can_send_emails_false(self):
+    def test_that_email_not_sent_if_can_send_emails_is_false(self):
         with self.can_not_send_emails_ctx:
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
@@ -199,7 +199,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
-    def test_that_email_not_sent_if_can_send_editor_role_email_is_false(self):
+    def test_that_email_not_sent_if_can_send_editor_role_emails_is_false(self):
         with self.can_send_emails_ctx, self.can_not_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_manager.ROLE_EDITOR,
@@ -1234,7 +1234,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
         self.can_not_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
 
-    def test_email_not_sent_if_can_send_emails_false(self):
+    def test_email_not_sent_if_can_send_emails_is_false(self):
         feedback_messages = {
             self.exploration.id: {
                 'title': self.exploration.title,
@@ -1248,7 +1248,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
-    def test_email_not_sent_if_can_send_feedback_message_emails_false(self):
+    def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
         feedback_messages = {
             self.exploration.id: {
                 'title': self.exploration.title,
@@ -1262,7 +1262,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
-    def test_that_email_not_sent_if_not_feedback_messages(self):
+    def test_that_email_not_sent_if_feedback_messages_are_empty(self):
         feedback_messages = {}
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             email_manager.send_feedback_message_email(
@@ -1376,23 +1376,23 @@ class SuggestionEmailTests(test_utils.GenericTestBase):
         self.can_not_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
 
-    def test_that_email_not_sent_if_can_send_emails_false(self):
+    def test_that_email_not_sent_if_can_send_emails_is_false(self):
         with self.can_not_send_emails_ctx:
             email_manager.send_suggestion_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
                 self.recipient_list)
 
-            # Make sure that email is not sent.
+            # Check that email is not sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
-    def test_that_email_not_sent_if_can_send_feedback_email_is_false(self):
+    def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
         with self.can_send_emails_ctx, self.can_not_send_feedback_email_ctx:
             email_manager.send_suggestion_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
                 self.recipient_list)
 
-            # Make sure that email is not sent.
+            # Check that email is not sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
@@ -1485,7 +1485,7 @@ class SubscriptionEmailTests(test_utils.GenericTestBase):
         self.can_not_send_subscription_email_ctx = self.swap(
             feconf, 'CAN_SEND_SUBSCRIPTION_EMAILS', False)
 
-    def test_that_email_not_sent_if_can_send_emails_false(self):
+    def test_that_email_not_sent_if_can_send_emails_is_false(self):
         with self.can_not_send_emails_ctx:
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
@@ -1707,7 +1707,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
         self.can_not_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
 
-    def test_that_email_not_sent_if_can_send_emails_false(self):
+    def test_that_email_not_sent_if_can_send_emails_is_false(self):
         with self.can_not_send_emails_ctx:
             email_manager.send_flag_exploration_email(
                 self.exploration.title, self.exploration.id, self.new_user_id,
@@ -1823,7 +1823,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
         self.can_not_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
 
-    def test_that_email_not_sent_if_can_send_emails_false(self):
+    def test_that_email_not_sent_if_can_send_emails_is_false(self):
         with self.can_not_send_emails_ctx:
             email_manager.send_mail_to_onboard_new_reviewers(
                 self.reviewer_id, 'Algebra')
@@ -1900,7 +1900,7 @@ class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
         self.can_not_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', False)
 
-    def test_that_email_not_sent_if_can_send_emails_false(self):
+    def test_that_email_not_sent_if_can_send_emails_is_false(self):
         with self.can_not_send_emails_ctx:
             email_manager.send_mail_to_notify_users_to_review(
                 self.reviewer_id, 'Algebra')
@@ -2232,32 +2232,17 @@ class BulkEmailsTests(test_utils.GenericTestBase):
             sent_email_model.intent,
             feconf.BULK_EMAIL_INTENT_MARKETING)
 
-    def test_that_email_not_sent_if_cleaned_not_equal_html(self):
+    def test_email_not_sent_if_original_html_not_matches_cleaned_html(self):
         email_subject = 'Dummy Email Subject'
         email_html_body = 'Dummy email body.<td>'
 
-        logged_errors = []
-
-        def _log_error_for_tests(error_message):
-            """Appends the error message to the logged errors list."""
-            logged_errors.append(error_message)
-
-        log_new_error_counter = test_utils.CallCounter(_log_error_for_tests)
-        log_new_error_ctx = self.swap(
-            email_manager, 'log_new_error', log_new_error_counter)
-        with self.can_send_emails_ctx, log_new_error_ctx:
-            self.assertEqual(log_new_error_counter.times_called, 0)
+        with self.can_send_emails_ctx:
             # pylint: disable=protected-access
             email_manager._send_bulk_mail(
                 self.recipient_ids, self.sender_id,
                 feconf.BULK_EMAIL_INTENT_MARKETING, email_subject,
                 email_html_body, self.SENDER_EMAIL, self.SENDER_USERNAME)
             # pylint: enable=protected-access
-
-            # An error should be recorded in the logs.
-            self.assertEqual(log_new_error_counter.times_called, 1)
-            self.assertTrue(logged_errors[0].startswith(
-                'Original email HTML body does not match cleaned HTML body'))
 
             # Check that no email was sent.
             messages_a = self.mail_stub.get_sent_messages(
@@ -2288,7 +2273,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         all_models = email_models.BulkEmailModel.get_all().fetch()
         self.assertEqual(len(all_models), 0)
 
-    def test_that_test_email_sent_for_bulk_emails(self):
+    def test_that_test_email_is_sent_for_bulk_emails(self):
         email_subject = 'Test Subject'
         email_body = 'Test Body'
         with self.can_send_emails_ctx:
@@ -2393,14 +2378,14 @@ class ModeratorActionEmailsTests(test_utils.GenericTestBase):
         self.can_send_email_moderator_action_ctx = self.swap(
             feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True)
 
-    def test_exception_raised_if_email_on_moderator_action_false(self):
+    def test_exception_raised_if_email_on_moderator_action_is_false(self):
         with self.assertRaisesRegexp(
             Exception,
             'For moderator emails to be sent, please ensure that '
             'REQUIRE_EMAIL_ON_MODERATOR_ACTION is set to True.'):
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
-    def test_exception_raised_if_can_send_emails_false(self):
+    def test_exception_raised_if_can_send_emails_is_false(self):
         with self.can_send_email_moderator_action_ctx, self.assertRaisesRegexp(
             Exception,
             'For moderator emails to be sent, please ensure that '
