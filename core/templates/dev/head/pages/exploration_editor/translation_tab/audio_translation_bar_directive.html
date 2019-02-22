@@ -1,8 +1,7 @@
 <div  class="oppia-drop-area" ng-if="showDropArea">
   <div class="oppia-blur-background"></div>
   <div class="oppia-drop-area-message" ng-if="guest == false && disallowed == false">Drop your file here!</div>
-  <div class="oppia-drop-area-message-disallow" ng-if="guest">Please try logging.</div>
-  <div class="oppia-drop-area-message-disallow" ng-if="disallowed">You do not have the right to perform this action.</div>
+  <div class="oppia-drop-area-message-disallow" ng-if="guest">Please log in to upload audio files.</div>
 </div>
 <div class="oppia-audio-recording-bar" ng-show="(!isAudioAvailable || audioIsUpdating) && !selectedRecording">
   <div class="oppia-content-wrapper">
