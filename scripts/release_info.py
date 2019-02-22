@@ -145,7 +145,7 @@ def _check_versions(current_release):
 
 
 def _git_diff_names_only(left, right='HEAD'):
-    """ Get names of changed files from git.
+    """Get names of changed files from git.
 
     Args:
         left: str. Lefthand timepoint.

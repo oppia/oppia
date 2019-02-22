@@ -17,10 +17,10 @@
  */
 
 oppia.factory('NumberWithUnitsValidationService', [
-  'WARNING_TYPES', 'baseInteractionValidationService',
-  'NumberWithUnitsObjectFactory',
-  function(WARNING_TYPES, baseInteractionValidationService,
-      NumberWithUnitsObjectFactory) {
+  'NumberWithUnitsObjectFactory', 'baseInteractionValidationService',
+  'WARNING_TYPES',
+  function(NumberWithUnitsObjectFactory, baseInteractionValidationService,
+      WARNING_TYPES) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         return [];

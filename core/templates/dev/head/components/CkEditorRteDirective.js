@@ -17,8 +17,8 @@
  */
 
 oppia.directive('ckEditorRte', [
-  'RteHelperService', 'ContextService', 'PAGE_CONTEXT',
-  function(RteHelperService, ContextService, PAGE_CONTEXT) {
+  'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
+  function(ContextService, RteHelperService, PAGE_CONTEXT) {
     return {
       restrict: 'E',
       scope: {
