@@ -179,12 +179,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': r'text\/ng-template',
         'message': 'The directives must be directly referenced.',
-        'excluded_files': (
-            'core/templates/dev/head/pages/exploration_player/'
-            'feedback_popup_container_directive.html',
-            'core/templates/dev/head/pages/exploration_player/'
-            'input_response_pair_directive.html'
-        ),
+        'excluded_files': (),
         'excluded_dirs': (
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
@@ -1159,6 +1154,8 @@ def _check_docstrings(all_files):
     previous_line_message = (
         'There should not be any empty lines before the end of '
         'the multi-line docstring.')
+    space_after_triple_quotes_in_docstring_message = (
+        'There should be no space after """ in docstring.')
     failed = False
     is_docstring = False
     is_class_or_function = False
@@ -1182,6 +1179,16 @@ def _check_docstrings(all_files):
                             line.startswith('"""')):
                         is_docstring = True
                         is_class_or_function = False
+
+                # Check for space after """ in docstring.
+                if re.match(r'^""".+$', line) and is_docstring and (
+                        line[3] == ' '):
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1,
+                        space_after_triple_quotes_in_docstring_message)
+                    print ''
+                    is_docstring = False
 
                 # Check if single line docstring span two lines.
                 if line == '"""' and prev_line.startswith('"""') and (
@@ -1238,13 +1245,13 @@ def _check_docstrings(all_files):
 
                     is_docstring = False
 
-        # Check that the args in the docstring are listed in the same
-        # order as they appear in the function definition.
         docstring_checker = docstrings_checker.ASTDocStringChecker()
         for filename in files_to_check:
             ast_file = ast.walk(ast.parse(FileCache.read(filename)))
             func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
             for func in func_defs:
+                # Check that the args in the docstring are listed in the same
+                # order as they appear in the function definition.
                 func_result = docstring_checker.check_docstrings_arg_order(func)
                 for error_line in func_result:
                     print '%s --> Func %s: %s' % (
@@ -1639,6 +1646,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
     def __init__(self, filename, file_lines, debug, failed=False):
+        """Define various variables to parse HTML."""
         HTMLParser.HTMLParser.__init__(self)
         self.tag_stack = []
         self.debug = debug
@@ -1653,6 +1661,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             'param', 'source', 'track', 'wbr']
 
     def handle_starttag(self, tag, attrs):
+        """Handle start tag of a HTML line."""
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
         expected_indentation = self.indentation_level * self.indentation_width
@@ -1731,6 +1740,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                 self.failed = True
 
     def handle_endtag(self, tag):
+        """Handle end tag of a HTML line."""
         line_number, _ = self.getpos()
         tag_line = self.file_lines[line_number - 1]
         leading_spaces_count = len(tag_line) - len(tag_line.lstrip())
@@ -1764,6 +1774,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             print self.tag_stack
 
     def handle_data(self, data):
+        """Handle indentation level."""
         data_lines = data.split('\n')
         opening_block = tuple(['{% block', '{% macro', '{% if'])
         ending_block = tuple(['{% end', '{%- end'])
