@@ -47,7 +47,7 @@ oppia.factory('StateEditorService', [
       isExplorationWhitelisted: function() {
         return explorationIsWhitelisted;
       },
-      setExplorationIsWhitelisted: function(value) {
+      updateExplorationWhitelistedStatus: function(value) {
         explorationIsWhitelisted = value;
       },
       setMisconceptions: function(newMisconceptions) {
