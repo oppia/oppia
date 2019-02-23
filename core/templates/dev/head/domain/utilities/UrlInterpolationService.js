@@ -119,7 +119,8 @@ oppia.factory('UrlInterpolationService', [
         }
 
         var escapedInterpolationValues = {};
-        for (var varName in interpolationValues) {
+        var varName;
+        for (varName in interpolationValues) {
           var value = interpolationValues[varName];
           if (!UtilsService.isString(value)) {
             AlertsService.fatalWarning(
@@ -135,7 +136,7 @@ oppia.factory('UrlInterpolationService', [
         var filledUrl = angular.copy(urlTemplate);
         var match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
         while (match) {
-          var varName = match[1];
+          varName = match[1];
           if (!escapedInterpolationValues.hasOwnProperty(varName)) {
             AlertsService.fatalWarning('Expected variable \'' + varName +
               '\' when interpolating URL.');

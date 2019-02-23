@@ -155,7 +155,7 @@ oppia.filter('isFloat', [function() {
 
     var viewValue = '';
     try {
-      var viewValue = input.toString().trim();
+      viewValue = input.toString().trim();
     } catch (e) {
       return undefined;
     }

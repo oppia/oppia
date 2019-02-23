@@ -27,7 +27,8 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
 
-var ExplorationEditorMainTab = function() {
+var ExplorationEditorMainTab;
+ExplorationEditorMainTab = function() {
   /*
    * Interactive elements
    */

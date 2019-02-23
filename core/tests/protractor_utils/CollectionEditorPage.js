@@ -19,7 +19,8 @@
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var CollectionEditorPage = function() {
+var CollectionEditorPage;
+CollectionEditorPage = function() {
   var addExplorationButton = element(
     by.css('.protractor-test-add-exploration-button'));
   var addExplorationInput = element(

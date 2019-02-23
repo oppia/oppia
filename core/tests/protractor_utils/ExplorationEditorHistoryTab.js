@@ -20,7 +20,8 @@
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
-var ExplorationEditorHistoryTab = function() {
+var ExplorationEditorHistoryTab;
+ExplorationEditorHistoryTab = function() {
   /*
    * Interactive elements
    */

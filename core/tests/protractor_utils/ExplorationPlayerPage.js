@@ -21,7 +21,8 @@ var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 
-var ExplorationPlayerPage = function() {
+var ExplorationPlayerPage;
+ExplorationPlayerPage = function() {
   var conversationInput = element(
     by.css('.protractor-test-conversation-input'));
   var suggestionDescriptionInput = element(

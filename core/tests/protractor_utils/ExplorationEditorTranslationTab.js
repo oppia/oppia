@@ -18,7 +18,8 @@
  */
 var waitFor = require('../protractor_utils/waitFor.js');
 
-var ExplorationEditorTranslationTab = function() {
+var ExplorationEditorTranslationTab;
+ExplorationEditorTranslationTab = function() {
   var dismissWelcomeModalButton = element(
     by.css('.protractor-test-translation-tab-dismiss-welcome-modal'));
   var translationWelcomeModal = element(

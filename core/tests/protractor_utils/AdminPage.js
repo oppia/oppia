@@ -21,7 +21,8 @@ var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var AdminPage = function() {
+var AdminPage;
+AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
   var configTab = element(by.css('.protractor-test-admin-config-tab'));
   var saveAllConfigs = element(by.css('.protractor-test-save-all-configs'));
