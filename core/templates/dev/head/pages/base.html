@@ -155,8 +155,7 @@
         </div>
       </div>
 
-      <div ng-if="DEV_MODE" class="oppia-dev-mode"  ng-cloak>
-        Dev Mode
+      <div ng-if="DEV_MODE" class="oppia-dev-mode" ng-bind="dev_mode_label">
       </div>
 
       <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank"
