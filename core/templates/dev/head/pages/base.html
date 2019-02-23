@@ -18,6 +18,8 @@
     <div ng-show="loadingMessage" class="oppia-loading-fullpage">
       <div class="oppia-align-center">
         <span translate="<[loadingMessage]>"></span>
+You’re editing a file in a project you don’t have write access to. Submitting a change to this file will write it to a new branch in your fork amey-kudari/oppia, so you can send a pull request.
+
         <span class="oppia-loading-dot-one">.</span>
         <span class="oppia-loading-dot-two">.</span>
         <span class="oppia-loading-dot-three">.</span>
@@ -89,6 +91,12 @@
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
     </script>
+    
+    <style>
+      [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak{
+        display: none !important;
+      }
+    </style>
 
     {% block header_js %}
       {% include 'pages/header_js_libs.html' %}
@@ -155,7 +163,7 @@
         </div>
       </div>
 
-      <div ng-if="DEV_MODE" class="oppia-dev-mode">
+      <div ng-if="DEV_MODE" class="oppia-dev-mode ng-cloak">
         Dev Mode
       </div>
 
