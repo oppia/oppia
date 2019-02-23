@@ -43,6 +43,7 @@ env:
     - RUN_E2E_TESTS_PREFERENCES=true
     - RUN_E2E_TESTS_PROFILE_MENU=true
     - RUN_E2E_TESTS_PUBLICATION=true
+    - RUN_E2E_TESTS_SKILL_EDITOR=true
     - RUN_E2E_TESTS_SUBSCRIPTIONS=true
     - RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD=true
     - RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR=true
@@ -127,6 +128,7 @@ script:
 - if [ "$RUN_E2E_TESTS_PREFERENCES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="preferences" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PROFILE_MENU" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="profileMenu" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PUBLICATION" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="publication" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="skillEditorPage" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_SUBSCRIPTIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicsAndSkillsDashboard" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor" --prod_env; fi
