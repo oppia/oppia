@@ -709,7 +709,9 @@ class SignUpTests(test_utils.GenericTestBase):
         response = self.get_html_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        os.environ['USER_ID'] = ''
+        response = self.get_html_response('/about', expected_status_int=302)
+        self.assertIn('Logout', response.location)
+        self.logout()
 
         response = self.post_json(
             feconf.SIGNUP_DATA_URL, {
