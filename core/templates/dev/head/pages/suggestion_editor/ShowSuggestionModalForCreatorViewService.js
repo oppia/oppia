@@ -105,7 +105,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
 
         $http.put(url, data).then(function() {
           for (var i = 0; i < suggestionsToReviewList.length; i++) {
-            if (suggestionsToReviewList[i] === $scope.activeThread) {
+            if (suggestionsToReviewList[i] === activeThread) {
               suggestionsToReviewList.splice(i, 1);
               break;
             }
