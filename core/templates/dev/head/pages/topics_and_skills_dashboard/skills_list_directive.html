@@ -26,7 +26,7 @@
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
         <a ng-href="<[skillLink]>" class="list-summary">
-          <span> <[skill.description]> </span>
+          <span class="protractor-test-skill-description"> <[skill.description]> </span>
         </a>
       </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"

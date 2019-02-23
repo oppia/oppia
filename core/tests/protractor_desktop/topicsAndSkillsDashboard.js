@@ -81,9 +81,6 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
   });
 
-  // TODO(aks681): Once skill editor tests are done by Nalin, add tests here
-  // regarding published skills.
-
   afterEach(function() {
     general.checkForConsoleErrors([]);
     users.logout();

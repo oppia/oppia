@@ -21,6 +21,7 @@ var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
 var SkillEditorPage = function() {
+  var EDITOR_URL_PREFIX = '/skill_editor/';
   var EditConceptCardExplanationButton = element(
     by.css('.protractor-test-edit-concept-card'));
   var saveConceptCardExplanationButton = element(
@@ -30,7 +31,7 @@ var SkillEditorPage = function() {
   var addWorkedExampleButton = element(
     by.css('.protractor-test-add-worked-example'));
   var saveWorkedExampleButton = element(
-    by.css('.protractor-test-save-worked-example'));
+    by.css('.protractor-test-save-worked-example-button'));
   var workedExampleSummary = function(index) {
     return element(by.css('.protractor-test-worked-example-' + index));
   };
@@ -40,7 +41,7 @@ var SkillEditorPage = function() {
       .element(by.css('.oppia-delete-example-button'));
   };
   var confirmDeleteWorkedExample = element(
-    by.css('.protractor-test-confirm-delete-worked-example'));
+    by.css('.protractor-test-confirm-delete-worked-example-button'));
   var addMisconceptionButton = element(
     by.css('.protractor-test-add-misconception-modal-button'));
   var misconceptionNameField = element(
@@ -52,7 +53,7 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-feedback-textarea'))
     .all(by.tagName('p')).last();
   var confirmAddMisconception = element(
-    by.css('.protractor-test-confirm-add-misconception'));
+    by.css('.protractor-test-confirm-add-misconception-button'));
   var misconceptionListItems = element.all(
     by.css('.protractor-test-misconception-list-item'));
   var deleteMisconceptionButton = function(index) {
@@ -61,7 +62,54 @@ var SkillEditorPage = function() {
       .element(by.css('.oppia-delete-example-button'));
   };
   var confirmDeleteMisconception =
-    element(by.css('.protractor-test-confirm-delete-misconception'));
+    element(by.css('.protractor-test-confirm-delete-misconception-button'));
+  var publishButton = element(by.css('.protractor-test-editor-publish-button'));
+  var confirmSkillPublishButton = element(
+    by.css('.protractor-test-confirm-skill-publish-button'));
+  var saveOrPublishSkillButton = element(
+    by.css('.protractor-test-save-or-publish-skill')
+  );
+  var closeSaveModalButton = element(
+    by.css('.protractor-test-close-save-modal-button'));
+  var commitMessageField = element(
+    by.css('.protractor-test-commit-message-input'));
+  var skillDescriptionField = element(
+    by.css('.protractor-test-skill-description-field'));
+
+  this.get = function(skillId) {
+    browser.get(EDITOR_URL_PREFIX + skillId);
+    return waitFor.pageToFullyLoad();
+  };
+
+  this.changeSkillDescription = function(description) {
+    skillDescriptionField.clear();
+    skillDescriptionField.sendKeys(description);
+  };
+
+  this.expectSkillDescriptionToBe = function(description) {
+    expect(skillDescriptionField.getAttribute('value')).toEqual(description);
+  };
+
+
+  this.firstTimePublishSkill = function() {
+    publishButton.click();
+
+    waitFor.elementToBeClickable(
+      confirmSkillPublishButton,
+      'Confirm skill publish button takes too long to be clickable');
+    confirmSkillPublishButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.saveOrPublishSkill = function(commitMessage) {
+    saveOrPublishSkillButton.click();
+
+    commitMessageField.sendKeys(commitMessage);
+    waitFor.elementToBeClickable(
+      closeSaveModalButton,
+      'Close save modal button takes too long to be clickable');
+    closeSaveModalButton.click();
+  };
 
   this.editConceptCard = function(explanation) {
     EditConceptCardExplanationButton.click();
@@ -106,7 +154,7 @@ var SkillEditorPage = function() {
       'Add Worked Example Modal takes too long to close');
   };
 
-  this.deleteWorkedExample = function(index) {
+  this.deleteWorkedExampleWithIndex = function(index) {
     deleteWorkedExampleButton(index).click();
 
     var deleteWorkedExampleModal =

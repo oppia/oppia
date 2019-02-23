@@ -31,26 +31,39 @@ var SkillEditorPage =
 describe('Skill Editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
+  var skillId = null;
 
   beforeAll(function() {
-    users.createAdmin('test@example.com',
-      'skillEditor');
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     skillEditorPage =
       new SkillEditorPage.SkillEditorPage();
+    users.createAndLoginAdminUser(
+      'creator@skillEditor.com', 'creatorSkillEditor');
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createSkillWithDescription('Skill 1');
+    browser.getCurrentUrl().then(function(url) {
+      skillId = url.split('/')[4];
+    });
   });
 
   beforeEach(function() {
-    users.login('test@example.com');
-
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createSkillWithDescription('Test Skill');
+    users.login('creator@skillEditor.com');
+    skillEditorPage.get(skillId);
   });
 
-  it('should edit concept card explanation', function() {
+  fit('should edit description and concept card explanation', function() {
+    skillEditorPage.changeSkillDescription('Skill 1 edited');
     skillEditorPage.editConceptCard('Test concept card explanation');
+    skillEditorPage.saveOrPublishSkill(
+      'Changed skill description and added review material.');
 
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.expectSkillDescriptionToBe(
+      'Skill 1 edited', 0);
+
+    skillEditorPage.get(skillId);
+    skillEditorPage.expectSkillDescriptionToBe('Skill 1 edited');
     skillEditorPage.expectConceptCardExplanationToMatch(
       'Test concept card explanation');
   });
@@ -58,12 +71,16 @@ describe('Skill Editor functionality', function() {
   it('should create and delete worked examples', function() {
     skillEditorPage.addWorkedExample('Example 1');
     skillEditorPage.addWorkedExample('Example 2');
+    skillEditorPage.saveOrPublishSkill('Added worked examples');
 
+    skillEditorPage.get(skillId);
     skillEditorPage.expectWorkedExampleSummariesToMatch([
       'Example 1', 'Example 2']);
 
-    skillEditorPage.deleteWorkedExample(0);
+    skillEditorPage.deleteWorkedExampleWithIndex(0);
+    skillEditorPage.saveOrPublishSkill('Deleted a worked example');
 
+    skillEditorPage.get(skillId);
     skillEditorPage.expectWorkedExampleSummariesToMatch(['Example 2']);
   });
 
@@ -72,12 +89,29 @@ describe('Skill Editor functionality', function() {
       'Misconception 1', 'Notes 1', 'Feedback 1');
     skillEditorPage.addMisconception(
       'Misconception 2', 'Notes 2', 'Feedback 2');
+    skillEditorPage.saveOrPublishSkill('Added misconceptions');
 
+    skillEditorPage.get(skillId);
     skillEditorPage.expectNumberOfMisconceptionsToBe(2);
 
     skillEditorPage.deleteMisconception(1);
+    skillEditorPage.saveOrPublishSkill('Deleted a misconception');
 
+    skillEditorPage.get(skillId);
     skillEditorPage.expectNumberOfMisconceptionsToBe(1);
+  });
+
+  fit('should correctly publishing skill', function() {
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnpublishedSkillsTab();
+    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+
+    skillEditorPage.get(skillId);
+    skillEditorPage.firstTimePublishSkill();
+
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
   });
 
   afterEach(function() {
