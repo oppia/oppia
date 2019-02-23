@@ -114,8 +114,8 @@ oppia.run([
   'HtmlEscaperService',
   function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
       HtmlEscaperService) {
-    //bind Dev Mode, to make sure it doesnt show up before pageload
-    $rootScope.dev_mode_label="Dev Mode";
+    // bind Dev Mode, to make sure it doesnt show up before pageload
+    $rootScope.dev_mode_label = 'Dev Mode';
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
