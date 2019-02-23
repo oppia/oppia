@@ -291,7 +291,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # IDs of feedback thread ids that this user subscribes to.
     general_feedback_thread_ids = ndb.StringProperty(
         repeated=True, indexed=True)
-    # IDs of the learners who have subscribed to this user.
+    # IDs of the creators to whom this learner has subscribed.
     creator_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
