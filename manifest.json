@@ -289,9 +289,9 @@
         "files": ["leaflet.js", "leaflet.css"]
       },
       "angular-simple-logger": {
-        "version": "1.0.3",
+        "version": "0.1.7",
         "downloadFormat": "files",
-        "url": "https://raw.githubusercontent.com/nmccready/angular-simple-logger/tree/0.1.7/dist",
+        "url": "https://raw.githubusercontent.com/nmccready/angular-simple-logger/0.1.7/dist",
         "rootDirPrefix": "angular-simple-logger-",
         "targetDirPrefix": "angular-simple-logger-",
         "files": ["angular-simple-logger.min.js"]
