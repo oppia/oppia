@@ -1,3 +1,15 @@
-<div style="border: 2px solid grey">
-  <leaflet lf-center="center" event-broadcast="events" markers="markers" style="width: 100%; height: 250px; max-width: 600px; max-height: 250px; margin: auto"></leaflet>
+<div class="oppia-coord-two-dim-editor-container">
+  <leaflet id="coordTwoDimEditor" lf-center="mapCenter" event-broadcast="mapEvents" markers="mapMarkers"></leaflet>
 </div>
+<style>
+  #coordTwoDimEditor {
+    height: 250px;
+    margin: auto;
+    max-height: 250px;
+    max-width: 600px;
+    width: 100%;
+  }
+  .oppia-coord-two-dim-editor-container {
+    border: 2px solid grey;
+  }
+</style>

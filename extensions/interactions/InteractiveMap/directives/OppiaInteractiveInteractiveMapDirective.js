@@ -34,8 +34,10 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
         '/interactions/InteractiveMap/directives/' +
         'interactive_map_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', '$timeout', 'CurrentInteractionService',
-        function($scope, $attrs, $timeout, CurrentInteractionService) {
+        '$attrs', '$scope', '$timeout', 'BrowserCheckerService',
+        'CurrentInteractionService', function(
+            $attrs, $scope, $timeout, BrowserCheckerService,
+            CurrentInteractionService) {
           $scope.coords = [
             HtmlEscaperService.escapedJsonToObj($attrs.latitudeWithValue),
             HtmlEscaperService.escapedJsonToObj($attrs.longitudeWithValue)];
@@ -50,31 +52,11 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             $scope.overlayStyle = {
               'background-color': 'black'
             };
-            $scope.mapStyle = {
-              opacity: '0.8'
-            };
-          };
-          var ICON = {
-            iconUrl: UrlInterpolationService.getExtensionResourceUrl(
-              '/interactions/InteractiveMap/static/marker-icon.png'),
-            shadowUrl: UrlInterpolationService.getExtensionResourceUrl(
-              '/interactions/InteractiveMap/static/marker-shadow.png'),
-            iconRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
-              '/interactions/InteractiveMap/static/marker-icon-2x.png'),
-            shadowRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
-              '/interactions/InteractiveMap/static/marker-shadow.png'),
-            iconAnchor: [12, 41],
-            shadowAnchor: [13, 41],
-            shadowSize: [41, 41],
-            iconSize: [25, 41]
           };
 
           $scope.hideOverlay = function() {
             $scope.overlayStyle = {
               'background-color': 'white'
-            };
-            $scope.mapStyle = {
-              opacity: '1'
             };
           };
 
@@ -82,7 +64,27 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             var newMarker = {
               lat: lat,
               lng: lng,
-              icon: ICON
+              icon: {
+                iconUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-icon.png'),
+                // The size of the icon image in pixels.
+                iconSize: [25, 41],
+                // The coordinates of the "tip" of the icon.
+                iconAnchor: [12, 41],
+                shadowUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-shadow.png'),
+                // The size of the shadow image in pixels.
+                shadowSize: [41, 41],
+                // The coordinates of the "tip" of the shadow.
+                shadowAnchor: [13, 41],
+                // The URL to a retina sized version of the icon image.
+                // Used for Retina screen devices.
+                iconRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-icon-2x.png'),
+                shadowRetinaUrl: (
+                  UrlInterpolationService.getExtensionResourceUrl(
+                    '/interactions/InteractiveMap/static/marker-shadow.png'))
+              }
             };
             $scope.mapMarkers.push(angular.copy(newMarker));
           };
@@ -103,37 +105,45 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
                 lng: coords[1],
                 zoom: zoomLevel
               },
-              events: {}
+              defaults: {
+                // Disable dragging for mobile devices.
+                dragging: !BrowserCheckerService.isMobileDevice()
+              },
+              events: {
+                map: {
+                  enable: ['click', 'mouseover', 'mouseout'],
+                  logic: 'emit'
+                }
+              }
             };
             if (!$scope.interactionIsActive) {
               addNewMarker(scope.getLastAnswer()[0], $scope.getLastAnswer()[1]);
             }
           };
 
-          $scope.$on('leafletDirectiveMap.mouseover', function(event) {
+          $scope.$on('leafletDirectiveMap.interactiveMap.mouseover',
+            function() {
+              if (!$scope.interactionIsActive) {
+                $scope.setOverlay();
+              }
+            });
+
+          $scope.$on('leafletDirectiveMap.interactiveMap.mouseout', function() {
             if ($scope.interactionIsActive) {
-              return;
+              $scope.hideOverlay();
             }
-            $scope.setOverlay();
           });
 
-          $scope.$on('leafletDirectiveMap.mouseout', function(event) {
-            if ($scope.interactionIsActive) {
-              return;
-            }
-            $scope.setOverlay();
-          });
-
-          $scope.$on('leafletDirectiveMap.click', function(event, args) {
-            if (!$scope.interactionIsActive) {
-              return;
-            }
-            var newLat = args.leafletEvent.latlng.lat;
-            var newLng = args.leafletEvent.latlng.lng;
-            addNewMarker(newLat, newLng);
-            CurrentInteractionService.onSubmit(
-              [newLat, newLng], interactiveMapRulesService);
-          });
+          $scope.$on('leafletDirectiveMap.interactiveMap.click',
+            function(event, args) {
+              if ($scope.interactionIsActive) {
+                var newLat = args.leafletEvent.latlng.lat;
+                var newLng = args.leafletEvent.latlng.lng;
+                addNewMarker(newLat, newLng);
+                CurrentInteractionService.onSubmit(
+                  [newLat, newLng], interactiveMapRulesService);
+              }
+            });
 
           refreshMap();
         }

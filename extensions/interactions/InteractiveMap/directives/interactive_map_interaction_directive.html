@@ -1,13 +1,5 @@
 <style>
-  /* Fixes for Google Maps zoom controls. */
-  .gm-style img {
-    max-width: none;
-  }
-  .gm-style label {
-    width: auto; display:inline;
-  }
-
-  #map_canvas {
+  #interactiveMap {
     height: 400px;
     margin: auto;
     max-height: 400px;
@@ -22,7 +14,7 @@
   }
 
   @media screen and (max-width: 559px) {
-    #map_canvas {
+    #interactiveMap {
       max-width: 100vw;
       min-width: 100vw;
       width: 100vw;
@@ -36,6 +28,6 @@
 
 <div class="interactive-map-container">
   <div ng-style="overlayStyle">
-    <leaflet lf-center="mapOptions.center" markers="mapMarkers" event-broadcast="mapOptions.events" height="480px" width="100%"></leaflet>
+    <leaflet id="interactiveMap" lf-center="mapOptions.center" markers="mapMarkers" event-broadcast="mapOptions.events" defaults="mapOptions.defaults"></leaflet>
   </div>
 </div>

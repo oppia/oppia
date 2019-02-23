@@ -286,7 +286,7 @@
         "url": "https://unpkg.com/leaflet@1.4.0/dist",
         "rootDirPrefix": "leaflet-",
         "targetDirPrefix": "leaflet-",
-        "files": ["leaflet.js","leaflet.css"]
+        "files": ["leaflet.js", "leaflet.css"]
       },
       "angular-simple-logger": {
         "version": "1.0.3",
