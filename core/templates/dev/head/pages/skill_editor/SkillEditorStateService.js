@@ -23,15 +23,17 @@ oppia.constant(
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
 oppia.factory('SkillEditorStateService', [
-  '$rootScope', 'SkillObjectFactory', 'SkillRightsObjectFactory',
-  'EditableSkillBackendApiService', 'SkillRightsBackendApiService',
-  'AlertsService', 'UndoRedoService', 'EVENT_SKILL_INITIALIZED',
-  'EVENT_SKILL_REINITIALIZED', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+  '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
+  'SkillObjectFactory', 'SkillRightsBackendApiService',
+  'SkillRightsObjectFactory', 'UndoRedoService',
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+  'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
   function(
-      $rootScope, SkillObjectFactory, SkillRightsObjectFactory,
-      EditableSkillBackendApiService, SkillRightsBackendApiService,
-      AlertsService, UndoRedoService, EVENT_SKILL_INITIALIZED,
-      EVENT_SKILL_REINITIALIZED, EVENT_QUESTION_SUMMARIES_INITIALIZED) {
+      $rootScope, AlertsService, EditableSkillBackendApiService,
+      SkillObjectFactory, SkillRightsBackendApiService,
+      SkillRightsObjectFactory, UndoRedoService,
+      EVENT_QUESTION_SUMMARIES_INITIALIZED,
+      EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = SkillRightsObjectFactory.createInterstitialSkillRights();
     var _skillIsInitialized = false;

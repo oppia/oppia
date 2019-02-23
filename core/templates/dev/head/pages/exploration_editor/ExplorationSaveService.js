@@ -17,27 +17,28 @@
  */
 
 oppia.factory('ExplorationSaveService', [
-  '$uibModal', '$timeout', '$rootScope', '$log', '$q',
-  'AlertsService', 'ExplorationDataService', 'ExplorationStatesService',
-  'ExplorationTagsService', 'ExplorationTitleService',
-  'ExplorationObjectiveService', 'ExplorationCategoryService',
-  'ExplorationLanguageCodeService', 'ExplorationRightsService',
-  'ExplorationWarningsService', 'ExplorationDiffService',
-  'ExplorationInitStateNameService', 'RouterService',
-  'FocusManagerService', 'ChangeListService', 'SiteAnalyticsService',
-  'StatesObjectFactory', 'UrlInterpolationService',
-  'AutosaveInfoModalsService',
+  '$log', '$q', '$rootScope', '$timeout', '$uibModal',
+  'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
+  'ExplorationCategoryService', 'ExplorationDataService',
+  'ExplorationDiffService', 'ExplorationInitStateNameService',
+  'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
+  'ExplorationRightsService', 'ExplorationStatesService',
+  'ExplorationTagsService',
+  'ExplorationTitleService', 'ExplorationWarningsService',
+  'FocusManagerService',
+  'RouterService', 'SiteAnalyticsService', 'StatesObjectFactory',
+  'UrlInterpolationService',
   function(
-      $uibModal, $timeout, $rootScope, $log, $q,
-      AlertsService, ExplorationDataService, ExplorationStatesService,
-      ExplorationTagsService, ExplorationTitleService,
-      ExplorationObjectiveService, ExplorationCategoryService,
-      ExplorationLanguageCodeService, ExplorationRightsService,
-      ExplorationWarningsService, ExplorationDiffService,
-      ExplorationInitStateNameService, RouterService,
-      FocusManagerService, ChangeListService, SiteAnalyticsService,
-      StatesObjectFactory, UrlInterpolationService,
-      AutosaveInfoModalsService) {
+      $log, $q, $rootScope, $timeout, $uibModal,
+      AlertsService, AutosaveInfoModalsService, ChangeListService,
+      ExplorationCategoryService, ExplorationDataService,
+      ExplorationDiffService, ExplorationInitStateNameService,
+      ExplorationLanguageCodeService, ExplorationObjectiveService,
+      ExplorationRightsService, ExplorationStatesService,
+      ExplorationTagsService,
+      ExplorationTitleService, ExplorationWarningsService, FocusManagerService,
+      RouterService, SiteAnalyticsService, StatesObjectFactory,
+      UrlInterpolationService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;

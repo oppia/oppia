@@ -20,9 +20,9 @@ oppia.constant(
   '/pretest_handler/<exploration_id>?story_id=<story_id>&cursor=<cursor>');
 
 oppia.factory('PretestQuestionBackendApiService', [
-  '$http', '$q', 'PRETEST_QUESTIONS_URL_TEMPLATE', 'UrlInterpolationService',
+  '$http', '$q', 'UrlInterpolationService', 'PRETEST_QUESTIONS_URL_TEMPLATE',
   function(
-      $http, $q, PRETEST_QUESTIONS_URL_TEMPLATE, UrlInterpolationService) {
+      $http, $q, UrlInterpolationService, PRETEST_QUESTIONS_URL_TEMPLATE) {
     var _cursor = '';
 
     var _fetchPretestQuestions = function(

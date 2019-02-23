@@ -17,10 +17,10 @@
  */
 
 oppia.factory('SkillCreationService', [
-  '$http', '$window', '$rootScope', '$timeout', 'AlertsService',
+  '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
   'UrlInterpolationService',
   function(
-      $http, $window, $rootScope, $timeout, AlertsService,
+      $http, $rootScope, $timeout, $window, AlertsService,
       UrlInterpolationService) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
