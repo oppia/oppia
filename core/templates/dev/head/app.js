@@ -356,7 +356,7 @@ oppia.config([
 oppia.config(['$provide', function($provide) {
   $provide.decorator('$log', ['$delegate', 'DEV_MODE',
     function($delegate, DEV_MODE) {
-      var _originalError = $delegate.error;    
+      var _originalError = $delegate.error;
       if (!DEV_MODE) {
         $delegate.log = function() {};
         $delegate.info = function() {};
