@@ -52,7 +52,7 @@ describe('Skill Editor functionality', function() {
     skillEditorPage.get(skillId);
   });
 
-  fit('should edit description and concept card explanation', function() {
+  it('should edit description and concept card explanation', function() {
     skillEditorPage.changeSkillDescription('Skill 1 edited');
     skillEditorPage.editConceptCard('Test concept card explanation');
     skillEditorPage.saveOrPublishSkill(
@@ -101,7 +101,7 @@ describe('Skill Editor functionality', function() {
     skillEditorPage.expectNumberOfMisconceptionsToBe(1);
   });
 
-  fit('should correctly publishing skill', function() {
+  it('should correctly publishing skill', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnpublishedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
