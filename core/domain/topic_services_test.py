@@ -698,22 +698,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
-    def test_reassigning_manager_role_to_same_user(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-        with self.assertRaisesRegexp(
-            Exception, 'This user already is a manager for this topic'):
-            topic_services.assign_role(
-                self.user_admin, self.user_a,
-                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-
-        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
-        self.assertTrue(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_b, topic_rights))
-
     def test_deassigning_manager_role(self):
         topic_services.assign_role(
             self.user_admin, self.user_a,

@@ -500,7 +500,5 @@ var constants = {
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
-  "CURRENT_STATES_SCHEMA_VERSION": 27,
-
   "DEV_MODE": true
 };

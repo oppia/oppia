@@ -984,9 +984,13 @@ def assign_role(committer, assignee, new_role, topic_id):
         old_role = topic_domain.ROLE_MANAGER
 
     if new_role == topic_domain.ROLE_MANAGER:
-        if topic_rights.is_manager(assignee.user_id):
-            raise Exception('This user already is a manager for this topic')
-        topic_rights.manager_ids.append(assignee.user_id)
+        # An exception shouldn't be raised if the user is already a manager of
+        # the topic, as in the case where the user's topic manager role has been
+        # removed and then reassigned to the same topic, this function should
+        # just not do anything instead of throwing an error, as this is a valid
+        # case.
+        if not topic_rights.is_manager(assignee.user_id):
+            topic_rights.manager_ids.append(assignee.user_id)
     elif new_role == topic_domain.ROLE_NONE:
         if topic_rights.is_manager(assignee.user_id):
             topic_rights.manager_ids.remove(assignee.user_id)
