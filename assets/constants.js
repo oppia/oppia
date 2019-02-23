@@ -502,5 +502,5 @@ var constants = {
 
   "CURRENT_STATES_SCHEMA_VERSION": 27,
 
-  "DEV_MODE": true
+  "DEV_MODE": false
 };
