@@ -19,5 +19,5 @@ Add error logs here.
 There are no specific repro steps available for this bug report. The general procedure to fix server errors should be the following:
 
 * Analyze the code in the file where the error occurred and come up with a hypothesis for the reason.
-* Get the logic of the fix you propose validated by an Oppia team member (have this discussion on the issue thread).
-* Make a PR that fixes the issue, then close the issue on merging the PR. (If the error reoccurs in production, the issue will be reopened for further investigation)
+* Get the logic of the proposed fix validated by an Oppia team member (have this discussion on the issue thread).
+* Make a PR that fixes the issue, then close the issue on merging the PR. (If the error reoccurs in production, the issue will be reopened for further investigation.)
