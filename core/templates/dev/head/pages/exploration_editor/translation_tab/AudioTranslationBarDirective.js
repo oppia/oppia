@@ -95,7 +95,7 @@ oppia.directive('audioTranslationBar', [
           $scope.audioIsCurrentlyBeingSaved = false;
 
           document.body.onkeyup = function(e) {
-            if (e.keyCode === 32) {
+            if (e.keyCode === 82) {
               shortcutkeyForRecording();
             }
           };
@@ -245,7 +245,7 @@ oppia.directive('audioTranslationBar', [
             });
           };
           var shortcutkeyForRecording = function() {
-            if (!$scope.recorder.status.isRecording) {
+            if (!$scope.recorder.status.isRecording && !$scope.audioBlob) {
               $scope.checkAndStartRecording();
             } else {
               $scope.recorder.stopRecord();

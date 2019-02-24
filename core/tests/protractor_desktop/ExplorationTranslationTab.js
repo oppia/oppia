@@ -169,30 +169,22 @@ describe('Exploration translation', function() {
     explorationEditorPage.saveChanges();
 
     explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.
-      expectNumericalStatusAccessibilityToMatch(
-        'n item translated out of m items');
-    explorationEditorTranslationTab.
-      expectTranslationTabContentAccessibilityToMatch(
-        'Contents of Lesson');
-    explorationEditorTranslationTab.
-      expectTranslationTabFeedbackAccessibilityToMatch(
-        'Feedbacks');
-    explorationEditorTranslationTab.
-      expectTranslationTabHintAccessibilityToMatch(
-        'Hints for the lesson');
-    explorationEditorTranslationTab.
-      expectTranslationTabSolutionAccessibilityToMatch(
-        'Solutions of the lesson');
-    explorationEditorTranslationTab.
-      expectTranslationTabStartRecordingAccessibilityToMatch(
-        'Start Recording');
-    explorationEditorTranslationTab.
-      expectTranslationTabUploadRecordingAccessibilityToMatch(
-        'Upload Translated file');
-    explorationEditorTranslationTab.
-      expectTranslationTabPlayRecordingAccessibilityToMatch(
-        'Play recorded audio');
+    explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
+      'n item translated out of m items');
+    explorationEditorTranslationTab.expectContentAccessibilityToMatch(
+      'Contents of Lesson');
+    explorationEditorTranslationTab.expectFeedbackAccessibilityToMatch(
+      'Feedbacks');
+    explorationEditorTranslationTab.expectHintAccessibilityToMatch(
+      'Hints for the lesson');
+    explorationEditorTranslationTab.expectSolutionAccessibilityToMatch(
+      'Solutions of the lesson');
+    explorationEditorTranslationTab.expectStartRecordingAccessibilityToMatch(
+      'Start Recording');
+    explorationEditorTranslationTab.expectUploadRecordingAccessibilityToMatch(
+      'Upload Translated file');
+    explorationEditorTranslationTab.expectPlayRecordingAccessibilityToMatch(
+      'Play recorded audio');
     users.logout();
   });
 

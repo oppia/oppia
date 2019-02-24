@@ -219,52 +219,44 @@ var ExplorationEditorTranslationTab = function() {
     expect(numericalStatus.getText()).toMatch(content);
   };
 
-  this.expectNumericalStatusAccessibilityToMatch =
-    function(content) {
-      expect(numericalStatusAccessibility.getAttribute(
-        'aria-label')).toMatch(content);
+  this.expectNumericalStatusAccessibilityToMatch = function(content) {
+    expect(numericalStatusAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
     };
 
-  this.expectTranslationTabContentAccessibilityToMatch =
-    function(content) {
-      expect(translationTabContentAccessibility.getAttribute(
-        'aria-label')).toMatch(content);
+  this.expectContentAccessibilityToMatch =  function(content) {
+    expect(translationTabContentAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
     };
 
-  this.expectTranslationTabFeedbackAccessibilityToMatch =
-    function(content) {
-      expect(translationTabFeedbackAccessibility.getAttribute(
-        'aria-label')).toMatch(content);
+  this.expectFeedbackAccessibilityToMatch = function(content) {
+    expect(translationTabFeedbackAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
     };
 
-  this.expectTranslationTabHintAccessibilityToMatch =
-    function(content) {
-      expect(translationTabHintAccessibility.getAttribute(
-        'aria-label')).toMatch(content);
+  this.expectHintAccessibilityToMatch = function(content) {
+    expect(translationTabHintAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
     };
 
-  this.expectTranslationTabSolutionAccessibilityToMatch =
-    function(content) {
-      expect(translationTabSolutionAccessibility.getAttribute(
-        'aria-label')).toMatch(content);
+  this.expectSolutionAccessibilityToMatch = function(content) {
+    expect(translationTabSolutionAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
     };
 
-  this.expectTranslationTabStartRecordingAccessibilityToMatch =
-    function(content) {
-      expect(translationTabStartRecordingAccessibility.getAttribute(
-        'aria-label')).toMatch(content);
+  this.expectStartRecordingAccessibilityToMatch = function(content) {
+    expect(translationTabStartRecordingAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
     };
 
-  this.expectTranslationTabUploadRecordingAccessibilityToMatch =
-    function(content) {
+  this.expectUploadRecordingAccessibilityToMatch = function(content) {
       expect(translationTabUploadRecordingAccessibility.getAttribute(
         'aria-label')).toMatch(content);
     };
 
-  this.expectTranslationTabPlayRecordingAccessibilityToMatch =
-    function(content) {
-      expect(translationTabPlayRecordingAccessibility.getAttribute(
-        'aria-label')).toMatch(content);
+  this.expectPlayRecordingAccessibilityToMatch = function(content) {
+    expect(translationTabPlayRecordingAccessibility.getAttribute(
+      s'aria-label')).toMatch(content);
     };
 
   this.changeTranslationLanguage = function(language) {
