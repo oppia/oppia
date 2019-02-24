@@ -92,6 +92,8 @@ oppia.controller('Profile', [
             function(urlObject) {
               if (urlObject.login_url) {
                 window.location.href = urlObject.login_url;
+              } else {
+                throw Error('Login url not found.');
               }
             }
           );
