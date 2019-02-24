@@ -7,6 +7,7 @@ third_party/*
 assets/hashes.js
 backend_prod_files/*
 core/templates/prod/*
+core/templates/dev/head/dist/*
 core/tests/.browserstack.env
 .coverage*
 .viminfo
