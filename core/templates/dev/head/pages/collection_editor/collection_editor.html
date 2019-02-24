@@ -49,6 +49,10 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
+  <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
+  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
 
   <script src="/templates/dev/head/expressions/ExpressionSyntaxTreeService.js"></script>
   <script src="/templates/dev/head/expressions/ExpressionEvaluatorService.js"></script>
