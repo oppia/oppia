@@ -114,7 +114,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_adding_existing_exp_to_playlist_does_not_add_again_with_pos(self):
         # Test adding the exploration_id if it is already in
-	# learner_playlist.exploration_ids
+        # learner_playlist.exploration_ids
         # Add two explorations to the learner playlist.
         learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
