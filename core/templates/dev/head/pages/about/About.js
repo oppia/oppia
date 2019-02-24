@@ -11,9 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-require('../../domain/utilities/UrlInterpolationService.js');
-require('../../components/background/BackgroundBannerDirective.js');
+try {
+  require('../../domain/utilities/UrlInterpolationService.js');
+  require('../../components/background/BackgroundBannerDirective.js');
+} catch (e) {
+  if (!(e instanceof ReferenceError)) {
+    throw e;
+  }
+}
 /**
  * @fileoverview Controllers for the about page.
  */
