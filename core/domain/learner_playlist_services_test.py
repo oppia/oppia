@@ -104,14 +104,13 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
     def test_adding_subscribed_exp_to_playlist_does_nothing_without_pos(self):
         # Subscribe to exploration.
         subscription_services.subscribe_to_exploration(
-	    self.user_id, 'SUBSCRIBED_ID')
+            self.user_id, 'SUBSCRIBED_ID')
 
         # Now if we try to add the same exploration, it shouldn't be added.
         learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, 'SUBSCRIBED_ID')
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), [])
-
 
     def test_adding_existing_exp_to_playlist_does_not_add_again_with_pos(self):
         # Test adding the exploration_id if it is already in
@@ -182,7 +181,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(self.user_id), [])
 
-    def test_adding_subscribed_col_to_playlist_does_not_add_again_with_pos(self):
+    def test_adding_existing_col_to_playlist_does_not_add_again_with_pos(self):
         # Test adding the collection_id if it is already in
 	# learner_playlist.collection_ids
 	# Add two collections to the learner playlist.
