@@ -175,8 +175,43 @@ oppia.controller('Signup', [
       $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
         window.location = window.decodeURIComponent(
           UrlService.getUrlParams().return_url);
-      }, function() {
+      }, function(rejection) {
+        if (
+          rejection.data && rejection.data.status_code === 401) {
+          $scope.showRegistrationSessionExpiredModal();
+        }
         $scope.submissionInProcess = false;
+      });
+    };
+
+    $scope.showRegistrationSessionExpiredModal = function() {
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/signup/registration_session_expired_modal_directive.html'),
+        backdrop: 'static',
+        keyboard: false,
+        resolve: {},
+        controller: [
+          '$scope', '$uibModalInstance', 'SiteAnalyticsService',
+          'UserService', '$timeout', '$window',
+          function($scope, $uibModalInstance, SiteAnalyticsService,
+              UserService, $timeout, $window) {
+            $scope.continueRegistration = function() {
+              UserService.getLoginAndLogoutUrls().then(
+                function(urlObject) {
+                  if (urlObject.login_url) {
+                    $timeout(function() {
+                      $window.location = urlObject.login_url;
+                    }, 150);
+                  } else {
+                    throw Error('Login url not found.');
+                  }
+                }
+              );
+              $uibModalInstance.dismiss('cancel');
+            };
+          }
+        ]
       });
     };
   }
