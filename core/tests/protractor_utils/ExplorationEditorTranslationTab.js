@@ -222,42 +222,42 @@ var ExplorationEditorTranslationTab = function() {
   this.expectNumericalStatusAccessibilityToMatch = function(content) {
     expect(numericalStatusAccessibility.getAttribute(
       'aria-label')).toMatch(content);
-    };
+  };
 
-  this.expectContentAccessibilityToMatch =  function(content) {
+  this.expectContentAccessibilityToMatch = function(content) {
     expect(translationTabContentAccessibility.getAttribute(
       'aria-label')).toMatch(content);
-    };
+  };
 
   this.expectFeedbackAccessibilityToMatch = function(content) {
     expect(translationTabFeedbackAccessibility.getAttribute(
       'aria-label')).toMatch(content);
-    };
+  };
 
   this.expectHintAccessibilityToMatch = function(content) {
     expect(translationTabHintAccessibility.getAttribute(
       'aria-label')).toMatch(content);
-    };
+  };
 
   this.expectSolutionAccessibilityToMatch = function(content) {
     expect(translationTabSolutionAccessibility.getAttribute(
       'aria-label')).toMatch(content);
-    };
+  };
 
   this.expectStartRecordingAccessibilityToMatch = function(content) {
     expect(translationTabStartRecordingAccessibility.getAttribute(
       'aria-label')).toMatch(content);
-    };
+  };
 
   this.expectUploadRecordingAccessibilityToMatch = function(content) {
-      expect(translationTabUploadRecordingAccessibility.getAttribute(
-        'aria-label')).toMatch(content);
-    };
+    expect(translationTabUploadRecordingAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
+  };
 
   this.expectPlayRecordingAccessibilityToMatch = function(content) {
     expect(translationTabPlayRecordingAccessibility.getAttribute(
-      s'aria-label')).toMatch(content);
-    };
+      'aria-label')).toMatch(content);
+  };
 
   this.changeTranslationLanguage = function(language) {
     _selectLanguage(language);
