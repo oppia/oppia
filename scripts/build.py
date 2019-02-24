@@ -77,7 +77,8 @@ FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
 # Files with these name patterns shouldn't be moved to build directory, and will
 # not be served in production. (This includes protractor.js files in
 # /extensions.)
-JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js', '.bundle.js')
+JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
+JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js')
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -86,7 +87,8 @@ GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
 FILEPATHS_NOT_TO_RENAME = (
     '*.py',
     'third_party/generated/fonts/*',
-    'third_party/generated/js/third_party.min.js.map')
+    'third_party/generated/js/third_party.min.js.map',
+    '*.bundle.js')
 
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.
@@ -717,12 +719,15 @@ def minify_func(source_path, target_path, file_hashes, filename):
         - CSS or JS files: Minify and save at target directory.
         - Other files: Copy the file from source directory to target directory.
     """
+    skip_minify = any(
+        filename.endswith(p) for p in JS_FILENAME_SUFFIXES_NOT_TO_MINIFY)
     if filename.endswith('.html'):
         print 'Building %s' % source_path
         with open(source_path, 'r+') as source_html_file:
             with open(target_path, 'w+') as minified_html_file:
                 process_html(source_html_file, minified_html_file, file_hashes)
-    elif filename.endswith('.css') or filename.endswith('.js'):
+    elif ((filename.endswith('.css') or filename.endswith('.js')) and 
+           not skip_minify):
         print 'Minifying %s' % source_path
         _minify(source_path, target_path)
     else:

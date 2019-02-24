@@ -180,7 +180,12 @@
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
     </script>
 <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <script src="dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script><% } %>
+  <% if (webpackConfig.mode == 'production') { %> 
+    <script src="build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <% } else { %>
+    <script src="dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <% } %>
+<% } %>
 
     {% block footer_js %}
     {% endblock footer_js %}
