@@ -70,7 +70,7 @@ describe('Image preloader service', function() {
           param_changes: [],
           content: {
             html: '',
-            audio_translations: {}
+            content_id: 'content'
           },
           content_ids_to_audio_translations: {
             content: {},
@@ -96,6 +96,12 @@ describe('Image preloader service', function() {
             answer_groups: [],
             hints: []
           },
+          writte_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
           classifier_model_id: null
         },
         'State 3': {
@@ -119,6 +125,11 @@ describe('Image preloader service', function() {
             solution: null,
             answer_groups: [],
             hints: []
+          },
+          writte_translations: {
+            translations_mapping: {
+              content: {}
+            }
           },
           classifier_model_id: null
         },
@@ -208,6 +219,14 @@ describe('Image preloader service', function() {
             ],
             hints: [],
             solution: null
+          },
+          writte_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
           }
         },
         'State 6': {
@@ -291,6 +310,15 @@ describe('Image preloader service', function() {
               }
             }],
             solution: null,
+          },
+          writte_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              hint_1: {}
+            }
           },
           classifier_model_id: null
         }
