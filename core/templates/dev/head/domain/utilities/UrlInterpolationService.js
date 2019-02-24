@@ -16,9 +16,7 @@ try {
   require('../../services/AlertsService.js');
   require('../../services/UtilsService.js');
 } catch (e) {
-  if (e instanceof ReferenceError) {
-    console.log("AAAA")
-  } else {
+  if (!(e instanceof ReferenceError)) {
     throw e;
   }
 }

@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+var CleanWebpackPlugin = require('clean-webpack-plugin');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const htmlMinifyConfig = {
-  ignoreCustomFragments: [ /\{\{[\s\S]*?\}\}/, /<\{%[\s\S]*?%\}/, /<\[[\s\S]*?\]>/]
-}
+var htmlMinifyConfig = {
+  ignoreCustomFragments: [
+    /\{\{[\s\S]*?\}\}/,
+    /<\{%[\s\S]*?%\}/,
+    /<\[[\s\S]*?\]>/]
+};
 
 module.exports = {
   plugins: [

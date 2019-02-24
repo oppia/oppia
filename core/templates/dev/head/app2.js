@@ -12,34 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require("./directives.js")
-require("./filters.js")
-require("./i18n.js")
+require('./directives.js');
+require('./filters.js');
+require('./i18n.js');
 
-require("./pages/Base.js")
+require('./pages/Base.js');
 
-require("./services/AlertsService.js")
-require("./services/NavigationService.js")
-require("./services/UtilsService.js")
-require("./services/DebouncerService.js")
-require("./services/TranslationFileHashLoaderService.js")
-require("./services/UserService.js")
-require("./services/contextual/DeviceInfoService.js")
-require("./services/contextual/UrlService.js")
-require("./services/contextual/WindowDimensionsService.js")
-require("./services/stateful/BackgroundMaskService.js")
-require("./services/SiteAnalyticsService.js")
+require('./services/AlertsService.js');
+require('./services/NavigationService.js');
+require('./services/UtilsService.js');
+require('./services/DebouncerService.js');
+require('./services/TranslationFileHashLoaderService.js');
+require('./services/UserService.js');
+require('./services/contextual/DeviceInfoService.js');
+require('./services/contextual/UrlService.js');
+require('./services/contextual/WindowDimensionsService.js');
+require('./services/stateful/BackgroundMaskService.js');
+require('./services/SiteAnalyticsService.js');
 
-require("./components/create_button/CreateActivityButtonDirective.js")
+require('./components/create_button/CreateActivityButtonDirective.js');
 
-require("./components/promo/PromoBarDirective.js")
-require("./components/side_navigation_bar/SideNavigationBarDirective.js")
-require("./components/social_buttons/SocialButtonsDirective.js")
-require("./components/top_navigation_bar/TopNavigationBarDirective.js")
+require('./components/promo/PromoBarDirective.js');
+require('./components/side_navigation_bar/SideNavigationBarDirective.js');
+require('./components/social_buttons/SocialButtonsDirective.js');
+require('./components/top_navigation_bar/TopNavigationBarDirective.js');
 
-require("./domain/sidebar/SidebarStatusService.js")
-require("./domain/user/UserInfoObjectFactory.js")
-require("./domain/utilities/UrlInterpolationService.js")
+require('./domain/sidebar/SidebarStatusService.js');
+require('./domain/user/UserInfoObjectFactory.js');
+require('./domain/utilities/UrlInterpolationService.js');
 
 
 /**

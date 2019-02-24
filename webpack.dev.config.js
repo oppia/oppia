@@ -13,8 +13,8 @@
 // limitations under the License.
 
 
-const commonWebpackConfig = require("./webpack.config.js")
-const path = require('path');
+var commonWebpackConfig = require('./webpack.config.js');
+var path = require('path');
 
 module.exports = {
   mode: 'development',
