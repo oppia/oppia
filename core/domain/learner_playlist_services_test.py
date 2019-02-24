@@ -115,7 +115,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
     def test_adding_existing_exp_to_playlist_does_not_add_again_with_pos(self):
         # Test adding the exploration_id if it is already in
 	# learner_playlist.exploration_ids
-	# Add two explorations to the learner playlist.
+        # Add two explorations to the learner playlist.
         learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
         learner_progress_services.add_exp_to_learner_playlist(
@@ -183,8 +183,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
     def test_adding_existing_col_to_playlist_does_not_add_again_with_pos(self):
         # Test adding the collection_id if it is already in
-	# learner_playlist.collection_ids
-	# Add two collections to the learner playlist.
+        # learner_playlist.collection_ids
+        # Add two collections to the learner playlist.
         learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0)
         learner_progress_services.add_collection_to_learner_playlist(
@@ -210,7 +210,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_progress_services.add_collection_to_learner_playlist(
                 self.user_id, col_ids[i], position_to_be_inserted=i)
         self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(self.user_id), col_ids)
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), col_ids)
 
         # Now if we try to add another collection at the end of the list,
         # it shouldn't be added as the list length would exceed
@@ -219,7 +220,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self.user_id, 'SAMPLE_COL_ID',
             position_to_be_inserted=MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
         self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(self.user_id), col_ids)
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), col_ids)
 
     def test_number_of_cols_cannot_exceed_max_without_given_pos(self):
         # Test that the length of the learner playlist doesn't exceed
@@ -231,14 +233,16 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_progress_services.add_collection_to_learner_playlist(
                 self.user_id, col_id)
         self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(self.user_id), col_ids)
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), col_ids)
 
         # Now if we try adding another collection, it shouldn't be added as the
         # list length would exceed MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, 'SAMPLE_COL_ID')
         self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(self.user_id), col_ids)
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), col_ids)
 
     def test_remove_exploration_from_learner_playlist(self):
         self.assertEqual(self._get_all_learner_playlist_exp_ids(
