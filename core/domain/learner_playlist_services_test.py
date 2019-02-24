@@ -101,10 +101,10 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_playlist_model.collection_ids if
             learner_playlist_model else [])
 
-    def test_that_adding_subscribed_exp_to_playlist_does_nothing_with_no_position(self):
+    def test_adding_subscribed_exp_to_playlist_does_nothing_without_pos(self):
         # Subscribe to exploration.
-        subscription_services.subscribe_to_exploration(self.user_id, 
-	    'SUBSCRIBED_ID')
+        subscription_services.subscribe_to_exploration(
+	    self.user_id, 'SUBSCRIBED_ID')
 
         # Now if we try to add the same exploration, it shouldn't be added.
         learner_progress_services.add_exp_to_learner_playlist(
@@ -113,9 +113,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(self.user_id), [])
 
 
-    def test_that_adding_existing_exp_to_playlist_does_not_add_exp_twice_with_position(self):
-        # Test adding the exploration_id if it is already in 
-	# learner_playlist.exploration_ids 
+    def test_adding_existing_exp_to_playlist_does_not_add_again_with_pos(self):
+        # Test adding the exploration_id if it is already in
+	# learner_playlist.exploration_ids
 	# Add two explorations to the learner playlist.
         learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
@@ -131,9 +131,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             position_to_be_inserted=1)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
-                self.user_id), [self.EXP_ID_1, self.EXP_ID_0]) 
+                self.user_id), [self.EXP_ID_1, self.EXP_ID_0])
 
-    def test_that_nunmber_of_exps_cannot_exceed_max_with_given_position(self):
+    def test_nunmber_of_exps_cannot_exceed_max_with_given_pos(self):
         # Add MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT explorations at given
         # positions.
         exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(
@@ -153,7 +153,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), exp_ids)
 
-    def test_that_number_of_exps_cannot_exceed_max_without_given_position(self):
+    def test_number_of_exps_cannot_exceed_max_without_given_pos(self):
         # Test that the length of the learner playlist doesn't exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(
@@ -171,7 +171,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), exp_ids)
 
-    def test_that_adding_subscribed_col_to_playlist_does_nothing_with_no_position(self):
+    def test_adding_subscribed_col_to_playlist_does_nothing_with_no_pos(self):
         # Subscribe to collection.
         subscription_services.subscribe_to_collection(
             self.user_id, 'SUBSCRIBED_ID')
@@ -182,9 +182,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(self.user_id), [])
 
-    def test_that_adding_subscribed_col_to_playlist_does_not_add_col_twice_with_position(self):
-        # Test adding the collection_id if it is already in 
-	# learner_playlist.collection_ids 
+    def test_adding_subscribed_col_to_playlist_does_not_add_again_with_pos(self):
+        # Test adding the collection_id if it is already in
+	# learner_playlist.collection_ids
 	# Add two collections to the learner playlist.
         learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0)
@@ -200,9 +200,9 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             position_to_be_inserted=1)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
-                self.user_id), [self.COL_ID_1, self.COL_ID_0]) 
+                self.user_id), [self.COL_ID_1, self.COL_ID_0])
 
-    def test_that_number_of_cols_cannot_exceed_max_with_given_position(self):
+    def test_number_of_cols_cannot_exceed_max_with_given_pos(self):
         # Add MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT collections at given
         # positions.
         col_ids = ['SAMPLE_COL_ID_%s' % index for index in range(
@@ -222,7 +222,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(self.user_id), col_ids)
 
-    def test_that_number_of_cols_cannot_exceed_max_without_given_position(self):
+    def test_number_of_cols_cannot_exceed_max_without_given_pos(self):
         # Test that the length of the learner playlist doesn't exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         # List of collections to be added.
