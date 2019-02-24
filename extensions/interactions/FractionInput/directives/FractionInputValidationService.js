@@ -17,10 +17,10 @@
  */
 
 oppia.factory('FractionInputValidationService', [
-  'WARNING_TYPES', 'baseInteractionValidationService',
-  'FractionObjectFactory',
+  'FractionObjectFactory', 'baseInteractionValidationService',
+  'WARNING_TYPES',
   function(
-      WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
+      FractionObjectFactory, baseInteractionValidationService, WARNING_TYPES) {
     var getNonIntegerInputWarning = function(i, j) {
       return {
         type: WARNING_TYPES.ERROR,

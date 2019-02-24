@@ -179,7 +179,7 @@ class TestBase(unittest.TestCase):
         }
     }
 
-    VERSION_26_STATE_DICT = {
+    VERSION_27_STATE_DICT = {
         'content': {'content_id': u'content', 'html': u''},
         'param_changes': [],
         'content_ids_to_audio_translations': {
@@ -187,6 +187,14 @@ class TestBase(unittest.TestCase):
             u'default_outcome': {},
             u'hint_1': {},
             u'solution': {}
+        },
+        'written_translations': {
+            'translations_mapping': {
+                u'content': {},
+                u'default_outcome': {},
+                u'hint_1': {},
+                u'solution': {}
+            }
         },
         'interaction': {
             'solution': {
@@ -357,6 +365,10 @@ states:
       id: null
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
   New state:
     classifier_model_id: null
     content:
@@ -382,6 +394,10 @@ states:
       id: null
       solution: null
     param_changes: []
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: Title
@@ -1074,7 +1090,7 @@ tags: []
             from_state.interaction.default_outcome.dest = dest_state_name
         end_state = exploration.states[state_names[-1]]
         end_state.update_interaction_id('EndExploration')
-        end_state.interaction.default_outcome = None
+        end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
@@ -1477,10 +1493,10 @@ tags: []
         question_services.add_question(owner_id, question)
         return question
 
-    def save_new_question_with_state_data_schema_v26(
+    def save_new_question_with_state_data_schema_v27(
             self, question_id, owner_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Saves a new default question with a default version 26 state
+        """Saves a new default question with a default version 27 state
         data dictionary.
 
         This function should only be used for creating questions in tests
@@ -1501,10 +1517,10 @@ tags: []
         question_services.create_new_question_rights(question_id, owner_id)
         question_model = question_models.QuestionModel(
             id=question_id,
-            question_state_data=self.VERSION_26_STATE_DICT,
+            question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_schema_version=26
+            question_state_schema_version=27
         )
         question_model.commit(
             owner_id, 'New question created',
@@ -1828,23 +1844,29 @@ class AppEngineTestBase(TestBase):
         """
         state = state_domain.State.create_default_state(
             default_dest_state_name, is_initial_state=True)
-        solution_explanation = state_domain.SubtitledHtml(
-            'solution', 'Solution explanation')
-        solution = state_domain.Solution(
-            'TextInput', False, 'Solution', solution_explanation)
-        hint_content = state_domain.SubtitledHtml('hint_1', 'Hint 1')
-        hint = state_domain.Hint(hint_content)
         state.interaction.id = 'TextInput'
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'content_id': 'solution',
+                'html': 'This is a solution.'
+            }
+        }
+        hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': '<p>This is a hint.</p>'
+            }
+        }]
+        state.update_interaction_solution(solution_dict)
+        state.update_interaction_hints(hints_list)
         state.interaction.customization_args = {
             'placeholder': 'Enter text here',
             'rows': 1
         }
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
-        state.interaction.hints.append(hint)
-        state.content_ids_to_audio_translations['hint_1'] = {}
-        state.interaction.solution = solution
-        state.content_ids_to_audio_translations['solution'] = {}
         return state
 
 
