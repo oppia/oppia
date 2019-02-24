@@ -38,7 +38,7 @@
     {% block prerender %}
     {% endblock prerender %}
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes">
     <meta name="referrer" content="no-referrer">
     <meta name="description" content="Oppia is a free site for sharing knowledge via interactive lessons called explorations. Learn from user-created explorations, or teach and create your own.">
 
@@ -110,9 +110,7 @@
       <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
       </div>
 
-      <div class="oppia-base-container"
-           ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
-           ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
+      <div class="oppia-base-container" ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}" ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
         <div class="oppia-content-container">
           <div id="wrapper">
             <div class="oppia-main-body">
@@ -143,8 +141,7 @@
                     <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE">We Need JavaScript in Your Browser</span>
                     <i class="material-icons">&#xE811;</i>
                   </h2>
-                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
-                     translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">
+                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION" translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">
                      Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com">click here.</a>
                   </p>
                   <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
@@ -161,8 +158,7 @@
         Dev Mode Base 2
       </div>
 
-      <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank"
-         class="oppia-site-feedback oppia-transition-200">
+      <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank" class="oppia-site-feedback oppia-transition-200">
         <i class="material-icons md-18">&#xE87F;</i>
         <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
       </a>
@@ -179,8 +175,9 @@
         ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
     </script>
-<% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <script src="dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script><% } %>
+
+    <script src="dist/about~app~donate.a0cafc4d304badc83a51.bundle.js"></script>
+    <script src="dist/app.bb1c22cd22d68599d4c9.bundle.js"></script>
 
     {% block footer_js %}
     {% endblock footer_js %}

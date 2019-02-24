@@ -42,6 +42,11 @@ handlers:
   expiration: "90d"
 
 # DEVELOPMENT STATIC
+- url: /dist
+  static_dir: core/templates/dev/head/dist
+  secure: always
+  application_readable: true
+  expiration: "0"
 - url: /assets
   static_dir: assets
   secure: always
@@ -55,9 +60,9 @@ handlers:
   upload: core/templates/dev/head/(.*\.(js|css))$
   secure: always
   expiration: "0"
-- url: /templates/dev/head/(.*directive\.html)$
+- url: /templates/dev/head/(.*\.(html))$
   static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*directive\.html)$
+  upload: core/templates/dev/head/(.*\.(html))$
   secure: always
   expiration: "0"
   application_readable: true

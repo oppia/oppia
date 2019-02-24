@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+require("../CollectionCreationService.js")
+require("../ExplorationCreationService.js")
+
 /**
  * @fileoverview Directive for the Create Exploration/Collection button.
  */

@@ -16,6 +16,10 @@
  * @fileoverview Controllers for the donate page.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../services/SiteAnalyticsService.js');
+require('../../services/contextual/WindowDimensionsService.js');
+
 oppia.controller('Donate', [
   '$http', '$scope', '$timeout', '$window', 'UrlInterpolationService',
   'SiteAnalyticsService', 'WindowDimensionsService',

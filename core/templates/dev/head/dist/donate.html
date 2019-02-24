@@ -59,10 +59,7 @@
       </div>
       <div class="oppia-donate-info">
         <div style="height: 0; margin: 60px auto 0px auto; width: 70%; padding-bottom: 56.25%; position: relative;">
-          <iframe title="Meet Oppia's Contributors" width="100%"
-                  height="100%" src="https://www.youtube.com/embed/OConyxG7HaM?rel=0&cc_lang_pref=en&cc_load_policy=1"
-                  frameborder="0" allowfullscreen
-                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+          <iframe title="Meet Oppia's Contributors" width="100%" height="100%" src="https://www.youtube.com/embed/OConyxG7HaM?rel=0&cc_lang_pref=en&cc_load_policy=1" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
           </iframe>
         </div>
         <h3 class="oppia-donate-h3"><em>Hear from our Oppia community</em></h3>
@@ -152,8 +149,9 @@
 
 {% block footer_js %}
   {{ super() }}
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <script src="dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script><% } %>
+  
+    <script src="dist/about~app~donate.a0cafc4d304badc83a51.bundle.js"></script>
+    <script src="dist/donate.fc3ebbe7428b46fb9deb.bundle.js"></script>
 {% endblock footer_js %}
 
 {% block footer %}

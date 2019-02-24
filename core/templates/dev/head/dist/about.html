@@ -603,8 +603,9 @@
 
 {% block footer_js %}
   {{ super() }}
-<% for (var chunk in htmlWebpackPlugin.files.js) { %>
-  <script src="dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script><% } %>
+
+  <script src="dist/about~app~donate.a0cafc4d304badc83a51.bundle.js"></script>
+  <script src="dist/about.ffc82be88ebcd6504158.bundle.js"></script>
 {% endblock footer_js %}
 
 {% block footer%}

@@ -68,13 +68,16 @@ NODE_FILE = os.path.join(
     PARENT_DIR, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
 UGLIFY_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
+WEBPACK_FILE = os.path.join(
+    PARENT_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
+WEBPACK_PROD_CONFIG = 'webpack.prod.config.js'
 
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
 # Files with these name patterns shouldn't be moved to build directory, and will
 # not be served in production. (This includes protractor.js files in
 # /extensions.)
-JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
+JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js', '.bundle.js')
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -488,6 +491,16 @@ def build_third_party_libs(third_party_directory_path):
     _execute_tasks(
         _generate_copy_tasks_for_fonts(
             dependency_filepaths['fonts'], FONTS_DIR))
+
+
+def webpack_build():
+    """Execute webpack build process."""
+
+    print 'Building webpack'
+
+    cmd = '%s --config %s' % (
+        WEBPACK_FILE, WEBPACK_PROD_CONFIG)
+    subprocess.check_call(cmd, shell=True)
 
 
 def hash_should_be_inserted(filepath):
@@ -1125,6 +1138,7 @@ def build():
         raise Exception(
             'minify_third_party_libs_only should not be set in non-prod mode.')
     if options.prod_mode:
+        webpack_build()
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         if not options.minify_third_party_libs_only:
             generate_build_directory()
