@@ -67,7 +67,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_page.to_dict(), self.subtopic_page.to_dict())
 
     def test_get_subtopic_page_contents_by_id(self):
-        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+        self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 1)
         content_ids_to_audio_translations_dict = {
             'content': {
@@ -79,11 +79,12 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_page_contents_dict = {
-            'content_ids_to_audio_translations': content_ids_to_audio_translations_dict,
-                 'subtitled_html': {
-                     'content_id': 'content', 'html': 'hello world'
-                     }
-                     }
+            'content_ids_to_audio_translations':
+                content_ids_to_audio_translations_dict,
+            'subtitled_html': {
+                'content_id': 'content', 'html': 'hello world'
+            }
+        }
         self.subtopic_page.update_page_contents_html({
             'html': 'hello world',
             'content_id': 'content'
@@ -93,15 +94,16 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Updated page contents',
             [subtopic_page_domain.SubtopicPageChange({
-                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY ,
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                 'subtopic_id': 1,
                 'property_name': 'page_contents_html',
                 'new_value': 'a',
                 'old_value': 'b'
             })]
         )
-        subtopic_page_contents = subtopic_page_services.get_subtopic_page_contents_by_id(
-                self.TOPIC_ID, 1)
+        subtopic_page_contents = (
+            subtopic_page_services.get_subtopic_page_contents_by_id(
+                self.TOPIC_ID, 1))
         self.assertEqual(
             subtopic_page_contents.to_dict(), expected_page_contents_dict)
 
