@@ -43,6 +43,7 @@ from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import skill_editor
 from core.controllers import story_editor
+from core.controllers import story_viewer
 from core.controllers import subscriptions
 from core.controllers import suggestion
 from core.controllers import topic_editor
@@ -226,6 +227,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<skill_id>' % feconf.NEW_QUESTION_URL,
         question_editor.QuestionCreationHandler),
     get_redirect_route(
+        r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
+        story_viewer.StoryPageDataHandler),
+    get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
     get_redirect_route(
@@ -282,6 +286,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
+    get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
 
     get_redirect_route(
         r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,

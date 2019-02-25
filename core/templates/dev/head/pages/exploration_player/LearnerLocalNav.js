@@ -20,14 +20,16 @@ oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$rootScope', '$http', '$uibModal', 'AlertsService',
+  '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
   'ExplorationEngineService', 'ExplorationPlayerStateService',
-  'FocusManagerService', 'UrlInterpolationService', 'UserService',
+  'FocusManagerService', 'ShowSuggestionModalForLearnerLocalViewService',
+  'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
   'FLAG_EXPLORATION_URL_TEMPLATE',
   function(
-      $scope, $rootScope, $http, $uibModal, AlertsService,
+      $http, $rootScope, $scope, $uibModal, AlertsService,
       ExplorationEngineService, ExplorationPlayerStateService,
-      FocusManagerService, UrlInterpolationService, UserService,
+      FocusManagerService, ShowSuggestionModalForLearnerLocalViewService,
+      UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
       FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationEngineService.getExplorationId();
     $scope.canEdit = GLOBALS.canEdit;
@@ -37,90 +39,15 @@ oppia.controller('LearnerLocalNav', [
       $scope.username = userInfo.getUsername();
       $rootScope.loadingMessage = '';
     });
+
+    $scope.getFeedbackPopoverUrl = function() {
+      return UrlInterpolationService.getDirectiveTemplateUrl(
+        FEEDBACK_POPOVER_PATH);
+    };
+
     $scope.showLearnerSuggestionModal = function() {
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_player/' +
-          'learner_view_suggestion_modal_directive.html'),
-        backdrop: 'static',
-        resolve: {},
-        controller: [
-          '$scope', '$uibModalInstance', '$timeout', 'PlayerPositionService',
-          'ExplorationEngineService', 'PlayerTranscriptService',
-          function(
-              $scope, $uibModalInstance, $timeout, PlayerPositionService,
-              ExplorationEngineService, PlayerTranscriptService) {
-            var stateName = PlayerPositionService.getCurrentStateName();
-            var displayedCard = PlayerTranscriptService.getCard(
-              PlayerPositionService.getDisplayedCardIndex());
-            $scope.originalHtml = displayedCard.getContentHtml();
-            $scope.description = '';
-            // ng-model needs to bind to a property of an object on
-            // the scope (the property cannot sit directly on the scope)
-            // Reference https://stackoverflow.com/q/12618342
-            $scope.suggestionData = {suggestionHtml: $scope.originalHtml};
-            $scope.showEditor = false;
-            // Rte initially displays content unrendered for a split second
-            $timeout(function() {
-              $scope.showEditor = true;
-            }, 500);
-
-            $scope.cancelSuggestion = function() {
-              $uibModalInstance.dismiss('cancel');
-            };
-
-            $scope.submitSuggestion = function() {
-              data = {
-                target_id: ExplorationEngineService.getExplorationId(),
-                version: ExplorationEngineService.getExplorationVersion(),
-                stateName: stateName,
-                suggestion_type: 'edit_exploration_state_content',
-                target_type: 'exploration',
-                description: $scope.description,
-                suggestionHtml: $scope.suggestionData.suggestionHtml,
-              };
-              $uibModalInstance.close(data);
-            };
-          }]
-      }).result.then(function(result) {
-        data = {
-          suggestion_type: result.suggestion_type,
-          target_type: result.target_type,
-          target_id: result.target_id,
-          target_version_at_submission: result.version,
-          assigned_reviewer_id: null,
-          final_reviewer_id: null,
-          description: result.description,
-          change: {
-            cmd: 'edit_state_property',
-            property_name: 'content',
-            state_name: result.stateName,
-            new_value: {
-              html: result.suggestionHtml
-            }
-          }
-        };
-        url = '/suggestionhandler/';
-
-        $http.post(url, data).error(function(res) {
-          AlertsService.addWarning(res);
-        });
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/' +
-            'learner_suggestion_submitted_modal_directive.html'),
-          backdrop: true,
-          resolve: {},
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.close = function() {
-                $uibModalInstance.dismiss();
-              };
-            }
-          ]
-        });
-      });
+      ShowSuggestionModalForLearnerLocalViewService.showSuggestionModal(
+        'edit_exploration_state_content', {});
     };
     $scope.showFlagExplorationModal = function() {
       $uibModal.open({

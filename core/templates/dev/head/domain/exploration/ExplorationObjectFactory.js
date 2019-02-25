@@ -18,12 +18,14 @@
  */
 
 oppia.factory('ExplorationObjectFactory', [
-  '$log', 'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-  'StatesObjectFactory', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
-  'UrlInterpolationService', function(
-      $log, INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
-      StatesObjectFactory, ParamChangesObjectFactory, ParamSpecsObjectFactory,
-      UrlInterpolationService) {
+  '$log', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+  'StatesObjectFactory', 'UrlInterpolationService',
+  'INTERACTION_DISPLAY_MODE_INLINE',
+  'INTERACTION_SPECS', function(
+      $log, ParamChangesObjectFactory, ParamSpecsObjectFactory,
+      StatesObjectFactory, UrlInterpolationService,
+      INTERACTION_DISPLAY_MODE_INLINE,
+      INTERACTION_SPECS) {
     var Exploration = function(
         initStateName, paramChanges, paramSpecs, states, title, languageCode) {
       this.initStateName = initStateName;

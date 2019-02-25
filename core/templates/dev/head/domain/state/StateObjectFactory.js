@@ -19,9 +19,9 @@
 
 oppia.factory('StateObjectFactory', [
   'ContentIdsToAudioTranslationsObjectFactory', 'InteractionObjectFactory',
-  'SubtitledHtmlObjectFactory', 'ParamChangesObjectFactory', function(
+  'ParamChangesObjectFactory', 'SubtitledHtmlObjectFactory', function(
       ContentIdsToAudioTranslationsObjectFactory, InteractionObjectFactory,
-      SubtitledHtmlObjectFactory, ParamChangesObjectFactory) {
+      ParamChangesObjectFactory, SubtitledHtmlObjectFactory) {
     var State = function(name, classifierModelId, content, interaction,
         paramChanges, contentIdsToAudioTranslations) {
       this.name = name;
