@@ -1826,7 +1826,7 @@ def can_edit_skill(handler):
         return False
 
     def test_can_edit_skill(self, skill_id, **kwargs):
-        """ Test to see if user can edit a given skill by checking if
+        """Test to see if user can edit a given skill by checking if
         logged in and using can_user_edit_skill.
 
         Args:

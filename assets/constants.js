@@ -489,12 +489,18 @@ var constants = {
       "content_ids_to_audio_translations": {
           "content": {},
           "default_outcome": {}
+      },
+      "written_translations": {
+          "translations_mapping": {
+            "content": {},
+            "default_outcome": {}
+          }
       }
   },
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
-  "CURRENT_STATES_SCHEMA_VERSION": 26,
+  "CURRENT_STATES_SCHEMA_VERSION": 27,
 
   "DEV_MODE": true
 };
