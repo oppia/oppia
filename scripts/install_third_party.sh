@@ -38,7 +38,7 @@ install_node_module htmllint 0.7.2
 install_node_module htmllint-cli 0.0.7
 install_node_module @mapbox/stylelint-processor-arbitrary-tags 0.2.0
 install_node_module postcss-syntax 0.36.2
-install_node_module stylelint 9.8.0
+install_node_module stylelint 9.10.1
 install_node_module stylelint-config-standard 18.2.0
 install_node_module stylelint-order 2.0.0
 install_node_module through2 2.0.0
