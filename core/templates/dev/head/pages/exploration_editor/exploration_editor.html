@@ -133,6 +133,7 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
   <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
@@ -331,6 +332,9 @@
   <script src="/templates/dev/head/pages/state_editor/StateEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StateEditorService.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StatePropertyServices.js"></script>
+
+  <script src="/templates/dev/head/components/CkEditorRteDirective.js"></script>
+  <script src="/templates/dev/head/components/CkEditorWidgetsGenerator.js"></script>
 
   <script src="/templates/dev/head/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
