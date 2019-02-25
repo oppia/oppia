@@ -117,7 +117,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               }
             };
             if (!$scope.interactionIsActive) {
-              addNewMarker(scope.getLastAnswer()[0], $scope.getLastAnswer()[1]);
+              addNewMarker($scope.getLastAnswer()[0], $scope.getLastAnswer()[1]);
             }
           };
 
@@ -129,7 +129,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             });
 
           $scope.$on('leafletDirectiveMap.interactiveMap.mouseout', function() {
-            if ($scope.interactionIsActive) {
+            if (!$scope.interactionIsActive) {
               $scope.hideOverlay();
             }
           });
