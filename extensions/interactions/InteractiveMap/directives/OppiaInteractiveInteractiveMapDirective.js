@@ -117,7 +117,8 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               }
             };
             if (!$scope.interactionIsActive) {
-              addNewMarker($scope.getLastAnswer()[0], $scope.getLastAnswer()[1]);
+              addNewMarker(
+                $scope.getLastAnswer()[0], $scope.getLastAnswer()[1]);
             }
           };
 
