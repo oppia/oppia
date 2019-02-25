@@ -1478,7 +1478,7 @@ def _check_directive_scope(all_files, parsed_js_files):
     return summary_messages
 
 
-def _check_js_property(all_files):
+def _check_js_property(all_files, parsed_js_files):
     """This function ensures that all JS files has exactly
     one component and the name of the component should match
     the filename.
@@ -1497,8 +1497,7 @@ def _check_js_property(all_files):
         property_num = 0
         # Filename without its path.
         exact_filename = filename.split('/')[-1][:-3]
-        content = FileCache.read(filename)
-        parsed_dict = _validate_and_parse_js_file(filename, content)
+        parsed_dict = parsed_js_files[filename]
         with _redirect_stdout(_TARGET_STDOUT):
             # Parse the body of the content as nodes.
             parsed_nodes = parsed_dict['body']
@@ -1534,20 +1533,30 @@ def _check_js_property(all_files):
                     if (property_name[0].upper() + property_name[1:] +
                             'Directive' != (exact_filename)):
                         print (
-                            '%s -> Please ensure that the %s name strictly matches the '
-                            'filename' % (filename, callee_property))
+                            '%s -> Please ensure that the %s name strictly '
+                            'matches the filename'
+                            % (filename, callee_property))
+                        failed = True
+                elif callee_property == 'filter':
+                    if (property_name[0].upper() + property_name[1:] +
+                            'Filter' != (exact_filename)):
+                        print (
+                            '%s -> Please ensure that the %s name strictly '
+                            'matches the filename'
+                            % (filename, callee_property))
                         failed = True
                 else:
                     if property_name != exact_filename:
                         print (
-                            '%s -> Please ensure that the %s name strictly matches the '
-                            'filename' % (filename, callee_property))
+                            '%s -> Please ensure that the %s name strictly '
+                            'matches the filename'
+                            % (filename, callee_property))
                         failed = True
 
             if property_num > 1:
                 print (
-                    '%s -> Please ensure that there is exactly one %s in the file'
-                    % (filename, propertyz))
+                    '%s -> Please ensure that there is exactly one %s in the'
+                    ' file.' % (filename, propertyz))
                 failed = True
 
     with _redirect_stdout(_TARGET_STDOUT):
@@ -1658,11 +1667,9 @@ def _check_sorted_dependencies(all_files, parsed_js_files):
                 '%s  Sorted dependencies check passed' % (
                     _MESSAGE_TYPE_SUCCESS))
 
-    summary_messages.append(summary_message)
-    print summary_message
-    print ''
-    print '----------------------------------------'
-    print ''
+        summary_messages.append(summary_message)
+        print summary_message
+        print ''
 
     return summary_messages
 
@@ -1984,7 +1991,7 @@ def main():
     parsed_js_files = _validate_and_parse_js_files(
         all_files)
     linter_messages = _pre_commit_linter(all_files)
-    js_property_messages = _check_js_property(all_files)
+    js_property_messages = _check_js_property(all_files, parsed_js_files)
     directive_scope_messages = _check_directive_scope(
         all_files, parsed_js_files)
     sorted_dependencies_messages = _check_sorted_dependencies(

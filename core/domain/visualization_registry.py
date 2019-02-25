@@ -53,11 +53,14 @@ class Registry(object):
         """Returns the HTML bodies for all visualizations."""
         js_directives = (
             utils.get_file_contents(os.path.join(
-            feconf.VISUALIZATIONS_DIR, 'OppiaVisualizationBarChartDirective.js')) +
+                feconf.VISUALIZATIONS_DIR,
+                'OppiaVisualizationBarChartDirective.js')) +
             utils.get_file_contents(os.path.join(
-            feconf.VISUALIZATIONS_DIR, 'OppiaVisualizationEnumeratedFrequencyTableDirective.js')) +
+                feconf.VISUALIZATIONS_DIR,
+                'OppiaVisualizationEnumeratedFrequencyTableDirective.js')) +
             utils.get_file_contents(os.path.join(
-            feconf.VISUALIZATIONS_DIR, 'OppiaVisualizationFrequencyTableDirective.js')))
+                feconf.VISUALIZATIONS_DIR,
+                'OppiaVisualizationFrequencyTableDirective.js')))
         return '<script>%s</script>\n' % (js_directives)
 
     @classmethod
