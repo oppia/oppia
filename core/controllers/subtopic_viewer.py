@@ -17,19 +17,28 @@
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import story_services
+from core.domain import subtopic_page_services
 import feconf
 
-class SubtopicViewerPage(base.BaseHandler):
-    """Renders the subtopic viewer page."""
+class SubtopicPageDataHandler(base.BaseHandler):
+    """Manages the data that needs to be displayed to a learner on the
+    subtopic page.
+    """
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
+
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
-        
+
         subtopic_page_contents = subtopic_page_services.get_subtopic_page_contents_by_id(topic_id, subtopic_id)
+        subtopic_page_contents_dict = subtopic_page_contents.to_dict()
+
         self.values.update({
-            'page_contents': subtopic_page_contents
+            'topic_id': topic_id,
+            'subtopic_id': subtopic_id,
+            'page_contents': subtopic_page_contents_dict
         })
+        self.render_json(self.values)
