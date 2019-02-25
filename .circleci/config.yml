@@ -92,9 +92,9 @@ workflows:
   circleci_tests:
     jobs:
       - setup
-      - lint_tests:
-          requires:
-            - setup
+      # - lint_tests:
+      #     requires:
+      #       - setup
       - frontend_tests:
           requires:
             - setup
