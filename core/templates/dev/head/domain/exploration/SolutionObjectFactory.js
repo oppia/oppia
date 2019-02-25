@@ -18,12 +18,12 @@
  */
 
 oppia.factory('SolutionObjectFactory', [
-  '$filter', 'HtmlEscaperService', 'ExplorationHtmlFormatterService',
-  'SubtitledHtmlObjectFactory', 'FractionObjectFactory',
-  'NumberWithUnitsObjectFactory',
-  function($filter, HtmlEscaperService, ExplorationHtmlFormatterService,
-      SubtitledHtmlObjectFactory, FractionObjectFactory,
-      NumberWithUnitsObjectFactory) {
+  '$filter', 'ExplorationHtmlFormatterService', 'FractionObjectFactory',
+  'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
+  'SubtitledHtmlObjectFactory',
+  function($filter, ExplorationHtmlFormatterService, FractionObjectFactory,
+      HtmlEscaperService, NumberWithUnitsObjectFactory,
+      SubtitledHtmlObjectFactory) {
     var Solution = function(answerIsExclusive, correctAnswer, explanation) {
       this.answerIsExclusive = answerIsExclusive;
       this.correctAnswer = correctAnswer;
