@@ -43,13 +43,13 @@ oppia.factory('itemSelectionInputRulesService', ['$filter', function($filter) {
       });
     },
     // add proper subset of
-    IsProperSubsetOf: function(answer, inputs){
+    IsProperSubsetOf: function(answer, inputs) {
       var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
       var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
       return normalizedAnswer.length < normalizedInput.length &&
           normalizedAnswer.every(function(val) {
             return normalizedInput.indexOf(val) !== -1;
-      });
+          });
     }
   };
 }]);
