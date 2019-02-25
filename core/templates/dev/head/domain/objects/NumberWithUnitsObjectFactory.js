@@ -67,9 +67,9 @@ oppia.constant('CURRENCY_UNITS', {
 });
 
 oppia.factory('NumberWithUnitsObjectFactory', [
-  'UnitsObjectFactory', 'FractionObjectFactory', 'CURRENCY_UNITS',
+  'FractionObjectFactory', 'UnitsObjectFactory', 'CURRENCY_UNITS',
   'NUMBER_WITH_UNITS_PARSING_ERRORS', function(
-      UnitsObjectFactory, FractionObjectFactory, CURRENCY_UNITS,
+      FractionObjectFactory, UnitsObjectFactory, CURRENCY_UNITS,
       NUMBER_WITH_UNITS_PARSING_ERRORS) {
     var NumberWithUnits = function(type, real, fractionObj, unitsObj) {
       this.type = type;

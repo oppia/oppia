@@ -20,10 +20,10 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveInteractiveMap', [
-  'HtmlEscaperService', 'InteractiveMapRulesService', 'UrlInterpolationService',
+  'HtmlEscaperService', 'UrlInterpolationService', 'interactiveMapRulesService',
   'EVENT_NEW_CARD_AVAILABLE',
   function(
-      HtmlEscaperService, InteractiveMapRulesService, UrlInterpolationService,
+      HtmlEscaperService, UrlInterpolationService, interactiveMapRulesService,
       EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',

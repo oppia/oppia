@@ -20,13 +20,13 @@
  * followed by the name of the arg.
  */
 oppia.directive('image', [
-  '$rootScope', '$sce', 'HtmlEscaperService', 'ContextService',
-  'UrlInterpolationService', 'ImagePreloaderService',
-  'AssetsBackendApiService', 'LOADING_INDICATOR_URL',
+  '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService',
+  'HtmlEscaperService', 'ImagePreloaderService',
+  'UrlInterpolationService', 'LOADING_INDICATOR_URL',
   function(
-      $rootScope, $sce, HtmlEscaperService, ContextService,
-      UrlInterpolationService, ImagePreloaderService, AssetsBackendApiService,
-      LOADING_INDICATOR_URL) {
+      $rootScope, $sce, AssetsBackendApiService, ContextService,
+      HtmlEscaperService, ImagePreloaderService,
+      UrlInterpolationService, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},

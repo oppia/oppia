@@ -21,16 +21,16 @@
  */
 
 oppia.directive('oppiaInteractiveImageClickInput', [
-  '$sce', 'HtmlEscaperService', 'ContextService',
-  'ImageClickInputRulesService', 'UrlInterpolationService',
-  'ImagePreloaderService', 'AssetsBackendApiService',
-  'EXPLORATION_EDITOR_TAB_CONTEXT', 'EVENT_NEW_CARD_AVAILABLE',
+  '$sce', 'AssetsBackendApiService', 'ContextService',
+  'HtmlEscaperService', 'ImagePreloaderService',
+  'UrlInterpolationService', 'imageClickInputRulesService',
+  'EVENT_NEW_CARD_AVAILABLE', 'EXPLORATION_EDITOR_TAB_CONTEXT',
   'LOADING_INDICATOR_URL',
   function(
-      $sce, HtmlEscaperService, ContextService,
-      ImageClickInputRulesService, UrlInterpolationService,
-      ImagePreloaderService, AssetsBackendApiService,
-      EXPLORATION_EDITOR_TAB_CONTEXT, EVENT_NEW_CARD_AVAILABLE,
+      $sce, AssetsBackendApiService, ContextService,
+      HtmlEscaperService, ImagePreloaderService,
+      UrlInterpolationService, imageClickInputRulesService,
+      EVENT_NEW_CARD_AVAILABLE, EXPLORATION_EDITOR_TAB_CONTEXT,
       LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',

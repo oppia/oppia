@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveContinue', [
-  'HtmlEscaperService', 'ContinueRulesService', 'UrlInterpolationService',
-  function(HtmlEscaperService, ContinueRulesService, UrlInterpolationService) {
+  'HtmlEscaperService', 'UrlInterpolationService', 'continueRulesService',
+  function(HtmlEscaperService, UrlInterpolationService, continueRulesService) {
     return {
       restrict: 'E',
       scope: {},

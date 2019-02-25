@@ -20,11 +20,11 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveMultipleChoiceInput', [
-  'HtmlEscaperService', 'MultipleChoiceInputRulesService',
-  'UrlInterpolationService',
+  'HtmlEscaperService', 'UrlInterpolationService',
+  'multipleChoiceInputRulesService',
   function(
-      HtmlEscaperService, MultipleChoiceInputRulesService,
-      UrlInterpolationService) {
+      HtmlEscaperService, UrlInterpolationService,
+      multipleChoiceInputRulesService) {
     return {
       restrict: 'E',
       scope: {},

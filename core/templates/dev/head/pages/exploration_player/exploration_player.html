@@ -70,8 +70,6 @@
       padding-top: 12px;
     }
   </style>
-
-  {% include 'pages/exploration_player/feedback_popup_container_directive.html' %}
 {% endblock %}
 
 {% block footer %}
@@ -86,6 +84,16 @@
   <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
   <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
   <script src="/extensions/objects/templates/ListOfTabsEditorDirective.js"></script>
+  <script src="/templates/dev/head/directives/AngularHtmlBindDirective.js"></script>
+  <script src="/templates/dev/head/directives/MathjaxBindDirective.js"></script>
+
+  <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
+  <script src="/templates/dev/head/filters/GetAbbreviatedTextFilter.js"></script>
+  <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
+  <script src="/templates/dev/head/filters/SummarizeNonnegativeNumberFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAndCapitalizeFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
+  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
 
   <script src="/templates/dev/head/services/AssetsBackendApiService.js"></script>
   <script src="/templates/dev/head/services/AudioPlayerService.js"></script>

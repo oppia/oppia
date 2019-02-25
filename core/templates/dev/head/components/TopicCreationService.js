@@ -17,10 +17,10 @@
  */
 
 oppia.factory('TopicCreationService', [
-  '$http', '$window', '$uibModal', '$rootScope', '$timeout', 'AlertsService',
+  '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
   'UrlInterpolationService',
   function(
-      $http, $window, $uibModal, $rootScope, $timeout, AlertsService,
+      $http, $rootScope, $timeout, $uibModal, $window, AlertsService,
       UrlInterpolationService) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
