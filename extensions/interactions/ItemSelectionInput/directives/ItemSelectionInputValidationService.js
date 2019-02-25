@@ -131,7 +131,7 @@ oppia.factory('ItemSelectionInputValidationService', [
                         'please select only one answer choice.')
                     });
                   }
-                } else if (rule.type === 'IsProperSubsetOf') {  
+                } else if (rule.type === 'IsProperSubsetOf') {
                   handledAnswers[choiceIndex] = true;
                 } else if (rule.type === 'ContainsAtLeastOneOf') {
                   handledAnswers[choiceIndex] = true;
