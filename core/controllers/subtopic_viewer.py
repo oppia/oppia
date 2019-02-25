@@ -20,6 +20,7 @@ from core.controllers import base
 from core.domain import subtopic_page_services
 import feconf
 
+
 class SubtopicPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
     subtopic page.
@@ -33,7 +34,9 @@ class SubtopicPageDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        subtopic_page_contents = subtopic_page_services.get_subtopic_page_contents_by_id(topic_id, subtopic_id)
+        subtopic_page_contents = (
+            subtopic_page_services.get_subtopic_page_contents_by_id(
+                topic_id, subtopic_id))
         subtopic_page_contents_dict = subtopic_page_contents.to_dict()
 
         self.values.update({

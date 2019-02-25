@@ -2405,11 +2405,12 @@ def can_access_subtopic_viewer_page(handler):
         function. The newly decorated function that now checks
             if the user can access the give subtopic viewer page.
     """
-    
+
     def test_can_access(self, topic_id, subtopic_id, **kwargs):
         """Checks if the user can access subtopic viewer page.
 
         Args:
+            topic_id: str. The id of the topic.
             subtopic_id: str. The id of the Subtopic.
             **kwargs: *. Keyword arguments.
 
@@ -2419,7 +2420,8 @@ def can_access_subtopic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(topic_id, subtopic_id)
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            topic_id, subtopic_id)
 
         if subtopic_page is None:
             raise self.PageNotFoundException

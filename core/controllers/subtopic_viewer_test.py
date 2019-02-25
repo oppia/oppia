@@ -34,7 +34,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.topic_id  = 'topic_id'
+        self.topic_id = 'topic_id'
         self.subtopic_id = 'subtopic_id'
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
@@ -57,10 +57,11 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             }
         }
         self.expected_page_contents_dict = {
-            'content_ids_to_audio_translations': self.content_ids_to_audio_translations_dict,
-                 'subtitled_html': {
-                     'content_id': 'content', 'html': 'hello world'
-                }
+            'content_ids_to_audio_translations':
+                self.content_ids_to_audio_translations_dict,
+            'subtitled_html': {
+                'content_id': 'content', 'html': 'hello world'
+            }
         }
         self.subtopic_page.update_page_contents_html({
             'html': 'hello world',
@@ -71,7 +72,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Updated page contents',
             [subtopic_page_domain.SubtopicPageChange({
-                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY ,
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                 'subtopic_id': self.subtopic_id,
                 'property_name': 'page_contents_html',
                 'new_value': 'a',
@@ -84,11 +85,13 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s/%s' % (feconf.SUBTOPIC_DATA_HANDLER, 'topic_id', 'subtopic_id'))
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'topic_id', 'subtopic_id'))
             expected_page_contents_dict = {
-                'content_ids_to_audio_translations': self.content_ids_to_audio_translations_dict,
+                'content_ids_to_audio_translations':
+                    self.content_ids_to_audio_translations_dict,
                 'subtitled_html': {
-                     'content_id': 'content', 'html': 'hello world'
+                    'content_id': 'content', 'html': 'hello world'
                 }
             }
             expected_dict = {
@@ -99,7 +102,8 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             self.assertDictContainsSubset(expected_dict, json_response)
 
     def test_get_fails_when_new_structures_not_enabled(self):
-       with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
-                '%s/%s/%s' % (feconf.SUBTOPIC_DATA_HANDLER, 'topic_id', 'subtopic_id'),
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'topic_id', 'subtopic_id'),
                 expected_status_int=404)
