@@ -77,11 +77,11 @@ describe('Item Selection rules service', function() {
       var RULE_INPUT = {
         x: ['a', 'b', 'c']
       };
-      expect(isirs.IsProperSubsetOf(['a'], RULE_INPUT)).toBe(false);
-      expect(isirs.IsProperSubsetOf(['a', 'b'], RULE_INPUT)).toBe(false);
+      expect(isirs.IsProperSubsetOf(['a'], RULE_INPUT)).toBe(true);
+      expect(isirs.IsProperSubsetOf(['a', 'b'], RULE_INPUT)).toBe(true);
       expect(isirs.IsProperSubsetOf(['a', 'b', 'c'], RULE_INPUT)).toBe(false);
       expect(isirs.IsProperSubsetOf(
-        ['a', 'b', 'c', 'd'], RULE_INPUT)).toBe(true);
+        ['a', 'b', 'c', 'd'], RULE_INPUT)).toBe(false);
       expect(isirs.IsProperSubsetOf(
         ['b', 'c', 'd', 'e'], RULE_INPUT)).toBe(false);
     }
