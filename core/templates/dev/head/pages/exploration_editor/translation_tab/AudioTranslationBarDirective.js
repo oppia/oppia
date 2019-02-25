@@ -30,10 +30,10 @@ oppia.directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
-          if (!scope.showDropArea) {
-            scope.showDropArea = true;
-            scope.$digest();
-          }
+          // don't show for user that is logged in and cannot add translation.
+          scope.showDropArea = !scope.userIsGuest && 
+            scope.translationIsDisallowed ? false : true;
+          scope.$digest();
           return false;
         });
 
@@ -94,8 +94,8 @@ oppia.directive('audioTranslationBar', [
           $scope.checkingMicrophonePermission = false;
           $scope.audioTimerIsShown = true;
           $scope.audioIsCurrentlyBeingSaved = false;
-          $scope.disallowed = !GLOBALS.can_translate;
-          $scope.guest = !GLOBALS.userIsLoggedIn;
+          $scope.translationIsDisallowed = !GLOBALS.can_translate;
+          $scope.userIsGuest = !GLOBALS.userIsLoggedIn;
 
           var saveContentIdsToAudioTranslationChanges = function() {
             StateContentIdsToAudioTranslationsService.saveDisplayedValue();
