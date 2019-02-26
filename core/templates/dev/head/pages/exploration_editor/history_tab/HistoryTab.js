@@ -17,15 +17,15 @@
  */
 
 oppia.controller('HistoryTab', [
-  '$scope', '$http', '$rootScope', '$log',
-  '$uibModal', 'ExplorationDataService',
-  'VersionTreeService', 'CompareVersionsService',
-  'DateTimeFormatService', 'UrlInterpolationService',
+  '$http', '$log', '$rootScope', '$scope',
+  '$uibModal', 'CompareVersionsService',
+  'DateTimeFormatService', 'ExplorationDataService',
+  'UrlInterpolationService', 'VersionTreeService',
   function(
-      $scope, $http, $rootScope, $log,
-      $uibModal, ExplorationDataService,
-      VersionTreeService, CompareVersionsService,
-      DateTimeFormatService, UrlInterpolationService) {
+      $http, $log, $rootScope, $scope,
+      $uibModal, CompareVersionsService,
+      DateTimeFormatService, ExplorationDataService,
+      UrlInterpolationService, VersionTreeService) {
     $scope.explorationId = ExplorationDataService.explorationId;
     $scope.explorationAllSnapshotsUrl =
         '/createhandler/snapshots/' + $scope.explorationId;

@@ -17,13 +17,13 @@
  */
 
 oppia.directive('skillConceptCardEditor', [
-  'UrlInterpolationService', 'SkillUpdateService', 'SkillEditorStateService',
-  'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_WORKED_EXAMPLE',
-  'COMPONENT_NAME_EXPLANATION', 'GenerateContentIdService',
+  'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
+  'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
+  'COMPONENT_NAME_EXPLANATION', 'COMPONENT_NAME_WORKED_EXAMPLE',
   function(
-      UrlInterpolationService, SkillUpdateService, SkillEditorStateService,
-      SubtitledHtmlObjectFactory, COMPONENT_NAME_WORKED_EXAMPLE,
-      COMPONENT_NAME_EXPLANATION, GenerateContentIdService) {
+      GenerateContentIdService, SkillEditorStateService, SkillUpdateService,
+      SubtitledHtmlObjectFactory, UrlInterpolationService,
+      COMPONENT_NAME_EXPLANATION, COMPONENT_NAME_WORKED_EXAMPLE) {
     return {
       restrict: 'E',
       scope: {},
