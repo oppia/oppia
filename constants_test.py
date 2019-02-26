@@ -44,3 +44,22 @@ class ConstantsTests(test_utils.GenericTestBase):
         self.assertIn(
             feconf.SYSTEM_COMMITTER_ID, constants.constants.SYSTEM_USER_IDS)
         self.assertEqual(len(constants.constants.SYSTEM_USER_IDS), 2)
+
+    def test_all_comments_are_removed_from_json_text(self):
+        """Tests if comments are removed from json text."""
+        with open(os.path.join(
+            feconf.TESTS_DATA_DIR, 'dummy_constants.js'), 'r') as f:
+            actual_text_without_comments = constants.remove_comments(f.read())
+            expected_text_without_comments = (
+                'var dummy_constants = {\n'
+                '  "File_purpose": "This file is for testing comments '
+                'removal",\n\n'
+                '  "Dummy_constant": "Simple constant",\n\n'
+                '  "Dummy_list_constant": ["List", "of", "dummy", '
+                '"constants"],\n\n'
+                '  "Dummy_constant_without_comment": '
+                '"Dummy constant with no comment"\n'
+                '};\n')
+
+            self.assertEqual(
+                actual_text_without_comments, expected_text_without_comments)

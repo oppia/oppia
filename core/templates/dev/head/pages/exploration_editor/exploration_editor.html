@@ -140,6 +140,24 @@
     {{ value_generators_js }}
   </script>
 
+  <script src="/templates/dev/head/directives/AngularHtmlBindDirective.js"></script>
+  <script src="/templates/dev/head/directives/MathjaxBindDirective.js"></script>
+
+  <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
+  <script src="/templates/dev/head/filters/CapitalizeFilter.js"></script>
+  <script src="/templates/dev/head/filters/FormatRtePreviewFilter.js"></script>
+  <script src="/templates/dev/head/filters/FormatTimerFilter.js"></script>
+  <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
+  <script src="/templates/dev/head/filters/ParameterizeRuleDescriptionFilter.js"></script>
+  <script src="/templates/dev/head/filters/RemoveDuplicatesInArrayFilter.js"></script>
+  <script src="/templates/dev/head/filters/ReplaceInputsWithEllipsesFilter.js"></script>
+  <script src="/templates/dev/head/filters/SummarizeNonnegativeNumberFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAndCapitalizeFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAtFirstEllipsisFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateInputBasedOnInteractionAnswerTypeFilter.js"></script>
+  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
+  <script src="/templates/dev/head/filters/WrapTextWithEllipsisFilter.js"></script>
 
   <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
@@ -278,6 +296,7 @@
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/StateTranslationDirective.js"></script>
 
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/TranslationStatusService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/translation_tab/TranslationTabActiveContentIdService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/AudioTranslationBarDirective.js"></script>
 
   <script src="/templates/dev/head/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
@@ -434,6 +453,9 @@
   <script src="/templates/dev/head/expressions/ExpressionInterpolationService.js"></script>
 
   <script src="/extensions/interactions/baseValidator.js"></script>
+  <script src="/templates/dev/head/pages/suggestion_editor/ShowSuggestionModalForEditorViewService.js"></script>
+  <script src="/templates/dev/head/pages/suggestion_editor/SuggestionModalService.js"></script>
+  <script src="/templates/dev/head/pages/suggestion_editor/ShowSuggestionModalForEditorView.js"></script>
 
   {% include 'components/rich_text_components.html' %}
   {{ interaction_templates }}

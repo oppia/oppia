@@ -18,11 +18,11 @@
  */
 
 oppia.factory('ChangeListService', [
-  '$rootScope', '$log', 'AlertsService', 'ExplorationDataService',
-  'AutosaveInfoModalsService',
+  '$log', '$rootScope', 'AlertsService', 'AutosaveInfoModalsService',
+  'ExplorationDataService',
   function(
-      $rootScope, $log, AlertsService, ExplorationDataService,
-      AutosaveInfoModalsService) {
+      $log, $rootScope, AlertsService, AutosaveInfoModalsService,
+      ExplorationDataService) {
     // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
     // TODO(sll): Allow the user to view the list of changes made so far, as
