@@ -346,7 +346,7 @@ class SubtopicPage(object):
 
     def update_page_contents_written_translations(
             self, new_page_written_translations_dict):
-        """The new value for the content_ids_to_audio_translations data field.
+        """The new value for the written_translations data field.
 
         Args:
             new_page_written_translations_dict: dict. The new translation for

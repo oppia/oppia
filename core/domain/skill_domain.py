@@ -275,7 +275,7 @@ class SkillContents(object):
                 for the skill. Each element should be a SubtitledHtml object.
             content_ids_to_audio_translations: dict. Dict to contain the ids of
                 the audio translations part of this SkillContents.
-            written_translations: WrittenTranslations. A text translations of
+            written_translations: WrittenTranslations. A text translation of
                 the skill contents.
         """
         self.explanation = explanation
