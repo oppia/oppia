@@ -32,13 +32,13 @@ describe('Translation status service', function() {
         return ['First', 'Second', 'Third'];
       },
       getContentIdsToAudioTranslationsMemento: function(stateName) {
-        var citatDict = {First:  {
+        var citatDict = {First: {
           content: {
             en: {
               filename: 'filename1.mp3',
               file_size_bytes: 100000,
               needs_update: true
-          }},
+            }},
           default_outcome: {},
           feedback_1: {},
           feedback_2: {
@@ -46,20 +46,20 @@ describe('Translation status service', function() {
               filename: 'filename2.mp3',
               file_size_bytes: 100000,
               needs_update: false
-          }}},
-          Second: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {}
-          },
-          Third: {
-            content: {
-              en: {
-                filename: 'filename3.mp3',
-                file_size_bytes: 100000,
-                needs_update: false
-        }}}};
+            }}},
+        Second: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
+        },
+        Third: {
+          content: {
+            en: {
+              filename: 'filename3.mp3',
+              file_size_bytes: 100000,
+              needs_update: false
+            }}}};
         return ContentIdsToAudioTranslationsObjectFactory.
           createFromBackendDict(citatDict[stateName]);
       },
