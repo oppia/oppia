@@ -17,8 +17,8 @@
  */
 
 oppia.directive('skillEditorMainTab', [
-  'UrlInterpolationService', 'SkillEditorStateService',
-  function(UrlInterpolationService, SkillEditorStateService) {
+  'SkillEditorStateService', 'UrlInterpolationService',
+  function(SkillEditorStateService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

@@ -18,9 +18,9 @@
  */
 
 oppia.factory('SubtopicPageContentsObjectFactory', [
-  'SubtitledHtmlObjectFactory', 'ContentIdsToAudioTranslationsObjectFactory',
+  'ContentIdsToAudioTranslationsObjectFactory', 'SubtitledHtmlObjectFactory',
   function(
-      SubtitledHtmlObjectFactory, ContentIdsToAudioTranslationsObjectFactory) {
+      ContentIdsToAudioTranslationsObjectFactory, SubtitledHtmlObjectFactory) {
     var SubtopicPageContents = function(
         subtitledHtml, contentIdsToAudioTranslations) {
       this._subtitledHtml = subtitledHtml;

@@ -17,8 +17,8 @@
 """Controllers for suggestions."""
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
