@@ -26,7 +26,6 @@ import feconf
 class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
 
     user_id = 'user_id'
-    subtopic_id = 1
 
     def setUp(self):
         super(BaseSubtopicViewerControllerTests, self).setUp()
