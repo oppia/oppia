@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
+"""Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
 
 from core.controllers import acl_decorators
 from core.controllers import base
