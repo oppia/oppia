@@ -18,11 +18,13 @@
 oppia.constant('NODE_ID_PREFIX', 'node_');
 
 oppia.controller('StoryEditor', [
-  '$scope', '$uibModal', '$window', 'UrlService', 'StoryEditorStateService',
-  'UrlInterpolationService', 'UndoRedoService',
+  '$scope', '$uibModal', '$window', 'StoryEditorStateService',
+  'UndoRedoService',
+  'UrlInterpolationService', 'UrlService',
   function(
-      $scope, $uibModal, $window, UrlService, StoryEditorStateService,
-      UrlInterpolationService, UndoRedoService) {
+      $scope, $uibModal, $window, StoryEditorStateService,
+      UndoRedoService,
+      UrlInterpolationService, UrlService) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
     var topicId = UrlService.getTopicIdFromUrl();
     StoryEditorStateService.loadStory(
