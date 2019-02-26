@@ -66,10 +66,11 @@ notifications:
   email:
     recipients:
     - sean@seanlip.org
-    - henning.benmax@gmail.com
-    - tzjiang1@gmail.com
-    - apurvabajaj007@gmail.com
     - nithusha21@yahoo.co.in
+    - apurvabajaj007@gmail.com
+    - annonymousxyz@outlook.com
+    - anubhavsinha98@gmail.com
+    - yashjipkate@gmail.com
     on_success: change
     on_failure: change
   irc:
