@@ -60,7 +60,7 @@ function maybeInstallDependencies {
     $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
     bash scripts/install_frontend_tests_dependencies.sh
 
-    $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.41 --ignore_ssl
+    $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.41
     # Start a selenium server using chromedriver 2.41.
     # The 'detach' option continues the flow once the server is up and runnning.
     # The 'quiet' option prints only the necessary information about the server start-up
