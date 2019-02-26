@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ oppia.factory('WrittenTranslationsObjectFactory', [
     };
 
     WrittenTranslations.prototype.hasWrittenTranslation = function(
-      contentId, langaugeCode) {
+        contentId, langaugeCode) {
       return this.getTranslationsLanguageCodes(
         contentId).indexOf(langaugeCode) !== -1;
     };
@@ -116,17 +116,17 @@ oppia.factory('WrittenTranslationsObjectFactory', [
         writtenTranslationsDict) {
       var translationsMapping = {};
       Object.keys(writtenTranslationsDict.translations_mapping).forEach(
-          function(contentId) {
-        translationsMapping[contentId] = {};
-        var languageCodeToWrittenTranslationDict = (
-          writtenTranslationsDict.translations_mapping[contentId]);
-        Object.keys(languageCodeToWrittenTranslationDict).forEach(
+        function(contentId) {
+          translationsMapping[contentId] = {};
+          var languageCodeToWrittenTranslationDict = (
+            writtenTranslationsDict.translations_mapping[contentId]);
+          Object.keys(languageCodeToWrittenTranslationDict).forEach(
             function(langCode) {
-          translationsMapping[contentId][langCode] = (
-            WrittenTranslationObjectFactory.createFromBackendDict(
-              languageCodeToWrittenTranslationDict[langCode]));
+              translationsMapping[contentId][langCode] = (
+                WrittenTranslationObjectFactory.createFromBackendDict(
+                  languageCodeToWrittenTranslationDict[langCode]));
+            });
         });
-      });
       return new WrittenTranslations(translationsMapping);
     };
 

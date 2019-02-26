@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ describe('WrittenTranslation object factory', function() {
   describe('WrittenTranslationObjectFactory', function() {
     var wtof, writtenTranslation;
 
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(inject(function($injector) {
       wtof = $injector.get('WrittenTranslationObjectFactory');
       writtenTranslation = wtof.createFromBackendDict({
         html: '<p>HTML</p>',
@@ -77,13 +77,13 @@ describe('WrittenTranslation object factory', function() {
     });
 
     it('should create a new written translation translation', function() {
-        expect(wtof.createNew('New')).toEqual(
-          wtof.createFromBackendDict({
-            html: 'New',
-            needs_update: false
-          })
-        );
-      }
+      expect(wtof.createNew('New')).toEqual(
+        wtof.createFromBackendDict({
+          html: 'New',
+          needs_update: false
+        })
+      );
+    }
     );
   });
 });
