@@ -19,7 +19,7 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('video', [
+oppia.directive('oppiaNoninteractiveVideo', [
   '$sce', 'HtmlEscaperService', 'UrlInterpolationService',
   function($sce, HtmlEscaperService, UrlInterpolationService) {
     return {

@@ -304,22 +304,26 @@ describe('Testing filters', function() {
         filter('<p>Text input</p>')
       ).toEqual('Text input');
       expect(
-        filter('<p><math attr1=value1></math>Text input</p>')
+        filter('<p><oppia-noninteractive-math attr1=value1>' +
+        '</oppia-noninteractive-math>Text input</p>')
       ).toEqual('[Math] Text input');
       expect(
-        filter('<p><math></math>' +
-        'Text input<collapsible></collapsible>Text input 2</p>')
+        filter('<p><oppia-noninteractive-math></oppia-noninteractive-math>' +
+        'Text input<oppia-noninteractive-collapsible>' +
+        '</oppia-noninteractive-collapsible>Text input 2</p>')
       ).toEqual('[Math] Text input [Collapsible] Text input 2');
       expect(
-        filter('<p><math></math>' +
-        'Text&nbsp;input<sample_tag><collapsible>' +
-        '</collapsible><a><sample_tag>Text input 2' +
+        filter('<p><oppia-noninteractive-math></oppia-noninteractive-math>' +
+        'Text&nbsp;input<sample_tag><oppia-noninteractive-collapsible>' +
+        '</oppia-noninteractive-collapsible><a><sample_tag>Text input 2' +
         '</sample_tag></a></p>')
       ).toEqual('[Math] Text input [Collapsible] Text input 2');
       expect(
-        filter('<math></math>' +
-        'Text input<collapsible></collapsible>Text input 2<image>' +
-        '</image> Text Input 3 ')
+        filter('<oppia-noninteractive-math></oppia-noninteractive-math>' +
+        'Text input<oppia-noninteractive-collapsible>' +
+        '</oppia-noninteractive-collapsible>Text input 2' +
+        '<oppia-noninteractive-image>' +
+        '</oppia-noninteractive-image> Text Input 3 ')
       ).toEqual('[Math] Text input [Collapsible] Text input 2 [Image]  ' +
       'Text Input 3');
     }));
@@ -335,23 +339,23 @@ describe('Testing filters', function() {
       var interactionIdMath = 'TextInput';
       var choicesMath = [
         {
-          label: '<math raw_latex-with-value="&amp;quot;' +
-            'x^3 - a x^2 - b x - c&amp;quot;"></math>',
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+            'x^3 - a x^2 - b x - c&amp;quot;"></oppia-noninteractive-math>',
           val: 0
         }, {
-          label: '<math raw_latex-with-value="&amp;quot;' +
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
             'x^3 + (a+b+c)x^2 + (ab+bc+ca)x + abc&amp;quot;">' +
-            '</math>',
+            '</oppia-noninteractive-math>',
           val: 1
         }, {
-          label: '<math raw_latex-with-value="&amp;quot;' +
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
             'x^3 - (a+b+c)x^2 + (ab+bc+ca)x - abc&amp;quot;">' +
-            '</math>',
+            '</oppia-noninteractive-math>',
           val: 2
         }, {
-          label: '<math raw_latex-with-value="&amp;quot;' +
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
             'x^3 + (a+b+c)x^2 - (ab+bc+ca)x + abc&amp;quot;">' +
-            '</math>',
+            '</oppia-noninteractive-math>',
           val: 3
         },
       ];
@@ -365,23 +369,23 @@ describe('Testing filters', function() {
       var interactionIdMixed = 'TextInput';
       var choicesMixed = [
         {
-          label: '<p><image alt-with-value="&amp;' +
+          label: '<p><oppia-noninteractive-image alt-with-value="&amp;' +
             'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
             'filepath-with-value="&amp;quot;img_20180112_170413_5jxq15ngmd' +
-            '.png&amp;quot;"></image>This is a text ' +
-            'input.</p><p><image alt-with-value="&amp;' +
+            '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+            'input.</p><p><oppia-noninteractive-image alt-with-value="&amp;' +
             'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
             'filepath-with-value="&amp;quot;img_20180112_170436_k7sz3xtvyy.' +
-            'png&amp;quot;"></image></p><p><oppia-' +
+            'png&amp;quot;"></oppia-noninteractive-image></p><p><oppia-' +
             'noninteractive-link text-with-value="&amp;quot;&amp;quot;"' +
             'url-with-value="&amp;quot;https://www.example.com&amp;quot;">' +
-            '</link><br><br></p>',
+            '</oppia-noninteractive-link><br><br></p>',
           val: 0
         }, {
-          label: '<p><image alt-with-value="&amp;quot;' +
+          label: '<p><oppia-noninteractive-image alt-with-value="&amp;quot;' +
             'g&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-' +
             'with-value="&amp;quot;img_20180112_170500_926cssn398.png&amp;' +
-            'quot;"></image><br></p>',
+            'quot;"></oppia-noninteractive-image><br></p>',
           val: 1
         }
       ];

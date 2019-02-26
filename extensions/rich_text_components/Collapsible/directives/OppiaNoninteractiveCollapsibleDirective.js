@@ -19,7 +19,7 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('collapsible', [
+oppia.directive('oppiaNoninteractiveCollapsible', [
   '$rootScope', '$sce', 'HtmlEscaperService', 'UrlInterpolationService',
   function($rootScope, $sce, HtmlEscaperService, UrlInterpolationService) {
     return {

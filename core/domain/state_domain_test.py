@@ -225,9 +225,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [], 'feedback': {
                         'content_id': 'default_outcome', 'html': (
-                            '<p><image filepath'
+                            '<p><oppia-noninteractive-image filepath'
                             '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></image>'
+                            'quot;"></oppia-noninteractive-image>'
                             'Hello this is test case to check '
                             'image tag inside p tag</p>'
                         )
@@ -257,9 +257,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [], 'feedback': {
                         'content_id': 'default_outcome', 'html': (
-                            '<p><image filepath'
+                            '<p><oppia-noninteractive-image filepath'
                             '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></image>'
+                            'quot;"></oppia-noninteractive-image>'
                             'Hello this is test case to check '
                             'image tag inside p tag</p>'
                         )
@@ -289,10 +289,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [], 'feedback': {
                         'content_id': 'default_outcome', 'html': (
-                            '<p><image caption-'
+                            '<p><oppia-noninteractive-image caption-'
                             'with-value="&amp;quot;&amp;quot;" filepath'
                             '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></image>'
+                            'quot;"></oppia-noninteractive-image>'
                             'Hello this is test case to check '
                             'image tag inside p tag</p>'
                         )
@@ -322,11 +322,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [], 'feedback': {
                         'content_id': 'default_outcome', 'html': (
-                            u'<p><image '
+                            u'<p><oppia-noninteractive-image '
                             'caption-with-value="&amp;quot;&amp;quot;" '
                             'filepath-with-value="&amp;quot;'
                             'random_height_490_width_120.png&amp;'
-                            'quot;"></image>Hello this '
+                            'quot;"></oppia-noninteractive-image>Hello this '
                             'is test case to check image tag inside p tag</p>'
                         )
                     },

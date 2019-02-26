@@ -3993,11 +3993,11 @@ states:
           html: <p>Hello, this is<div> html1<b> for </b></div>state2</p>
       - hint_content:
           content_id: hint_2
-          html: Here is link 2 <link
+          html: Here is link 2 <oppia-noninteractive-link
                 text-with-value="&amp;quot;discussion forum&amp;quot;"
                 url-with-value="&amp;quot;https://groups.google.com/
                 forum/?fromgroups#!forum/oppia&amp;quot;">
-                </link>
+                </oppia-noninteractive-link>
       id: MultipleChoiceInput
       solution: null
     param_changes: []
@@ -4016,11 +4016,11 @@ states:
           dest: state1
           feedback:
             content_id: feedback_1
-            html: Here is the image1 <i><image
+            html: Here is the image1 <i><oppia-noninteractive-image
                 filepath-with-value="&amp;quot;startBlue.png&amp;quot;">
-                </image></i>Here is the image2
-                <div><image filepath-with-value="&amp;quot;startBlue.png&amp;quot;">
-                </image></div>
+                </oppia-noninteractive-image></i>Here is the image2
+                <div><oppia-noninteractive-image filepath-with-value="&amp;quot;startBlue.png&amp;quot;">
+                </oppia-noninteractive-image></div>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4215,9 +4215,9 @@ states:
           html: <p>Hello, this is</p><p> html1<strong> for </strong></p><p>state2</p>
       - hint_content:
           content_id: hint_2
-          html: <p>Here is link 2 <link text-with-value="&amp;quot;discussion
+          html: <p>Here is link 2 <oppia-noninteractive-link ext-with-value="&amp;quot;discussion
             forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/
-            forum/?fromgroups#!forum/oppia&amp;quot;"> </link></p>
+            forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
       id: MultipleChoiceInput
       solution: null
     param_changes: []
@@ -4244,11 +4244,11 @@ states:
           dest: state1
           feedback:
             content_id: feedback_1
-            html: <p>Here is the image1 </p><image caption-with-value="&amp;quot;&amp;quot;"
+            html: <p>Here is the image1 </p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
               filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
-              </image><p>Here is the image2 </p><image
+              </oppia-noninteractive-image><p>Here is the image2 </p><oppia-noninteractive-image
               caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
-              </image>
+              </oppia-noninteractive-image>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4314,7 +4314,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: <p><image filepath-with-value="&amp;quot;random.png&amp;quot;"></image>Hello this
+      html: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>Hello this
             is test case to check image tag inside p tag</p>
     content_ids_to_audio_translations:
       content: {}
@@ -4424,8 +4424,8 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: <image caption-with-value="&amp;quot;&amp;quot;"
-        filepath-with-value="&amp;quot;random_height_490_width_120.png&amp;quot;"></image><p>Hello
+      html: <oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;random_height_490_width_120.png&amp;quot;"></oppia-noninteractive-image><p>Hello
         this is test case to check image tag inside p tag</p>
     content_ids_to_audio_translations:
       content: {}

@@ -81,14 +81,14 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
 
     def test_oppia_custom_tags(self):
         test_data = [(
-            '<image filepath-with-value="1"/>',
-            '<image filepath-with-value="1">'
-            '</image>'
+            '<oppia-noninteractive-image filepath-with-value="1"/>',
+            '<oppia-noninteractive-image filepath-with-value="1">'
+            '</oppia-noninteractive-image>'
         ), (
-            '<image filepath-with-value="1">'
-            '</image>',
-            '<image filepath-with-value="1">'
-            '</image>'
+            '<oppia-noninteractive-image filepath-with-value="1">'
+            '</oppia-noninteractive-image>',
+            '<oppia-noninteractive-image filepath-with-value="1">'
+            '</oppia-noninteractive-image>'
         ), (
             '<oppia-fake-tag></oppia-fake-tag>',
             ''
@@ -134,19 +134,19 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
     def test_get_rte_components(self):
         test_data = (
             '<p>Test text&nbsp;'
-            '<math '
+            '<oppia-noninteractive-math '
             'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
-            '</math></p><p>&nbsp;'
-            '<link '
+            '</oppia-noninteractive-math></p><p>&nbsp;'
+            '<oppia-noninteractive-link '
             'text-with-value="&amp;quot;Link&amp;quot;" '
             'url-with-value="&amp;quot;https://www.example.com&amp;quot;">'
-            '</link>.</p>'
+            '</oppia-noninteractive-link>.</p>'
             '<p>Video</p>'
-            '<p><video autoplay-with-value="false" '
+            '<p><oppia-noninteractive-video autoplay-with-value="false" '
             'end-with-value="0" start-with-value="0" '
             'video_id-with-value="&amp;quot;'
             'https://www.youtube.com/watch?v=Ntcw0H0hwPU&amp;quot;">'
-            '</video><br></p>'
+            '</oppia-noninteractive-video><br></p>'
         )
 
         expected_components = [

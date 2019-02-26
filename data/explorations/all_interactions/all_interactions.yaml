@@ -873,21 +873,21 @@ states:
       - hint_content:
           content_id: hint_1
           html: "<p>If you start with two points, p0=(x0, y0) and p1=(x1, y1), you\
-            \ can find the slope between them as such:</p><p>\_</p><p><math\
+            \ can find the slope between them as such:</p><p>\_</p><p><oppia-noninteractive-math\
             \ raw_latex-with-value=\"&amp;quot;m=\\\\frac{y0-y1}{x0-x1}&amp;quot;\"\
-            ></math><br></p><p>\_</p><p>This, combined with one\
+            ></oppia-noninteractive-math><br></p><p>\_</p><p>This, combined with one\
             \ of the points, can create a linear relationship between x and y.</p>"
       - hint_content:
           content_id: hint_2
           html: "<p>It's possible to use the slope and first point of the line to\
-            \ form a relationship:</p><p>\_</p><p><math raw_latex-with-value=\"\
-            &amp;quot;y-y0=m(x-x0)&amp;quot;\"></math><br></p>"
+            \ form a relationship:</p><p>\_</p><p><oppia-noninteractive-math raw_latex-with-value=\"\
+            &amp;quot;y-y0=m(x-x0)&amp;quot;\"></oppia-noninteractive-math><br></p>"
       - hint_content:
           content_id: hint_3
-          html: "<p>Which yields a final, common line equation:</p><p>\_</p><p><math\
-            \ raw_latex-with-value=\"&amp;quot;y=mx+b&amp;quot;\"></math><br></p><p>\_\
-            </p><p>Where\_<math raw_latex-with-value=\"&amp;quot;b=y0-m*x0&amp;quot;\"\
-            ></math></p>"
+          html: "<p>Which yields a final, common line equation:</p><p>\_</p><p><oppia-noninteractive-math\
+            \ raw_latex-with-value=\"&amp;quot;y=mx+b&amp;quot;\"></oppia-noninteractive-math><br></p><p>\_\
+            </p><p>Where\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;b=y0-m*x0&amp;quot;\"\
+            ></oppia-noninteractive-math></p>"
       id: MathExpressionInput
       solution: null
     param_changes: []

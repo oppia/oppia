@@ -148,14 +148,14 @@ describe('Image preloader service', function() {
             customization_args: {
               choices: {
                 value: [
-                  '<p> Go to ItemSelection <image' +
+                  '<p> Go to ItemSelection <oppia-noninteractive-image' +
                   ' filepath-with-value="&amp;quot;' +
                   'sIMChoice1_height_32_width_42.png&amp;' +
-                  'quot;"></image></p>',
-                  '<p> Go to ImageAndRegion<image' +
+                  'quot;"></oppia-noninteractive-image></p>',
+                  '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
                   ' filepath-with-value="&amp;quot;' +
                   'sIMChoice2_height_30_width_40.png&amp;' +
-                  'quot;"></image></p>'
+                  'quot;"></oppia-noninteractive-image></p>'
                 ]
               }
             },
@@ -167,9 +167,9 @@ describe('Image preloader service', function() {
                   feedback: {
                     content_id: 'feedback_1',
                     html: '<p>We are going to ItemSelection' +
-                          '<image filepath-with-value=' +
+                          '<oppia-noninteractive-image filepath-with-value=' +
                           '"&amp;quot;sIOFeedback_height_50_width_50.png' +
-                          '&amp;quot;"></image></p>'
+                          '&amp;quot;"></oppia-noninteractive-image></p>'
                   },
                   param_changes: [],
                   refresher_exploration_id: null,
@@ -285,9 +285,9 @@ describe('Image preloader service', function() {
             hints: [{
               hint_content: {
                 content_id: 'hint_1',
-                html: '<p><image filepath-with-value="' +
+                html: '<p><oppia-noninteractive-image filepath-with-value="' +
                       '&amp;quot;s6Hint1_height_60_width_60.png&amp;quot;">' +
-                      '</image></p>'
+                      '</oppia-noninteractive-image></p>'
               }
             }],
             solution: null,
