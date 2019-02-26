@@ -304,13 +304,11 @@ describe('Testing filters', function() {
         filter('<p>Text input</p>')
       ).toEqual('Text input');
       expect(
-        filter('<p><math attr1=value1></oppia-' +
-        'noninteractive-math>Text input</p>')
+        filter('<p><math attr1=value1></math>Text input</p>')
       ).toEqual('[Math] Text input');
       expect(
         filter('<p><math></math>' +
-        'Text input<collapsible></oppia-noninteractive' +
-        '-collapsible>Text input 2</p>')
+        'Text input<collapsible></collapsible>Text input 2</p>')
       ).toEqual('[Math] Text input [Collapsible] Text input 2');
       expect(
         filter('<p><math></math>' +
@@ -320,8 +318,7 @@ describe('Testing filters', function() {
       ).toEqual('[Math] Text input [Collapsible] Text input 2');
       expect(
         filter('<math></math>' +
-        'Text input<collapsible></oppia-noninteractive' +
-        '-collapsible>Text input 2<image>' +
+        'Text input<collapsible></collapsible>Text input 2<image>' +
         '</image> Text Input 3 ')
       ).toEqual('[Math] Text input [Collapsible] Text input 2 [Image]  ' +
       'Text Input 3');
