@@ -40,6 +40,7 @@
 /core/templates/dev/head/pages/exploration_editor/settings_tab @DubeySandeep
 /core/templates/dev/head/pages/exploration_player/ @aks681
 /core/templates/dev/head/pages/state_editor/ @aks681
+/core/templates/dev/head/components/state/ @aks681
 
 
 # Lesson Analytics team.
