@@ -18,11 +18,11 @@
  */
 
 oppia.factory('ThreadDataService', [
-  '$http', '$log', '$q', 'ExplorationDataService', 'AlertsService',
+  '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionObjectFactory',
   'SuggestionThreadObjectFactory', 'ACTION_ACCEPT_SUGGESTION',
   function(
-      $http, $log, $q, ExplorationDataService, AlertsService,
+      $http, $log, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionObjectFactory,
       SuggestionThreadObjectFactory, ACTION_ACCEPT_SUGGESTION) {
     var _expId = ExplorationDataService.explorationId;
