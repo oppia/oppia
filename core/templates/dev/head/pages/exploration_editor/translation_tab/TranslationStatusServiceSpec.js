@@ -17,7 +17,7 @@
  */
 
 describe('Translation status service', function() {
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(module('oppia', function($provide, $injector) {
     $provide.value('TranslationLanguageService', {
       getActiveLanguageCode: function() {
         return 'en';
@@ -32,48 +32,42 @@ describe('Translation status service', function() {
         return ['First', 'Second', 'Third'];
       },
       getContentIdsToAudioTranslationsMemento: function(stateName) {
-        if (stateName === 'First') {
-          var citatObject = ContentIdsToAudioTranslationsObjectFactory
-            .createFromBackendDict({
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {}
-            });
-          citatObject.addAudioTranslation('content', 'en',
-            'test_audio_1_en.mp3', 96426);
-          citatObject.addAudioTranslation('feedback_2', 'en',
-            'test_audio_2_en.mp3', 80000);
-          citatObject.toggleNeedsUpdateAttribute('content', 'en');
-          return citatObject;
-        } else if (stateName === 'Second') {
-          var citatObject = ContentIdsToAudioTranslationsObjectFactory
-            .createFromBackendDict({
-              content: {},
-              default_outcome: {},
-              feedback_1: {}
-            });
-          return citatObject;
-        } else if (stateName === 'Third') {
-          var citatObject = ContentIdsToAudioTranslationsObjectFactory
-            .createFromBackendDict({
-              content: {}
-            });
-          citatObject.addAudioTranslation('content', 'en',
-            'test_audio_3_en.mp3', 90000);
-          return citatObject;
-        } else {
-          var citatObject = ContentIdsToAudioTranslationsObjectFactory
-            .createEmpty();
-          return citatObject;
-        }
+        var citatDict = {First:  {
+          content: {
+            en: {
+              filename: 'filename1.mp3',
+              file_size_bytes: 100000,
+              needs_update: true
+          }},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {
+            en: {
+              filename: 'filename2.mp3',
+              file_size_bytes: 100000,
+              needs_update: false
+          }}},
+          Second: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          },
+          Third: {
+            content: {
+              en: {
+                filename: 'filename3.mp3',
+                file_size_bytes: 100000,
+                needs_update: false
+        }}}};
+        return ContentIdsToAudioTranslationsObjectFactory.
+          createFromBackendDict(citatDict[stateName]);
       },
       getInteractionIdMemento: function(stateName) {
-        if (stateName === 'First' || stateName === 'Second') {
-          return 'MultipleChoiceInput';
-        } else if (stateName === 'Third') {
-          return 'EndExploration';
-        }
+        var interactionIds = {First: 'MultipleChoiceInput',
+          Second: 'MultipleChoiceInput',
+          Third: 'EndExploration'};
+        return interactionIds[stateName];
       }
     });
     $provide.constant('INTERACTION_SPECS', {
@@ -116,14 +110,14 @@ describe('Translation status service', function() {
       'in an exploration', function() {
       var explorationAudioRequiredCount = tss.
         getExplorationAudioRequiredCount();
-      expect(explorationAudioRequiredCount).toBe(8);
+      expect(explorationAudioRequiredCount).toBe(9);
     });
 
     it('should return a correct count of audio translations not available ' +
       'in an exploration', function() {
       var explorationAudioNotAvailableCount = tss.
         getExplorationAudioNotAvailableCount();
-      expect(explorationAudioNotAvailableCount).toBe(5);
+      expect(explorationAudioNotAvailableCount).toBe(6);
     });
 
     it('should correctly return an object contaning status colors of all ' +
