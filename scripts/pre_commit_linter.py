@@ -1295,76 +1295,6 @@ def _check_docstrings(all_files):
     return summary_messages
 
 
-def _check_args_order(all_files):
-    """If class args like self and cls are there
-    in function then it come first.
-    """
-    print 'Starting arguments order check'
-    print '----------------------------------------'
-    wrong_ordself_message = ('The first arg of the function should be self')
-    wrong_ordcls_message = ('The first arg of the function should be cls')
-    summary_messages = []
-    files_to_check = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.py')]
-    failed = False
-    for filename in files_to_check:
-        with open(filename, 'r') as f:
-            file_content = f.readlines()
-            file_length = len(file_content)
-            for line_num in range(file_length):
-                line = file_content[line_num].lstrip().rstrip()
-                if line[0:3] == 'def ':
-                    START = '('
-                    END = ')'
-                    # Find index of '('.
-                    while 1:
-                        try:
-                            start_index = line.index(START)
-                            break
-                        except ValueError:
-                            line_num = line_num + 1
-                            line = file_content[line_num].lstrip().rstrip()
-                    # Find index of ')'.
-                    while 1:
-                        try:
-                            end_index = line.index(END)
-                            break
-                        except ValueError:
-                            line_num = line_num + 1
-                            line = file_content[line_num].lstrip().rstrip()
-                    if start_index + 1 != end_index:
-                        # Getting the list of all the arguments.
-                        args_list = line[start_index + 1:end_index].split(',')
-                        if 'self' in args_list:
-                            if args_list[0] != 'self':
-                                failed = True
-                                print '%s --> Line %s: %s' % (
-                                    filename, line_num + 1,
-                                    wrong_ordself_message)
-                            elif 'cls' in args_list:
-                                if args_list[0] != 'cls':
-                                    failed = True
-                                    print '%s --> Line %s: %s' % (
-                                        filename, line_num + 1,
-                                        wrong_ordcls_message)
-    print ''
-    print '----------------------------------------'
-    print ''
-    if failed:
-        summary_message = (
-            '%s   Arguments order check failed' % _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = (
-            '%s   Arguments order check passed' % _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
-    return summary_messages
-
-
 def _check_html_directive_name(all_files):
     """This function checks that all HTML directives end
     with _directive.html.
@@ -1877,9 +1807,6 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                 self.indentation_level -= 1
 
 
-class LintsCheckManager():
-    def __init__(self, mode):
-        self.mode = mode
 def _check_html_tags_and_attributes(all_files, debug=False):
     """This function checks the indentation of lines in HTML files."""
 
@@ -1981,7 +1908,270 @@ def _print_complete_summary_of_errors():
     print '----------------------------------------'
     print _TARGET_STDOUT.getvalue()
 
+class LintsCheckManager():
 
+    def __init__(self, all_files, mode):
+        self.all_files = all_files
+        self.mode = mode
+        self.parsed_js_files = _validate_and_parse_js_files(
+            all_files)
+    
+    def _pre_commit_linter(self):
+    """This function is used to check if node-eslint dependencies are installed
+    and pass ESLint binary path.
+    """
+        print 'Starting linter...'
+
+        pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
+
+        config_pylint = '--rcfile=%s' % pylintrc_path
+
+        config_pycodestyle = os.path.join(os.getcwd(), 'tox.ini')
+
+        parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+
+        node_path = os.path.join(
+            parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
+        eslint_path = os.path.join(
+            parent_dir, 'node_modules', 'eslint', 'bin', 'eslint.js')
+        stylelint_path = os.path.join(
+            parent_dir, 'node_modules', 'stylelint', 'bin', 'stylelint.js')
+        config_path_for_css_in_html = os.path.join(
+            parent_dir, 'oppia', '.stylelintrc')
+        config_path_for_oppia_css = os.path.join(
+            parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
+            'css', '.stylelintrc')
+        if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
+            print ''
+            print 'ERROR    Please run start.sh first to install node-eslint '
+            print '         or node-stylelint and its dependencies.'
+            sys.exit(1)
+
+        js_files_to_lint = [
+            filename for filename in self.all_files if filename.endswith('.js')]
+        py_files_to_lint = [
+            filename for filename in self.all_files if filename.endswith('.py')]
+        html_files_to_lint_for_css = [
+            filename for filename in self.all_files if filename.endswith('.html')]
+        css_files_to_lint = [
+            filename for filename in self.all_files if filename.endswith('oppia.css')]
+
+        css_in_html_result = multiprocessing.Queue()
+        css_in_html_stdout = multiprocessing.Queue()
+
+        linting_processes = []
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_css_files, args=(
+                node_path,
+                stylelint_path,
+                config_path_for_css_in_html,
+                html_files_to_lint_for_css, css_in_html_stdout,
+                css_in_html_result)))
+
+        css_result = multiprocessing.Queue()
+        css_stdout = multiprocessing.Queue()
+
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_css_files, args=(
+                node_path,
+                stylelint_path,
+                config_path_for_oppia_css,
+                css_files_to_lint, css_stdout,
+                css_result)))
+
+        js_result = multiprocessing.Queue()
+        js_stdout = multiprocessing.Queue()
+
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_js_files, args=(
+                node_path, eslint_path, js_files_to_lint,
+                js_stdout, js_result)))
+
+        py_result = multiprocessing.Queue()
+
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_py_files,
+            args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result)))
+
+        print 'Starting CSS, Javascript and Python Linting'
+        print '----------------------------------------'
+
+        for process in linting_processes:
+            process.daemon = False
+            process.start()
+
+        file_groups_to_lint = [
+            html_files_to_lint_for_css, css_files_to_lint,
+            js_files_to_lint, py_files_to_lint]
+        number_of_files_to_lint = sum(
+            len(file_group) for file_group in file_groups_to_lint)
+
+        timeout_multiplier = 2000
+        for file_group, process in zip(file_groups_to_lint, linting_processes):
+            # try..except block is needed to catch ZeroDivisionError
+            # when there are no CSS, HTML, JavaScript and Python files to lint.
+            try:
+                # Require timeout parameter to prevent against endless
+                # waiting for the linting function to return.
+                process.join(timeout=(
+                    timeout_multiplier * len(file_group) / number_of_files_to_lint))
+            except ZeroDivisionError:
+                break
+
+        js_messages = []
+        while not js_stdout.empty():
+            js_messages.append(js_stdout.get())
+
+        print ''
+        print '\n'.join(js_messages)
+
+        summary_messages = []
+
+        result_queues = [
+            css_in_html_result, css_result,
+            js_result, py_result]
+
+        for result_queue in result_queues:
+            while not result_queue.empty():
+                summary_messages.append(result_queue.get())
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            print '\n'.join(summary_messages)
+            print ''
+
+        return summary_messages
+
+    def _check_directive_scope(all_files, parsed_js_files):
+    """This function checks that all directives have an explicit
+    scope: {} and it should not be scope: true.
+    """
+        print 'Starting directive scope check'
+        print '----------------------------------------'
+        # Select JS files which need to be checked.
+        files_to_check = [
+            filename for filename in all_files if filename.endswith('.js') and
+            not any(fnmatch.fnmatch(filename, pattern) for pattern in
+                    EXCLUDED_PATHS)]
+        failed = False
+        summary_messages = []
+
+        for filename in files_to_check:
+            parsed_dict = parsed_js_files[filename]
+            with _redirect_stdout(_TARGET_STDOUT):
+                # Parse the body of the content as nodes.
+                parsed_nodes = parsed_dict['body']
+                for parsed_node in parsed_nodes:
+                    # Check the type of the node.
+                    if parsed_node['type'] != 'ExpressionStatement':
+                        continue
+                    # Separate the expression part of the node.
+                    expression = parsed_node['expression']
+                    # Check whether the expression belongs to a directive.
+                    expression_type_is_not_call = (
+                        expression['type'] != 'CallExpression')
+                    if expression_type_is_not_call:
+                        continue
+                    expression_callee_type_is_not_member = (
+                        expression['callee']['type'] != 'MemberExpression')
+                    if expression_callee_type_is_not_member:
+                        continue
+                    expression_callee_property_name_is_not_directive = (
+                        expression['callee']['property']['name'] != 'directive')
+                    if expression_callee_property_name_is_not_directive:
+                        continue
+                    # Separate the arguments of the expression.
+                    arguments = expression['arguments']
+                    # The first argument of the expression is the
+                    # name of the directive.
+                    if arguments[0]['type'] == 'Literal':
+                        directive_name = str(arguments[0]['value'])
+                    arguments = arguments[1:]
+                    for argument in arguments:
+                        # Check the type of an argument.
+                        if argument['type'] != 'ArrayExpression':
+                            continue
+                        # Separate out the elements for the argument.
+                        elements = argument['elements']
+                        for element in elements:
+                            # Check the type of an element.
+                            if element['type'] != 'FunctionExpression':
+                                continue
+                            # Separate out the body of the element.
+                            body = element['body']
+                            if body['type'] != 'BlockStatement':
+                                continue
+                            # Further separate the body elements from the body.
+                            body_elements = body['body']
+                            for body_element in body_elements:
+                                # Check if the body element is a return statement.
+                                body_element_type_is_not_return = (
+                                    body_element['type'] != 'ReturnStatement')
+                                body_element_argument_type_is_not_object = (
+                                    body_element['argument']['type'] != (
+                                        'ObjectExpression'))
+                                if (body_element_type_is_not_return or (
+                                        body_element_argument_type_is_not_object)):
+                                    continue
+                                # Separate the properties of the return node.
+                                return_node_properties = (
+                                    body_element['argument']['properties'])
+                                # Loop over all the properties of the return node
+                                # to find out the scope key.
+                                for return_node_property in return_node_properties:
+                                    # Check whether the property is scope.
+                                    property_key_is_an_identifier = (
+                                        return_node_property['key']['type'] == (
+                                            'Identifier'))
+                                    property_key_name_is_scope = (
+                                        return_node_property['key']['name'] == (
+                                            'scope'))
+                                    if (
+                                            property_key_is_an_identifier and (
+                                                property_key_name_is_scope)):
+                                        # Separate the scope value and
+                                        # check if it is an Object Expression.
+                                        # If it is not, then check for scope: true
+                                        # and report the error message.
+                                        scope_value = return_node_property['value']
+                                        if scope_value['type'] == 'Literal' and (
+                                                scope_value['value']):
+                                            failed = True
+                                            print (
+                                                'Please ensure that %s '
+                                                'directive in %s file '
+                                                'does not have scope set to '
+                                                'true.' %
+                                                (directive_name, filename))
+                                            print ''
+                                        elif scope_value['type'] != (
+                                                'ObjectExpression'):
+                                            # Check whether the directive has scope:
+                                            # {} else report the error message.
+                                            failed = True
+                                            print (
+                                                'Please ensure that %s directive '
+                                                'in %s file has a scope: {}.' % (
+                                                    directive_name, filename))
+                                            print ''
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            if failed:
+                summary_message = '%s   Directive scope check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+                print summary_message
+                summary_messages.append(summary_message)
+            else:
+                summary_message = '%s  Directive scope check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+                print summary_message
+                summary_messages.append(summary_message)
+
+            print ''
+
+        return summary_messages
+
+
+    
 def main():
     """Main method for pre commit linter script that lints Python and JavaScript
     files.
@@ -2001,7 +2191,6 @@ def main():
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
-    args_order_messages = _check_args_order(all_files)
     comment_messages = _check_comments(all_files)
     # The html tags and attributes check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
