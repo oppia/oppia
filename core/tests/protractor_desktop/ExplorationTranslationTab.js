@@ -134,7 +134,7 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.exitTutorial();
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
       '(0/8)');
-    
+
     // click upload button
     explorationEditorTranslationTab.openUploadAudioModal();
     browser.setFileDetector(new remote.FileDetector());

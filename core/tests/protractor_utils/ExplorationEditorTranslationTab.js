@@ -216,6 +216,6 @@ var ExplorationEditorTranslationTab = function() {
     saveUploadedAudioButton.click();
     waitFor.invisibilityOf(saveUploadedAudioButton,
       'Upload Audio modal takes too long to disappear');
-  }
+  };
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;
