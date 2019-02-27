@@ -216,6 +216,7 @@ states:
       feedback_1: {}
       feedback_2: {}
       feedback_3: {}
+      feedback_4: {}
       hint_1: {}
     interaction:
       answer_groups:
