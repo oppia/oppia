@@ -944,7 +944,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'tag_name': 'oppia-noninteractive-link'
         }, {
             'html_string': (
-                '<p><oppia-noninteractive-link ext-with-value="&amp;quot;'
+                '<p><oppia-noninteractive-link text-with-value="&amp;quot;'
                 'What is a link?&amp;quot;" url-with-value="&amp;quot;'
                 'htt://link.com&amp;quot;"></oppia-noninteractive-link></p>'
             ),

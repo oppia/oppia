@@ -192,7 +192,7 @@ states:
         check out the Library. You can also create new explorations, like this one,
         by clicking on the "Create" button in the top right of the page.</p><br><div>We
         hope you enjoy using Oppia. If you have feedback, please let us know at our
-        <oppia-noninteractive-link ext-with-value="&amp;quot;discussion forum&amp;quot;"
+        <oppia-noninteractive-link text-with-value="&amp;quot;discussion forum&amp;quot;"
         url-with-value="&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;"></oppia-noninteractive-link>!</div><p></p>
     interaction:
       answer_groups: []
@@ -212,7 +212,7 @@ states:
     classifier_model_id: null
     content:
       audio_translations: {}
-      html: <p>Hi, welcome to Oppia! <oppia-noninteractive-link ext-with-value="&amp;quot;Oppia&amp;quot;"
+      html: <p>Hi, welcome to Oppia! <oppia-noninteractive-link text-with-value="&amp;quot;Oppia&amp;quot;"
         url-with-value="&amp;quot;https://oppia.github.io&amp;quot;"></oppia-noninteractive-link>
         is a tool that helps you create interactive learning activities that can be
         continually improved over time.<br><br>Incidentally, do you know where the

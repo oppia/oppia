@@ -146,7 +146,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                 'content': '<p>hello</p>', 'title': 'Tabs'
             }, {
                 'content': (
-                    '<p><oppia-noninteractive-link ext-with-value="&amp;'
+                    '<p><oppia-noninteractive-link text-with-value="&amp;'
                     'quot;What is a link?&amp;quot;" url-with-value="'
                     '&amp;quot;https://link.com&amp;quot;">'
                     '</oppia-noninteractive-link></p>'

@@ -943,12 +943,12 @@ RTE_CONTENT_SPEC = {
             'ul': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
             'pre': ['ol', 'ul', 'blockquote', '[document]'],
             'blockquote': ['blockquote', '[document]'],
-            'link': ['b', 'i', 'li', 'p', 'pre'],
-            'math': ['b', 'i', 'li', 'p', 'pre'],
-            'image': ['b', 'i', 'li', 'p', 'pre'],
-            'collapsible': ['b', 'i', 'li', 'p', 'pre'],
-            'video': ['b', 'i', 'li', 'p', 'pre'],
-            'tabs': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-link': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-math': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -961,12 +961,12 @@ RTE_CONTENT_SPEC = {
             'ul',
             'pre',
             'blockquote',
-            'link',
-            'math',
-            'image',
-            'collapsible',
-            'video',
-            'tabs'
+            'oppia-noninteractive-link',
+            'oppia-noninteractive-math',
+            'oppia-noninteractive-image',
+            'oppia-noninteractive-collapsible',
+            'oppia-noninteractive-video',
+            'oppia-noninteractive-tabs'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -981,14 +981,14 @@ RTE_CONTENT_SPEC = {
             'ul': ['li', 'blockquote', 'pre', '[document]'],
             'pre': ['ol', 'ul', 'blockquote', 'li', '[document]'],
             'blockquote': ['blockquote', '[document]'],
-            'link': ['strong', 'em', 'li', 'p', 'pre'],
-            'math': ['strong', 'em', 'li', 'p', 'pre'],
-            'image': ['blockquote', 'li', '[document]'],
-            'collapsible': [
+            'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
+            'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
+            'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-collapsible': [
                 'blockquote', 'li', '[document]'
             ],
-            'video': ['blockquote', 'li', '[document]'],
-            'tabs': ['blockquote', 'li', '[document]']
+            'oppia-noninteractive-video': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]']
         },
         # Valid html tags in CKEditor.
         'ALLOWED_TAG_LIST': [
@@ -1001,12 +1001,12 @@ RTE_CONTENT_SPEC = {
             'ul',
             'pre',
             'blockquote',
-            'link',
-            'math',
-            'image',
-            'collapsible',
-            'video',
-            'tabs'
+            'oppia-noninteractive-link',
+            'oppia-noninteractive-math',
+            'oppia-noninteractive-image',
+            'oppia-noninteractive-collapsible',
+            'oppia-noninteractive-video',
+            'oppia-noninteractive-tabs'
         ]
 
     }
