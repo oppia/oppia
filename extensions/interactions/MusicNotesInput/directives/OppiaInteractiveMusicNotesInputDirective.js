@@ -39,13 +39,13 @@ oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
 
 oppia.directive('oppiaInteractiveMusicNotesInput', [
   'CurrentInteractionService', 'HtmlEscaperService',
-  'UrlInterpolationService', 'WindowDimensionsService',
   'MusicNotesInputRulesService', 'MusicPhrasePlayerService',
+  'UrlInterpolationService', 'WindowDimensionsService',
   'EVENT_NEW_CARD_AVAILABLE', 'NOTE_NAMES_TO_MIDI_VALUES',
   function(
       CurrentInteractionService, HtmlEscaperService,
-      UrlInterpolationService, WindowDimensionsService,
       MusicNotesInputRulesService, MusicPhrasePlayerService,
+      UrlInterpolationService, WindowDimensionsService,
       EVENT_NEW_CARD_AVAILABLE, NOTE_NAMES_TO_MIDI_VALUES) {
     return {
       restrict: 'E',
