@@ -113,7 +113,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(self.user_id), [])
 
         learner_playlist_services.remove_exploration_from_learner_playlist(
-            self.user_id, self.SUBSCRIBED_ID)
+            self.user_id, 'SUBSCRIBED_ID')
 
         # Test adding the exploration_id if it is already in
         # learner_playlist.exploration_ids
@@ -173,7 +173,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_collection_ids(self.user_id), [])
 
         learner_playlist_services.remove_collection_from_learner_playlist(
-            self.user_id, self.SUBSCRIBED_ID)
+            self.user_id, 'SUBSCRIBED_ID')
 
         # Test adding the collection_id if it is already in
         # learner_playlist.collection_ids
