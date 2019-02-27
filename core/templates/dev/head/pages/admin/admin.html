@@ -56,9 +56,9 @@
                         set-status-message="setStatusMessage">
       </admin-config-tab>
 
-      <roles-tab ng-if="isRolesTabOpen()"
-                 set-status-message="setStatusMessage">
-      </roles-tab>
+      <admin-roles-tab ng-if="isRolesTabOpen()"
+                       set-status-message="setStatusMessage">
+      </admin-roles-tab>
 
       <admin-misc-tab ng-if="isMiscTabOpen()"
                       set-status-message="setStatusMessage">
@@ -88,7 +88,7 @@
     <script src="/templates/dev/head/pages/admin/config_tab/AdminConfigTabDirective.js"></script>
     <script src="/templates/dev/head/pages/admin/jobs_tab/AdminJobsTabDirective.js"></script>
 
-    <script src="/templates/dev/head/pages/admin/roles_tab/RolesTabDirective.js"></script>
+    <script src="/templates/dev/head/pages/admin/roles_tab/AdminRolesTabDirective.js"></script>
     <script src="/templates/dev/head/pages/admin/roles_tab/RoleGraphDirective.js"></script>
     <script src="/templates/dev/head/components/StateGraphLayoutService.js"></script>
     <script src="/templates/dev/head/pages/admin/misc_tab/AdminMiscTabDirective.js"></script>
