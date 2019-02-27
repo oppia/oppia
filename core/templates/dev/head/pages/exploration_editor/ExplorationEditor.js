@@ -182,6 +182,9 @@ oppia.controller('ExplorationEditor', [
           EditabilityService.markTranslatable();
         }
 
+        StateEditorService.updateExplorationWhitelistedStatus(
+          featuresData.is_exploration_whitelisted);
+
         GraphDataService.recompute();
 
         if (!StateEditorService.getActiveStateName() ||

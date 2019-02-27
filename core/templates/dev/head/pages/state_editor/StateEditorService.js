@@ -31,6 +31,7 @@ oppia.factory('StateEditorService', [
     // interaction.
     var interaction = null;
     var misconceptions = [];
+    var explorationIsWhitelisted = false;
 
     return {
       getActiveStateName: function() {
@@ -42,6 +43,12 @@ oppia.factory('StateEditorService', [
           return;
         }
         activeStateName = newActiveStateName;
+      },
+      isExplorationWhitelisted: function() {
+        return explorationIsWhitelisted;
+      },
+      updateExplorationWhitelistedStatus: function(value) {
+        explorationIsWhitelisted = value;
       },
       setMisconceptions: function(newMisconceptions) {
         misconceptions = newMisconceptions;
