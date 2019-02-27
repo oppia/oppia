@@ -2022,7 +2022,7 @@ class Exploration(object):
     @classmethod
     def _convert_states_v22_dict_to_v23_dict(cls, states_dict):
         """Converts from version 22 to 23. Version 23 ensures that all
-        all image tags have caption attribute.
+        all oppia-noninteractive-image tags have caption attribute.
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
@@ -2057,7 +2057,7 @@ class Exploration(object):
     @classmethod
     def _convert_states_v24_dict_to_v25_dict(cls, exp_id, states_dict):
         """Converts from version 24 to 25. Version 25 adds the dimensions of
-        images in the image tags.
+        images in the oppia-noninteractive-image tags.
 
         Args:
             exp_id: str. ID of the exploration.
@@ -2725,7 +2725,7 @@ class Exploration(object):
     def _convert_v27_dict_to_v28_dict(cls, exploration_dict):
         """Converts a v27 exploration dict into a v28 exploration dict.
 
-        Adds caption attribute to all image tags.
+        Adds caption attribute to all oppia-noninteractive-image tags.
         """
         exploration_dict['schema_version'] = 28
 
@@ -2754,7 +2754,7 @@ class Exploration(object):
     def _convert_v29_dict_to_v30_dict(cls, exp_id, exploration_dict):
         """Converts a v29 exploration dict into a v30 exploration dict.
 
-        Adds dimensions to all image tags.
+        Adds dimensions to all oppia-noninteractive-image tags.
         """
         exploration_dict['schema_version'] = 30
 

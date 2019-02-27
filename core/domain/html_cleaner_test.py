@@ -154,7 +154,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
                 'customization_args': {
                     'text-with-value': u'Link',
                     'url-with-value': u'https://www.example.com'},
-                'id': 'link'
+                'id': 'oppia-noninteractive-link'
             },
             {
                 'customization_args': {
@@ -165,13 +165,13 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
                         u'v=Ntcw0H0hwPU'),
                     'autoplay-with-value': False
                 },
-                'id': 'video'
+                'id': 'oppia-noninteractive-video'
             },
             {
                 'customization_args': {
                     'raw_latex-with-value': u'\\frac{x}{y}'
                 },
-                'id': 'math'
+                'id': 'oppia-noninteractive-math'
             }
         ]
 

@@ -4215,7 +4215,7 @@ states:
           html: <p>Hello, this is</p><p> html1<strong> for </strong></p><p>state2</p>
       - hint_content:
           content_id: hint_2
-          html: <p>Here is link 2 <oppia-noninteractive-link ext-with-value="&amp;quot;discussion
+          html: <p>Here is link 2 <oppia-noninteractive-link text-with-value="&amp;quot;discussion
             forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/
             forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
       id: MultipleChoiceInput

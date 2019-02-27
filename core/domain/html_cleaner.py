@@ -120,7 +120,7 @@ def get_rte_components(html_string):
     Returns:
         list(dict). A list of dictionaries, each representing an RTE component.
         Each dict in the list contains:
-        - id: str. The name of the component, i.e. 'link'.
+        - id: str. The name of the component, i.e. 'oppia-noninteractive-link'.
         - customization_args: dict. Customization arg specs for the component.
     """
     parser = HTMLParser.HTMLParser()
