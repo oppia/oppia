@@ -92,13 +92,7 @@ var richTextComponents = {
       "description": "The link URL. If no protocol is specified, HTTPS will be used.",
       "schema": {
         "type": "custom",
-        "obj_type": "SanitizedUrl",
-        "validators": [{
-          "id": "is_nonempty"
-        }],
-        "ui_config": {
-          "placeholder": "https://www.example.com"
-        }
+        "obj_type": "SanitizedUrl"
       },
       "default_value": ""
     }, {

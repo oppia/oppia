@@ -22,12 +22,10 @@ oppia.directive('sanitizedUrlEditor', [
       restrict: 'E',
       scope: {
         getInitArgs: '&',
-        value: '=',
-        validators: '&',
-        uiConfig: '&'
+        value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/unicode_string_editor_directive.html'),
+        '/objects/templates/sanitized_url_editor_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.initArgs = $scope.getInitArgs();
         $scope.$watch('initArgs', function(newValue) {
@@ -43,7 +41,12 @@ oppia.directive('sanitizedUrlEditor', [
           };
         }, true);
 
-        $scope.alwaysEditable = true;
+        $scope.placeholderText = 'https://www.example.com';
+        $scope.validators = function() {
+          return [{
+            id: 'is_nonempty'
+          }];
+        };
 
         $scope.$watch('localValue.label', function(newValue) {
           $scope.value = newValue;
@@ -58,19 +61,6 @@ oppia.directive('sanitizedUrlEditor', [
             $scope.$apply();
           }
         });
-
-        $scope.getPlaceholder = function() {
-          if (!$scope.uiConfig()) {
-            return '';
-          } else {
-            if (!$scope.uiConfig().placeholder &&
-                DeviceInfoService.hasTouchEvents()) {
-              return $translate.instant(
-                'I18N_PLAYER_DEFAULT_MOBILE_PLACEHOLDER');
-            }
-            return $scope.uiConfig().placeholder;
-          }
-        };
       }]
     };
   }]);

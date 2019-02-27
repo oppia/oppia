@@ -68,28 +68,30 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertGreater(len(ca_spec['description']), 0)
 
             schema_utils_test.validate_schema(ca_spec['schema'])
-            # Default value of 'url' customization arg in rich-text component
-            # Link cannot be normalized as it is empty value. Hence when
-            # normalizing default values, we skip url.
-            if ca_spec['name'] != 'url':
-                # The default value might not pass validation checks (e.g. the
-                # Image component has a required field whose default value is
-                # empty). Thus, when checking the default value schema, we don't
-                # apply the custom validators.
+            # Default value of SanitizedUrl obj_type may be empty. Empty value
+            # cannot normalized, so we don't normalize it.
+            if ca_spec['schema']['type'] == 'custom' and (
+                    ca_spec['schema']['obj_type'] == 'SanitizedUrl'):
+                if ca_spec['default_value'] == '':
+                    self.assertEqual(len(ca_spec['default_value']), 0)
+                    return
+
+            # The default value might not pass validation checks (e.g. the
+            # Image component has a required field whose default value is
+            # empty). Thus, when checking the default value schema, we don't
+            # apply the custom validators.
+            self.assertEqual(
+                ca_spec['default_value'],
+                schema_utils.normalize_against_schema(
+                    ca_spec['default_value'], ca_spec['schema'],
+                    apply_custom_validators=False))
+
+            if ca_spec['schema']['type'] == 'custom':
+                obj_class = obj_services.Registry.get_object_class_by_type(
+                    ca_spec['schema']['obj_type'])
                 self.assertEqual(
                     ca_spec['default_value'],
-                    schema_utils.normalize_against_schema(
-                        ca_spec['default_value'], ca_spec['schema'],
-                        apply_custom_validators=False))
-
-                if ca_spec['schema']['type'] == 'custom':
-                    obj_class = obj_services.Registry.get_object_class_by_type(
-                        ca_spec['schema']['obj_type'])
-                    self.assertEqual(
-                        ca_spec['default_value'],
-                        obj_class.normalize(ca_spec['default_value']))
-            else:
-                self.assertEqual(ca_spec['default_value'], '')
+                    obj_class.normalize(ca_spec['default_value']))
 
     def _listdir_omit_ignored(self, directory):
         """List all files and directories within 'directory', omitting the ones

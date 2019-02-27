@@ -26,9 +26,7 @@ oppia.directive('schemaBasedCustomEditor', [
       scope: {
         localValue: '=',
         // The class of the object being edited.
-        objType: '=',
-        validators: '&',
-        uiConfig: '&'
+        objType: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_editors/' +
