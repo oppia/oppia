@@ -18,10 +18,10 @@
  */
 
 oppia.factory('ConceptCardObjectFactory', [
-  'SubtitledHtmlObjectFactory', 'ContentIdsToAudioTranslationsObjectFactory',
+  'ContentIdsToAudioTranslationsObjectFactory', 'SubtitledHtmlObjectFactory',
   'COMPONENT_NAME_EXPLANATION',
   function(
-      SubtitledHtmlObjectFactory, ContentIdsToAudioTranslationsObjectFactory,
+      ContentIdsToAudioTranslationsObjectFactory, SubtitledHtmlObjectFactory,
       COMPONENT_NAME_EXPLANATION) {
     var ConceptCard = function(
         explanation, workedExamples, contentIdsToAudioTranslations) {
