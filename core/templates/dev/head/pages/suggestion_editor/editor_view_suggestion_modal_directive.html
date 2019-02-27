@@ -14,17 +14,22 @@
     </div>
     <div class="oppia-suggestion-review-panel-container" style="float: right;">
       <strong>Suggested:</strong>
-      <div class="oppia-suggestion-review-panel">
+      <div class="oppia-suggestion-review-panel" ng-show="!suggestionEditorIsShown">
         <angular-html-bind html-data="newContent">
         </angular-html-bind>
       </div>
+      <div ng-show="suggestionEditorIsShown">
+        <ck-editor-rte ng-model="newContent"></ck-editor-rte>
+        <input type="text" class="form-control oppia-review-message" ng-model="summaryMessage" placeholder="Summarize your new changes">
+      </div>
+    </div>
     </div>
   </section>
-  <div ng-show="canAccept" style="margin-top: 20px; margin-left: 10px;">
+  <div ng-show="canAccept && !saveButtonIsShown" style="margin-top: 20px; margin-left: 10px;">
     Review message (required if rejecting):
     <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
   </div>
-  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
+  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept && !saveButtonIsShown">
     Brief Description of Changes (required if accepting):
     <input class="protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage" style="width: 100%">
   </div>
@@ -35,6 +40,8 @@
     <[ errorMessage ]>
   </div>
   <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
+  <button class="btn btn-info" ng-click="editSuggestion()" ng-if="!saveButtonIsShown && isNotHandled && canEdit">Edit</button>
+  <button class="btn btn-info" ng-click="saveSuggestion()" ng-if="suggestionEditorIsShown && saveButtonIsShown && canEdit">Save</button>
   <button class="btn btn-danger protractor-test-exploration-reject-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
   <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
 </div>

@@ -944,6 +944,55 @@ def can_edit_exploration(handler):
     return test_can_edit
 
 
+def can_edit_suggestion(handler):
+    """Decorator to check whether the user can edit given suggestion.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            a user has permission to edit a given suggestion.
+    """
+
+    def test_can_edit_suggestion(self, target_id, suggestion_id):
+        """Checks if the user can edit the suggestion.
+
+        Args:
+            target_id: str. The target id.
+            suggestion_id: str. The suggestion id.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to edit an suggestion.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            target_id)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_edit_activity(
+                self.user, exploration_rights):
+            return handler(self, target_id, suggestion_id)
+        elif suggestion_services.check_can_resubmit_suggestion(
+                suggestion_id, self.user_id):
+            return handler(self, target_id, suggestion_id)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to edit this suggestion.')
+    test_can_edit_suggestion.__wrapped__ = True
+
+    return test_can_edit_suggestion
+
+
 def can_translate_exploration(handler):
     """Decorator to check whether the user can translate given exploration.
 

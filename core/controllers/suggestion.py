@@ -174,3 +174,19 @@ class SuggestionListHandler(base.BaseHandler):
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)
+
+class EditSuggestionHandler(base.BaseHandler):
+    """Handler for editing the submitted suggestion by reviwer before
+    accepting.
+    """
+
+    @acl_decorators.can_edit_suggestion
+    def put(self, target_id, suggestion_id):# pylint: disable=unused-argument
+        """Edits the submitted suggestion.
+        Args:
+            target_id: str. target_id id.
+            suggestion_id: str. id of suggestion to be edit.
+        """
+        new_change = self.payload.get('change')
+        suggestion_services.edit_suggestion(suggestion_id, new_change)
+
