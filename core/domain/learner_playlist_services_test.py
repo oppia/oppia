@@ -172,7 +172,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(self.user_id), [])
 
-        learner_progrss_services.remove_collection_from_learner_playlist(
+        learner_progress_services.remove_collection_from_learner_playlist(
             self.user_id, self.SUBSCRIBED_ID)
 
         # Test adding the collection_id if it is already in
