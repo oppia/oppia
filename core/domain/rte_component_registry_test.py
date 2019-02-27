@@ -146,7 +146,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(protractor_file))
 
             main_js_file = os.path.join(
-                directives_dir, '%sDirective.js' % component_id)
+                directives_dir, 'OppiaNoninteractive%sDirective.js' % component_id)
             main_html_file = os.path.join(
                 directives_dir, '%s_directive.html' % component_id.lower())
 
