@@ -151,12 +151,21 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             for validator in schema[SCHEMA_KEY_VALIDATORS]:
                 kwargs = dict(validator)
                 del kwargs['id']
-                assert _Validators.get(
+                assert get_validator(
                     validator['id'])(normalized_obj, **kwargs), (
                         'Validation failed: %s (%s) for object %s' % (
                             validator['id'], kwargs, normalized_obj))
 
     return normalized_obj
+
+
+def get_validator(validator_id):
+    """Returns a validator function.
+
+    This is a necessary abstraction for backend testing. Simply returns
+    the validator function associated with the given validator_id.
+    """
+    return _Validators.get(validator_id)
 
 
 class Normalizers(object):
@@ -203,7 +212,9 @@ class Normalizers(object):
 
         Returns:
           a string that is the same as `obj`, except that each block of
-          whitespace is collapsed into a single space character.
+          whitespace is collapsed intos a single space character. Note
+          that whitespace at the front and end of the obj is not replaced
+          with a single space, and is instead removed. (so "a " is "a")
         """
         return ' '.join(obj.split())
 
@@ -336,31 +347,6 @@ class _Validators(object):
             bool. Whether the given object is at most `max_value`.
         """
         return obj <= max_value
-
-    @staticmethod
-    def is_regex(obj):
-        """Ensures that `obj` (a string) defines a valid regex.
-
-        Args:
-            obj: str. A string.
-
-        Raises:
-            NotImplementedError: The method is not implemented.
-        """
-        raise NotImplementedError
-
-    @staticmethod
-    def matches_regex(obj, regex):
-        """Ensures that `obj` (a string) matches the given regex.
-
-        Args:
-            obj: str. A string.
-            regex: str. A regular expression to match the given object with.
-
-        Raises:
-            NotImplementedError: The method is not implemented.
-        """
-        raise NotImplementedError
 
     @staticmethod
     def is_valid_email(obj):
