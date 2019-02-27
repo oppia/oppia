@@ -34,7 +34,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.topic_id = 'topic_id'
-        self.subtopic_id = 'subtopic_id'
+        self.subtopic_id = 1
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.topic_id))
@@ -85,7 +85,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'topic_id', 'subtopic_id'))
+                    feconf.SUBTOPIC_DATA_HANDLER, 'topic_id', 1))
             expected_page_contents_dict = {
                 'content_ids_to_audio_translations':
                     self.content_ids_to_audio_translations_dict,
@@ -95,7 +95,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             }
             expected_dict = {
                 'topic_id': self.topic_id,
-                'subtopic_id': self.subtopic_id,
+                'subtopic_id': '1',
                 'page_contents': expected_page_contents_dict
             }
             self.assertDictContainsSubset(expected_dict, json_response)
@@ -104,5 +104,5 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
                 '%s/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'topic_id', 'subtopic_id'),
+                    feconf.SUBTOPIC_DATA_HANDLER, 'topic_id', 1),
                 expected_status_int=404)
