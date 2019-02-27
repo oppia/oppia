@@ -116,12 +116,12 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         correctly and an old question is converted to new
         version.
         """
-        # Generate question with old(v27) state data.
-        self.save_new_question_with_state_data_schema_v27(
+        # Generate question with old(v26) state data.
+        self.save_new_question_with_state_data_schema_v26(
             self.QUESTION_ID, self.albert_id)
         question = (
             question_services.get_question_by_id(self.QUESTION_ID))
-        self.assertEqual(question.question_state_schema_version, 27)
+        self.assertEqual(question.question_state_schema_version, 26)
 
         # Start migration job.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):

@@ -18,18 +18,18 @@
  */
 
 oppia.factory('ExplorationPlayerStateService', [
-  '$log', '$q', 'ContextService', 'EditableExplorationBackendApiService',
-  'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
-  'ExplorationFeaturesService', 'NumberAttemptsService',
+  '$log', 'ContextService', 'EditableExplorationBackendApiService',
+  'ExplorationEngineService', 'ExplorationFeaturesService',
+  'ExplorationFeaturesBackendApiService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
   'PretestEngineService', 'PretestQuestionBackendApiService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlService',
   function(
-      $log, $q, ContextService, EditableExplorationBackendApiService,
-      ExplorationEngineService, ExplorationFeaturesBackendApiService,
-      ExplorationFeaturesService, NumberAttemptsService,
+      $log, ContextService, EditableExplorationBackendApiService,
+      ExplorationEngineService, ExplorationFeaturesService,
+      ExplorationFeaturesBackendApiService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
       PretestEngineService, PretestQuestionBackendApiService,
@@ -76,7 +76,7 @@ oppia.factory('ExplorationPlayerStateService', [
 
     var initExplorationPreviewPlayer = function(callback) {
       setExplorationMode();
-      $q.all([
+      Promise.all([
         EditableExplorationBackendApiService.fetchApplyDraftExploration(
           explorationId),
         ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
@@ -99,7 +99,7 @@ oppia.factory('ExplorationPlayerStateService', [
           explorationId, version) :
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
           explorationId);
-      $q.all([
+      Promise.all([
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
           explorationId, storyId),

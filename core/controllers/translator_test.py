@@ -244,7 +244,7 @@ class TranslationFirstTimeTutorialTest(BaseTranslatorControllerTests):
         self.csrf_token = self.get_csrf_token_from_response(response)
 
     def test_firsttime_translation_tutorial(self):
-        """Testing of the firsttime translation tutorial http requests."""
+        """ Testing of the firsttime translation tutorial http requests."""
         # Check if method returns 200 http status.
         self.post_json(
             '/createhandler/started_translation_tutorial_event/%s'

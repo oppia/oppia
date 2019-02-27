@@ -58,6 +58,78 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         return self.ONE_OFF_JOB_CLASS.get_output(job_id)
 
 
+class ExplorationIssuesModelCreatorOneOffJobTests(OneOffJobTestBase):
+    ONE_OFF_JOB_CLASS = (
+        stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob)
+    EXP_ID1 = 'EXP_ID1'
+    EXP_ID2 = 'EXP_ID2'
+
+    def setUp(self):
+        super(ExplorationIssuesModelCreatorOneOffJobTests, self).setUp()
+        self.exp1 = self.save_new_valid_exploration(self.EXP_ID1, 'owner')
+        self.exp1.add_states(['New state'])
+        change_list = [
+            exp_domain.ExplorationChange(
+                {'cmd': 'add_state', 'state_name': 'New state'})]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '')
+        self.exp1 = exp_services.get_exploration_by_id(self.exp1.id)
+        self.exp2 = self.save_new_valid_exploration(self.EXP_ID2, 'owner')
+
+    def test_default_job_execution(self):
+        self.run_one_off_job()
+
+        # ExplorationIssuesModel will be created for versions 1 and 2.
+        exp_issues1_v1 = stats_models.ExplorationIssuesModel.get_model(
+            self.EXP_ID1, self.exp1.version - 1)
+        self.assertEqual(exp_issues1_v1.exp_id, self.EXP_ID1)
+        self.assertEqual(exp_issues1_v1.exp_version, self.exp1.version - 1)
+        self.assertEqual(exp_issues1_v1.unresolved_issues, [])
+
+        exp_issues1_v2 = stats_models.ExplorationIssuesModel.get_model(
+            self.EXP_ID1, self.exp1.version)
+        self.assertEqual(exp_issues1_v2.exp_id, self.EXP_ID1)
+        self.assertEqual(exp_issues1_v2.exp_version, self.exp1.version)
+        self.assertEqual(exp_issues1_v2.unresolved_issues, [])
+
+        # ExplorationIssuesModel will be created only for version 1.
+        exp_issues2 = stats_models.ExplorationIssuesModel.get_model(
+            self.EXP_ID2, self.exp2.version)
+        self.assertEqual(exp_issues2.exp_id, self.EXP_ID2)
+        self.assertEqual(exp_issues2.exp_version, self.exp2.version)
+        self.assertEqual(exp_issues2.unresolved_issues, [])
+
+    def test_with_existing_exp_issues_instance(self):
+        stats_models.ExplorationIssuesModel.create(
+            self.EXP_ID1, self.exp1.version, unresolved_issues=[{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1',
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200,
+                    },
+                },
+                'playthrough_ids': ['playthrough_id1'],
+            }]
+        )
+
+        self.run_one_off_job()
+
+        exp_issues1 = stats_models.ExplorationIssuesModel.get_model(
+            self.EXP_ID1, self.exp1.version)
+        self.assertEqual(exp_issues1.exp_id, self.EXP_ID1)
+        self.assertEqual(exp_issues1.exp_version, self.exp1.version)
+        self.assertEqual(exp_issues1.unresolved_issues, [])
+
+        exp_issues2 = stats_models.ExplorationIssuesModel.get_model(
+            self.EXP_ID2, self.exp2.version)
+        self.assertEqual(exp_issues2.exp_id, self.EXP_ID2)
+        self.assertEqual(exp_issues2.exp_version, self.exp2.version)
+        self.assertEqual(exp_issues2.unresolved_issues, [])
+
+
 class PlaythroughAuditTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.PlaythroughAudit
 

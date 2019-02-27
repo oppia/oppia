@@ -64,7 +64,6 @@ GCS_AUDIO_ID_REGEX = re.compile(
 GCS_IMAGE_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
         ALLOWED_IMAGE_EXTENSIONS) + '))$')
-SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -89,11 +88,11 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if not exploration_model.deleted:
             exp_services.create_exploration_summary(
                 exploration_model.id, None)
-            yield ('SUCCESS', exploration_model.id)
+            yield('SUCCESS', exploration_model.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        yield(key, len(values))
 
 
 class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -140,11 +139,11 @@ class ExplorationContributorsSummaryOneOffJob(
         summary.contributors_summary = (
             exp_services.compute_exploration_contributors_summary(item.id))
         exp_services.save_exploration_summary(summary)
-        yield ('SUCCESS', item.id)
+        yield('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        yield(key, len(values))
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -258,7 +257,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                 'Update exploration states from schema version %d to %d.' % (
                     item.states_schema_version,
                     feconf.CURRENT_STATES_SCHEMA_VERSION))
-            yield ('SUCCESS', item.id)
+            yield('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
@@ -523,6 +522,74 @@ class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
+class ExplorationContentValidationJobForTextAngular(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates it
+    for TextAngular.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+
+        html_list = exploration.get_all_html_content_strings()
+
+        err_dict = html_validation_service.validate_rte_format(
+            html_list, feconf.RTE_FORMAT_TEXTANGULAR)
+
+        for key in err_dict:
+            if err_dict[key]:
+                yield (key, err_dict[key])
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))
+
+
+class ExplorationMigrationValidationJobForTextAngular(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that migrates the html content of an exploration into the valid
+    TextAngular format and validates it.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+
+        html_list = exploration.get_all_html_content_strings()
+
+        err_dict = html_validation_service.validate_rte_format(
+            html_list, feconf.RTE_FORMAT_TEXTANGULAR, run_migration=True)
+
+        for key in err_dict:
+            if err_dict[key]:
+                yield (key, err_dict[key])
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))
+
+
 class ExplorationContentValidationJobForCKEditor(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that checks the html content of an exploration and validates it
@@ -544,6 +611,50 @@ class ExplorationContentValidationJobForCKEditor(
 
         err_dict = html_validation_service.validate_rte_format(
             html_list, feconf.RTE_FORMAT_CKEDITOR)
+
+        for key in err_dict:
+            if err_dict[key]:
+                yield (key, err_dict[key])
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))
+
+
+class ExplorationMigrationValidationJobForCKEditor(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that migrates the html content of an exploration into the valid
+    CKEditor format and validates it.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+        err_dict = {}
+
+        try:
+            exploration = exp_services.get_exploration_from_model(item)
+        except Exception as e:
+            yield ('Error %s when loading exploration' % str(e), [item.id])
+            return
+
+        html_list = exploration.get_all_html_content_strings()
+        try:
+            err_dict = html_validation_service.validate_rte_format(
+                html_list, feconf.RTE_FORMAT_CKEDITOR, run_migration=True)
+        except Exception as e:
+            yield (
+                'Error in validating rte format for exploration %s' % item.id,
+                [traceback.format_exc()])
+            return
 
         for key in err_dict:
             if err_dict[key]:
