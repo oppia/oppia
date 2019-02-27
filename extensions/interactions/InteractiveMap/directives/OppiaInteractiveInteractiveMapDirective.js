@@ -44,7 +44,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           $scope.zoom = (
             HtmlEscaperService.escapedJsonToObj($attrs.zoomWithValue));
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-          $scope.mapMarkers = [];
+          $scope.mapMarkers = {};
           var coords = $scope.coords || [0, 0];
           var zoomLevel = parseInt($scope.zoom, 10) || 0;
 
@@ -61,7 +61,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           };
 
           var addNewMarker = function(lat, lng) {
-            var newMarker = {
+            $scope.mapMarkers.mainMarker = {
               lat: lat,
               lng: lng,
               icon: {
@@ -86,7 +86,6 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
                     '/interactions/InteractiveMap/static/marker-shadow.png'))
               }
             };
-            $scope.mapMarkers.push(angular.copy(newMarker));
           };
 
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
@@ -117,7 +116,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               }
             };
             if (!$scope.interactionIsActive) {
-              addNewMarker(
+              changeMarkerPosition(
                 $scope.getLastAnswer()[0], $scope.getLastAnswer()[1]);
             }
           };
