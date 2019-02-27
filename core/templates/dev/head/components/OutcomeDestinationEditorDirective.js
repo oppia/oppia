@@ -38,6 +38,7 @@ oppia.directive('outcomeDestinationEditor', [
           var currentStateName = null;
           $scope.canAddPrerequisiteSkill = (
             constants.ENABLE_NEW_STRUCTURE_EDITORS &&
+            constants.ENABLE_PREREQUISITE_SKILLS &&
             StateEditorService.isExplorationWhitelisted());
 
           $scope.$on('saveOutcomeDestDetails', function() {
