@@ -18,8 +18,8 @@
 
 // Rules service for number with units interaction.
 oppia.factory('numberWithUnitsRulesService', [
-  'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
-  function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
+  'FractionObjectFactory', 'NumberWithUnitsObjectFactory',
+  function(FractionObjectFactory, NumberWithUnitsObjectFactory) {
     try {
       NumberWithUnitsObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}

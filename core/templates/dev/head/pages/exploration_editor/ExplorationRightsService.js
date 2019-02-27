@@ -18,9 +18,9 @@
  */
 
 oppia.factory('ExplorationRightsService', [
-  '$http', 'ExplorationDataService', 'AlertsService', 'ACTIVITY_STATUS_PRIVATE',
+  '$http', 'AlertsService', 'ExplorationDataService', 'ACTIVITY_STATUS_PRIVATE',
   'ACTIVITY_STATUS_PUBLIC',
-  function($http, ExplorationDataService, AlertsService,
+  function($http, AlertsService, ExplorationDataService,
       ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC) {
     return {
       init: function(

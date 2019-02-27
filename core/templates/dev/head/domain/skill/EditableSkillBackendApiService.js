@@ -25,11 +25,11 @@ oppia.constant(
   '/skill_editor_question_handler/<skill_id>?cursor=<cursor>');
 
 oppia.factory('EditableSkillBackendApiService', [
-  '$http', '$q', 'EDITABLE_SKILL_DATA_URL_TEMPLATE',
-  'SKILL_EDITOR_QUESTION_URL_TEMPLATE', 'UrlInterpolationService',
+  '$http', '$q', 'UrlInterpolationService',
+  'EDITABLE_SKILL_DATA_URL_TEMPLATE', 'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
   function(
-      $http, $q, EDITABLE_SKILL_DATA_URL_TEMPLATE,
-      SKILL_EDITOR_QUESTION_URL_TEMPLATE, UrlInterpolationService) {
+      $http, $q, UrlInterpolationService,
+      EDITABLE_SKILL_DATA_URL_TEMPLATE, SKILL_EDITOR_QUESTION_URL_TEMPLATE) {
     var _fetchSkill = function(skillId, successCallback, errorCallback) {
       var skillDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_SKILL_DATA_URL_TEMPLATE, {
