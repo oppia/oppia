@@ -115,6 +115,9 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-solution-tab'));
 
   var contentTabText = element(by.css('.protractor-test-content-text'));
+  var uploadAudioButton = element(
+    by.css('[ng-click="openAddAudioTranslationModal()"]'));
+  var saveUploadedAudioButton = element(by.css('[ng-click="save()"]'));
 
   var feedbackList = element.all(
     by.css('li.protractor-test-translation-feedback'));
@@ -200,5 +203,19 @@ var ExplorationEditorTranslationTab = function() {
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
     ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
   };
+
+  this.openUploadAudioModal = function() {
+    waitFor.elementToBeClickable(
+      uploadAudioButton, 'Upload Audio button is not clickable');
+    uploadAudioButton.click();
+  };
+
+  this.saveUploadedAudio = function() {
+    waitFor.elementToBeClickable(
+      saveUploadedAudioButton, 'Save button is not clickable');
+    saveUploadedAudioButton.click();
+    waitFor.invisibilityOf(saveUploadedAudioButton,
+      'Upload Audio modal takes too long to disappear');
+  }
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;

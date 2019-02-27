@@ -21,7 +21,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-
+var remote = require('../../../../node_modules/selenium-webdriver/remote');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
@@ -131,8 +131,21 @@ describe('Exploration translation', function() {
     explorationEditorPage.saveChanges();
 
     explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.exitTutorial();
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
       '(0/8)');
+    
+    // click upload button
+    explorationEditorTranslationTab.openUploadAudioModal();
+    browser.setFileDetector(new remote.FileDetector());
+    var audioToUpload = '../data/cafe.mp3';
+    var path = require('path');
+    var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
+    var audioElem = element(by.css('[ng-class="inputFieldClassName"]'));
+    audioElem.sendKeys(audioAbsolutePath);
+    explorationEditorTranslationTab.saveUploadedAudio();
+    explorationEditorTranslationTab.expectNumericalStatusToMatch(
+      '(1/8)');
     users.logout();
   });
 
