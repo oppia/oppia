@@ -589,7 +589,7 @@ describe('Match line to template', function() {
       logicProofShared.parseLineString(
         lineString, logicProofData.BASE_STUDENT_LANGUAGE.operators,
         logicProofData.BASE_VOCABULARY
-      )[0], template.reader_view, logicProofData.BASE_VOCABULARY);
+      )[0], template.reader_view);
   };
 
   it('should match examples correctly', function() {

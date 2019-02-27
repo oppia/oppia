@@ -42,16 +42,16 @@ oppia.constant('PythonProgramTokenType', {
 
 oppia.factory('PythonProgramTokenizer', [
   '$log', 'PythonProgramTokenType', function($log, PythonProgramTokenType) {
-    var groupOfRegEx = function() {
-      return '(' + Array.prototype.join.call(arguments, '|') + ')';
+    var groupOfRegEx = function(...params) {
+      return '(' + Array.prototype.join.call(params, '|') + ')';
     };
 
-    var regExMayBePresent = function() {
-      return groupOfRegEx(arguments) + '?';
+    var regExMayBePresent = function(params) {
+      return groupOfRegEx(params) + '?';
     };
 
-    var repeatedRegEx = function() {
-      return groupOfRegEx(arguments) + '*';
+    var repeatedRegEx = function(params) {
+      return groupOfRegEx(params) + '*';
     };
 
     var whitespace = '[ \\f\\t]*';
@@ -163,6 +163,7 @@ oppia.factory('PythonProgramTokenizer', [
         var contline = null;
         var indents = [0];
         var lcount = 0;
+        var endprog = null;
 
         while (1) {
           var line = program[lcount];
@@ -235,8 +236,10 @@ oppia.factory('PythonProgramTokenizer', [
                 tokenizedProgram.push(
                   [PythonProgramTokenType.NL, line.slice(nlPos)]);
               } else {
+                var comment = PythonProgramTokenType.COMMENT;
+                var nl = PythonProgramTokenType.NL;
                 tokenizedProgram.push([
-                  PythonProgramTokenType.line[pos] === '#' ? COMMENT : NL,
+                  PythonProgramTokenType.line[pos] === '#' ? comment : nl,
                   line.slice(pos)]);
               }
               continue;

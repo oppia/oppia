@@ -230,8 +230,8 @@ oppia.animation('.conversation-skin-animate-cards', function() {
 });
 
 oppia.directive('conversationSkin', [
-  'UrlInterpolationService', 'UrlService',
-  function(UrlInterpolationService, UrlService) {
+  'UrlInterpolationService', 'UrlService', 'UserService',
+  function(UrlInterpolationService, UrlService, UserService) {
     return {
       restrict: 'E',
       scope: {},
@@ -617,6 +617,10 @@ oppia.directive('conversationSkin', [
           };
 
           $rootScope.$on('playerStateChange', function(evt, newStateName) {
+            var isLoggedIn = false;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              isLoggedIn = userInfo.isLoggedIn();
+            });
             if (!newStateName) {
               return;
             }
@@ -637,10 +641,10 @@ oppia.directive('conversationSkin', [
               var collectionAllowsGuestProgress = (
                 WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
                   GLOBALS.collectionId) !== -1);
-              if (collectionAllowsGuestProgress && !_isLoggedIn) {
+              if (collectionAllowsGuestProgress && !isLoggedIn) {
                 GuestCollectionProgressService.
                   recordExplorationCompletedInCollection(
-                    GLOBALS.collectionId, _explorationId);
+                    GLOBALS.collectionId, $scope.explorationId);
               }
 
               // For single state explorations, when the exploration reaches the

@@ -868,7 +868,7 @@ var logicProofStudent = (function() {
       for (var j = 0; j < lineTemplates.length; j++) {
         try {
           matchLineToTemplate(
-            protoLines[i], lineTemplates[j].reader_view, vocabulary);
+            protoLines[i], lineTemplates[j].reader_view);
           lineIdentified = true;
         } catch (err) {
           if (errorMessage === undefined) {
@@ -971,7 +971,7 @@ var logicProofStudent = (function() {
       for (var j = 0; j < lineTemplates.length; j++) {
         try {
           var matchings = matchLineToTemplate(
-            protoLines[i], lineTemplates[j].reader_view, vocabulary);
+            protoLines[i], lineTemplates[j].reader_view);
           requireValidMatching(
             matchings, lineTemplates[j].reader_view, language);
           throwLineMessages(

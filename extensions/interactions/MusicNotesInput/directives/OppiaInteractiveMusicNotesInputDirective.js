@@ -381,7 +381,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                       noteId = scope.generateNoteId();
                       $(ui.helper).data('noteId', noteId);
                     }
-                    drawLedgerLine(topPos, leftPos, lineValue, noteId);
+                    drawLedgerLine(topPos, leftPos);
                   }
                 },
                 out: function() {
@@ -635,9 +635,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             if (isLedgerLineNote(lineValue)) {
               drawLedgerLine(
                 getVerticalPosition(note.baseNoteMidiNumber),
-                getHorizontalPosition(getNoteStartAsFloat(note)),
-                lineValue,
-                note.noteId
+                getHorizontalPosition(getNoteStartAsFloat(note))
               );
             }
           }

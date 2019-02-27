@@ -931,7 +931,7 @@ var logicProofShared = (function() {
       } catch (err) {}
     }
     throw UserError('unknown_typing_error', {
-      expression: expression
+      array: array
     });
   };
 
