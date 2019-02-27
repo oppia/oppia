@@ -42,6 +42,7 @@ from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
@@ -739,6 +740,17 @@ def apply_change_list(exploration_id, change_list):
                         exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS): # pylint: disable=line-too-long
                     state.update_content_ids_to_audio_translations(
                         change.new_value)
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                    if not isinstance(change.new_value, dict):
+                        raise Exception(
+                            'Expected written_translations to be a dict, '
+                            'received %s' % change.new_value)
+                    written_translations = (
+                        state_domain.WrittenTranslations.from_dict(
+                            change.new_value))
+                    state.update_written_translations(written_translations)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -1885,6 +1897,7 @@ def get_user_exploration_data(
         'rights': rights_manager.get_exploration_rights(
             exploration_id).to_dict(),
         'show_state_editor_tutorial_on_load': None,
+        'show_state_translation_tutorial_on_load': None,
         'states': states,
         'tags': exploration.tags,
         'title': exploration.title,
@@ -1956,7 +1969,6 @@ def get_exp_with_draft_applied(exp_id, user_id):
     Returns:
         Exploration. The exploration domain object.
     """
-
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = get_exploration_by_id(exp_id)
     if exp_user_data:

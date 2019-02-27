@@ -17,9 +17,7 @@
 import os
 import subprocess
 
-GCLOUD_PATH = os.path.join(
-    '..', 'oppia_tools', 'google-cloud-sdk-222.0.0', 'google-cloud-sdk',
-    'bin', 'gcloud')
+RELEASE_BRANCH_NAME_PREFIX = 'release-'
 
 
 def ensure_directory_exists(d):
@@ -54,6 +52,16 @@ def open_new_tab_in_browser_if_possible(url):
         if subprocess.call(['which', cmd]) == 0:
             subprocess.call([cmd, url])
             return
+    print '******************************************************************'
+    print 'WARNING: Unable to open browser. Please manually open the following '
+    print 'URL in a browser window, then press Enter to confirm.'
+    print ''
+    print '    %s' % url
+    print ''
+    print 'NOTE: To get rid of this message, open scripts/common.py and fix'
+    print 'the function open_new_tab_in_browser_if_possible() to work on your'
+    print 'system.'
+    raw_input()
 
 
 def get_remote_alias(remote_url):
@@ -77,8 +85,11 @@ def verify_local_repo_is_clean():
     git_status_output = subprocess.check_output(
         ['git', 'status']).strip().split('\n')
 
-    branch_is_clean_message = 'nothing to commit, working directory clean'
-    if not branch_is_clean_message in git_status_output:
+    branch_is_clean_message_1 = 'nothing to commit, working directory clean'
+    branch_is_clean_message_2 = 'nothing to commit, working tree clean'
+    if (
+            not branch_is_clean_message_1 in git_status_output and
+            not branch_is_clean_message_2 in git_status_output):
         raise Exception(
             'ERROR: This script should be run from a clean branch.')
 
@@ -91,6 +102,16 @@ def get_current_branch_name():
     git_status_first_line = git_status_output[0]
     assert git_status_first_line.startswith(branch_message_prefix)
     return git_status_first_line[len(branch_message_prefix):]
+
+
+def is_current_branch_a_release_branch():
+    """Returns whether the current branch is a release branch.
+
+    Returns:
+        bool. Whether the current branch is a release branch.
+    """
+    current_branch_name = get_current_branch_name()
+    return current_branch_name.startswith(RELEASE_BRANCH_NAME_PREFIX)
 
 
 def verify_current_branch_name(expected_branch_name):
@@ -134,16 +155,6 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
         remote_alias = get_remote_alias(
             'git@github.com:oppia/release-scripts.git')
         subprocess.call(['git', 'pull', remote_alias])
-
-
-def require_gcloud_to_be_available():
-    """Check whether gcloud is installed while undergoing deployment process."""
-    try:
-        subprocess.check_output([GCLOUD_PATH, '--version'])
-    except Exception:
-        raise Exception(
-            'gcloud required, but could not be found. Please run '
-            'scripts/start.sh to install gcloud.')
 
 
 class CD(object):

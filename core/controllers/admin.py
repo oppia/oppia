@@ -20,9 +20,9 @@ import random
 from constants import constants
 from core import jobs
 from core import jobs_registry
+from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import editor
-from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -376,7 +376,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         exp_id = self.request.get('exp_id')
-        exp_version = self.request.get('exp_version')
+        exp_version = int(self.request.get('exp_version'))
         state_name = self.request.get('state_name')
         num_answers = int(self.request.get('num_answers'))
 

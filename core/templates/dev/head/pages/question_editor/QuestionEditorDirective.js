@@ -35,14 +35,12 @@ oppia.directive('questionEditor', [
         '$scope', '$rootScope', 'AlertsService', 'QuestionCreationService',
         'EditabilityService', 'EditableQuestionBackendApiService',
         'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
-        'StateContentService', 'StateContentIdsToAudioTranslationsService',
         'INTERACTION_SPECS', 'StateEditorService', 'ResponsesService',
         'SolutionValidityService', 'QuestionUpdateService',
         function(
             $scope, $rootScope, AlertsService, QuestionCreationService,
             EditabilityService, EditableQuestionBackendApiService,
             QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
-            StateContentService, StateContentIdsToAudioTranslationsService,
             INTERACTION_SPECS, StateEditorService, ResponsesService,
             SolutionValidityService, QuestionUpdateService) {
           if ($scope.canEditQuestion()) {
@@ -158,12 +156,28 @@ oppia.directive('questionEditor', [
             });
           };
 
-          $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
-            _updateQuestion(function() {
-              var stateData = $scope.question.getStateData();
-              stateData.contentIdsToAudioTranslations =
-                angular.copy(displayedValue);
-            });
+          $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
+              contentId) {
+            var state = $scope.question.getStateData();
+            var contentIdsToAudioTranslations = (
+              state.contentIdsToAudioTranslations);
+            var updateQuestion = _updateQuestion;
+            if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
+              contentId)) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/components/forms/' +
+                  'mark_all_audio_as_needing_update_modal_directive.html'),
+                backdrop: true,
+                resolve: {},
+                controller: 'MarkAllAudioAsNeedingUpdateController'
+              }).result.then(function() {
+                updateQuestion(function() {
+                  contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
+                    contentId);
+                });
+              });
+            }
           };
 
           $scope.$on('stateEditorDirectiveInitialized', function(evt) {

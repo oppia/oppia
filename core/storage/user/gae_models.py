@@ -46,7 +46,9 @@ class UserSettingsModel(base_models.BaseModel):
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.
-    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)  # pylint: disable=invalid-name
+    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
+    # When the user last started the state translation tutorial. May be None.
+    last_started_state_translation_tutorial = ndb.DateTimeProperty(default=None)
     # When the user last logged in. This may be out-of-date by up to
     # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     last_logged_in = ndb.DateTimeProperty(default=None)
@@ -289,7 +291,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # IDs of feedback thread ids that this user subscribes to.
     general_feedback_thread_ids = ndb.StringProperty(
         repeated=True, indexed=True)
-    # IDs of the learners who have subscribed to this user.
+    # IDs of the creators to whom this learner has subscribed.
     creator_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)

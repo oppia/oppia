@@ -19,12 +19,13 @@
 import StringIO
 import datetime
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
@@ -218,3 +219,14 @@ class ExplorationTranslationHandler(base.BaseHandler):
 
         self.values.update(exploration_data)
         self.render_json(self.values)
+
+
+class StartedTranslationTutorialEventHandler(base.BaseHandler):
+    """Records that this user has started the state translation tutorial."""
+
+    @acl_decorators.can_play_exploration
+    def post(self, unused_exploration_id):
+        """Handles POST requests."""
+        user_services.record_user_started_state_translation_tutorial(
+            self.user_id)
+        self.render_json({})
