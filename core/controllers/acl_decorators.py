@@ -2421,8 +2421,7 @@ def can_access_subtopic_viewer_page(handler):
             PageNotFoundException: The given page cannot be found.
         """
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-            topic_id, subtopic_id)
-
+            topic_id, subtopic_id, strict=False)
         if subtopic_page is None:
             raise self.PageNotFoundException
         else:

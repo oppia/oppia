@@ -103,10 +103,14 @@ def get_subtopic_page_contents_by_id(topic_id, subtopic_id):
         subtopic_id: int. The id of the subtopic.
 
     Returns:
-        SubtopicPageContents: The page contents for a subtopic page.
+        SubtopicPageContents or None: The page contents for a subtopic page,
+            or None if subtopic page does not exist.
     """
     subtopic_page = get_subtopic_page_by_id(topic_id, subtopic_id)
-    return subtopic_page.page_contents
+    if subtopic_page is not None:
+        return subtopic_page.page_contents
+    else:
+        return None
 
 
 def save_subtopic_page(

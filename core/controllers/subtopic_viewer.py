@@ -30,7 +30,6 @@ class SubtopicPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
-
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
