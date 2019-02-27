@@ -99,6 +99,8 @@ oppia.directive('topNavigationBar', [
                   $timeout(function() {
                     $window.location = urlObject.login_url;
                   }, 150);
+                } else {
+                  throw Error('Login url not found.');
                 }
               }
             );
