@@ -19,8 +19,7 @@
 
 var waitFor = require('./waitFor.js');
 
-var CreatorDashboardPage;
-CreatorDashboardPage = function() {
+var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator_dashboard';
   var activityCreationModal = element(
     by.css('.protractor-test-creation-modal'));

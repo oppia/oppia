@@ -17,8 +17,7 @@
  * Protractor tests.
  */
 
-var ExplorationEditorStatsTab;
-ExplorationEditorStatsTab = function() {
+var ExplorationEditorStatsTab = function() {
   /**
      * Interactive elements
      */

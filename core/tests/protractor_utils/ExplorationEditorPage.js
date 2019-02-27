@@ -18,8 +18,6 @@
  */
 var waitFor = require('./waitFor.js');
 
-var ExplorationEditorPage;
-
 var ExplorationEditorFeedbackTab = require(
   '../protractor_utils/ExplorationEditorFeedbackTab.js');
 var ExplorationEditorHistoryTab = require(
@@ -35,7 +33,7 @@ var ExplorationEditorStatsTab = require(
 var ExplorationEditorTranslationTab = require(
   '../protractor_utils/ExplorationEditorTranslationTab.js');
 
-ExplorationEditorPage = function() {
+var ExplorationEditorPage = function() {
   /*
    * Components
    */

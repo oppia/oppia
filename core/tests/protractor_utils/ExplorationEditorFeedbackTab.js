@@ -20,8 +20,7 @@
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var ExplorationEditorFeedbackTab;
-ExplorationEditorFeedbackTab = function() {
+var ExplorationEditorFeedbackTab = function() {
   /*
    * Interactive elements
    */
