@@ -394,7 +394,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 short_response_directive_js_file_content)
             self.assertIn(
                 '%sRulesService' % (
-                    interaction_id[0].lower() + interaction_id[1:]),
+                    interaction_id[0] + interaction_id[1:]),
                 rules_service_js_file_content)
             self.assertIn(
                 '%sValidationService' % interaction_id,
