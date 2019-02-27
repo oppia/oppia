@@ -137,6 +137,14 @@ class ThanksPage(base.BaseHandler):
         self.render_template('pages/thanks/thanks.html')
 
 
+class ForumRedirectPage(base.BaseHandler):
+    """A handler to redirect to Oppia's Google group."""
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.GOOGLE_GROUP_URL)
+
+
 class TermsPage(base.BaseHandler):
     """Page with terms and conditions."""
 

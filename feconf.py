@@ -593,6 +593,10 @@ DEMO_COLLECTIONS = {
 # editor views.
 DISABLED_EXPLORATION_IDS = ['5']
 
+# Oppia Google Group URL.
+GOOGLE_GROUP_URL = (
+    'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia')
+
 # External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
