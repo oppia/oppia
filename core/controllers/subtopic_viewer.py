@@ -33,6 +33,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
+        subtopic_id = int(subtopic_id)
         subtopic_page_contents = (
             subtopic_page_services.get_subtopic_page_contents_by_id(
                 topic_id, subtopic_id))
