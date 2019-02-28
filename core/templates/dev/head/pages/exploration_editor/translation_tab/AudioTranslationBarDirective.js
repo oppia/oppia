@@ -97,7 +97,7 @@ oppia.directive('audioTranslationBar', [
           $scope.audioIsCurrentlyBeingSaved = false;
           $scope.translationIsDisallowed = !GLOBALS.can_translate;
           $scope.userIsGuest = !GLOBALS.userIsLoggedIn;
-          $scope.dropAreaIsShown = !$scope.userIsGuest && 
+          $scope.dropAreaIsShown = !$scope.userIsGuest &&
             !$scope.translationIsDisallowed;
 
           var saveContentIdsToAudioTranslationChanges = function() {
