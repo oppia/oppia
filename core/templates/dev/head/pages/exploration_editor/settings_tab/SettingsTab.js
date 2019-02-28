@@ -225,13 +225,14 @@ oppia.controller('SettingsTab', [
     $scope.unmuteSuggestionNotifications = function() {
       UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
     };
-    // check for title and allow submit 
+
+    // Check for title and allow submit.
     $scope.checkForTitle = function(event) {
       console.log(event);
-      if($scope.explorationTitleService.displayed=="") {
+      if ( $scope.explorationTitleService.displayed === '' ) {
         event.preventDefault();
         $scope.titleAdd = true;
-      } else { 
+      } else {
         $scope.titleAdd = false;
       }
     };
