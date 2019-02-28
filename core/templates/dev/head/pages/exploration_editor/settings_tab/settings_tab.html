@@ -286,11 +286,13 @@
                   </span>
                 </div>
 
-                <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
+                <input type="submit" class="btn btn-default protractor-test-save-role" value="Save"
+                        ng-click="checkForTitle($event)">
                 <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
                         ng-show="isRolesFormOpen">
                   Cancel
                 </button>
+                <p style="color:red;" ng-show="titleAdd">*Please add title and try again</p>
               </form>
             </div>
           </div>

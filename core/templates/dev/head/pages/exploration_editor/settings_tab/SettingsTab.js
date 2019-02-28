@@ -54,6 +54,7 @@ oppia.controller('SettingsTab', [
     }
 
     $scope.isRolesFormOpen = false;
+    $scope.titleAdd = false;
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
     $scope.canDelete = GLOBALS.canDelete;
@@ -223,6 +224,16 @@ oppia.controller('SettingsTab', [
     };
     $scope.unmuteSuggestionNotifications = function() {
       UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
+    };
+    // check for title and allow submit 
+    $scope.checkForTitle = function(event) {
+      console.log(event);
+      if($scope.explorationTitleService.displayed=="") {
+        event.preventDefault();
+        $scope.titleAdd = true;
+      } else { 
+        $scope.titleAdd = false;
+      }
     };
 
     // Methods relating to control buttons.
