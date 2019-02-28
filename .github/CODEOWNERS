@@ -21,6 +21,15 @@
 /core/templates/dev/head/pages/collection_player/ @kevinlee12
 
 
+# Dashboard frontend pages.
+/core/templates/dev/head/domain/creator_dashboard/ @nithusha21
+/core/templates/dev/head/domain/learner_dashboard/ @nithusha21
+/core/templates/dev/head/pages/creator_dashboard/ @nithusha21
+/core/templates/dev/head/pages/email_dashboard/ @nithusha21
+/core/templates/dev/head/pages/learner_dashboard/ @nithusha21
+/core/templates/dev/head/pages/notifications_dashboard/ @nithusha21
+
+
 # Dev workflow team.
 /core/tests/ @apb7
 /scripts/ @apb7
@@ -43,6 +52,36 @@
 /core/templates/dev/head/components/state/ @aks681
 
 
+# Forms pages.
+/core/templates/dev/head/components/forms/ @DubeySandeep
+
+
+# Global components.
+/core/templates/dev/head/components/alerts/ @ankita240796
+/core/templates/dev/head/components/attribution_guide/ @ankita240796
+/core/templates/dev/head/components/background/ @ankita240796
+/core/templates/dev/head/components/embed_modal/ @ankita240796
+/core/templates/dev/head/components/loading/ @ankita240796
+/core/templates/dev/head/components/profile_link/ @ankita240796
+/core/templates/dev/head/components/promo/ @ankita240796
+/core/templates/dev/head/components/share/ @ankita240796
+/core/templates/dev/head/components/social_buttons/ @ankita240796
+/core/templates/dev/head/components/summary_tile/ @ankita240796
+
+
+# Global stylesheet.
+/core/templates/dev/head/css/oppia.css @ankita240796
+
+
+# Interaction project.
+/core/templates/dev/head/domain/objects/ @kevinlee12
+/core/templates/dev/head/expressions/ @seanlip
+/extensions/dependencies/ @seanlip
+/extensions/interactions/ @kevinlee12
+/extensions/objects/ @seanlip
+/extensions/value_generators/ @seanlip
+
+
 # Lesson Analytics team.
 /core/domain/stats*.py @brianrodri
 /core/storage/statistics/ @brianrodri
@@ -58,6 +97,13 @@
 # Library page.
 /core/controllers/library*.py @kevinlee12
 /core/templates/dev/head/pages/library/ @kevinlee12
+
+
+# Navigation bar project.
+/core/templates/dev/head/domain/sidebar/ @nithusha21
+/core/templates/dev/head/components/create_button/ @nithusha21
+/core/templates/dev/head/components/side_navigation_bar/ @nithusha21
+/core/templates/dev/head/components/top_navigation_bar/ @nithusha21
 
 
 # New structures team.
@@ -109,12 +155,19 @@
 /core/templates/dev/head/pages/about/ @seanlip
 /core/templates/dev/head/pages/privacy/ @seanlip
 /core/templates/dev/head/pages/terms/ @seanlip
+/core/templates/dev/head/pages/tests/ @seanlip
+/core/templates/dev/head/domain/utilities/ @DubeySandeep
 /export/ @seanlip
-/extensions/objects/ @seanlip
-/extensions/value_generators/ @seanlip
+
+
+# Restricted pages.
+/core/templates/dev/head/pages/admin/ @seanlip
+/core/templates/dev/head/pages/moderator/ @seanlip
+/.github/CODEOWNERS @seanlip
 
 
 # Rich text editor team.
+/core/templates/dev/head/components/CkEditorRteDirective.js @AllanYangZhou @bansalnitish
 /extensions/rich_text_components/ @AllanYangZhou @bansalnitish
 /extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
 
@@ -136,6 +189,20 @@
 /core/templates/dev/head/pages/exploration_editor/feedback_tab/ @nithusha21
 
 
+# Simple pages.
+/core/templates/dev/head/pages/contact/ @vojtechjelinek
+/core/templates/dev/head/pages/donate/ @vojtechjelinek
+/core/templates/dev/head/pages/error/ @vojtechjelinek
+/core/templates/dev/head/pages/get_started/ @vojtechjelinek
+/core/templates/dev/head/pages/landing/ @vojtechjelinek
+/core/templates/dev/head/pages/maintenance/ @vojtechjelinek
+/core/templates/dev/head/pages/preferences/ @vojtechjelinek
+/core/templates/dev/head/pages/signup/ @vojtechjelinek
+/core/templates/dev/head/pages/splash/ @vojtechjelinek
+/core/templates/dev/head/pages/teach/ @vojtechjelinek
+/core/templates/dev/head/pages/thanks/ @vojtechjelinek
+
+
 # Speed Improvement team.
 app.yaml @vojtechjelinek
 manifest.json @vojtechjelinek
@@ -143,3 +210,8 @@ manifest.json @vojtechjelinek
 /core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
+
+
+# User’s profile page.
+/core/templates/dev/head/domain/user/ @kevinlee12
+/core/templates/dev/head/pages/profile/ @kevinlee12
