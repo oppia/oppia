@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,6 +41,15 @@ oppia.factory('itemSelectionInputRulesService', ['$filter', function($filter) {
       return normalizedInput.some(function(val) {
         return normalizedAnswer.indexOf(val) === -1;
       });
+    }
+    // add proper subset of
+    IsProperSubsetOf: function(answer, inputs) {
+      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+      return normalizedAnswer.length < normalizedInput.length &&
+          normalizedAnswer.every(function(val) {
+            return normalizedInput.indexOf(val) !== -1;
+          });
     }
   };
 }]);
