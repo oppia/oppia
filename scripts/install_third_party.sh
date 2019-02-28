@@ -45,6 +45,7 @@ install_node_module typescript 3.3.3
 install_node_module @types/angular 1.6.54
 install_node_module @types/jasmine 3.3.8
 install_node_module @types/jquery 3.3.29
+install_node_module @types/leaflet 1.4.0
 install_node_module @types/node 10.12.24
 install_node_module @types/q 0.0.32
 install_node_module @types/selenium-webdriver 2.53.43
