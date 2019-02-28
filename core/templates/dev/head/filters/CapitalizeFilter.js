@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,11 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia 'forum' page.
+ * @fileoverview Capitalize filter for Oppia.
  */
 
-oppia.controller('Forum', [
-  '$scope', 'DEV_MODE', function($scope, DEV_MODE) {
-    $scope.DEV_MODE = DEV_MODE;
-  }
-]);
+oppia.filter('capitalize', [function() {
+  return function(input) {
+    if (!input) {
+      return input;
+    }
+
+    var trimmedInput = input.trim();
+    return trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
+  };
+}]);
