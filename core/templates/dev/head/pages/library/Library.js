@@ -156,8 +156,7 @@ oppia.controller('Library', [
         // elements flush left.
         // Transforms the group names into translation ids
         $scope.leftmostCardIndices = [];
-        var i;
-        for (i = 0; i < $scope.libraryGroups.length; i++) {
+        for (var i = 0; i < $scope.libraryGroups.length; i++) {
           $scope.leftmostCardIndices.push(0);
         }
       });
@@ -296,8 +295,7 @@ oppia.controller('Library', [
         $window.location.href = fullResultsUrl;
       } else {
         var selectedCategories = {};
-        var i;
-        for (i = 0; i < categories.length; i++) {
+        for (var i = 0; i < categories.length; i++) {
           selectedCategories[categories[i]] = true;
         }
 

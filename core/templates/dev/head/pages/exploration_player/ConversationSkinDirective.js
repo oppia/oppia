@@ -617,10 +617,6 @@ oppia.directive('conversationSkin', [
           };
 
           $rootScope.$on('playerStateChange', function(evt, newStateName) {
-            var isLoggedIn = false;
-            UserService.getUserInfoAsync().then(function(userInfo) {
-              isLoggedIn = userInfo.isLoggedIn();
-            });
             if (!newStateName) {
               return;
             }
@@ -641,7 +637,7 @@ oppia.directive('conversationSkin', [
               var collectionAllowsGuestProgress = (
                 WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
                   GLOBALS.collectionId) !== -1);
-              if (collectionAllowsGuestProgress && !isLoggedIn) {
+              if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
                 GuestCollectionProgressService.
                   recordExplorationCompletedInCollection(
                     GLOBALS.collectionId, $scope.explorationId);

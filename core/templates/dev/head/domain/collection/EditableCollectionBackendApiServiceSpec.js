@@ -94,7 +94,7 @@ describe('Editable collection backend API service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      var collection;
+      var collection = null;
 
       // Loading a collection the first time should fetch it from the backend.
       $httpBackend.expect('GET', '/collection_editor_handler/data/0').respond(

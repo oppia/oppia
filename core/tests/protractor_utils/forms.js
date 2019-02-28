@@ -85,8 +85,7 @@ var GraphEditor = function(graphInputContainer) {
         by.css('.protractor-test-Delete-button'));
       deleteButton.click();
       // Sample graph comes with 3 vertices.
-      var i;
-      for (i = 2; i >= 0; i--) {
+      for (var i = 2; i >= 0; i--) {
         vertexElement(i).click();
       }
     },
@@ -158,8 +157,8 @@ var ListEditor = function(elem) {
           for (var i = startingLength; i < desiredLength; i++) {
             addItem();
           }
-          for (var i = startingLength - 1; i >= desiredLength; i--) {
-            deleteItem(i);
+          for (var j = startingLength - 1; j >= desiredLength; j--) {
+            deleteItem(j);
           }
         }
       );

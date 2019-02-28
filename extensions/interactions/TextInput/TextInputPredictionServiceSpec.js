@@ -34,7 +34,7 @@ describe('Text Input Prediction Service', function() {
       var classifierData = getJSONFixture('text_input_classifier_data.json');
       var trainingData = getJSONFixture('text_classifier_results.json');
       var correctPredictions = 0, totalAnswers = 0;
-      var predictedAnswerGroup;
+      var predictedAnswerGroup = null;
 
       for (var i = 0; i < trainingData.length; i++) {
         for (var j = 0; j < trainingData[i].answers.length; j++) {
@@ -64,7 +64,7 @@ describe('Text Input Prediction Service', function() {
 
       // To keep things simple, we will calculate accuracy score
       // and not F1 score.
-      var predictedAnswerGroup;
+      var predictedAnswerGroup = null;
       for (var i = 0; i < trainingData.length; i++) {
         for (var j = 0; j < trainingData[i].answers.length; j++) {
           predictedAnswerGroup = predictionService.predict(

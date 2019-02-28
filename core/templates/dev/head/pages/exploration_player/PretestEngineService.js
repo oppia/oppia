@@ -196,7 +196,7 @@ oppia.factory('PretestEngineService', [
           return;
         }
 
-        var newState;
+        var newState = null;
         if (answerIsCorrect && (currentIndex < pretestQuestions.length - 1)) {
           newState = pretestQuestions[currentIndex + 1].getStateData();
         } else {

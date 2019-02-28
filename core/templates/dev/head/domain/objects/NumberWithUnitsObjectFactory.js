@@ -36,7 +36,7 @@ oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
     name:  The name of the custom currency unit.
     aliases: Other allowed canonical forms of the currency unit.
     front_units: A list of all the currency symbols that are added to the front
-      (like- $, ₹, rupeeSymbol). Keep it an empty list if no symbol is needed.
+      (like- $, Rs, ₹). Keep it an empty list if no symbol is needed.
     base_unit: Define the unit in terms of base unit only if the defined custom
       unit is a sub unit else assign it 'null' value.*/
 oppia.constant('CURRENCY_UNITS', {

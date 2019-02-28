@@ -431,7 +431,7 @@ var ExplorationEditorMainTab = function() {
       destName, createNewDest, refresherExplorationId) {
     expect(destName === null && createNewDest).toBe(false);
 
-    var targetOption;
+    var targetOption = null;
     if (createNewDest) {
       targetOption = _NEW_STATE_OPTION;
     } else if (destName === null | destName === '(try again)') {

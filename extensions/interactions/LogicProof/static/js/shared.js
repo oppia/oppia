@@ -558,7 +558,8 @@ var logicProofShared = (function() {
    *         largest (in lexicographic ordering) as this is likely to be closest
    *         to what the user intended.
    */
-  var assignTypesToExpression = function(untypedExpression, possibleTopTypes,
+  var assignTypesToExpression = function(
+      untypedExpression, possibleTopTypes,
       language, newKindsPermitted = ['constant', 'variable'],
       permitDuplicateDummyNames = false) {
     var operators = language.operators;
@@ -773,7 +774,8 @@ var logicProofShared = (function() {
    *          }
    * @raises: as before
    */
-  var assignTypesToExpressionArray = function(untypedArray, topTypes, language,
+  var assignTypesToExpressionArray = function(
+      untypedArray, topTypes, language,
       newKindsPermitted = ['constant', 'variable'], isTemplate = false,
       numDummies = 0) {
     var partiallyTypedArrays = [[[]]];
