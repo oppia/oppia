@@ -1013,8 +1013,10 @@ RTE_CONTENT_SPEC = {
     }
 }
 
-
+# A dict representing available landing pages, having subject as a key and list
+# of topics as the value.
 AVAILABLE_LANDING_PAGES = {
     'maths': ['fractions', 'ratios']
 }
+# A list of viewer types for landing pages.
 LANDING_PAGES_VIEWER_TYPES = ['teacher', 'student']

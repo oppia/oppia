@@ -22,7 +22,7 @@ import feconf
 
 
 class FractionLandingRedirectPage(base.BaseHandler):
-    """PThe handler redirecting to fractions landing page."""
+    """The handler redirecting to fraction's landing page."""
 
     @acl_decorators.open_access
     def get(self):

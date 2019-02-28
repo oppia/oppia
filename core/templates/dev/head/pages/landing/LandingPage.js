@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for fractions landing page.
+ * @fileoverview Controller for landing page.
  */
 
 oppia.constant('LANDING_PAGE_DATA', {
@@ -95,7 +95,7 @@ oppia.controller('Fractions', [
       if (landingPageData[rowString]) {
         return landingPageData[rowString];
       } else {
-        throw 'Unable to find ' + rowString + ' in landingPageData.';
+        throw Error('Unable to find ' + rowString + ' in landingPageData.');
       }
     };
 
@@ -104,7 +104,7 @@ oppia.controller('Fractions', [
       if (row.image) {
         return UrlInterpolationService.getStaticImageUrl(assetsDir + row.image);
       } else {
-        throw 'Row ' + rowIndex + ' doesn\'t have image data.';
+        throw Error('Row ' + rowIndex + ' doesn\'t have image data.');
       }
     };
 
@@ -113,7 +113,7 @@ oppia.controller('Fractions', [
       if (row.video) {
         return UrlInterpolationService.getStaticVideoUrl(assetsDir + row.video);
       } else {
-        throw 'Row ' + rowIndex + ' doesn\'t have video data.';
+        throw Error('Row ' + rowIndex + ' doesn\'t have video data.');
       }
     };
 
@@ -122,7 +122,7 @@ oppia.controller('Fractions', [
       if (row.heading) {
         return row.heading;
       } else {
-        throw 'Row ' + rowIndex + ' doesn\'t have heading.';
+        throw Error('Row ' + rowIndex + ' doesn\'t have heading.');
       }
     };
 
@@ -132,7 +132,7 @@ oppia.controller('Fractions', [
       if (row[paragraphkey]) {
         return row[paragraphkey];
       } else {
-        throw (
+        throw Error(
           'Row ' + rowIndex + ' doesn\'t have paragraph at index: ' +
           paragraphIndex);
       }
