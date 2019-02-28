@@ -30,7 +30,8 @@ oppia.directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
-          // don't show for user that is logged in and cannot add translation.
+          /* Don't show drag and drop area for user that is logged in
+            and cannot add translation. */
           scope.showDropArea = !scope.userIsGuest &&
             scope.translationIsDisallowed ? false : true;
           scope.$digest();
