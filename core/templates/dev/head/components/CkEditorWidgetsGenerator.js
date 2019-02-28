@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Dynamically generate CKEditor widgets for the rich text
+ * @fileoverview dynamically generate CKEditor widgets for the rich text
  components.
  */
 
