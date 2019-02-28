@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
+  	"outDir": "generated_js",
+    "target": "es6",
     "typeRoots": ["./node_modules/@types"],
     "types": ["angular", "ckeditor", "d3", "googlemaps", "google.visualization", "jasmine", "jquery", "mathjax", "mathjs", "mousetrap", "node", "q", "selenium-webdriver"]
   }

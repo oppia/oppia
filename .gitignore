@@ -9,6 +9,7 @@ backend_prod_files/*
 core/templates/prod/*
 core/tests/.browserstack.env
 .coverage*
+generated_js/*
 .viminfo
 .vscode/*
 libpeerconnection.log
