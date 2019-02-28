@@ -29,6 +29,7 @@ describe('WrittenTranslation object factory', function() {
         needs_update: false
       });
     }));
+
     it('should set and get html value correctly',
       function() {
         expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
@@ -38,6 +39,7 @@ describe('WrittenTranslation object factory', function() {
         writtenTranslation.markAsNeedingUpdate();
         expect(writtenTranslation.getHtml()).toEqual('<p>HTML</p>');
       });
+
     it('should correctly mark written translation as needing update',
       function() {
         expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
