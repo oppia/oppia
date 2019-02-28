@@ -98,7 +98,7 @@
     "DoesNotContainAtLeastOneOf": {
       "description": "omits at least one of {{x|SetOfHtmlString}}"
     },
-    "IsProperSubsetOf":{
+    "IsProperSubsetOf": {
       "description": "is a proper subset of {{x|SetOfHtmlString}}"
     }
   },
