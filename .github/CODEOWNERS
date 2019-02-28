@@ -1,5 +1,11 @@
 # Per-directory ownership and automatic assignment for pull requests.
 
+# The e2e test files are owned by both Devworkflow and QA team.
+# - Firstly, QA team will look for the test coverage in a PR, then they will ask
+#   Devworkflow team for a final review.
+# - Devworkflow team will look for the code quality i.e, whether the e2e tests
+#   can be optimized any further.
+
 # Answer classification team.
 /core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08
@@ -34,10 +40,10 @@
 /core/templates/dev/head/domain/exploration/ @DubeySandeep
 /core/templates/dev/head/domain/state/ @aks681
 /core/templates/dev/head/domain/state_card/ @aks681
-/core/templates/dev/head/pages/exploration_editor/editor_tab @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/history_tab @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/preview_tab @aks681
-/core/templates/dev/head/pages/exploration_editor/settings_tab @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/editor_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/history_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/preview_tab/ @aks681
+/core/templates/dev/head/pages/exploration_editor/settings_tab/ @DubeySandeep
 /core/templates/dev/head/pages/exploration_player/ @aks681
 /core/templates/dev/head/pages/state_editor/ @aks681
 
@@ -111,6 +117,10 @@
 /export/ @seanlip
 /extensions/objects/ @seanlip
 /extensions/value_generators/ @seanlip
+
+
+# QA team.
+/core/tests/ @nithusha21
 
 
 # Rich text editor team.
