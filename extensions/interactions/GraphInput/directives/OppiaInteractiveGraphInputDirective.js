@@ -23,11 +23,11 @@
 oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 oppia.directive('oppiaInteractiveGraphInput', [
-  'HtmlEscaperService', 'UrlInterpolationService', 'UrlService',
-  'graphInputRulesService', 'EVENT_NEW_CARD_AVAILABLE',
+  'GraphInputRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
+  'UrlService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
-      HtmlEscaperService, UrlInterpolationService, UrlService,
-      graphInputRulesService, EVENT_NEW_CARD_AVAILABLE) {
+      GraphInputRulesService, HtmlEscaperService, UrlInterpolationService,
+      UrlService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
