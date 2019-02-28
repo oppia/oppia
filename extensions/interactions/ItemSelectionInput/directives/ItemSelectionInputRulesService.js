@@ -42,7 +42,8 @@ oppia.factory('itemSelectionInputRulesService', ['$filter', function($filter) {
         return normalizedAnswer.indexOf(val) === -1;
       });
     },
-    // add proper subset of
+    // Add function is proper subset of. This dunction checks if the answer
+    // given by user, is a subset of the correct answers.
     IsProperSubsetOf: function(answer, inputs) {
       var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
       var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
