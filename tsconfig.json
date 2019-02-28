@@ -2,6 +2,6 @@
   "compilerOptions": {
     "target": "es5",
     "typeRoots": ["./node_modules/@types"],
-    "types": ["angular", "ckeditor", "d3", "googlemaps", "jasmine", "jquery", "mathjax", "mathjs", "mousetrap", "node", "q", "selenium-webdriver"]
+    "types": ["angular", "ckeditor", "d3", "googlemaps", "google.visualization", "jasmine", "jquery", "mathjax", "mathjs", "mousetrap", "node", "q", "selenium-webdriver"]
   }
 }

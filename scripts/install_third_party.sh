@@ -47,6 +47,7 @@ install_node_module @types/angular 1.6.54
 install_node_module @types/ckeditor 4.9.7
 install_node_module @types/d3 5.7.1
 install_node_module @types/googlemaps 3.30.16
+install_node_module @types/google.visualization 0.0.46
 install_node_module @types/jasmine 3.3.8
 install_node_module @types/jquery 3.3.29
 install_node_module @types/mathjax 0.0.35
