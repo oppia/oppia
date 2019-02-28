@@ -323,7 +323,6 @@ oppia.directive('stateResponses', [
                     $scope.$broadcast('saveOutcomeDestDetails');
 
                     EditorFirstTimeEventsService.registerFirstSaveRuleEvent();
-
                     // Close the modal and save it afterwards.
                     $uibModalInstance.close({
                       tmpRule: angular.copy($scope.tmpRule),
