@@ -151,53 +151,54 @@ describe('Exploration translation', function() {
 
   it('should provide correct status color ' +
     'for each card(state) in Exploration Overview', function() {
-      users.createUser('user@correctstatus.com', 'correctStatus');
-      users.login('user@correctstatus.com');
-      workflow.createExploration();
+    users.createUser('user@correctstatus.com', 'correctStatus');
+    users.login('user@correctstatus.com');
+    workflow.createExploration();
 
-      explorationEditorMainTab.setStateName('First');
-      explorationEditorMainTab.setContent(forms.toRichText(
-        'This is first card.'));
-      explorationEditorMainTab.setInteraction('NumericInput');
-      explorationEditorMainTab.addResponse(
-        'NumericInput', forms.toRichText('This is feedback.'),
-        'Second', true, 'Equals', 6);
-      explorationEditorMainTab.moveToState('Second');
-      explorationEditorMainTab.setInteraction('Continue');
-      var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-      responseEditor.setDestination('Three', true, null);
-      explorationEditorMainTab.moveToState('Three');
-      explorationEditorMainTab.setInteraction('EndExploration');
-      explorationEditorMainTab.moveToState('First');
-      explorationEditorPage.navigateToTranslationTab();
-      explorationEditorTranslationTab.exitTutorial();
-      explorationEditorTranslationTab.openUploadAudioModal();
-      browser.setFileDetector(new remote.FileDetector());
-      var audioToUpload = '../data/cafe.mp3';
-      var path = require('path');
-      var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
-      var audioElem = element(by.css('[ng-class="inputFieldClassName"]'));
-      audioElem.sendKeys(audioAbsolutePath);
-      explorationEditorTranslationTab.saveUploadedAudio();
-      explorationEditorPage.navigateToMainTab();
-      explorationEditorMainTab.moveToState('Three');
-      explorationEditorPage.navigateToTranslationTab();
-      explorationEditorTranslationTab.openUploadAudioModal();
-      audioElem.sendKeys(audioAbsolutePath);
-      explorationEditorTranslationTab.saveUploadedAudio();
-      var colorOfFirstState = element.all(by.css(
-        'rect.protractor-test-node-background.init-node')).last().
-        getCssValue('fill');
-      var colorOfSecondState = element.all(by.css(
-        'rect.protractor-test-node-background.normal-node')).last().
-        getCssValue('fill');
-      var colorOfThirdState = element.all(by.css(
-        'rect.protractor-test-node-background.terminal-node')).last().
-        getCssValue('fill');
-      expect(colorOfFirstState).toBe('rgb(233, 179, 48)');
-      expect(colorOfSecondState).toBe('rgb(209, 72, 54)');
-      expect(colorOfThirdState).toBe('rgb(22, 167, 101)');
-    });
+    explorationEditorMainTab.setStateName('First');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'This is first card.'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('This is feedback.'),
+      'Second', true, 'Equals', 6);
+    explorationEditorMainTab.moveToState('Second');
+    explorationEditorMainTab.setInteraction('Continue');
+    var responseEditor = explorationEditorMainTab.
+      getResponseEditor('default');
+    responseEditor.setDestination('Three', true, null);
+    explorationEditorMainTab.moveToState('Three');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorMainTab.moveToState('First');
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.exitTutorial();
+    explorationEditorTranslationTab.openUploadAudioModal();
+    browser.setFileDetector(new remote.FileDetector());
+    var audioToUpload = '../data/cafe.mp3';
+    var path = require('path');
+    var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
+    var audioElem = element(by.css('[ng-class="inputFieldClassName"]'));
+    audioElem.sendKeys(audioAbsolutePath);
+    explorationEditorTranslationTab.saveUploadedAudio();
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.moveToState('Three');
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.openUploadAudioModal();
+    audioElem.sendKeys(audioAbsolutePath);
+    explorationEditorTranslationTab.saveUploadedAudio();
+    var colorOfFirstState = element.all(by.css(
+      'rect.protractor-test-node-background.init-node')).last().
+      getCssValue('fill');
+    var colorOfSecondState = element.all(by.css(
+      'rect.protractor-test-node-background.normal-node')).last().
+      getCssValue('fill');
+    var colorOfThirdState = element.all(by.css(
+      'rect.protractor-test-node-background.terminal-node')).last().
+      getCssValue('fill');
+    expect(colorOfFirstState).toBe('rgb(233, 179, 48)');
+    expect(colorOfSecondState).toBe('rgb(209, 72, 54)');
+    expect(colorOfThirdState).toBe('rgb(22, 167, 101)');
+  });
 
   it(
     'should maintain its active sub-tab on saving draft and publishing changes',
