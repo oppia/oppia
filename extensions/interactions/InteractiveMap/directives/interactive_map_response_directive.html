@@ -1,6 +1,6 @@
 <div>
   <div class="oppia-overlay-map-response"></div>
-  <leaflet id="interactiveMapResponse" lf-center="mapOptions.center" markers="mapOptions.mapMarkers" defaults="mapOptions.defaults"></leaflet>
+  <leaflet id="interactiveMapResponse" lf-center="mapOptions.center" markers="mapOptions.mapMarkers" defaults="mapOptions.defaults" width="150px" height="150px"></leaflet>
 </div>
 <style>
   .oppia-overlay-map-response {
@@ -8,5 +8,6 @@
     position: absolute;
     width: 100%;
     opacity: 0.5;
+    z-index: 1001;
   }
 </style>

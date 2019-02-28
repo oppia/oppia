@@ -33,7 +33,8 @@ oppia.directive('oppiaResponseInteractiveMap', [
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.mapOptions = {
           defaults: {
-            zoomControl: false
+            zoomControl: false,
+            attributionControl: false
           },
           center: {
             lat: _answer[0],
