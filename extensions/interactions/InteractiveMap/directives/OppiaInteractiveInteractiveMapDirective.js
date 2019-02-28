@@ -50,7 +50,9 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
 
           $scope.setOverlay = function() {
             $scope.overlayStyle = {
-              'background-color': 'black'
+              'background-color': 'white',
+              opacity: 0.5,
+              'z-index': 1001
             };
           };
 
@@ -60,7 +62,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             };
           };
 
-          var addNewMarker = function(lat, lng) {
+          var changeMarkerPosition = function(lat, lng) {
             $scope.mapMarkers.mainMarker = {
               lat: lat,
               lng: lng,
@@ -139,7 +141,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               if ($scope.interactionIsActive) {
                 var newLat = args.leafletEvent.latlng.lat;
                 var newLng = args.leafletEvent.latlng.lng;
-                addNewMarker(newLat, newLng);
+                changeMarkerPosition(newLat, newLng);
                 CurrentInteractionService.onSubmit(
                   [newLat, newLng], interactiveMapRulesService);
               }

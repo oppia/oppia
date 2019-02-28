@@ -1598,7 +1598,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-editable-section:hover .oppia-interaction-preview {
   background: rgba(5, 140, 166, 0.5);
   border-radius: 4px;
-  /* The z-index value of leaflet map zoom control  is 1000, to make it go lower
+  /* The z-index value of leaflet map zoom control is 1000, to make it go lower
      in stack we have used 1001.
   */
   z-index: 1001;
