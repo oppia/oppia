@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview dynamically generate CKEditor widgets for the rich text
- components.
+ * @fileoverview Code to dynamically generate CKEditor widgets for the rich
+ * text components.
  */
 
 oppia.run([
