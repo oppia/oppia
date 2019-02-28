@@ -83,7 +83,6 @@ describe('WrittenTranslation object factory', function() {
           needs_update: false
         })
       );
-    }
-    );
+    });
   });
 });
