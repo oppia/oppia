@@ -319,7 +319,6 @@ from pylint import lint  # isort:skip
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
-_MODE = 'nv'
 _TARGET_STDOUT = StringIO.StringIO()
 
 
@@ -478,6 +477,7 @@ def _get_all_files():
     """
     eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     parsed_args = _PARSER.parse_args()
+    # Default mode is non-verbose mode.
     mode = 'nv'
     if parsed_args.v is True:
         mode = 'v'
@@ -880,7 +880,7 @@ def _print_complete_summary_of_errors():
 
 
 class LintsCheckManager(object):
-    """Manages all the lint function."""
+    """Manages all the linting functions."""
 
     def __init__(self, all_files, mode):
         self.all_files = all_files
