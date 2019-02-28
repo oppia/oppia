@@ -18,24 +18,45 @@
 
 from core.controllers import acl_decorators
 from core.controllers import base
+import feconf
 
 
-class FractionLandingPage(base.BaseHandler):
-    """Page showing the landing page for fractions. It will randomly select a
-    version out of the four versions of fractions landing page and display it.
-    """
+class FractionLandingRedirectPage(base.BaseHandler):
+    """PThe handler redirecting to fractions landing page."""
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         viewer_type = self.request.get('viewerType')
 
-        if not viewer_type:
+        if viewer_type not in feconf.LANDING_PAGES_VIEWER_TYPES:
             viewer_type = 'teacher'
-            self.redirect('/fractions?viewerType=%s' % viewer_type)
 
-        self.render_template(
-            'pages/landing/fractions/landing_page_%s.html' % viewer_type)
+        self.redirect('/learn/maths/fractions?viewerType=%s' % viewer_type)
+
+
+class TopicWiseLandingPage(base.BaseHandler):
+    """Page showing the topic-wise landing page based on viewer type."""
+
+    @acl_decorators.open_access
+    def get(self, subject, topic):
+        """Handles GET requests."""
+
+        if subject in feconf.AVAILABLE_LANDING_PAGES:
+            if topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
+                viewer_type = self.request.get('viewerType')
+                if viewer_type not in feconf.LANDING_PAGES_VIEWER_TYPES:
+                    viewer_type = feconf.LANDING_PAGES_VIEWER_TYPES[0]
+                    self.redirect(
+                        '/learn/%s/%s?viewerType=%s'
+                        % (subject, topic, viewer_type))
+                self.render_template(
+                    'pages/landing/landing_page_%s.html' % viewer_type)
+                return
+            else:
+                raise self.PageNotFoundException
+        else:
+            raise self.PageNotFoundException
 
 
 class StewardsLandingPage(base.BaseHandler):

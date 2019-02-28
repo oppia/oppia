@@ -651,6 +651,7 @@ FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
+TOPIC_WISE_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -1011,3 +1012,9 @@ RTE_CONTENT_SPEC = {
 
     }
 }
+
+
+AVAILABLE_LANDING_PAGES = {
+    'maths': ['fractions', 'ratios']
+}
+LANDING_PAGES_VIEWER_TYPES = ['teacher', 'student']

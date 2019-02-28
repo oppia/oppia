@@ -18,8 +18,8 @@ from core.tests import test_utils
 import feconf
 
 
-class FractionLandingPageTest(test_utils.GenericTestBase):
-    """Test for showing landing page for fractions."""
+class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting landing page for fractions."""
 
     def test_fraction_landing_page_without_viewer_type(self):
         """Test for showing the landing page for fractions,
@@ -27,15 +27,48 @@ class FractionLandingPageTest(test_utils.GenericTestBase):
         """
         response = self.get_html_response(
             feconf.FRACTIONS_LANDING_PAGE_URL, expected_status_int=302)
-        response.mustcontain('/fractions_landing/teachers')
+        self.assertIn(
+            '/learn/maths/fractions?viewerType=teacher',
+            response.headers['location'])
 
     def test_fraction_landing_page_with_viewer_type(self):
         """Test for showing the landing page for fractions,
-        with student viewer type should respond student type.
+        with student viewer type should redirect to student type.
         """
         response = self.get_html_response(
-            '%s?viewerType=student' % (feconf.FRACTIONS_LANDING_PAGE_URL))
-        response.mustcontain('/fractions_landing/student')
+            '%s?viewerType=student' % (feconf.FRACTIONS_LANDING_PAGE_URL),
+            expected_status_int=302)
+        self.assertIn(
+            '/learn/maths/fractions?viewerType=student',
+            response.headers['location'])
+
+
+class TopicWiseLandingPageTest(test_utils.GenericTestBase):
+    """Test for showing landing pages."""
+
+    def test_invalid_subject_landing_page_leads_to_404(self):
+        self.get_html_response(
+            '/learn/invalid_subject/fractions', expected_status_int=404)
+
+    def test_invalid_topic_landing_page_leads_to_404(self):
+        self.get_html_response(
+            '/learn/maths/invalid_topic', expected_status_int=404)
+
+    def test_valid_subject_and_topic_loads_correctly(self):
+        response = self.get_html_response(
+            '/learn/maths/fractions?viewerType=teacher')
+        response.mustcontain('students and kids')
+
+    def test_invalid_viewer_type_redirects_teachers_page(self):
+        response = self.get_html_response(
+            '/learn/maths/fractions?viewerType=invalid',
+            expected_status_int=302)
+        self.assertIn('viewerType=teacher', response.headers['location'])
+
+    def test_valid_viewer_type_loads_page_correctly(self):
+        response = self.get_html_response(
+            '/learn/maths/fractions?viewerType=student')
+        response.mustcontain('free interactive lessons')
 
 
 class StewardsLandingPageTest(test_utils.GenericTestBase):

@@ -1598,6 +1598,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-editable-section:hover .oppia-interaction-preview {
   background: rgba(5, 140, 166, 0.5);
   border-radius: 4px;
+  z-index: 1001;
 }
 
 .oppia-editor-edit-icon {
