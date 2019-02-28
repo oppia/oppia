@@ -698,7 +698,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
 
 def _lint_css_files(
         node_path, stylelint_path, config_path, files_to_lint, stdout, result,
-            mode):
+        mode):
     """Prints a list of lint errors in the given list of CSS files.
 
     Args:
@@ -880,13 +880,14 @@ def _print_complete_summary_of_errors():
 
 
 class LintsCheckManager(object):
+    """Manages all the lint function."""
 
     def __init__(self, all_files, mode):
         self.all_files = all_files
         self.mode = mode
-        self.parsed_js_files = self._validate_and_parse_js_files()
+        self.parsed_js_files = self.validate_and_parse_js_files()
 
-    def _validate_and_parse_js_files(self):
+    def validate_and_parse_js_files(self):
         """This function validates JavaScript files and returns the parsed
         contents as a Python dictionary.
         """
@@ -896,7 +897,7 @@ class LintsCheckManager(object):
         files_to_check = [
             filename for filename in self.all_files if filename.endswith('.js')
             and not any(fnmatch.fnmatch(filename, pattern) for pattern in
-                    EXCLUDED_PATHS)]
+                        EXCLUDED_PATHS)]
         parsed_js_files = dict()
         if self.mode != 'v':
             print 'Validating and parsing JS files ...'
@@ -907,7 +908,7 @@ class LintsCheckManager(object):
             parsed_js_files[filename] = parser.parse(content)
         return parsed_js_files
 
-    def _pre_commit_linter(self):
+    def pre_commit_linter(self):
         """This function is used to check if node-eslint dependencies are
         installed and pass ESLint binary path.
         """
@@ -984,7 +985,8 @@ class LintsCheckManager(object):
 
         linting_processes.append(multiprocessing.Process(
             target=_lint_py_files,
-            args=(config_pylint, config_pycodestyle, py_files_to_lint,
+            args=(
+                config_pylint, config_pycodestyle, py_files_to_lint,
                 py_result)))
 
         print 'Starting CSS, Javascript and Python Linting'
@@ -1036,7 +1038,7 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _check_directive_scope(self):
+    def check_directive_scope(self):
         """This function checks that all directives have an explicit
         scope: {} and it should not be scope: true.
         """
@@ -1046,7 +1048,7 @@ class LintsCheckManager(object):
         files_to_check = [
             filename for filename in self.all_files if filename.endswith('.js')
             and not any(fnmatch.fnmatch(filename, pattern) for pattern in
-                    EXCLUDED_PATHS)]
+                        EXCLUDED_PATHS)]
         failed = False
         summary_messages = []
 
@@ -1102,35 +1104,38 @@ class LintsCheckManager(object):
                                 # statement.
                                 body_element_type_is_not_return = (
                                     body_element['type'] != 'ReturnStatement')
-                                body_element_argument_type_is_not_object = (
+                                body_element_arg_type_is_not_object = (
                                     body_element['argument']['type'] != (
                                         'ObjectExpression'))
                                 if (body_element_type_is_not_return or (
-                                        body_element_argument_type_is_not_object)):
+                                        body_element_arg_type_is_not_object)):
                                     continue
                                 # Separate the properties of the return node.
                                 return_node_properties = (
                                     body_element['argument']['properties'])
-                                # Loop over all the properties of the return node
-                                # to find out the scope key.
-                                for return_node_property in return_node_properties:
+                                # Loop over all the properties of the return
+                                # node to find out the scope key.
+                                for return_node_property in (
+                                        return_node_properties):
                                     # Check whether the property is scope.
                                     property_key_is_an_identifier = (
-                                        return_node_property['key']['type'] == (
-                                            'Identifier'))
+                                        return_node_property['key'][
+                                            'type'] == ('Identifier'))
                                     property_key_name_is_scope = (
-                                        return_node_property['key']['name'] == (
-                                            'scope'))
+                                        return_node_property['key'][
+                                            'name'] == ('scope'))
                                     if (
                                             property_key_is_an_identifier and (
                                                 property_key_name_is_scope)):
                                         # Separate the scope value and
                                         # check if it is an Object Expression.
-                                        # If it is not, then check for scope: true
-                                        # and report the error message.
-                                        scope_value = return_node_property['value']
-                                        if scope_value['type'] == 'Literal' and (
-                                                scope_value['value']):
+                                        # If it is not, then check for scope:
+                                        # true and report the error message.
+                                        scope_value = (
+                                            return_node_property['value'])
+                                        if scope_value['type'] == (
+                                                'Literal') and (
+                                                    scope_value['value']):
                                             failed = True
                                             print (
                                                 'Please ensure that %s '
@@ -1141,12 +1146,14 @@ class LintsCheckManager(object):
                                             print ''
                                         elif scope_value['type'] != (
                                                 'ObjectExpression'):
-                                            # Check whether the directive has scope:
-                                            # {} else report the error message.
+                                            # Check whether the directive has
+                                            # scope: {} else report the error
+                                            # message.
                                             failed = True
                                             print (
-                                                'Please ensure that %s directive '
-                                                'in %s file has a scope: {}.' % (
+                                                'Please ensure that %s '
+                                                'directive in %s file '
+                                                'has a scope: {}.' % (
                                                     directive_name, filename))
                                             print ''
 
@@ -1166,7 +1173,7 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _check_sorted_dependencies(self):
+    def check_sorted_dependencies(self):
         """This function checks that the dependencies which are
         imported in the controllers/directives/factories in JS
         files are in following pattern: dollar imports, regular
@@ -1175,9 +1182,9 @@ class LintsCheckManager(object):
         print 'Starting sorted dependencies check'
         print '----------------------------------------'
         files_to_check = [
-            filename for filename in self.all_files if filename.endswith('.js') and
-            not any(fnmatch.fnmatch(filename, pattern) for pattern in
-                    EXCLUDED_PATHS)]
+            filename for filename in self.all_files if filename.endswith('.js')
+            and not any(fnmatch.fnmatch(filename, pattern) for pattern in
+                        EXCLUDED_PATHS)]
         properties_to_check = ['controller', 'directive', 'factory']
         failed = False
         summary_messages = []
@@ -1266,7 +1273,7 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _match_line_breaks_in_controller_dependencies(self):
+    def match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
         listed in the controller of a directive or service exactly match those
         between the arguments of the controller function.
@@ -1275,8 +1282,8 @@ class LintsCheckManager(object):
         print '----------------------------------------'
         files_to_check = [
             filename for filename in self.all_files if not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-            and filename.endswith('.js')]
+            any(fnmatch.fnmatch(filename, pattern) for pattern in
+                EXCLUDED_PATHS) and filename.endswith('.js')]
         failed = False
         summary_messages = []
 
@@ -1289,7 +1296,8 @@ class LintsCheckManager(object):
                 content = FileCache.read(filename)
                 matched_patterns = re.findall(pattern_to_match, content)
                 for matched_pattern in matched_patterns:
-                    stringfied_dependencies, function_parameters = matched_pattern
+                    stringfied_dependencies, function_parameters = (
+                        matched_pattern)
                     stringfied_dependencies = (
                         stringfied_dependencies.strip().replace(
                             '\'', '').replace(' ', ''))[:-1]
@@ -1298,10 +1306,11 @@ class LintsCheckManager(object):
                     if stringfied_dependencies != function_parameters:
                         failed = True
                         print (
-                            'Please ensure that in file %s the line breaks pattern '
-                            'between the dependencies mentioned as strings:\n[%s]\n'
-                            'and the dependencies mentioned as function parameters:'
-                            '\n(%s)\nfor the corresponding controller should '
+                            'Please ensure that in file %s the line breaks '
+                            'pattern between the dependencies mentioned as '
+                            'strings:\n[%s]\nand the dependencies mentioned '
+                            'as function parameters: \n(%s)\nfor the '
+                            'corresponding controller should '
                             'exactly match.' % (
                                 filename, stringfied_dependencies,
                                 function_parameters))
@@ -1324,7 +1333,7 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _check_html_directive_name(self):
+    def check_html_directive_name(self):
         """This function checks that all HTML directives end
         with _directive.html.
         """
@@ -1334,8 +1343,8 @@ class LintsCheckManager(object):
         total_error_count = 0
         files_to_check = [
             filename for filename in self.all_files if not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-            and filename.endswith('.js')]
+            any(fnmatch.fnmatch(filename, pattern) for pattern in
+                EXCLUDED_PATHS) and filename.endswith('.js')]
         failed = False
         summary_messages = []
         # For RegExp explanation, please see https://regex101.com/r/gU7oT6/37.
@@ -1378,7 +1387,7 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _check_import_order(self):
+    def check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
         """
@@ -1387,8 +1396,8 @@ class LintsCheckManager(object):
         summary_messages = []
         files_to_check = [
             filename for filename in self.all_files if not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-            and filename.endswith('.py')]
+            any(fnmatch.fnmatch(filename, pattern) for pattern in
+                EXCLUDED_PATHS) and filename.endswith('.py')]
         failed = False
         with _redirect_stdout(_TARGET_STDOUT):
             for filename in files_to_check:
@@ -1397,7 +1406,8 @@ class LintsCheckManager(object):
                 # If check is set to True, isort simply checks the file and
                 # if check is set to False, it autocorrects import-order errors.
                 if (isort.SortImports(
-                        filename, check=True, show_diff=True).incorrectly_sorted):
+                        filename, check=True, show_diff=(
+                            True)).incorrectly_sorted):
                     failed = True
                     print ''
 
@@ -1415,7 +1425,7 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _check_newline_character(self):
+    def check_newline_character(self):
         """This function is used to check that each file
         ends with a single newline character.
         """
@@ -1436,11 +1446,12 @@ class LintsCheckManager(object):
                 if len(content) == 1:
                     errors_found += 1
                     print '%s --> Error: Only one character in file.' % filename
-                elif len(content) >= 2 and not re.match(r'[^\n]\n', content[-2:]):
+                elif len(content) >= 2 and not re.match(
+                        r'[^\n]\n', content[-2:]):
                     errors_found += 1
                     print (
-                        '%s --> Please ensure that this file ends with exactly one '
-                        'newline char.' % filename)
+                        '%s --> Please ensure that this file ends with exactly '
+                        'one newline char.' % filename)
                     print ''
 
             if errors_found:
@@ -1461,12 +1472,13 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _check_docstrings(self):
+    def check_docstrings(self):
         """This function ensures that docstrings end in a period and the arg
         order in the function definition matches the order in the doc string.
 
         Returns:
-            summary_messages: list(str). Summary of messages generated by the check.
+            summary_messages: list(str). Summary of messages generated by the
+            check.
         """
 
         print 'Starting docstring checks'
@@ -1474,8 +1486,8 @@ class LintsCheckManager(object):
         summary_messages = []
         files_to_check = [
             filename for filename in self.all_files if not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-            and filename.endswith('.py')]
+            any(fnmatch.fnmatch(filename, pattern) for pattern in
+                EXCLUDED_PATHS) and filename.endswith('.py')]
         missing_period_message = (
             'There should be a period at the end of the docstring.')
         multiline_docstring_message = (
@@ -1537,7 +1549,8 @@ class LintsCheckManager(object):
                         # Check for punctuation at line[-4] since last three
                         # characters are double quotes.
                         if (len(line) > 6) and (
-                                line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
+                                line[-4] not in
+                                ALLOWED_TERMINATING_PUNCTUATIONS):
                             failed = True
                             print '%s --> Line %s: %s' % (
                                 filename, line_num + 1, missing_period_message)
@@ -1559,21 +1572,25 @@ class LintsCheckManager(object):
                             else:
                                 last_char_is_invalid = prev_line[-1] not in (
                                     ALLOWED_TERMINATING_PUNCTUATIONS)
-                                no_word_is_present_in_excluded_phrases = not any(
-                                    word in prev_line for word in EXCLUDED_PHRASES)
+                                no_word_is_present_in_excluded_phrases = (
+                                    not any(
+                                        word in prev_line for word in(
+                                            EXCLUDED_PHRASES)))
                                 if last_char_is_invalid and (
                                         no_word_is_present_in_excluded_phrases):
                                     failed = True
                                     print '%s --> Line %s: %s' % (
-                                        filename, line_num, missing_period_message)
+                                        filename, line_num,
+                                        missing_period_message)
                                     print ''
 
-                        # Case 2: line contains some words before """. """ should
-                        # shift to next line.
+                        # Case 2: line contains some words before """. """
+                        # should shift to next line.
                         elif not any(word in line for word in EXCLUDED_PHRASES):
                             failed = True
                             print '%s --> Line %s: %s' % (
-                                filename, line_num + 1, multiline_docstring_message)
+                                filename, line_num + 1,
+                                multiline_docstring_message)
                             print ''
 
                         is_docstring = False
@@ -1581,11 +1598,13 @@ class LintsCheckManager(object):
             docstring_checker = docstrings_checker.ASTDocStringChecker()
             for filename in files_to_check:
                 ast_file = ast.walk(ast.parse(FileCache.read(filename)))
-                func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
+                func_defs = [n for n in ast_file if isinstance(
+                    n, ast.FunctionDef)]
                 for func in func_defs:
-                    # Check that the args in the docstring are listed in the same
-                    # order as they appear in the function definition.
-                    func_result = docstring_checker.check_docstrings_arg_order(func)
+                    # Check that the args in the docstring are listed in the
+                    # same order as they appear in the function definition.
+                    func_result = docstring_checker.check_docstrings_arg_order(
+                        func)
                     for error_line in func_result:
                         print '%s --> Func %s: %s' % (
                             filename, func.name, error_line)
@@ -1606,15 +1625,15 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _check_comments(self):
+    def check_comments(self):
         """This function ensures that comments follow correct style."""
         print 'Starting comment checks'
         print '----------------------------------------'
         summary_messages = []
         files_to_check = [
             filename for filename in self.all_files if not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-            and filename.endswith('.py')]
+            any(fnmatch.fnmatch(filename, pattern) for pattern in
+                EXCLUDED_PATHS) and filename.endswith('.py')]
         message = 'There should be a period at the end of the comment.'
         failed = False
         space_regex = re.compile(r'^#[^\s].*$')
@@ -1633,7 +1652,8 @@ class LintsCheckManager(object):
                         previous_line = file_content[line_num - 1].strip()
 
                     if line.startswith('#') and not next_line.startswith('#'):
-                        # Check that the comment ends with the proper punctuation.
+                        # Check that the comment ends with the proper
+                        # punctuation.
                         last_char_is_invalid = line[-1] not in (
                             ALLOWED_TERMINATING_PUNCTUATIONS)
                         no_word_is_present_in_excluded_phrases = not any(
@@ -1645,9 +1665,9 @@ class LintsCheckManager(object):
                                 filename, line_num + 1, message)
                             print ''
 
-                    # Check that comment starts with a space and is not a shebang
-                    # expression at the start of a bash script which loses function
-                    # when a space is added.
+                    # Check that comment starts with a space and is not a
+                    # shebang expression at the start of a bash script which
+                    # loses funtion when a space is added.
                     if space_regex.match(line) and not line.startswith('#!'):
                         message = (
                             'There should be a space at the beginning '
@@ -1682,14 +1702,15 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _check_html_tags_and_attributes(self, debug=False):
+    def check_html_tags_and_attributes(self, debug=False):
         """This function checks the indentation of lines in HTML files."""
 
         print 'Starting HTML tag and attribute check'
         print '----------------------------------------'
 
         html_files_to_lint = [
-            filename for filename in self.all_files if filename.endswith('.html')]
+            filename for filename in self.all_files if filename.endswith(
+                '.html')]
 
         failed = False
         summary_messages = []
@@ -1722,7 +1743,7 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _lint_html_files(self):
+    def lint_html_files(self):
         """This function is used to check HTML files for linting errors."""
         parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -1736,7 +1757,8 @@ class LintsCheckManager(object):
         summary_messages = []
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
         html_files_to_lint = [
-            filename for filename in self.all_files if filename.endswith('.html')]
+            filename for filename in self.all_files if filename.endswith(
+                '.html')]
         print 'Starting HTML linter...'
         print '----------------------------------------'
         print ''
@@ -1752,8 +1774,8 @@ class LintsCheckManager(object):
 
                 linter_stdout, _ = proc.communicate()
                 # This line splits the output of the linter and extracts digits
-                # from it. The digits are stored in a list. The second last digit
-                # in the list represents the number of errors in the file.
+                # from it. The digits are stored in a list. The second last
+                # digit in the list represents the number of errors in the file.
                 error_count = (
                     [int(s) for s in linter_stdout.split() if s.isdigit()][-2])
                 if error_count:
@@ -1783,7 +1805,7 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _check_bad_patterns(self):
+    def check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
         print 'Starting Pattern Checks'
         print '----------------------------------------'
@@ -1814,19 +1836,22 @@ class LintsCheckManager(object):
 
                 if filename.endswith('.js'):
                     for regexp in BAD_PATTERNS_JS_REGEXP:
-                        if _check_bad_pattern_in_file(filename, content, regexp):
+                        if _check_bad_pattern_in_file(
+                                filename, content, regexp):
                             failed = True
                             total_error_count += 1
 
                 if filename.endswith('.html'):
                     for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
-                        if _check_bad_pattern_in_file(filename, content, regexp):
+                        if _check_bad_pattern_in_file(
+                                filename, content, regexp):
                             failed = True
                             total_error_count += 1
 
                 if filename.endswith('.py'):
                     for regexp in BAD_PATTERNS_PYTHON_REGEXP:
-                        if _check_bad_pattern_in_file(filename, content, regexp):
+                        if _check_bad_pattern_in_file(
+                                filename, content, regexp):
                             failed = True
                             total_error_count += 1
 
@@ -1840,10 +1865,12 @@ class LintsCheckManager(object):
                             print ''
                             total_error_count += 1
             if failed:
-                summary_message = '%s Pattern checks failed' % _MESSAGE_TYPE_FAILED
+                summary_message = '%s Pattern checks failed' % (
+                    _MESSAGE_TYPE_FAILED)
                 summary_messages.append(summary_message)
             else:
-                summary_message = '%s Pattern checks passed' % _MESSAGE_TYPE_SUCCESS
+                summary_message = '%s Pattern checks passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
                 summary_messages.append(summary_message)
 
             print ''
@@ -1856,19 +1883,19 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def _check_for_copyright_notice(self):
+    def check_for_copyright_notice(self):
         """This function checks whether the copyright notice
         is present at the beginning of files.
         """
         print 'Starting copyright notice check'
         print '----------------------------------------'
         js_files_to_check = [
-            filename for filename in self.all_files if filename.endswith('.js') and (
-                not filename.endswith(GENERATED_FILE_PATHS)) and (
+            filename for filename in self.all_files if filename.endswith(
+                '.js') and (not filename.endswith(GENERATED_FILE_PATHS)) and (
                     not filename.endswith(CONFIG_FILE_PATHS))]
         py_files_to_check = [
-            filename for filename in self.all_files if filename.endswith('.py') and (
-                not filename.endswith('__init__.py'))]
+            filename for filename in self.all_files if filename.endswith(
+                '.py') and (not filename.endswith('__init__.py'))]
         sh_files_to_check = [
             filename for filename in self.all_files if filename.endswith('.sh')]
         all_files_to_check = (
@@ -1909,12 +1936,6 @@ class LintsCheckManager(object):
 
         return summary_messages
 
-    def check_protected_access(self):
-        with _redirect_stdout(_TARGET_STDOUT):
-            for filename in self.all_files:
-                content = FileCache.read(filename)
-                return content
-
 
 def main():
     """Main method for pre commit linter script that lints Python and JavaScript
@@ -1922,22 +1943,26 @@ def main():
     """
     all_files, mode = _get_all_files()
     lint_checks_manager = LintsCheckManager(all_files, mode)
-    content = lint_checks_manager.check_protected_access()
-    linter_messages = lint_checks_manager._pre_commit_linter()
-    directive_scope_messages = lint_checks_manager._check_directive_scope()
-    sorted_dependencies_messages = lint_checks_manager._check_sorted_dependencies()
-    controller_dependency_messages = lint_checks_manager._match_line_breaks_in_controller_dependencies()
-    html_directive_name_messages = lint_checks_manager._check_html_directive_name()
-    import_order_messages = lint_checks_manager._check_import_order()
-    newline_messages = lint_checks_manager._check_newline_character()
-    docstring_messages = lint_checks_manager._check_docstrings()
-    comment_messages = lint_checks_manager._check_comments()
+    linter_messages = lint_checks_manager.pre_commit_linter()
+    directive_scope_messages = lint_checks_manager.check_directive_scope()
+    sorted_dependencies_messages = (
+        lint_checks_manager.check_sorted_dependencies())
+    controller_dependency_messages = (
+        lint_checks_manager.match_line_breaks_in_controller_dependencies())
+    html_directive_name_messages = (
+        lint_checks_manager.check_html_directive_name())
+    import_order_messages = lint_checks_manager.check_import_order()
+    newline_messages = lint_checks_manager.check_newline_character()
+    docstring_messages = lint_checks_manager.check_docstrings()
+    comment_messages = lint_checks_manager.check_comments()
     # The html tags and attributes check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
-    html_tag_and_attribute_messages = lint_checks_manager._check_html_tags_and_attributes()
-    html_linter_messages = lint_checks_manager._lint_html_files()
-    pattern_messages = lint_checks_manager._check_bad_patterns()
-    copyright_notice_messages = lint_checks_manager._check_for_copyright_notice()
+    html_tag_and_attribute_messages = (
+        lint_checks_manager.check_html_tags_and_attributes())
+    html_linter_messages = lint_checks_manager.lint_html_files()
+    pattern_messages = lint_checks_manager.check_bad_patterns()
+    copyright_notice_messages = (
+        lint_checks_manager.check_for_copyright_notice())
     _print_complete_summary_of_errors()
     all_messages = (
         directive_scope_messages + sorted_dependencies_messages +
