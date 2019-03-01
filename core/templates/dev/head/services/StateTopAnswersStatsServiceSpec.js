@@ -28,27 +28,47 @@ describe('StateTopAnswersStatsService', function() {
 
     this.ess.init({
       Hola: {
-        content: '',
+        content: {
+          content_id: 'content',
+          html: ''
+        },
         param_changes: [],
         interaction: {
           answer_groups: [{
             rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
             outcome: {
               dest: 'Me Llamo',
-              feedback: {html: 'buen trabajo!'},
+              feedback: {
+                content_id: 'feedback_1',
+                html: 'buen trabajo!'
+              },
               labelled_as_correct: true
             }
           }],
           default_outcome: {
             dest: 'Hola',
-            feedback: {html: 'try again!'},
+            feedback: {
+              content_id: 'default_outcome',
+              html: 'try again!'
+            },
             labelled_as_correct: false
           },
           hints: [],
           id: 'TextInput',
         },
         classifier_model_id: 0,
-        content_ids_to_audio_translations: {}
+        content_ids_to_audio_translations: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {}
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       }
     });
 
