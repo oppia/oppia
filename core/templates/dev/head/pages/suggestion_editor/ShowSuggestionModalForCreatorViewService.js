@@ -29,6 +29,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
     var _showEditStateContentSuggestionModal = function(
         activeThread, suggestionsToReviewList, clearActiveThread,
         canReviewActiveThread) {
+      console.log(activeThread);
       $uibModal.open({
         templateUrl: _templateUrl,
         backdrop: true,
@@ -63,6 +64,8 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
       }).result.then(function(result) {
         var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/resubmit/<suggestion_id>');
+        var EDIT_SUGGESTION_URL_TEMPLATE = (
+          '/suggestionactionhandler/edit/<target_type>/<target_id>/<suggestion_id>');
         var HANDLE_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/<target_type>/<target_id>/<suggestion_id>');
 
@@ -72,7 +75,29 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
             result.suggestionType === 'edit_exploration_state_content') {
           url = UrlInterpolationService.interpolateUrl(
             RESUBMIT_SUGGESTION_URL_TEMPLATE, {
-              suggestion_id: activeThread.suggestion.suggestionId
+              suggestion_id: activeThread.suggestion.suggestionId,
+            }
+          );
+          data = {
+            action: result.action,
+            summary_message: result.summaryMessage,
+            change: {
+              cmd: 'edit_state_property',
+              property_name: 'content',
+              state_name: result.stateName,
+              old_value: result.oldContent,
+              new_value: {
+                html: result.newSuggestionHtml
+              }
+            }
+          };
+        } else if (result.action === 'edit' &&
+          result.suggestionType === 'edit_exploration_state_content') {
+          url = UrlInterpolationService.interpolateUrl(
+            EDIT_SUGGESTION_URL_TEMPLATE, {
+              target_type: activeThread.suggestion.targetType,
+              target_id: activeThread.suggestion.targetId,
+              suggestion_id: activeThread.suggestion.suggestionId,
             }
           );
           data = {
