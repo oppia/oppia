@@ -174,3 +174,6 @@ class SuggestionListHandler(base.BaseHandler):
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)
+
+class EditSuggestionHandler(base.BaseHandler):
+    pass
