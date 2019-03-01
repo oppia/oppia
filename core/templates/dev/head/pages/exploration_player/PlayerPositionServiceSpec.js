@@ -19,7 +19,7 @@
 describe('Player position service', function() {
   beforeEach(module('oppia'));
 
-  var pts, pps, scof;
+  var pts = null, pps = null, scof = null;
   beforeEach(inject(function($injector) {
     pts = $injector.get('PlayerTranscriptService');
     pps = $injector.get('PlayerPositionService');
@@ -41,7 +41,7 @@ describe('Player position service', function() {
   });
 
   it('should set displayed index card to given value', function() {
-    callBack = function() {};
+    var callBack = function() {};
     expect(pps.getDisplayedCardIndex()).toBe(null);
     pps.init(callBack);
     pps.setDisplayedCardIndex(4);
@@ -55,7 +55,7 @@ describe('Player position service', function() {
     pts.addNewCard(scof.createNewCard(
       'Second state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>'));
-    callBack = function() {};
+    var callBack = function() {};
     pps.init(callBack);
     pps.setDisplayedCardIndex(0);
     expect(pps.getCurrentStateName()).toBe('First state');
@@ -65,7 +65,7 @@ describe('Player position service', function() {
 
   it('should not change displayed card index if it is the same as the' +
      'previously displayed card index', function() {
-    callBack = function() {};
+    var callBack = function() {};
     expect(pps.getDisplayedCardIndex()).toBe(null);
     pps.init(callBack);
     pps.setDisplayedCardIndex(4);
