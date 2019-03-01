@@ -23,7 +23,8 @@ from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(topic_models, base_models, ) = models.Registry.import_models([
+    models.NAMES.topic, models.NAMES.base_model])
 
 
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
@@ -66,6 +67,11 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.subtopic_id)
         self.assertEqual(subtopic_page.to_dict(), self.subtopic_page.to_dict())
 
+    def test_get_subtopic_pages_with_ids(self):
+        subtopic_ids = [self.subtopic_id]
+        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(self.TOPIC_ID, subtopic_ids)
+        self.assertEqual(subtopic_pages[0].to_dict(), self.subtopic_page.to_dict())
+
     def test_get_subtopic_page_contents_by_id(self):
         self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 1)
@@ -107,6 +113,49 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             subtopic_page_contents.to_dict(), expected_page_contents_dict)
 
+    def test_save_subtopic_page(self):
+        subtopic_page_1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, 'topic_id_1'))
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page_1, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        with self.assertRaises(Exception):
+            subtopic_page_services.save_subtopic_page(
+                self.user_id, subtopic_page_1, 'Added subtopic', [])
+        subtopic_page_id_1 = (
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                 'topic_id_1', 1))
+        subtopic_page_model_1 = topic_models.SubtopicPageModel.get(
+            subtopic_page_id_1)
+        subtopic_page_1.version = 2
+        subtopic_page_model_1.version = 3
+        with self.assertRaises(Exception):
+            subtopic_page_services.save_subtopic_page(
+                self.user_id, subtopic_page_1, 'Added subtopic',
+                [topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Sample'
+                })]
+            )
+        subtopic_page_1.version = 3
+        subtopic_page_model_1.version = 2
+        with self.assertRaises(Exception):
+            subtopic_page_services.save_subtopic_page(
+                self.user_id, subtopic_page_1, 'Added subtopic',
+                [topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Sample'
+                })]
+            )
+
     def test_commit_log_entry(self):
         subtopic_page_commit_log_entry = (
             topic_models.SubtopicPageCommitLogEntryModel.get_commit(
@@ -117,3 +166,11 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_commit_log_entry.subtopic_page_id,
             self.subtopic_page_id)
         self.assertEqual(subtopic_page_commit_log_entry.user_id, self.user_id)
+
+    def test_delete_subtopic_page(self):
+        subtopic_page_id = (
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                self.TOPIC_ID, 1))
+        subtopic_page_services.delete_subtopic_page(self.user_id, self.TOPIC_ID, 1)
+        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            topic_models.SubtopicPageModel.get(subtopic_page_id)
