@@ -68,6 +68,7 @@ ENABLE_CONSOLE_ARG=""
 
 # Argument passed to feconf.py to help choose production templates folder.
 FORCE_PROD_MODE=False
+START_BROWSER=True
 for arg in "$@"; do
   if [ "$arg" == "--save_datastore" ]; then
     CLEAR_DATASTORE_ARG=""
@@ -78,6 +79,9 @@ for arg in "$@"; do
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
     FORCE_PROD_MODE=True
+  fi
+  if [ "$arg" == "--no-browser" ]; then
+    START_BROWSER=False
   fi
 done
 
@@ -103,6 +107,7 @@ echo Starting GAE development server
 
 if ! [[ "$FORCE_PROD_MODE" == "True" ]]; then
   ($NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js watch)&
+  ($NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.js --watch)&
 fi
 (python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py $CLEAR_DATASTORE_ARG $ENABLE_CONSOLE_ARG --admin_host 0.0.0.0 --admin_port 8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true app.yaml)&
 
@@ -110,7 +115,7 @@ fi
 while ! nc -vz localhost 8181 >/dev/null 2>&1; do sleep 1; done
 
 # Launch a browser window.
-if [ ${OS} == "Linux" ]; then
+if [ ${OS} == "Linux" ] && [ "$START_BROWSER" == "True" ]; then
   detect_virtualbox="$(ls -1 /dev/disk/by-id/)"
   if [[ $detect_virtualbox = *"VBOX"* ]]; then
     echo ""
@@ -126,7 +131,7 @@ if [ ${OS} == "Linux" ]; then
     echo ""
     (sleep 5; xdg-open http://localhost:8181/ )&
   fi
-elif [ ${OS} == "Darwin" ]; then
+elif [ ${OS} == "Darwin" ] && [ "$START_BROWSER" == "True" ]; then
   echo ""
   echo "  INFORMATION"
   echo "  Setting up a local development server at localhost:8181. Opening a"
