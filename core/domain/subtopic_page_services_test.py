@@ -69,8 +69,10 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_subtopic_pages_with_ids(self):
         subtopic_ids = [self.subtopic_id]
-        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(self.TOPIC_ID, subtopic_ids)
-        self.assertEqual(subtopic_pages[0].to_dict(), self.subtopic_page.to_dict())
+        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
+            self.TOPIC_ID, subtopic_ids)
+        self.assertEqual(
+            subtopic_pages[0].to_dict(), self.subtopic_page.to_dict())
 
     def test_get_subtopic_page_contents_by_id(self):
         self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
@@ -113,11 +115,6 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             subtopic_page_contents.to_dict(), expected_page_contents_dict)
 
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
-            subtopic_page_c = (
-                subtopic_page_services.get_subtopic_page_contents_by_id(
-                    'topic_id', 1))
-
     def test_save_subtopic_page(self):
         subtopic_page_1 = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
@@ -135,7 +132,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id, subtopic_page_1, 'Added subtopic', [])
         subtopic_page_id_1 = (
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                 'topic_id_1', 1))
+                'topic_id_1', 1))
         subtopic_page_model_1 = topic_models.SubtopicPageModel.get(
             subtopic_page_id_1)
         subtopic_page_1.version = 2
@@ -176,6 +173,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page_id = (
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                 self.TOPIC_ID, 1))
-        subtopic_page_services.delete_subtopic_page(self.user_id, self.TOPIC_ID, 1)
+        subtopic_page_services.delete_subtopic_page(
+            self.user_id, self.TOPIC_ID, 1)
         with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
             topic_models.SubtopicPageModel.get(subtopic_page_id)
