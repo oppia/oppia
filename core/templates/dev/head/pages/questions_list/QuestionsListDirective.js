@@ -33,18 +33,19 @@ oppia.directive('questionsList', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/questions_list/questions_list_directive.html'),
       controller: [
-        '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
-        'QuestionCreationService', 'UrlService', 'NUM_QUESTIONS_PER_PAGE',
-        'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
-        'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
-        'QuestionUndoRedoService', 'UndoRedoService', function(
-            $scope, $http, $q, $uibModal, $window, AlertsService,
-            QuestionCreationService, UrlService, NUM_QUESTIONS_PER_PAGE,
-            EditableQuestionBackendApiService, EditableSkillBackendApiService,
-            MisconceptionObjectFactory, QuestionObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
-            QuestionUndoRedoService, UndoRedoService) {
+        '$scope', '$filter', '$http', '$q', '$uibModal', '$window',
+        'AlertsService', 'QuestionCreationService', 'UrlService',
+        'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
+        'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
+        'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
+        function(
+            $scope, $filter, $http, $q, $uibModal, $window,
+            AlertsService, QuestionCreationService, UrlService,
+            NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
+            EditableSkillBackendApiService, MisconceptionObjectFactory,
+            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            StateEditorService, QuestionUndoRedoService, UndoRedoService) {
           $scope.currentPage = 0;
 
           var _initTab = function() {
@@ -52,6 +53,14 @@ oppia.directive('questionsList', [
             $scope.question = null;
             $scope.questionSummaries =
               $scope.getQuestionSummaries($scope.currentPage);
+            if ($scope.questionSummaries) {
+              $scope.questionSummaries.forEach(function(question) {
+                var summary = $filter(
+                  'formatRtePreview')(question.summary.question_content);
+                summary = $filter('truncate')(summary, 100);
+                question.summary.question_content = summary;
+              });
+            }
             $scope.activeQuestion = null;
             $scope.questionIsBeingUpdated = false;
             $scope.misconceptions = [];

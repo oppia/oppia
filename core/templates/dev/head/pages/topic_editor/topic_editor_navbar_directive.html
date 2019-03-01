@@ -54,7 +54,7 @@
   </li>
   <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>" class="icon">
     <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()">
-      <i class="material-icons">&#xE254;</i>
+      <i class="material-icons">&#xE254;</i> <span style="font-size: 0.8em;">Topic</span>
     </a>
     <div ng-show="getWarningsCount()"
          class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
@@ -75,20 +75,20 @@
 
   <li ng-class="{'active': getActiveTabName() === 'subtopics'}" class="icon">
     <a uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
-      <i class="material-icons">library_books</i>
+      <i class="material-icons">&#xE254;</i><span style="font-size: 0.7em;">Subtopics</span>
     </a>
   </li>
 
   <li style="margin-right: 20px;" ng-class="{'active': getActiveTabName() === 'questions'}" class="icon">
     <a uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="selectQuestionsTab()">
-      <i class="material-icons">question_answer</i>
+      <i class="material-icons">&#xE254;</i><span style="font-size: 0.7em;">Questions</span>
     </a>
   </li>
 </ul>
 
 <style>
   topic-editor-navbar .icon {
-    width: 2.5em;
+    width: 3.5em;
   }
   topic-editor-navbar .save-draft-button-padding {
     padding-right: 120px;
