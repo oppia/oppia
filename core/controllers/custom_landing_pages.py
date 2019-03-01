@@ -30,7 +30,7 @@ class FractionLandingRedirectPage(base.BaseHandler):
         viewer_type = self.request.get('viewerType')
 
         if viewer_type not in feconf.LANDING_PAGES_VIEWER_TYPES:
-            viewer_type = 'teacher'
+            viewer_type = feconf.LANDING_PAGES_VIEWER_TYPES[0]
 
         self.redirect('/learn/maths/fractions?viewerType=%s' % viewer_type)
 
