@@ -1,8 +1,13 @@
 <div class="oppia-coord-two-dim-editor-container">
-  <leaflet id="coordTwoDimEditor" lf-center="mapCenter" event-broadcast="mapEvents" markers="mapMarkers"></leaflet>
+  <leaflet id="coordTwoDimEditor"
+           class="oppia-coord-to-dim-editor-map"
+           event-broadcast="mapEvents"
+           lf-center="mapCenter"
+           markers="mapMarkers">
+  </leaflet>
 </div>
 <style>
-  #coordTwoDimEditor {
+  .oppia-coord-to-dim-editor-map {
     height: 250px;
     margin: auto;
     max-height: 250px;

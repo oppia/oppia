@@ -1,5 +1,5 @@
 <style>
-  #interactiveMap {
+  .oppia-interactive-map {
     height: 400px;
     margin: auto;
     max-height: 400px;
@@ -14,10 +14,10 @@
   }
 
   @media screen and (max-width: 559px) {
-    #interactiveMap {
-      max-width: 90vw;
-      min-width: 90vw;
-      width: 90vw;
+    .oppia-interactive-map {
+      max-width: 83vw;
+      min-width: 83vw;
+      width: 83vw;
     }
 
     .interactive-map-container {
@@ -28,6 +28,12 @@
 
 <div class="interactive-map-container">
   <div ng-style="overlayStyle">
-    <leaflet id="interactiveMap" lf-center="mapOptions.center" markers="mapMarkers" event-broadcast="mapOptions.events" defaults="mapOptions.defaults"></leaflet>
+    <leaflet id="interactiveMap"
+             class="oppia-interactive-map"
+             defaults="mapOptions.defaults"
+             event-broadcast="mapOptions.events"
+             lf-center="mapOptions.center"
+             markers="mapMarkers">
+    </leaflet>
   </div>
 </div>

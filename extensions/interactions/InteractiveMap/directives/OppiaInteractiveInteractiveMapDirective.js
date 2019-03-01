@@ -137,7 +137,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           });
 
           $scope.$on('leafletDirectiveMap.interactiveMap.click',
-            function(event, args) {
+            function(evt, args) {
               if ($scope.interactionIsActive) {
                 var newLat = args.leafletEvent.latlng.lat;
                 var newLng = args.leafletEvent.latlng.lng;
