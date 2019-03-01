@@ -17,6 +17,8 @@
  * interaction.
  */
 
+import {element, by} from 'protractor';
+
 var objects = require('../../objects/protractor.js');
 /**
  * Add recommended exploration Id to End Exploration interaction.

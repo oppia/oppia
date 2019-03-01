@@ -17,6 +17,8 @@
  * interaction.
  */
 
+import {element, by} from 'protractor';
+
 var forms = require('../../../core/tests/protractor_utils/forms.js');
 
 // The members of richTextInstructionsArray are functions, one for each option,

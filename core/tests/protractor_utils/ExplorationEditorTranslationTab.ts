@@ -16,6 +16,9 @@
  * @fileoverview Page object for the exploration editor's translation tab, for
  * use in Protractor tests.
  */
+
+import {element, by} from 'protractor';
+
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorTranslationTab = function() {

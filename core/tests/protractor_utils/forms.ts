@@ -17,6 +17,8 @@
  * out end-to-end testing with protractor.
  */
 
+import {element, browser, by} from 'protractor';
+
 var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');

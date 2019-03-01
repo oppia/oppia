@@ -16,6 +16,9 @@
  * @fileoverview Page object for Collection Editor Page, for use in Protractor
  * tests.
  */
+
+import {element, browser, by} from 'protractor';
+
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 

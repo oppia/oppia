@@ -16,6 +16,9 @@
  * @fileoverview Page object for the subscription dashboard,
  * for use in Protractor tests.
  */
+
+import {element, browser, by} from 'protractor';
+
 var waitFor = require('./waitFor.js');
 
 var SubscriptionDashboardPage = function() {

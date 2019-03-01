@@ -83,36 +83,36 @@ exports.config = {
     // in 'full' individually. This is to parallelize the suites on
     // browserstack.
     full: [
-      'protractor/accessibility.js',
-      'protractor/learnerFlow.js',
-      'protractor/libraryFlow.js',
-      'protractor_mobile/navigation.js',
-      'protractor/profileMenuFlow.js',
-      'protractor/subscriptionsFlow.js'
+      '../../compiled_js/core/tests/protractor/accessibility.js',
+      '../../compiled_js/core/tests/protractor/learnerFlow.js',
+      '../../compiled_js/core/tests/protractor/libraryFlow.js',
+      '../../compiled_js/core/tests/protractor_mobile/navigation.js',
+      '../../compiled_js/core/tests/protractor/profileMenuFlow.js',
+      '../../compiled_js/core/tests/protractor/subscriptionsFlow.js'
     ],
 
     accessibility: [
-      'protractor/accessibility.js'
+      '../../compiled_js/core/tests/protractor/accessibility.js'
     ],
 
     learner: [
-      'protractor/learnerFlow.js'
+      '../../compiled_js/core/tests/protractor/learnerFlow.js'
     ],
 
     library: [
-      'protractor/libraryFlow.js'
+      '../../compiled_js/core/tests/protractor/libraryFlow.js'
     ],
 
     navigation: [
-      'protractor_mobile/navigation.js'
+      '../../compiled_js/core/tests/protractor_mobile/navigation.js'
     ],
 
     profileMenu: [
-      'protractor/profileMenuFlow.js'
+      '../../compiled_js/core/tests/protractor/profileMenuFlow.js'
     ],
 
     subscriptions: [
-      'protractor/subscriptionsFlow.js'
+      '../../compiled_js/core/tests/protractor/subscriptionsFlow.js'
     ]
   },
 

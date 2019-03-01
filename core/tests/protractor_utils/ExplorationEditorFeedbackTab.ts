@@ -17,6 +17,8 @@
  * use in Protractor tests.
  */
 
+import {element, by} from 'protractor';
+
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 

@@ -15,6 +15,9 @@
 /**
  * @fileoverview End-to-end tests for general site navigation.
  */
+
+import {element, browser, by} from 'protractor';
+
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var ThanksPage = require('../protractor_utils/ThanksPage.js');

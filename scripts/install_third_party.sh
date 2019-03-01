@@ -55,7 +55,6 @@ install_node_module @types/mathjax 0.0.35
 install_node_module @types/mathjs 5.0.0
 install_node_module @types/mousetrap 1.6.1
 install_node_module @types/node 10.12.24
-install_node_module @types/q 1.5.1
 install_node_module @types/selenium-webdriver 2.53.43
 install_node_module uglify-js 3.3.11
 install_node_module yargs 3.29.0

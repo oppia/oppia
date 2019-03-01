@@ -17,6 +17,8 @@
  * tests.
  */
 
+import {element, browser, by} from 'protractor';
+
 var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');

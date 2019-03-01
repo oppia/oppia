@@ -17,6 +17,8 @@
  * tests.
  */
 
+import {element, by} from 'protractor';
+
 var forms = require('../../core/tests/protractor_utils/forms.js');
 
 // NOTE: all editors for objects that are used as parameters in a rule must

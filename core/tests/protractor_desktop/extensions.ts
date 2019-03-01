@@ -16,6 +16,8 @@
  * @fileoverview End-to-end tests for rich-text components and interactions.
  */
 
+import {element, by} from 'protractor';
+
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');

@@ -17,6 +17,8 @@
  * and then logout.
  */
 
+import {element, browser, by} from 'protractor';
+
 var LearnerDashboardPage = require(
   '../protractor_utils/LearnerDashboardPage.js');
 var general = require('../protractor_utils/general.js');

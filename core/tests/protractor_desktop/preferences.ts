@@ -15,6 +15,9 @@
 /**
  * @fileoverview End-to-end tests for user preferences.
  */
+
+import {browser} from 'protractor';
+
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');

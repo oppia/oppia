@@ -61,94 +61,94 @@ exports.config = {
     // them. Therefore, we mention the complete directory
     // in 'full'.
     full: [
-      'protractor/*.js',
-      'protractor_desktop/*.js'
+      'compiled_js/core/tests/../../protractor/*.js',
+      'compiled_js/core/tests/../../protractor_desktop/*.js'
     ],
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
     accessibility: [
-      'protractor/accessibility.js'
+      '../../compiled_js/core/tests/protractor/accessibility.js'
     ],
 
     additionalEditorAndPlayerFeatures: [
-      'protractor_desktop/additionalEditorAndPlayerFeatures.js'
+      '../../compiled_js/core/tests/protractor_desktop/additionalEditorAndPlayerFeatures.js'
     ],
 
     collections: [
-      'protractor_desktop/collections.js'
+      '../../compiled_js/core/tests/protractor_desktop/collections.js'
     ],
 
     coreEditorAndPlayerFeatures: [
-      'protractor_desktop/coreEditorAndPlayerFeatures.js'
+      '../../compiled_js/core/tests/protractor_desktop/coreEditorAndPlayerFeatures.js'
     ],
 
     embedding: [
-      'protractor_desktop/embedding.js'
+      '../../compiled_js/core/tests/protractor_desktop/embedding.js'
     ],
 
     explorationFeedbackTab: [
-      'protractor_desktop/explorationFeedbackTab.js'
+      '../../compiled_js/core/tests/protractor_desktop/explorationFeedbackTab.js'
     ],
 
     explorationHistoryTab: [
-      'protractor_desktop/explorationHistoryTab.js'
+      '../../compiled_js/core/tests/protractor_desktop/explorationHistoryTab.js'
     ],
 
     explorationStatisticsTab: [
-      'protractor_desktop/explorationStatisticsTab.js'
+      '../../compiled_js/core/tests/protractor_desktop/explorationStatisticsTab.js'
     ],
 
     explorationTranslationTab: [
-      'protractor_desktop/explorationTranslationTab.js'
+      '../../compiled_js/core/tests/protractor_desktop/explorationTranslationTab.js'
     ],
 
     extensions: [
-      'protractor_desktop/extensions.js'
+      '../../compiled_js/core/tests/protractor_desktop/extensions.js'
     ],
 
     learnerDashboard: [
-      'protractor_desktop/learnerDashboard.js'
+      '../../compiled_js/core/tests/protractor_desktop/learnerDashboard.js'
     ],
 
     learner: [
-      'protractor/learnerFlow.js'
+      '../../compiled_js/core/tests/protractor/learnerFlow.js'
     ],
 
     library: [
-      'protractor/libraryFlow.js'
+      '../../compiled_js/core/tests/protractor/libraryFlow.js'
     ],
 
     navigation: [
-      'protractor_desktop/navigation.js'
+      '../../compiled_js/core/tests/protractor_desktop/navigation.js'
     ],
 
     preferences: [
-      'protractor_desktop/preferences.js'
+      'compiled_js/core/tests/../../protractor_desktop/preferences.js'
     ],
 
     profileFeatures: [
-      'protractor_desktop/profileFeatures.js'
+      '../../compiled_js/core/tests/protractor_desktop/profileFeatures.js'
     ],
 
     profileMenu: [
-      'protractor/profileMenuFlow.js'
+      '../../compiled_js/core/tests/protractor/profileMenuFlow.js'
     ],
 
     publication: [
-      'protractor_desktop/publicationAndLibrary.js'
+      '../../compiled_js/core/tests/protractor_desktop/publicationAndLibrary.js'
     ],
 
     subscriptions: [
-      'protractor/subscriptionsFlow.js'
+      '../../compiled_js/core/tests/protractor/subscriptionsFlow.js'
     ],
 
     topicsAndSkillsDashboard: [
-      'protractor_desktop/topicsAndSkillsDashboard.js'
+      '../../compiled_js/core/tests/protractor_desktop/topicsAndSkillsDashboard.js'
     ],
 
     users: [
-      'protractor_desktop/userJourneys.js',
+      '../../compiled_js/core/tests/protractor_desktop/userJourneys.js',
     ],
   },
 

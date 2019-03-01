@@ -16,6 +16,8 @@
  * @fileoverview End-to-end tests for library flow.
  */
 
+import {element, browser, by} from 'protractor';
+
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
