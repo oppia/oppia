@@ -43,7 +43,7 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
             response.headers['location'])
 
 
-class TopicWiseLandingPageTest(test_utils.GenericTestBase):
+class TopicLandingPageTest(test_utils.GenericTestBase):
     """Test for showing landing pages."""
 
     def test_invalid_subject_landing_page_leads_to_404(self):
@@ -56,19 +56,8 @@ class TopicWiseLandingPageTest(test_utils.GenericTestBase):
 
     def test_valid_subject_and_topic_loads_correctly(self):
         response = self.get_html_response(
-            '/learn/maths/fractions?viewerType=teacher')
+            '/learn/maths/fractions')
         response.mustcontain('students and kids')
-
-    def test_invalid_viewer_type_redirects_teachers_page(self):
-        response = self.get_html_response(
-            '/learn/maths/fractions?viewerType=invalid',
-            expected_status_int=302)
-        self.assertIn('viewerType=teacher', response.headers['location'])
-
-    def test_valid_viewer_type_loads_page_correctly(self):
-        response = self.get_html_response(
-            '/learn/maths/fractions?viewerType=student')
-        response.mustcontain('free interactive lessons')
 
 
 class StewardsLandingPageTest(test_utils.GenericTestBase):

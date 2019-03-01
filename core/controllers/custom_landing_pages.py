@@ -22,37 +22,23 @@ import feconf
 
 
 class FractionLandingRedirectPage(base.BaseHandler):
-    """The handler redirecting to fraction's landing page."""
+    """The handler redirecting to the Fractions landing page."""
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        viewer_type = self.request.get('viewerType')
-
-        if viewer_type not in feconf.LANDING_PAGES_VIEWER_TYPES:
-            viewer_type = feconf.LANDING_PAGES_VIEWER_TYPES[0]
-
-        self.redirect('/learn/maths/fractions?viewerType=%s' % viewer_type)
+        self.redirect('/learn/maths/fractions')
 
 
-class TopicWiseLandingPage(base.BaseHandler):
-    """Page showing the topic-wise landing page based on viewer type."""
+class TopicLandingPage(base.BaseHandler):
+    """Page showing the topic landing page."""
 
     @acl_decorators.open_access
     def get(self, subject, topic):
         """Handles GET requests."""
-
         if subject in feconf.AVAILABLE_LANDING_PAGES:
             if topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
-                viewer_type = self.request.get('viewerType')
-                if viewer_type not in feconf.LANDING_PAGES_VIEWER_TYPES:
-                    viewer_type = feconf.LANDING_PAGES_VIEWER_TYPES[0]
-                    self.redirect(
-                        '/learn/%s/%s?viewerType=%s'
-                        % (subject, topic, viewer_type))
-                self.render_template(
-                    'pages/landing/landing_page_%s.html' % viewer_type)
-                return
+                self.render_template('pages/landing/topic_landing_page.html')
             else:
                 raise self.PageNotFoundException
         else:

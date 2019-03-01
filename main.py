@@ -293,7 +293,7 @@ URLS = MAPREDUCE_HANDLERS + [
         custom_landing_pages.FractionLandingRedirectPage),
     get_redirect_route(
         r'%s' % feconf.TOPIC_WISE_LANDING_PAGE_URL,
-        custom_landing_pages.TopicWiseLandingPage),
+        custom_landing_pages.TopicLandingPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),

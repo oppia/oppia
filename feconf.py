@@ -1015,5 +1015,3 @@ RTE_CONTENT_SPEC = {
 AVAILABLE_LANDING_PAGES = {
     'maths': ['fractions', 'ratios']
 }
-# A list of viewer types for landing pages.
-LANDING_PAGES_VIEWER_TYPES = ['teacher', 'student']

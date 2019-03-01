@@ -20,38 +20,7 @@ oppia.constant('LANDING_PAGE_DATA', {
   maths: {
     fractions: {
       collection_id: '4UgTQUc1tala',
-      student: {
-        row_1: {
-          heading: 'Fractions just got easier.',
-          image: 'hero_bakery_combined.png'
-        },
-        row_2: {
-          heading: 'Fractions don’t have to be hard',
-          paragraph_1: 'Learning about fractions can be tricky. With so ' +
-            'much to understand, it’s easy to get confused with the concepts.',
-          paragraph_2: 'That’s where we come in! Oppia makes it easy to ' +
-            'quickly jump in and learn the fundamentals of fractions.',
-          image: 'intro_matthew.svg',
-        },
-        row_3: {
-          heading: 'Fun storytelling for all',
-          paragraph_1: 'Every fractions lesson follows our friend, ' +
-            'Matthew, as he works hard to become a great baker!',
-          paragraph_2: 'We’ll make sure you’re not confused along the way ' +
-            'with helpful hints at every step.',
-          image: 'storytelling_combined.png'
-        },
-        row_4: {
-          heading: 'Easy to follow lessons',
-          paragraph_1: 'With Oppia, we make it easy to go through the ' +
-            'lessons and learn something new!',
-          paragraph_2: 'You will work to learn new concepts and help ' +
-            'Matthew become a great baker along the way. We make it fun and ' +
-            'easy to get started.',
-          image: 'lessons_lessons.svg'
-        }
-      },
-      teacher: {
+      page_data: {
         row_1: {
           heading: 'Fractions just got easier',
           image: 'matthew_paper.png'
@@ -73,22 +42,45 @@ oppia.constant('LANDING_PAGE_DATA', {
           video: 'fractions_video.mp4',
         }
       }
+    },
+    ratios: {
+      collection_id: '53gXGLIR044l',
+      page_data: {
+        row_1: {
+          heading: 'Ratios just got easier',
+          image: 'ratios_James.png'
+        },
+        row_2: {
+          heading: 'Fun storytelling for all',
+          paragraph_1: 'Students are guided through explorations with ' +
+            'targeted feedback and immersive storytelling.',
+          paragraph_2: 'Oppia guides students step-by-step with helpful ' +
+            'hints, so they can complete the lessons on their own.',
+          image: 'ratios_question.png',
+        },
+        row_3: {
+          heading: 'Easy-to-follow lessons',
+          paragraph_1: 'By working through lessons on Oppia, your young ' +
+            'learners can apply their knowledge to real-world problems.',
+          paragraph_2: 'Our lessons also have audio subtitles, to support ' +
+            'students with reading difficulties.',
+          video: 'ratios_video.mp4',
+        }
+      }
     }
   }
 });
 
-oppia.controller('Fractions', [
+oppia.controller('TopicLandingPage', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'LANDING_PAGE_DATA', function(
       $scope, $timeout, $window, SiteAnalyticsService,
       UrlInterpolationService, LANDING_PAGE_DATA) {
-    var url = new URL($window.location.href);
-    var viewerType = url.searchParams.get('viewerType');
     var pathArray = $window.location.pathname.split('/');
     var subject = pathArray[2];
     $scope.topic = pathArray[3];
-    var landingPageData = LANDING_PAGE_DATA[subject][$scope.topic][viewerType];
-    var assetsDir = '/landing/' + subject + '/' + $scope.topic + '/';
+    var landingPageData = LANDING_PAGE_DATA[subject][$scope.topic].page_data;
+    var assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
 
     var _getRowData = function(rowIndex) {
       var rowString = 'row_' + rowIndex;
@@ -102,16 +94,28 @@ oppia.controller('Fractions', [
     $scope.getRowImageUrl = function(rowIndex) {
       var row = _getRowData(rowIndex);
       if (row.image) {
-        return UrlInterpolationService.getStaticImageUrl(assetsDir + row.image);
+        var imagePath = UrlInterpolationService.interpolateUrl(
+          angular.copy(assetsPathFormat), {
+            subject: subject,
+            topic: $scope.topic,
+            file_name: row.image
+          });
+        return UrlInterpolationService.getStaticImageUrl(imagePath);
       } else {
         throw Error('Row ' + rowIndex + ' doesn\'t have image data.');
       }
     };
 
-    $scope.getRowVideoeUrl = function(rowIndex) {
+    $scope.getRowVideoUrl = function(rowIndex) {
       var row = _getRowData(rowIndex);
       if (row.video) {
-        return UrlInterpolationService.getStaticVideoUrl(assetsDir + row.video);
+        var videoPath = UrlInterpolationService.interpolateUrl(
+          angular.copy(assetsPathFormat), {
+            subject: subject,
+            topic: $scope.topic,
+            file_name: row.video
+          });
+        return UrlInterpolationService.getStaticVideoUrl(videoPath);
       } else {
         throw Error('Row ' + rowIndex + ' doesn\'t have video data.');
       }
@@ -127,10 +131,10 @@ oppia.controller('Fractions', [
     };
 
     $scope.getRowParagraph = function(rowIndex, paragraphIndex) {
-      paragraphkey = 'paragraph_' + paragraphIndex;
+      var paragraphKey = 'paragraph_' + paragraphIndex;
       var row = _getRowData(rowIndex);
-      if (row[paragraphkey]) {
-        return row[paragraphkey];
+      if (row[paragraphKey]) {
+        return row[paragraphKey];
       } else {
         throw Error(
           'Row ' + rowIndex + ' doesn\'t have paragraph at index: ' +
@@ -139,14 +143,14 @@ oppia.controller('Fractions', [
     };
 
     $scope.getStaticSubjectImageUrl = function(subjectName) {
-      return UrlInterpolationService.getStaticImageUrl('/subjects/' +
-        subjectName + '.svg');
+      return UrlInterpolationService.getStaticImageUrl(
+        '/subjects/' + subjectName + '.svg');
     };
 
-    $scope.onClickGetStartedButton = function(viewerType) {
-      SiteAnalyticsService.registerOpenFractionsFromLandingPageEvent(
-        viewerType);
+    $scope.onClickGetStartedButton = function() {
       var collectionId = LANDING_PAGE_DATA[subject][$scope.topic].collection_id;
+      SiteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
+        collectionId);
       $timeout(function() {
         $window.location = '/collection/' + collectionId;
       }, 150);
