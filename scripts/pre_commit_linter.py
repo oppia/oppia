@@ -1274,76 +1274,6 @@ def _check_docstrings(all_files):
     return summary_messages
 
 
-def _check_args_order(all_files):
-    """If class args like self and cls are there
-    in function then it come first.
-    """
-    print 'Starting arguments order check'
-    print '----------------------------------------'
-    wrong_ordself_message = ('The first arg of the function should be self')
-    wrong_ordcls_message = ('The first arg of the function should be cls')
-    summary_messages = []
-    files_to_check = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.py')]
-    failed = False
-    for filename in files_to_check:
-        with open(filename, 'r') as f:
-            file_content = f.readlines()
-            file_length = len(file_content)
-            for line_num in range(file_length):
-                line = file_content[line_num].lstrip().rstrip()
-                if line[0:3] == 'def ':
-                    START = '('
-                    END = ')'
-                    # Find index of '('.
-                    while 1:
-                        try:
-                            start_index = line.index(START)
-                            break
-                        except ValueError:
-                            line_num = line_num + 1
-                            line = file_content[line_num].lstrip().rstrip()
-                    # Find index of ')'.
-                    while 1:
-                        try:
-                            end_index = line.index(END)
-                            break
-                        except ValueError:
-                            line_num = line_num + 1
-                            line = file_content[line_num].lstrip().rstrip()
-                    if start_index + 1 != end_index:
-                        # Getting the list of all the arguments.
-                        args_list = line[start_index + 1:end_index].split(',')
-                        if 'self' in args_list:
-                            if args_list[0] != 'self':
-                                failed = True
-                                print '%s --> Line %s: %s' % (
-                                    filename, line_num + 1,
-                                    wrong_ordself_message)
-                            elif 'cls' in args_list:
-                                if args_list[0] != 'cls':
-                                    failed = True
-                                    print '%s --> Line %s: %s' % (
-                                        filename, line_num + 1,
-                                        wrong_ordcls_message)
-    print ''
-    print '----------------------------------------'
-    print ''
-    if failed:
-        summary_message = (
-            '%s   Arguments order check failed' % _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = (
-            '%s   Arguments order check passed' % _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
-    return summary_messages
-
-
 def _check_html_directive_name(all_files):
     """This function checks that all HTML directives end
     with _directive.html.
@@ -1976,7 +1906,6 @@ def main():
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
-    args_order_messages = _check_args_order(all_files)
     comment_messages = _check_comments(all_files)
     # The html tags and attributes check has an additional
     # debug mode which when enabled prints the tag_stack for each file.
@@ -1989,10 +1918,9 @@ def main():
         directive_scope_messages + sorted_dependencies_messages +
         controller_dependency_messages +
         html_directive_name_messages + import_order_messages +
-        newline_messages + docstring_messages + args_order_messages +
-        comment_messages + html_tag_and_attribute_messages +
-        html_linter_messages + linter_messages + pattern_messages +
-        copyright_notice_messages)
+        newline_messages + docstring_messages + comment_messages +
+        html_tag_and_attribute_messages + html_linter_messages +
+        linter_messages + pattern_messages + copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
