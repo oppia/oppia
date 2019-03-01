@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// NOTE TO DEVELOPERS: This forms framework accepts an external event
-// named 'schemaBasedFormsShown'. This should be called by clients
-// when these forms first come into view.
+/**
+ * @fileoverview Converts {{name}} substrings to
+ * <oppia-parameter>name</oppia-parameter> tags and unescapes the
+ * {, } and \ characters. This is done by reading the given string from
+ * left to right: if we see a backslash, we use the following character;
+ * if we see a '{{', this is the start of a parameter; if we see a '}}';
+ * this is the end of a parameter.
+ */
 
-// Converts {{name}} substrings to <oppia-parameter>name</oppia-parameter> tags
-// and unescapes the {, } and \ characters. This is done by reading the given
-// string from left to right: if we see a backslash, we use the following
-// character; if we see a '{{', this is the start of a parameter; if
-// we see a '}}'; this is the end of a parameter.
 oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
   var assert = function(b) {
     if (!b) {

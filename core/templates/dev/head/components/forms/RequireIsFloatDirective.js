@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
  * @fileoverview Directives for schema-based form builders.
  */
 
-/* eslint-enable angular/directive-restrict */
-
-// This should come before 'apply-validation', if that is defined as
+// This should come before all validators, if that is defined as
 // an attribute on the HTML tag.
 
 /* eslint-disable angular/directive-restrict */

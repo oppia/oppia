@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -100,12 +100,13 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
         var unit = unitsWithMultiplier[i][0];
         var multiplier = unitsWithMultiplier[i][1];
         var ind = unit.indexOf('^');
+        var s, power;
         if (ind > -1) {
-          var s = unit.substr(0, ind);
-          var power = parseInt(unit.substr(ind + 1));
+          s = unit.substr(0, ind);
+          power = parseInt(unit.substr(ind + 1));
         } else {
-          var s = unit;
-          var power = 1;
+          s = unit;
+          power = 1;
         }
         if (!(s in unitDict)) {
           unitDict[s] = 0;

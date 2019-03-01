@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the current interaction solution.
+ * @fileoverview A data service that stores the current state customization
+ * args for theinteraction. This is a dict mapping customization arg names
+ * to dicts of the form {value: customization_arg_value}.
  */
 
-oppia.factory('StateSolutionService', [
+// TODO(sll): Add validation.
+oppia.factory('StateCustomizationArgsService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveSolution';
+    child.setterMethodKey = 'saveInteractionCustomizationArgs';
     return child;
   }
 ]);

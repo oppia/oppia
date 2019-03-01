@@ -1478,10 +1478,10 @@ def _check_directive_scope(all_files, parsed_js_files):
     return summary_messages
 
 
-def _check_js_property(all_files, parsed_js_files):
-    """This function ensures that all JS files has exactly
-    one component and the name of the component should match
-    the filename.
+def _check_js_component_count(all_files, parsed_js_files):
+    """This function ensures that all JS files have exactly
+    one component and and that the name of the component
+    matches the filename.
     """
     print 'Starting js property check'
     print '----------------------------------------'
@@ -1489,10 +1489,10 @@ def _check_js_property(all_files, parsed_js_files):
     files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.js') and not filename.endswith('app.js')]
+        and filename.endswith('.js') and not filename.endswith('App.js')]
     failed = False
     summary_messages = []
-    property_name = ''
+    component_name = ''
     for filename in files_to_check:
         property_num = 0
         # Filename without its path.
@@ -1502,71 +1502,77 @@ def _check_js_property(all_files, parsed_js_files):
             # Parse the body of the content as nodes.
             parsed_nodes = parsed_dict['body']
             for parsed_node in parsed_nodes:
-                # Check the type of the node.
+                # Check the type of the node. If the type is
+                # 'ExpressionStatement' then it means the
+                # declaration of a component.
                 if parsed_node['type'] != 'ExpressionStatement':
                     continue
                 # Separate the expression part of the node.
                 expression = parsed_node['expression']
-                # Check whether the expression belongs to a directive.
+                # Check whether the expression belongs to a component.
                 expression_type_is_not_call = (
                     expression['type'] != 'CallExpression')
                 if expression_type_is_not_call:
                     continue
+                # Check whether the expression belongs to a
+                # 'MemberExpression' which represents a computed
+                # expression or an Identifier which represents a
+                # static expression.
                 expression_callee_type_is_not_member = (
                     expression['callee']['type'] != 'MemberExpression')
                 if expression_callee_type_is_not_member:
                     continue
-                callee_property = expression['callee']['property']['name']
-                if callee_property != 'factory' and (
-                        callee_property != 'directive' and
-                        callee_property != 'controller' and
-                        callee_property != 'filter'):
+                # Get the component in the JS file.
+                component = expression['callee']['property']['name']
+                if component != 'factory' and (
+                        component != 'directive' and
+                        component != 'controller' and
+                        component != 'filter'):
                     continue
-                propertyz = callee_property
                 # Separate the arguments of the expression.
                 arguments = expression['arguments']
                 # The first argument of the expression is the
-                # name of the property.
-                property_name = arguments[0]['value']
+                # name of the component.
+                component_name = arguments[0]['value']
                 property_num += 1
-                if callee_property == 'directive':
-                    if (property_name[0].upper() + property_name[1:] +
+                if component == 'directive':
+                    if (component_name[0].upper() + component_name[1:] +
                             'Directive' != (exact_filename)):
                         print (
                             '%s -> Please ensure that the %s name strictly '
                             'matches the filename'
-                            % (filename, callee_property))
+                            % (filename, component))
                         failed = True
-                elif callee_property == 'filter':
-                    if (property_name[0].upper() + property_name[1:] +
+                elif component == 'filter':
+                    if (component_name[0].upper() + component_name[1:] +
                             'Filter' != (exact_filename)):
                         print (
                             '%s -> Please ensure that the %s name strictly '
                             'matches the filename'
-                            % (filename, callee_property))
+                            % (filename, component))
                         failed = True
                 else:
-                    if property_name != exact_filename:
+                    if component_name != exact_filename:
                         print (
                             '%s -> Please ensure that the %s name strictly '
                             'matches the filename'
-                            % (filename, callee_property))
+                            % (filename, component))
                         failed = True
 
             if property_num > 1:
                 print (
-                    '%s -> Please ensure that there is exactly one %s in the'
-                    ' file.' % (filename, propertyz))
+                    '%s -> Please ensure that there is exactly one component'
+                    ' in the file.' % (filename))
                 failed = True
 
     with _redirect_stdout(_TARGET_STDOUT):
         if failed:
-            summary_message = '%s  Js property check failed' % (
+            summary_message = '%s  Js component count check failed' % (
                 _MESSAGE_TYPE_FAILED)
             print summary_message
             summary_messages.append(summary_message)
         else:
-            summary_message = '%s  Js property check passed' % (
+            summary_message = '%s  Js component count check passed' % (
                 _MESSAGE_TYPE_SUCCESS)
             print summary_message
             summary_messages.append(summary_message)
@@ -1991,7 +1997,7 @@ def main():
     parsed_js_files = _validate_and_parse_js_files(
         all_files)
     linter_messages = _pre_commit_linter(all_files)
-    js_property_messages = _check_js_property(all_files, parsed_js_files)
+    js_property_messages = _check_js_component_count(all_files, parsed_js_files)
     directive_scope_messages = _check_directive_scope(
         all_files, parsed_js_files)
     sorted_dependencies_messages = _check_sorted_dependencies(

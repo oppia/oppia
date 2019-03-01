@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// A data service that stores the current interaction id.
+/**
+ * @fileoverview A data service that stores the current state content.
+ */
+
 // TODO(sll): Add validation.
-oppia.factory('StateInteractionIdService', [
+oppia.factory('StateContentService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveInteractionId';
+    child.setterMethodKey = 'saveStateContent';
     return child;
   }
 ]);
