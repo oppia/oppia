@@ -44,6 +44,7 @@ install_node_module stylelint-config-standard 18.2.0
 install_node_module through2 2.0.0
 install_node_module typescript 3.3.3
 install_node_module @types/angular 1.6.54
+install_node_module @types/angular-mocks 1.7.0
 install_node_module @types/ckeditor 4.9.7
 install_node_module @types/d3 5.7.1
 install_node_module @types/googlemaps 3.30.16
