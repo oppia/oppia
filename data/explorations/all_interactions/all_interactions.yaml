@@ -634,7 +634,7 @@ states:
           dest: Item Selection Multi
           feedback:
             content_id: feedback_4
-            html: <p>That's good!, no bad options, but choose all good options!</p>
+            html: <p>That's good! No bad options, but make sure choose all good options!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
