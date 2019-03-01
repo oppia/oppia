@@ -1,10 +1,10 @@
 # Per-directory ownership and automatic assignment for pull requests.
 
-# The e2e test files are owned by both Devworkflow and QA team.
-# - Firstly, QA team will look for the test coverage in a PR, then they will ask
-#   Devworkflow team for a final review.
-# - Devworkflow team will look for the code quality i.e, whether the e2e tests
-#   can be optimized any further.
+# Note: The e2e test files are owned by both the dev workflow and QA teams.
+# - The QA team will do an initial review to verify the PR's test coverage. They
+#   will then ask the dev workflow team for a final review.
+# - The dev workflow team will review the code quality to see if the e2e tests
+#   can be optimized further.
 
 # Answer classification team.
 /core/controllers/classifier*.py @prasanna08
