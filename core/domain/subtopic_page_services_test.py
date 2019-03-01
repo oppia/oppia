@@ -107,8 +107,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': 'page_contents_html',
                 'new_value': 'a',
                 'old_value': 'b'
-            })]
-        )
+            })])
         subtopic_page_contents = (
             subtopic_page_services.get_subtopic_page_contents_by_id(
                 self.TOPIC_ID, 1))
@@ -125,8 +124,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
                 'title': 'Sample'
-            })]
-        )
+            })])
         with self.assertRaises(Exception):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic', [])
@@ -144,8 +142,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                     'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                     'subtopic_id': 1,
                     'title': 'Sample'
-                })]
-            )
+                })])
         subtopic_page_1.version = 3
         subtopic_page_model_1.version = 2
         with self.assertRaises(Exception):
@@ -155,8 +152,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                     'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                     'subtopic_id': 1,
                     'title': 'Sample'
-                })]
-            )
+                })])
 
     def test_commit_log_entry(self):
         subtopic_page_commit_log_entry = (
