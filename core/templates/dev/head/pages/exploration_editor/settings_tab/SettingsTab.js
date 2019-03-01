@@ -227,9 +227,9 @@ oppia.controller('SettingsTab', [
     };
 
     // Check for title and allow submit.
-    $scope.checkForTitle = function(event) {
+    $scope.checkForTitle = function($event) {
       if ( $scope.explorationTitleService.displayed === '' ) {
-        event.preventDefault();
+        $event.preventDefault();
         $scope.titleAdd = true;
       } else {
         $scope.titleAdd = false;
