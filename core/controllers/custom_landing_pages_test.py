@@ -27,9 +27,7 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
         """
         response = self.get_html_response(
             feconf.FRACTIONS_LANDING_PAGE_URL, expected_status_int=302)
-        self.assertIn(
-            '/learn/maths/fractions?viewerType=teacher',
-            response.headers['location'])
+        self.assertIn('/learn/maths/fractions', response.headers['location'])
 
     def test_fraction_landing_page_with_viewer_type(self):
         """Test for showing the landing page for fractions,
@@ -38,9 +36,7 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
         response = self.get_html_response(
             '%s?viewerType=student' % (feconf.FRACTIONS_LANDING_PAGE_URL),
             expected_status_int=302)
-        self.assertIn(
-            '/learn/maths/fractions?viewerType=student',
-            response.headers['location'])
+        self.assertIn('/learn/maths/fractions', response.headers['location'])
 
 
 class TopicLandingPageTest(test_utils.GenericTestBase):
