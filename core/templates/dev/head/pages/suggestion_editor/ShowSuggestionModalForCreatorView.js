@@ -54,7 +54,9 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     // the scope (the property cannot sit directly on the scope)
     // Reference https://stackoverflow.com/q/12618342
     $scope.suggestionData = {newSuggestionHtml: newContent.html};
+    $scope.beforeEditSuggestionContent = $scope.suggestionData;
     $scope.suggestionEditorIsShown = false;
+    $scope.editButtonShown = true;
     $scope.acceptSuggestion = function() {
       SuggestionModalService.acceptSuggestion(
         $uibModalInstance,
@@ -76,14 +78,26 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     };
     $scope.editSuggestion = function() {
       $scope.suggestionEditorIsShown = true;
+      $scope.editButtonShown = false;
     };
     $scope.cancel = function() {
       SuggestionModalService.cancelSuggestion($uibModalInstance);
     };
     $scope.isEditButtonShown = function() {
       return (
-        !$scope.isNotHandled && $scope.isSuggestionRejected &&
-        !$scope.suggestionEditorIsShown);
+        $scope.isNotHandled &&
+        $scope.editButtonShown);
+    };
+    $scope.isSaveButtonShown = function () {
+      return (
+        $scope.isNotHandled &&
+        !$scope.editButtonShown);
+    };
+    $scope.isSaveButtonDisabled = function () {
+      return (
+        $scope.beforeEditSuggestionContent.newSuggestionHtml === $scope.newContent.html ||
+        $scope.summaryMessage === ""
+        );
     };
     $scope.isResubmitButtonShown = function() {
       return (
@@ -98,6 +112,16 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     };
     $scope.cancelEditMode = function() {
       $scope.suggestionEditorIsShown = false;
+    };
+    $scope.saveSuggestion = function() {
+      $uibModalInstance.close({
+        action: SuggestionModalService.ACTION_EDIT_SUGGESTION,
+        newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
+        summaryMessage: $scope.summaryMessage,
+        stateName: $scope.stateName,
+        suggestionType: $scope.suggestionType,
+        oldContent: $scope.oldContent
+      })
     };
     $scope.resubmitChanges = function() {
       $uibModalInstance.close({

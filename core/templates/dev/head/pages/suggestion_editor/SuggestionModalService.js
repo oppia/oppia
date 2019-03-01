@@ -30,6 +30,7 @@ oppia.factory('SuggestionModalService', [function() {
     ACTION_ACCEPT_SUGGESTION: 'accept',
     ACTION_REJECT_SUGGESTION: 'reject',
     ACTION_RESUBMIT_SUGGESTION: 'resubmit',
+    ACTION_EDIT_SUGGESTION: 'edit',
     SUGGESTION_ACCEPTED: 'accepted',
     SUGGESTION_REJECTED: 'rejected',
 
