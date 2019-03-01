@@ -13,8 +13,10 @@
 // limitations under the License.
 
 try {
-  require('./directives.js');
-  require('./filters.js');
+  require('./directives/FocusOnDirective.js');
+  require('./filters/ConvertToPlainTextFilter.js');
+  require('./filters/TruncateFilter.js');
+  require('./filters/NormalizeWhitespaceFilter.js');
   require('./i18n.js');
 
   require('./pages/Base.js');

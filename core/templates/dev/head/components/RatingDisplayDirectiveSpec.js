@@ -24,6 +24,7 @@ describe('Rating display directive', function() {
   beforeEach(inject(function($compile, $rootScope, $templateCache) {
     var templateHtml = $templateCache.get(
       '/core/templates/dev/head/components/rating_display_directive.html');
+    console.log(templateHtml)
     $compile(templateHtml)($rootScope);
     $rootScope.$digest();
 

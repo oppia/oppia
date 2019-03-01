@@ -63,6 +63,7 @@ echo ""
 echo "  Running test in development environment"
 echo ""
 $PYTHON_CMD scripts/build.py
+$NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.js
 $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
 
 if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
