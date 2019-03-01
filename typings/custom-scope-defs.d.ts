@@ -66,12 +66,10 @@ interface ICustomScope extends ng.IScope {
     CONTAINER_HEIGHT?: any;
     HORIZONTAL_GRID_SPACING?: any;
     VERTICAL_GRID_SPACING?: any;
-    interactionIsActive?: any;
     submitAnswer?: any;
     staffBottom?: any;
     staffTop?: any;
     playSequenceToGuess?: any;
-    sequenceToGuess?: any;
     playCurrentSequence?: any;
     clearSequence?: any;
     topPositionForCenterOfTopStaffLine?: any;
