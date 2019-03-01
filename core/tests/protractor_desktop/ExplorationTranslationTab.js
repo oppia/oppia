@@ -21,7 +21,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var remote = require('../../../../node_modules/selenium-webdriver/remote');
+var path = require('path');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
@@ -137,9 +137,7 @@ describe('Exploration translation', function() {
 
     // click upload button
     explorationEditorTranslationTab.openUploadAudioModal();
-    browser.setFileDetector(new remote.FileDetector());
     var audioToUpload = '../data/cafe.mp3';
-    var path = require('path');
     var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
     var audioElem = element(by.css('[ng-class="inputFieldClassName"]'));
     audioElem.sendKeys(audioAbsolutePath);
@@ -166,22 +164,20 @@ describe('Exploration translation', function() {
     explorationEditorMainTab.setInteraction('Continue');
     var responseEditor = explorationEditorMainTab.
       getResponseEditor('default');
-    responseEditor.setDestination('Three', true, null);
-    explorationEditorMainTab.moveToState('Three');
+    responseEditor.setDestination('Third', true, null);
+    explorationEditorMainTab.moveToState('Third');
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorMainTab.moveToState('First');
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.exitTutorial();
     explorationEditorTranslationTab.openUploadAudioModal();
-    browser.setFileDetector(new remote.FileDetector());
     var audioToUpload = '../data/cafe.mp3';
-    var path = require('path');
     var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
     var audioElem = element(by.css('[ng-class="inputFieldClassName"]'));
     audioElem.sendKeys(audioAbsolutePath);
     explorationEditorTranslationTab.saveUploadedAudio();
     explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.moveToState('Three');
+    explorationEditorMainTab.moveToState('Third');
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.openUploadAudioModal();
     audioElem.sendKeys(audioAbsolutePath);
