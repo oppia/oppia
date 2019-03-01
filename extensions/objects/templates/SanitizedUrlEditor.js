@@ -21,46 +21,20 @@ oppia.directive('sanitizedUrlEditor', [
     return {
       restrict: 'E',
       scope: {
-        getInitArgs: '&',
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/sanitized_url_editor_directive.html'),
+        '/objects/templates/list_editor_directive.html'),
       controller: ['$scope', function($scope) {
-        $scope.initArgs = $scope.getInitArgs();
-        $scope.$watch('initArgs', function(newValue) {
-          $scope.largeInput = false;
-          if (newValue && newValue.largeInput) {
-            $scope.largeInput = newValue.largeInput;
-          }
-        });
-
-        $scope.$watch('value', function(newValue) {
-          $scope.localValue = {
-            label: String(newValue) || ''
-          };
-        }, true);
-
-        $scope.placeholderText = 'https://www.example.com';
-        $scope.validators = function() {
-          return [{
+        $scope.SCHEMA = {
+          type: 'unicode',
+          validators: [{
             id: 'is_nonempty'
-          }];
-        };
-
-        $scope.$watch('localValue.label', function(newValue) {
-          $scope.value = newValue;
-        });
-
-        $scope.$on('externalSave', function() {
-          var currentValue = String($scope.localValue.label);
-          if ($scope.active) {
-            $scope.replaceValue(currentValue);
-            // The $scope.$apply() call is needed to propagate the replaced
-            // value.
-            $scope.$apply();
+          }],
+          ui_config: {
+            placeholder: 'https://www.example.com'
           }
-        });
+        };
       }]
     };
   }]);

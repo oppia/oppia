@@ -67,26 +67,22 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(isinstance(ca_spec['description'], basestring))
             self.assertGreater(len(ca_spec['description']), 0)
 
-            schema_utils_test.validate_schema(ca_spec['schema'])
-            # Default value of SanitizedUrl obj_type may be empty. Empty value
-            # cannot normalized, so we don't normalize it.
-            if ca_spec['schema']['type'] == 'custom' and (
-                    ca_spec['schema']['obj_type'] == 'SanitizedUrl'):
-                if ca_spec['default_value'] == '':
-                    self.assertEqual(len(ca_spec['default_value']), 0)
-                    return
-
             # The default value might not pass validation checks (e.g. the
             # Image component has a required field whose default value is
             # empty). Thus, when checking the default value schema, we don't
             # apply the custom validators.
+            schema_utils_test.validate_schema(ca_spec['schema'])
             self.assertEqual(
                 ca_spec['default_value'],
                 schema_utils.normalize_against_schema(
                     ca_spec['default_value'], ca_spec['schema'],
                     apply_custom_validators=False))
 
-            if ca_spec['schema']['type'] == 'custom':
+            # Default value of SanitizedUrl obj_type may be empty. The empty
+            # string is not considered valid for this object, so we don't
+            # attempt to normalize it.
+            if ca_spec['schema']['type'] == 'custom' and (
+                    ca_spec['schema']['obj_type'] != 'SanitizedUrl'):
                 obj_class = obj_services.Registry.get_object_class_by_type(
                     ca_spec['schema']['obj_type'])
                 self.assertEqual(
