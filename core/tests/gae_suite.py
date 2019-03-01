@@ -52,6 +52,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(THIRD_PARTY_DIR, 'simplejson-3.7.1'),
     os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
     os.path.join(THIRD_PARTY_DIR, 'mutagen-1.38'),
+    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.8'),
 ]
 
 _PARSER = argparse.ArgumentParser()

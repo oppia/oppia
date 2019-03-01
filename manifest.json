@@ -78,6 +78,14 @@
         "tarRootDirPrefix": "mutagen-",
         "rootDirPrefix": "mutagen-",
         "targetDirPrefix": "mutagen-"
+      },
+      "soupsieve": {
+        "version": "1.8",
+        "downloadFormat": "tar",
+        "url": "https://pypi.python.org/packages/0c/52/e9088bb9b96e2d39fc3b33fcda5b4fde9d71473536ac660a1ca9a0958a2f/soupsieve-1.8.tar.gz#md5=3b3d830576e5fa5148bc154e38e63ebc",
+        "tarRootDirPrefix": "soupsieve-",
+        "rootDirPrefix": "soupsieve-",
+        "targetDirPrefix": "soupsieve-"
       }
     },
     "frontend": {

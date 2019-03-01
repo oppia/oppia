@@ -97,6 +97,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.7.1'),
     os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.7.1'),
     os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.38'),
+    os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.8'),
 ]
 
 for lib_path in THIRD_PARTY_LIBS:
