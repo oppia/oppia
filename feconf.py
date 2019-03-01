@@ -1012,6 +1012,8 @@ RTE_CONTENT_SPEC = {
 
 # A dict representing available landing pages, having subject as a key and list
 # of topics as the value.
+# Note: This dict need to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
+# oppia constant.
 AVAILABLE_LANDING_PAGES = {
     'maths': ['fractions', 'ratios']
 }

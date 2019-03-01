@@ -16,7 +16,7 @@
  * @fileoverview Controller for landing page.
  */
 
-oppia.constant('LANDING_PAGE_DATA', {
+oppia.constant('TOPIC_LANDING_PAGE_DATA', {
   maths: {
     fractions: {
       collection_id: '4UgTQUc1tala',
@@ -73,13 +73,14 @@ oppia.constant('LANDING_PAGE_DATA', {
 
 oppia.controller('TopicLandingPage', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
-  'UrlInterpolationService', 'LANDING_PAGE_DATA', function(
+  'UrlInterpolationService', 'TOPIC_LANDING_PAGE_DATA', function(
       $scope, $timeout, $window, SiteAnalyticsService,
-      UrlInterpolationService, LANDING_PAGE_DATA) {
+      UrlInterpolationService, TOPIC_LANDING_PAGE_DATA) {
     var pathArray = $window.location.pathname.split('/');
     var subject = pathArray[2];
     $scope.topic = pathArray[3];
-    var landingPageData = LANDING_PAGE_DATA[subject][$scope.topic].page_data;
+    var landingPageData = (
+      TOPIC_LANDING_PAGE_DATA[subject][$scope.topic].page_data);
     var assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
 
     var _getRowData = function(rowIndex) {
@@ -148,7 +149,8 @@ oppia.controller('TopicLandingPage', [
     };
 
     $scope.onClickGetStartedButton = function() {
-      var collectionId = LANDING_PAGE_DATA[subject][$scope.topic].collection_id;
+      var collectionId = (
+        TOPIC_LANDING_PAGE_DATA[subject][$scope.topic].collection_id);
       SiteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
         collectionId);
       $timeout(function() {
