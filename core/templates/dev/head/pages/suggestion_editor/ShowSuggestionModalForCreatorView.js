@@ -96,8 +96,7 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     $scope.isSaveButtonDisabled = function () {
       return (
         $scope.beforeEditSuggestionContent.newSuggestionHtml === $scope.newContent.html ||
-        $scope.summaryMessage === ""
-        );
+        $scope.summaryMessage === "");
     };
     $scope.isResubmitButtonShown = function() {
       return (

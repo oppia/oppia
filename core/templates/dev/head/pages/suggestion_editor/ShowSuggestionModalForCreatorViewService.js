@@ -29,7 +29,6 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
     var _showEditStateContentSuggestionModal = function(
         activeThread, suggestionsToReviewList, clearActiveThread,
         canReviewActiveThread) {
-      console.log(activeThread);
       $uibModal.open({
         templateUrl: _templateUrl,
         backdrop: true,
@@ -128,12 +127,15 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
           };
         }
 
-        $http.put(url, data).then(function() {
+        $http.put(url, data).then(function(response) {
           for (var i = 0; i < suggestionsToReviewList.length; i++) {
             if (suggestionsToReviewList[i] === $scope.activeThread) {
               suggestionsToReviewList.splice(i, 1);
               break;
             }
+          }
+          if(response) {
+            activeThread.suggestion.newValue = response.data.new_value;
           }
           clearActiveThread();
         }, function() {

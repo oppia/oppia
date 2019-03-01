@@ -165,6 +165,15 @@ def _update_suggestion(suggestion):
     suggestion_model.put()
 
 
+def edit_suggestion(suggestion_id, new_change):
+    suggestion = get_suggestion_by_id(suggestion_id)
+    change_cls = type(suggestion.change)
+    change_object = change_cls(new_change)
+    suggestion.pre_update_validate(change_object)
+    suggestion.change = change_object
+    _update_suggestion(suggestion)
+
+
 def mark_review_completed(suggestion, status, reviewer_id):
     """Marks that a review has been completed.
 

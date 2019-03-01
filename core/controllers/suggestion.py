@@ -176,4 +176,7 @@ class SuggestionListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 class EditSuggestionHandler(base.BaseHandler):
-    pass
+    def put(self, target_type, target_id, suggestion_id):
+        new_change = self.payload.get('change')
+        suggestion_services.edit_suggestion(suggestion_id, new_change)
+        self.render_json(new_change)
