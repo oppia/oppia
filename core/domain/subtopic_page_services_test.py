@@ -113,6 +113,11 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             subtopic_page_contents.to_dict(), expected_page_contents_dict)
 
+        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            subtopic_page_c = (
+                subtopic_page_services.get_subtopic_page_contents_by_id(
+                    'topic_id', 1))
+
     def test_save_subtopic_page(self):
         subtopic_page_1 = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
