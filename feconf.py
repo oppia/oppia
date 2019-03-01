@@ -150,7 +150,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATES_SCHEMA_VERSION = 26
+CURRENT_STATES_SCHEMA_VERSION = 27
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -213,6 +213,13 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
     'content': {},
     'default_outcome': {}
+}
+# Default written_translations dict for a default state template.
+DEFAULT_WRITTEN_TRANSLATIONS = {
+    'translations_mapping': {
+        'content': {},
+        'default_outcome': {}
+    }
 }
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
@@ -357,11 +364,6 @@ DUPLICATE_EMAIL_INTERVAL_MINS = 2
 # Number of digits after decimal to which the average ratings value in the
 # dashboard is rounded off to.
 AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
-# Whether to enable the promo bar functionality. This does not actually turn on
-# the promo bar, as that is gated by a config value (see config_domain). This
-# merely avoids checking for whether the promo bar is enabled for every Oppia
-# page visited.
-ENABLE_PROMO_BAR = True
 # Whether to enable maintenance mode on the site. For non-admins, this redirects
 # all HTTP requests to the maintenance page. This is the only check which
 # determines whether the site is in maintenance mode to avoid queries to the
@@ -591,9 +593,9 @@ DEMO_COLLECTIONS = {
 # editor views.
 DISABLED_EXPLORATION_IDS = ['5']
 
-# Google Group embed URL for the Forum page.
-EMBEDDED_GOOGLE_GROUP_URL = (
-    'https://groups.google.com/forum/embed/?place=forum/oppia')
+# Oppia Google Group URL.
+GOOGLE_GROUP_URL = (
+    'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia')
 
 # External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
@@ -686,8 +688,10 @@ SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SPLASH_URL = '/splash'
+STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
+SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
@@ -862,9 +866,6 @@ CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'learners.')
 DONATE_PAGE_DESCRIPTION = (
     'Donate to The Oppia Foundation.')
-FORUM_PAGE_DESCRIPTION = (
-    'Engage with the Oppia community by discussing questions, bugs and '
-    'explorations in the forum.')
 LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '

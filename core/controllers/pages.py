@@ -12,13 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
+"""Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
 
-import urllib
-import urlparse
-
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 import feconf
 
 
@@ -140,28 +137,12 @@ class ThanksPage(base.BaseHandler):
         self.render_template('pages/thanks/thanks.html')
 
 
-class ForumPage(base.BaseHandler):
-    """Page with an embedded forum."""
-
+class ForumRedirectPage(base.BaseHandler):
+    """A handler to redirect to Oppia's Google group."""
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        # Note: if you are working in the development environment and
-        # are accessing this page at localhost, please replace
-        # 'localhost' with '127.0.0.1'.
-        _, netloc, _, _, _ = urlparse.urlsplit(self.request.uri)
-
-        self.values.update({
-            'full_google_group_url': (
-                '%s&showtabs=false&hideforumtitle=true&parenturl=%s' % (
-                    feconf.EMBEDDED_GOOGLE_GROUP_URL,
-                    urllib.quote(self.request.uri, safe=''),
-                )
-            ),
-            'meta_description': feconf.FORUM_PAGE_DESCRIPTION,
-            'on_localhost': netloc.startswith('localhost'),
-        })
-        self.render_template('pages/forum/forum.html')
+        self.redirect(feconf.GOOGLE_GROUP_URL)
 
 
 class TermsPage(base.BaseHandler):

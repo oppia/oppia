@@ -230,6 +230,15 @@ class BaseHandler(webapp2.RequestHandler):
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
+                # If user opens a new tab during signup process, the user_id
+                # parameter is set to None and this causes the signup session
+                # to expire. The code here checks if user is on the signup
+                # page and the user_id is None, if that is the case an exception
+                # is raised which is handled by the frontend by showing a
+                # continue to registration modal.
+                if 'signup' in self.request.uri and not self.user_id:
+                    raise self.UnauthorizedUserException(
+                        'Registration session expired.')
                 csrf_token = self.request.get('csrf_token')
                 if not csrf_token:
                     raise Exception(
@@ -338,16 +347,6 @@ class BaseHandler(webapp2.RequestHandler):
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id)
-        })
-        if feconf.ENABLE_PROMO_BAR:
-            promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
-            promo_bar_message = config_domain.PROMO_BAR_MESSAGE.value
-        else:
-            promo_bar_enabled = False
-            promo_bar_message = ''
-        values.update({
-            'promo_bar_enabled': promo_bar_enabled,
-            'promo_bar_message': promo_bar_message,
         })
 
         if 'status_code' not in values:
