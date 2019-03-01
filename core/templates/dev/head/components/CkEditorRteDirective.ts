@@ -29,7 +29,7 @@ oppia.directive('ckEditorRte', [
                 '</div></div>',
       require: '?ngModel',
 
-      link: function(scope, el, attr, ngModel) {
+      link: function(scope: ICustomScope, el, attr, ngModel) {
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];

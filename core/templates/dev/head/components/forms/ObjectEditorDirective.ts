@@ -27,7 +27,7 @@ oppia.directive('objectEditor', ['$compile', '$log', function($compile, $log) {
       objType: '@',
       value: '='
     },
-    link: function(scope, element) {
+    link: function(scope: ICustomScope, element) {
       // Converts a camel-cased string to a lower-case hyphen-separated string.
       var directiveName = scope.objType.replace(
         /([a-z])([A-Z])/g, '$1-$2').toLowerCase();

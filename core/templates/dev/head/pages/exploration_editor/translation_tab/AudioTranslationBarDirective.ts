@@ -25,7 +25,7 @@ oppia.directive('audioTranslationBar', [
       scope: {
         isTranslationTabBusy: '='
       },
-      link: function(scope, elm) {
+      link: function(scope: ICustomScope, elm) {
         scope.getRecorderController();
 
         $('.oppia-translation-tab').on('dragover', function(evt) {

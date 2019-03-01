@@ -29,7 +29,7 @@ oppia.directive('imageUploader', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/image_uploader_directive.html'),
-      link: function(scope, elt) {
+      link: function(scope: ICustomScope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();
           $('.image-uploader-drop-area').removeClass(

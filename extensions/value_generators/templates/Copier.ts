@@ -17,7 +17,7 @@
 
 oppia.directive('copier', ['$compile', function($compile) {
   return {
-    link: function(scope, element) {
+    link: function(scope: ICustomScope, element) {
       scope.getTemplateUrl = function() {
         return '/value_generator_handler/' + scope.generatorId;
       };
