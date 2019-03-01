@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for Drag and Drop Sorting rules.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Drag and Drop Sort Input rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var ddsrs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ddsrs = $injector.get('dragAndDropSortInputRulesService');
   }));
 

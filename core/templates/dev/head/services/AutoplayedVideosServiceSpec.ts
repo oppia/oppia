@@ -15,11 +15,14 @@
  * @fileoverview Unit tests for AutoplayedVideosService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('AutoplayedVideosService', function() {
   var AutoplayedVideosService = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     AutoplayedVideosService = $injector.get('AutoplayedVideosService');
   }));
 

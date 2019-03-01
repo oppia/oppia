@@ -16,12 +16,15 @@
  * @fileoverview Tests that ratings are being displayed correctly.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Rating display directive', function() {
   var outerScope, ctrlScope;
 
-  beforeEach(module('directiveTemplates'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(inject(function($compile, $rootScope, $templateCache) {
+  beforeEach(angular.mock.module('directiveTemplates'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.inject(function($compile, $rootScope, $templateCache) {
     var templateHtml = $templateCache.get(
       '/core/templates/dev/head/components/rating_display_directive.html');
     $compile(templateHtml)($rootScope);

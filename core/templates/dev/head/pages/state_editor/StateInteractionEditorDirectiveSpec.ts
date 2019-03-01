@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for the controller of 'State Interactions'.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('State Interaction controller', function() {
   describe('StateInteraction', function() {
     beforeEach(function() {
-      module('oppia');
+      angular.mock.module('oppia');
       // Set a global value for INTERACTION_SPECS that will be used by all the
       // descendant dependencies.
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.constant('INTERACTION_SPECS', {
           TextInput: {
             display_mode: 'inline',
@@ -41,19 +44,19 @@ describe('State Interaction controller', function() {
     var mockExplorationData;
     var outerScope, directiveScope;
 
-    beforeEach(module('directiveTemplates'));
+    beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(function() {
       mockExplorationData = {
         explorationId: 0,
         autosaveChangeList: function() {}
       };
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function(
+    beforeEach(angular.mock.inject(function(
         $compile, $controller, $injector, $rootScope, $templateCache) {
       scope = $rootScope.$new();
       ecs = $injector.get('StateEditorService');

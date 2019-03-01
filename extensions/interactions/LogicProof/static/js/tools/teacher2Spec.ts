@@ -42,6 +42,9 @@ var errorWrapper2 = function(
   };
 };
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Build line templates', function() {
   var buildThenDisplay = function(nameString, readerViewString,
       antecedentsString, resultsString, variablesString, errorStrings) {

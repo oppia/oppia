@@ -16,8 +16,11 @@
  * @fileoverview unit tests for the local save services.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('LocalStorageService', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('behavior in editor', function() {
     var LocalStorageService = null;
@@ -38,7 +41,7 @@ describe('LocalStorageService', function() {
     var draftOne = null;
     var draftTwo = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       LocalStorageService = $injector.get('LocalStorageService');
       ExplorationDraftObjectFactory = $injector.get(
         'ExplorationDraftObjectFactory');

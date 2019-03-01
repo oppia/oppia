@@ -489,6 +489,9 @@ var sampleInteraction = {
   control_model: sampleControlModel
 };
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Match expression to expression template', function() {
   var matchThenDisplay = function(
       expressionString, templateString, oldMatchings) {

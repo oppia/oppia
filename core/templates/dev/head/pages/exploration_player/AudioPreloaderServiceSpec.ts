@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for the audio preloader service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Audio preloader service', function() {
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
-    module(function($provide) {
+    angular.mock.module(function($provide) {
       $provide.constant('INTERACTION_SPECS', {
         TextInput: {
           is_terminal: false
@@ -42,7 +45,7 @@ describe('Audio preloader service', function() {
   var $rootScope = null;
   var explorationDict;
   var requestUrl1, requestUrl2, requestUrl3, requestUrl4;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
     UrlInterpolationService = $injector.get('UrlInterpolationService');
     aps = $injector.get('AudioPreloaderService');

@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for StoryEditorStateService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Story editor state service', function() {
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
@@ -58,9 +61,9 @@ describe('Story editor state service', function() {
     return self;
   };
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableStoryBackendApiService = (
       new FakeEditableStoryBackendApiService());
     $provide.value(
@@ -68,7 +71,7 @@ describe('Story editor state service', function() {
       [fakeEditableStoryBackendApiService][0]);
   }));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     StoryEditorStateService = $injector.get(
       'StoryEditorStateService');
     StoryObjectFactory = $injector.get('StoryObjectFactory');

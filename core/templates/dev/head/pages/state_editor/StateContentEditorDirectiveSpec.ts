@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the state content editor directive.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, citat, scitat;
   var mockExplorationData;
@@ -31,20 +34,20 @@ describe('State content editor directive', function() {
     return citat.createFromBackendDict(citatDict);
   };
 
-  beforeEach(module('directiveTemplates'));
+  beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(function() {
-    module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS);
+    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS);
 
     mockExplorationData = {
       explorationId: 0,
       autosaveChangeList: function() {}
     };
-    module(function($provide) {
+    angular.mock.module(function($provide) {
       $provide.value('ExplorationDataService', [mockExplorationData][0]);
     });
   });
 
-  beforeEach(inject(function($compile, $injector, $rootScope, $templateCache) {
+  beforeEach(angular.mock.inject(function($compile, $injector, $rootScope, $templateCache) {
     shof = $injector.get('SubtitledHtmlObjectFactory');
     cls = $injector.get('ChangeListService');
     citat = $injector.get('ContentIdsToAudioTranslationsObjectFactory');

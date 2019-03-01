@@ -16,11 +16,14 @@
 * @fileoverview Unit tests for the player position service.
 */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Player position service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var pts, pps, scof;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     pts = $injector.get('PlayerTranscriptService');
     pps = $injector.get('PlayerPositionService');
     scof = $injector.get('StateCardObjectFactory');

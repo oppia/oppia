@@ -16,8 +16,11 @@
  * @fileoverview Unit tests for GenerateContentIdService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('GenerateContentIdService', function() {
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('COMPONENT_NAME_FEEDBACK', 'feedback');
     $provide.value('COMPONENT_NAME_HINT', 'hint');
     $provide.value('COMPONENT_NAME_WORKED_EXAMPLE', 'worked_example');
@@ -38,7 +41,7 @@ describe('GenerateContentIdService', function() {
     worked_example_1: {}
   };
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     gcis = $injector.get('GenerateContentIdService');
     scitat = $injector.get('StateContentIdsToAudioTranslationsService');
     citatof = $injector.get('ContentIdsToAudioTranslationsObjectFactory');

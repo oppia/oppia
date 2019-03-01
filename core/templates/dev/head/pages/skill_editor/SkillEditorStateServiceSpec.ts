@@ -16,6 +16,9 @@
 * @fileoverview Unit tests for SkillEditorStateService.js
 */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Skill editor state service', function() {
   var SkillEditorStateService, $q, $rootScope,
     SkillObjectFactory, SkillUpdateService,
@@ -65,8 +68,8 @@ describe('Skill editor state service', function() {
     return self;
   };
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableSkillBackendApiService = (
       new FakeEditableSkillBackendApiService());
     $provide.value(
@@ -80,7 +83,7 @@ describe('Skill editor state service', function() {
       [fakeSkillRightsBackendApiService][0]);
   }));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     SkillEditorStateService = $injector.get(
       'SkillEditorStateService');
     SkillObjectFactory = $injector.get('SkillObjectFactory');

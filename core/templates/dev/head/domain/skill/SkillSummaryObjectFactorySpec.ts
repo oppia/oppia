@@ -16,12 +16,15 @@
  * @fileoverview Tests for SkillSummaryObjectFactory.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Skill summary object factory', function() {
   var SkillSummaryObjectFactory = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
   }));
 

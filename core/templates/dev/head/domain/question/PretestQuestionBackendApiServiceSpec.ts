@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for PretestQuestionBackendApiService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Pretest question backend API service', function() {
   var PretestQuestionBackendApiService = null;
   var sampleDataResults = null;
@@ -23,10 +26,10 @@ describe('Pretest question backend API service', function() {
   var $scope = null;
   var $httpBackend = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     PretestQuestionBackendApiService = $injector.get(
       'PretestQuestionBackendApiService');
     $rootScope = $injector.get('$rootScope');

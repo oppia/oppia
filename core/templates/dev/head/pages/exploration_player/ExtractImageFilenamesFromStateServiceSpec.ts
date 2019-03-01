@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for the extracting image files in state service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Extracting Image file names in the state service', function() {
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
-    module(function($provide) {
+    angular.mock.module(function($provide) {
       $provide.constant('INTERACTION_SPECS', {
         TextInput: {
           is_terminal: false
@@ -46,7 +49,7 @@ describe('Extracting Image file names in the state service', function() {
   var $rootScope = null;
   var explorationDict;
   var ImageFilenamesInExploration;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     eof = $injector.get('ExplorationObjectFactory');
     ecs = $injector.get('ContextService');
     eifss = $injector.get('ExtractImageFilenamesFromStateService');

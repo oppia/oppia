@@ -16,18 +16,21 @@
  * @fileoverview Unit tests for the training data service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('TrainingDataService', function() {
   var $httpBackend;
   var scope, siis, ecs, cls, rs, tds, ess, IS, oof;
   var mockExplorationData;
 
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
-    module(function($provide) {
+    angular.mock.module(function($provide) {
       $provide.constant('INTERACTION_SPECS', {
         TextInput: {
           display_mode: 'inline',
@@ -39,13 +42,13 @@ describe('TrainingDataService', function() {
       explorationId: 0,
       autosaveChangeList: function() {}
     };
-    module(function($provide) {
+    angular.mock.module(function($provide) {
       $provide.value('ExplorationDataService', [mockExplorationData][0]);
     });
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
 
-  beforeEach(inject(function($injector, $rootScope) {
+  beforeEach(angular.mock.inject(function($injector, $rootScope) {
     scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     siis = $injector.get('StateInteractionIdService');

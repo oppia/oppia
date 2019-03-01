@@ -16,14 +16,17 @@
 * @fileoverview Unit tests for SuggestionThreadObjectFactory.
 */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Suggestion thread object factory', function() {
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
   var SuggestionThreadObjectFactory = null;
   var SuggestionObjectFactory = null;
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     SuggestionThreadObjectFactory = $injector.get(
       'SuggestionThreadObjectFactory');
     SuggestionObjectFactory = $injector.get('SuggestionObjectFactory');

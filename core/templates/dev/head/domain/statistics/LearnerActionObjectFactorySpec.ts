@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for the LearnerActionObjectFactory.
  */
 
-describe('Learner Action Object Factory', function() {
-  beforeEach(module('oppia'));
+import * as angular from 'angular';
+import 'angular-mocks';
 
-  beforeEach(inject(function($injector) {
+describe('Learner Action Object Factory', function() {
+  beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.inject(function($injector) {
     this.LearnerActionObjectFactory =
         $injector.get('LearnerActionObjectFactory');
     this.LEARNER_ACTION_SCHEMA_LATEST_VERSION =

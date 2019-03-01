@@ -53,6 +53,9 @@ var sharedErrorWrapper = function(message, line, code, category) {
   };
 };
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Full system', function() {
   var completeCheck = function(assumptionsString, targetString, proofString) {
     var questionInstance = logicProofStudent.buildInstance(

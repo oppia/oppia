@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for the Code Normalizer Service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Code Normalization', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var cns = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     cns = $injector.get('CodeNormalizerService');
   }));
 

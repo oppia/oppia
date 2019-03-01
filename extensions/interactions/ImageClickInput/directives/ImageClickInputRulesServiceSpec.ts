@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for Image Click Input rules.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Image Click Input rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var icirs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     icirs = $injector.get('imageClickInputRulesService');
   }));
 

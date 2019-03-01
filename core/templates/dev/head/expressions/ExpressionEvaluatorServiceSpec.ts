@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Expression evaluator service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var ees = null;
   var eps = null;
   var ests = null;
   var isString = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ees = $injector.get('ExpressionEvaluatorService');
     eps = $injector.get('ExpressionParserService');
     ests = $injector.get('ExpressionSyntaxTreeService');

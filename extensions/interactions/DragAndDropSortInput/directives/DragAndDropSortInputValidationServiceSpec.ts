@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('DragAndDropSortInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 
@@ -23,10 +26,10 @@ describe('DragAndDropSortInputValidationService', function() {
   var oof, agof, rof;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('DragAndDropSortInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');
     agof = $injector.get('AnswerGroupObjectFactory');

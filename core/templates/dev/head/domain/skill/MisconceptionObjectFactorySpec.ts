@@ -16,14 +16,17 @@
 * @fileoverview Unit tests for MisconceptionObjectFacfory.
 */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Misconception object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('MisconceptionObjectFacfory', function() {
     var MisconceptionObjectFactory;
     var misconceptionDict;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       misconceptionDict = {
         id: '1',

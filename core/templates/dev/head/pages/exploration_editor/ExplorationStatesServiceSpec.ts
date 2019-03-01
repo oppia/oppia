@@ -16,10 +16,13 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
-describe('ExplorationStatesService', function() {
-  beforeEach(module('oppia'));
+import * as angular from 'angular';
+import 'angular-mocks';
 
-  beforeEach(inject(function($injector) {
+describe('ExplorationStatesService', function() {
+  beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.inject(function($injector) {
     this.ess = $injector.get('ExplorationStatesService');
 
     spyOn($injector.get('ContextService'), 'getExplorationId')
@@ -68,7 +71,7 @@ describe('ExplorationStatesService', function() {
         }
       });
     });
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       // ChangeListService will need its calls mocked out since it isn't
       // configured correctly in, or interesting to, the tests of this block.
       this.cls = $injector.get('ChangeListService');
@@ -92,7 +95,7 @@ describe('ExplorationStatesService', function() {
     describe('.registerOnStateDeletedCallback', function() {
       var STATE_NAME = 'Hola';
 
-      beforeEach(inject(function($injector) {
+      beforeEach(angular.mock.inject(function($injector) {
         spyOn(this.cls, 'deleteState');
 
         var modalArgs = {

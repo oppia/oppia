@@ -16,8 +16,11 @@
  * @fileoverview Unit tests for statistics services.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('StateImprovementSuggestionService', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   // TODO(bhenning): These tests were ported from the backend tests. More tests
   // should be added to make sure getStateImprovements() is thoroughly tested.
@@ -286,7 +289,7 @@ describe('StateImprovementSuggestionService', function() {
       stateStats.total_entry_count++;
     };
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       siss = $injector.get('StateImprovementSuggestionService');
       ssof = $injector.get('StatesObjectFactory');
     }));

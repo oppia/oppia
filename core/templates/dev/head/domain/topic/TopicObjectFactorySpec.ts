@@ -16,13 +16,16 @@
  * @fileoverview Tests for TopicObjectFactory.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Topic object factory', function() {
   var TopicObjectFactory = null;
   var _sampleTopic = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     TopicObjectFactory = $injector.get('TopicObjectFactory');
 
     var sampleTopicBackendObject = {

@@ -16,16 +16,19 @@
  * @fileoverview Unit tests for SearchExplorationsBackendApiService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Exploration search backend API service', function() {
   var SearchExplorationsBackendApiService = null;
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     SearchExplorationsBackendApiService = $injector.get(
       'SearchExplorationsBackendApiService');
     $rootScope = $injector.get('$rootScope');

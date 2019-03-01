@@ -16,8 +16,11 @@
  * @fileoverview Unit tests for the Exploration data service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Exploration data service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('getData local save', function() {
     var eds = null;
@@ -29,15 +32,15 @@ describe('Exploration data service', function() {
     var $q = null;
 
     beforeEach(function() {
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value(
           'LocalStorageService', [mockLocalStorageService][0]);
       });
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value(
           'EditableExplorationBackendApiService', [mockBackendApiService][0]);
       });
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value(
           'UrlService', [mockUrlService][0]);
       });
@@ -59,7 +62,7 @@ describe('Exploration data service', function() {
       spyOn(mockUrlService, 'getPathname').and.returnValue('/create/exp_id');
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       eds = $injector.get('ExplorationDataService');
       $q = $injector.get('$q');
     }));

@@ -17,6 +17,9 @@
  * user's explorations.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Creator dashboard controller', function() {
   describe('CreatorDashboard', function() {
     var scope, ctrl;
@@ -52,11 +55,11 @@ describe('Creator dashboard controller', function() {
       }
     };
 
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(function() {
-      module('oppia');
-      module(function($provide) {
+      angular.mock.module('oppia');
+      angular.mock.module(function($provide) {
         $provide.factory(
           'CreatorDashboardBackendApiService', ['$q', function($q) {
             var fetchDashboardData = function() {
@@ -69,7 +72,7 @@ describe('Creator dashboard controller', function() {
       });
     });
 
-    beforeEach(inject(
+    beforeEach(angular.mock.inject(
       function($controller, $rootScope, CreatorDashboardBackendApiService) {
         mockDashboardBackendApiService = CreatorDashboardBackendApiService;
         spyOn(mockDashboardBackendApiService, 'fetchDashboardData')

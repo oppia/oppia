@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for Solution Verification Service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Solution Verification Service', function() {
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
-    module(function($provide) {
+    angular.mock.module(function($provide) {
       $provide.constant('INTERACTION_SPECS', {
         TextInput: {
           display_mode: 'inline',
@@ -45,13 +48,13 @@ describe('Solution Verification Service', function() {
       explorationId: 0,
       autosaveChangeList: function() {}
     };
-    module(function($provide) {
+    angular.mock.module(function($provide) {
       $provide.value('ExplorationDataService', [mockExplorationData][0]);
     });
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ess = $injector.get('ExplorationStatesService');
     siis = $injector.get('StateInteractionIdService');
     scas = $injector.get('StateCustomizationArgsService');

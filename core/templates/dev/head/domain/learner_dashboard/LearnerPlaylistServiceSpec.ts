@@ -16,6 +16,9 @@
  * @fileoverview Tests for LearnerPlaylistService.js.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;
   var $httpBackend = null;
@@ -28,10 +31,10 @@ describe('Learner playlist service factory', function() {
   var spyInfoMessage = null;
   var spySuccessMessage = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
     LearnerPlaylistService = $injector.get(
       'LearnerPlaylistService');

@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('User info factory', function() {
   var UserInfoObjectFactory = null;
 
@@ -29,9 +32,9 @@ describe('User info factory', function() {
     user_is_logged_in: true
   };
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     UserInfoObjectFactory = $injector.get('UserInfoObjectFactory');
   }));
 

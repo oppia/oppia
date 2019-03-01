@@ -33,6 +33,9 @@ var errorWrapper = function(dubiousFunction, input, parameter = null) {
   };
 };
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Parse then display expressions', function() {
   var parseThenDisplay = function(expressionString) {
     return logicProofShared.displayExpression(

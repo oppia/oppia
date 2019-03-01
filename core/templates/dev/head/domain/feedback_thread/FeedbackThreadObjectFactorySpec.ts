@@ -16,11 +16,14 @@
 * @fileoverview Unit tests for FeedbackThreadObjectFactory.
 */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Feedback thread object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
   var FeedbackThreadObjectFactory = null;
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
   }));
 

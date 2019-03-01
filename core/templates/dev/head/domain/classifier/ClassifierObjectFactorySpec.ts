@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for the ClassifierObjectFactory.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Classifier Object Factory', function() {
   var ClassifierObjectFactory;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ClassifierObjectFactory = $injector.get('ClassifierObjectFactory');
   }));
 

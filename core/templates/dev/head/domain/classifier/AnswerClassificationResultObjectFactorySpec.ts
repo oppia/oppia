@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for the AnswerClassificationResultObjectFactory.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Answer classification result object factory', function() {
   var oof, acrof;
   var DEFAULT_OUTCOME_CLASSIFICATION;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     acrof = $injector.get('AnswerClassificationResultObjectFactory');
     oof = $injector.get('OutcomeObjectFactory');
     DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(

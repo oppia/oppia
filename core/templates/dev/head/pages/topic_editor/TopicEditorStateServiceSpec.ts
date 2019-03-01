@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
@@ -95,9 +98,9 @@ describe('Topic editor state service', function() {
     return self;
   };
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableTopicBackendApiService = (
       new FakeEditableTopicBackendApiService());
     $provide.value(
@@ -111,7 +114,7 @@ describe('Topic editor state service', function() {
       [fakeTopicRightsBackendApiService][0]);
   }));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     TopicEditorStateService = $injector.get(
       'TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');

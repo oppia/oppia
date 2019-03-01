@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for LearnerDashboardBackendApiService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Learner Dashboard Backend API Service', function() {
   var LearnerDashboardBackendApiService = null;
   var $httpBackend = null;
@@ -50,10 +53,10 @@ describe('Learner Dashboard Backend API Service', function() {
   var LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';
   var ERROR_STATUS_CODE = 500;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     LearnerDashboardBackendApiService = $injector.get(
       'LearnerDashboardBackendApiService');
     $httpBackend = $injector.get('$httpBackend');

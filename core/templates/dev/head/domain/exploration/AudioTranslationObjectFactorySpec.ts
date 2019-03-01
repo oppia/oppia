@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for the AudioTranslation object factory.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('AudioTranslation object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('AudioTranslationObjectFactory', function() {
     var scope, atof, audioTranslation;
 
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(angular.mock.inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       atof = $injector.get('AudioTranslationObjectFactory');
       audioTranslation = atof.createFromBackendDict({
@@ -32,7 +35,7 @@ describe('AudioTranslation object factory', function() {
       });
     }));
 
-    it('should correctly mark audio as needing update', inject(function() {
+    it('should correctly mark audio as needing update', angular.mock.inject(function() {
       audioTranslation.markAsNeedingUpdate();
       expect(audioTranslation).toEqual(atof.createFromBackendDict({
         filename: 'a.mp3',
@@ -41,7 +44,7 @@ describe('AudioTranslation object factory', function() {
       }));
     }));
 
-    it('should toggle needs update attribute correctly', inject(function() {
+    it('should toggle needs update attribute correctly', angular.mock.inject(function() {
       audioTranslation.toggleNeedsUpdateAttribute();
       expect(audioTranslation).toEqual(atof.createFromBackendDict({
         filename: 'a.mp3',
@@ -57,7 +60,7 @@ describe('AudioTranslation object factory', function() {
       }));
     }));
 
-    it('should convert to backend dict correctly', inject(function() {
+    it('should convert to backend dict correctly', angular.mock.inject(function() {
       expect(audioTranslation.toBackendDict()).toEqual({
         filename: 'a.mp3',
         file_size_bytes: 200000,
@@ -65,7 +68,7 @@ describe('AudioTranslation object factory', function() {
       });
     }));
 
-    it('should create a new audio translation', inject(function() {
+    it('should create a new audio translation', angular.mock.inject(function() {
       expect(atof.createNew('filename.mp3', 100000)).toEqual(
         atof.createFromBackendDict({
           filename: 'filename.mp3',
@@ -75,7 +78,7 @@ describe('AudioTranslation object factory', function() {
       );
     }));
 
-    it('should get the correct file size in MB', inject(function() {
+    it('should get the correct file size in MB', angular.mock.inject(function() {
       var NUM_BYTES_IN_MB = 1 << 20;
       expect(audioTranslation.getFileSizeMB()).toEqual(
         200000 / NUM_BYTES_IN_MB);

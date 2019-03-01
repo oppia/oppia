@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for the editor prerequisites page.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Signup controller', function() {
   describe('SignupCtrl', function() {
     var scope, ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
 
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(inject(function($controller, $http, _$httpBackend_, $rootScope) {
+    beforeEach(angular.mock.inject(function($controller, $http, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/signuphandler/data').respond({
         username: 'myUsername',

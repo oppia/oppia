@@ -16,8 +16,11 @@
 * @fileoverview Unit tests for SkillObjectFactory.
 */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Skill object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('SkillObjectFactory', function() {
     var SkillObjectFactory = null;
@@ -28,7 +31,7 @@ describe('Skill object factory', function() {
     var skillContentsDict = null;
     var skillDict = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       SkillObjectFactory = $injector.get('SkillObjectFactory');
       MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       ConceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');

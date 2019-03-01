@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for StateTopAnswersStatsBackendApiService.
  */
 
-describe('StateTopAnswersStatsBackendApiService', function() {
-  beforeEach(module('oppia'));
+import * as angular from 'angular';
+import 'angular-mocks';
 
-  beforeEach(inject(function($injector) {
+describe('StateTopAnswersStatsBackendApiService', function() {
+  beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.inject(function($injector) {
     this.StateTopAnswersStatsBackendApiService =
       $injector.get('StateTopAnswersStatsBackendApiService');
     this.$httpBackend = $injector.get('$httpBackend');

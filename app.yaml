@@ -48,9 +48,14 @@ handlers:
 # Serve js scripts and css files under core/templates/dev/head.
 # This regex allows us to recursively serve js scripts.
 # "\1" inserts text captured by the capture group in the URL pattern.
-- url: /templates/dev/head/(.*\.(js|css))$
+- url: /templates/dev/head/(.*\.(css))$
   static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(js|css))$
+  upload: core/templates/dev/head/(.*\.(css))$
+  secure: always
+  expiration: "0"
+- url: /templates/dev/head/(.*\.(js))$
+  static_files: compiled_js/core/templates/dev/head/\1
+  upload: compiled_js/core/templates/dev/head/(.*\.(js))$
   secure: always
   expiration: "0"
 - url: /templates/dev/head/(.*directive\.html)$
@@ -63,9 +68,14 @@ handlers:
   static_dir: third_party/generated
   secure: always
   expiration: "0"
-- url: /extensions/interactions/(.*)/static/(.*)
+- url: /extensions/interactions/(.*)/static/(.*\.(css|png))
   static_files: extensions/interactions/\1/static/\2
-  upload: extensions/interactions/(.*)/static/(.*)
+  upload: extensions/interactions/(.*)/static/(.*\.(css|png))
+  secure: always
+  expiration: "0"
+- url: /extensions/interactions/(.*)/static/(.js)
+  static_files: extensions/interactions/\1/static/\2
+  upload: compiled_js/extensions/interactions/(.*)/static/(.js)
   secure: always
   expiration: "0"
 - url: /extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
@@ -77,9 +87,14 @@ handlers:
 # and objects under extensions in dev mode. This regex allows us to recursively serve js
 # scripts under the three specified directories. "\1" and "\2" insert capture
 # groups from the url pattern.
-- url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js|png))$
+- url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
   static_files: extensions/\1/\2
-  upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js|png))$
+  upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
+  secure: always
+  expiration: "0"
+- url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js))$
+  static_files: compiled_js/extensions/\1/\2
+  upload: compiled_js/extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js))$
   secure: always
   expiration: "0"
 - url: /extensions/visualizations/(.*\.html)

@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the FocusManagerService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Focus Manager Service', function() {
   var FocusManagerService;
   var DeviceInfoService;
@@ -26,8 +29,8 @@ describe('Focus Manager Service', function() {
   var focusLabel = 'FocusLabel';
   var focusLabelTwo = 'FocusLabelTwo';
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     clearLabel = $injector.get('LABEL_FOR_CLEARING_FOCUS');
     FocusManagerService = $injector.get('FocusManagerService');
     DeviceInfoService = $injector.get('DeviceInfoService');

@@ -15,14 +15,17 @@
 /**
  * @fileoverview unit tests for the fraction object type factory service.
  */
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('FractionObjectFactory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('fraction object factory', function() {
     var errors = null;
     var Fraction = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       errors = $injector.get('FRACTION_PARSING_ERRORS');
       Fraction = $injector.get('FractionObjectFactory');
     }));

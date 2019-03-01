@@ -16,15 +16,18 @@
  * @fileoverview Unit tests for Solution Validity Service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Solution Validity Service', function() {
   describe('SolutionValidityService', function() {
     beforeEach(function() {
-      module('oppia');
+      angular.mock.module('oppia');
     });
 
     var scope, svs;
 
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(angular.mock.inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       svs = $injector.get('SolutionValidityService');
 

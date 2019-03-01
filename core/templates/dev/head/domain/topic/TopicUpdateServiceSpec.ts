@@ -16,6 +16,9 @@
  * @fileoverview Tests for Topic update service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Topic update service', function() {
   var ContentIdsToAudioTranslationsObjectFactory = null;
   var TopicUpdateService = null;
@@ -32,9 +35,9 @@ describe('Topic update service', function() {
   var _thirdSkillSummary = null;
   var _sampleSubtopicPage = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ContentIdsToAudioTranslationsObjectFactory = $injector.get(
       'ContentIdsToAudioTranslationsObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');

@@ -16,13 +16,16 @@
  * @fileoverview Unit test for the Editor state service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Editor state service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('editor state service', function() {
     var ecs = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       ecs = $injector.get('StateEditorService');
     }));
 

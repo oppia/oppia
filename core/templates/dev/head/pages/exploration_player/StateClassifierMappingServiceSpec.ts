@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for the State classifier mapping service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('State classifier mapping service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Test correct retrieval of classifier details', function() {
     var mappingService;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       mappingService = $injector.get('StateClassifierMappingService');
 
       mappingService.init({

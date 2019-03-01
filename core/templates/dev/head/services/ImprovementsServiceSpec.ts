@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('ImprovementsService', function() {
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     this.ImprovementsService = $injector.get('ImprovementsService');
   }));
 

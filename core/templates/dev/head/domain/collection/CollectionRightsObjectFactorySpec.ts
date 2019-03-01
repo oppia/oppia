@@ -16,12 +16,15 @@
  * @fileoverview Tests for CollectionRightsObjectFactory.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Collection rights object factory', function() {
   var CollectionRightsObjectFactory = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     CollectionRightsObjectFactory = $injector.get(
       'CollectionRightsObjectFactory');
   }));

@@ -16,6 +16,9 @@
  * @fileoverview Tests for GuestCollectionProgressService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Guest collection progress service', function() {
   var GuestCollectionProgressService = null;
   var CollectionObjectFactory = null;
@@ -30,9 +33,9 @@ describe('Guest collection progress service', function() {
   var _expTitle2 = null;
   var _collection0 = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     GuestCollectionProgressService = $injector.get(
       'GuestCollectionProgressService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');

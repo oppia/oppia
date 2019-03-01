@@ -16,19 +16,22 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Library controller', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Library', function() {
     var scope, ctrl, rootScope, $httpBackend;
 
     beforeEach(function() {
-      module('ui.bootstrap');
+      angular.mock.module('ui.bootstrap');
     });
 
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(inject(function($controller, _$httpBackend_, $rootScope) {
+    beforeEach(angular.mock.inject(function($controller, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/searchhandler/data').respond({
         allow_yaml_file_upload: false,

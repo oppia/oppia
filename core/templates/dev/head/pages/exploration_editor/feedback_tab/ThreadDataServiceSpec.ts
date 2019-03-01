@@ -17,12 +17,15 @@
  * data for the feedback tab of the exploration editor.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('retrieving threads service', function() {
   var expId = '12345';
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(function() {
-    module('oppia');
-    module(function($provide) {
+    angular.mock.module('oppia');
+    angular.mock.module(function($provide) {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
@@ -30,7 +33,7 @@ describe('retrieving threads service', function() {
   });
 
   var ThreadDataService, httpBackend;
-  beforeEach(inject(function($httpBackend, _ThreadDataService_) {
+  beforeEach(angular.mock.inject(function($httpBackend, _ThreadDataService_) {
     ThreadDataService = _ThreadDataService_;
     httpBackend = $httpBackend;
   }));

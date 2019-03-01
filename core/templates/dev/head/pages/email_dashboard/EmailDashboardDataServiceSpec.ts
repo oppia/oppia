@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for the email dashboard page.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Email Dashboard Services', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Email Dashboard Services', function() {
     var service, $httpBackend, recentQueries;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       $httpBackend = $injector.get('$httpBackend');
       service = $injector.get('EmailDashboardDataService');
     }));

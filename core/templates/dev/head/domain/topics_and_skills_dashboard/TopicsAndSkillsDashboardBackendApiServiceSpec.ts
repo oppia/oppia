@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Topics and Skills Dashboard backend API service', function() {
   var TopicsAndSkillsDashboardBackendApiService = null;
   var $httpBackend = null;
@@ -42,10 +45,10 @@ describe('Topics and Skills Dashboard backend API service', function() {
     '/topics_and_skills_dashboard/data';
   var ERROR_STATUS_CODE = 500;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     TopicsAndSkillsDashboardBackendApiService = $injector.get(
       'TopicsAndSkillsDashboardBackendApiService');
     UrlInterpolationService = $injector.get('UrlInterpolationService');

@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for EditableExplorationBackendApiService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Editable exploration backend API service', function() {
   var EditableExplorationBackendApiService = null;
   var ReadOnlyExplorationBackendApiService = null;
@@ -24,10 +27,10 @@ describe('Editable exploration backend API service', function() {
   var $scope = null;
   var $httpBackend = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     EditableExplorationBackendApiService = $injector.get(
       'EditableExplorationBackendApiService');
     ReadOnlyExplorationBackendApiService = $injector.get(

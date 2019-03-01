@@ -16,11 +16,14 @@
 * @fileoverview Unit tests for ParamMetadataObjectFactory.
 */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('ParameterMetadata object factory', function() {
   var parameterMetadata = null;
   var pmof = null;
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     pmof = $injector.get('ParamMetadataObjectFactory');
   }));
 

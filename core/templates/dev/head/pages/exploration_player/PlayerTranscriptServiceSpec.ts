@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for the player transcript service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Player transcript service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var pts;
   var scof;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     pts = $injector.get('PlayerTranscriptService');
     scof = $injector.get('StateCardObjectFactory');
   }));

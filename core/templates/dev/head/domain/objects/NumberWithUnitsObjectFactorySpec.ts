@@ -15,8 +15,11 @@
 /**
  * @fileoverview unit tests for number with units object type factory service.
  */
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('NumberWithUnitsObjectFactory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('number with units object factory', function() {
     var NumberWithUnits = null;
@@ -24,7 +27,7 @@ describe('NumberWithUnitsObjectFactory', function() {
     var Fraction = null;
     var errors = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       NumberWithUnits = $injector.get('NumberWithUnitsObjectFactory');
       Units = $injector.get('UnitsObjectFactory');
       Fraction = $injector.get('FractionObjectFactory');

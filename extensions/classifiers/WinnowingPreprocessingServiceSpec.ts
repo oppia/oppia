@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for the winnowing preprocessing functions.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Winnowing preprocessing functions', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Test winnowing preprocessing functions', function() {
     var service;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       service = $injector.get('WinnowingPreprocessingService');
     }));
 

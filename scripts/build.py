@@ -70,7 +70,7 @@ UGLIFY_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
 # Files with these extensions shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
+FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
 # Files with these name patterns shouldn't be moved to build directory, and will
 # not be served in production. (This includes protractor.js files in
 # /extensions.)
@@ -1101,6 +1101,11 @@ def generate_build_directory():
     print 'Build completed.'
 
 
+def compile_typescript_files():
+    cmd = '../node_modules/typescript/bin/tsc'
+    subprocess.call(cmd)
+
+
 def build():
     """The main method of this script.
 
@@ -1118,6 +1123,8 @@ def build():
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+
+    compile_typescript_files()
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.

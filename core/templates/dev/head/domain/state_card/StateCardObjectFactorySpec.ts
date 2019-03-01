@@ -16,6 +16,9 @@
  * @fileoverview Tests for StateCardObjectFactory.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('State card object factory', function() {
   var StateCardObjectFactory = null;
   var InteractionObjectFactory = null;
@@ -24,9 +27,9 @@ describe('State card object factory', function() {
   var AudioTranslationObjectFactory = null;
   var _sampleCard = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     StateCardObjectFactory = $injector.get('StateCardObjectFactory');
     InteractionObjectFactory = $injector.get('InteractionObjectFactory');
     ContentIdsToAudioTranslationsObjectFactory =

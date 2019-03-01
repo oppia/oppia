@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for the BackgroundMaskService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Background Mask Service', function() {
   var BackgroundMaskService;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     BackgroundMaskService = $injector.get('BackgroundMaskService');
   }));
 

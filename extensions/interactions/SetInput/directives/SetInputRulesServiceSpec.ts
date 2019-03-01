@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for Set Input rules.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Set Input rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var sirs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     sirs = $injector.get('setInputRulesService');
   }));
 

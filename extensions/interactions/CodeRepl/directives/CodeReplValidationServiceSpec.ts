@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('CodeReplValidationService', function() {
   var WARNING_TYPES, validatorService;
   var currentState, customizationArguments;
@@ -19,10 +22,10 @@ describe('CodeReplValidationService', function() {
   var oof, agof;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     validatorService = $injector.get('CodeReplValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     oof = $injector.get('OutcomeObjectFactory');

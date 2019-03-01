@@ -16,8 +16,11 @@
  * @fileoverview Tests for the form builders.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('HTML to text', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var htmlUnicodeHtmlPairings = [
     ['abc', 'abc', 'abc'],
@@ -29,7 +32,7 @@ describe('HTML to text', function() {
     ['abc  a', 'abc  a', 'abc  a']
   ];
 
-  it('should convert HTML to and from raw text correctly', inject(
+  it('should convert HTML to and from raw text correctly', angular.mock.inject(
     function($filter) {
       htmlUnicodeHtmlPairings.forEach(function(pairing) {
         expect($filter('convertHtmlToUnicode')(pairing[0])).toEqual(pairing[1]);
@@ -46,7 +49,7 @@ describe('HTML to text', function() {
     '{{a}\\}'
   ];
 
-  it('should detect invalid unicode strings', inject(function($filter) {
+  it('should detect invalid unicode strings', angular.mock.inject(function($filter) {
     invalidUnicodeStrings.forEach(function(s) {
       var fn = function() {
         return $filter('convertUnicodeWithParamsToHtml')(s);
@@ -62,7 +65,7 @@ describe('HTML to text', function() {
     '\\{{{abc}}'
   ];
 
-  it('should detect valid unicode strings', inject(function($filter) {
+  it('should detect valid unicode strings', angular.mock.inject(function($filter) {
     var results = [
       '<oppia-parameter></oppia-parameter>',
       '<oppia-parameter>abc</oppia-parameter>',
@@ -87,15 +90,15 @@ describe('Normalizer tests', function() {
     'isInteger'
   ];
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  it('should have the relevant filters', inject(function($filter) {
+  it('should have the relevant filters', angular.mock.inject(function($filter) {
     angular.forEach(filterNames, function(filterName) {
       expect($filter(filterName)).not.toEqual(null);
     });
   }));
 
-  it('should validate floats correctly', inject(function($filter) {
+  it('should validate floats correctly', angular.mock.inject(function($filter) {
     var filter = $filter('isFloat');
     expect(filter('1.23')).toEqual(1.23);
     expect(filter('-1.23')).toEqual(-1.23);
@@ -128,7 +131,7 @@ describe('Normalizer tests', function() {
     expect(filter(undefined)).toBeUndefined();
   }));
 
-  it('should impose minimum bounds', inject(function($filter) {
+  it('should impose minimum bounds', angular.mock.inject(function($filter) {
     var filter = $filter('isAtLeast');
     var args = {
       minValue: -2.0
@@ -141,7 +144,7 @@ describe('Normalizer tests', function() {
     expect(filter(-3, args)).toBe(false);
   }));
 
-  it('should impose maximum bounds', inject(function($filter) {
+  it('should impose maximum bounds', angular.mock.inject(function($filter) {
     var filter = $filter('isAtMost');
     var args = {
       maxValue: -2.0
@@ -154,13 +157,13 @@ describe('Normalizer tests', function() {
     expect(filter(-1.99, args)).toBe(false);
   }));
 
-  it('should validate non-emptiness', inject(function($filter) {
+  it('should validate non-emptiness', angular.mock.inject(function($filter) {
     var filter = $filter('isNonempty');
     expect(filter('a')).toBe(true);
     expect(filter('')).toBe(false);
   }));
 
-  it('should validate integers', inject(function($filter) {
+  it('should validate integers', angular.mock.inject(function($filter) {
     var filter = $filter('isInteger');
     expect(filter('3')).toBe(true);
     expect(filter('-3')).toBe(true);
@@ -172,9 +175,9 @@ describe('Normalizer tests', function() {
 describe('Testing requireIsFloat directive', function() {
   var $compile, scope, testInput;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($compile, $rootScope) {
+  beforeEach(angular.mock.inject(function($compile, $rootScope) {
     scope = $rootScope.$new();
     var element = '<form name="testForm">' +
       '<input name="floatValue" type="number" ng-model="localValue" ' +
@@ -228,9 +231,9 @@ describe('Testing requireIsFloat directive', function() {
 describe('Testing apply-validation directive', function() {
   var $compile, element, scope, testInput;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($rootScope) {
+  beforeEach(angular.mock.inject(function($rootScope) {
     scope = $rootScope.$new();
     element = '<form name="testForm">' +
       '<input name="inputValue" type="number" ng-model="localValue" ' +
@@ -238,7 +241,7 @@ describe('Testing apply-validation directive', function() {
       '</form>';
   }));
 
-  it('should apply isAtLeast validation', inject(function($compile) {
+  it('should apply isAtLeast validation', angular.mock.inject(function($compile) {
     scope.validators = function() {
       return [{
         id: 'isAtLeast',
@@ -274,7 +277,7 @@ describe('Testing apply-validation directive', function() {
     expect(Object.keys(testInput.$error).length).toEqual(1);
   }));
 
-  it('should apply isAtMost validation', inject(function($compile) {
+  it('should apply isAtMost validation', angular.mock.inject(function($compile) {
     scope.validators = function() {
       return [{
         id: 'isAtMost',
@@ -310,7 +313,7 @@ describe('Testing apply-validation directive', function() {
     expect(Object.keys(testInput.$error).length).toEqual(1);
   }));
 
-  it('should apply isNonempty validation', inject(function($compile) {
+  it('should apply isNonempty validation', angular.mock.inject(function($compile) {
     scope.validators = function() {
       return [{
         id: 'isNonempty'
@@ -335,7 +338,7 @@ describe('Testing apply-validation directive', function() {
     expect(Object.keys(testInput.$error).length).toEqual(1);
   }));
 
-  it('should apply isInteger validation', inject(function($compile) {
+  it('should apply isInteger validation', angular.mock.inject(function($compile) {
     scope.validators = function() {
       return [{
         id: 'isInteger'
@@ -370,7 +373,7 @@ describe('Testing apply-validation directive', function() {
     expect(Object.keys(testInput.$error).length).not.toEqual(0);
   }));
 
-  it('should apply isFloat validation', inject(function($compile) {
+  it('should apply isFloat validation', angular.mock.inject(function($compile) {
     scope.validators = function() {
       return [{
         id: 'isFloat'
@@ -425,7 +428,7 @@ describe('Testing apply-validation directive', function() {
     expect(Object.keys(testInput.$error).length).not.toEqual(0);
   }));
 
-  it('should not apply nonexistent validation', inject(function($compile) {
+  it('should not apply nonexistent validation', angular.mock.inject(function($compile) {
     scope.validators = function() {
       return [{
         id: 'testFilterFilter'

@@ -16,15 +16,18 @@
  * @fileoverview Tests for Story update service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Story update service', function() {
   var StoryUpdateService = null;
   var StoryObjectFactory = null;
   var UndoRedoService = null;
   var _sampleStory = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     StoryUpdateService = $injector.get('StoryUpdateService');
     StoryObjectFactory = $injector.get('StoryObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');

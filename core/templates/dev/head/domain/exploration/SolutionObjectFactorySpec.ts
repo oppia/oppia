@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for the Solution object factory.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Solution object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('SolutionObjectFactory', function() {
     var scope, sof, solution;
-    beforeEach(inject(function($injector, $rootScope) {
+    beforeEach(angular.mock.inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       sof = $injector.get('SolutionObjectFactory');
       solution = sof.createFromBackendDict({

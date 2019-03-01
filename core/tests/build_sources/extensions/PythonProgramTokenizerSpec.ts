@@ -16,12 +16,15 @@
  * @fileoverview Unit tests python program tokenizer.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Python program tokenizer', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Test python program tokenizer', function() {
     var tokenizer;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       tokenizer = $injector.get('PythonProgramTokenizer');
     }));
 

@@ -24,6 +24,9 @@
  * tests to ensure it is working properly.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Interaction validator', function() {
   var scope, filter, bivs, WARNING_TYPES, agof;
 
@@ -32,10 +35,10 @@ describe('Interaction validator', function() {
   var agof, oof;
 
   beforeEach(function() {
-    module('oppia');
+    angular.mock.module('oppia');
   });
 
-  beforeEach(inject(function($injector, $rootScope) {
+  beforeEach(angular.mock.inject(function($injector, $rootScope) {
     scope = $rootScope.$new();
     filter = $injector.get('$filter');
     bivs = $injector.get('baseInteractionValidationService');

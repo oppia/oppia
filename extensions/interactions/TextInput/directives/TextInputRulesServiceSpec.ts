@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for Text Input rules.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Text Input rules service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var tirs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     tirs = $injector.get('textInputRulesService');
   }));
 

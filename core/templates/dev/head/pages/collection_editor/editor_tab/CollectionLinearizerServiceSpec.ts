@@ -16,6 +16,9 @@
  * @fileoverview Tests for CollectionLinearizerService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Collection linearizer service', function() {
   var CollectionObjectFactory = null;
   var CollectionNodeObjectFactory = null;
@@ -25,9 +28,9 @@ describe('Collection linearizer service', function() {
   var secondCollectionNode = null;
   var thirdCollectionNode = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
     CollectionLinearizerService = $injector.get('CollectionLinearizerService');

@@ -17,11 +17,14 @@
  * by both the learner and editor views
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Exploration Html Formatter Service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
   var ehfs = null;
 
-  beforeEach(module(function($provide) {
+  beforeEach(angular.mock.module(function($provide) {
     $provide.constant('INTERACTION_SPECS', {
       sampleId: {
         show_generic_submit_button: true
@@ -29,7 +32,7 @@ describe('Exploration Html Formatter Service', function() {
     });
   }));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ehfs = $injector.get('ExplorationHtmlFormatterService');
   }));
 

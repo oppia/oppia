@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for CollectionEditorStateService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;
   var CollectionObjectFactory = null;
@@ -70,9 +73,9 @@ describe('Collection editor state service', function() {
     return self;
   };
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableCollectionBackendApiService = (
       new FakeEditableCollectionBackendApiService());
     $provide.value(
@@ -86,7 +89,7 @@ describe('Collection editor state service', function() {
       [fakeCollectionRightsBackendApiService][0]);
   }));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     CollectionEditorStateService = $injector.get(
       'CollectionEditorStateService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');

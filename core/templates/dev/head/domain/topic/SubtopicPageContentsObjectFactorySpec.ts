@@ -16,6 +16,9 @@
  * @fileoverview Tests for SubtopicPageContentsObjectFactory.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Subtopic page contents object factory', function() {
   var SubtopicPageContentsObjectFactory = null;
 
@@ -45,9 +48,9 @@ describe('Subtopic page contents object factory', function() {
     }
   };
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     SubtopicPageContentsObjectFactory =
       $injector.get('SubtopicPageContentsObjectFactory');
   }));

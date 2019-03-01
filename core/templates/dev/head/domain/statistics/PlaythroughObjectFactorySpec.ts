@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for the PlaythroughObjectFactory.
  */
 
-describe('Playthrough Object Factory', function() {
-  beforeEach(module('oppia'));
+import * as angular from 'angular';
+import 'angular-mocks';
 
-  beforeEach(inject(function($injector) {
+describe('Playthrough Object Factory', function() {
+  beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.inject(function($injector) {
     this.pof = $injector.get('PlaythroughObjectFactory');
     this.laof = $injector.get('LearnerActionObjectFactory');
   }));

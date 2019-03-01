@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for the count vectorizer service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Count vectorizer service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('Test count vectorizer service', function() {
     var service;
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       service = $injector.get('CountVectorizerService');
     }));
 

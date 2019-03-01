@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for Numeric Input rules.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Numeric Input service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var nirs = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     nirs = $injector.get('numericInputRulesService');
   }));
 

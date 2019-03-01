@@ -16,12 +16,15 @@
  * @fileoverview Tests for CollectionNodeObjectFactory.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Collection node object factory', function() {
   var CollectionNodeObjectFactory = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
   }));
 

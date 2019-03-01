@@ -16,14 +16,17 @@
  * @fileoverview Unit tests for ConceptCardBackendApiService.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Concept card backend API service', function() {
   var ConceptCardBackendApiService = null;
   var $httpBackend = null;
   var sampleResponse = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     ConceptCardBackendApiService = $injector.get(
       'ConceptCardBackendApiService');
     $httpBackend = $injector.get('$httpBackend');

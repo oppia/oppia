@@ -16,13 +16,16 @@
  * @fileoverview Unit test for the Angular names service.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('Angular names service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   describe('angular name service', function() {
     var ans = null;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       ans = $injector.get('AngularNameService');
     }));
 
