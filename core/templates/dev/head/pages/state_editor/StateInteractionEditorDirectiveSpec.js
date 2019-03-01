@@ -106,7 +106,14 @@ describe('State Interaction controller', function() {
             },
             hints: []
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          }
         },
         'End State': {
           content: {
@@ -145,7 +152,14 @@ describe('State Interaction controller', function() {
             },
             hints: []
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          }
         }
       });
 

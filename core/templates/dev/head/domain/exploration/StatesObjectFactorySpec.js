@@ -58,7 +58,13 @@ describe('States object factory', function() {
           hints: [],
           id: 'TextInput'
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
       };
 
       statesDict = {
@@ -104,7 +110,14 @@ describe('States object factory', function() {
             hints: [],
             solution: null
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          },
         }
       };
 
@@ -209,7 +222,16 @@ describe('States object factory', function() {
             }],
             id: 'TextInput'
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              hint_1: {},
+              hint_2: {}
+            }
+          }
         },
         'second state': {
           content: {
@@ -257,7 +279,13 @@ describe('States object factory', function() {
             },
             id: 'TextInput'
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          }
         }
       };
     }));
@@ -298,7 +326,13 @@ describe('States object factory', function() {
             hints: [],
             id: 'TextInput'
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
         }));
     });
 
