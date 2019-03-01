@@ -593,9 +593,9 @@ DEMO_COLLECTIONS = {
 # editor views.
 DISABLED_EXPLORATION_IDS = ['5']
 
-# Google Group embed URL for the Forum page.
-EMBEDDED_GOOGLE_GROUP_URL = (
-    'https://groups.google.com/forum/embed/?place=forum/oppia')
+# Oppia Google Group URL.
+GOOGLE_GROUP_URL = (
+    'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia')
 
 # External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
@@ -691,6 +691,7 @@ SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
+SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
@@ -865,9 +866,6 @@ CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'learners.')
 DONATE_PAGE_DESCRIPTION = (
     'Donate to The Oppia Foundation.')
-FORUM_PAGE_DESCRIPTION = (
-    'Engage with the Oppia community by discussing questions, bugs and '
-    'explorations in the forum.')
 LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
