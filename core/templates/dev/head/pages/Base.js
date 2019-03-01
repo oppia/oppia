@@ -18,14 +18,14 @@
 
 oppia.controller('Base', [
   '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService', 'DEV_MODE', 'SITE_NAME',
+  'SidebarStatusService', 'DEV_MODE', 'SITE_NAME', 'SITE_FEEDBACK_FORM_URL',
   function($document, $rootScope, $scope, AlertsService, BackgroundMaskService,
-      SidebarStatusService, DEV_MODE, SITE_NAME) {
+      SidebarStatusService, DEV_MODE, SITE_NAME, SITE_FEEDBACK_FORM_URL) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
     $scope.iframed = GLOBALS.iframed;
-    $scope.siteFeedbackFormUrl = GLOBALS.SITE_FEEDBACK_FORM_URL;
+    $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
 
     $rootScope.DEV_MODE = DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
