@@ -1,0 +1,422 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/var/www/GSOC/oppia_tools/node-6.9.1/bin/node',
+1 verbose cli   '/var/www/GSOC/oppia_tools/node-6.9.1/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'karma-jasmine-jquery@0.1.1' ]
+2 info using npm@3.10.8
+3 info using node@v6.9.1
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData karma-jasmine-jquery@0.1.1
+8 silly fetchNamedPackageData karma-jasmine-jquery
+9 silly mapToRegistry name karma-jasmine-jquery
+10 silly mapToRegistry using default registry
+11 silly mapToRegistry registry https://registry.npmjs.org/
+12 silly mapToRegistry data Result {
+12 silly mapToRegistry   raw: 'karma-jasmine-jquery',
+12 silly mapToRegistry   scope: null,
+12 silly mapToRegistry   escapedName: 'karma-jasmine-jquery',
+12 silly mapToRegistry   name: 'karma-jasmine-jquery',
+12 silly mapToRegistry   rawSpec: '',
+12 silly mapToRegistry   spec: 'latest',
+12 silly mapToRegistry   type: 'tag' }
+13 silly mapToRegistry uri https://registry.npmjs.org/karma-jasmine-jquery
+14 verbose request uri https://registry.npmjs.org/karma-jasmine-jquery
+15 verbose request no auth needed
+16 info attempt registry request try #1 at 10:25:35 PM
+17 verbose request id c806718506a71968
+18 http request GET https://registry.npmjs.org/karma-jasmine-jquery
+19 http 200 https://registry.npmjs.org/karma-jasmine-jquery
+20 verbose headers { date: 'Fri, 01 Mar 2019 21:25:37 GMT',
+20 verbose headers   'content-type': 'application/json; charset=UTF-8',
+20 verbose headers   'transfer-encoding': 'chunked',
+20 verbose headers   connection: 'keep-alive',
+20 verbose headers   'set-cookie': [ '__cfduid=d16d2a11d1151eef1b139ad929c1f8e3f1551475537; expires=Sat, 29-Feb-20 21:25:37 GMT; path=/; domain=.registry.npmjs.org; HttpOnly' ],
+20 verbose headers   'cf-cache-status': 'HIT',
+20 verbose headers   'cache-control': 'max-age=300',
+20 verbose headers   'cf-ray': '4b0e345baa719d0e-AMS',
+20 verbose headers   etag: 'W/"d9b8c25fcbc2318489db9bcb040ce955"',
+20 verbose headers   'expect-ct': 'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
+20 verbose headers   'last-modified': 'Sun, 27 May 2018 05:56:30 GMT',
+20 verbose headers   vary: 'accept-encoding, accept',
+20 verbose headers   server: 'cloudflare',
+20 verbose headers   'content-encoding': 'gzip' }
+21 silly get cb [ 200,
+21 silly get   { date: 'Fri, 01 Mar 2019 21:25:37 GMT',
+21 silly get     'content-type': 'application/json; charset=UTF-8',
+21 silly get     'transfer-encoding': 'chunked',
+21 silly get     connection: 'keep-alive',
+21 silly get     'set-cookie': [ '__cfduid=d16d2a11d1151eef1b139ad929c1f8e3f1551475537; expires=Sat, 29-Feb-20 21:25:37 GMT; path=/; domain=.registry.npmjs.org; HttpOnly' ],
+21 silly get     'cf-cache-status': 'HIT',
+21 silly get     'cache-control': 'max-age=300',
+21 silly get     'cf-ray': '4b0e345baa719d0e-AMS',
+21 silly get     etag: 'W/"d9b8c25fcbc2318489db9bcb040ce955"',
+21 silly get     'expect-ct': 'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
+21 silly get     'last-modified': 'Sun, 27 May 2018 05:56:30 GMT',
+21 silly get     vary: 'accept-encoding, accept',
+21 silly get     server: 'cloudflare',
+21 silly get     'content-encoding': 'gzip' } ]
+22 verbose get saving karma-jasmine-jquery to /home/james/.npm/registry.npmjs.org/karma-jasmine-jquery/.cache.json
+23 verbose correctMkdir /home/james/.npm correctMkdir not in flight; initializing
+24 silly install normalizeTree
+25 silly loadCurrentTree Finishing
+26 silly loadIdealTree Starting
+27 silly install loadIdealTree
+28 silly cloneCurrentTree Starting
+29 silly install cloneCurrentTreeToIdealTree
+30 silly cloneCurrentTree Finishing
+31 silly loadShrinkwrap Starting
+32 silly install loadShrinkwrap
+33 silly loadShrinkwrap Finishing
+34 silly loadAllDepsIntoIdealTree Starting
+35 silly install loadAllDepsIntoIdealTree
+36 silly resolveWithNewModule karma-jasmine-jquery@0.1.1 checking installable status
+37 silly cache add args [ 'karma-jasmine-jquery@0.1.1', null ]
+38 verbose cache add spec karma-jasmine-jquery@0.1.1
+39 silly cache add parsed spec Result {
+39 silly cache add   raw: 'karma-jasmine-jquery@0.1.1',
+39 silly cache add   scope: null,
+39 silly cache add   escapedName: 'karma-jasmine-jquery',
+39 silly cache add   name: 'karma-jasmine-jquery',
+39 silly cache add   rawSpec: '0.1.1',
+39 silly cache add   spec: '0.1.1',
+39 silly cache add   type: 'version' }
+40 silly addNamed karma-jasmine-jquery@0.1.1
+41 verbose addNamed "0.1.1" is a plain semver version for karma-jasmine-jquery
+42 silly mapToRegistry name karma-jasmine-jquery
+43 silly mapToRegistry using default registry
+44 silly mapToRegistry registry https://registry.npmjs.org/
+45 silly mapToRegistry data Result {
+45 silly mapToRegistry   raw: 'karma-jasmine-jquery',
+45 silly mapToRegistry   scope: null,
+45 silly mapToRegistry   escapedName: 'karma-jasmine-jquery',
+45 silly mapToRegistry   name: 'karma-jasmine-jquery',
+45 silly mapToRegistry   rawSpec: '',
+45 silly mapToRegistry   spec: 'latest',
+45 silly mapToRegistry   type: 'tag' }
+46 silly mapToRegistry uri https://registry.npmjs.org/karma-jasmine-jquery
+47 verbose addNameVersion registry:https://registry.npmjs.org/karma-jasmine-jquery not in flight; fetching
+48 verbose get https://registry.npmjs.org/karma-jasmine-jquery not expired, no request
+49 silly mapToRegistry name karma-jasmine-jquery
+50 silly mapToRegistry using default registry
+51 silly mapToRegistry registry https://registry.npmjs.org/
+52 silly mapToRegistry data Result {
+52 silly mapToRegistry   raw: 'karma-jasmine-jquery',
+52 silly mapToRegistry   scope: null,
+52 silly mapToRegistry   escapedName: 'karma-jasmine-jquery',
+52 silly mapToRegistry   name: 'karma-jasmine-jquery',
+52 silly mapToRegistry   rawSpec: '',
+52 silly mapToRegistry   spec: 'latest',
+52 silly mapToRegistry   type: 'tag' }
+53 silly mapToRegistry uri https://registry.npmjs.org/karma-jasmine-jquery
+54 verbose addRemoteTarball https://registry.npmjs.org/karma-jasmine-jquery/-/karma-jasmine-jquery-0.1.1.tgz not in flight; adding
+55 verbose addRemoteTarball [ 'https://registry.npmjs.org/karma-jasmine-jquery/-/karma-jasmine-jquery-0.1.1.tgz',
+55 verbose addRemoteTarball   '89c1b754fea4125b1f893821392c11b9ce5d7456' ]
+56 info retry fetch attempt 1 at 10:25:37 PM
+57 info attempt registry request try #1 at 10:25:37 PM
+58 http fetch GET https://registry.npmjs.org/karma-jasmine-jquery/-/karma-jasmine-jquery-0.1.1.tgz
+59 http fetch 200 https://registry.npmjs.org/karma-jasmine-jquery/-/karma-jasmine-jquery-0.1.1.tgz
+60 silly fetchAndShaCheck shasum 89c1b754fea4125b1f893821392c11b9ce5d7456
+61 verbose addTmpTarball /tmp/npm-1911-59d71ca2/registry.npmjs.org/karma-jasmine-jquery/-/karma-jasmine-jquery-0.1.1.tgz not in flight; adding
+62 verbose addTmpTarball already have metadata; skipping unpack for karma-jasmine-jquery@0.1.1
+63 verbose correctMkdir /home/james/.npm correctMkdir not in flight; initializing
+64 silly cache afterAdd karma-jasmine-jquery@0.1.1
+65 verbose afterAdd /home/james/.npm/karma-jasmine-jquery/0.1.1/package/package.json not in flight; writing
+66 verbose correctMkdir /home/james/.npm correctMkdir not in flight; initializing
+67 verbose afterAdd /home/james/.npm/karma-jasmine-jquery/0.1.1/package/package.json written
+68 silly fetchNamedPackageData bower
+69 silly mapToRegistry name bower
+70 silly mapToRegistry using default registry
+71 silly mapToRegistry registry https://registry.npmjs.org/
+72 silly mapToRegistry data Result {
+72 silly mapToRegistry   raw: 'bower',
+72 silly mapToRegistry   scope: null,
+72 silly mapToRegistry   escapedName: 'bower',
+72 silly mapToRegistry   name: 'bower',
+72 silly mapToRegistry   rawSpec: '',
+72 silly mapToRegistry   spec: 'latest',
+72 silly mapToRegistry   type: 'tag' }
+73 silly mapToRegistry uri https://registry.npmjs.org/bower
+74 silly fetchOtherPackageData bower-installer@git://github.com/bessdsv/bower-installer.git#temp
+75 silly cache add args [ 'bower-installer@git://github.com/bessdsv/bower-installer.git#temp',
+75 silly cache add   null ]
+76 verbose cache add spec bower-installer@git://github.com/bessdsv/bower-installer.git#temp
+77 verbose request uri https://registry.npmjs.org/bower
+78 verbose request no auth needed
+79 info attempt registry request try #1 at 10:25:38 PM
+80 http request GET https://registry.npmjs.org/bower
+81 silly cache add parsed spec Result {
+81 silly cache add   raw: 'bower-installer@git://github.com/bessdsv/bower-installer.git#temp',
+81 silly cache add   scope: null,
+81 silly cache add   escapedName: 'bower-installer',
+81 silly cache add   name: 'bower-installer',
+81 silly cache add   rawSpec: 'git://github.com/bessdsv/bower-installer.git#temp',
+81 silly cache add   spec: 'git://github.com/bessdsv/bower-installer.git#temp',
+81 silly cache add   type: 'hosted',
+81 silly cache add   hosted:
+81 silly cache add    { type: 'github',
+81 silly cache add      ssh: 'git@github.com:bessdsv/bower-installer.git#temp',
+81 silly cache add      sshUrl: 'git+ssh://git@github.com/bessdsv/bower-installer.git#temp',
+81 silly cache add      httpsUrl: 'git+https://github.com/bessdsv/bower-installer.git#temp',
+81 silly cache add      gitUrl: 'git://github.com/bessdsv/bower-installer.git#temp',
+81 silly cache add      shortcut: 'github:bessdsv/bower-installer#temp',
+81 silly cache add      directUrl: 'https://raw.githubusercontent.com/bessdsv/bower-installer/temp/package.json' } }
+82 verbose addRemoteGit caching git://github.com/bessdsv/bower-installer.git#temp
+83 verbose addRemoteGit git://github.com/bessdsv/bower-installer.git#temp is a repository hosted by github
+84 silly tryClone cloning git://github.com/bessdsv/bower-installer.git#temp via git://github.com/bessdsv/bower-installer.git#temp
+85 verbose tryClone git-github-com-bessdsv-bower-installer-git-temp-5f628818 not in flight; caching
+86 verbose correctMkdir /home/james/.npm/_git-remotes correctMkdir not in flight; initializing
+87 verbose makeDirectory /home/james/.npm/_git-remotes creation not in flight; initializing
+88 silly makeDirectory /home/james/.npm/_git-remotes uid: 1000 gid: 1000
+89 info git [ 'clone',
+89 info git   '--template=/home/james/.npm/_git-remotes/_templates',
+89 info git   '--mirror',
+89 info git   'git://github.com/bessdsv/bower-installer.git',
+89 info git   '/home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818' ]
+90 http 200 https://registry.npmjs.org/bower
+91 verbose headers { date: 'Fri, 01 Mar 2019 21:25:39 GMT',
+91 verbose headers   'content-type': 'application/json',
+91 verbose headers   'transfer-encoding': 'chunked',
+91 verbose headers   connection: 'keep-alive',
+91 verbose headers   'set-cookie': [ '__cfduid=d91185799c1d7ad68051bf0f55f574f351551475539; expires=Sat, 29-Feb-20 21:25:39 GMT; path=/; domain=.registry.npmjs.org; HttpOnly' ],
+91 verbose headers   'cf-cache-status': 'HIT',
+91 verbose headers   'cache-control': 'max-age=300',
+91 verbose headers   'cf-ray': '4b0e346b0ece9d0e-AMS',
+91 verbose headers   etag: 'W/"71888cd2306c54797547fb58b5974b6a"',
+91 verbose headers   'expect-ct': 'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
+91 verbose headers   'last-modified': 'Thu, 31 Jan 2019 15:30:23 GMT',
+91 verbose headers   vary: 'accept-encoding, accept',
+91 verbose headers   'x-amz-meta-rev': '1041-ee213f57703279b4cb23066296cd2d0c',
+91 verbose headers   server: 'cloudflare',
+91 verbose headers   'content-encoding': 'gzip' }
+92 silly get cb [ 200,
+92 silly get   { date: 'Fri, 01 Mar 2019 21:25:39 GMT',
+92 silly get     'content-type': 'application/json',
+92 silly get     'transfer-encoding': 'chunked',
+92 silly get     connection: 'keep-alive',
+92 silly get     'set-cookie': [ '__cfduid=d91185799c1d7ad68051bf0f55f574f351551475539; expires=Sat, 29-Feb-20 21:25:39 GMT; path=/; domain=.registry.npmjs.org; HttpOnly' ],
+92 silly get     'cf-cache-status': 'HIT',
+92 silly get     'cache-control': 'max-age=300',
+92 silly get     'cf-ray': '4b0e346b0ece9d0e-AMS',
+92 silly get     etag: 'W/"71888cd2306c54797547fb58b5974b6a"',
+92 silly get     'expect-ct': 'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
+92 silly get     'last-modified': 'Thu, 31 Jan 2019 15:30:23 GMT',
+92 silly get     vary: 'accept-encoding, accept',
+92 silly get     'x-amz-meta-rev': '1041-ee213f57703279b4cb23066296cd2d0c',
+92 silly get     server: 'cloudflare',
+92 silly get     'content-encoding': 'gzip' } ]
+93 verbose get saving bower to /home/james/.npm/registry.npmjs.org/bower/.cache.json
+94 verbose correctMkdir /home/james/.npm correctMkdir not in flight; initializing
+95 silly resolveWithNewModule bower@1.8.8 checking installable status
+96 silly cache add args [ 'bower@^1.3.9', null ]
+97 verbose cache add spec bower@^1.3.9
+98 silly cache add parsed spec Result {
+98 silly cache add   raw: 'bower@^1.3.9',
+98 silly cache add   scope: null,
+98 silly cache add   escapedName: 'bower',
+98 silly cache add   name: 'bower',
+98 silly cache add   rawSpec: '^1.3.9',
+98 silly cache add   spec: '>=1.3.9 <2.0.0',
+98 silly cache add   type: 'range' }
+99 silly addNamed bower@>=1.3.9 <2.0.0
+100 verbose addNamed ">=1.3.9 <2.0.0" is a valid semver range for bower
+101 silly addNameRange { name: 'bower', range: '>=1.3.9 <2.0.0', hasData: false }
+102 silly mapToRegistry name bower
+103 silly mapToRegistry using default registry
+104 silly mapToRegistry registry https://registry.npmjs.org/
+105 silly mapToRegistry data Result {
+105 silly mapToRegistry   raw: 'bower',
+105 silly mapToRegistry   scope: null,
+105 silly mapToRegistry   escapedName: 'bower',
+105 silly mapToRegistry   name: 'bower',
+105 silly mapToRegistry   rawSpec: '',
+105 silly mapToRegistry   spec: 'latest',
+105 silly mapToRegistry   type: 'tag' }
+106 silly mapToRegistry uri https://registry.npmjs.org/bower
+107 verbose addNameRange registry:https://registry.npmjs.org/bower not in flight; fetching
+108 verbose get https://registry.npmjs.org/bower not expired, no request
+109 silly addNameRange number 2 { name: 'bower', range: '>=1.3.9 <2.0.0', hasData: true }
+110 silly addNameRange versions [ 'bower',
+110 silly addNameRange   [ '0.1.0',
+110 silly addNameRange     '0.1.2',
+110 silly addNameRange     '0.1.3',
+110 silly addNameRange     '0.2.0',
+110 silly addNameRange     '0.3.0',
+110 silly addNameRange     '0.3.1',
+110 silly addNameRange     '0.3.2',
+110 silly addNameRange     '0.4.0',
+110 silly addNameRange     '0.5.0',
+110 silly addNameRange     '0.5.1',
+110 silly addNameRange     '0.6.0',
+110 silly addNameRange     '0.6.1',
+110 silly addNameRange     '0.6.2',
+110 silly addNameRange     '0.6.3',
+110 silly addNameRange     '0.6.4',
+110 silly addNameRange     '0.6.5',
+110 silly addNameRange     '0.6.6',
+110 silly addNameRange     '0.6.7',
+110 silly addNameRange     '0.6.8',
+110 silly addNameRange     '0.7.0',
+110 silly addNameRange     '0.7.1',
+110 silly addNameRange     '0.8.0',
+110 silly addNameRange     '0.8.1',
+110 silly addNameRange     '0.8.2',
+110 silly addNameRange     '0.8.3',
+110 silly addNameRange     '0.8.4',
+110 silly addNameRange     '0.8.5',
+110 silly addNameRange     '0.8.6',
+110 silly addNameRange     '0.9.0',
+110 silly addNameRange     '0.9.1',
+110 silly addNameRange     '0.9.2',
+110 silly addNameRange     '0.10.0',
+110 silly addNameRange     '1.0.0',
+110 silly addNameRange     '1.0.1',
+110 silly addNameRange     '1.0.2',
+110 silly addNameRange     '1.0.3',
+110 silly addNameRange     '1.1.0',
+110 silly addNameRange     '1.1.1',
+110 silly addNameRange     '1.1.2',
+110 silly addNameRange     '1.2.0',
+110 silly addNameRange     '1.2.1',
+110 silly addNameRange     '1.2.2',
+110 silly addNameRange     '1.2.3',
+110 silly addNameRange     '1.2.4',
+110 silly addNameRange     '1.2.5',
+110 silly addNameRange     '1.2.6',
+110 silly addNameRange     '1.2.7',
+110 silly addNameRange     '1.2.8',
+110 silly addNameRange     '1.3.0',
+110 silly addNameRange     '1.3.1',
+110 silly addNameRange     '1.3.2',
+110 silly addNameRange     '1.3.3',
+110 silly addNameRange     '1.3.4',
+110 silly addNameRange     '1.3.5',
+110 silly addNameRange     '1.3.6',
+110 silly addNameRange     '1.3.7',
+110 silly addNameRange     '1.3.8',
+110 silly addNameRange     '1.3.9',
+110 silly addNameRange     '1.3.10',
+110 silly addNameRange     '1.3.11',
+110 silly addNameRange     '1.3.12',
+110 silly addNameRange     '1.4.0',
+110 silly addNameRange     '1.4.1',
+110 silly addNameRange     '1.5.0',
+110 silly addNameRange     '1.5.1',
+110 silly addNameRange     '1.5.2',
+110 silly addNameRange     '1.5.3',
+110 silly addNameRange     '1.6.2',
+110 silly addNameRange     '1.6.3',
+110 silly addNameRange     '1.6.4',
+110 silly addNameRange     '1.6.5',
+110 silly addNameRange     '1.5.4',
+110 silly addNameRange     '1.4.2',
+110 silly addNameRange     '1.6.6',
+110 silly addNameRange     '1.6.7',
+110 silly addNameRange     '1.6.8',
+110 silly addNameRange     '1.6.9',
+110 silly addNameRange     '1.7.0',
+110 silly addNameRange     '1.7.1',
+110 silly addNameRange     '1.7.2',
+110 silly addNameRange     '1.7.5',
+110 silly addNameRange     '1.7.6',
+110 silly addNameRange     '1.7.7',
+110 silly addNameRange     '1.7.8',
+110 silly addNameRange     '1.7.9',
+110 silly addNameRange     '1.8.0',
+110 silly addNameRange     '1.8.2',
+110 silly addNameRange     '1.7.10',
+110 silly addNameRange     '1.8.3',
+110 silly addNameRange     '1.8.4',
+110 silly addNameRange     '1.8.6',
+110 silly addNameRange     '1.8.7',
+110 silly addNameRange     '1.8.8' ] ]
+111 silly addNamed bower@1.8.8
+112 verbose addNamed "1.8.8" is a plain semver version for bower
+113 warn deprecated bower@1.8.8: We don't recommend using Bower for new projects. Please consider Yarn and Webpack or Parcel. You can read how to migrate legacy project here: https://bower.io/blog/2017/how-to-migrate-away-from-bower/
+114 silly mapToRegistry name bower
+115 silly mapToRegistry using default registry
+116 silly mapToRegistry registry https://registry.npmjs.org/
+117 silly mapToRegistry data Result {
+117 silly mapToRegistry   raw: 'bower',
+117 silly mapToRegistry   scope: null,
+117 silly mapToRegistry   escapedName: 'bower',
+117 silly mapToRegistry   name: 'bower',
+117 silly mapToRegistry   rawSpec: '',
+117 silly mapToRegistry   spec: 'latest',
+117 silly mapToRegistry   type: 'tag' }
+118 silly mapToRegistry uri https://registry.npmjs.org/bower
+119 verbose addRemoteTarball https://registry.npmjs.org/bower/-/bower-1.8.8.tgz not in flight; adding
+120 verbose addRemoteTarball [ 'https://registry.npmjs.org/bower/-/bower-1.8.8.tgz',
+120 verbose addRemoteTarball   '82544be34a33aeae7efb8bdf9905247b2cffa985' ]
+121 info retry fetch attempt 1 at 10:25:39 PM
+122 info attempt registry request try #1 at 10:25:39 PM
+123 http fetch GET https://registry.npmjs.org/bower/-/bower-1.8.8.tgz
+124 http fetch 200 https://registry.npmjs.org/bower/-/bower-1.8.8.tgz
+125 silly fetchAndShaCheck shasum 82544be34a33aeae7efb8bdf9905247b2cffa985
+126 verbose addTmpTarball /tmp/npm-1911-59d71ca2/registry.npmjs.org/bower/-/bower-1.8.8.tgz not in flight; adding
+127 verbose addTmpTarball already have metadata; skipping unpack for bower@1.8.8
+128 verbose correctMkdir /home/james/.npm correctMkdir not in flight; initializing
+129 silly cache afterAdd bower@1.8.8
+130 verbose afterAdd /home/james/.npm/bower/1.8.8/package/package.json not in flight; writing
+131 verbose correctMkdir /home/james/.npm correctMkdir not in flight; initializing
+132 verbose afterAdd /home/james/.npm/bower/1.8.8/package/package.json written
+133 error git clone --template=/home/james/.npm/_git-remotes/_templates --mirror git://github.com/bessdsv/bower-installer.git /home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818: Cloning into bare repository '/home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818'...
+133 error git clone --template=/home/james/.npm/_git-remotes/_templates --mirror git://github.com/bessdsv/bower-installer.git /home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818: fatal: The remote end hung up unexpectedly
+133 error git clone --template=/home/james/.npm/_git-remotes/_templates --mirror git://github.com/bessdsv/bower-installer.git /home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818: fatal: early EOF
+133 error git clone --template=/home/james/.npm/_git-remotes/_templates --mirror git://github.com/bessdsv/bower-installer.git /home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818: fatal: index-pack failed
+134 silly fetchPackageMetaData Error: Command failed: git clone --template=/home/james/.npm/_git-remotes/_templates --mirror git://github.com/bessdsv/bower-installer.git /home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818
+134 silly fetchPackageMetaData Cloning into bare repository '/home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818'...
+134 silly fetchPackageMetaData fatal: The remote end hung up unexpectedly
+134 silly fetchPackageMetaData fatal: early EOF
+134 silly fetchPackageMetaData fatal: index-pack failed
+134 silly fetchPackageMetaData
+134 silly fetchPackageMetaData     at ChildProcess.exithandler (child_process.js:206:12)
+134 silly fetchPackageMetaData     at emitTwo (events.js:106:13)
+134 silly fetchPackageMetaData     at ChildProcess.emit (events.js:191:7)
+134 silly fetchPackageMetaData     at maybeClose (internal/child_process.js:877:16)
+134 silly fetchPackageMetaData     at Process.ChildProcess._handle.onexit (internal/child_process.js:226:5)
+134 silly fetchPackageMetaData  error for bower-installer@git://github.com/bessdsv/bower-installer.git#temp { Error: Command failed: git clone --template=/home/james/.npm/_git-remotes/_templates --mirror git://github.com/bessdsv/bower-installer.git /home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818
+134 silly fetchPackageMetaData Cloning into bare repository '/home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818'...
+134 silly fetchPackageMetaData fatal: The remote end hung up unexpectedly
+134 silly fetchPackageMetaData fatal: early EOF
+134 silly fetchPackageMetaData fatal: index-pack failed
+134 silly fetchPackageMetaData
+134 silly fetchPackageMetaData     at ChildProcess.exithandler (child_process.js:206:12)
+134 silly fetchPackageMetaData     at emitTwo (events.js:106:13)
+134 silly fetchPackageMetaData     at ChildProcess.emit (events.js:191:7)
+134 silly fetchPackageMetaData     at maybeClose (internal/child_process.js:877:16)
+134 silly fetchPackageMetaData     at Process.ChildProcess._handle.onexit (internal/child_process.js:226:5)
+134 silly fetchPackageMetaData   killed: false,
+134 silly fetchPackageMetaData   code: 128,
+134 silly fetchPackageMetaData   signal: null,
+134 silly fetchPackageMetaData   cmd: 'git clone --template=/home/james/.npm/_git-remotes/_templates --mirror git://github.com/bessdsv/bower-installer.git /home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818' }
+135 silly rollbackFailedOptional Starting
+136 silly rollbackFailedOptional Finishing
+137 silly runTopLevelLifecycles Finishing
+138 silly install printInstalled
+139 verbose stack Error: Command failed: git clone --template=/home/james/.npm/_git-remotes/_templates --mirror git://github.com/bessdsv/bower-installer.git /home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818
+139 verbose stack Cloning into bare repository '/home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818'...
+139 verbose stack fatal: The remote end hung up unexpectedly
+139 verbose stack fatal: early EOF
+139 verbose stack fatal: index-pack failed
+139 verbose stack
+139 verbose stack     at ChildProcess.exithandler (child_process.js:206:12)
+139 verbose stack     at emitTwo (events.js:106:13)
+139 verbose stack     at ChildProcess.emit (events.js:191:7)
+139 verbose stack     at maybeClose (internal/child_process.js:877:16)
+139 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:226:5)
+140 verbose cwd /var/www/GSOC/oppia
+141 error Linux 4.4.0-43-Microsoft
+142 error argv "/var/www/GSOC/oppia_tools/node-6.9.1/bin/node" "/var/www/GSOC/oppia_tools/node-6.9.1/bin/npm" "install" "karma-jasmine-jquery@0.1.1"
+143 error node v6.9.1
+144 error npm  v3.10.8
+145 error code 128
+146 error Command failed: git clone --template=/home/james/.npm/_git-remotes/_templates --mirror git://github.com/bessdsv/bower-installer.git /home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818
+146 error Cloning into bare repository '/home/james/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818'...
+146 error fatal: The remote end hung up unexpectedly
+146 error fatal: early EOF
+146 error fatal: index-pack failed
+147 error If you need help, you may report this error at:
+147 error     <https://github.com/npm/npm/issues>
+148 verbose exit [ 1, true ]
