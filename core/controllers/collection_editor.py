@@ -68,6 +68,7 @@ class CollectionEditorPage(CollectionEditorHandler):
             'TAG_REGEX': feconf.TAG_REGEX,
             'title': collection.title,
         })
+
         self.render_template('pages/collection_editor/collection_editor.html')
 
 
