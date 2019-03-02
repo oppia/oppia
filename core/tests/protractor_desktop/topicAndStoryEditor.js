@@ -66,6 +66,19 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectTopicDescriptionToBe('Topic Description');
   });
 
+  it('should add and delete subtopics correctly', function() {
+    topicEditorPage.moveToSubtopicsTab();
+    topicEditorPage.addSubtopic('Subtopic 1');
+    topicEditorPage.expectNumberOfSubtopicsToBe(1);
+    topicEditorPage.saveTopic('Added subtopic.');
+
+    topicEditorPage.get(topicId);
+    topicEditorPage.moveToSubtopicsTab();
+    topicEditorPage.expectNumberOfSubtopicsToBe(1);
+    topicEditorPage.deleteSubtopicWithIndex(0);
+    topicEditorPage.expectNumberOfSubtopicsToBe(0);
+  });
+
   it('should add a canonical story to topic correctly', function() {
     topicEditorPage.expectNumberOfStoriesToBe(0);
     topicEditorPage.createStory('Story Title');
@@ -90,10 +103,16 @@ describe('Topic editor functionality', function() {
     storyEditorPage.expectNotesToBe(forms.toRichText('Story notes'));
   });
 
-  it('should add, edit and remove nodes (chapters) from a story', function() {
+  it('should add and remove nodes (chapters) from a story', function() {
     topicEditorPage.navigateToStoryWithIndex(0);
+    storyEditorPage.expectNumberOfChaptersToBe(0);
     storyEditorPage.createInitialChapter('Chapter 1');
-    storyEditorPage.returnToTopic();
+    storyEditorPage.expectNumberOfChaptersToBe(1);
+
+    storyEditorPage.createNewDestinationChapter('Chapter 2');
+    storyEditorPage.expectNumberOfChaptersToBe(2);
+    storyEditorPage.deleteChapterWithIndex(1);
+    storyEditorPage.expectNumberOfChaptersToBe(1);
   });
 
   afterEach(function() {

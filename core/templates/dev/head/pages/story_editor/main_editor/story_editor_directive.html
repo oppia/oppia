@@ -73,7 +73,7 @@
                    ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
                    ng-click="setNodeToEdit(node.getId())">
             <div class="story-editor-node-title">
-              <[node.getTitle()]>
+              <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
             </div>
             <span style="font-size: 0.8em; width: 15vw;" ng-if="disconnectedNodeIds.indexOf(node.getId()) !== -1">
               <i>This chapter is not reachable from any other chapter</i>
@@ -85,7 +85,7 @@
               </span>
             </span>
             <span class="story-editor-delete-node">
-              <span ng-click="deleteNode(node.getId())" aria-hidden="true">
+              <span class="protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())" aria-hidden="true">
                 <i class="material-icons md-18">&#xE14C;</i>
               </span>
             </span>

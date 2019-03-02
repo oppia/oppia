@@ -18,6 +18,7 @@
  */
 
 var forms = require('./forms.js');
+var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var StoryEditorPage = function() {
@@ -45,6 +46,34 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-new-chapter-title-field'));
   var confirmChapterCreationButton = element(
     by.css('.protractor-test-confirm-chapter-creation-button'));
+  var addDestinationChapterButton = element(
+    by.css('.protractor-test-add-destination-chapter-button'));
+  var chapterTitles = element.all(by.css('.protractor-test-chapter-title'));
+  var deleteChapterButtons = element.all(
+    by.css('.protractor-test-delete-chapter-button'));
+  var confirmDeleteChapterButton = element(
+    by.css('.protractor-test-confirm-delete-chapter-button'));
+
+  this.deleteChapterWithIndex = function(index) {
+    deleteChapterButtons.then(function(elems) {
+      elems[index].click();
+    });
+    confirmDeleteChapterButton.click();
+  };
+
+  this.createNewDestinationChapter = function(title) {
+    browser.actions().mouseMove(addDestinationChapterButton).perform();
+    addDestinationChapterButton.click();
+    newChapterTitleField.sendKeys(title);
+    confirmChapterCreationButton.click();
+    general.scrollToTop();
+  };
+
+  this.expectNumberOfChaptersToBe = function(count) {
+    chapterTitles.then(function(items) {
+      expect(items.length).toEqual(count);
+    });
+  };
 
   this.createInitialChapter = function(title) {
     createInitialChapterButton.click();

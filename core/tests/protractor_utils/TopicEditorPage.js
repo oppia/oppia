@@ -43,10 +43,42 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-commit-message-input'));
   var closeSaveModalButton = element(
     by.css('.protractor-test-close-save-modal-button'));
+  var subtopicsTabButton = element(
+    by.css('.protractor-test-subtopics-tab-button'));
+  var addSubtopicCard = element(by.css('.protractor-test-add-subtopic-card'));
+  var newSubtopicTitlefield = element(
+    by.css('.protractor-test-new-subtopic-title-field'));
+  var confirmSubtopicCreationButton = element(
+    by.css('.protractor-test-confirm-subtopic-creation-button'));
+  var subtopics = element.all(by.css('.protractor-test-subtopic'));
+  var deleteSubtopicButtons = element.all(
+    by.css('.protractor-test-delete-subtopic-button'));
 
   this.get = function(topicId) {
     browser.get(EDITOR_URL_PREFIX + topicId);
     return waitFor.pageToFullyLoad();
+  };
+
+  this.deleteSubtopicWithIndex = function(index) {
+    deleteSubtopicButtons.then(function(items) {
+      items[index].click();
+    });
+  };
+
+  this.expectNumberOfSubtopicsToBe = function(count) {
+    subtopics.then(function(items) {
+      expect(items.length).toEqual(count);
+    });
+  };
+
+  this.addSubtopic = function(title) {
+    addSubtopicCard.click();
+    newSubtopicTitlefield.sendKeys(title);
+    confirmSubtopicCreationButton.click();
+  };
+
+  this.moveToSubtopicsTab = function() {
+    subtopicsTabButton.click();
   };
 
   this.expectNumberOfStoriesToBe = function(count) {
