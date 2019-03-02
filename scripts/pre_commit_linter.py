@@ -876,10 +876,12 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
 
 
 def _print_complete_summary_of_errors():
-    """Print complete summary of errors."""
-    print 'Summary of Errors:'
-    print '----------------------------------------'
-    print _TARGET_STDOUT.getvalue()
+    """Returns complete summary of errors.
+
+    Returns:
+        str. Complete summary of error messages.
+    """
+    return _TARGET_STDOUT.getvalue()
 
 
 class LintChecksManager(object):
@@ -1984,7 +1986,6 @@ class LintChecksManager(object):
         pattern_messages = self._check_bad_patterns()
         copyright_notice_messages = (
             self._check_for_copyright_notice())
-        _print_complete_summary_of_errors()
         all_messages = (
             directive_scope_messages + sorted_dependencies_messages +
             controller_dependency_messages +
@@ -2003,6 +2004,12 @@ def main():
     all_files, verbose_mode_enabled = _get_all_files()
     lint_checks_manager = LintChecksManager(all_files, verbose_mode_enabled)
     all_messages = lint_checks_manager.perform_all_lint_checks()
+    error_messages = _print_complete_summary_of_errors()
+
+    print 'Summary of Errors:'
+    print '----------------------------------------'
+    print error_messages
+
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         print '---------------------------'
