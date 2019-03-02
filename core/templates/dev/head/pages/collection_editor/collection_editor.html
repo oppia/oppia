@@ -50,6 +50,8 @@
 {% block footer_js %}
   {{ super() }}
   <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
+  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
+  <script src="/templates/dev/head/filters/NormalizeWhitespaceFilter.js"></script>
   <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
   <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
   <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
@@ -149,6 +151,7 @@
   <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>
   <script src="/templates/dev/head/services/LocalStorageService.js"></script>
   <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
+  <script src="/templates/dev/head/services/ValidatorsService.js"></script>
 
   <script src="/templates/dev/head/pages/state_editor/StateEditorService.js"></script>
 
