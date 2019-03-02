@@ -15,8 +15,8 @@
             </div>
             <div class="col-sm-6 col-sm-pull-6" style="z-index: 20">
               <div class="oppia-landing-text-box-0">
-                <h1 class="oppia-landing-h1"><[getRowHeading(1)]></h1>
-                <h2 class="oppia-landing-h2" style="padding-right: 15px;">Get your students and kids started with our free, effective math lessons.</h2>
+                <h1 class="oppia-landing-h1"><[topic | capitalize]> just got easier</h1>
+                <h2 class="oppia-landing-h2" style="padding-right: 15px;">Get your students and kids started with our free, effective <[subject]> lessons.</h2>
               </div>
               <button class="btn oppia-landing-get-started" ng-click="onClickGetStartedButton('teacher')">Get Started</button>
               <button class="btn oppia-landing-learn-more" ng-click="onClickLearnMoreButton()">Learn More</button>
@@ -132,11 +132,11 @@
             </div>
             <div class="col-sm-6 col-sm-pull-6">
               <div class="oppia-landing-text-box-1">
-                <h1 class="oppia-landing-h1" style="color: #242424"><[getRowHeading(2)]></h1>
-                <h2 class="oppia-landing-h2" style="color: #242424"><[getRowParagraph(2, 1)]>
+                <h1 class="oppia-landing-h1" style="color: #242424">Fun storytelling for all</h1>
+                <h2 class="oppia-landing-h2" style="color: #242424">Students are guided through explorations with targeted feedback and immersive storytelling.
                   <br>
                   <br>
-                  <[getRowParagraph(2, 2)]>
+                  Oppia guides students step-by-step with helpful hints, so they can complete the lessons on their own.
                 </h2>
               </div>
             </div>
@@ -151,20 +151,20 @@
           <div class="row">
             <div class="col-sm-6 oppia-landing-image-div">
               <div class="oppia-landing-video-frame">
-                <video controls type="video/mp4" ng-src="<[getRowVideoUrl(3)]>" class="oppia-landing-image
+                <video controls type="video/mp4" ng-src="<[getRowVideoUrl()]>" class="oppia-landing-image
                 oppia-landing-image-desktop" onclick="this.paused ? this.play() : this.pause();">Sorry, your browser doesn't support embedded videos.
                 </video>
-                <video controls type="video/mp4" ng-src="<[getRowVideoUrl(3)]>" class="oppia-landing-image
+                <video controls type="video/mp4" ng-src="<[getRowVideoUrl()]>" class="oppia-landing-image
                 oppia-landing-image-mobile" onclick="this.paused ? this.play() : this.pause();">Sorry, your browser doesn't support embedded videos.
                 </video>
               </div>
             </div>
             <div class="col-sm-6 oppia-landing-text-box-2">
-              <h1 class="oppia-landing-h1" style="color: #FFFFFF;"><[getRowHeading(3)]></h1>
-              <h2 class="oppia-landing-h2" style="color: #FFFFFF;"><[getRowParagraph(3, 1)]>
+              <h1 class="oppia-landing-h1" style="color: #FFFFFF;">Easy-to-follow lessons</h1>
+              <h2 class="oppia-landing-h2" style="color: #FFFFFF;">By working through lessons on Oppia, your young learners can apply their knowledge to real-world problems.
                 <br>
                 <br>
-                <[getRowParagraph(3, 2)]>
+                Our lessons also have audio subtitles, to support students with reading difficulties.
               </h2>
             </div>
           </div>

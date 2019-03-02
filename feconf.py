@@ -651,7 +651,7 @@ FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
-TOPIC_WISE_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
+TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -1012,8 +1012,9 @@ RTE_CONTENT_SPEC = {
 
 # A dict representing available landing pages, having subject as a key and list
 # of topics as the value.
-# Note: This dict need to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
-# oppia constant.
+# Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
+# oppia constant defined in
+# core/templates/dev/head/pages/landing/TopicLandingPage.js file.
 AVAILABLE_LANDING_PAGES = {
     'maths': ['fractions', 'ratios']
 }

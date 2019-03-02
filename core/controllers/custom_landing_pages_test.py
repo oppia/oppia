@@ -21,22 +21,26 @@ import feconf
 class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting landing page for fractions."""
 
-    def test_fraction_landing_page_without_viewer_type(self):
-        """Test for showing the landing page for fractions,
-        without any viewer type should redirect to teacher type.
+    def test_old_fractions_landing_url_without_viewer_type(self):
+        """Test to validate the old Fractions landing url without viewerType
+        redirects to the new Fractions landing url.
         """
         response = self.get_html_response(
             feconf.FRACTIONS_LANDING_PAGE_URL, expected_status_int=302)
-        self.assertIn('/learn/maths/fractions', response.headers['location'])
+        self.assertEqual(
+            'http://localhost/learn/maths/fractions',
+            response.headers['location'])
 
-    def test_fraction_landing_page_with_viewer_type(self):
-        """Test for showing the landing page for fractions,
-        with student viewer type should redirect to student type.
+    def test_old_fraction_landing_url_with_viewer_type(self):
+        """Test to validate the old Fractions landing url with viewerType
+        redirects to the new Fractions landing url.
         """
         response = self.get_html_response(
-            '%s?viewerType=student' % (feconf.FRACTIONS_LANDING_PAGE_URL),
+            '%s?viewerType=student' % feconf.FRACTIONS_LANDING_PAGE_URL,
             expected_status_int=302)
-        self.assertIn('/learn/maths/fractions', response.headers['location'])
+        self.assertEqual(
+            'http://localhost/learn/maths/fractions',
+            response.headers['location'])
 
 
 class TopicLandingPageTest(test_utils.GenericTestBase):
