@@ -890,6 +890,7 @@ def get_topic_rights(topic_id, strict=True):
 
     return get_topic_rights_from_model(model)
 
+
 def get_topic_rights_with_user(user_id):
     """Retrieves the rights object for all topics assigned to given user.
 
@@ -981,6 +982,7 @@ def deassign_user_from_all_topics(committer, user_id):
         save_topic_rights(
             topic_rights, committer.user_id,
             'Removed all assigned topics from %s' % (user_id), commit_cmds)
+
 
 def assign_role(committer, assignee, new_role, topic_id):
     """Assigns a new role to the user.
