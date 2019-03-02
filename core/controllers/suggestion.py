@@ -175,6 +175,7 @@ class SuggestionListHandler(base.BaseHandler):
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)
 
+
 class EditSuggestionHandler(base.BaseHandler):
     """Handler for editing the submitted suggestion by reviwer before
     accepting.
