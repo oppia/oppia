@@ -203,7 +203,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         # it shouldn't be added as the list length would exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_exploration_to_be_played_later(
-            self.user_id, self."SAMPLE_EXP_ID_MAX")
+            self.user_id, "SAMPLE_EXP_ID_MAX")
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), exp_ids)
 
