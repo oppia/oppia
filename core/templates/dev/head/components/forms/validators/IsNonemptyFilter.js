@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Validator to check if input is empty.
+ * @fileoverview Validator to check if input is nonempty.
  */
 
 oppia.filter('isNonempty', [function() {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for visualization bar chart.
+ * @fileoverview Directive for "bar chart" visualization.
  */
 
 // Each visualization receives three variables: 'data', 'options', and

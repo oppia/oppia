@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for visualization frequency table.
+ * @fileoverview Directive for the "frequency table" visualization.
  */
 
 // Each visualization receives three variables: 'data', 'options', and

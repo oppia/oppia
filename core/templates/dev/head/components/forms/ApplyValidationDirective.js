@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for schema-based form builders.
+ * @fileoverview Directive for applying validation.
  */
 
 /* eslint-disable angular/directive-restrict */

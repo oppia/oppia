@@ -1347,6 +1347,42 @@ def _validate_and_parse_js_files(all_files):
         parsed_js_files[filename] = parser.parse(content)
     return parsed_js_files
 
+def _get_expression(parsed_node, components_to_check):
+    """This function returns the expression part of a node.
+    Args:
+        parsed_node: dict. Parsed node of the body of a JS file.
+        components_to_check: list(str). List of components to check in a
+            JS file.
+
+    Returns:
+        expression: dict. Expression part of the node.
+    """
+    # Check the type of the node. If the type is
+    # 'ExpressionStatement' then it means the
+    # declaration of a component.
+    if parsed_node['type'] != 'ExpressionStatement':
+        return
+    # Separate the expression part of the node.
+    expression = parsed_node['expression']
+    # Check whether the expression belongs to a component.
+    expression_type_is_not_call = (
+        expression['type'] != 'CallExpression')
+    if expression_type_is_not_call:
+        return
+    # Check whether the expression belongs to a
+    # 'MemberExpression' which represents a computed
+    # expression or an Identifier which represents a
+    # static expression.
+    expression_callee_type_is_not_member = (
+        expression['callee']['type'] != 'MemberExpression')
+    if expression_callee_type_is_not_member:
+        return
+    # Get the component in the JS file.
+    component = expression['callee']['property']['name']
+    if component not in components_to_check:
+        return
+    return expression
+
 
 def _check_directive_scope(all_files, parsed_js_files):
     """This function checks that all directives have an explicit
@@ -1361,6 +1397,7 @@ def _check_directive_scope(all_files, parsed_js_files):
                 EXCLUDED_PATHS)]
     failed = False
     summary_messages = []
+    components_to_check = ['directive']
 
     for filename in files_to_check:
         parsed_dict = parsed_js_files[filename]
@@ -1368,23 +1405,9 @@ def _check_directive_scope(all_files, parsed_js_files):
             # Parse the body of the content as nodes.
             parsed_nodes = parsed_dict['body']
             for parsed_node in parsed_nodes:
-                # Check the type of the node.
-                if parsed_node['type'] != 'ExpressionStatement':
-                    continue
-                # Separate the expression part of the node.
-                expression = parsed_node['expression']
-                # Check whether the expression belongs to a directive.
-                expression_type_is_not_call = (
-                    expression['type'] != 'CallExpression')
-                if expression_type_is_not_call:
-                    continue
-                expression_callee_type_is_not_member = (
-                    expression['callee']['type'] != 'MemberExpression')
-                if expression_callee_type_is_not_member:
-                    continue
-                expression_callee_property_name_is_not_directive = (
-                    expression['callee']['property']['name'] != 'directive')
-                if expression_callee_property_name_is_not_directive:
+                expression = _get_expression(
+                    parsed_node, components_to_check)
+                if not expression:
                     continue
                 # Separate the arguments of the expression.
                 arguments = expression['arguments']
@@ -1483,7 +1506,7 @@ def _check_js_component_count(all_files, parsed_js_files):
     one component and and that the name of the component
     matches the filename.
     """
-    print 'Starting js property check'
+    print 'Starting js component count check'
     print '----------------------------------------'
     # Select JS files which need to be checked.
     files_to_check = [
@@ -1493,6 +1516,7 @@ def _check_js_component_count(all_files, parsed_js_files):
     failed = False
     summary_messages = []
     component_name = ''
+    components_to_check = ['controller', 'directive', 'factory', 'filter']
     for filename in files_to_check:
         property_num = 0
         # Filename without its path.
@@ -1502,32 +1526,9 @@ def _check_js_component_count(all_files, parsed_js_files):
             # Parse the body of the content as nodes.
             parsed_nodes = parsed_dict['body']
             for parsed_node in parsed_nodes:
-                # Check the type of the node. If the type is
-                # 'ExpressionStatement' then it means the
-                # declaration of a component.
-                if parsed_node['type'] != 'ExpressionStatement':
-                    continue
-                # Separate the expression part of the node.
-                expression = parsed_node['expression']
-                # Check whether the expression belongs to a component.
-                expression_type_is_not_call = (
-                    expression['type'] != 'CallExpression')
-                if expression_type_is_not_call:
-                    continue
-                # Check whether the expression belongs to a
-                # 'MemberExpression' which represents a computed
-                # expression or an Identifier which represents a
-                # static expression.
-                expression_callee_type_is_not_member = (
-                    expression['callee']['type'] != 'MemberExpression')
-                if expression_callee_type_is_not_member:
-                    continue
-                # Get the component in the JS file.
-                component = expression['callee']['property']['name']
-                if component != 'factory' and (
-                        component != 'directive' and
-                        component != 'controller' and
-                        component != 'filter'):
+                expression = _get_expression(
+                    parsed_node, components_to_check)
+                if not expression:
                     continue
                 # Separate the arguments of the expression.
                 arguments = expression['arguments']
@@ -1535,6 +1536,7 @@ def _check_js_component_count(all_files, parsed_js_files):
                 # name of the component.
                 component_name = arguments[0]['value']
                 property_num += 1
+                component = expression['callee']['property']['name']
                 if component == 'directive':
                     if (component_name[0].upper() + component_name[1:] +
                             'Directive' != (exact_filename)):
@@ -1593,7 +1595,7 @@ def _check_sorted_dependencies(all_files, parsed_js_files):
         filename for filename in all_files if filename.endswith('.js') and
         not any(fnmatch.fnmatch(filename, pattern) for pattern in
                 EXCLUDED_PATHS)]
-    properties_to_check = ['controller', 'directive', 'factory']
+    components_to_check = ['controller', 'directive', 'factory']
     failed = False
     summary_messages = []
 
@@ -1602,16 +1604,11 @@ def _check_sorted_dependencies(all_files, parsed_js_files):
         with _redirect_stdout(_TARGET_STDOUT):
             parsed_nodes = parsed_dict['body']
             for parsed_node in parsed_nodes:
-                if parsed_node['type'] != 'ExpressionStatement':
+                expression = _get_expression(
+                    parsed_node, components_to_check)
+                if not expression:
                     continue
-                expression = parsed_node['expression']
-                if expression['type'] != 'CallExpression':
-                    continue
-                if expression['callee']['type'] != 'MemberExpression':
-                    continue
-                property_name = expression['callee']['property']['name']
-                if property_name not in properties_to_check:
-                    continue
+                # Separate the arguments of the expression.
                 arguments = expression['arguments']
                 if arguments[0]['type'] == 'Literal':
                     property_value = str(arguments[0]['value'])

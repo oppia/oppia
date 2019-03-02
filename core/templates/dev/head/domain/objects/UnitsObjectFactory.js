@@ -100,7 +100,8 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
         var unit = unitsWithMultiplier[i][0];
         var multiplier = unitsWithMultiplier[i][1];
         var ind = unit.indexOf('^');
-        var s, power;
+        var s = null;
+        var power = null;
         if (ind > -1) {
           s = unit.substr(0, ind);
           power = parseInt(unit.substr(ind + 1));

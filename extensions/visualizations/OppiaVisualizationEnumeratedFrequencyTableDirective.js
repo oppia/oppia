@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for all visualization enumerted frequency
- * table.
+ * @fileoverview Directive for "enumerated frequency table" visualization.
  */
 
 // Each visualization receives three variables: 'data', 'options', and

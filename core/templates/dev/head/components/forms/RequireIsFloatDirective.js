@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for schema-based form builders.
+ * @fileoverview Directive for requiring "isFloat" filter.
  */
 
-// This should come before all validators, if that is defined as
+// This should come before 'apply-validation', if that is defined as
 // an attribute on the HTML tag.
 
 /* eslint-disable angular/directive-restrict */
