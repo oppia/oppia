@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This directive is based on the unicodeStringEditor one.
-
 oppia.directive('sanitizedUrlEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
@@ -24,7 +22,7 @@ oppia.directive('sanitizedUrlEditor', [
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/list_editor_directive.html'),
+        '/objects/templates/sanitized_url_editor_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.SCHEMA = {
           type: 'unicode',
