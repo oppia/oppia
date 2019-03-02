@@ -163,7 +163,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_1, self.EXP_ID_0])
 
     def test_incomplete_exploration_is_not_added_to_learner_playlist(self):
-	learner_progress_services.add_exp_to_learner_playlist(
+        learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
