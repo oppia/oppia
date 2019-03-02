@@ -33,7 +33,7 @@ oppia.directive('responseHeader', [
         navigateToState: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/response_header_directive.html'),
+        '/components/state/response_header_directive.html'),
       controller: [
         '$scope', 'EditabilityService', 'StateEditorService',
         'PLACEHOLDER_OUTCOME_DEST',
