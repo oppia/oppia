@@ -55,8 +55,7 @@ class TopicLandingPageTest(test_utils.GenericTestBase):
             '/learn/maths/invalid_topic', expected_status_int=404)
 
     def test_valid_subject_and_topic_loads_correctly(self):
-        response = self.get_html_response(
-            '/learn/maths/fractions')
+        response = self.get_html_response('/learn/maths/fractions')
         response.mustcontain('students and kids')
 
 

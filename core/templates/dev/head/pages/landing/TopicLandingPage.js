@@ -66,7 +66,7 @@ oppia.controller('TopicLandingPage', [
       }
     };
 
-    $scope.getRowVideoUrl = function() {
+    $scope.getVideoUrl = function() {
       if (landingPageData.video) {
         var videoPath = UrlInterpolationService.interpolateUrl(
           angular.copy(assetsPathFormat), {
