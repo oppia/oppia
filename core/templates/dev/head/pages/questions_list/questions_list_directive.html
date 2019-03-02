@@ -25,7 +25,7 @@
       style="height: 4em;"
       ng-click="editQuestion(question.summary)">
     <td> <[getQuestionIndex($index)]> </td>
-    <td> <[question.summary.question_content]> </td>
+    <td> <[truncatedQuestionSummaries[$index]]> </td>
     <td ng-if="!getSkill()">{{question.skill_description}}</td>
   </tr>
 </table>

@@ -53,12 +53,13 @@ oppia.directive('questionsList', [
             $scope.question = null;
             $scope.questionSummaries =
               $scope.getQuestionSummaries($scope.currentPage);
+            $scope.truncatedQuestionSummaries = [];
             if ($scope.questionSummaries) {
               $scope.questionSummaries.forEach(function(question) {
                 var summary = $filter(
                   'formatRtePreview')(question.summary.question_content);
                 summary = $filter('truncate')(summary, 100);
-                question.summary.question_content = summary;
+                $scope.truncatedQuestionSummaries.push(summary);
               });
             }
             $scope.activeQuestion = null;
