@@ -31,13 +31,44 @@ oppia.directive('oppiaResponseInteractiveMap', [
         'interactive_map_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-
-        var latLongPair = _answer[0] + ',' + _answer[1];
-        $scope.staticMapUrl =
-          'https://maps.googleapis.com/maps/api/staticmap?' +
-          'center=' + latLongPair + '&zoom=4&size=500x400' +
-          '&maptype=roadmap&visual_refresh=true&markers=color:red|' +
-          latLongPair + '&sensor=false';
+        $scope.mapOptions = {
+          defaults: {
+            zoomControl: false,
+            attributionControl: false
+          },
+          center: {
+            lat: _answer[0],
+            lng: _answer[1],
+            zoom: 8
+          },
+          mapMarkers: {
+            mainMarker: {
+              lat: _answer[0],
+              lng: _answer[1],
+              icon: {
+                iconUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-icon.png'),
+                // The size of the icon image in pixels.
+                iconSize: [25, 41],
+                // The coordinates of the "tip" of the icon.
+                iconAnchor: [12, 41],
+                shadowUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-shadow.png'),
+                // The size of the shadow image in pixels.
+                shadowSize: [41, 41],
+                // The coordinates of the "tip" of the shadow.
+                shadowAnchor: [13, 41],
+                // The URL to a retina sized version of the icon image.
+                // Used for Retina screen devices.
+                iconRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-icon-2x.png'),
+                shadowRetinaUrl: (
+                  UrlInterpolationService.getExtensionResourceUrl(
+                    '/interactions/InteractiveMap/static/marker-shadow.png'))
+              }
+            }
+          }
+        };
       }]
     };
   }

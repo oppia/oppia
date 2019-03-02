@@ -43,7 +43,10 @@
     right: 12px;
     text-align: left;
     transition: all 350ms;
-    z-index: 500;
+    /* The z-index value of leaflet map attribution is 1000, to make it go lower
+       in stack we have used 1001.
+    */
+    z-index: 1001;
   }
 
   .conversation-skin-help-card.ng-enter,

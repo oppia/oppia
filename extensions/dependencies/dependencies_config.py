@@ -21,7 +21,7 @@
 # should insert when the Angular app is first initialized.
 DEPENDENCIES_TO_ANGULAR_MODULES_DICT = {
     'codemirror': ['ui.codemirror'],
-    'google_maps': ['ui.map'],
+    'ui_leaflet': ['ui-leaflet'],
     'guppy': [],
     'logic_proof': [],
     'math_expressions': [],

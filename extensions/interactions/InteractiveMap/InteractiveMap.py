@@ -26,7 +26,7 @@ class InteractiveMap(base.BaseInteraction):
     description = 'Allows learners to specify a position on a world map.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     is_trainable = False
-    _dependency_ids = ['google_maps']
+    _dependency_ids = ['ui_leaflet']
     answer_type = 'CoordTwoDim'
     instructions = 'Click on the map'
     narrow_instructions = 'View map'
