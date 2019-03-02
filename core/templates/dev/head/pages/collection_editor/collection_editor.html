@@ -50,6 +50,8 @@
 {% block footer_js %}
   {{ super() }}
   <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
+  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
+  <script src="/templates/dev/head/filters/NormalizeWhitespaceFilter.js"></script>
   <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
   <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
   <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
@@ -94,6 +96,8 @@
   <script src="/templates/dev/head/domain/objects/UnitsObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/AnswerGroupObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/ContentIdsToAudioTranslationsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/WrittenTranslationObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/WrittenTranslationsObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
@@ -159,6 +163,7 @@
   <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>
   <script src="/templates/dev/head/services/LocalStorageService.js"></script>
   <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
+  <script src="/templates/dev/head/services/ValidatorsService.js"></script>
 
   <script src="/templates/dev/head/pages/state_editor/state_properties/StateEditorService.js"></script>
 

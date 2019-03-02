@@ -99,7 +99,14 @@ describe('State content editor directive', function() {
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       },
       'Second State': {
         content: {
@@ -138,7 +145,14 @@ describe('State content editor directive', function() {
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       },
       'Third State': {
         content: {
@@ -184,7 +198,14 @@ describe('State content editor directive', function() {
             value: 'something clever',
             parse_with_jinja: false
           }
-        }]
+        }],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       }
     });
 
