@@ -641,7 +641,8 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: []
+            x:
+            - <p>Good option A.</p>
           rule_type: IsProperSubsetOf
         tagged_misconception_id: null
         training_data: []
