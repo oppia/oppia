@@ -19,17 +19,20 @@
 
 oppia.factory('StateObjectFactory', [
   'ContentIdsToAudioTranslationsObjectFactory', 'InteractionObjectFactory',
-  'SubtitledHtmlObjectFactory', 'ParamChangesObjectFactory', function(
+  'ParamChangesObjectFactory', 'SubtitledHtmlObjectFactory',
+  'WrittenTranslationsObjectFactory', function(
       ContentIdsToAudioTranslationsObjectFactory, InteractionObjectFactory,
-      SubtitledHtmlObjectFactory, ParamChangesObjectFactory) {
+      ParamChangesObjectFactory, SubtitledHtmlObjectFactory,
+      WrittenTranslationsObjectFactory) {
     var State = function(name, classifierModelId, content, interaction,
-        paramChanges, contentIdsToAudioTranslations) {
+        paramChanges, contentIdsToAudioTranslations, writtenTranslations) {
       this.name = name;
       this.classifierModelId = classifierModelId;
       this.content = content;
       this.interaction = interaction;
       this.paramChanges = paramChanges;
       this.contentIdsToAudioTranslations = contentIdsToAudioTranslations;
+      this.writtenTranslations = writtenTranslations;
     };
 
     State.prototype.setName = function(newName) {
@@ -46,7 +49,8 @@ oppia.factory('StateObjectFactory', [
           return paramChange.toBackendDict();
         }),
         content_ids_to_audio_translations: (
-          this.contentIdsToAudioTranslations.toBackendDict())
+          this.contentIdsToAudioTranslations.toBackendDict()),
+        written_translations: this.writtenTranslations.toBackendDict()
       };
     };
 
@@ -58,6 +62,7 @@ oppia.factory('StateObjectFactory', [
       this.paramChanges = angular.copy(otherState.paramChanges);
       this.contentIdsToAudioTranslations =
         angular.copy(otherState.contentIdsToAudioTranslations);
+      this.writtenTranslations = angular.copy(otherState.writtenTranslations);
     };
 
     State.createDefaultState = function(newStateName) {
@@ -68,7 +73,8 @@ oppia.factory('StateObjectFactory', [
         interaction: newStateTemplate.interaction,
         param_changes: newStateTemplate.param_changes,
         content_ids_to_audio_translations: (
-          newStateTemplate.content_ids_to_audio_translations)
+          newStateTemplate.content_ids_to_audio_translations),
+        written_translations: newStateTemplate.written_translations
       });
       newState.interaction.defaultOutcome.dest = newStateName;
       return newState;
@@ -85,7 +91,9 @@ oppia.factory('StateObjectFactory', [
         ParamChangesObjectFactory.createFromBackendList(
           stateDict.param_changes),
         ContentIdsToAudioTranslationsObjectFactory.createFromBackendDict(
-          stateDict.content_ids_to_audio_translations));
+          stateDict.content_ids_to_audio_translations),
+        WrittenTranslationsObjectFactory.createFromBackendDict(
+          stateDict.written_translations));
     };
 
     return State;

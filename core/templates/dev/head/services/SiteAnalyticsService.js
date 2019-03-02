@@ -189,9 +189,9 @@ oppia.factory('SiteAnalyticsService', ['$window', function($window) {
     registerFinishExploration: function() {
       _sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
     },
-    registerOpenFractionsFromLandingPageEvent: function(viewerType) {
+    registerOpenCollectionFromLandingPageEvent: function(collectionId) {
       _sendEventToGoogleAnalytics(
-        'OpenFractionsFromLandingPage', 'click', viewerType);
+        'OpenFractionsFromLandingPage', 'click', collectionId);
     },
     registerStewardsLandingPageEvent: function(viewerType, buttonText) {
       _sendEventToGoogleAnalytics(

@@ -21,10 +21,10 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-    'ngMaterial', 'ngAnimate', 'ngAudio', 'angularAudioRecorder', 'ngSanitize',
-    'ngTouch', 'ngResource', 'ui.bootstrap', 'ui.tree', 'ui.sortable',
-    'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
-    'pascalprecht.translate', 'ngCookies', 'toastr', 'headroom', 'dndLists'
+    'angularAudioRecorder', 'dndLists', 'headroom', 'infinite-scroll',
+    'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
+    'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
+    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
@@ -99,6 +99,14 @@ oppia.constant('ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'CyclicStateTransitions');
 oppia.constant('SITE_NAME', 'Oppia.org');
 
 oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
+oppia.constant('FEEDBACK_POPOVER_PATH',
+  '/pages/exploration_player/feedback_popup_container_directive.html');
+
+// Whether to enable the promo bar functionality. This does not actually turn on
+// the promo bar, as that is gated by a config value (see config_domain). This
+// merely avoids checking for whether the promo bar is enabled for every Oppia
+// page visited.
+oppia.constant('ENABLE_PROMO_BAR', true);
 
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([

@@ -19,8 +19,8 @@ import logging
 import string
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import summary_services

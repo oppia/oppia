@@ -18,9 +18,9 @@
  */
 
 oppia.factory('TranslationStatusService', [
-  'StateContentIdsToAudioTranslationsService', 'ExplorationStatesService',
+  'ExplorationStatesService', 'StateContentIdsToAudioTranslationsService',
   'TranslationLanguageService', 'INTERACTION_SPECS', function(
-      StateContentIdsToAudioTranslationsService, ExplorationStatesService,
+      ExplorationStatesService, StateContentIdsToAudioTranslationsService,
       TranslationLanguageService, INTERACTION_SPECS) {
     var NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var ALL_AUDIO_AVAILABLE_COLOR = '#16A765';

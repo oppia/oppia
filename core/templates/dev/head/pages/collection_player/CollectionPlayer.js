@@ -31,16 +31,16 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 });
 
 oppia.controller('CollectionPlayer', [
-  '$scope', '$anchorScroll', '$location', '$http',
-  'ReadOnlyCollectionBackendApiService', 'CollectionObjectFactory',
-  'CollectionPlaythroughObjectFactory', 'AlertsService',
-  'UrlInterpolationService', 'GuestCollectionProgressService',
+  '$anchorScroll', '$http', '$location', '$scope',
+  'AlertsService', 'CollectionObjectFactory',
+  'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
+  'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
-      $scope, $anchorScroll, $location, $http,
-      ReadOnlyCollectionBackendApiService, CollectionObjectFactory,
-      CollectionPlaythroughObjectFactory, AlertsService,
-      UrlInterpolationService, GuestCollectionProgressService,
+      $anchorScroll, $http, $location, $scope,
+      AlertsService, CollectionObjectFactory,
+      CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
+      ReadOnlyCollectionBackendApiService, UrlInterpolationService,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;

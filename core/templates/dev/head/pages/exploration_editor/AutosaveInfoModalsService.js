@@ -18,13 +18,13 @@
  */
 
 oppia.factory('AutosaveInfoModalsService', [
-  '$log', '$uibModal', '$timeout', '$window',
-  'ExplorationDataService', 'LocalStorageService',
-  'ChangesInHumanReadableFormService', 'UrlInterpolationService',
+  '$log', '$timeout', '$uibModal', '$window',
+  'ChangesInHumanReadableFormService', 'ExplorationDataService',
+  'LocalStorageService', 'UrlInterpolationService',
   function(
-      $log, $uibModal, $timeout, $window,
-      ExplorationDataService, LocalStorageService,
-      ChangesInHumanReadableFormService, UrlInterpolationService) {
+      $log, $timeout, $uibModal, $window,
+      ChangesInHumanReadableFormService, ExplorationDataService,
+      LocalStorageService, UrlInterpolationService) {
     var _isModalOpen = false;
     var _refreshPage = function(delay) {
       $timeout(function() {

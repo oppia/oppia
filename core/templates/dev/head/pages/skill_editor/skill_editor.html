@@ -40,6 +40,25 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="/templates/dev/head/directives/AngularHtmlBindDirective.js"></script>
+  <script src="/templates/dev/head/directives/MathjaxBindDirective.js"></script>
+
+  <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
+  <script src="/templates/dev/head/filters/CapitalizeFilter.js"></script>
+  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
+  <script src="/templates/dev/head/filters/FormatRtePreviewFilter.js"></script>
+  <script src="/templates/dev/head/filters/NormalizeWhitespaceFilter.js"></script>
+  <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
+  <script src="/templates/dev/head/filters/ParameterizeRuleDescriptionFilter.js"></script>
+  <script src="/templates/dev/head/filters/RemoveDuplicatesInArrayFilter.js"></script>
+  <script src="/templates/dev/head/filters/ReplaceInputsWithEllipsesFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAtFirstEllipsisFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateInputBasedOnInteractionAnswerTypeFilter.js"></script>
+  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
+  <script src="/templates/dev/head/filters/WrapTextWithEllipsisFilter.js"></script>
+
   <script src="/templates/dev/head/pages/skill_editor/editor_tab/SkillEditorMainTabDirective.js"></script>
   <script src="/templates/dev/head/pages/skill_editor/editor_tab/SkillDescriptionEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/skill_editor/editor_tab/SkillConceptCardEditorDirective.js"></script>
@@ -96,16 +115,16 @@
 
   <script src="/templates/dev/head/components/QuestionCreationService.js"></script>
   <script src="/templates/dev/head/components/HintAndSolutionButtonsDirective.js"></script>
-  <script src="/templates/dev/head/components/AnswerGroupEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/HintEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/OutcomeEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/OutcomeDestinationEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/OutcomeFeedbackEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/ResponseHeaderDirective.js"></script>
-  <script src="/templates/dev/head/components/RuleEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/RuleTypeSelectorDirective.js"></script>
-  <script src="/templates/dev/head/components/SolutionEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/SolutionExplanationEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/AnswerGroupEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/HintEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/OutcomeEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/OutcomeDestinationEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/OutcomeFeedbackEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/ResponseHeaderDirective.js"></script>
+  <script src="/templates/dev/head/components/state/RuleEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/RuleTypeSelectorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/SolutionEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/SolutionExplanationEditorDirective.js"></script>
   <script src="/templates/dev/head/components/StateGraphLayoutService.js"></script>
   <script src="/templates/dev/head/components/forms/HtmlSelectDirective.js"></script>
 
@@ -131,15 +150,17 @@
   <script src="/templates/dev/head/domain/exploration/RuleObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/SolutionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/StatesObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/WrittenTranslationObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/WrittenTranslationsObjectFactory.js"></script>
+
+
   <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/NumberWithUnitsObjectFactory.js"></script>
 
   <script src="/templates/dev/head/services/ExplorationHtmlFormatterService.js"></script>
   <script src="/templates/dev/head/services/ExtensionTagAssemblerService.js"></script>
 
-  <script src="/templates/dev/head/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
-  <script src="/templates/dev/head/domain/exploration/ContentIdsToAudioTranslationsObjectFactory.js"></script>
-  <script src="/templates/dev/head/domain/exploration/AudioTranslationObjectFactory.js"></script>
 
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>

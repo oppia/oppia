@@ -86,9 +86,7 @@
         iframed: JSON.parse('{{iframed|js_string}}'),
         isTopicManager: JSON.parse('{{is_topic_manager|js_string}}'),
         logoutUrl: JSON.parse('{{logout_url|js_string}}'),
-        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
-        PROMO_BAR_IS_ENABLED: JSON.parse('{{promo_bar_enabled|js_string}}'),
-        PROMO_BAR_MESSAGE: JSON.parse('{{promo_bar_message|js_string}}')
+        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
     </script>
 
@@ -105,7 +103,7 @@
     </div>
     <div ng-if="!iframed">
       <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
-      <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
+      <promo-bar>
       </promo-bar>
       <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
       </div>
@@ -157,7 +155,7 @@
         </div>
       </div>
 
-      <div ng-if="DEV_MODE" class="oppia-dev-mode">
+      <div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>
         Dev Mode
       </div>
 
@@ -171,9 +169,9 @@
     {% include 'pages/footer_js_libs.html' %}
 
     <script src="/templates/dev/head/app.js"></script>
-    <script src="/templates/dev/head/directives.js"></script>
-    <script src="/templates/dev/head/filters.js"></script>
     <script src="/templates/dev/head/i18n.js"></script>
+
+    <script src="/templates/dev/head/directives/FocusOnDirective.js"></script>
 
     <script src="/templates/dev/head/pages/Base.js"></script>
 
@@ -184,13 +182,13 @@
     <script src="/templates/dev/head/services/DebouncerService.js"></script>
     <script src="/templates/dev/head/services/DateTimeFormatService.js"></script>
     <script src="/templates/dev/head/services/IdGenerationService.js"></script>
-    <script src="/templates/dev/head/services/ValidatorsService.js"></script>
     <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
     <script src="/templates/dev/head/services/TranslationFileHashLoaderService.js"></script>
     <script src="/templates/dev/head/services/RteHelperService.js"></script>
     <script src="/templates/dev/head/services/StateRulesStatsService.js"></script>
     <script src="/templates/dev/head/services/ConstructTranslationIdsService.js"></script>
     <script src="/templates/dev/head/services/UserService.js"></script>
+    <script src="/templates/dev/head/services/PromoBarService.js"></script>
     <script src="/templates/dev/head/services/contextual/DeviceInfoService.js"></script>
     <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
     <script src="/templates/dev/head/services/contextual/WindowDimensionsService.js"></script>
