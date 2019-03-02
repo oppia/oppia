@@ -1347,6 +1347,7 @@ def _validate_and_parse_js_files(all_files):
         parsed_js_files[filename] = parser.parse(content)
     return parsed_js_files
 
+
 def _get_expression(parsed_node, components_to_check):
     """This function returns the expression part of a node.
     Args:

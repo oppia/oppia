@@ -18,7 +18,6 @@
 
 import inspect
 import os
-import re
 
 from extensions.visualizations import models
 import feconf
@@ -54,7 +53,8 @@ class Registry(object):
         """Returns the HTML bodies for all visualizations."""
         js_directives = ''
         for visualization_class in cls.get_all_visualization_ids():
-            filename = 'OppiaVisualization%sDirective.js' % (visualization_class)
+            filename = (
+                'OppiaVisualization%sDirective.js' % (visualization_class))
             js_directives += (
                 utils.get_file_contents(os.path.join(
                     feconf.VISUALIZATIONS_DIR, filename)))
