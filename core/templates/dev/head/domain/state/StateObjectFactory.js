@@ -33,7 +33,6 @@ oppia.factory('StateObjectFactory', [
       this.paramChanges = paramChanges;
       this.contentIdsToAudioTranslations = contentIdsToAudioTranslations;
       this.writtenTranslations = writtenTranslations;
-      console.log(this);
     };
 
     State.prototype.setName = function(newName) {

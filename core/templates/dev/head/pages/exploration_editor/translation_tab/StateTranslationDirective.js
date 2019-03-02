@@ -29,18 +29,22 @@ oppia.directive('stateTranslation', [
       controller: [
         '$filter', '$rootScope', '$scope',
         'ExplorationCorrectnessFeedbackService',
-        'ExplorationInitStateNameService', 'ExplorationStatesService',
-        'RouterService', 'StateEditorService', 'TranslationStatusService',
-        'TranslationTabActiveContentIdService', 'COMPONENT_NAME_CONTENT',
+        'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
+        'ExplorationStatesService',
+        'RouterService', 'StateEditorService', 'TranslationLanguageService',
+        'TranslationStatusService', 'TranslationTabActiveContentIdService',
+        'TranslationTabActiveModeService', 'COMPONENT_NAME_CONTENT',
         'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
         'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
         'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
             $filter, $rootScope, $scope,
             ExplorationCorrectnessFeedbackService,
-            ExplorationInitStateNameService, ExplorationStatesService,
-            RouterService, StateEditorService, TranslationStatusService,
-            TranslationTabActiveContentIdService, COMPONENT_NAME_CONTENT,
+            ExplorationInitStateNameService, ExplorationLanguageCodeService,
+            ExplorationStatesService,
+            RouterService, StateEditorService, TranslationLanguageService,
+            TranslationStatusService, TranslationTabActiveContentIdService,
+            TranslationTabActiveModeService, COMPONENT_NAME_CONTENT,
             COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
             RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
@@ -66,6 +70,30 @@ oppia.directive('stateTranslation', [
           $scope.stateSolution = null;
           $scope.needsUpdateTooltipMessage = 'Audio needs update to match ' +
             'text. Please record new audio.';
+          var isTranslatedTextRequiered = function() {
+            return (TranslationTabActiveModeService.isVoiceoverModeActive &&
+              TranslationLanguageService.getActiveLanguageCode() != (
+                ExplorationLanguageCodeService.displayed))
+          }
+          $scope.getRequieredHtml = function(subtitledHtml) {
+            if(isTranslatedTextRequiered()) {
+              var contentId = subtitledHtml.getContentId();
+              var activeLanguageCode = (
+                TranslationLanguageService.getActiveLanguageCode());
+              var writtenTranslations = (
+                ExplorationStatesService.getWrittenTranslationsMemento(
+                  $scope.stateName));
+              if(writtenTranslations.hasWrittenTranslation(
+                contentId, activeLanguageCode)) {
+                return writtenTranslations.getWrittenTranslation(
+                  contentId, activeLanguageCode);
+              } else {
+                return "<h1>No translation Found</h1>";
+              }
+            } else {
+              return subtitledHtml.getHtml();
+            }
+          }
 
           $scope.isActive = function(tabId) {
             return ($scope.activatedTabId === tabId);
