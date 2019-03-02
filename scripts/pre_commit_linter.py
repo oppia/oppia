@@ -45,7 +45,7 @@ CUSTOMIZATION OPTIONS
         python scripts/pre_commit_linter.py --files file_1 file_2 ... file_n
 
 4.  To lint files in verbose mode
-        python scripts/pre_commit_linter.py -v
+        python scripts/pre_commit_linter.py --verbose
 
 Note that the root folder MUST be named 'oppia'.
  """
@@ -82,7 +82,7 @@ _EXCLUSIVE_GROUP.add_argument(
     help='specific files to be linted. Space separated list',
     action='store')
 _PARSER.add_argument(
-    '-v',
+    '--verbose',
     help='verbose mode. All details will be printed.',
     action='store_true')
 
@@ -476,15 +476,13 @@ def _get_all_files():
 
     Returns:
         list(str, bool). The list of files for linting and pattern checks and
-            bool for mode.
+            bool which checks if whether verbose mode is enabled or not.
     """
     eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     parsed_args = _PARSER.parse_args()
-    # Default mode is non-verbose mode, if arguments contains -v flag it will
-    # be made True, which will represent verbose mode.
-    mode = False
-    if parsed_args.v is True:
-        mode = True
+    # Default mode is non-verbose mode, if arguments contains --verbose flag it
+    # will be made True, which will represent verbose mode.
+    verbose_mode_enabled = bool(parsed_args.verbose)
     if parsed_args.path:
         input_path = os.path.join(os.getcwd(), parsed_args.path)
         if not os.path.exists(input_path):
@@ -515,7 +513,7 @@ def _get_all_files():
     all_files = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
-    return [all_files, mode]
+    return [all_files, verbose_mode_enabled]
 
 
 def _check_bad_pattern_in_file(filename, content, pattern):
@@ -702,7 +700,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
 
 def _lint_css_files(
         node_path, stylelint_path, config_path, files_to_lint, stdout, result,
-        mode):
+        verbose_mode_enabled):
     """Prints a list of lint errors in the given list of CSS files.
 
     Args:
@@ -712,7 +710,7 @@ def _lint_css_files(
         files_to_lint: list(str). A list of filepaths to lint.
         stdout:  multiprocessing.Queue. A queue to store Stylelint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
-        mode: bool. Mode i.e. verbose if True.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     start_time = time.time()
     num_files_with_errors = 0
@@ -727,10 +725,10 @@ def _lint_css_files(
     stylelint_cmd_args = [
         node_path, stylelint_path, '--config=' + config_path]
     result_list = []
-    if mode is False:
+    if verbose_mode_enabled is False:
         print 'Linting CSS files.'
     for _, filename in enumerate(files_to_lint):
-        if mode is True:
+        if verbose_mode_enabled is True:
             print 'Linting: ', filename
         proc_args = stylelint_cmd_args + [filename]
         proc = subprocess.Popen(
@@ -761,7 +759,8 @@ def _lint_css_files(
 
 
 def _lint_js_files(
-        node_path, eslint_path, files_to_lint, stdout, result, mode):
+        node_path, eslint_path, files_to_lint, stdout, result,
+        verbose_mode_enabled):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
@@ -770,7 +769,7 @@ def _lint_js_files(
         files_to_lint: list(str). A list of filepaths to lint.
         stdout:  multiprocessing.Queue. A queue to store ESLint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
-        mode: bool. Mode i.e. verbose if True.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     start_time = time.time()
     num_files_with_errors = 0
@@ -784,10 +783,10 @@ def _lint_js_files(
     print 'Total js files: ', num_js_files
     eslint_cmd_args = [node_path, eslint_path, '--quiet']
     result_list = []
-    if mode is False:
+    if verbose_mode_enabled is False:
         print 'Linting JS files.'
     for _, filename in enumerate(files_to_lint):
-        if mode is True:
+        if verbose_mode_enabled is True:
             print 'Linting: ', filename
         proc_args = eslint_cmd_args + [filename]
         proc = subprocess.Popen(
@@ -888,23 +887,23 @@ class LintChecksManager(object):
 
     Attributes:
         all_files: list(str). The list of files to be linted.
-        mode: bool. Mode i.e. verbose if True.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
         parsed_js_files: dict(). Contains the content of JS files, after
             validating and parsing the files.
     """
 
-    def __init__(self, all_files, mode=False):
+    def __init__(self, all_files, verbose_mode_enabled=False):
         """Constructs a LintChecksManager object.
 
         Args:
             all_files: list(str). The list of files to be linted.
-            mode: bool. Mode i.e. verbose if True.
+            verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         self.all_files = all_files
-        self.mode = mode
-        self.parsed_js_files = self.validate_and_parse_js_files()
+        self.verbose_mode_enabled = verbose_mode_enabled
+        self.parsed_js_files = self._validate_and_parse_js_files()
 
-    def validate_and_parse_js_files(self):
+    def _validate_and_parse_js_files(self):
         """This function validates JavaScript files and returns the parsed
         contents as a Python dictionary.
         """
@@ -918,16 +917,16 @@ class LintChecksManager(object):
         parsed_js_files = dict()
         if not files_to_check:
             return parsed_js_files
-        if self.mode is False:
+        if self.verbose_mode_enabled is False:
             print 'Validating and parsing JS files ...'
         for filename in files_to_check:
-            if self.mode is True:
+            if self.verbose_mode_enabled is True:
                 print 'Validating and parsing %s file ...' % filename
             content = FileCache.read(filename)
             parsed_js_files[filename] = parser.parse(content)
         return parsed_js_files
 
-    def lint_all_files(self):
+    def _lint_all_files(self):
         """This function is used to check if node-eslint dependencies are
         installed and pass ESLint binary path and lint all the files(JS, Python,
         HTML, CSS) with their respective third party linters.
@@ -981,7 +980,7 @@ class LintChecksManager(object):
                 stylelint_path,
                 config_path_for_css_in_html,
                 html_files_to_lint_for_css, css_in_html_stdout,
-                css_in_html_result, self.mode)))
+                css_in_html_result, self.verbose_mode_enabled)))
 
         css_result = multiprocessing.Queue()
         css_stdout = multiprocessing.Queue()
@@ -992,7 +991,7 @@ class LintChecksManager(object):
                 stylelint_path,
                 config_path_for_oppia_css,
                 css_files_to_lint, css_stdout,
-                css_result, self.mode)))
+                css_result, self.verbose_mode_enabled)))
 
         js_result = multiprocessing.Queue()
         js_stdout = multiprocessing.Queue()
@@ -1000,7 +999,7 @@ class LintChecksManager(object):
         linting_processes.append(multiprocessing.Process(
             target=_lint_js_files, args=(
                 node_path, eslint_path, js_files_to_lint,
-                js_stdout, js_result, self.mode)))
+                js_stdout, js_result, self.verbose_mode_enabled)))
 
         py_result = multiprocessing.Queue()
 
@@ -1059,7 +1058,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def check_directive_scope(self):
+    def _check_directive_scope(self):
         """This function checks that all directives have an explicit
         scope: {} and it should not be scope: true.
         """
@@ -1194,7 +1193,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def check_sorted_dependencies(self):
+    def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
         imported in the controllers/directives/factories in JS
         files are in following pattern: dollar imports, regular
@@ -1294,7 +1293,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def match_line_breaks_in_controller_dependencies(self):
+    def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
         listed in the controller of a directive or service exactly match those
         between the arguments of the controller function.
@@ -1354,7 +1353,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def check_html_directive_name(self):
+    def _check_html_directive_name(self):
         """This function checks that all HTML directives end
         with _directive.html.
         """
@@ -1408,7 +1407,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def check_import_order(self):
+    def _check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
         """
@@ -1446,7 +1445,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def check_newline_character(self):
+    def _check_newline_character(self):
         """This function is used to check that each file
         ends with a single newline character.
         """
@@ -1493,7 +1492,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def check_docstrings(self):
+    def _check_docstrings(self):
         """This function ensures that docstrings end in a period and the arg
         order in the function definition matches the order in the doc string.
 
@@ -1646,7 +1645,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def check_comments(self):
+    def _check_comments(self):
         """This function ensures that comments follow correct style."""
         print 'Starting comment checks'
         print '----------------------------------------'
@@ -1723,7 +1722,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def check_html_tags_and_attributes(self, debug=False):
+    def _check_html_tags_and_attributes(self, debug=False):
         """This function checks the indentation of lines in HTML files."""
 
         print 'Starting HTML tag and attribute check'
@@ -1764,7 +1763,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def lint_html_files(self):
+    def _lint_html_files(self):
         """This function is used to check HTML files for linting errors."""
         parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -1783,11 +1782,11 @@ class LintChecksManager(object):
         print 'Starting HTML linter...'
         print '----------------------------------------'
         print ''
-        if self.mode is False:
+        if self.verbose_mode_enabled is False:
             print 'Linting HTML files ....'
         for filename in html_files_to_lint:
             proc_args = htmllint_cmd_args + [filename]
-            if self.mode is True:
+            if self.verbose_mode_enabled is True:
                 print 'Linting %s file' % filename
             with _redirect_stdout(_TARGET_STDOUT):
                 proc = subprocess.Popen(
@@ -1826,7 +1825,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def check_bad_patterns(self):
+    def _check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
         print 'Starting Pattern Checks'
         print '----------------------------------------'
@@ -1904,7 +1903,7 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def check_for_copyright_notice(self):
+    def _check_for_copyright_notice(self):
         """This function checks whether the copyright notice
         is present at the beginning of files.
         """
@@ -1965,26 +1964,26 @@ class LintChecksManager(object):
             all_messages: str. All the messages returned by the lint checks.
         """
 
-        linter_messages = self.lint_all_files()
-        directive_scope_messages = self.check_directive_scope()
+        linter_messages = self._lint_all_files()
+        directive_scope_messages = self._check_directive_scope()
         sorted_dependencies_messages = (
-            self.check_sorted_dependencies())
+            self._check_sorted_dependencies())
         controller_dependency_messages = (
-            self.match_line_breaks_in_controller_dependencies())
+            self._match_line_breaks_in_controller_dependencies())
         html_directive_name_messages = (
-            self.check_html_directive_name())
-        import_order_messages = self.check_import_order()
-        newline_messages = self.check_newline_character()
-        docstring_messages = self.check_docstrings()
-        comment_messages = self.check_comments()
+            self._check_html_directive_name())
+        import_order_messages = self._check_import_order()
+        newline_messages = self._check_newline_character()
+        docstring_messages = self._check_docstrings()
+        comment_messages = self._check_comments()
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
         html_tag_and_attribute_messages = (
-            self.check_html_tags_and_attributes())
-        html_linter_messages = self.lint_html_files()
-        pattern_messages = self.check_bad_patterns()
+            self._check_html_tags_and_attributes())
+        html_linter_messages = self._lint_html_files()
+        pattern_messages = self._check_bad_patterns()
         copyright_notice_messages = (
-            self.check_for_copyright_notice())
+            self._check_for_copyright_notice())
         _print_complete_summary_of_errors()
         all_messages = (
             directive_scope_messages + sorted_dependencies_messages +
@@ -2001,11 +2000,14 @@ def main():
     """Main method for pre commit linter script that lints Python and JavaScript
     files.
     """
-    all_files, mode = _get_all_files()
-    lint_checks_manager = LintChecksManager(all_files, mode)
+    all_files, verbose_mode_enabled = _get_all_files()
+    lint_checks_manager = LintChecksManager(all_files, verbose_mode_enabled)
     all_messages = lint_checks_manager.perform_all_lint_checks()
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
+        print '---------------------------'
+        print 'Checks Not Passed.'
+        print '---------------------------'
         sys.exit(1)
     else:
         print '---------------------------'
