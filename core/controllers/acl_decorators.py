@@ -303,6 +303,77 @@ def can_edit_collection(handler):
     return test_can_edit
 
 
+def can_edit_suggestion(handler):
+    """Decorator to check whether the user can edit given suggestion.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if
+            a user has permission to edit a given suggestion.
+    """
+
+    def test_can_edit_suggestion(self, **kwargs):
+        """Checks if the user can edit the suggestion.
+
+        Args:
+            target_type: str. The target type.
+            **kwargs: dict(str, str). The suggestion id.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to edit a suggestion.
+        """
+        credentials_to_check = kwargs
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if suggestion_services.check_can_edit_or_resubmit_suggestion(
+                credentials_to_check['suggestion_id'], self.user_id):
+            return handler(
+                self, credentials_to_check['target_id'],
+                credentials_to_check['suggestion_id'])
+
+        if target_type == 'exploration':
+            exploration_rights = rights_manager.get_exploration_rights(
+                credentials_to_check['target_id'])
+            if exploration_rights is None:
+                raise base.UserFacingExceptions.PageNotFoundException
+
+            if rights_manager.check_can_edit_activity(
+                    self.user, exploration_rights):
+                return handler(
+                    self, credentials_to_check['target_id'],
+                    credentials_to_check['suggestion_id'])
+            else:
+                raise base.UserFacingExceptions.UnauthorizedUserException(
+                    'You do not have credentials to edit this exploration.')
+
+        elif target_type == 'collection':
+            collection_rights = rights_manager.get_collection_rights(
+                credentials_to_check['target_id'])
+            if collection_rights is None:
+                raise base.UserFacingExceptions.PageNotFoundException
+
+            if rights_manager.check_can_edit_activity(
+                    self.user, collection_rights):
+                return handler(
+                    self, credentials_to_check['target_id'],
+                    credentials_to_check['suggestion_id'])
+            else:
+                raise base.UserFacingExceptions.UnauthorizedUserException(
+                    'You do not have credentials to edit this collection.')
+    test_can_edit_suggestion.__wrapped__ = True
+
+    return test_can_edit_suggestion
+
+
 def can_manage_email_dashboard(handler):
     """Decorator to check whether user can access email dashboard.
 
@@ -1124,7 +1195,7 @@ def can_resubmit_suggestion(handler):
             UnauthorizedUserException: The user does not have
                 credentials to edit this suggestion.
         """
-        if suggestion_services.check_can_resubmit_suggestion(
+        if suggestion_services.check_can_edit_or_resubmit_suggestion(
                 suggestion_id, self.user_id):
             return handler(self, suggestion_id, **kwargs)
         else:

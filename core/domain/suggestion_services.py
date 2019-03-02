@@ -166,6 +166,13 @@ def _update_suggestion(suggestion):
 
 
 def edit_suggestion(suggestion_id, new_change):
+    """Edits the submitted suggestion.
+
+    Args:
+        suggestion_id: obj. Id of suggestion to be changed.
+        new_change: dict(str, str). Dictionary contains the change in
+        suggestion.
+    """
     suggestion = get_suggestion_by_id(suggestion_id)
     change_cls = type(suggestion.change)
     change_object = change_cls(new_change)
@@ -537,7 +544,7 @@ def update_position_in_rotation(score_category, user_id):
         score_category, user_id)
 
 
-def check_can_resubmit_suggestion(suggestion_id, user_id):
+def check_can_edit_or_resubmit_suggestion(suggestion_id, user_id):
     """Checks whether the given user can resubmit the suggestion.
 
     Args:

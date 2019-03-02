@@ -430,7 +430,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_services.resubmit_rejected_suggestion(
                         suggestion, 'resubmit summary message', self.author_id)
 
-    def test_check_can_resubmit_suggestion(self):
+    def test_check_can_edit_or_resubmit_suggestion(self):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
@@ -443,10 +443,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description',
                     self.reviewer_id)
-        can_resubmit = suggestion_services.check_can_resubmit_suggestion(
+        can_resubmit = suggestion_services.check_can_edit_or_resubmit_suggestion(# pylint: disable=line-too-long
             self.suggestion_id, self.author_id)
         self.assertEqual(can_resubmit, True)
-        can_resubmit = suggestion_services.check_can_resubmit_suggestion(
+        can_resubmit = suggestion_services.check_can_edit_or_resubmit_suggestion(# pylint: disable=line-too-long
             self.suggestion_id, self.normal_user_id)
         self.assertEqual(can_resubmit, False)
 
