@@ -23,6 +23,8 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var SkillEditorPage =
@@ -32,12 +34,16 @@ describe('Skill Editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
   var skillId = null;
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
 
   beforeAll(function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     skillEditorPage =
       new SkillEditorPage.SkillEditorPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       'creator@skillEditor.com', 'creatorSkillEditor');
     topicsAndSkillsDashboardPage.get();
@@ -84,6 +90,27 @@ describe('Skill Editor functionality', function() {
     skillEditorPage.expectWorkedExampleSummariesToMatch(['Example 2']);
   });
 
+  it('should create a question for the skill', function() {
+    skillEditorPage.moveToQuestionsTab();
+    skillEditorPage.clickCreateQuestionButton();
+    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
+    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', 'correct');
+    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
+    explorationEditorMainTab.addHint('Hint 1');
+    explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
+    });
+    skillEditorPage.saveQuestion();
+
+    skillEditorPage.get(skillId);
+    skillEditorPage.moveToQuestionsTab();
+    skillEditorPage.expectNumberofQuestionsToBe(1);
+  });
+
   it('should create and delete misconceptions', function() {
     skillEditorPage.addMisconception(
       'Misconception 1', 'Notes 1', 'Feedback 1');
@@ -99,19 +126,6 @@ describe('Skill Editor functionality', function() {
 
     skillEditorPage.get(skillId);
     skillEditorPage.expectNumberOfMisconceptionsToBe(1);
-  });
-
-  it('should correctly publishing skill', function() {
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnpublishedSkillsTab();
-    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
-
-    skillEditorPage.get(skillId);
-    skillEditorPage.firstTimePublishSkill();
-
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
   });
 
   afterEach(function() {

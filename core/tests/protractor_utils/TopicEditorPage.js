@@ -53,10 +53,18 @@ var TopicEditorPage = function() {
   var subtopics = element.all(by.css('.protractor-test-subtopic'));
   var deleteSubtopicButtons = element.all(
     by.css('.protractor-test-delete-subtopic-button'));
+  var uncategorizedSkillItems = element.all(
+    by.css('.protractor-test-uncategorized-skill-item'));
 
   this.get = function(topicId) {
     browser.get(EDITOR_URL_PREFIX + topicId);
     return waitFor.pageToFullyLoad();
+  };
+
+  this.expectNumberOfUncategorizedSkillsToBe = function(count) {
+    uncategorizedSkillItems.then(function(items) {
+      expect(items.length).toEqual(1);
+    });
   };
 
   this.deleteSubtopicWithIndex = function(index) {

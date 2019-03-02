@@ -75,10 +75,42 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-commit-message-input'));
   var skillDescriptionField = element(
     by.css('.protractor-test-skill-description-field'));
+  var questionsTab = element(by.css('.protractor-test-questions-tab'));
+  var createQuestionButton = element(
+    by.css('.protractor-test-create-question-button'));
+  var saveQuestionButton = element(
+    by.css('.protractor-test-save-question-button'));
+  var questionItems = element.all(
+    by.css('.protractor-test-question-list-item'));
+  var questionItem = element(by.css('.protractor-test-question-list-item'));
 
   this.get = function(skillId) {
     browser.get(EDITOR_URL_PREFIX + skillId);
     return waitFor.pageToFullyLoad();
+  };
+
+  this.expectNumberofQuestionsToBe = function(count) {
+    waitFor.visibilityOf(
+      questionItem, 'Question takes too long to appear');
+    questionItems.then(function(items) {
+      expect(items.length).toEqual(count);
+    });
+  };
+
+  this.saveQuestion = function() {
+    saveQuestionButton.click();
+    return waitFor.pageToFullyLoad();
+  };
+
+  this.moveToQuestionsTab = function() {
+    waitFor.elementToBeClickable(
+      questionsTab,
+      'Questions tab button takes too long to be clickable');
+    questionsTab.click();
+  };
+
+  this.clickCreateQuestionButton = function() {
+    createQuestionButton.click();
   };
 
   this.changeSkillDescription = function(description) {

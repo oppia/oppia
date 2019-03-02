@@ -59,10 +59,30 @@ var TopicsAndSkillsDashboardPage = function() {
   var unusedSkillsTabButton = element(
     by.css('.protractor-test-unused-skills-tab')
   );
+  var assignSkillToTopicButtons = element.all(
+    by.css('.protractor-test-assign-skill-to-topic-button'));
+  var confirmMoveButton = element(
+    by.css('.protractor-test-confirm-move-button'));
 
   this.get = function() {
     browser.get(DASHBOARD_URL);
     waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToTopicWithIndex = function(index) {
+    topicsListItems.then(function(elems) {
+      elems[index].click();
+    });
+  };
+
+  this.assignSkillWithIndexToTopic = function(index, topicIndex) {
+    assignSkillToTopicButtons.then(function(elems) {
+      elems[index].click();
+      topicsListItems.then(function(topics) {
+        topics[index].click();
+        confirmMoveButton.click();
+      });
+    });
   };
 
   this.createTopicWithTitle = function(title) {

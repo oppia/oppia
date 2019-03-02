@@ -25,23 +25,31 @@ var workflow = require('../protractor_utils/workflow.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
+var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
+var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
 describe('Topics and skills dashboard functionality', function() {
   var topicsAndSkillsDashboardPage = null;
+  var skillEditorPage = null;
+  var topicEditorPage = null;
 
   beforeAll(function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+    skillEditorPage =
+      new SkillEditorPage.SkillEditorPage();
+    topicEditorPage =
+      new TopicEditorPage.TopicEditorPage();
     users.createAdmin('creator@topicsAndSkillsDashboard.com',
       'creatorTopicsAndSkillsDashboard');
   });
 
   beforeEach(function() {
     users.login('creator@topicsAndSkillsDashboard.com');
+    topicsAndSkillsDashboardPage.get();
   });
 
   it('should add a new topic to list', function() {
-    topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     topicsAndSkillsDashboardPage.createTopicWithTitle('Topic 1');
 
@@ -50,7 +58,6 @@ describe('Topics and skills dashboard functionality', function() {
   });
 
   it('should add a new unpublished skill to list', function() {
-    topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
 
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
@@ -61,8 +68,26 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
   });
 
-  it('should remove a skill from list once deleted', function() {
+  it('should move published skill to unused skills section', function() {
+    topicsAndSkillsDashboardPage.createSkillWithDescription('Skill 2');
+    skillEditorPage.editConceptCard('Concept card explanation');
+    skillEditorPage.saveOrPublishSkill('Added review material.');
+    skillEditorPage.firstTimePublishSkill();
     topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+  });
+
+  it('should move skill to a topic', function() {
+    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    topicEditorPage.moveToSubtopicsTab();
+    topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
+  });
+
+  it('should remove a skill from list once deleted', function() {
     topicsAndSkillsDashboardPage.navigateToUnpublishedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
     topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
@@ -73,7 +98,6 @@ describe('Topics and skills dashboard functionality', function() {
   });
 
   it('should remove a topic from list once deleted', function() {
-    topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
 
