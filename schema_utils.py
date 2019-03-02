@@ -220,7 +220,8 @@ class Normalizers(object):
 
         Returns:
             An empty string if the URL does not start with http:// or https://
-            except when the string is empty. Otherwise, returns the original URL.
+            except when the string is empty. Otherwise, returns the original
+            URL.
 
         Raises:
             AssertionError: The string is non-empty and does not start with
