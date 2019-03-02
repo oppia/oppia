@@ -471,12 +471,13 @@ def _redirect_stdout(new_target):
 
 
 def _get_all_files():
-    """This function is used to get the list of all files for linting and
-    pattern checks.
+    """This function is used to parse the arguments entered by the user, and
+    returns the list of all files for linting and pattern checks.
 
     Returns:
-        list(str, bool). The list of files for linting and pattern checks and
-            bool which checks if whether verbose mode is enabled or not.
+        tuple(list(str), bool). The tuple consisting list of files for linting
+        and pattern checks and bool which checks if whether verbose
+        mode is enabled or not.
     """
     eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     parsed_args = _PARSER.parse_args()
@@ -513,7 +514,7 @@ def _get_all_files():
     all_files = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
-    return [all_files, verbose_mode_enabled]
+    return (all_files, verbose_mode_enabled)
 
 
 def _check_bad_pattern_in_file(filename, content, pattern):
@@ -873,15 +874,6 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
             _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
     print 'Python linting finished.'
-
-
-def _print_complete_summary_of_errors():
-    """Returns complete summary of errors.
-
-    Returns:
-        str. Complete summary of error messages.
-    """
-    return _TARGET_STDOUT.getvalue()
 
 
 class LintChecksManager(object):
@@ -1996,19 +1988,20 @@ class LintChecksManager(object):
             copyright_notice_messages)
         return all_messages
 
+def _print_complete_summary_of_errors():
+    """Print complete summary of errors."""
+    print 'Summary of Errors:'
+    print '----------------------------------------'
+    return _TARGET_STDOUT.getvalue()
 
 def main():
-    """Main method for pre commit linter script that lints Python and JavaScript
-    files.
+    """Main method for pre commit linter script that lints Python, JavaScript,
+    HTML, and CSS files.
     """
     all_files, verbose_mode_enabled = _get_all_files()
     lint_checks_manager = LintChecksManager(all_files, verbose_mode_enabled)
     all_messages = lint_checks_manager.perform_all_lint_checks()
-    error_messages = _print_complete_summary_of_errors()
-
-    print 'Summary of Errors:'
-    print '----------------------------------------'
-    print error_messages
+    _print_complete_summary_of_errors()
 
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
