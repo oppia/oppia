@@ -643,6 +643,7 @@ states:
         - inputs:
             x:
             - <p>Good option A.</p>
+            - <p>Good option C.</p>
           rule_type: IsProperSubsetOf
         tagged_misconception_id: null
         training_data: []
