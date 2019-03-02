@@ -59,4 +59,3 @@ oppia.controller('Base', [
     };
   }
 ]);
-
