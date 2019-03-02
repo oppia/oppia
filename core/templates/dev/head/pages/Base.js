@@ -18,9 +18,9 @@
 
 oppia.controller('Base', [
   '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService', 'DEV_MODE', 'SITE_NAME', 'SITE_FEEDBACK_FORM_URL',
+  'SidebarStatusService', 'DEV_MODE', 'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function($document, $rootScope, $scope, AlertsService, BackgroundMaskService,
-      SidebarStatusService, DEV_MODE, SITE_NAME, SITE_FEEDBACK_FORM_URL) {
+      SidebarStatusService, DEV_MODE, SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
@@ -59,3 +59,4 @@ oppia.controller('Base', [
     };
   }
 ]);
+
