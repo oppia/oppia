@@ -63,9 +63,15 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_page.to_dict(), self.subtopic_page.to_dict())
 
     def test_get_subtopic_page_by_id(self):
-        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+        subtopic_page_1 = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, self.subtopic_id)
-        self.assertEqual(subtopic_page.to_dict(), self.subtopic_page.to_dict())
+        self.assertEqual(
+            subtopic_page_1.to_dict(), self.subtopic_page.to_dict())
+        # When the subtopic page with the given subtopic id and topic id
+        # doesn't exist.
+        subtopic_page_2 = subtopic_page_services.get_subtopic_page_by_id(
+            'topic_id', 1, strict=False)
+        self.assertEqual(subtopic_page_2, None)
 
     def test_get_subtopic_pages_with_ids(self):
         subtopic_ids = [self.subtopic_id]
@@ -73,6 +79,10 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, subtopic_ids)
         self.assertEqual(
             subtopic_pages[0].to_dict(), self.subtopic_page.to_dict())
+        subtopic_ids = [2]
+        with self.assertRaises(AttributeError):
+            subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
+                self.TOPIC_ID, subtopic_ids)
 
     def test_get_subtopic_page_contents_by_id(self):
         self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
@@ -125,7 +135,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'subtopic_id': 1,
                 'title': 'Sample'
             })])
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Unexpected error: received an invalid change list *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic', [])
         subtopic_page_id_1 = (
@@ -135,7 +146,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_id_1)
         subtopic_page_1.version = 2
         subtopic_page_model_1.version = 3
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(Exception, 'Trying to update version *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic',
                 [topic_domain.TopicChange({
@@ -145,7 +156,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 })])
         subtopic_page_1.version = 3
         subtopic_page_model_1.version = 2
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Unexpected error: trying to update version *'):
             subtopic_page_services.save_subtopic_page(
                 self.user_id, subtopic_page_1, 'Added subtopic',
                 [topic_domain.TopicChange({
@@ -173,3 +185,6 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             self.user_id, self.TOPIC_ID, 1)
         with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
             topic_models.SubtopicPageModel.get(subtopic_page_id)
+        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            subtopic_page_services.delete_subtopic_page(
+                self.user_id, self.TOPIC_ID, 1)
