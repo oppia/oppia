@@ -901,7 +901,7 @@ def get_topic_rights_with_user(user_id):
         list(TopicRights). The rights objects associated with the topics
             assigned to given user.
     """
-    topic_rights_models = topic_models.TopicRightsModel.get_with_user(user_id)
+    topic_rights_models = topic_models.TopicRightsModel.get_by_user(user_id)
     return [
         get_topic_rights_from_model(model) for model in topic_rights_models
         if model is not None]
@@ -977,7 +977,7 @@ def deassign_user_from_all_topics(committer, user_id):
         topic_rights.manager_ids.remove(user_id)
         commit_cmds = [topic_domain.TopicRightsChange({
             'cmd': topic_domain.CMD_REMOVED_MANAGER_ROLE,
-            'assignee_id': user_id
+            'removed_user_id': user_id
         })]
         save_topic_rights(
             topic_rights, committer.user_id,

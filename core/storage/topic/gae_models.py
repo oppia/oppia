@@ -306,7 +306,7 @@ class TopicRightsModel(base_models.VersionedModel):
         indexed=True, required=True, default=False)
 
     @classmethod
-    def get_with_user(cls, user_id):
+    def get_by_user(cls, user_id):
         """Retrieves the rights object for all topics assigned to given user
 
         Args:

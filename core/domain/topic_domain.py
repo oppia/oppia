@@ -164,7 +164,7 @@ class TopicRightsChange(object):
     """Domain object for changes made to a topic rights object."""
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'assignee_id', 'new_role', 'old_role'
+        'assignee_id', 'new_role', 'old_role', 'removed_user_id'
     ]
 
     def __init__(self, change_dict):
@@ -192,7 +192,7 @@ class TopicRightsChange(object):
             self.new_role = change_dict['new_role']
             self.old_role = change_dict['old_role']
         elif self.cmd == CMD_REMOVED_MANAGER_ROLE:
-            self.assignee_id = change_dict['assignee_id']
+            self.removed_user_id = change_dict['removed_user_id']
         elif self.cmd == CMD_CREATE_NEW:
             pass
         elif self.cmd == CMD_PUBLISH_TOPIC:
