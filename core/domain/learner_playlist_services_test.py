@@ -134,7 +134,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
-    def test_changing_order_of_added_explorations_has_no_effect_on_playlist(self):
+    def test_changing_order_of_added_explorations_has_no_playlist_effect(self):
         # Test adding the exploration_id if it is already in
         # learner_playlist.exploration_ids.
         # Add the first exploration to the second position.
@@ -157,7 +157,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
 
-	state_name = 'state_name'
+        state_name = 'state_name'
         version = 1
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_1, state_name, version)
@@ -221,14 +221,14 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_0])
-        
+
         learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_1)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-    def test_changing_order_of_added_collections_has_no_effect_on_playlist(self):
+    def test_changing_order_of_added_collections_has_no_playlist_effect(self):
         # Test adding the collection_id if it is already in
         # learner_playlist.collection_ids.
         # Add the first collection to the second position.
