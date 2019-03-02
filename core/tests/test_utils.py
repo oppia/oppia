@@ -1549,6 +1549,7 @@ tags: []
         skill = skill_domain.Skill.create_default_skill(skill_id, description)
         if misconceptions:
             skill.misconceptions = misconceptions
+            skill.next_misconception_id = len(misconceptions) + 1
         if skill_contents:
             skill.skill_contents = skill_contents
         skill.language_code = language_code

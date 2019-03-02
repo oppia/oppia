@@ -976,7 +976,7 @@ def deassign_user_from_all_topics(committer, user_id):
     for topic_rights in topic_rights_list:
         topic_rights.manager_ids.remove(user_id)
         commit_cmds = [topic_domain.TopicRightsChange({
-            'cmd': topic_domain.CMD_REMOVED_MANAGER_ROLE,
+            'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
             'removed_user_id': user_id
         })]
         save_topic_rights(

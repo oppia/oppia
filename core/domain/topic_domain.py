@@ -29,7 +29,7 @@ import utils
 
 CMD_CREATE_NEW = 'create_new'
 CMD_CHANGE_ROLE = 'change_role'
-CMD_REMOVED_MANAGER_ROLE = 'removed_manager_role'
+CMD_REMOVE_MANAGER_ROLE = 'remove_manager_role'
 CMD_PUBLISH_TOPIC = 'publish_topic'
 CMD_UNPUBLISH_TOPIC = 'unpublish_topic'
 
@@ -191,7 +191,7 @@ class TopicRightsChange(object):
             self.assignee_id = change_dict['assignee_id']
             self.new_role = change_dict['new_role']
             self.old_role = change_dict['old_role']
-        elif self.cmd == CMD_REMOVED_MANAGER_ROLE:
+        elif self.cmd == CMD_REMOVE_MANAGER_ROLE:
             self.removed_user_id = change_dict['removed_user_id']
         elif self.cmd == CMD_CREATE_NEW:
             pass
