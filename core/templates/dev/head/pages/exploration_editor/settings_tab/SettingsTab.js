@@ -54,7 +54,7 @@ oppia.controller('SettingsTab', [
     }
 
     $scope.isRolesFormOpen = false;
-    $scope.titleAdd = false;
+    $scope.hasTitleBeenAdded = false;
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
     $scope.canDelete = GLOBALS.canDelete;
@@ -230,9 +230,9 @@ oppia.controller('SettingsTab', [
     $scope.checkForTitle = function($event) {
       if ( $scope.explorationTitleService.displayed === '' ) {
         $event.preventDefault();
-        $scope.titleAdd = true;
+        $scope.hasTitleBeenAdded = true;
       } else {
-        $scope.titleAdd = false;
+        $scope.hasTitleBeenAdded = false;
       }
     };
 
