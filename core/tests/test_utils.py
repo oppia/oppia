@@ -1547,10 +1547,10 @@ tags: []
             Skill. A newly-created skill.
         """
         skill = skill_domain.Skill.create_default_skill(skill_id, description)
-        if misconceptions:
+        if misconceptions is not None:
             skill.misconceptions = misconceptions
             skill.next_misconception_id = len(misconceptions) + 1
-        if skill_contents:
+        if skill_contents is not None:
             skill.skill_contents = skill_contents
         skill.language_code = language_code
         skill.version = 0
