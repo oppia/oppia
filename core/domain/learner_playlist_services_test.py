@@ -101,23 +101,43 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_playlist_model.collection_ids if
             learner_playlist_model else [])
 
-    def test_adding_subscribed_exploration_to_playlist_does_not_add_again(self):
+    def test_subscribed_exploration_cannot_be_added_to_playlist(self):
         # Subscribe to exploration.
         subscription_services.subscribe_to_exploration(
-            self.user_id, 'SUBSCRIBED_ID')
+            self.user_id, self.EXP_ID_0)
 
         # Now if we try to add the same exploration, it shouldn't be added.
         learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, 'SUBSCRIBED_ID')
+            self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), [])
 
-        learner_playlist_services.remove_exploration_from_learner_playlist(
-            self.user_id, 'SUBSCRIBED_ID')
+    def test_single_exploration_is_added_correctly_to_playlist(self):
+        # Test adding a single exploration_id to learner playlist.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_0)
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), [self.EXP_ID_0])
 
+    def test_multiple_explorations_are_added_correctly_to_playlist(self):
+        # Test adding two explorations to the learner playlist.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_0)
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), [self.EXP_ID_0])
+
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_1)
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
+
+    def test_changing_order_of_added_explorations_has_no_effect_on_playlist(self):
         # Test adding the exploration_id if it is already in
-        # learner_playlist.exploration_ids
-        # Add two explorations to the learner playlist.
+        # learner_playlist.exploration_ids.
+        # Add the first exploration to the second position.
         learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
         learner_progress_services.add_exp_to_learner_playlist(
@@ -126,13 +146,27 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
-        # Add the first exploration to the second position.
         learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0,
             position_to_be_inserted=1)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_1, self.EXP_ID_0])
+
+    def test_incomplete_exploration_is_not_added_to_learner_playlist(self):
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_0)
+
+	state_name = 'state_name'
+        version = 1
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_1, state_name, version)
+
+        # Test that the exploration added to the in progress list doesn't get
+        # added to the learner playlist.
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), [self.EXP_ID_0])
 
     def test_nunmber_of_explorations_cannot_exceed_max(self):
         # Add MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT explorations.
@@ -148,7 +182,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         # it shouldn't be added as the list length would exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_exploration_to_be_played_later(
-            self.user_id, 'SAPMLE_EXP_ID',
+            self.user_id, self.EXP_ID_MAX,
             position_to_be_inserted=MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), exp_ids)
@@ -157,27 +191,47 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         # it shouldn't be added as the list length would exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_exploration_to_be_played_later(
-            self.user_id, 'SAMPLE_EXP_ID')
+            self.user_id, self.EXP_ID_MAX)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), exp_ids)
 
-    def test_adding_subscribed_collections_to_playlist_does_not_add_again(self):
+    def test_subscribed_collection_cannot_be_added_to_playlist(self):
         # Subscribe to collection.
         subscription_services.subscribe_to_collection(
-            self.user_id, 'SUBSCRIBED_ID')
+            self.user_id, self.COL_ID_0)
 
         # Now if we try to add the same collection, it shouldn't be added.
         learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, 'SUBSCRIBED_ID')
+            self.user_id, self.COL_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(self.user_id), [])
 
-        learner_playlist_services.remove_collection_from_learner_playlist(
-            self.user_id, 'SUBSCRIBED_ID')
+    def test_single_collection_is_added_correctly_to_playlist(self):
+        # Test adding a single collection_id to learner playlist.
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_0)
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), [self.COL_ID_0])
 
+    def test_multiple_collections_are_added_correctly_to_playlist(self):
+        # Test adding two explorations to the learner playlist.
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_0)
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), [self.COL_ID_0])
+        
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_1)
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1])
+
+    def test_changing_order_of_added_collections_has_no_effect_on_playlist(self):
         # Test adding the collection_id if it is already in
-        # learner_playlist.collection_ids
-        # Add two collections to the learner playlist.
+        # learner_playlist.collection_ids.
+        # Add the first collection to the second position.
         learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0)
         learner_progress_services.add_collection_to_learner_playlist(
@@ -186,7 +240,6 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-        # Add the first collection to the second position.
         learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0,
             position_to_be_inserted=1)
@@ -209,7 +262,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         # it shouldn't be added as the list length would exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_collection_to_be_played_later(
-            self.user_id, 'SAMPLE_COL_ID',
+            self.user_id, self.COL_ID_MAX,
             position_to_be_inserted=MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
@@ -219,7 +272,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         # it shouldn't be added as the list length would exceed
         # MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT.
         learner_playlist_services.mark_collection_to_be_played_later(
-            self.user_id, 'SAMPLE_COL_ID')
+            self.user_id, self.COL_ID_MAX)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), col_ids)
