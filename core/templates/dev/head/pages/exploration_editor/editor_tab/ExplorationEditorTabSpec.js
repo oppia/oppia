@@ -67,7 +67,14 @@ describe('Exploration editor tab controller', function() {
             },
             hints: []
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          }
         },
         'Second State': {
           content: {
@@ -106,7 +113,14 @@ describe('Exploration editor tab controller', function() {
             },
             hints: []
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          }
         },
         'Third State': {
           content: {
@@ -152,7 +166,14 @@ describe('Exploration editor tab controller', function() {
               value: 'something clever',
               parse_with_jinja: false
             }
-          }]
+          }],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          }
         }
       });
 

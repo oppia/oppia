@@ -21,10 +21,10 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-    'ngMaterial', 'ngAnimate', 'ngAudio', 'angularAudioRecorder', 'ngSanitize',
-    'ngTouch', 'ngResource', 'ui.bootstrap', 'ui.tree', 'ui.sortable',
-    'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
-    'pascalprecht.translate', 'ngCookies', 'toastr', 'headroom', 'dndLists'
+    'angularAudioRecorder', 'dndLists', 'headroom', 'infinite-scroll',
+    'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
+    'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
+    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
