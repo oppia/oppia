@@ -64,7 +64,8 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
         var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/resubmit/<suggestion_id>');
         var EDIT_SUGGESTION_URL_TEMPLATE = (
-          '/suggestionactionhandler/edit/<target_type>/<target_id>/<suggestion_id>');
+          '/suggestionactionhandler/edit/<target_type>/<target_id>/' +
+          '<suggestion_id>');
         var HANDLE_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/<target_type>/<target_id>/<suggestion_id>');
 
@@ -134,7 +135,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
               break;
             }
           }
-          if(response) {
+          if (response) {
             activeThread.suggestion.newValue = response.data.new_value;
           }
           clearActiveThread();

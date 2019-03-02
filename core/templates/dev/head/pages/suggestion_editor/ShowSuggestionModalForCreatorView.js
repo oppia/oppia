@@ -88,15 +88,15 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
         $scope.isNotHandled &&
         $scope.editButtonShown);
     };
-    $scope.isSaveButtonShown = function () {
+    $scope.isSaveButtonShown = function() {
       return (
         $scope.isNotHandled &&
         !$scope.editButtonShown);
     };
-    $scope.isSaveButtonDisabled = function () {
+    $scope.isSaveButtonDisabled = function() {
       return (
-        $scope.beforeEditSuggestionContent.newSuggestionHtml === $scope.newContent.html ||
-        $scope.summaryMessage === "");
+        $scope.beforeEditSuggestionContent.newSuggestionHtml ===
+        $scope.newContent.html || $scope.summaryMessage === '');
     };
     $scope.isResubmitButtonShown = function() {
       return (
@@ -120,7 +120,7 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
         stateName: $scope.stateName,
         suggestionType: $scope.suggestionType,
         oldContent: $scope.oldContent
-      })
+      });
     };
     $scope.resubmitChanges = function() {
       $uibModalInstance.close({

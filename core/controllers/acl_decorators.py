@@ -318,8 +318,7 @@ def can_edit_suggestion(handler):
         """Checks if the user can edit the suggestion.
 
         Args:
-            target_type: str. The target type.
-            **kwargs: dict(str, str). The suggestion id.
+            **kwargs: dict(str, str). Credentials to check for permisssion.
 
         Returns:
             *. The return value of the decorated function.
@@ -337,10 +336,9 @@ def can_edit_suggestion(handler):
         if suggestion_services.check_can_edit_or_resubmit_suggestion(
                 credentials_to_check['suggestion_id'], self.user_id):
             return handler(
-                self, credentials_to_check['target_id'],
-                credentials_to_check['suggestion_id'])
+                self, credentials_to_check['suggestion_id'])
 
-        if target_type == 'exploration':
+        if credentials_to_check['target_type'] == 'exploration':
             exploration_rights = rights_manager.get_exploration_rights(
                 credentials_to_check['target_id'])
             if exploration_rights is None:
@@ -349,13 +347,12 @@ def can_edit_suggestion(handler):
             if rights_manager.check_can_edit_activity(
                     self.user, exploration_rights):
                 return handler(
-                    self, credentials_to_check['target_id'],
-                    credentials_to_check['suggestion_id'])
+                    self, credentials_to_check['suggestion_id'])
             else:
                 raise base.UserFacingExceptions.UnauthorizedUserException(
                     'You do not have credentials to edit this exploration.')
 
-        elif target_type == 'collection':
+        elif credentials_to_check['target_type'] == 'collection':
             collection_rights = rights_manager.get_collection_rights(
                 credentials_to_check['target_id'])
             if collection_rights is None:
@@ -364,8 +361,7 @@ def can_edit_suggestion(handler):
             if rights_manager.check_can_edit_activity(
                     self.user, collection_rights):
                 return handler(
-                    self, credentials_to_check['target_id'],
-                    credentials_to_check['suggestion_id'])
+                    self, credentials_to_check['suggestion_id'])
             else:
                 raise base.UserFacingExceptions.UnauthorizedUserException(
                     'You do not have credentials to edit this collection.')
