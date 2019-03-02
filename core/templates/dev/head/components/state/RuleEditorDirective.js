@@ -32,8 +32,7 @@ oppia.directive('ruleEditor', [
         rule: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' +
-        'rule_editor_directive.html'),
+        '/components/state/rule_editor_directive.html'),
       controller: [
         '$scope', '$timeout', 'StateEditorService',
         'ValidatorsService', 'INTERACTION_SPECS',
