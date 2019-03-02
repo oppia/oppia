@@ -203,11 +203,11 @@ class Normalizers(object):
         """Collapses multiple spaces into single spaces.
 
         Args:
-          obj: a string.
+            obj: a string.
 
         Returns:
-          a string that is the same as `obj`, except that each block of
-          whitespace is collapsed into a single space character.
+            a string that is the same as `obj`, except that each block of
+            whitespace is collapsed into a single space character.
         """
         return ' '.join(obj.split())
 
@@ -216,15 +216,15 @@ class Normalizers(object):
         """Takes a string representing a URL and sanitizes it.
 
         Args:
-          obj: a string representing a URL.
+            obj: a string representing a URL.
 
         Returns:
-          An empty string if the URL does not start with http:// or https://
-          except when the string is empty. Otherwise, returns the original URL.
+            An empty string if the URL does not start with http:// or https://
+            except when the string is empty. Otherwise, returns the original URL.
 
         Raises:
-          AssertionError: The string is non-empty and does not start with
-          http:// or https://
+            AssertionError: The string is non-empty and does not start with
+            http:// or https://
         """
         if obj == '':
             return obj
