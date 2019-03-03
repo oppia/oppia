@@ -1349,38 +1349,40 @@ def _validate_and_parse_js_files(all_files):
 
 
 def _get_expression_from_node_if_one_exists(parsed_node, components_to_check):
-    """This function returns the expression part of a node.
+    """This function first checks whether the parsed node represents
+    the required angular component that needs to be derived. If yes, then it
+    will return the expression part of the node from which the component can be
+    derived. If no, it will return None.
+
     Args:
         parsed_node: dict. Parsed node of the body of a JS file.
         components_to_check: list(str). List of angular components to check
             in a JS file. These include directives, factories, controllers, etc.
 
     Returns:
-        expression: dict. Expression part of the node.
+        expression: dict or None. Expression part of the node if the node
+            represents a component else None.
     """
-    # Check the type of the node. If the type is
-    # 'ExpressionStatement' (meaning the declaration
-    # of a component) and if not returns None.
     if parsed_node['type'] != 'ExpressionStatement':
         return
     # Separate the expression part of the node which is the actual
     # content of the node.
     expression = parsed_node['expression']
-    # Check whether the expression belongs to a component and
-    # if not returns None.
-    expression_type_is_not_call = (
-        expression['type'] != 'CallExpression')
-    if expression_type_is_not_call:
-        return
     # Check whether the expression belongs to a
-    # 'MemberExpression' which represents a computed
-    # expression or an Identifier which represents a
-    # static expression.
-    expression_callee_type_is_not_member = (
-        expression['callee']['type'] != 'MemberExpression')
-    # If expression does not belong to a 'MemberExpression'
-    # then return None.
-    if expression_callee_type_is_not_member:
+    # 'CallExpression' which always contains a call
+    # and not an 'AssignmentExpression'.
+    # For example, func() is a CallExpression.
+    if expression['type'] != 'CallExpression':
+        return
+    # Check whether the expression belongs to a 'MemberExpression' which
+    # represents a computed expression or an Identifier which represents
+    # a static expression.
+    # For example, 'thing.func' is a MemberExpression where
+    # 'thing' is the object of the MemberExpression and
+    # 'func' is the property of the MemberExpression.
+    # Another example of a MemberExpression within a CallExpression is
+    # 'thing.func()' where 'thing.func' is the callee of the CallExpression.
+    if expression['callee']['type'] != 'MemberExpression':
         return
     # Get the component in the JS file.
     component = expression['callee']['property']['name']
