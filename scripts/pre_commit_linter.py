@@ -1348,24 +1348,26 @@ def _validate_and_parse_js_files(all_files):
     return parsed_js_files
 
 
-def _get_expression(parsed_node, components_to_check):
+def _get_expression_from_node_if_one_exists(parsed_node, components_to_check):
     """This function returns the expression part of a node.
     Args:
         parsed_node: dict. Parsed node of the body of a JS file.
-        components_to_check: list(str). List of components to check in a
-            JS file.
+        components_to_check: list(str). List of angular components to check
+            in a JS file. These include directives, factories, controllers, etc.
 
     Returns:
         expression: dict. Expression part of the node.
     """
     # Check the type of the node. If the type is
-    # 'ExpressionStatement' then it means the
-    # declaration of a component.
+    # 'ExpressionStatement' (meaning the declaration
+    # of a component) and if not returns None.
     if parsed_node['type'] != 'ExpressionStatement':
         return
-    # Separate the expression part of the node.
+    # Separate the expression part of the node which is the actual
+    # content of the node.
     expression = parsed_node['expression']
-    # Check whether the expression belongs to a component.
+    # Check whether the expression belongs to a component and
+    # if not returns None.
     expression_type_is_not_call = (
         expression['type'] != 'CallExpression')
     if expression_type_is_not_call:
@@ -1376,6 +1378,8 @@ def _get_expression(parsed_node, components_to_check):
     # static expression.
     expression_callee_type_is_not_member = (
         expression['callee']['type'] != 'MemberExpression')
+    # If expression does not belong to a 'MemberExpression'
+    # then return None.
     if expression_callee_type_is_not_member:
         return
     # Get the component in the JS file.
@@ -1406,7 +1410,7 @@ def _check_directive_scope(all_files, parsed_js_files):
             # Parse the body of the content as nodes.
             parsed_nodes = parsed_dict['body']
             for parsed_node in parsed_nodes:
-                expression = _get_expression(
+                expression = _get_expression_from_node_if_one_exists(
                     parsed_node, components_to_check)
                 if not expression:
                     continue
@@ -1527,7 +1531,7 @@ def _check_js_component_count(all_files, parsed_js_files):
             # Parse the body of the content as nodes.
             parsed_nodes = parsed_dict['body']
             for parsed_node in parsed_nodes:
-                expression = _get_expression(
+                expression = _get_expression_from_node_if_one_exists(
                     parsed_node, components_to_check)
                 if not expression:
                     continue
@@ -1605,7 +1609,7 @@ def _check_sorted_dependencies(all_files, parsed_js_files):
         with _redirect_stdout(_TARGET_STDOUT):
             parsed_nodes = parsed_dict['body']
             for parsed_node in parsed_nodes:
-                expression = _get_expression(
+                expression = _get_expression_from_node_if_one_exists(
                     parsed_node, components_to_check)
                 if not expression:
                     continue
