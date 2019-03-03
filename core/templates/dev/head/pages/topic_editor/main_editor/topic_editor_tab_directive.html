@@ -2,7 +2,7 @@
   <md-card class="oppia-page-card oppia-long-text">
     <div class="topic-name">
       <label for="topicName" class="form-heading">Topic Name</label>
-      <input id="topicName" type="text" class="form-control"
+      <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
              ng-disabled="!topicRights.canEditTopic()"
              ng-model="editableName" ng-blur="updateTopicName(editableName)"
              placeholder="Enter a name for the topic." maxlength="20" ng-trim="false">
@@ -13,7 +13,7 @@
 
     <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
       <label for="topicDescription" class="form-heading">Description</label>
-      <textarea type="text" class="form-control"
+      <textarea type="text" class="form-control protractor-test-topic-description-field"
                 ng-model="editableDescription"
                 maxlength="120"
                 ng-change="updateTopicDescriptionStatus(editableDescription)"
@@ -30,7 +30,7 @@
 
     <div class="canonical-stories">
       <label class="form-heading"> Canonical Stories </label>
-      <button class="btn btn-default"
+      <button class="btn btn-default protractor-test-create-story-button"
               ng-click="createCanonicalStory()"
               style="float: right;">
         Create Story

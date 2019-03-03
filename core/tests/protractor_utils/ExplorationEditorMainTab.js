@@ -139,6 +139,8 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-save-state-content'));
   var stateNameSubmitButton = stateNameContainer.element(
     by.css('.protractor-test-state-name-submit'));
+  var answerCorrectnessToggle = element(
+    by.css('.protractor-test-editor-correctness-toggle'));
 
   /*
    * Actions
@@ -273,8 +275,10 @@ var ExplorationEditorMainTab = function() {
     // If the destination is being changed, open the corresponding editor.
     if (destStateName || destStateName !== '(try again)') {
     // Set destination contents.
-      _setOutcomeDest(
-        destStateName, createNewState, null);
+      if (destStateName !== null) {
+        _setOutcomeDest(
+          destStateName, createNewState, null);
+      }
     }
 
     // Close new response modal.
@@ -359,6 +363,9 @@ var ExplorationEditorMainTab = function() {
         // Save destination.
         expect(saveOutcomeDestButton.isDisplayed()).toBe(true);
         saveOutcomeDestButton.click();
+      },
+      markAsCorrect: function() {
+        answerCorrectnessToggle.click();
       },
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: function(stateNames) {

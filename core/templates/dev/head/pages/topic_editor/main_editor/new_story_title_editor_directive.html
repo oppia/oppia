@@ -7,14 +7,14 @@
   <div class="modal-body new-story-title-editor" ng-class="{'has-error': isStoryTitleEmpty(storyTitle)}">
     <p>
       Enter the title for the story: &nbsp;
-      <input class="form-group" ng-model="storyTitle" maxlength="20" autofocus>
+      <input class="form-group protractor-test-new-story-title-field" ng-model="storyTitle" maxlength="20" autofocus>
       <p style="color: red;" ng-if="storyTitle.length === 20">
         Story title should be less than 20 characters.
       </p>
     </p>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-success" type="submit" ng-disabled="isStoryTitleEmpty(storyTitle) || storyTitle.length >= 20">
+    <button class="btn btn-success protractor-test-confirm-story-creation-button" type="submit" ng-disabled="isStoryTitleEmpty(storyTitle) || storyTitle.length >= 20">
       <span>Create Story</span>
     </button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>

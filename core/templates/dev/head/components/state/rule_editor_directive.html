@@ -1,6 +1,6 @@
 <div style="position: relative;">
   <form class="form-inline protractor-test-rule-details" role="form" name="ruleEditForm.form">
-    <div ng-if="rule.type != 'FuzzyMatches'">
+    <div ng-if="rule.type != 'FuzzyMatches'" class="rule-parent">
       <rule-type-selector class="protractor-test-answer-description" local-value="<[rule.type]>" on-selection-change="onSelectNewRuleType">
       </rule-type-selector>
 

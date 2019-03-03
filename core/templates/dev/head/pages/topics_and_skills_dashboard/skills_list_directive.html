@@ -26,7 +26,7 @@
           ng-mouseover="highlightColumns($index)"
           ng-mouseleave="unhighlightColumns()">
         <a ng-href="<[skillLink]>" class="list-summary">
-          <span> <[skill.description]> </span>
+          <span class="protractor-test-skill-description"> <[skill.description]> </span>
         </a>
       </td>
       <td ng-class="{'hoverable-cell': highlightedIndex === $index}"
@@ -49,7 +49,7 @@
         </button>
       </td>
       <td ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
-        <button class="btn btn-default" ng-click="assignSkillToTopic(skill.id)">
+        <button class="btn btn-default protractor-test-assign-skill-to-topic-button" ng-click="assignSkillToTopic(skill.id)">
           <span> Assign to Topic </span>
         </button>
       </td>
