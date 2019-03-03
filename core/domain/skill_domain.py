@@ -625,6 +625,7 @@ class Skill(object):
                     explanation_content_id: {}
                 }
             }))
+
         return cls(
             skill_id, description, [], skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
