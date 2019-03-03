@@ -79,11 +79,17 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                     apply_custom_validators=False))
 
             if ca_spec['schema']['type'] == 'custom':
-                obj_class = obj_services.Registry.get_object_class_by_type(
-                    ca_spec['schema']['obj_type'])
-                self.assertEqual(
-                    ca_spec['default_value'],
-                    obj_class.normalize(ca_spec['default_value']))
+                # Default value of SanitizedUrl obj_type may be empty. The empty
+                # string is not considered valid for this object, so we don't
+                # attempt to normalize it.
+                if ca_spec['schema']['obj_type'] == 'SanitizedUrl':
+                    self.assertEqual(ca_spec['default_value'], '')
+                else:
+                    obj_class = obj_services.Registry.get_object_class_by_type(
+                        ca_spec['schema']['obj_type'])
+                    self.assertEqual(
+                        ca_spec['default_value'],
+                        obj_class.normalize(ca_spec['default_value']))
 
     def _listdir_omit_ignored(self, directory):
         """List all files and directories within 'directory', omitting the ones

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This directive is based on the unicodeStringEditor one.
-
 oppia.directive('sanitizedUrlEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
@@ -21,41 +19,20 @@ oppia.directive('sanitizedUrlEditor', [
     return {
       restrict: 'E',
       scope: {
-        getInitArgs: '&',
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/unicode_string_editor_directive.html'),
+        '/objects/templates/sanitized_url_editor_directive.html'),
       controller: ['$scope', function($scope) {
-        $scope.initArgs = $scope.getInitArgs();
-        $scope.$watch('initArgs', function(newValue) {
-          $scope.largeInput = false;
-          if (newValue && newValue.largeInput) {
-            $scope.largeInput = newValue.largeInput;
+        $scope.SCHEMA = {
+          type: 'unicode',
+          validators: [{
+            id: 'is_nonempty'
+          }],
+          ui_config: {
+            placeholder: 'https://www.example.com'
           }
-        });
-
-        $scope.$watch('value', function(newValue) {
-          $scope.localValue = {
-            label: String(newValue) || ''
-          };
-        }, true);
-
-        $scope.alwaysEditable = true;
-
-        $scope.$watch('localValue.label', function(newValue) {
-          $scope.value = newValue;
-        });
-
-        $scope.$on('externalSave', function() {
-          var currentValue = String($scope.localValue.label);
-          if ($scope.active) {
-            $scope.replaceValue(currentValue);
-            // The $scope.$apply() call is needed to propagate the replaced
-            // value.
-            $scope.$apply();
-          }
-        });
+        };
       }]
     };
   }]);
