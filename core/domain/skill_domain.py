@@ -291,11 +291,13 @@ class SkillContents(object):
             ValidationError: One or more attributes of skill contents are
             invalid.
         """
+        available_content_ids = set([])
         if not isinstance(self.explanation, state_domain.SubtitledHtml):
             raise utils.ValidationError(
                 'Expected skill explanation to be a SubtitledHtml object, '
                 'received %s' % self.explanation)
         self.explanation.validate()
+        available_content_ids.add(self.explanation.content_id)
         if not isinstance(self.worked_examples, list):
             raise utils.ValidationError(
                 'Expected worked examples to be a list, received %s' %
@@ -305,7 +307,22 @@ class SkillContents(object):
                 raise utils.ValidationError(
                     'Expected worked example to be a SubtitledHtml object, '
                     'received %s' % example)
+            if example.content_id in available_content_ids:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % example.content_id)
+            available_content_ids.add(example.content_id)
             example.validate()
+
+        audio_content_ids = set(self.content_ids_to_audio_translations.keys())
+        if audio_content_ids != available_content_ids:
+            raise utils.ValidationError(
+                'Expected content_ids_to_audio_translations to contain only '
+                'content_ids in worked examples and explanation. '
+                'content_ids_to_audio_translations: %s. '
+                'content IDs found: %s' % (
+                    audio_content_ids, available_content_ids))
+
+        self.written_translations.validate(available_content_ids)
 
         # TODO(tjiang11): Extract content ids to audio translations out into
         # its own object to reuse throughout audio-capable structures.
@@ -339,24 +356,6 @@ class SkillContents(object):
                         'Unrecognized language code: %s' % language_code)
 
                 translation.validate()
-
-        explanation_content_id = set([self.explanation.content_id])
-        worked_example_content_ids = set([example.content_id for example
-                                          in self.worked_examples])
-        content_ids = explanation_content_id | worked_example_content_ids
-
-        self.written_translations.validate(content_ids)
-
-        audio_content_ids = set(
-            [audio[0] for audio
-             in self.content_ids_to_audio_translations.iteritems()])
-        for c in audio_content_ids:
-            if c not in content_ids:
-                raise utils.ValidationError(
-                    'Expected content_ids_to_audio_translations to contain '
-                    'only content_ids in worked examples and explanation. '
-                    'content_ids_to_audio_translations: %s. '
-                    'content IDs found: %s' % (audio_content_ids, content_ids))
 
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
@@ -555,11 +554,16 @@ class Skill(object):
             raise utils.ValidationError(
                 'Expected misconceptions to be a list, '
                 'received %s' % self.skill_contents)
+        misconception_id_list = []
         for misconception in self.misconceptions:
             if not isinstance(misconception, Misconception):
                 raise utils.ValidationError(
                     'Expected each misconception to be a Misconception '
                     'object, received %s' % misconception)
+            if misconception.id in misconception_id_list:
+                raise utils.ValidationError(
+                    'Duplicate misconception ID found: %s' % misconception.id)
+            misconception_id_list.append(misconception.id)
             if int(misconception.id) >= int(self.next_misconception_id):
                 raise utils.ValidationError(
                     'The misconception with id %s is out of bounds.'
@@ -757,6 +761,7 @@ class Skill(object):
             self.skill_contents.content_ids_to_audio_translations)
         content_ids_for_text_translations = (
             written_translations.get_content_ids_for_text_translation())
+
         for content_id in content_ids_to_delete:
             if not content_id in content_ids_to_audio_translations:
                 raise Exception(

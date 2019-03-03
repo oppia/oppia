@@ -43,7 +43,6 @@ oppia.directive('ruleTypeSelector', [function() {
               ruleTypesToDescriptions[ruleType])
           });
         }
-
         // TODO(bhenning): The order of choices should be meaningful. E.g.,
         // having "is equal to" for most interactions first makes sense. They
         // should ideally be ordered based on likelihood of being used.
@@ -64,6 +63,7 @@ oppia.directive('ruleTypeSelector', [function() {
           // Suppress the search box.
           minimumResultsForSearch: -1,
           width: '350px',
+          dropdownParent: $('.rule-parent'),
           templateSelection: function(object) {
             return $filter('truncateAtFirstEllipsis')(object.text);
           }

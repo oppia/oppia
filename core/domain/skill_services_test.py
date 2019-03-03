@@ -115,6 +115,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                     state_domain.SubtitledHtml('2', 'Example 1')],
                 {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
+
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             skill_descriptions = skill_services.get_skill_descriptions_by_ids(
                 'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
@@ -167,7 +168,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
                 'new_misconception_dict': {
-                    'id': 0,
+                    'id': self.skill.next_misconception_id,
                     'name': 'test name',
                     'notes': 'test notes',
                     'feedback': 'test feedback'
@@ -177,7 +178,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
-                'id': 0,
+                'id': self.skill.next_misconception_id,
                 'old_value': 'test name',
                 'new_value': 'Name'
             })
@@ -221,6 +222,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_set_merge_complete_for_skill(self):
         changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': None,
+                'new_value': self.SKILL_ID
+            }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
                 'property_name': (

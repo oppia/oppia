@@ -142,8 +142,23 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'content_id_3': {}
         }
         self._assert_validation_error(
-            'Expected content_ids_to_audio_translations to contain '
-            'only content_ids in worked examples and explanation.')
+            'Expected content_ids_to_audio_translations to contain only '
+            'content_ids in worked examples and explanation.')
+
+        self.skill.skill_contents.worked_examples = [
+            state_domain.SubtitledHtml('content_id_1', '<p>Hello</p>'),
+            state_domain.SubtitledHtml('content_id_1', '<p>Hello 2</p>')
+        ]
+
+        self._assert_validation_error('Found a duplicate content id')
+
+    def test_misconception_id_validation(self):
+        self.skill.misconceptions = [
+            skill_domain.Misconception(
+                self.MISCONCEPTION_ID, 'name', 'notes', 'default_feedback'),
+            skill_domain.Misconception(
+                self.MISCONCEPTION_ID, 'name 2', 'notes 2', 'default_feedback')]
+        self._assert_validation_error('Duplicate misconception ID found')
 
     def test_skill_migration_validation(self):
         self.skill.superseding_skill_id = 'TestSkillId'
