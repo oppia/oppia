@@ -304,3 +304,19 @@ class TopicRightsModel(base_models.VersionedModel):
     # Whether this topic is published.
     topic_is_published = ndb.BooleanProperty(
         indexed=True, required=True, default=False)
+
+    @classmethod
+    def get_by_user(cls, user_id):
+        """Retrieves the rights object for all topics assigned to given user
+
+        Args:
+            user_id: str. ID of user.
+
+        Returns:
+            list(TopicRightsModel). The list of TopicRightsModel objects in
+                which the given user is a manager.
+        """
+        topic_rights_models = cls.query(
+            cls.manager_ids == user_id
+        )
+        return topic_rights_models

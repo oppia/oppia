@@ -13,7 +13,7 @@
         </div>
 
         <strong>Worked Example</strong>
-        <angular-html-bind html-data="container.workedExample"></angular-html-bind>
+        <angular-html-bind html-data="container.workedExampleHtml"></angular-html-bind>
       </div>
     </div>
   </div>
@@ -26,7 +26,7 @@
       <div class="oppia-rule-details-header">
         <strong>Worked Example</strong>
         <schema-based-editor schema="WORKED_EXAMPLE_FORM_SCHEMA"
-                             local-value="container.workedExample">
+                             local-value="container.workedExampleHtml">
         </schema-based-editor>
       </div>
     </form>
@@ -40,7 +40,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!container.workedExample || editWorkedExampleForm.$invalid"
+                ng-disabled="!container.workedExampleHtml || editWorkedExampleForm.$invalid"
                 ng-click="saveWorkedExample()">
           Save
         </button>

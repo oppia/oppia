@@ -61,6 +61,7 @@
                      ng-if="untriagedSkillSummaries.length > 0"
                      editable-topic-summaries="editableTopicSummaries"
                      mergeable-skill-summaries="mergeableSkillSummaries"
+                     user-can-create-skill="userCanCreateSkill"
                      in-modal="false"
                      user-can-delete-skill="userCanDeleteSkill">
         </skills-list>
@@ -73,6 +74,7 @@
         <skills-list skill-summaries="unpublishedSkillSummaries"
                      editable-topic-summaries="editableTopicSummaries"
                      in-modal="false"
+                     user-can-create-skill="userCanCreateSkill"
                      user-can-delete-skill="userCanDeleteSkill"
                      unpublished-skill="true">
         </skills-list>

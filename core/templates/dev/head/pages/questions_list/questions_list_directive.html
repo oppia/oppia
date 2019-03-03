@@ -22,13 +22,10 @@
   </tr>
   <tr ng-repeat="question in questionSummaries"
       class="list-item protractor-test-question-list-item"
+      style="height: 4em;"
       ng-click="editQuestion(question.summary)">
     <td> <[getQuestionIndex($index)]> </td>
-    <td>
-      <a class="list-summary">
-        <angular-html-bind html-data="question.summary.question_content"></angular-html-bind>
-      </a>
-    </td>
+    <td> <[truncatedQuestionSummaries[$index]]> </td>
     <td ng-if="!getSkill()">{{question.skill_description}}</td>
   </tr>
 </table>

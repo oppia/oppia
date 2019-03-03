@@ -198,8 +198,6 @@ oppia.factory('SkillUpdateService', [
             return workedExample.toBackendDict();
           }),
           function(changeDict, skill) {
-            var newWorkedExamples =
-              _getNewPropertyValueFromChangeDict(changeDict);
             skill.getConceptCard().setWorkedExamples(newWorkedExamples);
           }, function(changeDict, skill) {
             skill.getConceptCard().setWorkedExamples(oldWorkedExamples);

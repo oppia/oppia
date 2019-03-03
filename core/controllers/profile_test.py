@@ -683,6 +683,7 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'is_moderator': False,
             'is_admin': False,
+            'is_topic_manager': False,
             'is_super_admin': False,
             'can_create_collections': False,
             'username': self.EDITOR_USERNAME,

@@ -38,7 +38,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 '1', 'Explanation'), [
-                    state_domain.SubtitledHtml('2', 'Example 1')], {})
+                    state_domain.SubtitledHtml('2', 'Example 1')],
+            {'1': {}, '2': {}})
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', 'description', 'default_feedback')]
         self.SKILL_ID = skill_services.get_new_skill_id()
@@ -105,13 +106,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
+                        state_domain.SubtitledHtml('2', 'Example 1')],
+                {'1': {}, '2': {}}))
         self.save_new_skill(
             'skill_3', self.USER_ID, 'Description 3', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
+                        state_domain.SubtitledHtml('2', 'Example 1')],
+                {'1': {}, '2': {}}))
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             skill_descriptions = skill_services.get_skill_descriptions_by_ids(
                 'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
@@ -164,7 +167,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
                 'new_misconception_dict': {
-                    'id': 0,
+                    'id': self.skill.next_misconception_id,
                     'name': 'test name',
                     'notes': 'test notes',
                     'feedback': 'test feedback'
@@ -174,7 +177,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
-                'id': 0,
+                'id': self.skill.next_misconception_id,
                 'old_value': 'test name',
                 'new_value': 'Name'
             })
@@ -218,6 +221,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_set_merge_complete_for_skill(self):
         changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': None,
+                'new_value': self.SKILL_ID
+            }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
                 'property_name': (
@@ -269,13 +279,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
+                        state_domain.SubtitledHtml('2', 'Example 1')],
+                {'1': {}, '2': {}}))
         self.save_new_skill(
             'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
+                        state_domain.SubtitledHtml('2', 'Example 1')],
+                {'1': {}, '2': {}}))
 
         skill_rights = skill_services.get_unpublished_skill_rights_by_creator(
             self.user_id_admin)
@@ -294,13 +306,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
+                        state_domain.SubtitledHtml('2', 'Example 1')],
+                {'1': {}, '2': {}}))
         self.save_new_skill(
             'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
+                        state_domain.SubtitledHtml('2', 'Example 1')],
+                {'1': {}, '2': {}}))
         try:
             skill_services.get_multi_skills(['skill_a', 'skill_b'])
         except Exception:
