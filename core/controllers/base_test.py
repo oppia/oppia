@@ -272,7 +272,7 @@ class EscapingTests(test_utils.GenericTestBase):
 
     def test_jinja_autoescaping(self):
         form_url = '<[angular_tag]> x{{51 * 3}}y'
-        with self.swap(constants, 'SITE_FEEDBACK_FORM_URL', form_url):
+        with self.swap(constants, 'DEV_MODE', form_url):
             response = self.get_html_response('/fake')
 
             self.assertIn('&lt;[angular_tag]&gt;', response.body)
