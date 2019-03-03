@@ -95,6 +95,24 @@ def get_subtopic_pages_with_ids(topic_id, subtopic_ids):
     return subtopic_pages
 
 
+def get_subtopic_page_contents_by_id(topic_id, subtopic_id):
+    """Returns the page contents of a subtopic
+
+    Args:
+        topic_id: str. ID of the topic that the subtopic belong to.
+        subtopic_id: int. The id of the subtopic.
+
+    Returns:
+        SubtopicPageContents or None: The page contents for a subtopic page,
+            or None if subtopic page does not exist.
+    """
+    subtopic_page = get_subtopic_page_by_id(topic_id, subtopic_id)
+    if subtopic_page is not None:
+        return subtopic_page.page_contents
+    else:
+        return None
+
+
 def save_subtopic_page(
         committer_id, subtopic_page, commit_message, change_list):
     """Validates a subtopic page and commits it to persistent storage. If

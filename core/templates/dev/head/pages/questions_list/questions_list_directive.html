@@ -1,4 +1,4 @@
-<button class="btn btn-default"
+<button class="btn btn-default protractor-test-create-question-button"
         ng-click="createQuestion()"
         style="float: right;">
   Create Question
@@ -21,7 +21,7 @@
     </th>
   </tr>
   <tr ng-repeat="question in questionSummaries"
-      class="list-item"
+      class="list-item protractor-test-question-list-item"
       style="height: 4em;"
       ng-click="editQuestion(question.summary)">
     <td> <[getQuestionIndex($index)]> </td>

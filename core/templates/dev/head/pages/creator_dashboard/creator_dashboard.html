@@ -880,11 +880,13 @@
 
   <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
   <script src="/templates/dev/head/filters/CapitalizeFilter.js"></script>
+  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
   <script src="/templates/dev/head/filters/FormatRtePreviewFilter.js"></script>
   <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
   <script src="/templates/dev/head/filters/ParameterizeRuleDescriptionFilter.js"></script>
   <script src="/templates/dev/head/filters/RemoveDuplicatesInArrayFilter.js"></script>
   <script src="/templates/dev/head/filters/ReplaceInputsWithEllipsesFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateFilter.js"></script>
   <script src="/templates/dev/head/filters/TruncateAndCapitalizeFilter.js"></script>
   <script src="/templates/dev/head/filters/TruncateAtFirstEllipsisFilter.js"></script>
   <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
@@ -978,6 +980,8 @@
 
   <script src="/templates/dev/head/services/AssetsBackendApiService.js"></script>
   <script src="/templates/dev/head/services/StateTopAnswersStatsBackendApiService.js"></script>
+  <script src="/templates/dev/head/services/ValidatorsService.js"></script>
+
   <script src="/templates/dev/head/domain/collection/GuestCollectionProgressObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/collection/GuestCollectionProgressService.js"></script>
 
@@ -1052,17 +1056,16 @@
   <script src="/templates/dev/head/pages/state_editor/StateEditorService.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StatePropertyServices.js"></script>
 
-  <script src="/templates/dev/head/components/HintAndSolutionButtonsDirective.js"></script>
-  <script src="/templates/dev/head/components/AnswerGroupEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/HintEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/OutcomeEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/OutcomeDestinationEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/OutcomeFeedbackEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/ResponseHeaderDirective.js"></script>
-  <script src="/templates/dev/head/components/RuleEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/RuleTypeSelectorDirective.js"></script>
-  <script src="/templates/dev/head/components/SolutionEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/SolutionExplanationEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/AnswerGroupEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/HintEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/OutcomeEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/OutcomeDestinationEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/OutcomeFeedbackEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/ResponseHeaderDirective.js"></script>
+  <script src="/templates/dev/head/components/state/RuleEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/RuleTypeSelectorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/SolutionEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/SolutionExplanationEditorDirective.js"></script>
   <script src="/templates/dev/head/components/StateGraphLayoutService.js"></script>
   <script src="/templates/dev/head/components/forms/HtmlSelectDirective.js"></script>
 
