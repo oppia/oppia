@@ -21,7 +21,11 @@ oppia.factory('IdGenerationService', [function() {
     generateNewId: function() {
       // Generates random string using the last 10 digits of
       // the string for better entropy.
-      return Math.random().toString(36).slice(2).slice(-10);
+      var randomString = Math.random().toString(36).slice(2);
+      while (randomString.length < 10) {
+        randomString = randomString + '0';
+      }
+      return randomString.slice(-10);
     }
   };
 }]);
