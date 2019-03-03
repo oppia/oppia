@@ -379,8 +379,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_PRETESTS_URL_PREFIX,
         reader.PretestHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EXPLORATION_FEATURES_PREFIX,
-        features.ExplorationFeaturesHandler),
+        r'%s/<exploration_id>' % feconf.EXPLORATION_QUESTIONS_URL_PREFIX,
+        reader.QuestionPlayerHandler),
+    get_redirect_route(
+        r'%s' % feconf.EXPLORATION_FEATURES_PREFIX),
     get_redirect_route(
         '/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler),

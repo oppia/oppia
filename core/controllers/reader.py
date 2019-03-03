@@ -336,6 +336,31 @@ class PretestHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
+class QuestionPlayerHandler(base.BaseHandler):
+    """Provides subsequent questions after initial batch."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_play_exploration
+    def get(self):
+        """Handles GET request."""
+        start_cursor = self.request.get('start_cursor')
+        skill_ids = self.request.get('skill_ids')
+        question_count = self.request.get('question_count')
+
+        questions, _, next_start_cursor = (
+            question_services.get_questions_and_skill_descriptions_by_skill_ids(
+                question_count,
+                skill_ids,
+                start_cursor)
+        )
+        question_dicts = [question.to_dict() for question in questions]
+
+        self.values.update({
+            'question_dicts': question_dicts,
+            'next_start_cursor': next_start_cursor
+        })
+        self.render_json(self.values
 
 class StorePlaythroughHandler(base.BaseHandler):
     """Handles a useful playthrough coming in from the frontend to store it. If
