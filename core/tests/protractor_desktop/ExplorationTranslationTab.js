@@ -19,9 +19,9 @@
 
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
+var path = require('path');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var path = require('path');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
@@ -124,31 +124,45 @@ describe('Exploration translation', function() {
     explorationEditorMainTab.setInteraction('Continue');
     responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setDestination('final card', true, null);
-    // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorMainTab.moveToState('first');
     explorationEditorPage.saveChanges();
-
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.exitTutorial();
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
       '(0/8)');
 
-    // click upload button
     explorationEditorTranslationTab.openUploadAudioModal();
     var audioToUpload = '../data/cafe.mp3';
     var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
-    var audioElem = element(by.css('[ng-class="inputFieldClassName"]'));
-    audioElem.sendKeys(audioAbsolutePath);
-    explorationEditorTranslationTab.saveUploadedAudio();
+    explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+    explorationEditorTranslationTab.saveUploadedAudio(true);
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
       '(1/8)');
+    explorationEditorTranslationTab.openUploadAudioModal();
+    
+    var audioToUpload = '../data/img.png';
+    var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
+    explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+    expect(explorationEditorTranslationTab.errorMessage === undefined).toBe(false);
+    expect(explorationEditorTranslationTab.saveUploadedAudioButton.getAttribute("disabled")).toBe("true");
+    audioToUpload = '../data/cafe-over-five-minutes.mp3';
+    audioAbsolutePath = path.resolve(__dirname, audioToUpload);
+    explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+    expect(explorationEditorTranslationTab.errorMessageElement() === undefined).toBe(false);
+    explorationEditorTranslationTab.saveUploadedAudio();
+    expect(explorationEditorTranslationTab.saveUploadedAudioButton.getAttribute("disabled")).toBe("true");
+    
     users.logout();
   });
 
-  it('should provide correct status color ' +
-    'for each card(state) in Exploration Overview', function() {
+  it('should provide correct status color for each state in the graph view',
+    function() {
+    var ALL_AUDIO_AVAILABLE_COLOR = 'rgb(22, 167, 101)';
+    var FEW_AUDIO_AVAILABLE_COLOR = 'rgb(233, 179, 48)';
+    var NO_AUDIO_AVAILABLE_COLOR = 'rgb(209, 72, 54)';
+
     users.createUser('user@correctstatus.com', 'correctStatus');
     users.login('user@correctstatus.com');
     workflow.createExploration();
@@ -173,27 +187,20 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.openUploadAudioModal();
     var audioToUpload = '../data/cafe.mp3';
     var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
-    var audioElem = element(by.css('[ng-class="inputFieldClassName"]'));
-    audioElem.sendKeys(audioAbsolutePath);
-    explorationEditorTranslationTab.saveUploadedAudio();
+    explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+    explorationEditorTranslationTab.saveUploadedAudio(true);
     explorationEditorPage.navigateToMainTab();
     explorationEditorMainTab.moveToState('Third');
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.openUploadAudioModal();
-    audioElem.sendKeys(audioAbsolutePath);
-    explorationEditorTranslationTab.saveUploadedAudio();
-    var colorOfFirstState = element.all(by.css(
-      'rect.protractor-test-node-background.init-node')).last().
-      getCssValue('fill');
-    var colorOfSecondState = element.all(by.css(
-      'rect.protractor-test-node-background.normal-node')).last().
-      getCssValue('fill');
-    var colorOfThirdState = element.all(by.css(
-      'rect.protractor-test-node-background.terminal-node')).last().
-      getCssValue('fill');
-    expect(colorOfFirstState).toBe('rgb(233, 179, 48)');
-    expect(colorOfSecondState).toBe('rgb(209, 72, 54)');
-    expect(colorOfThirdState).toBe('rgb(22, 167, 101)');
+    explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+    explorationEditorTranslationTab.saveUploadedAudio(true);
+    expect(explorationEditorTranslationTab.colorOfFirstState()).
+    toBe(FEW_AUDIO_AVAILABLE_COLOR);
+    expect(explorationEditorTranslationTab.colorOfSecondState()).
+    toBe(NO_AUDIO_AVAILABLE_COLOR);
+    expect(explorationEditorTranslationTab.colorOfThirdState()).
+    toBe(ALL_AUDIO_AVAILABLE_COLOR);
   });
 
   it(

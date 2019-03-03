@@ -23,6 +23,28 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-tab-dismiss-welcome-modal'));
   var translationWelcomeModal = element(
     by.css('.protractor-test-translation-tab-welcome-modal'));
+  
+  this.saveUploadedAudioButton = element(by.className('protractor-test-save-button'));
+  
+  this.errorMessage = element(by.css('div.error-message'));
+  
+  this.colorOfFirstState = function() {
+    return(element.all(by.css(
+      'rect.protractor-test-node-background.init-node')).last().
+      getCssValue('fill'));
+  };
+
+  this.colorOfSecondState = function() {
+    return(element.all(by.css(
+      'rect.protractor-test-node-background.normal-node')).last().
+      getCssValue('fill'));
+  };
+
+  this.colorOfThirdState = function() {
+    return(element.all(by.css(
+      'rect.protractor-test-node-background.terminal-node')).last().
+      getCssValue('fill'));
+  };
 
   this.exitTutorial = function() {
     // If the translation welcome modal shows up, exit it.
@@ -115,9 +137,8 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-solution-tab'));
 
   var contentTabText = element(by.css('.protractor-test-content-text'));
-  var uploadAudioButton = element(
-    by.css('[ng-click="openAddAudioTranslationModal()"]'));
-  var saveUploadedAudioButton = element(by.css('[ng-click="save()"]'));
+  var uploadAudioButton = element.all(
+    by.css('[ng-click="openAddAudioTranslationModal()"]')).last();
 
   var feedbackList = element.all(
     by.css('li.protractor-test-translation-feedback'));
@@ -146,6 +167,11 @@ var ExplorationEditorTranslationTab = function() {
     element(by.css('.protractor-test-translation-language-selector')).
       element(by.cssContainingText('option', language)).click();
   };
+
+  this.audioElem = function() {
+    var audioElem = element(by.className('protractor-test-upload-audio'));
+    return audioElem;
+  }
 
   this.expectContentTabContentToMatch = function(content) {
     waitFor.elementToBeClickable(
@@ -199,6 +225,11 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.pageToFullyLoad();
   };
 
+  this.errorMessageElement = function() {
+    var errorMessage = element(by.css('div.error-message'));
+    return errorMessage;
+  }
+
   this.expectFeedbackTabToBeActive = function() {
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
     ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
@@ -210,12 +241,14 @@ var ExplorationEditorTranslationTab = function() {
     uploadAudioButton.click();
   };
 
-  this.saveUploadedAudio = function() {
+  this.saveUploadedAudio = function(wait) {
     waitFor.elementToBeClickable(
-      saveUploadedAudioButton, 'Save button is not clickable');
-    saveUploadedAudioButton.click();
-    waitFor.invisibilityOf(saveUploadedAudioButton,
-      'Upload Audio modal takes too long to disappear');
+      this.saveUploadedAudioButton, 'Save button is not clickable');
+    this.saveUploadedAudioButton.click();
+    if (wait) {
+      waitFor.invisibilityOf(this.saveUploadedAudioButton,
+        'Upload Audio modal takes too long to disappear');
+    }
   };
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;
