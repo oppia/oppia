@@ -141,22 +141,22 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
       '(1/8)');
     explorationEditorTranslationTab.openUploadAudioModal();
-    
+
     var audioToUpload = '../data/img.png';
     var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
     explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
     expect(explorationEditorTranslationTab.errorMessage === undefined).
-    toBe(false);
+      toBe(false);
     expect(explorationEditorTranslationTab.saveUploadedAudioButton.
-    getAttribute('disabled')).toBe('true');
+      getAttribute('disabled')).toBe('true');
     audioToUpload = '../data/cafe-over-five-minutes.mp3';
     audioAbsolutePath = path.resolve(__dirname, audioToUpload);
     explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
     expect(explorationEditorTranslationTab.
-    errorMessageElement() === undefined).toBe(false);
+      errorMessageElement() === undefined).toBe(false);
     explorationEditorTranslationTab.saveUploadedAudio();
     expect(explorationEditorTranslationTab.saveUploadedAudioButton.
-    getAttribute("disabled")).toBe("true");
+      getAttribute('disabled')).toBe('true');
 
     users.logout();
   });
@@ -200,11 +200,11 @@ describe('Exploration translation', function() {
       explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
       explorationEditorTranslationTab.saveUploadedAudio(true);
       expect(explorationEditorTranslationTab.colorOfFirstState()).
-      toBe(FEW_AUDIO_AVAILABLE_COLOR);
+        toBe(FEW_AUDIO_AVAILABLE_COLOR);
       expect(explorationEditorTranslationTab.colorOfSecondState()).
-      toBe(NO_AUDIO_AVAILABLE_COLOR);
+        toBe(NO_AUDIO_AVAILABLE_COLOR);
       expect(explorationEditorTranslationTab.colorOfThirdState()).
-      toBe(ALL_AUDIO_AVAILABLE_COLOR);
+        toBe(ALL_AUDIO_AVAILABLE_COLOR);
   });
 
   it(
