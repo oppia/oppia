@@ -581,3 +581,36 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_vals = [[u'admin@oppia'], big_email_list,
                         [u'admin@oppia.commmm'], [u'a@.com']]
         self.check_normalization(schema, mappings, invalid_vals)
+
+    def test_sanitize_url(self):
+        """Tests that sanitize_url method correctly sanitizes a string
+        representing a URL and raises error for invalid strings.
+        """
+        sanitize_url = schema_utils.Normalizers.get('sanitize_url')
+        self.assertEqual(
+            sanitize_url('https://www.oppia.org/splash/'),
+            'https://www.oppia.org/splash/')
+
+        self.assertEqual(
+            sanitize_url('http://www.oppia.org/splash/'),
+            'http://www.oppia.org/splash/')
+
+        self.assertEqual(
+            sanitize_url('http://example.com/~path;parameters?q=arg#fragment'),
+            'http://example.com/%7Epath%3Bparameters?q%3Darg#fragment')
+
+        self.assertEqual(sanitize_url(''), '')
+
+        # Raise AssertionError if string does not start with http:// or
+        # https://.
+        with self.assertRaisesRegexp(
+            AssertionError,
+            'Invalid URL: Sanitized URL should start with \'http://\' or'
+            ' \'https://\'; received oppia.org'):
+            sanitize_url('oppia.org')
+
+        with self.assertRaisesRegexp(
+            AssertionError,
+            'Invalid URL: Sanitized URL should start with \'http://\' or'
+            ' \'https://\'; received www.oppia.org'):
+            sanitize_url('www.oppia.org')
