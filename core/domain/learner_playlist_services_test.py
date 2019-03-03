@@ -124,7 +124,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_0])
 
-        # Test adding a single exploration_id to learner playlist at 
+        # Test adding a single exploration_id to learner playlist at
         # a specific position.
         learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_1, position_to_be_inserted=0)
@@ -238,7 +238,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_0])
 
-        # Test adding a single collection_id to learner playlist at 
+        # Test adding a single collection_id to learner playlist at
         # a specific position.
         learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_1, position_to_be_inserted=0)
