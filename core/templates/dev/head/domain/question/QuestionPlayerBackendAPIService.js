@@ -20,7 +20,7 @@ oppia.constant(
   '/question_player_handler?skill_ids=<skill_ids>&question_count' +
   '=<question_count>&start_cursor=<start_cursor>');
 
-oppia.factory('QuestionPlayerBackendAPIService', [
+oppia.factory('QuestionPlayerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTION_PLAYER_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE) {
     var _startCursor = '';

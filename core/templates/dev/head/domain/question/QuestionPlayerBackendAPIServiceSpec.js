@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /**
- * @fileoverview Unit tests for QuestionPlayerBackendAPIService.
+ * @fileoverview Unit tests for QuestionPlayerBackendApiService.
  */
-describe('Question backend API service', function() {
-  var QuestionPlayerBackendAPIService = null;
+describe('Question backend Api service', function() {
+  var QuestionPlayerBackendApiService = null;
   var sampleDataResults = null;
   var $httpBackend = null;
   var $rootScope = null;
@@ -24,8 +24,8 @@ describe('Question backend API service', function() {
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(inject(function($injector) {
-    QuestionPlayerBackendAPIService = $injector.get(
-      'QuestionPlayerBackendAPIService');
+    QuestionPlayerBackendApiService = $injector.get(
+      'QuestionPlayerBackendApiService');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
 
@@ -86,7 +86,7 @@ describe('Question backend API service', function() {
       'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
       'start_cursor=').respond(
       sampleDataResults);
-    QuestionPlayerBackendAPIService.fetchQuestions(
+    QuestionPlayerBackendApiService.fetchQuestions(
       '1', '1').then(successHandler, failHandler);
     $httpBackend.flush();
 
@@ -107,7 +107,7 @@ describe('Question backend API service', function() {
         'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
         'start_cursor=').respond(
         sampleDataResultsWithCursor);
-      QuestionPlayerBackendAPIService.fetchQuestions(
+      QuestionPlayerBackendApiService.fetchQuestions(
         '1', '1').then(successHandler, failHandler);
       $httpBackend.flush();
 
@@ -120,7 +120,7 @@ describe('Question backend API service', function() {
         'start_cursor=1').respond(
         sampleDataResults);
 
-      QuestionPlayerBackendAPIService.fetchQuestions(
+      QuestionPlayerBackendApiService.fetchQuestions(
         '1', '1').then(successHandler, failHandler);
       $httpBackend.flush();
 
@@ -129,7 +129,7 @@ describe('Question backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     });
 
-  it('should use the rejection handler if the backend request failed',
+  it('should use the fail handler if the backend request failed',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -138,7 +138,7 @@ describe('Question backend API service', function() {
         'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
         'start_cursor=').respond(
         500, 'Error loading questions.');
-      QuestionPlayerBackendAPIService.fetchQuestions(
+      QuestionPlayerBackendApiService.fetchQuestions(
         '1', '1').then(successHandler, failHandler);
       $httpBackend.flush();
 
@@ -148,11 +148,11 @@ describe('Question backend API service', function() {
     }
   );
 
-  it('should use the rejection handler if question count is in invalid format',
+  it('should use the fail handler if question count is in invalid format',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      QuestionPlayerBackendAPIService.fetchQuestions(
+      QuestionPlayerBackendApiService.fetchQuestions(
         '1', 'abc').then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
@@ -161,11 +161,11 @@ describe('Question backend API service', function() {
     }
   );
 
-  it('should use the rejection handler if question count is negative',
+  it('should use the fail handler if question count is negative',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      QuestionPlayerBackendAPIService.fetchQuestions(
+      QuestionPlayerBackendApiService.fetchQuestions(
         '1', '-1').then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
@@ -173,10 +173,10 @@ describe('Question backend API service', function() {
         'positive');
     }
   );
-  it('should use the rejection handler if skill ids is missing', function() {
+  it('should use the fail handler if skill ids is missing', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
-    QuestionPlayerBackendAPIService.fetchQuestions(
+    QuestionPlayerBackendApiService.fetchQuestions(
       '', '1').then(successHandler, failHandler);
     $rootScope.$digest();
     expect(successHandler).not.toHaveBeenCalled();
@@ -184,11 +184,11 @@ describe('Question backend API service', function() {
       ' but is missing');
   });
 
-  it('should use the rejection handler if skill ids is not comma separated ' +
+  it('should use the fail handler if skill ids is not comma separated ' +
     'numbers', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
-    QuestionPlayerBackendAPIService.fetchQuestions(
+    QuestionPlayerBackendApiService.fetchQuestions(
       '1,2,abc', '1').then(successHandler, failHandler);
     $rootScope.$digest();
     expect(successHandler).not.toHaveBeenCalled();
