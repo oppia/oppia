@@ -313,7 +313,7 @@ class SkillContents(object):
         audio_content_ids = set(self.content_ids_to_audio_translations.keys())
         if audio_content_ids != available_content_ids:
             raise utils.ValidationError(
-                'Expected content_ids_to_audio_translations to contain only'
+                'Expected content_ids_to_audio_translations to contain only '
                 'content_ids in worked examples and explanation. '
                 'content_ids_to_audio_translations: %s. '
                 'content IDs found: %s' % (
@@ -546,11 +546,16 @@ class Skill(object):
             raise utils.ValidationError(
                 'Expected misconceptions to be a list, '
                 'received %s' % self.skill_contents)
+        misconception_id_list = []
         for misconception in self.misconceptions:
             if not isinstance(misconception, Misconception):
                 raise utils.ValidationError(
                     'Expected each misconception to be a Misconception '
                     'object, received %s' % misconception)
+            if misconception.id in misconception_id_list:
+                raise utils.ValidationError(
+                    'Duplicate misconception ID found: %s' % misconception.id)
+            misconception_id_list.append(misconception.id)
             if int(misconception.id) >= int(self.next_misconception_id):
                 raise utils.ValidationError(
                     'The misconception with id %s is out of bounds.'

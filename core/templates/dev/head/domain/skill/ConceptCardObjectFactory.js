@@ -55,7 +55,7 @@ oppia.factory('ConceptCardObjectFactory', [
       return diffList;
     };
 
-    var _extractAvailableConetntIdsFromWorkedExamples = function(
+    var _extractAvailableContentIdsFromWorkedExamples = function(
         workedExamples) {
       contentIds = new Set();
       workedExamples.forEach(function(workedExample) {
@@ -87,12 +87,12 @@ oppia.factory('ConceptCardObjectFactory', [
     };
 
     ConceptCard.prototype.setWorkedExamples = function(workedExamples) {
-      oldContentIds = _extractAvailableConetntIdsFromWorkedExamples(
+      oldContentIds = _extractAvailableContentIdsFromWorkedExamples(
         this._workedExamples);
 
       this._workedExamples = workedExamples.slice();
 
-      newContentIds = _extractAvailableConetntIdsFromWorkedExamples(
+      newContentIds = _extractAvailableContentIdsFromWorkedExamples(
         this._workedExamples);
 
       var contentIdsToDelete = _getElementsInFirstSetButNotInSecond(
