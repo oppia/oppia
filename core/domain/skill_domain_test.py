@@ -135,8 +135,23 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'content_id_3': {}
         }
         self._assert_validation_error(
-            'Expected content_ids_to_audio_translations to contain '
-            'only content_ids in worked examples and explanation.')
+            'Expected content_ids_to_audio_translations to contain only '
+            'content_ids in worked examples and explanation.')
+
+        self.skill.skill_contents.worked_examples = [
+            state_domain.SubtitledHtml('content_id_1', '<p>Hello</p>'),
+            state_domain.SubtitledHtml('content_id_1', '<p>Hello 2</p>')
+        ]
+
+        self._assert_validation_error('Found a duplicate content id')
+
+    def test_misconception_id_validation(self):
+        self.skill.misconceptions = [
+            skill_domain.Misconception(
+                self.MISCONCEPTION_ID, 'name', 'notes', 'default_feedback'),
+            skill_domain.Misconception(
+                self.MISCONCEPTION_ID, 'name 2', 'notes 2', 'default_feedback')]
+        self._assert_validation_error('Duplicate misconception ID found')
 
     def test_skill_migration_validation(self):
         self.skill.superseding_skill_id = 'TestSkillId'
@@ -163,7 +178,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                     'html': feconf.DEFAULT_SKILL_EXPLANATION,
                     'content_id': 'explanation'
                 },
-                'content_ids_to_audio_translations': {},
+                'content_ids_to_audio_translations': {'explanation': {}},
                 'worked_examples': []
             },
             'misconceptions_schema_version': (
@@ -186,7 +201,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', 'Explanation'), [
-                state_domain.SubtitledHtml('2', 'Example 1')], {})
+                state_domain.SubtitledHtml('2', 'Example 1')],
+            {'1': {}, '2': {}})
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(
             skill_contents_dict)
