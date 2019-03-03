@@ -288,11 +288,13 @@ class SkillContents(object):
             ValidationError: One or more attributes of skill contents are
             invalid.
         """
+        available_content_ids = set([])
         if not isinstance(self.explanation, state_domain.SubtitledHtml):
             raise utils.ValidationError(
                 'Expected skill explanation to be a SubtitledHtml object, '
                 'received %s' % self.explanation)
         self.explanation.validate()
+        available_content_ids.add(self.explanation.content_id)
         if not isinstance(self.worked_examples, list):
             raise utils.ValidationError(
                 'Expected worked examples to be a list, received %s' %
@@ -302,7 +304,20 @@ class SkillContents(object):
                 raise utils.ValidationError(
                     'Expected worked example to be a SubtitledHtml object, '
                     'received %s' % example)
+            if example.content_id in available_content_ids:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % example.content_id)
+            available_content_ids.add(example.content_id)
             example.validate()
+
+        audio_content_ids = set(self.content_ids_to_audio_translations.keys())
+        if audio_content_ids != available_content_ids:
+            raise utils.ValidationError(
+                'Expected content_ids_to_audio_translations to contain only'
+                'content_ids in worked examples and explanation. '
+                'content_ids_to_audio_translations: %s. '
+                'content IDs found: %s' % (
+                    audio_content_ids, available_content_ids))
 
         # TODO(tjiang11): Extract content ids to audio translations out into
         # its own object to reuse throughout audio-capable structures.
@@ -336,22 +351,6 @@ class SkillContents(object):
                         'Unrecognized language code: %s' % language_code)
 
                 translation.validate()
-
-        explanation_content_id = set([self.explanation.content_id])
-        worked_example_content_ids = set([example.content_id for example
-                                          in self.worked_examples])
-        content_ids = explanation_content_id | worked_example_content_ids
-
-        audio_content_ids = set(
-            [audio[0] for audio
-             in self.content_ids_to_audio_translations.iteritems()])
-        for c in audio_content_ids:
-            if c not in content_ids:
-                raise utils.ValidationError(
-                    'Expected content_ids_to_audio_translations to contain '
-                    'only content_ids in worked examples and explanation. '
-                    'content_ids_to_audio_translations: %s. '
-                    'content IDs found: %s' % (audio_content_ids, content_ids))
 
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
@@ -603,9 +602,12 @@ class Skill(object):
         Returns:
             Skill. The Skill domain object with the default values.
         """
+        explanation_conetent_id = feconf.DEFAULT_EXPLANATION_CONTENT_ID
         skill_contents = SkillContents(
             state_domain.SubtitledHtml(
-                'explanation', feconf.DEFAULT_SKILL_EXPLANATION), [], {})
+                'explanation', feconf.DEFAULT_SKILL_EXPLANATION), [], {
+                    explanation_conetent_id: {}
+                })
         return cls(
             skill_id, description, [], skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -712,9 +714,48 @@ class Skill(object):
         Args:
             worked_examples: list(dict). The new worked examples of the skill.
         """
+        old_content_ids = [worked_example.content_id for worked_example in (
+            self.skill_contents.worked_examples)]
+
         self.skill_contents.worked_examples = [
             state_domain.SubtitledHtml.from_dict(worked_example)
             for worked_example in worked_examples]
+
+        new_content_ids = [worked_example.content_id for worked_example in (
+            self.skill_contents.worked_examples)]
+
+        self._update_content_ids_in_assets(old_content_ids, new_content_ids)
+
+    def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
+        """Adds or deletes content ids in content_ids_to_audio_translations.
+
+         Args:
+            old_ids_list: list(str). A list of content ids present earlier
+                in worked_examples.
+                state.
+            new_ids_list: list(str). A list of content ids currently present
+                in worked_examples.
+        """
+        content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
+        content_ids_to_add = set(new_ids_list) - set(old_ids_list)
+        content_ids_to_audio_translations = (
+            self.skill_contents.content_ids_to_audio_translations)
+
+        for content_id in content_ids_to_delete:
+            if not content_id in content_ids_to_audio_translations:
+                raise Exception(
+                    'The content_id %s does not exist in '
+                    'content_ids_to_audio_translations.' % content_id)
+            else:
+                content_ids_to_audio_translations.pop(content_id)
+
+        for content_id in content_ids_to_add:
+            if content_id in content_ids_to_audio_translations:
+                raise Exception(
+                    'The content_id %s already exists in '
+                    'content_ids_to_audio_translations.' % content_id)
+            else:
+                content_ids_to_audio_translations[content_id] = {}
 
     def _find_misconception_index(self, misconception_id):
         """Returns the index of the misconception with the given misconception
