@@ -28,7 +28,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['app'],
       filename: 'base.html',
-      template: 'core/templates/dev/head/pages/base2.html',
+      template: 'core/templates/dev/head/pages/base.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

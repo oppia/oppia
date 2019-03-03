@@ -86,9 +86,7 @@
         iframed: JSON.parse('{{iframed|js_string}}'),
         isTopicManager: JSON.parse('{{is_topic_manager|js_string}}'),
         logoutUrl: JSON.parse('{{logout_url|js_string}}'),
-        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
-        PROMO_BAR_IS_ENABLED: JSON.parse('{{promo_bar_enabled|js_string}}'),
-        PROMO_BAR_MESSAGE: JSON.parse('{{promo_bar_message|js_string}}')
+        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
     </script>
 
@@ -105,7 +103,7 @@
     </div>
     <div ng-if="!iframed">
       <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
-      <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
+      <promo-bar>
       </promo-bar>
       <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
       </div>
@@ -158,7 +156,7 @@
       </div>
 
       <div ng-if="DEV_MODE" class="oppia-dev-mode">
-        Dev Mode Base 2
+        Dev Mode
       </div>
 
       <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank"
@@ -171,12 +169,12 @@
     {% include 'pages/footer_js_libs.html' %}
     <script>
       var oppia = angular.module(
-        'oppia', [
-          'ngMaterial', 'ngAnimate', 'ngAudio', 'angularAudioRecorder', 'ngSanitize',
-          'ngTouch', 'ngResource', 'ui.bootstrap', 'ui.tree', 'ui.sortable',
-          'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
-          'pascalprecht.translate', 'ngCookies', 'toastr', 'headroom', 'dndLists'
-        ].concat(
+      'oppia', [
+        'ngMaterial', 'ngAnimate', 'ngAudio', 'angularAudioRecorder', 'ngSanitize',
+        'ngTouch', 'ngResource', 'ui.bootstrap', 'ui.tree', 'ui.sortable',
+        'infinite-scroll', 'ngJoyRide', 'ngImgCrop', 'ui.validate',
+        'pascalprecht.translate', 'ngCookies', 'toastr', 'headroom', 'dndLists'
+      ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
     </script>
 <% for (var chunk in htmlWebpackPlugin.files.js) { %>

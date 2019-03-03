@@ -167,54 +167,29 @@
     </div>
 
     {% include 'pages/footer_js_libs.html' %}
+  
+  <script>
+    // TODO(sll): Remove the check for window.GLOBALS. This check is currently
+    // only there so that the Karma tests run, since it looks like Karma doesn't
+    // 'see' the GLOBALS variable that is defined in base.html. We should fix this
+    // in order to make the testing and production environments match.
+    var oppia = angular.module(
+      'oppia', [
+        'angularAudioRecorder', 'dndLists', 'headroom', 'infinite-scroll',
+        'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
+        'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
+        'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
+      ].concat(
+        window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
+  </script>
 
-    <script src="/templates/dev/head/app.js"></script>
-    <script src="/templates/dev/head/i18n.js"></script>
-
-    <script src="/templates/dev/head/directives/FocusOnDirective.js"></script>
-
-    <script src="/templates/dev/head/pages/Base.js"></script>
-
-    <script src="/templates/dev/head/services/AlertsService.js"></script>
-    <script src="/templates/dev/head/services/ContextService.js"></script>
-    <script src="/templates/dev/head/services/NavigationService.js"></script>
-    <script src="/templates/dev/head/services/UtilsService.js"></script>
-    <script src="/templates/dev/head/services/DebouncerService.js"></script>
-    <script src="/templates/dev/head/services/DateTimeFormatService.js"></script>
-    <script src="/templates/dev/head/services/IdGenerationService.js"></script>
-    <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
-    <script src="/templates/dev/head/services/TranslationFileHashLoaderService.js"></script>
-    <script src="/templates/dev/head/services/RteHelperService.js"></script>
-    <script src="/templates/dev/head/services/StateRulesStatsService.js"></script>
-    <script src="/templates/dev/head/services/ConstructTranslationIdsService.js"></script>
-    <script src="/templates/dev/head/services/UserService.js"></script>
-    <script src="/templates/dev/head/services/PromoBarService.js"></script>
-    <script src="/templates/dev/head/services/contextual/DeviceInfoService.js"></script>
-    <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
-    <script src="/templates/dev/head/services/contextual/WindowDimensionsService.js"></script>
-    <script src="/templates/dev/head/services/stateful/BackgroundMaskService.js"></script>
-    <script src="/templates/dev/head/services/stateful/FocusManagerService.js"></script>
-    <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
-
-    <script src="/templates/dev/head/components/alerts/AlertMessageDirective.js"></script>
-    <script src="/templates/dev/head/components/create_button/CreateActivityButtonDirective.js"></script>
-
-    <script src="/templates/dev/head/components/forms/ObjectEditorDirective.js"></script>
-    <script src="/templates/dev/head/components/promo/PromoBarDirective.js"></script>
-    <script src="/templates/dev/head/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
-    <script src="/templates/dev/head/components/social_buttons/SocialButtonsDirective.js"></script>
-    <script src="/templates/dev/head/components/top_navigation_bar/TopNavigationBarDirective.js"></script>
-
-    <script src="/templates/dev/head/components/CollectionCreationService.js"></script>
-    <script src="/templates/dev/head/components/ExplorationCreationService.js"></script>
-    <script src="/templates/dev/head/components/TopicCreationService.js"></script>
-    <script src="/templates/dev/head/components/SkillCreationService.js"></script>
-    <script src="/templates/dev/head/components/StoryCreationService.js"></script>
-
-    <script src="/templates/dev/head/domain/sidebar/SidebarStatusService.js"></script>
-    <script src="/templates/dev/head/domain/user/UserInfoObjectFactory.js"></script>
-    <script src="/templates/dev/head/domain/utilities/UrlInterpolationService.js"></script>
-
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %> 
+      <script src="build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
     {% block footer_js %}
     {% endblock footer_js %}
   </body>

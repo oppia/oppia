@@ -19,7 +19,7 @@ var path = require('path');
 module.exports = {
   mode: 'production',
   entry: {
-    app: './core/templates/dev/head/app2.js',
+    app: './core/templates/dev/head/app.js',
     about: './core/templates/dev/head/pages/about/About.js',
     donate: './core/templates/dev/head/pages/donate/Donate.js'
   },
