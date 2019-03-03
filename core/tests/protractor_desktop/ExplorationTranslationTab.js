@@ -149,6 +149,8 @@ describe('Exploration translation', function() {
       toBe(false);
     expect(explorationEditorTranslationTab.saveUploadedAudioButton.
       getAttribute('disabled')).toBe('true');
+    explorationEditorTranslationTab.expectNumericalStatusToMatch(
+      '(1/8)');
     audioToUpload = '../data/cafe-over-five-minutes.mp3';
     audioAbsolutePath = path.resolve(__dirname, audioToUpload);
     explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
@@ -157,6 +159,8 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.saveUploadedAudio();
     expect(explorationEditorTranslationTab.saveUploadedAudioButton.
       getAttribute('disabled')).toBe('true');
+    explorationEditorTranslationTab.expectNumericalStatusToMatch(
+      '(1/8)');
 
     users.logout();
   });
