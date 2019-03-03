@@ -16,6 +16,9 @@
  * @fileoverview Directive for a schema-based viewer for dicts.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../services/NestedDirectivesRecursionTimeoutPreventionService.js');
+
 oppia.directive('schemaBasedDictViewer', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',

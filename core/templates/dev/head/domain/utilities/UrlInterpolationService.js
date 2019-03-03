@@ -12,14 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-try {
-  require('../../services/AlertsService.js');
-  require('../../services/UtilsService.js');
-} catch (e) {
-  if (!(e instanceof ReferenceError)) {
-    throw e;
-  }
-}
+require('../../services/AlertsService.js');
+require('../../services/UtilsService.js');
 
 /**
  * @fileoverview Service to construct URLs by inserting variables within them as

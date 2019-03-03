@@ -16,6 +16,10 @@
  * @fileoverview Directive for a schema-based editor for dicts.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../services/IdGenerationService.js');
+require('../../services/NestedDirectivesRecursionTimeoutPreventionService.js');
+
 oppia.directive('schemaBasedDictEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',

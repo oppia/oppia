@@ -29,12 +29,13 @@ module.exports = function(config) {
       'third_party/static/angular-recorder-1.4.1/dist' +
       '/angular-audio-recorder.min.js',
       generatedJs,
-      'core/templates/dev/head/*.js',
+      'core/templates/dev/head/appInit.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
-      'core/templates/dev/head/**!(dist)/*.js',
+      'core/templates/dev/head/dist/*.bundle.js',
       'core/templates/dev/head/**/*_directive.html',
+      'core/templates/dev/head/**/*Spec.js',
       'extensions/**/*.js',
       {
         pattern: 'extensions/**/*.png',
@@ -79,7 +80,7 @@ module.exports = function(config) {
       // list above.
       'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/**/*_directive.html': ['ng-html2js'],
-      'extensions/interactions/rule_templates.json': ['json_fixtures']
+      'extensions/interactions/rule_templates.json': ['json_fixtures'],
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
@@ -109,13 +110,15 @@ module.exports = function(config) {
         flags: ['--no-sandbox']
       }
     },
+
     plugins: [
       'karma-jasmine-jquery',
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-ng-html2js-preprocessor',
       'karma-json-fixtures-preprocessor',
-      'karma-coverage'
+      'karma-coverage',
+      'karma-webpack'
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',

@@ -16,6 +16,9 @@
  * @fileoverview Directive for a schema-based editor for floats.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../services/stateful/FocusManagerService.js');
+
 oppia.directive('schemaBasedFloatEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

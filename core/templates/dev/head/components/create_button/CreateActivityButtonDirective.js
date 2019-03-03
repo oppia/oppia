@@ -11,17 +11,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-try {
-  require('../CollectionCreationService.js');
-  require('../ExplorationCreationService.js');
-} catch (e) {
-  if (!(e instanceof ReferenceError)) {
-    throw e;
-  }
-}
+
 /**
  * @fileoverview Directive for the Create Exploration/Collection button.
  */
+
+require('../CollectionCreationService.js');
+require('../ExplorationCreationService.js');
+require('../../domain/utilities/BrowserCheckerService.js');
+require('../../services/contextual/UrlService.js');
+require('../../services/SiteAnalyticsService.js');
+require('../../services/UserService.js');
 
 oppia.directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {

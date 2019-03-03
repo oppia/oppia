@@ -16,6 +16,9 @@
  * @fileoverview Directive for a schema-based viewer for lists.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../services/NestedDirectivesRecursionTimeoutPreventionService.js');
+
 oppia.directive('schemaBasedListViewer', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',

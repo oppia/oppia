@@ -16,6 +16,9 @@
  * @fileoverview Directive for a schema-based editor for unicode strings.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../services/contextual/DeviceInfoService.js');
+
 oppia.directive('schemaBasedUnicodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

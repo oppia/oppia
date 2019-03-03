@@ -16,6 +16,9 @@
  * @fileoverview Directive that enables the user to upload audio files.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../services/IdGenerationService.js');
+
 oppia.directive('audioFileUploader', [
   'IdGenerationService', 'UrlInterpolationService',
   function(IdGenerationService, UrlInterpolationService) {

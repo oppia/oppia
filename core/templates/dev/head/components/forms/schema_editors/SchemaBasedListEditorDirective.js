@@ -16,6 +16,13 @@
  * @fileoverview Directive for a schema-based editor for lists.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../services/IdGenerationService.js');
+require('../../services/NestedDirectivesRecursionTimeoutPreventionService.js');
+require('../../services/SchemaDefaultValueService.js');
+require('../../services/SchemaUndefinedLastElementService.js');
+require('../../services/stateful/FocusManagerService.js');
+
 oppia.directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',
   'NestedDirectivesRecursionTimeoutPreventionService',

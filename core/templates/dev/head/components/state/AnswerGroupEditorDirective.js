@@ -16,6 +16,14 @@
  * @fileoverview Directive for the answer group editor.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../domain/exploration/RuleObjectFactory.js');
+require('../../pages/exploration_editor/editor_tab/ResponsesService.js');
+require('../../pages/exploration_editor/editor_tab/TrainingDataEditorPanelService.js');
+require('../../pages/state_editor/StateEditorService.js');
+require('../../pages/state_editor/StatePropertyServices.js');
+require('../../services/AlertsService.js');
+
 oppia.directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

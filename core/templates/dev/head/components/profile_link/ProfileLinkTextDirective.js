@@ -16,6 +16,8 @@
  * @fileoverview Directives for creating text links to a user's profile page.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+
 oppia.directive('profileLinkText', [
   'UrlInterpolationService', 'SYSTEM_USER_IDS',
   function(UrlInterpolationService, SYSTEM_USER_IDS) {

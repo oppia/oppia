@@ -56,6 +56,7 @@ install_node_module webpack
 install_node_module webpack-cli
 install_node_module clean-webpack-plugin
 install_node_module html-webpack-plugin 4.0.0-beta.5
+install_node_module karma-webpack
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
 # GitPython, however the patches to it below (with the sed operations) lead to

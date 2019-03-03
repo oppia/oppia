@@ -16,6 +16,9 @@
  * @fileoverview Directive for a schema-based editor for multiple choice.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../services/NestedDirectivesRecursionTimeoutPreventionService.js');
+
 oppia.directive('schemaBasedChoicesEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',

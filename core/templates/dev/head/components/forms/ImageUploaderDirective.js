@@ -16,6 +16,9 @@
  * @fileoverview Directive for uploading images.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../services/IdGenerationService.js');
+
 oppia.directive('imageUploader', [
   'IdGenerationService', 'UrlInterpolationService',
   function(IdGenerationService, UrlInterpolationService) {

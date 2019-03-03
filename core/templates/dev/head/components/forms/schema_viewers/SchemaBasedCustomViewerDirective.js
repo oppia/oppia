@@ -16,6 +16,9 @@
  * @fileoverview Directive for a schema-based viewer for custom values.
  */
 
+require('../../domain/utilities/UrlInterpolationService.js');
+require('../../services/NestedDirectivesRecursionTimeoutPreventionService.js');
+
 oppia.directive('schemaBasedCustomViewer', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',

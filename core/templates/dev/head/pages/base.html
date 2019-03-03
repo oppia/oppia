@@ -168,21 +168,7 @@
 
     {% include 'pages/footer_js_libs.html' %}
   
-  <script>
-    // TODO(sll): Remove the check for window.GLOBALS. This check is currently
-    // only there so that the Karma tests run, since it looks like Karma doesn't
-    // 'see' the GLOBALS variable that is defined in base.html. We should fix this
-    // in order to make the testing and production environments match.
-    var oppia = angular.module(
-      'oppia', [
-        'angularAudioRecorder', 'dndLists', 'headroom', 'infinite-scroll',
-        'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-        'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
-        'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
-      ].concat(
-        window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
-  </script>
-
+  <script src="appInit.js"></script>
   <% for (var chunk in htmlWebpackPlugin.files.js) { %>
     <% if (webpackConfig.mode == 'production') { %> 
       <script src="build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
