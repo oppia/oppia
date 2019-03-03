@@ -117,13 +117,20 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
     def test_single_exploration_is_added_correctly_to_playlist(self):
         # Test adding a single exploration_id to learner playlist.
         self.assertEqual(
-            self._get_all_learner_playlist_exp_ids(
-                self.user_id), [])
+            self._get_all_learner_playlist_exp_ids(self.user_id), [])
         learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_0])
+
+        # Test adding a single exploration_id to learner playlist at 
+        # a specific position.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_1, position_to_be_inserted=0)
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(
+                self.user_id), [self.EXP_ID_1, self.EXP_ID_0])
 
     def test_multiple_explorations_are_added_correctly_to_playlist(self):
         # Test adding two explorations to the learner playlist.
@@ -224,13 +231,20 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
     def test_single_collection_is_added_correctly_to_playlist(self):
         # Test adding a single collection_id to learner playlist.
         self.assertEqual(
-            self._get_all_learner_playlist_collection_ids(
-                self.user_id), [])
+            self._get_all_learner_playlist_collection_ids(self.user_id), [])
         learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_0])
+
+        # Test adding a single collection_id to learner playlist at 
+        # a specific position.
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_1, position_to_be_inserted=0)
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(
+                self.user_id), [self.COL_ID_1, self.COL_ID_0])
 
     def test_multiple_collections_are_added_correctly_to_playlist(self):
         # Test adding two explorations to the learner playlist.
