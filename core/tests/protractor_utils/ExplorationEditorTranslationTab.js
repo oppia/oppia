@@ -139,7 +139,7 @@ var ExplorationEditorTranslationTab = function() {
 
   var contentTabText = element(by.css('.protractor-test-content-text'));
   var uploadAudioButton = element.all(
-    by.css('[ng-click="openAddAudioTranslationModal()"]')).last();
+    by.className('protractor-test-upload-audio-button')).last();
 
   var feedbackList = element.all(
     by.css('li.protractor-test-translation-feedback'));
