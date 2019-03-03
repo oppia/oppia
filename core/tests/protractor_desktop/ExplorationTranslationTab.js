@@ -205,7 +205,7 @@ describe('Exploration translation', function() {
         toBe(NO_AUDIO_AVAILABLE_COLOR);
       expect(explorationEditorTranslationTab.colorOfThirdState()).
         toBe(ALL_AUDIO_AVAILABLE_COLOR);
-  });
+    });
 
   it(
     'should maintain its active sub-tab on saving draft and publishing changes',
