@@ -209,7 +209,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', 'Example 1')], {}))
+                        state_domain.SubtitledHtml('2', 'Example 1')],
+                {'1': {}, '2': {}}))
         with self.assertRaisesRegexp(
             Exception,
             'Cannot assign unpublished skills to a topic'):
