@@ -23,25 +23,26 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-tab-dismiss-welcome-modal'));
   var translationWelcomeModal = element(
     by.css('.protractor-test-translation-tab-welcome-modal'));
-  
-  this.saveUploadedAudioButton = element(by.className('protractor-test-save-button'));
-  
+
+  this.saveUploadedAudioButton = element(
+    by.className('protractor-test-save-button'));
+
   this.errorMessage = element(by.css('div.error-message'));
-  
+
   this.colorOfFirstState = function() {
-    return(element.all(by.css(
+    return (element.all(by.css(
       'rect.protractor-test-node-background.init-node')).last().
       getCssValue('fill'));
   };
 
   this.colorOfSecondState = function() {
-    return(element.all(by.css(
+    return (element.all(by.css(
       'rect.protractor-test-node-background.normal-node')).last().
       getCssValue('fill'));
   };
 
   this.colorOfThirdState = function() {
-    return(element.all(by.css(
+    return (element.all(by.css(
       'rect.protractor-test-node-background.terminal-node')).last().
       getCssValue('fill'));
   };
@@ -171,7 +172,7 @@ var ExplorationEditorTranslationTab = function() {
   this.audioElem = function() {
     var audioElem = element(by.className('protractor-test-upload-audio'));
     return audioElem;
-  }
+  };
 
   this.expectContentTabContentToMatch = function(content) {
     waitFor.elementToBeClickable(
@@ -228,7 +229,7 @@ var ExplorationEditorTranslationTab = function() {
   this.errorMessageElement = function() {
     var errorMessage = element(by.css('div.error-message'));
     return errorMessage;
-  }
+  };
 
   this.expectFeedbackTabToBeActive = function() {
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]

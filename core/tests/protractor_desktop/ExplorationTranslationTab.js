@@ -145,62 +145,66 @@ describe('Exploration translation', function() {
     var audioToUpload = '../data/img.png';
     var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
     explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
-    expect(explorationEditorTranslationTab.errorMessage === undefined).toBe(false);
-    expect(explorationEditorTranslationTab.saveUploadedAudioButton.getAttribute("disabled")).toBe("true");
+    expect(explorationEditorTranslationTab.errorMessage === undefined).
+    toBe(false);
+    expect(explorationEditorTranslationTab.saveUploadedAudioButton.
+    getAttribute('disabled')).toBe('true');
     audioToUpload = '../data/cafe-over-five-minutes.mp3';
     audioAbsolutePath = path.resolve(__dirname, audioToUpload);
     explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
-    expect(explorationEditorTranslationTab.errorMessageElement() === undefined).toBe(false);
+    expect(explorationEditorTranslationTab.
+    errorMessageElement() === undefined).toBe(false);
     explorationEditorTranslationTab.saveUploadedAudio();
-    expect(explorationEditorTranslationTab.saveUploadedAudioButton.getAttribute("disabled")).toBe("true");
-    
+    expect(explorationEditorTranslationTab.saveUploadedAudioButton.
+    getAttribute("disabled")).toBe("true");
+
     users.logout();
   });
 
   it('should provide correct status color for each state in the graph view',
     function() {
-    var ALL_AUDIO_AVAILABLE_COLOR = 'rgb(22, 167, 101)';
-    var FEW_AUDIO_AVAILABLE_COLOR = 'rgb(233, 179, 48)';
-    var NO_AUDIO_AVAILABLE_COLOR = 'rgb(209, 72, 54)';
+      var ALL_AUDIO_AVAILABLE_COLOR = 'rgb(22, 167, 101)';
+      var FEW_AUDIO_AVAILABLE_COLOR = 'rgb(233, 179, 48)';
+      var NO_AUDIO_AVAILABLE_COLOR = 'rgb(209, 72, 54)';
 
-    users.createUser('user@correctstatus.com', 'correctStatus');
-    users.login('user@correctstatus.com');
-    workflow.createExploration();
+      users.createUser('user@correctstatus.com', 'correctStatus');
+      users.login('user@correctstatus.com');
+      workflow.createExploration();
 
-    explorationEditorMainTab.setStateName('First');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'This is first card.'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse(
-      'NumericInput', forms.toRichText('This is feedback.'),
-      'Second', true, 'Equals', 6);
-    explorationEditorMainTab.moveToState('Second');
-    explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = explorationEditorMainTab.
-      getResponseEditor('default');
-    responseEditor.setDestination('Third', true, null);
-    explorationEditorMainTab.moveToState('Third');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorMainTab.moveToState('First');
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.exitTutorial();
-    explorationEditorTranslationTab.openUploadAudioModal();
-    var audioToUpload = '../data/cafe.mp3';
-    var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
-    explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
-    explorationEditorTranslationTab.saveUploadedAudio(true);
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorMainTab.moveToState('Third');
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.openUploadAudioModal();
-    explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
-    explorationEditorTranslationTab.saveUploadedAudio(true);
-    expect(explorationEditorTranslationTab.colorOfFirstState()).
-    toBe(FEW_AUDIO_AVAILABLE_COLOR);
-    expect(explorationEditorTranslationTab.colorOfSecondState()).
-    toBe(NO_AUDIO_AVAILABLE_COLOR);
-    expect(explorationEditorTranslationTab.colorOfThirdState()).
-    toBe(ALL_AUDIO_AVAILABLE_COLOR);
+      explorationEditorMainTab.setStateName('First');
+      explorationEditorMainTab.setContent(forms.toRichText(
+        'This is first card.'));
+      explorationEditorMainTab.setInteraction('NumericInput');
+      explorationEditorMainTab.addResponse(
+        'NumericInput', forms.toRichText('This is feedback.'),
+        'Second', true, 'Equals', 6);
+      explorationEditorMainTab.moveToState('Second');
+      explorationEditorMainTab.setInteraction('Continue');
+      var responseEditor = explorationEditorMainTab.
+        getResponseEditor('default');
+      responseEditor.setDestination('Third', true, null);
+      explorationEditorMainTab.moveToState('Third');
+      explorationEditorMainTab.setInteraction('EndExploration');
+      explorationEditorMainTab.moveToState('First');
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.exitTutorial();
+      explorationEditorTranslationTab.openUploadAudioModal();
+      var audioToUpload = '../data/cafe.mp3';
+      var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
+      explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+      explorationEditorTranslationTab.saveUploadedAudio(true);
+      explorationEditorPage.navigateToMainTab();
+      explorationEditorMainTab.moveToState('Third');
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.openUploadAudioModal();
+      explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+      explorationEditorTranslationTab.saveUploadedAudio(true);
+      expect(explorationEditorTranslationTab.colorOfFirstState()).
+      toBe(FEW_AUDIO_AVAILABLE_COLOR);
+      expect(explorationEditorTranslationTab.colorOfSecondState()).
+      toBe(NO_AUDIO_AVAILABLE_COLOR);
+      expect(explorationEditorTranslationTab.colorOfThirdState()).
+      toBe(ALL_AUDIO_AVAILABLE_COLOR);
   });
 
   it(
