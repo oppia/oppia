@@ -32,7 +32,7 @@ oppia.directive('outcomeEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/outcome_editor_directive.html'),
+        '/components/state/outcome_editor_directive.html'),
       controller: [
         '$scope', 'StateEditorService', 'StateInteractionIdService',
         'INTERACTION_SPECS',
@@ -42,7 +42,9 @@ oppia.directive('outcomeEditor', [
           $scope.editOutcomeForm = {};
           $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
           $scope.canAddPrerequisiteSkill =
-            constants.ENABLE_NEW_STRUCTURE_EDITORS;
+            constants.ENABLE_NEW_STRUCTURE_EDITORS &&
+              constants.ENABLE_PREREQUISITE_SKILLS &&
+                StateEditorService.isExplorationWhitelisted();
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
           $scope.correctnessLabelEditorIsOpen = false;

@@ -16,82 +16,67 @@ oppia.directive('coordTwoDimEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
-      controller: ['$scope', '$timeout', function($scope, $timeout) {
-        $scope.schemaLatitude = {
-          type: 'float',
-          validators: [{
-            id: 'is_at_least',
-            min_value: -90.0
-          }, {
-            id: 'is_at_most',
-            max_value: 90.0
-          }]
-        };
-
-        $scope.schemaLongitude = {
-          type: 'float',
-          validators: [{
-            id: 'is_at_least',
-            min_value: -180.0
-          }, {
-            id: 'is_at_most',
-            max_value: 180.0
-          }]
-        };
-
-        var updateMarker = function(lat, lng) {
-          var latLng = new google.maps.LatLng(lat, lng);
-
-          $timeout(function() {
-            if ($scope.mapMarker) {
-              $scope.mapMarker.setPosition(latLng);
-            } else {
-              $scope.mapMarker = new google.maps.Marker({
-                map: $scope.map,
-                position: latLng
-              });
-            }
-          }, 10);
-        };
-
-        $scope.$watch('value', function(newValue, oldValue) {
-          // A new rule has just been created.
-          if ($scope.value === '') {
-            $scope.value = [0.0, 0.0];
-          }
-
-          if (!angular.equals(newValue, oldValue)) {
-            updateMarker(newValue[0], newValue[1]);
-          }
-        });
-
-        // A new rule has just been created.
-        if ($scope.value === '') {
-          $scope.value = [0.0, 0.0];
-        }
-
-        // This is required in order to avoid the following bug:
-        //   http://stackoverflow.com/q/18769287
-        $timeout(function() {
-          updateMarker($scope.value[0], $scope.value[1]);
-          if ($scope.map) {
-            google.maps.event.trigger($scope.map, 'resize');
-          }
-        }, 100);
-
-        $scope.mapOptions = {
-          center: new google.maps.LatLng(
-            $scope.value[0],
-            $scope.value[1]
-          ),
-          mapTypeId: google.maps.MapTypeId.ROADMAP,
+      controller: ['$scope', function($scope) {
+        $scope.mapCenter = {
+          lat: $scope.value[0],
+          lng: $scope.value[1],
           zoom: 0
         };
+        $scope.mapMarkers = {
+          mainMarker: {
+            lat: $scope.value[0],
+            lng: $scope.value[1],
+            focus: true,
+            draggable: true,
+            icon: {
+              iconUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/interactions/InteractiveMap/static/marker-icon.png'),
+              // The size of the icon image in pixels.
+              iconSize: [25, 41],
+              // The coordinates of the "tip" of the icon.
+              iconAnchor: [12, 41],
+              shadowUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/interactions/InteractiveMap/static/marker-shadow.png'),
+              // The size of the shadow image in pixels.
+              shadowSize: [41, 41],
+              // The coordinates of the "tip" of the shadow.
+              shadowAnchor: [13, 41],
+              // The URL to a retina sized version of the icon image.
+              // Used for Retina screen devices.
+              iconRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/interactions/InteractiveMap/static/marker-icon-2x.png'),
+              shadowRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/interactions/InteractiveMap/static/marker-shadow.png')
+            }
+          }
+        };
+        $scope.mapEvents = {
+          map: {
+            enable: ['click'],
+            logic: 'emit'
+          },
+          markers: {
+            enable: ['dragend'],
+            logic: 'emit'
+          }
+        };
 
-        $scope.registerClick = function($event, $params) {
-          var latLng = $params[0].latLng;
-          updateMarker(latLng.lat(), latLng.lng());
-          $scope.value = [latLng.lat(), latLng.lng()];
+        $scope.$on('leafletDirectiveMap.coordTwoDimEditor.click',
+          function(evt, args) {
+            var newLat = args.leafletEvent.latlng.lat;
+            var newLng = args.leafletEvent.latlng.lng;
+            $scope.value = [newLat, newLng];
+            updateMarker(newLat, newLng);
+          });
+
+        $scope.$on('leafletDirectiveMarker.coordTwoDimEditor.dragend',
+          function(evt, args) {
+            $scope.value = [args.model.lat, args.model.lng];
+          });
+
+        var updateMarker = function(lat, lng) {
+          $scope.mapMarkers.mainMarker.lat = lat;
+          $scope.mapMarkers.mainMarker.lng = lng;
         };
       }],
       restrict: 'E',
