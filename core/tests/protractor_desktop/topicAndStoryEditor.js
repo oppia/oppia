@@ -79,6 +79,22 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectNumberOfSubtopicsToBe(0);
   });
 
+  it('should edit subtopic page contents correctly', function() {
+    topicEditorPage.moveToSubtopicsTab();
+    topicEditorPage.editSubtopicWithIndex(0);
+    topicEditorPage.changeSubtopicTitle('Modified Title');
+    topicEditorPage.changeSubtopicPageContents(
+      forms.toRichText('Subtopic Contents'));
+    topicEditorPage.saveSubtopic();
+    topicEditorPage.saveTopic('Edited subtopic.');
+
+    topicEditorPage.get(topicId);
+    topicEditorPage.moveToSubtopicsTab();
+    topicEditorPage.expectTitleOfSubtopicWithIndexToMatch('Modified Title', 0);
+    topicEditorPage.editSubtopicWithIndex(0);
+    topicEditorPage.expectSubtopicPageContentsToMatch('Subtopic Contents');
+  });
+
   it('should add a canonical story to topic correctly', function() {
     topicEditorPage.expectNumberOfStoriesToBe(0);
     topicEditorPage.createStory('Story Title');
