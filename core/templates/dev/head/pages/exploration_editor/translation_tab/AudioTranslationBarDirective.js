@@ -32,8 +32,8 @@ oppia.directive('audioTranslationBar', [
           evt.preventDefault();
           /* Don't show drag and drop area for user that is logged in
             and cannot add translation. */
-          scope.dropAreaIsAccessible = !scope.userIsGuest &&
-            scope.translationIsDisallowed ? false : true;
+          scope.dropAreaIsAccessible = !(!scope.userIsGuest &&
+            scope.translationIsDisallowed);
           scope.$digest();
           return false;
         });
@@ -97,8 +97,6 @@ oppia.directive('audioTranslationBar', [
           $scope.audioIsCurrentlyBeingSaved = false;
           $scope.translationIsDisallowed = !GLOBALS.can_translate;
           $scope.userIsGuest = !GLOBALS.userIsLoggedIn;
-          $scope.dropAreaIsShown = !$scope.userIsGuest &&
-            !$scope.translationIsDisallowed;
 
           var saveContentIdsToAudioTranslationChanges = function() {
             StateContentIdsToAudioTranslationsService.saveDisplayedValue();
