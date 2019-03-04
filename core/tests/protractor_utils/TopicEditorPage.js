@@ -64,10 +64,49 @@ var TopicEditorPage = function() {
   var pageEditor = element(
     by.css('.protractor-test-subtopic-page-contents'));
   var subtopicTitles = element.all(by.css('.protractor-test-subtopic-title'));
+  var questionsTabButton = element(
+    by.css('.protractor-test-questions-tab-button'));
+  var createQuestionButton = element(
+    by.css('.protractor-test-create-question-button'));
+  var skillItems = element.all(by.css('.protractor-test-skill-item'));
+  var confirmSkillButton = element(
+    by.css('.protractor-test-confirm-skill-button'));
+  var saveQuestionButton = element(
+    by.css('.protractor-test-save-question-button'));
+  var questionItems = element.all(
+    by.css('.protractor-test-question-list-item'));
+  var questionItem = element(by.css('.protractor-test-question-list-item'));
 
   this.get = function(topicId) {
     browser.get(EDITOR_URL_PREFIX + topicId);
     return waitFor.pageToFullyLoad();
+  };
+
+  this.expectNumberOfQuestionsToBe = function(count) {
+    waitFor.visibilityOf(
+      questionItem, 'Question takes too long to appear');
+    questionItems.then(function(items) {
+      expect(items.length).toEqual(count);
+    });
+  };
+
+  this.saveQuestion = function() {
+    saveQuestionButton.click();
+  };
+
+  this.createQuestionForSkillWithIndex = function(index) {
+    createQuestionButton.click();
+    skillItems.then(function(elem) {
+      elem[index].click();
+      waitFor.elementToBeClickable(
+        confirmSkillButton,
+        'Confirm Skill button takes too long to be clickable');
+      confirmSkillButton.click();
+    });
+  };
+
+  this.moveToQuestionsTab = function() {
+    questionsTabButton.click();
   };
 
   this.expectSubtopicPageContentsToMatch = function(contents) {
