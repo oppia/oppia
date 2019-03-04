@@ -1,7 +1,10 @@
 <div  class="oppia-drop-area" ng-if="dropAreaIsAccessible">
   <div class="oppia-blur-background"></div>
-  <div class="oppia-drop-area-message" ng-if="!userIsGuest && !translationIsDisallowed">Drop your file here!</div>
-  <div class="oppia-drop-area-message-for-guest-users" ng-if="userIsGuest">Please log in to upload audio files.</div>
+  <div class="oppia-drop-area-message" >Drop your file here!</div>
+</div>
+<div  class="oppia-drop-area" ng-if="userIsGuest">
+  <div class="oppia-blur-background"></div>
+  <div class="oppia-drop-area-message-for-guest-users" >Please log in to upload audio files.</div>
 </div>
 <div class="oppia-audio-recording-bar" ng-show="(!isAudioAvailable || audioIsUpdating) && !selectedRecording">
   <div class="oppia-content-wrapper">

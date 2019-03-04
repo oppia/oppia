@@ -30,10 +30,9 @@ oppia.directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
-          /* Don't show drag and drop area for user that is logged in
-            and cannot add translation. */
-          scope.dropAreaIsAccessible = !(!scope.userIsGuest &&
-            scope.translationIsDisallowed);
+          scope.dropAreaIsAccessible = (GLOBALS.userIsLoggedIn &&
+            GLOBALS.can_translate);
+          scope.userIsGuest = !GLOBALS.userIsLoggedIn;
           scope.$digest();
           return false;
         });
@@ -42,6 +41,7 @@ oppia.directive('audioTranslationBar', [
           evt.preventDefault();
           if (evt.pageX === 0 || evt.pageY === 0) {
             scope.dropAreaIsAccessible = false;
+            scope.userIsGuest = false;
             scope.$digest();
           }
           return false;
@@ -50,7 +50,7 @@ oppia.directive('audioTranslationBar', [
         $('.oppia-translation-tab').on('drop', function(evt) {
           evt.preventDefault();
           if (evt.target.classList.contains('oppia-drop-area-message') &&
-            GLOBALS.can_translate && GLOBALS.userIsLoggedIn) {
+            scope.dropAreaIsAccessible) {
             files = evt.originalEvent.dataTransfer.files;
             scope.openAddAudioTranslationModal(files);
           }
@@ -95,8 +95,6 @@ oppia.directive('audioTranslationBar', [
           $scope.checkingMicrophonePermission = false;
           $scope.audioTimerIsShown = true;
           $scope.audioIsCurrentlyBeingSaved = false;
-          $scope.translationIsDisallowed = !GLOBALS.can_translate;
-          $scope.userIsGuest = !GLOBALS.userIsLoggedIn;
 
           var saveContentIdsToAudioTranslationChanges = function() {
             StateContentIdsToAudioTranslationsService.saveDisplayedValue();
