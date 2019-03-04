@@ -1350,9 +1350,12 @@ def _validate_and_parse_js_files(all_files):
 
 def _get_expression_from_node_if_one_exists(parsed_node, components_to_check):
     """This function first checks whether the parsed node represents
-    the required angular component that needs to be derived. If yes, then it
-    will return the expression part of the node from which the component can be
-    derived. If no, it will return None.
+    the required angular component that needs to be derived by checking if its
+    in the 'components_to_check' list. If yes, then it  will return the
+    expression part of the node from which the component can be derived.
+    If no, it will return None. It is done by filtering out
+    'AssignmentExpression' (as it represents an assignment) and 'Identifier'
+    (as it represents a static expression).
 
     Args:
         parsed_node: dict. Parsed node of the body of a JS file.
