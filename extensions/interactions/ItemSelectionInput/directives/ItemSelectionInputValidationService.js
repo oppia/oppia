@@ -132,7 +132,16 @@ oppia.factory('ItemSelectionInputValidationService', [
                     });
                   }
                 } else if (rule.type === 'IsProperSubsetOf') {
-                  handledAnswers[choiceIndex] = true;
+                  handledAnswers[choiceIndex] = true
+                  if(ruleInput.length < 2) {
+                    warningsList.push({
+                      type: WARNING_TYPES.ERROR,
+                      message: (
+                        'In answer group ' + (answerIndex + 1) + ', ' +
+                        'rule ' + (ruleIndex + 1) + ', ' +
+                        'Is proper subset, needs at least 2 options')
+                    });
+                  }
                 } else if (rule.type === 'ContainsAtLeastOneOf') {
                   handledAnswers[choiceIndex] = true;
                 } else if (rule.type ===
