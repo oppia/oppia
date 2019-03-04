@@ -23,6 +23,74 @@ from core.tests import test_utils
 import utils
 
 
+class SubtopicPageChangeDomainUnitTests(test_utils.GenericTestBase):
+    """Tests for subtopic page change domain objects."""
+    user_id = 'user_id'
+    topic_id = 'topic_id'
+    subtopic_id = 1
+
+    def setUp(self):
+        super(SubtopicPageChangeDomainUnitTests, self).setUp()
+        self.subtopic_page_change = subtopic_page_domain.SubtopicPageChange({
+            'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+            'subtopic_id': 1,
+            'property_name': 'page_contents_html',
+            'new_value': 'a',
+            'old_value': 'b'
+            })
+
+    def test_init_method(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict *'):
+            subtopic_page_domain.SubtopicPageChange({
+                'subtopic_id': 1,
+                'property_name': 'page_contents_html',
+                'new_value': 'a',
+                'old_value': 'b'
+            })
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict *'):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                'subtopic_id': 1,
+                'property_name': 'not in subtopic page propertioes',
+                'new_value': 'a',
+                'old_value': 'b'
+            })
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict *'):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'subtopic changed',
+                'subtopic_id': 1,
+                'property_name': 'page_contents_html',
+                'new_value': 'a',
+                'old_value': 'b'
+            })
+        subtopic_page_change_4 = subtopic_page_domain.SubtopicPageChange({
+            'cmd': subtopic_page_domain.CMD_CREATE_NEW,
+            'subtopic_id': 1,
+            'topic_id': self.topic_id,
+            'property_name': 'page_contents_html',
+            'new_value': 'a',
+            'old_value': 'b'
+        })
+        expected_subtopic_page_4_change_dict = {
+            'cmd': subtopic_page_domain.CMD_CREATE_NEW,
+            'topic_id': self.topic_id
+        }
+        self.assertEqual(
+            expected_subtopic_page_4_change_dict,
+            subtopic_page_change_4.to_dict())
+
+    def test_to_dict(self):
+        expected_subtopic_page_change_dict = {
+            'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+            'property_name': 'page_contents_html',
+            'new_value': 'a',
+            'old_value': 'b'
+        }
+        self.assertEqual(
+            expected_subtopic_page_change_dict,
+            self.subtopic_page_change.to_dict())
+
+
 class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
     """Tests for subtopic page domain objects."""
     topic_id = 'topic_id'
@@ -90,6 +158,10 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             self.subtopic_page.validate()
+
+    def test_subtopic_page_validation(self):
+        self.subtopic_page.version = 'a'
+        self._assert_validation_error('Expected version number')
 
     def test_subtopic_topic_id_validation(self):
         self.subtopic_page.topic_id = 1
@@ -197,6 +269,32 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected content_ids_to_audio_translations to contain '
             'only content_ids in the subtopic page.')
+
+        self.subtopic_page_contents.content_ids_to_audio_translations = {
+            1: {}}
+        self._assert_validation_error(
+            'Expected content_id to be a string, received: 1')
+
+        self.subtopic_page_contents.content_ids_to_audio_translations = {
+            'conent_id': 1
+        }
+        self._assert_validation_error(
+            'Expected audio_translations to be a dict, received 1')
+
+        self.subtopic_page_contents.content_ids_to_audio_translations = {
+            'content': {
+                1: {}
+            }
+        }
+        self._assert_validation_error(
+            'Expected language code to be a string, received: 1')
+
+        self.subtopic_page_contents.content_ids_to_audio_translations = {
+            'content': {
+                'a': {}
+            }
+        }
+        self._assert_validation_error('Unrecognized language code: a')
 
     def test_to_and_from_dict(self):
         subtopic_page_contents_dict = {
