@@ -74,13 +74,15 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         with self.swap(constants, 'DEV_MODE', True):
             response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
-                          response.body)
+            self.assertIn(
+                '<div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>',
+                response.body)
 
         with self.swap(constants, 'DEV_MODE', False):
             response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
-                          response.body)
+            self.assertIn(
+                '<div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>',
+                response.body)
 
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
@@ -697,3 +699,44 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                                         msg=error_message)
 
         self.assertGreater(num_handlers_checked, 150)
+
+
+class SignUpTests(test_utils.GenericTestBase):
+
+    def test_error_is_raised_on_opening_new_tab_during_signup(self):
+        """Test that error is raised if user opens a new tab
+        during signup.
+        """
+        self.login('abc@example.com')
+        response = self.get_html_response(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        response = self.get_html_response('/about', expected_status_int=302)
+        self.assertIn('Logout', response.location)
+        self.logout()
+
+        response = self.post_json(
+            feconf.SIGNUP_DATA_URL, {
+                'username': 'abc',
+                'agreed_to_terms': True
+            }, csrf_token=csrf_token, expected_status_int=401,
+        )
+
+        self.assertEqual(response['error'], 'Registration session expired.')
+
+    def test_no_error_is_raised_on_opening_new_tab_after_signup(self):
+        """Test that no error is raised if user opens a new tab
+        after signup.
+        """
+        self.login('abc@example.com')
+        response = self.get_html_response(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        self.post_json(
+            feconf.SIGNUP_DATA_URL, {
+                'username': 'abc',
+                'agreed_to_terms': True
+            }, csrf_token=csrf_token,
+        )
+
+        self.get_html_response('/about')

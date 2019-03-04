@@ -18,21 +18,23 @@
  */
 
 oppia.factory('ResponsesService', [
-  '$rootScope', 'StateInteractionIdService', 'INTERACTION_SPECS',
-  'AnswerGroupsCacheService', 'StateEditorService',
-  'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
-  'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
-  'ContextService', 'SolutionValidityService', 'INFO_MESSAGE_SOLUTION_IS_VALID',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
+  '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
+  'ContextService', 'OutcomeObjectFactory',
+  'SolutionValidityService', 'SolutionVerificationService',
+  'StateEditorService', 'StateInteractionIdService',
+  'StateSolutionService', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
+  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INTERACTION_SPECS',
   function(
-      $rootScope, StateInteractionIdService, INTERACTION_SPECS,
-      AnswerGroupsCacheService, StateEditorService,
-      OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
-      StateSolutionService, SolutionVerificationService, AlertsService,
-      ContextService, SolutionValidityService, INFO_MESSAGE_SOLUTION_IS_VALID,
+      $rootScope, AlertsService, AnswerGroupsCacheService,
+      ContextService, OutcomeObjectFactory,
+      SolutionValidityService, SolutionVerificationService,
+      StateEditorService, StateInteractionIdService,
+      StateSolutionService, COMPONENT_NAME_DEFAULT_OUTCOME,
+      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
-      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
+      INFO_MESSAGE_SOLUTION_IS_VALID, INTERACTION_SPECS) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;

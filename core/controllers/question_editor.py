@@ -17,8 +17,8 @@ and are created.
 """
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -46,14 +46,16 @@ class QuestionCreationHandler(base.BaseHandler):
                 (question_dict['id'] is not None) or
                 ('question_state_data' not in question_dict) or
                 ('language_code' not in question_dict) or
-                (question_dict['version'] != 1) or
-                (question_dict['question_state_schema_version'] != (
-                    feconf.CURRENT_STATES_SCHEMA_VERSION))):
+                (question_dict['version'] != 1)):
             raise self.InvalidInputException
 
-
+        question_dict['question_state_schema_version'] = (
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
-        question = question_domain.Question.from_dict(question_dict)
+        try:
+            question = question_domain.Question.from_dict(question_dict)
+        except:
+            raise self.InvalidInputException
         question_services.add_question(self.user_id, question)
         question_services.create_new_question_skill_link(
             question.id, skill_id)

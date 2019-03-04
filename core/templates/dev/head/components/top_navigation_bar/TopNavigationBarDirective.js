@@ -38,6 +38,7 @@ oppia.directive('topNavigationBar', [
             DebouncerService, DeviceInfoService) {
           $scope.isModerator = null;
           $scope.isAdmin = null;
+          $scope.isTopicManager = null;
           $scope.isSuperAdmin = null;
           $scope.userIsLoggedIn = null;
           $scope.username = '';
@@ -47,6 +48,7 @@ oppia.directive('topNavigationBar', [
             }
             $scope.isModerator = userInfo.isModerator();
             $scope.isAdmin = userInfo.isAdmin();
+            $scope.isTopicManager = userInfo.isTopicManager();
             $scope.isSuperAdmin = userInfo.isSuperAdmin();
             $scope.userIsLoggedIn = userInfo.isLoggedIn();
             $scope.username = userInfo.getUsername();
@@ -97,6 +99,8 @@ oppia.directive('topNavigationBar', [
                   $timeout(function() {
                     $window.location = urlObject.login_url;
                   }, 150);
+                } else {
+                  throw Error('Login url not found.');
                 }
               }
             );

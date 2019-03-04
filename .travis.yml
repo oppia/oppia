@@ -20,8 +20,10 @@ branches:
 env:
   matrix:
     - RUN_LINT=true
-    - RUN_FRONTEND_TESTS=true
-    - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false EXCLUDE_LOAD_TESTS=true
+    # These lines are commented out because these checks are being run on CircleCI
+    # here: https://circleci.com/gh/oppia/oppia
+    # - RUN_FRONTEND_TESTS=true
+    # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false EXCLUDE_LOAD_TESTS=true
     # TODO(sll): Reinstate this when we can get it to run in reasonable time.
     # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
     # TODO(sll): Reinstate this when the load tests are more reliable.
@@ -43,8 +45,10 @@ env:
     - RUN_E2E_TESTS_PREFERENCES=true
     - RUN_E2E_TESTS_PROFILE_MENU=true
     - RUN_E2E_TESTS_PUBLICATION=true
+    - RUN_E2E_TESTS_SKILL_EDITOR=true
     - RUN_E2E_TESTS_SUBSCRIPTIONS=true
     - RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD=true
+    - RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR=true
     - RUN_E2E_TESTS_USERS=true
 
 matrix:
@@ -64,10 +68,11 @@ notifications:
   email:
     recipients:
     - sean@seanlip.org
-    - henning.benmax@gmail.com
-    - tzjiang1@gmail.com
-    - apurvabajaj007@gmail.com
     - nithusha21@yahoo.co.in
+    - apurvabajaj007@gmail.com
+    - annonymousxyz@outlook.com
+    - anubhavsinha98@gmail.com
+    - yashjipkate@gmail.com
     on_success: change
     on_failure: change
   irc:
@@ -98,16 +103,19 @@ install:
 - pushd $TRAVIS_BUILD_DIR
 - source scripts/setup.sh || exit 1
 - source scripts/setup_gae.sh || exit 1
+- bash scripts/install_third_party.sh
 
 script:
-- if [ "$RUN_LINT" == 'true' ]; then bash scripts/install_third_party.sh; python scripts/third_party_size_check.py; python scripts/pre_commit_linter.py --path=.; fi
+- if [ "$RUN_LINT" == 'true' ]; then python scripts/third_party_size_check.py; python scripts/pre_commit_linter.py --path=.; fi
+# These lines are commented out because these checks are being run on CircleCI
+# here: https://circleci.com/gh/oppia/oppia
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
-- if [ "$RUN_FRONTEND_TESTS" == 'true' ]; then travis_retry bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
-- if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests; fi
-- if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --exclude_load_tests; fi
-- if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
-- if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh; fi
+# - if [ "$RUN_FRONTEND_TESTS" == 'true' ]; then travis_retry bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
+# - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests; fi
+# - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --exclude_load_tests; fi
+# - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
+# - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh; fi
 # Run e2e tests in production mode.
 - if [ "$RUN_E2E_TESTS_ACCESSIBILITY" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="additionalEditorAndPlayerFeatures" --prod_env; fi
@@ -126,15 +134,19 @@ script:
 - if [ "$RUN_E2E_TESTS_PREFERENCES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="preferences" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PROFILE_MENU" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="profileMenu" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PUBLICATION" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="publication" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="skillEditorPage" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_SUBSCRIPTIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicsAndSkillsDashboard" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_USERS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users" --prod_env; fi
 # Run e2e tests for mobile in dev mode since the demo explorations and collections are only available in the dev mode and not in production mode.
 - if [ "$RUN_E2E_TESTS_MOBILE" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --browserstack; fi
 
-after_success:
-- if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ]; then codecov; fi
-- if [ "$RUN_FRONTEND_TESTS" == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
+# These lines are commented out because these checks are being run on CircleCI
+# here: https://circleci.com/gh/oppia/oppia
+# after_success:
+# - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ]; then codecov; fi
+# - if [ "$RUN_FRONTEND_TESTS" == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
 
 cache:
   # Cache Oppia's dependencies.

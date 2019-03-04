@@ -19,8 +19,8 @@
 import StringIO
 import datetime
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain

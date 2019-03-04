@@ -18,8 +18,8 @@
  */
 
 oppia.factory('SuggestionThreadObjectFactory', [
-  'SuggestionObjectFactory', 'QuestionSuggestionObjectFactory',
-  function(SuggestionObjectFactory, QuestionSuggestionObjectFactory) {
+  'QuestionSuggestionObjectFactory', 'SuggestionObjectFactory',
+  function(QuestionSuggestionObjectFactory, SuggestionObjectFactory) {
     var SuggestionThread = function(
         status, subject, summary, originalAuthorName, lastUpdated, messageCount,
         threadId, suggestion) {

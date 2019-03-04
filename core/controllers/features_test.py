@@ -51,7 +51,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-        self.assertTrue(json_response['is_playthrough_recording_enabled'])
+        self.assertTrue(json_response['is_exploration_whitelisted'])
 
     def test_can_not_record_playthroughs_with_empty_whitelist(self):
         self.set_config_property(
@@ -60,7 +60,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-        self.assertFalse(json_response['is_playthrough_recording_enabled'])
+        self.assertFalse(json_response['is_exploration_whitelisted'])
 
     def test_can_not_record_playthroughs_for_exploration_not_in_whitelist(self):
         self.set_config_property(
@@ -69,7 +69,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-        self.assertFalse(json_response['is_playthrough_recording_enabled'])
+        self.assertFalse(json_response['is_exploration_whitelisted'])
 
 
 class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):

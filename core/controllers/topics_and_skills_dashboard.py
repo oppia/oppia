@@ -17,8 +17,8 @@ are created.
 """
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
@@ -199,6 +199,13 @@ class MergeSkillHandler(base.BaseHandler):
         question_services.update_skill_ids_of_questions(
             old_skill_id, old_skill.description, new_skill_id)
         changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': old_skill.superseding_skill_id,
+                'new_value': new_skill_id
+            }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
                 'property_name': (

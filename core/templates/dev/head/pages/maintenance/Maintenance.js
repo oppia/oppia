@@ -17,8 +17,8 @@
  */
 
 oppia.controller('Maintenance', [
-  '$scope', '$rootScope', 'UrlInterpolationService', 'DEV_MODE',
-  function($scope, $rootScope, UrlInterpolationService, DEV_MODE) {
+  '$rootScope', '$scope', 'UrlInterpolationService', 'DEV_MODE',
+  function($rootScope, $scope, UrlInterpolationService, DEV_MODE) {
     $scope.currentLang = 'en';
     $rootScope.DEV_MODE = DEV_MODE;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
