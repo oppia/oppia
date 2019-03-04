@@ -55,6 +55,7 @@ import argparse
 import ast
 import contextlib
 import fnmatch
+import glob
 import multiprocessing
 import os
 import re
@@ -254,6 +255,11 @@ CONFIG_FILE_PATHS = (
     'core/templates/dev/head/mathjaxConfig.js',
     'assets/constants.js',
     'assets/rich_text_components_definitions.js')
+
+CODEOWNER_DIR_PATHS = [
+    './core', './extensions', './scripts', './export', './.github']
+
+CODEOWNER_FILE_PATHS = ['app.yaml', 'manifest.json']
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -1881,6 +1887,81 @@ def _check_for_copyright_notice(all_files):
     return summary_messages
 
 
+def _check_codeowner_file():
+    """Checks the CODEOWNERS file for any uncovered dirs/files and
+    and also checks that every pattern in the CODEOWNERS file matches
+    at least one file/dir.
+    """
+    print 'Starting CODEOWNERS file check'
+    print '----------------------------------------'
+
+    with _redirect_stdout(_TARGET_STDOUT):
+        codeowner_file = '.github/CODEOWNERS'
+        failed = False
+        summary_messages = []
+        # Checks whether every pattern in the CODEOWNERS file matches at least
+        # one dir/file.
+        path_patterns = []
+        for line_num, line in enumerate(FileCache.readlines(codeowner_file)):
+            if line.strip() != '' and line.strip()[0] != '#':
+                if '@' not in line:
+                    print ('%s --> Pattern on line %s doesn\'t have'
+                           'codeowner' % (codeowner_file, line_num))
+                    failed = True
+                else:
+                    line_in_concern = line.split('@')[0].strip()
+                    if line_in_concern.endswith('/'):
+                        line_in_concern = line_in_concern[:-1]
+                    if not glob.glob(line_in_concern.replace('/', '', 1)):
+                        print ('%s --> Pattern on line %s doesn\'t match any '
+                               'file or directory' % (codeowner_file, line_num))
+                        failed = True
+                    path_patterns.append(line_in_concern.replace('/', '', 1))
+
+        # Checks that every dir/file is covered under CODEOWNERS.
+        for root, _, filename in os.walk('.'):
+            for file_name in filename:
+                is_root_file = False
+                if file_name in CODEOWNER_FILE_PATHS:
+                    is_root_file = True
+                if any(root.startswith(
+                        x) for x in CODEOWNER_DIR_PATHS) or is_root_file:
+                    match = False
+                    if file_name.endswith('.pyc') or file_name == '__init__.py':
+                        match = True
+                        continue
+                    for path_to_match in path_patterns:
+                        if path_to_match.split('/')[-1]:
+                            level = len(path_to_match.split('/'))
+                        else:
+                            level = len(path_to_match.split('/')) - 1
+                        if os.path.join(*((
+                                os.path.join(root, file_name).replace(
+                                    './', '', 1)).split(
+                                        '/')[:level])) in glob.glob(
+                                            path_to_match):
+                            match = True
+                            break
+                    if not match:
+                        print ('WARNING! %s/%s is not covered under '
+                               'CODEOWNERS' % (root, file_name))
+
+        if failed:
+            summary_message = '%s   CODEOWNERS file check failed' % (
+                _MESSAGE_TYPE_FAILED)
+            print summary_message
+            summary_messages.append(summary_message)
+        else:
+            summary_message = '%s  CODEOWNERS file check passed' % (
+                _MESSAGE_TYPE_SUCCESS)
+            print summary_message
+            summary_messages.append(summary_message)
+
+        print ''
+
+    return summary_messages
+
+
 def _print_complete_summary_of_errors():
     """Print complete summary of errors."""
     print 'Summary of Errors:'
@@ -1913,6 +1994,7 @@ def main():
     html_linter_messages = _lint_html_files(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     copyright_notice_messages = _check_for_copyright_notice(all_files)
+    codeowner_messages = _check_codeowner_file()
     _print_complete_summary_of_errors()
     all_messages = (
         directive_scope_messages + sorted_dependencies_messages +
@@ -1920,7 +2002,8 @@ def main():
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
         html_tag_and_attribute_messages + html_linter_messages +
-        linter_messages + pattern_messages + copyright_notice_messages)
+        linter_messages + pattern_messages + copyright_notice_messages +
+        codeowner_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
