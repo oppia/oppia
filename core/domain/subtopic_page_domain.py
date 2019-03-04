@@ -322,7 +322,7 @@ class SubtopicPage(object):
 
         Args:
             new_page_contents_html_dict: dict. The new html for the subtopic
-            page.
+                page.
         """
         self.page_contents.subtitled_html = (
             state_domain.SubtitledHtml.from_dict(new_page_contents_html_dict))
@@ -332,7 +332,7 @@ class SubtopicPage(object):
 
         Args:
             new_page_contents_audio_dict: dict. The new audio for the subtopic
-            page.
+                page.
         """
         self.page_contents.content_ids_to_audio_translations = {
             content_id: {
@@ -350,7 +350,7 @@ class SubtopicPage(object):
 
         Args:
             new_page_written_translations_dict: dict. The new translation for
-            the subtopic page.
+                the subtopic page.
         """
         self.page_contents.written_translations = (
             state_domain.WrittenTranslations.from_dict(
