@@ -400,11 +400,42 @@ class UrlHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    def _get_redirect_url_on_logout(self, current_url):
+        """
+        """
+        print current_url
+        redirect_url_on_logout = current_url
+        if current_url == '/preferences':
+            redirect_url_on_logout = '/'
+        elif current_url.split("/")[1] == feconf.SKILL_EDITOR_URL_PREFIX:
+            redirect_url_on_logout = '/'
+        elif current_url == feconf.LEARNER_DASHBOARD_URL:
+            redirect_url_on_logout = '/'
+        elif current_url.split("/")[1] == feconf.TOPIC_EDITOR_URL_PREFIX[1:]:
+            redirect_url_on_logout = '/'
+        elif current_url.split("/")[1] == feconf.STORY_EDITOR_URL_PREFIX[1:]:
+            redirect_url_on_logout = '/'
+        elif current_url == '/notifications_dashboard':
+            redirect_url_on_logout = '/'
+        elif current_url == feconf.CREATOR_DASHBOARD_URL:
+            redirect_url_on_logout = '/'
+        elif current_url == feconf.TOPICS_AND_SKILLS_DASHBOARD_URL:
+            redirect_url_on_logout = '/'
+
+        return redirect_url_on_logout
+
     @acl_decorators.open_access
     def get(self):
         login_url = None
+        logout_url = None
         if self.user_id:
-            self.render_json({'login_url': None})
+            if self.request and self.request.get('current_url'):
+                redirect_url_on_logout = self._get_redirect_url_on_logout(self.request.get('current_url'))
+                logout_url = current_user_services.create_logout_url(redirect_url_on_logout)
+            else:
+                raise self.InvalidInputException(
+                    'Incomplete or empty GET parameters passed'
+                )
         else:
             if self.request and self.request.get('current_url'):
                 target_url = (
@@ -413,8 +444,9 @@ class UrlHandler(base.BaseHandler):
                     else self.request.get('current_url'))
                 login_url = (
                     current_user_services.create_login_url(target_url))
-                self.render_json({'login_url': login_url})
+                #self.render_json({'login_url': login_url})
             else:
                 raise self.InvalidInputException(
                     'Incomplete or empty GET parameters passed'
                 )
+        self.render_json({'login_url': login_url, 'logout_url': logout_url})

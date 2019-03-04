@@ -73,6 +73,7 @@ oppia.factory('UserService', [
         return $http.get('/url_handler', {params: urlParameters}).then(
           function(response) {
             return {
+              logout_url: response.data.logout_url,
               login_url: response.data.login_url,
             };
           }
