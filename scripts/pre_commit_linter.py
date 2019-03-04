@@ -259,7 +259,7 @@ CONFIG_FILE_PATHS = (
 CODEOWNER_DIR_PATHS = [
     './core', './extensions', './scripts', './export', './.github']
 
-CODEOWNER_FILE_PATHS = ['app.yaml', 'manifest.json']
+CODEOWNER_FILE_PATHS = ['./app.yaml', './manifest.json']
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -1922,7 +1922,7 @@ def _check_codeowner_file():
         for root, _, filename in os.walk('.'):
             for file_name in filename:
                 is_root_file = False
-                if file_name in CODEOWNER_FILE_PATHS:
+                if os.path.join(root, file_name) in CODEOWNER_FILE_PATHS:
                     is_root_file = True
                 if any(root.startswith(
                         x) for x in CODEOWNER_DIR_PATHS) or is_root_file:
@@ -1943,8 +1943,7 @@ def _check_codeowner_file():
                             match = True
                             break
                     if not match:
-                        print ('WARNING! %s/%s is not covered under '
-                               'CODEOWNERS' % (root, file_name))
+                        print os.path.join(root, file_name)
 
         if failed:
             summary_message = '%s   CODEOWNERS file check failed' % (
