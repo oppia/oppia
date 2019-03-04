@@ -60,9 +60,10 @@ describe('Exploration Html Formatter Service', function() {
   it('should set answer HTML correctly', function() {
     var interactionId = 'sampleId';
     var answer = 'sampleAnswer';
-    var interactionCustomizationArgs = {};
-    interactionCustomizationArgs.choices = {
-      value: 'sampleChoice'
+    var interactionCustomizationArgs = {
+      choices: {
+        value: 'sampleChoice'
+      }
     };
     var expectedHtmlTag = '<oppia-response-sample-id ' +
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +
@@ -76,9 +77,10 @@ describe('Exploration Html Formatter Service', function() {
   it('should set short answer HTML correctly', function() {
     var interactionId = 'sampleId';
     var answer = 'sampleAnswer';
-    var interactionCustomizationArgs = {};
-    interactionCustomizationArgs.choices = {
-      value: 'sampleChoice'
+    var interactionCustomizationArgs = {
+      choices: {
+        value: 'sampleChoice'
+      }
     };
     var expectedHtmlTag = '<oppia-short-response-sample-id ' +
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +

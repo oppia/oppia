@@ -963,7 +963,7 @@ var logicProofStudent = (function() {
     // Returns true iff error1 is a better attempt than error2
     var _isBetterAttempt = function(error1, error2) {
       return error2 === undefined ||
-        (error1.code === 'pre-rendered' && !error2.code === 'pre-rendered') ||
+        (error1.code === 'pre-rendered' && error2.code !== 'pre-rendered') ||
         (error1.code !== 'unmatched_line' && error2.code === 'unmatched_line');
     };
 

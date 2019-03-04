@@ -17,7 +17,8 @@
  * ExpectedConditions.
  */
 
-import {browser} from 'protractor';
+import {protractor} from 'protractor/globals';
+import {element, browser, by} from 'protractor';
 
 var until = protractor.ExpectedConditions;
 // When running tests on mobile via browserstack, the localhost

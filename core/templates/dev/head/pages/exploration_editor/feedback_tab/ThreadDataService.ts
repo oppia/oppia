@@ -194,10 +194,11 @@ oppia.factory('ThreadDataService', [
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
           onSuccess, onFailure) {
         var payload = {
-          action: action
+          action: action,
+          review_message: reviewMsg,
+          commit_message: null
         };
 
-        payload.review_message = reviewMsg;
         if (action === ACTION_ACCEPT_SUGGESTION) {
           payload.commit_message = commitMsg;
         }

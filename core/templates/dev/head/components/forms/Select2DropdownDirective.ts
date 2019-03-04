@@ -54,6 +54,7 @@ oppia.directive('select2Dropdown', [
           tags: $scope.newChoiceRegex !== undefined,
           placeholder: $scope.placeholder,
           width: $scope.width || '250px',
+          dropdownCssClass: null,
           createTag: function(params) {
             return params.term.match($scope.newChoiceValidator) ? {
               id: params.term,

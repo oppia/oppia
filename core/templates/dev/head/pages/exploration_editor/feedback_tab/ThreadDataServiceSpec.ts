@@ -99,7 +99,7 @@ describe('retrieving threads service', function() {
       }
     ];
     httpBackend.whenGET('/threadlisthandler/' + expId).respond({
-      threads: mockFeedbackThreads.join(feedbackThreadsForSuggestionThreads)
+      threads: mockFeedbackThreads.concat(feedbackThreadsForSuggestionThreads)
     });
 
     httpBackend.whenGET(

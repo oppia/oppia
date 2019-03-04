@@ -17,6 +17,32 @@
  */
 
 var GLOBALS = {
+  ALLOWED_INTERACTION_CATEGORIES: '',
+  can_edit: true,
+  can_publish: true,
+  CAN_SEND_EMAILS: true,
+  can_translate: true,
+  canDelete: true,
+  canEdit: true,
+  canModifyRoles: true,
+  canReleaseOwnership: true,
+  canUnpublish: true,
+  collectionId: '',
+  collectionTitle: '',
+  CONTINUOUS_COMPUTATIONS_DATA: '',
+  csrf_token: '',
+  DEFAULT_OBJECT_VALUES: null,
+  DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD: '',
+  DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR: '',
+  DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER: '',
+  DEMO_COLLECTIONS: '',
+  DEMO_EXPLORATION_IDS: '',
+  DEMO_EXPLORATIONS: '',
+  DEV_MODE: true,
+  explorationVersion: 1,
+  GCS_RESOURCE_BUCKET_NAME: null,
+  HUMAN_READABLE_CURRENT_TIME: '',
+  iframed: false,
   INTERACTION_SPECS: {
     TextInput: {
       is_terminal: false,
@@ -71,6 +97,29 @@ var GLOBALS = {
       narrow_instructions: null
     }
   },
+  INVALID_PARAMETER_NAMES: '',
+  isLoggedIn: true,
+  LANGUAGE_CODES_AND_NAMES: [{
+    code: 'en',
+    name: 'English'
+  }, {
+    code: 'es',
+    name: 'español'
+  }, {
+    code: 'hr',
+    name: 'hrvatski'
+  }],
+  LOGOUT_URL: '',
+  logoutUrl: '',
+  ONE_OFF_JOB_SPECS: '',
+  PAGE_MODE: '',
+  PROFILE_USERNAME: '',
+  RECENT_JOB_DATA: '',
+  ROLE_GRAPH_DATA: '',
+  SEARCH_DROPDOWN_CATEGORIES: [],
+  SHOW_TRAINABLE_UNRESOLVED_ANSWERS: '',
+  SITE_FEEDBACK_FORM_URL: '',
+  status_code: '',
   SUPPORTED_SITE_LANGUAGES: [{
     id: 'id',
     text: 'Bahasa Indonesia'
@@ -78,8 +127,15 @@ var GLOBALS = {
     id: 'en',
     text: 'English'
   }],
-  GCS_RESOURCE_BUCKET_NAME: null,
-  userIsLoggedIn: true
+  TAG_REGEX: '^[a-z ]+$',
+  TOPIC_SUMMARIES: '',
+  TRANSLATOR_PROVIDER_FOR_TESTS: null,
+  UNFINISHED_JOB_DATA: '',
+  UPDATABLE_ROLES: '',
+  USER_EMAIL: 'user@example.com',
+  userIsLoggedIn: true,
+  VIEWABLE_ROLES: '',
+
 };
 
 /* hashes for UrlInterpolationService tests */

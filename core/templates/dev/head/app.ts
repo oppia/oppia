@@ -223,7 +223,7 @@ oppia.run([
             downcast: function(element) {
               // Clear the angular rendering content, which we don't
               // want in the output.
-              element.children[0].setHtml('');
+              (<Element><any>element.children[0]).setHtml('');
               // Return just the rich text component, without its wrapper.
               return element.children[0];
             },
@@ -235,7 +235,7 @@ oppia.run([
             upcast: function(element) {
               return (element.name !== 'p' &&
                       element.children.length > 0 &&
-                      element.children[0].name === tagName);
+                      (<Element><any>element.children[0]).name === tagName);
             },
             data: function() {
               var that = this;

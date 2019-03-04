@@ -36,7 +36,7 @@ oppia.factory('RatingComputationService', [function() {
         var totalNumber = 0;
         var totalValue = 0.0;
         for (var value in ratingFrequencies) {
-          totalValue += value * ratingFrequencies[value];
+          totalValue += <number><any>value * ratingFrequencies[value];
           totalNumber += ratingFrequencies[value];
         }
 

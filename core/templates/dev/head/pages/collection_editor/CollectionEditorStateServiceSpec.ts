@@ -33,7 +33,12 @@ describe('Collection editor state service', function() {
 
   // TODO(bhenning): Consider moving this to a more shareable location.
   var FakeEditableCollectionBackendApiService = function() {
-    var self = {};
+    var self = {
+      BackendCollectionObject: null,
+      failure: null,
+      fetchCollection: null,
+      updateCollection: null
+    };
 
     var _fetchOrUpdateCollection = function() {
       return $q(function(resolve, reject) {
@@ -54,7 +59,11 @@ describe('Collection editor state service', function() {
   };
 
   var FakeCollectionRightsBackendApiService = function() {
-    var self = {};
+    var self = {
+      BackendCollectionObject: null,
+      failure: null,
+      fetchCollectionRights: null,
+    };
 
     var _fetchCollectionRights = function() {
       return $q(function(resolve, reject) {
@@ -77,13 +86,13 @@ describe('Collection editor state service', function() {
   beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableCollectionBackendApiService = (
-      new FakeEditableCollectionBackendApiService());
+      FakeEditableCollectionBackendApiService());
     $provide.value(
       'EditableCollectionBackendApiService',
       [fakeEditableCollectionBackendApiService][0]);
 
     fakeCollectionRightsBackendApiService = (
-      new FakeCollectionRightsBackendApiService());
+      FakeCollectionRightsBackendApiService());
     $provide.value(
       'CollectionRightsBackendApiService',
       [fakeCollectionRightsBackendApiService][0]);

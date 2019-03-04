@@ -87,10 +87,10 @@ describe('Creator dashboard controller', function() {
     ));
 
     it('should have the correct data for creator dashboard', function() {
-      expect(scope.explorationsList).toEqual(dashboardData.explorations_list);
-      expect(scope.collectionsList).toEqual(dashboardData.collections_list);
-      expect(scope.dashboardStats).toEqual(dashboardData.dashboard_stats);
-      expect(scope.lastWeekStats).toEqual(dashboardData.last_week_stats);
+      expect(scope.explorationsList).toEqual(dashboardData.explorationsList);
+      expect(scope.collectionsList).toEqual(dashboardData.collectionsList);
+      expect(scope.dashboardStats).toEqual(dashboardData.dashboardStats);
+      expect(scope.lastWeekStats).toEqual(dashboardData.lastWeekStats);
     });
   });
 });

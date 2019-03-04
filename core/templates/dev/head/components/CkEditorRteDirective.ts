@@ -99,7 +99,7 @@ oppia.directive('ckEditorRte', [
           startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
         }
         // Initialize CKEditor.
-        var ck = CKEDITOR.inline(el[0].children[0].children[1], {
+        var ck = CKEDITOR.inline(<HTMLElement>(el[0].children[0].children[1]), {
           extraPlugins: 'pre,sharedspace,' + pluginNames,
           startupFocus: startupFocusEnabled,
           removePlugins: 'indentblock',

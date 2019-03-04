@@ -28,7 +28,12 @@ describe('Skill editor state service', function() {
   var skillRightsObject = null;
 
   var FakeEditableSkillBackendApiService = function() {
-    var self = {};
+    var self = {
+      newBackendSkillObject: null,
+      failure: null,
+      fetchSkill: null,
+      updateSkill: null
+    };
 
     var _fetchOrUpdateSkill = function() {
       return $q(function(resolve, reject) {
@@ -49,7 +54,11 @@ describe('Skill editor state service', function() {
   };
 
   var FakeSkillRightsBackendApiService = function() {
-    var self = {};
+    var self = {
+      backendSkillRightsObject: null,
+      failure: null,
+      fetchSkillRights: null
+    };
 
     var _fetchSkillRights = function() {
       return $q(function(resolve, reject) {
@@ -71,13 +80,13 @@ describe('Skill editor state service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableSkillBackendApiService = (
-      new FakeEditableSkillBackendApiService());
+      FakeEditableSkillBackendApiService());
     $provide.value(
       'EditableSkillBackendApiService',
       [fakeEditableSkillBackendApiService][0]);
 
     fakeSkillRightsBackendApiService = (
-      new FakeSkillRightsBackendApiService());
+      FakeSkillRightsBackendApiService());
     $provide.value(
       'SkillRightsBackendApiService',
       [fakeSkillRightsBackendApiService][0]);

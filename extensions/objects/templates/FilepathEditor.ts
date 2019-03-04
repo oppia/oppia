@@ -414,20 +414,20 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.getCropAreaDynamicStyles = function() {
-          var styles = {};
-
-          // Position and size.
-          styles.left = $scope.cropArea.x1 + 'px';
-          styles.top = $scope.cropArea.y1 + 'px';
-
           var cropWidth = $scope.cropArea.x2 - $scope.cropArea.x1;
           var cropHeight = $scope.cropArea.y2 - $scope.cropArea.y1;
-          styles.width = cropWidth + 'px';
-          styles.height = cropHeight + 'px';
-
-          // Cursor.
           var position = $scope.mousePositionWithinCropArea;
-          styles.cursor = CROP_CURSORS[position];
+
+          // Position and size.
+          var styles = {
+            left: $scope.cropArea.x1 + 'px',
+            top: $scope.cropArea.y1 + 'px',
+            width: cropWidth + 'px',
+            height: cropHeight + 'px',
+            cursor: CROP_CURSORS[position],
+            background: null
+          };
+
           if (!styles.cursor) {
             styles.cursor = 'default';
           }
@@ -561,9 +561,9 @@ oppia.directive('filepathEditor', [
                 mode: MODE_UPLOADED,
                 metadata: {
                   uploadedFile: file,
-                  uploadedImageData: e.target.result,
-                  originalWidth: this.naturalWidth,
-                  originalHeight: this.naturalHeight
+                  uploadedImageData: (<FileReader>e.target).result,
+                  originalWidth: img.naturalWidth,
+                  originalHeight: img.naturalHeight
                 }
               };
               var dimensions = $scope.calculateTargetImageDimensions();
@@ -575,7 +575,7 @@ oppia.directive('filepathEditor', [
               };
               $scope.$apply();
             };
-            img.src = e.target.result;
+            img.src = (<FileReader>e.target).result;
           };
           reader.readAsDataURL(file);
         };

@@ -28,7 +28,17 @@ oppia.constant(
 oppia.factory('BaseUndoRedoService', [
   '$rootScope', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
   function($rootScope, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-    var BaseUndoRedoService = {};
+    var BaseUndoRedoService = {
+      applyChange: null,
+      undoChange: null,
+      redoChange: null,
+      getChangeList: null,
+      getCommittableChangeList: null,
+      setChangeList: null,
+      getChangeCount: null,
+      hasChanges: null,
+      clearChanges: null
+    };
 
     this._appliedChanges = [];
     this._undoneChanges = [];

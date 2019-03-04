@@ -189,7 +189,7 @@ oppia.controller('Preferences', [
                 var reader = new FileReader();
                 reader.onload = function(e) {
                   $scope.$apply(function() {
-                    $scope.uploadedImage = e.target.result;
+                    $scope.uploadedImage = (<FileReader>e.target).result;
                   });
                 };
                 reader.readAsDataURL(file);

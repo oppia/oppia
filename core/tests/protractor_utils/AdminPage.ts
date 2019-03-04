@@ -127,7 +127,7 @@ var AdminPage = function() {
       return saveConfigProperty(
         x, propertyName, objectType, editingInstructions);
     }).then(function(results) {
-      var success = false;
+      var success = null;
       for (var i = 0; i < results.length; i++) {
         success = success || results[i];
       }

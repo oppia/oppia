@@ -17,6 +17,7 @@
  * and check for any console errors
  */
 
+import {protractor} from 'protractor/globals';
 import {element, browser, by} from 'protractor';
 
 var general = require('../protractor_utils/general.js');

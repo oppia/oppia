@@ -16,11 +16,14 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
+import * as angular from 'angular';
+import 'angular-mocks';
+
 describe('User Service', function() {
   var UserService, $httpBackend, UrlInterpolationService;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
     UserService = $injector.get('UserService');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');

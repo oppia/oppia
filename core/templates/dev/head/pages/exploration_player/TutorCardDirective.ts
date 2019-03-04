@@ -23,14 +23,14 @@ oppia.animation('.conversation-skin-responses-animate-slide', function() {
         done();
         return;
       }
-      element.hide().slideDown(400, done);
+      element.hide().slideDown(400, <(this: HTMLElement) => void>done);
     },
     addClass: function(element, className, done) {
       if (className !== 'ng-hide') {
         done();
         return;
       }
-      element.slideUp(400, done);
+      element.slideUp(400, <(this: HTMLElement) => void>done);
     }
   };
 });

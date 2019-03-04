@@ -34,7 +34,16 @@ describe('Topic editor state service', function() {
   var $scope = null;
 
   var FakeEditableTopicBackendApiService = function() {
-    var self = {};
+    var self = {
+      newBackendSubtopicPageObject: null,
+      newBackendTopicObject: null,
+      backendStorySummariesObject: null,
+      failure: null,
+      fetchTopic: null,
+      fetchSubtopicPage: null,
+      updateTopic: null,
+      fetchStories: null
+    };
 
     var _fetchOrUpdateTopic = function() {
       return $q(function(resolve, reject) {
@@ -79,7 +88,11 @@ describe('Topic editor state service', function() {
   };
 
   var FakeTopicRightsBackendApiService = function() {
-    var self = {};
+    var self = {
+      backendTopicRightsObject: null,
+      failure: null,
+      fetchTopicRights: null
+    };
 
     var _fetchTopicRights = function() {
       return $q(function(resolve, reject) {
@@ -102,13 +115,13 @@ describe('Topic editor state service', function() {
   beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableTopicBackendApiService = (
-      new FakeEditableTopicBackendApiService());
+      FakeEditableTopicBackendApiService());
     $provide.value(
       'EditableTopicBackendApiService',
       [fakeEditableTopicBackendApiService][0]);
 
     fakeTopicRightsBackendApiService = (
-      new FakeTopicRightsBackendApiService());
+      FakeTopicRightsBackendApiService());
     $provide.value(
       'TopicRightsBackendApiService',
       [fakeTopicRightsBackendApiService][0]);

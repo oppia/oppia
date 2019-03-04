@@ -109,7 +109,7 @@ describe('CodeRepl prediction service', function() {
 
       // Test algorithm against first test set. This test set contains
       // examples for which KNN fails but SVM succeeds.
-      var testData = getJSONFixture('code_classifier_test_svm.json');
+      var testData = jasmine.getJSONFixture('code_classifier_test_svm.json');
       var predictedAnswerGroup = null;
       for (var i = 0; i < testData.length; i++) {
         for (var j = 0; j < testData[i].answers.length; j++) {

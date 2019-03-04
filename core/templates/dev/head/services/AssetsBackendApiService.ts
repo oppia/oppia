@@ -66,13 +66,14 @@ oppia.factory('AssetsBackendApiService', [
         url: _getDownloadUrl(explorationId, filename, assetType),
         timeout: canceler.promise
       }).success(function(data) {
+        var assetBlob = null;
         try {
           if (assetType === ASSET_TYPE_AUDIO) {
             // Add type for audio assets. Without this, translations can
             // not be played on Safari.
-            var assetBlob = new Blob([data], {type: 'audio/mpeg'});
+            assetBlob = new Blob([data], {type: 'audio/mpeg'});
           } else {
-            var assetBlob = new Blob([data]);
+            assetBlob = new Blob([data]);
           }
         } catch (exception) {
           window.BlobBuilder = window.BlobBuilder ||
@@ -82,7 +83,7 @@ oppia.factory('AssetsBackendApiService', [
           if (exception.name === 'TypeError' && window.BlobBuilder) {
             var blobBuilder = new BlobBuilder();
             blobBuilder.append(data);
-            var assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
+            assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
           } else {
             throw exception;
           }

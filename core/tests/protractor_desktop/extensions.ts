@@ -191,17 +191,17 @@ describe('Interactions', function() {
     explorationEditorMainTab.setStateName('Graph');
     explorationEditorMainTab.setContent(forms.toRichText(
       'Draw a complete graph with the given vertices.'));
-    var graphDict = {
+    var graphDictForInput = {
       vertices: [[277, 77], [248, 179], [405, 144]]
     };
-    explorationEditorMainTab.setInteraction('GraphInput', graphDict);
-    graphDict = {
+    explorationEditorMainTab.setInteraction('GraphInput', graphDictForInput);
+    var graphDictForResponse = {
       edges: [[0, 1], [1, 2], [0, 2]],
       vertices: [[277, 77], [248, 179], [405, 144]]
     };
     explorationEditorMainTab.addResponse(
       'GraphInput', forms.toRichText('Good job!'), 'MathExp',
-      true, 'IsIsomorphicTo', graphDict);
+      true, 'IsIsomorphicTo', graphDictForResponse);
     var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setFeedback(forms.toRichText(
       'A complete graph is a graph in which each pair of graph vertices is ' +
@@ -247,10 +247,10 @@ describe('Interactions', function() {
     // Play Graph Input interaction.
     explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'Draw a complete graph with the given vertices.'));
-    graphDict = {
+    var graphDictForAnswer = {
       edges: [[1, 2], [1, 0], [0, 2]]
     };
-    explorationPlayerPage.submitAnswer('GraphInput', graphDict);
+    explorationPlayerPage.submitAnswer('GraphInput', graphDictForAnswer);
     explorationPlayerPage.expectLatestFeedbackToMatch(
       forms.toRichText('Good job!'));
     explorationPlayerPage.clickThroughToNextCard();

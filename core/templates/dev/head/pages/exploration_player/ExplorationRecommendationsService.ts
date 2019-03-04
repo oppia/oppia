@@ -37,7 +37,9 @@ oppia.factory('ExplorationRecommendationsService', [
           successCallback) {
         var recommendationsUrlParams = {
           stringified_author_recommended_ids: JSON.stringify(
-            authorRecommendedExpIds)
+            authorRecommendedExpIds),
+          collection_id: null,
+          include_system_recommendations: null
         };
         if (GLOBALS.collectionId) {
           recommendationsUrlParams.collection_id = GLOBALS.collectionId;

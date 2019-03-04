@@ -219,7 +219,7 @@ oppia.directive('topNavigationBar', [
             var i18nCompleted = true;
             var tabs = document.querySelectorAll('.oppia-navbar-tab-content');
             for (var i = 0; i < tabs.length; i++) {
-              if (tabs[i].innerText.length === 0) {
+              if ((<HTMLElement>tabs[i]).innerText.length === 0) {
                 i18nCompleted = false;
                 break;
               }

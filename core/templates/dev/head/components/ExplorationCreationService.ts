@@ -65,8 +65,12 @@ oppia.factory('ExplorationCreationService', [
           controller: [
             '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.save = function() {
-                var returnObj = {};
-                var file = document.getElementById('newFileInput').files[0];
+                var returnObj = {
+                  yamlFile: null
+                };
+                var file = (
+                  <HTMLInputElement>document.getElementById('newFileInput')
+                ).files[0];
                 if (!file || !file.size) {
                   AlertsService.addWarning('Empty file detected.');
                   return;

@@ -29,7 +29,12 @@ describe('Story editor state service', function() {
   var $scope = null;
 
   var FakeEditableStoryBackendApiService = function() {
-    var self = {};
+    var self = {
+      newBackendStoryObject: null,
+      failure: null,
+      fetchStory: null,
+      updateStory: null
+    };
 
     var _fetchStory = function() {
       return $q(function(resolve, reject) {
@@ -65,7 +70,7 @@ describe('Story editor state service', function() {
   beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableStoryBackendApiService = (
-      new FakeEditableStoryBackendApiService());
+      FakeEditableStoryBackendApiService());
     $provide.value(
       'EditableStoryBackendApiService',
       [fakeEditableStoryBackendApiService][0]);

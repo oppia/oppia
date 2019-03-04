@@ -198,7 +198,7 @@ oppia.controller('Library', [
       // The following determines whether to enable left scroll after resize.
       for (var i = 0; i < $scope.libraryGroups.length; i++) {
         var carouselJQuerySelector = (
-          '.oppia-library-carousel-tiles:eq(n)'.replace('n', i));
+          '.oppia-library-carousel-tiles:eq(n)'.replace('n', <string><any>i));
         var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
         var index = Math.ceil(carouselScrollPositionPx / LIBRARY_TILE_WIDTH_PX);
         $scope.leftmostCardIndices[i] = index;

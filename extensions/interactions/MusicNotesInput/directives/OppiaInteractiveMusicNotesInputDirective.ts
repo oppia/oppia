@@ -20,6 +20,9 @@
  * followed by the name of the arg.
  */
 
+import * as $ from 'jquery';
+import 'jqueryui';
+
 // Gives the staff-lines human readable values.
 oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
   A5: 81,
@@ -253,13 +256,12 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           var validNoteArea = element.find(
             '.oppia-music-input-valid-note-area');
           for (var i = 0; i < NOTE_TYPES.length; i++) {
+            var className = 'oppia-music-input-natural-note';
             var innerDiv = $('<div></div>')
               .data('noteType', NOTE_TYPES[i])
-              .addClass(function() {
-                if ($(this).data('noteType') === NOTE_TYPE_NATURAL) {
-                  $(this).addClass('oppia-music-input-natural-note');
-                }
-              });
+              .addClass((
+                $(this).data('noteType') === NOTE_TYPE_NATURAL
+              ) ? className : '');
             if (scope.interactionIsActive) {
               innerDiv.draggable({
                 // Keeps note from being placed on top of the clef.
@@ -422,7 +424,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                   var note = {
                     baseNoteMidiNumber: NOTE_NAMES_TO_MIDI_VALUES[lineValue],
                     offset: parseInt(noteType, 10),
-                    noteId: noteId
+                    noteId: noteId,
+                    noteStart: null
                   };
 
                   // When a note is moved, its previous state must be removed

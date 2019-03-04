@@ -9,6 +9,7 @@ interface ICustomScope extends ng.IScope {
 
     // AudioFileUploaderDirective.ts
     inputFieldClassName?: any;
+    inputFieldFormId?: any;
     onFileCleared?: any;
     droppedFile?: any;
 
@@ -73,4 +74,7 @@ interface ICustomScope extends ng.IScope {
     playCurrentSequence?: any;
     clearSequence?: any;
     topPositionForCenterOfTopStaffLine?: any;
+    _addNoteToNoteSequence?: any;
+    _removeNotesFromNoteSequenceWithId?: any;
+    _sortNoteSequence?: any;
 }

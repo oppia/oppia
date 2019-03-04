@@ -88,12 +88,13 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 
               var fakeInputElement = document.querySelector(
                 '#fakeInputForMathExpression');
-              fakeInputElement.focus();
+              (<HTMLInputElement>fakeInputElement).focus();
 
               // Place the cursor at the end of the text input, so that the
               // user can use backspace to delete.
-              fakeInputElement.setSelectionRange(
-                fakeInputElement.value.length, fakeInputElement.value.length);
+              (<HTMLInputElement>fakeInputElement).setSelectionRange(
+                (<HTMLInputElement>fakeInputElement).value.length,
+                (<HTMLInputElement>fakeInputElement).value.length);
             };
 
             var setGuppyContentFromInput = function() {
@@ -103,8 +104,8 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               guppyInstance.render(true);
 
               // Get content of the text input field as an array of characters.
-              var textContent = document
-                .querySelector('#fakeInputForMathExpression').value
+              var textContent = (<HTMLInputElement>document
+                .querySelector('#fakeInputForMathExpression')).value
                 .toLowerCase().split('');
 
               // Replay key combination for each character on the document.

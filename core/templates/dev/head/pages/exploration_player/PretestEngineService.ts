@@ -182,8 +182,9 @@ oppia.factory('PretestEngineService', [
         // at oldState.interaction.default_outcome
         var outcome = angular.copy(classificationResult.outcome);
         // Compute the data for the next state.
-        var oldParams = {};
-        oldParams.answer = answer;
+        var oldParams = {
+          answer: answer
+        };
         var feedbackHtml =
           makeFeedback(outcome.feedback.getHtml(), [oldParams]);
         var feedbackContentId = outcome.feedback.getContentId();

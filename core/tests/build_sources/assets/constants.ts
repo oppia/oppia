@@ -454,7 +454,11 @@ var constants = {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
-  "ENABLE_NEW_STRUCTURES": false,
+  "ENABLE_NEW_STRUCTURE_EDITORS": true,
+
+  "ENABLE_NEW_STRUCTURE_PLAYERS": false,
+
+  "NUM_QUESTIONS_PER_PAGE": 10,
 
   "NEW_STATE_TEMPLATE": {
       "classifier_model_id": null,
@@ -485,8 +489,18 @@ var constants = {
       "content_ids_to_audio_translations": {
           "content": {},
           "default_outcome": {}
+      },
+      "written_translations": {
+          "translations_mapping": {
+            "content": {},
+            "default_outcome": {}
+          }
       }
   },
 
-  "CURRENT_STATES_SCHEMA_VERSION": 25
+  "ALLOW_YAML_FILE_UPLOAD": false,
+
+  "CURRENT_STATES_SCHEMA_VERSION": 27,
+
+  "DEV_MODE": true
 };

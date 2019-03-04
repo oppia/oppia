@@ -24,6 +24,7 @@ oppia.factory('AnswerClassificationResultObjectFactory', [function() {
     this.answerGroupIndex = answerGroupIndex;
     this.ruleIndex = ruleIndex;
     this.classificationCategorization = classificationCategorization;
+    this.createNew = null;
   };
 
   AnswerClassificationResult.createNew = function(

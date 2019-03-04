@@ -37,7 +37,7 @@ describe('Testing filters', function() {
     'getAbbreviatedText'
   ];
 
-  beforeEach(angular.mock.angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   it('should have all expected filters', angular.mock.inject(function($filter) {
     angular.forEach(filterNames, function(filterName) {

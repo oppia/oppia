@@ -58,10 +58,12 @@ oppia.directive('adminMiscTab', [
         };
 
         $scope.uploadTopicSimilaritiesFile = function() {
-          var file = document.getElementById('topicSimilaritiesFile').files[0];
+          var file = (
+            <HTMLInputElement>document.getElementById(
+              'topicSimilaritiesFile')).files[0];
           var reader = new FileReader();
           reader.onload = function(e) {
-            var data = e.target.result;
+            var data = (<FileReader>e.target).result;
             $http.post(ADMIN_HANDLER_URL, {
               action: 'upload_topic_similarities',
               data: data

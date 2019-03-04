@@ -56,12 +56,16 @@ describe('States object factory', function() {
               content_id: 'default_outcome',
               html: ''
             },
-            param_changes: []
+            param_changes: [],
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           hints: [],
           id: 'TextInput'
         },
-        param_changes: []
+        param_changes: [],
       };
 
       statesDict = {

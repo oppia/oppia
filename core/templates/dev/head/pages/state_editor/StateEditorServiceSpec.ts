@@ -43,7 +43,7 @@ describe('Editor state service', function() {
     });
 
     it('should correctly return answer choices for interaction', function() {
-      var customizationArgs = {
+      var customizationArgsForMultipleChoiceInput = {
         choices: {
           value: [
             'Choice 1',
@@ -52,7 +52,8 @@ describe('Editor state service', function() {
         }
       };
       expect(
-        ecs.getAnswerChoices('MultipleChoiceInput', customizationArgs)
+        ecs.getAnswerChoices(
+          'MultipleChoiceInput', customizationArgsForMultipleChoiceInput)
       ).toEqual([{
         val: 0,
         label: 'Choice 1',
@@ -61,7 +62,7 @@ describe('Editor state service', function() {
         label: 'Choice 2',
       }]);
 
-      customizationArgs = {
+      var customizationArgsForImageClickInput = {
         imageAndRegions: {
           value: {
             labeledRegions: [{
@@ -73,7 +74,8 @@ describe('Editor state service', function() {
         }
       };
       expect(
-        ecs.getAnswerChoices('ImageClickInput', customizationArgs)
+        ecs.getAnswerChoices(
+          'ImageClickInput', customizationArgsForImageClickInput)
       ).toEqual([{
         val: 'Label 1',
         label: 'Label 1',
@@ -82,7 +84,7 @@ describe('Editor state service', function() {
         label: 'Label 2',
       }]);
 
-      customizationArgs = {
+      var customizationArgsForItemSelectionAndDragAndDropInput = {
         choices: {
           value: [
             'Choice 1',
@@ -91,7 +93,9 @@ describe('Editor state service', function() {
         }
       };
       expect(
-        ecs.getAnswerChoices('ItemSelectionInput', customizationArgs)
+        ecs.getAnswerChoices(
+          'ItemSelectionInput',
+          customizationArgsForItemSelectionAndDragAndDropInput)
       ).toEqual([{
         val: 'Choice 1',
         label: 'Choice 1',
@@ -100,7 +104,9 @@ describe('Editor state service', function() {
         label: 'Choice 2',
       }]);
       expect(
-        ecs.getAnswerChoices('DragAndDropSortInput', customizationArgs)
+        ecs.getAnswerChoices(
+          'DragAndDropSortInput',
+          customizationArgsForItemSelectionAndDragAndDropInput)
       ).toEqual([{
         val: 'Choice 1',
         label: 'Choice 1',

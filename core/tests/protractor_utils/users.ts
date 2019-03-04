@@ -17,6 +17,7 @@
  * carrying out end-to-end testing with protractor.
  */
 
+import {protractor} from 'protractor/globals';
 import {element, browser, by} from 'protractor';
 
 var forms = require('./forms.js');
