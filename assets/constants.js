@@ -456,6 +456,8 @@ var constants = {
 
   "ENABLE_NEW_STRUCTURE_EDITORS": true,
 
+  "ENABLE_PREREQUISITE_SKILLS": false,
+
   "ENABLE_NEW_STRUCTURE_PLAYERS": false,
 
   "NUM_QUESTIONS_PER_PAGE": 10,
@@ -499,8 +501,6 @@ var constants = {
   },
 
   "ALLOW_YAML_FILE_UPLOAD": false,
-
-  "CURRENT_STATES_SCHEMA_VERSION": 27,
 
   "DEV_MODE": true
 };

@@ -1,13 +1,5 @@
 <style>
-  /* Fixes for Google Maps zoom controls. */
-  .gm-style img {
-    max-width: none;
-  }
-  .gm-style label {
-    width: auto; display:inline;
-  }
-
-  #map_canvas {
+  .oppia-interactive-map {
     height: 400px;
     margin: auto;
     max-height: 400px;
@@ -22,10 +14,10 @@
   }
 
   @media screen and (max-width: 559px) {
-    #map_canvas {
-      max-width: 100vw;
-      min-width: 100vw;
-      width: 100vw;
+    .oppia-interactive-map {
+      max-width: 83vw;
+      min-width: 83vw;
+      width: 83vw;
     }
 
     .interactive-map-container {
@@ -36,9 +28,12 @@
 
 <div class="interactive-map-container">
   <div ng-style="overlayStyle">
-    <div id="map_canvas" ng-style="mapStyle" ui-map="map" ui-options="mapOptions"
-         ui-event="{'map-click': 'registerClick($event, $params)', 'map-mouseover': 'onMouseOver()',
-                   'map-mouseout': 'onMouseOut()'}">
-    </div>
+    <leaflet id="interactiveMap"
+             class="oppia-interactive-map"
+             defaults="mapOptions.defaults"
+             event-broadcast="mapOptions.events"
+             lf-center="mapOptions.center"
+             markers="mapMarkers">
+    </leaflet>
   </div>
 </div>
