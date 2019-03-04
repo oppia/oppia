@@ -19,7 +19,9 @@
 describe('Player position service', function() {
   beforeEach(module('oppia'));
 
-  var pts = null, pps = null, scof = null;
+  var pts = null;
+  var pps = null;
+  var scof = null;
   beforeEach(inject(function($injector) {
     pts = $injector.get('PlayerTranscriptService');
     pps = $injector.get('PlayerPositionService');

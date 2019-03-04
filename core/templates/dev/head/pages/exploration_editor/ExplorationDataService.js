@@ -87,7 +87,7 @@ oppia.factory('ExplorationDataService', [
           }
         }, function() {
           if (errorCallback) {
-            errorCallback();
+            errorCallback;
           }
         });
       },
