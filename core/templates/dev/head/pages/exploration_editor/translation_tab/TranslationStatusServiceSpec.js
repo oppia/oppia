@@ -32,39 +32,47 @@ describe('Translation status service', function() {
         return ['First', 'Second', 'Third'];
       },
       getContentIdsToAudioTranslationsMemento: function(stateName) {
-        var citatDict = {First: {
-          content: {
-            en: {
-              filename: 'filename1.mp3',
-              file_size_bytes: 100000,
-              needs_update: true
-            }},
-          default_outcome: {},
-          feedback_1: {},
-          feedback_2: {
-            en: {
-              filename: 'filename2.mp3',
-              file_size_bytes: 100000,
-              needs_update: false
-            }}},
-        Second: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {},
-          feedback_2: {}
-        },
-        Third: {
-          content: {
-            en: {
-              filename: 'filename3.mp3',
-              file_size_bytes: 100000,
-              needs_update: false
-            }}}};
-        return ContentIdsToAudioTranslationsObjectFactory.
-          createFromBackendDict(citatDict[stateName]);
+        var citatDict = {
+          First: {
+            content: {
+              en: {
+                filename: 'filename1.mp3',
+                file_size_bytes: 100000,
+                needs_update: true
+              }
+            },
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {
+              en: {
+                filename: 'filename2.mp3',
+                file_size_bytes: 100000,
+                needs_update: false
+              }
+            }
+          },
+          Second: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          },
+          Third: {
+            content: {
+              en: {
+                filename: 'filename3.mp3',
+                file_size_bytes: 100000,
+                needs_update: false
+              }
+            }
+          }
+        };
+        return ContentIdsToAudioTranslationsObjectFactory
+        .createFromBackendDict(citatDict[stateName]);
       },
       getInteractionIdMemento: function(stateName) {
-        var interactionIds = {First: 'MultipleChoiceInput',
+        var interactionIds = {
+          First: 'MultipleChoiceInput',
           Second: 'MultipleChoiceInput',
           Third: 'EndExploration'};
         return interactionIds[stateName];
@@ -83,14 +91,19 @@ describe('Translation status service', function() {
   }));
 
   describe('Translation status service', function() {
+    var ess = null;
+    var StateContentIdsToAudioTranslationsService = null;
     var tss = null;
+    var ALL_AUDIO_AVAILABLE_COLOR = '#16A765';
+    var FEW_AUDIO_AVAILABLE_COLOR = '#E9B330';
+    var NO_AUDIO_AVAILABLE_COLOR = '#D14836';
     beforeEach(inject(function($injector) {
       tss = $injector.get('TranslationStatusService');
       ess = $injector.get('ExplorationStatesService');
-      ContentIdsToAudioTranslationsObjectFactory = $injector.get(
-        'ContentIdsToAudioTranslationsObjectFactory');
       StateContentIdsToAudioTranslationsService = $injector.get(
         'StateContentIdsToAudioTranslationsService');
+      ContentIdsToAudioTranslationsObjectFactory = $injector.get(
+       'ContentIdsToAudioTranslationsObjectFactory');
 
       // To call _computeAllStatesStatus() function of
       // TranslationStatusService, so that the status of all states is
@@ -102,65 +115,65 @@ describe('Translation status service', function() {
       'audio needs update', function() {
       var statesNeedingAudioUpdate = tss.getAllStatesNeedUpdatewarning();
       expect(Object.keys(statesNeedingAudioUpdate).length).toBe(1);
-      expect(statesNeedingAudioUpdate.First.
-        indexOf('Audio needs update!')).toBe(0);
+      expect(statesNeedingAudioUpdate.First.indexOf(
+      	'Audio needs update!')).toBe(0);
     });
 
     it('should return a correct count of audio translations required ' +
       'in an exploration', function() {
-      var explorationAudioRequiredCount = tss.
-        getExplorationAudioRequiredCount();
+      var explorationAudioRequiredCount = tss
+      .getExplorationAudioRequiredCount();
       expect(explorationAudioRequiredCount).toBe(9);
     });
 
     it('should return a correct count of audio translations not available ' +
       'in an exploration', function() {
-      var explorationAudioNotAvailableCount = tss.
-        getExplorationAudioNotAvailableCount();
+      var explorationAudioNotAvailableCount = tss
+      .getExplorationAudioNotAvailableCount();
       expect(explorationAudioNotAvailableCount).toBe(6);
     });
 
     it('should correctly return an object contaning status colors of all ' +
       'states in exploration', function() {
       var stateWiseStatusColor = tss.getAllStateStatusColors();
-      expect(stateWiseStatusColor.First).toBe('#E9B330');
-      expect(stateWiseStatusColor.Second).toBe('#D14836');
-      expect(stateWiseStatusColor.Third).toBe('#16A765');
+      expect(stateWiseStatusColor.First).toBe(FEW_AUDIO_AVAILABLE_COLOR);
+      expect(stateWiseStatusColor.Second).toBe(NO_AUDIO_AVAILABLE_COLOR);
+      expect(stateWiseStatusColor.Third).toBe(ALL_AUDIO_AVAILABLE_COLOR);
     });
 
     it('should return correct status color for active state', function() {
       StateContentIdsToAudioTranslationsService.init(
         'First', ess.getContentIdsToAudioTranslationsMemento('First'));
-      var activeStateComponentStatus = tss.
-        getActiveStateComponentStatusColor('content');
-      expect(activeStateComponentStatus).toBe('#16A765');
-      activeStateComponentStatus = tss.
-        getActiveStateComponentStatusColor('feedback');
-      expect(activeStateComponentStatus).toBe('#E9B330');
+      var activeStateComponentStatus = tss
+      .getActiveStateComponentStatusColor('content');
+      expect(activeStateComponentStatus).toBe(ALL_AUDIO_AVAILABLE_COLOR);
+      activeStateComponentStatus = tss
+      .getActiveStateComponentStatusColor('feedback');
+      expect(activeStateComponentStatus).toBe(FEW_AUDIO_AVAILABLE_COLOR);
       StateContentIdsToAudioTranslationsService.init(
         'Second', ess.getContentIdsToAudioTranslationsMemento('Second'));
-      activeStateComponentStatus = tss.
-        getActiveStateComponentStatusColor('content');
-      expect(activeStateComponentStatus).toBe('#D14836');
-      activeStateComponentStatus = tss.
-        getActiveStateComponentStatusColor('feedback');
-      expect(activeStateComponentStatus).toBe('#D14836');
+      activeStateComponentStatus = tss
+      .getActiveStateComponentStatusColor('content');
+      expect(activeStateComponentStatus).toBe(NO_AUDIO_AVAILABLE_COLOR);
+      activeStateComponentStatus = tss
+      .getActiveStateComponentStatusColor('feedback');
+      expect(activeStateComponentStatus).toBe(NO_AUDIO_AVAILABLE_COLOR);
       StateContentIdsToAudioTranslationsService.init(
         'Third', ess.getContentIdsToAudioTranslationsMemento('Third'));
-      activeStateComponentStatus = tss.
-        getActiveStateComponentStatusColor('content');
-      expect(activeStateComponentStatus).toBe('#16A765');
+      activeStateComponentStatus = tss
+      .getActiveStateComponentStatusColor('content');
+      expect(activeStateComponentStatus).toBe(ALL_AUDIO_AVAILABLE_COLOR);
     });
 
     it('should correctly return whether audio translation(s) of ' +
       'active state component need(s) update', function() {
       StateContentIdsToAudioTranslationsService.init(
         'First', ess.getContentIdsToAudioTranslationsMemento('First'));
-      var activeStateComponentNeedsUpdateStatus = tss.
-        getActiveStateComponentNeedsUpdateStatus('content');
+      var activeStateComponentNeedsUpdateStatus = tss
+      .getActiveStateComponentNeedsUpdateStatus('content');
       expect(activeStateComponentNeedsUpdateStatus).toBe(true);
-      activeStateComponentNeedsUpdateStatus = tss.
-        getActiveStateComponentNeedsUpdateStatus('feedback');
+      activeStateComponentNeedsUpdateStatus = tss
+      .getActiveStateComponentNeedsUpdateStatus('feedback');
       expect(activeStateComponentNeedsUpdateStatus).toBe(false);
     });
 
@@ -168,27 +181,27 @@ describe('Translation status service', function() {
       function() {
         StateContentIdsToAudioTranslationsService.init(
           'First', ess.getContentIdsToAudioTranslationsMemento('First'));
-        var activeStateContentIdStatusColor = tss.
-          getActiveStateContentIdStatusColor('content');
-        expect(activeStateContentIdStatusColor).toBe('#16A765');
+        var activeStateContentIdStatusColor = tss
+        .getActiveStateContentIdStatusColor('content');
+        expect(activeStateContentIdStatusColor).toBe(ALL_AUDIO_AVAILABLE_COLOR);
         StateContentIdsToAudioTranslationsService.init(
           'Second', ess.getContentIdsToAudioTranslationsMemento('Second'));
-        activeStateContentIdStatusColor = tss.
-          getActiveStateContentIdStatusColor('content');
-        expect(activeStateContentIdStatusColor).toBe('#D14836');
+        activeStateContentIdStatusColor = tss
+        .getActiveStateContentIdStatusColor('content');
+        expect(activeStateContentIdStatusColor).toBe(NO_AUDIO_AVAILABLE_COLOR);
       });
 
     it('should return whether audio translation(s) of active ' +
       'state contentId needs update status', function() {
       StateContentIdsToAudioTranslationsService.init(
         'First', ess.getContentIdsToAudioTranslationsMemento('First'));
-      var activeStateContentIdNeedsUpdateStatus = tss.
-        getActiveStateContentIdNeedsUpdateStatus('content');
+      var activeStateContentIdNeedsUpdateStatus = tss
+      .getActiveStateContentIdNeedsUpdateStatus('content');
       expect(activeStateContentIdNeedsUpdateStatus).toBe(true);
       StateContentIdsToAudioTranslationsService.init(
         'Third', ess.getContentIdsToAudioTranslationsMemento('Third'));
-      activeStateContentIdNeedsUpdateStatus = tss.
-        getActiveStateContentIdNeedsUpdateStatus('content');
+      activeStateContentIdNeedsUpdateStatus = tss
+      .getActiveStateContentIdNeedsUpdateStatus('content');
       expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
     });
   });
