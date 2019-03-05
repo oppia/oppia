@@ -137,9 +137,12 @@ describe('Translation status service', function() {
       'states in exploration', function() {
       var stateNames = ess.getStateNames();
       var stateWiseStatusColor = tss.getAllStateStatusColors();
-      expect(stateWiseStatusColor[stateNames[0]]).toBe(FEW_AUDIO_AVAILABLE_COLOR);
-      expect(stateWiseStatusColor[stateNames[1]]).toBe(NO_AUDIO_AVAILABLE_COLOR);
-      expect(stateWiseStatusColor[stateNames[2]]).toBe(ALL_AUDIO_AVAILABLE_COLOR);
+      expect(stateWiseStatusColor[stateNames[0]]).toBe(
+        FEW_AUDIO_AVAILABLE_COLOR);
+      expect(stateWiseStatusColor[stateNames[1]]).toBe(
+        NO_AUDIO_AVAILABLE_COLOR);
+      expect(stateWiseStatusColor[stateNames[2]]).toBe(
+        ALL_AUDIO_AVAILABLE_COLOR);
     });
 
     it('should return correct status color for active state', function() {
