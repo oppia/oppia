@@ -348,7 +348,7 @@ def can_edit_suggestion(handler):
                 return handler(self, credentials_to_check['suggestion_id'])
             else:
                 raise base.UserFacingExceptions.UnauthorizedUserException(
-                    'You do not have credentials to edit this exploration.')
+                    'You do not have credentials to edit this suggestion.')
 
         elif credentials_to_check['target_type'] == 'collection':
             if users_which_having_rights['page_not_found']:
@@ -358,7 +358,7 @@ def can_edit_suggestion(handler):
                 return handler(self, credentials_to_check['suggestion_id'])
             else:
                 raise base.UserFacingExceptions.UnauthorizedUserException(
-                    'You do not have credentials to edit this collection.')
+                    'You do not have credentials to edit this suggestion.')
 
     test_can_edit_suggestion.__wrapped__ = True
 

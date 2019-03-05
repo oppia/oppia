@@ -188,6 +188,52 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 3)
         self.logout()
 
+    def test_edit_suggestion(self):
+
+        suggestion = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id_2))['suggestions'][1]
+
+        # Create new content for exploration after edit.
+        self.new_content_after_edit = state_domain.SubtitledHtml(
+            'content', 'new edit content html').to_dict()
+
+        target_type = suggestion_models.TARGET_TYPE_EXPLORATION
+        target_id = '/exp1'
+        suggestion_id = '/' + suggestion['suggestion_id']
+
+        # Change that needs to be done in submitted suggestion.
+        change = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'State 3',
+            'old_value': self.new_content,
+            'new_value': self.new_content_after_edit
+        }
+
+        self.login(self.AUTHOR_EMAIL_2)
+        response = self.get_html_response('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Put suggestion after some change.
+        self.put_json(
+            ('/suggestionactionhandler/edit/' + target_type + target_id
+                + suggestion_id), {
+                'action': 'edit',
+                'summary_message': 'summary message',
+                'change': change
+            }, csrf_token=csrf_token)
+
+        # Get suggestion after edit.
+        suggestion_after_edit = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id_2))['suggestions'][1]
+
+        self.assertEqual(change, suggestion_after_edit['change'])
+        self.logout()
+
     def test_accept_suggestion(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
