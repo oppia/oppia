@@ -210,7 +210,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml(
                     '1', 'Explanation'), [
                         state_domain.SubtitledHtml('2', 'Example 1')],
-                {'1': {}, '2': {}}))
+                {'1': {}, '2': {}},
+                state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})))
         with self.assertRaisesRegexp(
             Exception,
             'Cannot assign unpublished skills to a topic'):
