@@ -6,9 +6,10 @@
         This is the name of the skill as visible to learners and other creators.
       </div>
       <p ng-class="{'has-error': !tmpSkillDescription.length > 0}">
-        <input type="text" class="form-control" ng-disabled="!canEditSkillDescription()"
+        <input type="text" class="form-control protractor-test-skill-description-field" ng-if="canEditSkillDescription()"
                ng-model="tmpSkillDescription" ng-blur="saveSkillDescription(tmpSkillDescription)"
                maxlength="40" ng-trim="false">
+        <span ng-if="!canEditSkillDescription()"><[tmpSkillDescription]></span>
         <span ng-if="tmpSkillDescription.length === 40" class="help-block" style="color: red; font-size: smaller">
           <em>Please use at most 40 characters.</em>
         </span>
