@@ -80,9 +80,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             subtopic_pages[0].to_dict(), self.subtopic_page.to_dict())
         subtopic_ids = [2]
-        with self.assertRaises(AttributeError):
-            subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
-                self.TOPIC_ID, subtopic_ids)
+        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
+            self.TOPIC_ID, subtopic_ids)
+        self.assertEqual(subtopic_pages, None)
 
     def test_get_subtopic_page_contents_by_id(self):
         self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
