@@ -184,6 +184,7 @@ describe('ItemSelectionInputValidationService', function() {
       // Modify values of customization arguments, to get warning
       customizationArguments.minAllowableSelectionCount.value = 0;
       customizationArguments.maxAllowableSelectionCount.value = 1;
+   
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, IsProperSubsetValidOption,
         goodDefaultOutcome);
@@ -191,6 +192,7 @@ describe('ItemSelectionInputValidationService', function() {
         type: WARNING_TYPES.ERROR,
         message: (
          'In answer group 1, ' + 
-         'rule  1, Is proper subset, needs at least 2 options.')
-    }
+         'rule 1, Is proper subset, needs at least 2 options.')
+    }]);
+  });
 });

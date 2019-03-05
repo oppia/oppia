@@ -133,7 +133,7 @@ oppia.factory('ItemSelectionInputValidationService', [
                   }
                 } else if (rule.type === 'IsProperSubsetOf') {
                   handledAnswers[choiceIndex] = true;
-                  if (ruleInput.length < 2) {
+                  if (ruleInputs.length < 2) {
                     warningsList.push({
                       type: WARNING_TYPES.ERROR,
                       message: (
