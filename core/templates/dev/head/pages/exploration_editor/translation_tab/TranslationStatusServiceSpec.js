@@ -17,7 +17,7 @@
  */
 
 describe('Translation status service', function() {
-  beforeEach(module('oppia', function($provide, $injector) {
+  beforeEach(module('oppia', function($provide) {
     $provide.value('TranslationLanguageService', {
       getActiveLanguageCode: function() {
         return 'en';
@@ -88,6 +88,11 @@ describe('Translation status service', function() {
         is_terminal: false
       }
     });
+  }));
+
+  beforeEach(inject(function($injector) {
+    var ContentIdsToAudioTranslationsObjectFactory = $injector.get(
+      'ContentIdsToAudioTranslationsObjectFactory');
   }));
 
   describe('Translation status service', function() {
