@@ -5,6 +5,12 @@
 # are allowed. For information about supported glob patterns please refer
 # https://docs.python.org/2/library/glob.html.
 
+# Note: The e2e test files are owned by both the dev workflow and QA teams.
+# - The QA team will do an initial review to verify the PR's test coverage. They
+#   will then ask the dev workflow team for a final review.
+# - The dev workflow team will review the code quality to see if the e2e tests
+#   can be optimized further.
+
 # Answer classification team.
 /core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08
@@ -48,12 +54,13 @@
 /core/templates/dev/head/domain/exploration/ @DubeySandeep
 /core/templates/dev/head/domain/state/ @aks681
 /core/templates/dev/head/domain/state_card/ @aks681
-/core/templates/dev/head/pages/exploration_editor/editor_tab @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/history_tab @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/preview_tab @aks681
-/core/templates/dev/head/pages/exploration_editor/settings_tab @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/editor_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/history_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/preview_tab/ @aks681
+/core/templates/dev/head/pages/exploration_editor/settings_tab/ @DubeySandeep
 /core/templates/dev/head/pages/exploration_player/ @aks681
 /core/templates/dev/head/pages/state_editor/ @aks681
+/core/templates/dev/head/components/state/ @aks681
 
 
 # Forms pages.
@@ -87,15 +94,16 @@
 
 
 # Lesson Analytics team.
-/core/domain/stats*.py @brianrodri
-/core/storage/statistics/ @brianrodri
-/core/templates/dev/head/domain/statistics/ @brianrodri
-/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @brianrodri
-/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @brianrodri
-/extensions/actions/ @brianrodri
-/extensions/answer_summarizers/ @brianrodri
-/extensions/issues/ @brianrodri
-/extensions/visualizations/ @brianrodri
+# TODO(brianrodri): Revert ownership to @brianrodri after 2019-03-31.
+/core/domain/stats*.py @seanlip
+/core/storage/statistics/ @seanlip
+/core/templates/dev/head/domain/statistics/ @seanlip
+/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @seanlip
+/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @seanlip
+/extensions/actions/ @seanlip
+/extensions/answer_summarizers/ @seanlip
+/extensions/issues/ @seanlip
+/extensions/visualizations/ @seanlip
 
 
 # Library page.
@@ -168,6 +176,10 @@
 /core/templates/dev/head/pages/admin/ @seanlip
 /core/templates/dev/head/pages/moderator/ @seanlip
 /.github/CODEOWNERS @seanlip
+
+
+# QA team.
+/core/tests/ @nithusha21
 
 
 # Rich text editor team.

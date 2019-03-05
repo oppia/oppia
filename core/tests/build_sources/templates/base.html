@@ -83,7 +83,6 @@
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
         status_code: JSON.parse('{{status_code}}'),
         GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
-        SITE_FEEDBACK_FORM_URL: JSON.parse('{{SITE_FEEDBACK_FORM_URL|js_string}}'),
         iframed: JSON.parse('{{iframed|js_string}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),
         isModerator: JSON.parse('{{is_moderator|js_string}}'),
@@ -160,7 +159,7 @@
         </div>
       </div>
 
-      <div ng-if="DEV_MODE" class="oppia-dev-mode">
+      <div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>
         Dev Mode
       </div>
 

@@ -349,6 +349,7 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         commit_cmds: list(SkillChange). A list of change commands made to the
             given skill.
     """
+    skill.validate()
     create_new_skill_rights(skill.id, committer_id)
     model = skill_models.SkillModel(
         id=skill.id,
@@ -491,6 +492,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
             'save skill %s: %s' % (skill.id, change_list))
+    skill.validate()
 
     skill_model = skill_models.SkillModel.get(
         skill.id, strict=False)
