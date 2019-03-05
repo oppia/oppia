@@ -89,15 +89,16 @@
 
 
 # Lesson Analytics team.
-/core/domain/stats*.py @seanlip  # TODO(brianrodri): Revert ownership to Brian after 2019-03-31
-/core/storage/statistics/ @seanlip  # TODO(brianrodri): Revert ownership to Brian after 2019-03-31
-/core/templates/dev/head/domain/statistics/ @seanlip  # TODO(brianrodri): Revert ownership to Brian after 2019-03-31
-/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @seanlip  # TODO(brianrodri): Revert ownership to Brian after 2019-03-31
-/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @seanlip  # TODO(brianrodri): Revert ownership to Brian after 2019-03-31
-/extensions/actions/ @seanlip  # TODO(brianrodri): Revert ownership to Brian after 2019-03-31
-/extensions/answer_summarizers/ @seanlip  # TODO(brianrodri): Revert ownership to Brian after 2019-03-31
-/extensions/issues/ @seanlip  # TODO(brianrodri): Revert ownership to Brian after 2019-03-31
-/extensions/visualizations/ @seanlip  # TODO(brianrodri): Revert ownership to Brian after 2019-03-31
+# TODO(brianrodri): Revert ownership to Brian after 2019-03-31
+/core/domain/stats*.py @seanlip
+/core/storage/statistics/ @seanlip
+/core/templates/dev/head/domain/statistics/ @seanlip
+/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @seanlip
+/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @seanlip
+/extensions/actions/ @seanlip
+/extensions/answer_summarizers/ @seanlip
+/extensions/issues/ @seanlip
+/extensions/visualizations/ @seanlip
 
 
 # Library page.
