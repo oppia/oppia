@@ -27,18 +27,27 @@ var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
+var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
   var topicId = null;
+  var skillEditorPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
 
   beforeAll(function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
     topicsAndSkillsDashboardPage.get();
@@ -77,6 +86,61 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectNumberOfSubtopicsToBe(1);
     topicEditorPage.deleteSubtopicWithIndex(0);
     topicEditorPage.expectNumberOfSubtopicsToBe(0);
+  });
+
+  it('should edit subtopic page contents correctly', function() {
+    topicEditorPage.moveToSubtopicsTab();
+    topicEditorPage.editSubtopicWithIndex(0);
+    topicEditorPage.changeSubtopicTitle('Modified Title');
+    topicEditorPage.changeSubtopicPageContents(
+      forms.toRichText('Subtopic Contents'));
+    topicEditorPage.saveSubtopic();
+    topicEditorPage.saveTopic('Edited subtopic.');
+
+    topicEditorPage.get(topicId);
+    topicEditorPage.moveToSubtopicsTab();
+    topicEditorPage.expectTitleOfSubtopicWithIndexToMatch('Modified Title', 0);
+    topicEditorPage.editSubtopicWithIndex(0);
+    topicEditorPage.expectSubtopicPageContentsToMatch('Subtopic Contents');
+  });
+
+  it('should create a question for a skill in the topic', function() {
+    var skillId = null;
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createSkillWithDescription('Skill 1');
+    browser.getCurrentUrl().then(function(url) {
+      skillId = url.split('/')[4];
+      skillEditorPage.editConceptCard('Concept card explanation');
+      skillEditorPage.saveOrPublishSkill('Added review material.');
+      skillEditorPage.firstTimePublishSkill();
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+      topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+
+      topicEditorPage.get(topicId);
+      topicEditorPage.moveToQuestionsTab();
+      topicEditorPage.createQuestionForSkillWithIndex(0);
+      explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
+      explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
+      explorationEditorMainTab.addResponse(
+        'TextInput', forms.toRichText('Correct Answer'), null, false,
+        'FuzzyEquals', 'correct');
+      explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
+      explorationEditorMainTab.addHint('Hint 1');
+      explorationEditorMainTab.addSolution('TextInput', {
+        correctAnswer: 'correct',
+        explanation: 'It is correct'
+      });
+      topicEditorPage.saveQuestion();
+
+      topicEditorPage.get(topicId);
+      topicEditorPage.moveToQuestionsTab();
+      topicEditorPage.expectNumberOfQuestionsToBe(1);
+
+      skillEditorPage.get(skillId);
+      skillEditorPage.moveToQuestionsTab();
+      skillEditorPage.expectNumberOfQuestionsToBe(1);
+    });
   });
 
   it('should add a canonical story to topic correctly', function() {

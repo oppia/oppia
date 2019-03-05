@@ -89,7 +89,7 @@ var SkillEditorPage = function() {
     return waitFor.pageToFullyLoad();
   };
 
-  this.expectNumberofQuestionsToBe = function(count) {
+  this.expectNumberOfQuestionsToBe = function(count) {
     waitFor.visibilityOf(
       questionItem, 'Question takes too long to appear');
     questionItems.then(function(items) {
