@@ -70,7 +70,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(1, len(messages))
         self.assertFalse(hasattr(messages, 'bcc'))
 
-    def test_that_email_has_reply_to_email_if_passed(self):
+    def test_sending_email_with_reply_to_id_adds_reply_to_email(self):
         reply_to = 'reply_to_address'
 
         # Tests that email has reply_to_id if passed.
@@ -155,6 +155,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         self.assertEqual(len(message_b), 0)
 
     def test_that_bulk_mails_not_sent_if_sender_email_is_malformed(self):
+
         malformed_sender_email = ''
         email_exception = (self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
@@ -170,7 +171,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
             to=self.RECIPIENT_EMAILS[1])
         self.assertEqual(0, len(message_b))
 
-    def test_that_bulk_mails_not_sent_if_recepient_email_is_malformed(self):
+    def test_that_bulk_mails_not_sent_if_recipient_email_is_malformed(self):
         malformed_recipient_emails = ['', '']
         email_exception = (self.assertRaisesRegexp(
             ValueError, 'Malformed recipient email address: %s'
