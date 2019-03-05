@@ -17,10 +17,13 @@
 """Script that simplifies releases by collecting various information.
 Should be run from the oppia root dir.
 """
+import argparse
 import collections
 import os
 import re
 import subprocess
+
+import github
 
 GIT_CMD_GET_STATUS = 'git status'
 GIT_CMD_GET_TAGS = 'git tag'
@@ -31,13 +34,23 @@ GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'
 GIT_CMD_SHOW_FORMAT_STRING = 'git show %s:feconf.py'
 ISSUE_URL_FORMAT_STRING = 'https://github.com/oppia/oppia/issues/%s'
 ISSUE_REGEX = re.compile(r'#(\d+)')
+PR_NUMBER_REGEX = re.compile(r'\(#(\d+)\)')
 GROUP_SEP = '\x1D'
 VERSION_RE_FORMAT_STRING = r'%s\s*=\s*(\d+|\.)+'
 FECONF_VAR_NAMES = ['CURRENT_STATES_SCHEMA_VERSION',
                     'CURRENT_COLLECTION_SCHEMA_VERSION']
 FIRST_OPPIA_COMMIT = '6a7138f5f603375e58d1dc3e1c4f1c80a126e249'
+NO_LABEL_CHANGELOG_CATEGORY = 'Uncategorized'
 
 Log = collections.namedtuple('Log', ['sha1', 'author', 'email', 'message'])
+
+_PARSER = argparse.ArgumentParser()
+_PARSER.add_argument(
+    '--personal_access_token',
+    help=(
+        'Personal access token for your github ID. '
+        'You can create one at https://github.com/settings/tokens'),
+    type=str)
 
 
 def _run_cmd(cmd_str):
@@ -119,6 +132,71 @@ def _extract_issues(logs):
     return links
 
 
+def _extract_pr_numbers(logs):
+    """Extract PR numbers out of a list of Logs
+
+    Args:
+        logs: list(Log). List of Logs to parse
+
+    Returns:
+        set(int): Set of PR numbers extracted from the log.
+    """
+    pr_numbers = PR_NUMBER_REGEX.findall(
+        ' '.join([log.message for log in logs]))
+    # Delete duplicates.
+    return list(set(pr_numbers))
+
+
+def get_prs_from_pr_numbers(pr_numbers, personal_access_token):
+    """Returns a list of PRs corresponding to the numbers provided.
+
+    Args:
+        pr_numbers: list(int). List of PR numbers.
+        personal_access_token: str. The personal access token of the user.
+
+    Returns:
+        list(github.PullRequest.PullRequest). The list of references to the PRs.
+    """
+    g = github.Github(personal_access_token)
+    repo = g.get_organization('oppia').get_repo('oppia')
+    pulls = [repo.get_pull(int(num)) for num in pr_numbers]
+    return list(pulls)
+
+
+def get_changelog_categories(pulls):
+    """Categorizes the given PRs into various changelog categories
+
+    Args:
+        pulls: list(github.PullRequest.PullRequest). The list of PRs to be
+            categorized.
+
+    Returns:
+        dict(str, list(str)). A list where the keys are the various changelog
+            labels, and the values are the titles of the PRs that fall under
+            that category.
+    """
+    result = {}
+    for pull in pulls:
+        labels = pull.labels
+        added_to_dict = False
+        formatted_title = '%s (#%d)' % (pull.title, pull.number)
+        for label in labels:
+            if 'CHANGELOG:' in label.name:
+                category = label.name[label.name.find(':') + 2:]
+                added_to_dict = True
+                if category in result.keys():
+                    result[category].append(formatted_title)
+                else:
+                    result[category] = [formatted_title]
+                break
+        if not added_to_dict:
+            if NO_LABEL_CHANGELOG_CATEGORY in result.keys():
+                result[NO_LABEL_CHANGELOG_CATEGORY].append(formatted_title)
+            else:
+                result[NO_LABEL_CHANGELOG_CATEGORY] = [formatted_title]
+    return result
+
+
 def _check_versions(current_release):
     """Checks if the versions for the exploration or collection schemas have
     changed.
@@ -198,11 +276,12 @@ def _check_storage_models(current_release):
 
 def main():
     """Collects necessary info and dumps it to disk."""
-    branch_name = _get_current_branch()
+    branch_name = 'release-2.7.4'
     if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
         raise Exception(
             'This script should only be run from the latest release branch.')
-
+    parsed_args = _PARSER.parse_args()
+    personal_access_token = parsed_args.personal_access_token
     current_release = _get_current_version_tag()
     base_commit = _get_base_commit_with_develop(current_release)
     new_release_logs = _gather_logs(base_commit)
@@ -211,6 +290,10 @@ def main():
     feconf_version_changes = _check_versions(current_release)
     setup_changes = _check_setup_scripts(current_release)
     storage_changes = _check_storage_models(current_release)
+
+    pr_numbers = _extract_pr_numbers(new_release_logs)
+    prs = get_prs_from_pr_numbers(pr_numbers, personal_access_token)
+    categorized_pr_titles = get_changelog_categories(prs)
 
     summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
     with open(summary_file, 'w') as out:
@@ -269,6 +352,13 @@ def main():
         out.write(
             '``Thanks to %s, our returning contributors who made this release '
             'possible.``\n' % existing_author_comma_list)
+
+        out.write('\n### Changelog: \n')
+        for category in categorized_pr_titles:
+            out.write('%s\n' % category)
+            for pr_title in categorized_pr_titles[category]:
+                out.write('* %s\n' % pr_title)
+            out.write('\n')
 
         out.write('\n### Commit History:\n')
         for name, title in [(log.author, log.message.split('\n\n')[0])

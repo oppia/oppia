@@ -203,6 +203,13 @@ if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
   fi
 fi
 
+echo Checking if PyGithub is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/PyGithub-1.43.5" ]; then
+  echo Installing PyGithub
+
+  pip install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5"
+fi
+
 # install pre-push script
 echo Installing pre-push hook for git
 $PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install
