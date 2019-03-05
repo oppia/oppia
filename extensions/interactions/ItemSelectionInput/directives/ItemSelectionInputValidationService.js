@@ -139,7 +139,7 @@ oppia.factory('ItemSelectionInputValidationService', [
                       message: (
                         'In answer group ' + (answerIndex + 1) + ', ' +
                         'rule ' + (ruleIndex + 1) + ', ' +
-                        'Is proper subset, needs at least 2 options')
+                        'Is proper subset, needs at least 2 options.')
                     });
                   }
                 } else if (rule.type === 'ContainsAtLeastOneOf') {

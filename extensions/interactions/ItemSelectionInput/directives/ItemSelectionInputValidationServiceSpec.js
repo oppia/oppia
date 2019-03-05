@@ -68,6 +68,17 @@ describe('ItemSelectionInputValidationService', function() {
       false,
       null)
     ];
+    IsProperSubsetValidOption = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'IsProperSubsetOf',
+        inputs: {
+          x: ['Selection 1']
+        }
+      })],
+      goodDefaultOutcome,
+      false,
+      null)
+    ];
   }));
 
   it('should be able to perform basic validation', function() {
@@ -165,4 +176,21 @@ describe('ItemSelectionInputValidationService', function() {
       message: 'Please ensure the choices are unique.'
     }]);
   });
+
+  it(
+    'Should give a warning, if max allowed choices = 1, and ' +
+    'Proper subset rule is used',
+    function(){
+      // Modify values of customization arguments, to get warning
+      customizationArguments.minAllowableSelectionCount.value = 0;
+      customizationArguments.maxAllowableSelectionCount.value = 1;
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, IsProperSubsetValidOption,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+         'In answer group 1, ' + 
+         'rule  1, Is proper subset, needs at least 2 options.')
+    }
 });
