@@ -1,5 +1,10 @@
 # Per-directory ownership and automatic assignment for pull requests.
 
+# The paths to the directory/files must be relative to the location of this
+# file. Wildcards such as '**', '!' are not allowed. Only glob style patterns
+# are allowed. For information about supported glob patterns please refer
+# https://docs.python.org/2/library/glob.html.
+
 # Answer classification team.
 /core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08

@@ -1888,9 +1888,11 @@ def _check_for_copyright_notice(all_files):
 
 
 def _check_codeowner_file():
-    """Checks the CODEOWNERS file for any uncovered dirs/files and
-    and also checks that every pattern in the CODEOWNERS file matches
-    at least one file/dir.
+    """Checks the CODEOWNERS file for any uncovered dirs/files and also
+    checks that every pattern in the CODEOWNERS file matches at least one
+    file/dir. Note that this checks the CODEOWNERS file according to the glob
+    patterns supported by Python2.7 environment. For more information please
+    refer https://docs.python.org/2/library/glob.html.
     """
     print 'Starting CODEOWNERS file check'
     print '----------------------------------------'
