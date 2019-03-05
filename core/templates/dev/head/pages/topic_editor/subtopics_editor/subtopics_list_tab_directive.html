@@ -10,10 +10,10 @@
                dnd-list="subtopic.getSkillSummaries()"
                dnd-drop="endMoveSkill(subtopic.getId())">
         <div class="subtopic-header protractor-test-subtopic">
-          <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 17" style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
-          <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 17" style="padding-left: 1.5vw;"><[subtopic.getTitle().substring(0,15)]>...</strong>
+          <strong class="protractor-test-subtopic-title" uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 17" style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
+          <strong class="protractor-test-subtopic-title" uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 17" style="padding-left: 1.5vw;"><[subtopic.getTitle().substring(0,15)]>...</strong>
           <div style="float: right;">
-            <span style="color: #1d7800;" ng-click="editSubtopic(subtopic)" aria-hidden="true">
+            <span class="protractor-test-edit-subtopic-button" style="color: #1d7800;" ng-click="editSubtopic(subtopic)" aria-hidden="true">
               <i class="material-icons md-18">edit</i>
             </span>
             <span class="protractor-test-delete-subtopic-button" style="color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
