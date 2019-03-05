@@ -123,6 +123,10 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 1))
         self.assertEqual(
             subtopic_page_contents.to_dict(), expected_page_contents_dict)
+        subtopic_page_contents = (
+            subtopic_page_services.get_subtopic_page_contents_by_id(
+                self.TOPIC_ID, 2, strict=False))
+        self.assertEqual(subtopic_page_contents, None)
 
     def test_save_subtopic_page(self):
         subtopic_page_1 = (
