@@ -89,7 +89,7 @@
 
 
 # Lesson Analytics team.
-# TODO(brianrodri): Revert ownership to Brian after 2019-03-31
+# TODO(brianrodri): Revert ownership to @brianrodri after 2019-03-31.
 /core/domain/stats*.py @seanlip
 /core/storage/statistics/ @seanlip
 /core/templates/dev/head/domain/statistics/ @seanlip
