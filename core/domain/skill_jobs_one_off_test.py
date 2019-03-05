@@ -132,6 +132,11 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'content_ids_to_audio_translations': {
                 'explanation': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
             }
         }
         self.save_new_skill_with_defined_schema_versions(
