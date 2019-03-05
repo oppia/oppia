@@ -132,6 +132,9 @@ oppia.controller('SettingsTab', [
       value: 'viewer'
     }];
 
+    $scope.formStyle = {
+      display: 'table-cell', width: '16.66666667%', 'vertical-align': 'top'};
+
     $scope.saveExplorationTitle = function() {
       ExplorationTitleService.saveDisplayedValue();
     };
