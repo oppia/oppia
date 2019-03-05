@@ -1,23 +1,5 @@
 {% extends 'pages/base.html' %}
 
 {% block content %}
-  <div class="oppia-page-card oppia-static-content">
-    <div class="oppia-static-card-content-wide">
-      <h2>Get involved!</h2>
-      <p>
-        Oppia is an open commons for education. And, true to this ethos,
-        it is an open-source website created through the hard work and
-        creativity of people like you! To get involved in the Oppia
-        project and help us bring about our mission of free, high-quality
-        universal education, reach out via our
-        <a href="https://groups.google.com/forum/#!forum/oppia-dev">oppia-dev@</a> Google Group, or contact us at
-        <a href="mailto:admin@oppia.org" class="inline-links">admin@oppia.org</a>.
-        We're excited to hear from you!
-      </p>
-
-      <p>
-        Also, if you have any feedback for us, please don't hesitate to let us know via our <a href="{{SITE_FEEDBACK_FORM_URL}}">feedback form</a> &mdash; we read all the feedback we receive. Thanks in advance!
-      </p>
-    </div>
-  </div>
+  <p>{{DEV_MODE}}</p>
 {% endblock %}
