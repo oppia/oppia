@@ -276,7 +276,7 @@ def _check_storage_models(current_release):
 
 def main():
     """Collects necessary info and dumps it to disk."""
-    branch_name = 'release-2.7.4'
+    branch_name = _get_current_branch()
     if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
         raise Exception(
             'This script should only be run from the latest release branch.')
