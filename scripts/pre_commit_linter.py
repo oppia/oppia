@@ -470,7 +470,7 @@ def _redirect_stdout(new_target):
         sys.stdout = old_target
 
 
-def _get_all_files(input_files, input_path):
+def _get_all_files(input_path, input_files):
     """This function is used to return the files which needs to be linted and
     checked.
 
@@ -1974,7 +1974,7 @@ def main():
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
-    all_files = _get_all_files(parsed_args.files, parsed_args.path)
+    all_files = _get_all_files(parsed_args.path, parsed_args.files)
     lint_checks_manager = LintChecksManager(all_files, verbose_mode_enabled)
     all_messages = lint_checks_manager.perform_all_lint_checks()
     _print_complete_summary_of_errors()
