@@ -19,6 +19,7 @@ suggestions.
 from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import rights_manager
 from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.domain import user_services
@@ -165,17 +166,13 @@ def _update_suggestion(suggestion):
     suggestion_model.put()
 
 
-def edit_suggestion(suggestion_id, new_change):
+def edit_suggestion(suggestion, change_object):
     """Edits the submitted suggestion.
 
     Args:
-        suggestion_id: obj. Id of suggestion to be changed.
-        new_change: dict(str, str). Dictionary contains the change in
-        suggestion.
+        suggestion: obj. The suggestion to be changed.
+        change_object: dict(str, str). Object of change in suugestion.
     """
-    suggestion = get_suggestion_by_id(suggestion_id)
-    change_cls = type(suggestion.change)
-    change_object = change_cls(new_change)
     suggestion.pre_update_validate(change_object)
     suggestion.change = change_object
     _update_suggestion(suggestion)
@@ -544,7 +541,7 @@ def update_position_in_rotation(score_category, user_id):
         score_category, user_id)
 
 
-def check_can_edit_or_resubmit_suggestion(suggestion_id, user_id):
+def check_can_resubmit_suggestion(suggestion_id, user_id):
     """Checks whether the given user can resubmit the suggestion.
 
     Args:
@@ -558,3 +555,52 @@ def check_can_edit_or_resubmit_suggestion(suggestion_id, user_id):
     suggestion = get_suggestion_by_id(suggestion_id)
 
     return suggestion.author_id == user_id
+
+
+def check_can_edit_suggestion(credentials_to_check, user_id):
+    """Checks whether the user have permission to edit suggestion or not.
+
+    Args:
+        credentials_to_check: dict(str, str). Dict having key value pairs that
+            are needed for checking whether a user have permission or not for
+            edit suggestion.
+        user_id: str. Id of a user.
+
+    Returns:
+        users_which_have_rights: dict(str, str). Dict whose key value pairs
+            describes whether a user have permisson or not.
+    """
+
+    suggestion_id = credentials_to_check['suggestion_id']
+    users_which_have_rights = {'author': False, 'exploration_author': False,
+                               'collection_author': False,
+                               'page_not_found': False}
+    suggestion = get_suggestion_by_id(suggestion_id)
+
+    if suggestion.author_id == user_id:
+        users_which_have_rights['author'] = True
+        return users_which_have_rights
+
+    if credentials_to_check['target_type'] == 'exploration':
+        exploration_rights = rights_manager.get_exploration_rights(
+            credentials_to_check['target_id'])
+        if exploration_rights is None:
+            users_which_have_rights['page_not_found'] = True
+            return users_which_have_rights
+
+        if rights_manager.check_can_edit_activity(
+                user_id, exploration_rights):
+            users_which_have_rights['exploration_author'] = True
+            return users_which_have_rights
+
+    elif credentials_to_check['target_type'] == 'collection':
+        collection_rights = rights_manager.get_collection_rights(
+            credentials_to_check['target_id'])
+        if collection_rights is None:
+            users_which_have_rights['page_not_found'] = True
+            return users_which_have_rights
+
+        if rights_manager.check_can_edit_activity(
+                user_id, collection_rights):
+            users_which_have_rights['collection_author'] = True
+            return users_which_have_rights

@@ -188,6 +188,9 @@ class EditSuggestionHandler(base.BaseHandler):
         Args:
             suggestion_id: str. Id of suggestion to be edit.
         """
-        new_change = self.payload.get('change')
-        suggestion_services.edit_suggestion(suggestion_id, new_change)
-        self.render_json(new_change)
+        new_change_dict = self.payload.get('change')
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        change_cls = type(suggestion.change)
+        change_object = change_cls(new_change_dict)
+        suggestion_services.edit_suggestion(suggestion, change_object)
+        self.render_json(new_change_dict)

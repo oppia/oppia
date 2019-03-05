@@ -333,38 +333,33 @@ def can_edit_suggestion(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if suggestion_services.check_can_edit_or_resubmit_suggestion(
-                credentials_to_check['suggestion_id'], self.user_id):
-            return handler(
-                self, credentials_to_check['suggestion_id'])
+        users_which_having_rights = (
+            suggestion_services.check_can_edit_suggestion(
+                credentials_to_check, self.user_id))
 
-        if credentials_to_check['target_type'] == 'exploration':
-            exploration_rights = rights_manager.get_exploration_rights(
-                credentials_to_check['target_id'])
-            if exploration_rights is None:
+        if users_which_having_rights['author']:
+            return handler(self, credentials_to_check['suggestion_id'])
+
+        elif credentials_to_check['target_type'] == 'exploration':
+            if users_which_having_rights['page_not_found']:
                 raise base.UserFacingExceptions.PageNotFoundException
 
-            if rights_manager.check_can_edit_activity(
-                    self.user, exploration_rights):
-                return handler(
-                    self, credentials_to_check['suggestion_id'])
+            if users_which_having_rights['exploration_author']:
+                return handler(self, credentials_to_check['suggestion_id'])
             else:
                 raise base.UserFacingExceptions.UnauthorizedUserException(
                     'You do not have credentials to edit this exploration.')
 
         elif credentials_to_check['target_type'] == 'collection':
-            collection_rights = rights_manager.get_collection_rights(
-                credentials_to_check['target_id'])
-            if collection_rights is None:
+            if users_which_having_rights['page_not_found']:
                 raise base.UserFacingExceptions.PageNotFoundException
 
-            if rights_manager.check_can_edit_activity(
-                    self.user, collection_rights):
-                return handler(
-                    self, credentials_to_check['suggestion_id'])
+            if users_which_having_rights['collection_author']:
+                return handler(self, credentials_to_check['suggestion_id'])
             else:
                 raise base.UserFacingExceptions.UnauthorizedUserException(
                     'You do not have credentials to edit this collection.')
+
     test_can_edit_suggestion.__wrapped__ = True
 
     return test_can_edit_suggestion
@@ -1191,7 +1186,7 @@ def can_resubmit_suggestion(handler):
             UnauthorizedUserException: The user does not have
                 credentials to edit this suggestion.
         """
-        if suggestion_services.check_can_edit_or_resubmit_suggestion(
+        if suggestion_services.check_can_resubmit_suggestion(
                 suggestion_id, self.user_id):
             return handler(self, suggestion_id, **kwargs)
         else:
