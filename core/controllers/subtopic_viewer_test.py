@@ -55,6 +55,11 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 }
             }
         }
+        self.written_translations_dict = {
+            'translations_mapping': {
+                'content': {}
+            }
+        }
         self.expected_page_contents_dict = {
             'content_ids_to_audio_translations':
                 self.content_ids_to_audio_translations_dict,
@@ -90,8 +95,10 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 'content_ids_to_audio_translations':
                     self.content_ids_to_audio_translations_dict,
                 'subtitled_html': {
-                    'content_id': 'content', 'html': 'hello world'
-                }
+                    'content_id': 'content',
+                    'html': 'hello world'
+                },
+                'written_translations': self.written_translations_dict
             }
             expected_dict = {
                 'topic_id': self.topic_id,
