@@ -205,7 +205,7 @@ describe('Exploration translation', function() {
       explorationEditorTranslationTab.saveUploadedAudio(true);
       expect(explorationEditorTranslationTab.colorOfFirstState()).
         toBe(FEW_AUDIO_AVAILABLE_COLOR);
-      expect(explorationEditorTranslationTab.colorOfSecondState()).
+      expect(explorationEditorTranslationTab.colorOfNormalNode()).
         toBe(NO_AUDIO_AVAILABLE_COLOR);
       expect(explorationEditorTranslationTab.colorOfThirdState()).
         toBe(ALL_AUDIO_AVAILABLE_COLOR);

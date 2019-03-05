@@ -35,7 +35,7 @@ var ExplorationEditorTranslationTab = function() {
       getCssValue('fill'));
   };
 
-  this.colorOfSecondState = function() {
+  this.colorOfNormalNode = function() {
     return (element.all(by.css(
       'rect.protractor-test-node-background.normal-node')).last().
       getCssValue('fill'));
