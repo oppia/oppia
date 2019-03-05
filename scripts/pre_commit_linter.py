@@ -471,14 +471,16 @@ def _redirect_stdout(new_target):
 
 
 def _get_all_files(input_files, input_path):
-    """This function is used to return the files which needs to linted and
+    """This function is used to return the files which needs to be linted and
     checked.
 
     Args:
-        input_files: list. The list of files to be linted and checked.
         input_path: str. The path of the directory to be linted and checked.
+        input_files: list(str). The list of files to be linted and checked,
+        ignored if input_path is specified.
+
     Returns:
-        all_files: list. The list of files to be linted and checked.
+        all_files: list(str). The list of files to be linted and checked.
     """
     eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     if input_path:
