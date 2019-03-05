@@ -289,6 +289,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
+    os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),

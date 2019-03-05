@@ -42,6 +42,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'selenium-2.53.2'),
     os.path.join(OPPIA_TOOLS_DIR, 'PIL-1.1.7'),
     CURR_DIR,
+    os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
     os.path.join(THIRD_PARTY_DIR, 'bleach-1.2.2'),
     os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.15.0'),
     os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.17.0'),
