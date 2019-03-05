@@ -135,10 +135,11 @@ describe('Translation status service', function() {
 
     it('should correctly return an object contaning status colors of all ' +
       'states in exploration', function() {
+      var stateNames = ess.getStateNames();
       var stateWiseStatusColor = tss.getAllStateStatusColors();
-      expect(stateWiseStatusColor.First).toBe(FEW_AUDIO_AVAILABLE_COLOR);
-      expect(stateWiseStatusColor.Second).toBe(NO_AUDIO_AVAILABLE_COLOR);
-      expect(stateWiseStatusColor.Third).toBe(ALL_AUDIO_AVAILABLE_COLOR);
+      expect(stateWiseStatusColor[stateNames[0]]).toBe(FEW_AUDIO_AVAILABLE_COLOR);
+      expect(stateWiseStatusColor[stateNames[1]]).toBe(NO_AUDIO_AVAILABLE_COLOR);
+      expect(stateWiseStatusColor[stateNames[2]]).toBe(ALL_AUDIO_AVAILABLE_COLOR);
     });
 
     it('should return correct status color for active state', function() {
