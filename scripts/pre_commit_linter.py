@@ -1918,6 +1918,17 @@ def _check_codeowner_file():
                         print ('%s --> Pattern on line %s doesn\'t match any '
                                'file or directory' % (codeowner_file, line_num))
                         failed = True
+                    if (not line_in_concern.startswith('/') and
+                            not './' + line_in_concern in CODEOWNER_FILE_PATHS):
+                        print ('%s --> Pattern on line %s is invalid. Use full '
+                               'path relative to the root directory' % (
+                                   codeowner_file, line_num))
+                        failed = True
+                    if '**' in line_in_concern:
+                        print ('%s --> Pattern on line %s is invalid. \'**\' '
+                               'wildcard not allowed' % (
+                                   codeowner_file, line_num))
+                        failed = True
                     path_patterns.append(line_in_concern.replace('/', '', 1))
 
         # Checks that every dir/file is covered under CODEOWNERS.
@@ -1945,7 +1956,8 @@ def _check_codeowner_file():
                             match = True
                             break
                     if not match:
-                        print os.path.join(root, file_name)
+                        print ('WARNING! %s/%s is not covered under '
+                               'CODEOWNERS' % (root, file_name))
 
         if failed:
             summary_message = '%s   CODEOWNERS file check failed' % (
