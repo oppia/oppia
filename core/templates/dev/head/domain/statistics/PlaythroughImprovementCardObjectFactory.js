@@ -59,7 +59,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
         return new PlaythroughImprovementCard();
       },
       fetchCards: function() {
-        return Promise.resolve([]);
+        console.log('hi');
+        return Promise.resolve([new PlaythroughImprovementCard()]);
       },
     };
   }
