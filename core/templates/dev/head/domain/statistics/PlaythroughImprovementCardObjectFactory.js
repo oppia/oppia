@@ -29,10 +29,11 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       this._isArchived = false;
 
       var that = this;
-      var archiveCardAction = ImprovementResolutionActionObjectFactory.createNew(
-        'Archive Card', function() {
-          that._isArchived = true;
-        });
+      var archiveCardAction =
+        ImprovementResolutionActionObjectFactory.createNew(
+          'Archive Card', function() {
+            that._isArchived = true;
+          });
       // TODO(brianrodri): Create a 'goToState' action.
       this._resolutionActions = [archiveCardAction];
     };
@@ -61,4 +62,5 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
         return Promise.resolve([]);
       },
     };
-}]);
+  }
+]);
