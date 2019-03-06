@@ -27,10 +27,9 @@ describe('ImprovementActionObjectFactory', function() {
     it('stores the name and action', function() {
       var flag = false;
       var action =
-        this.ImprovementActionObjectFactory.createNew(
-          'Test', function() {
-            flag = true;
-          });
+        this.ImprovementActionObjectFactory.createNew('Test', function() {
+          flag = true;
+        });
 
       expect(action.getName()).toEqual('Test');
       expect(flag).toBe(false);
