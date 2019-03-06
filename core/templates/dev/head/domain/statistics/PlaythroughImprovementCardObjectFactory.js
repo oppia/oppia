@@ -47,8 +47,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
               '$scope', '$uibModalInstance', 'playthroughIndex',
               'playthrough', 'AlertsService', 'LearnerActionRenderService',
               function(
-                $scope, $uibModalInstance, playthroughIndex,
-                playthrough, AlertsService, LearnerActionRenderService) {
+                  $scope, $uibModalInstance, playthroughIndex,
+                  playthrough, AlertsService, LearnerActionRenderService) {
                 $scope.playthroughIndex = playthroughIndex;
 
                 $scope.displayBlocks =
@@ -137,7 +137,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
               }
             ]
           });
-      });
+        });
     };
 
     var renderImprovementCardContentHtml = function(issue) {
