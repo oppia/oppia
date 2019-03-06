@@ -26,15 +26,15 @@ describe('ImprovementActionObjectFactory', function() {
   describe('createNew', function() {
     it('stores the name and action', function(done) {
       var testFlag = false;
-      var action =
-        this.ImprovementActionObjectFactory.createNew('Test', function() {
-          testFlag = true;
-        });
       var onActionCompletion = function() {
         expect(testFlag).toBe(true);
         done();
       };
 
+      var action =
+        this.ImprovementActionObjectFactory.createNew('Test', function() {
+          testFlag = true;
+        });
       expect(action.getName()).toEqual('Test');
       expect(testFlag).toBe(false);
 
