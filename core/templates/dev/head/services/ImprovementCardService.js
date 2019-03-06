@@ -34,14 +34,14 @@ oppia.factory('ImprovementCardService', [
   'PlaythroughImprovementCardObjectFactory',
   function(PlaythroughImprovementCardObjectFactory) {
     /** @type {Object[]} */
-    var improvementCardRegistry = Object.freeze([
+    var improvementCardObjectFactoryRegistry = Object.freeze([
       PlaythroughImprovementCardObjectFactory,
     ]);
 
     return {
       /** @returns {Object[]} */
-      getImprovementCardRegistry: function() {
-        return improvementCardRegistry;
+      getImprovementCardObjectFactoryRegistry: function() {
+        return improvementCardObjectFactoryRegistry;
       },
 
       /**
@@ -55,8 +55,8 @@ oppia.factory('ImprovementCardService', [
        */
       fetchCards: function() {
         return Promise.all(
-          improvementCardRegistry.map(function(improvementCardObjectFactory) {
-            return improvementCardObjectFactory.fetchCards();
+          improvementCardObjectFactoryRegistry.map(function(cardFactory) {
+            return cardFactory.fetchCards();
           })
         ).then(function(cardsFromFactories) {
           // Flatten the cards into a single list before returning.
