@@ -40,15 +40,20 @@ describe('ImprovementCardService', function() {
   });
 
   describe('fetchCards', function() {
-    it('returns empty list when all factories return nothing', function() {
+    describe('when all factories return empty cards', function() {
       // TODO(brianrodri): Add boilerplate to force empty values.
 
-      var onSuccess = jasmine.createSpy('onSuccess');
-      var onFailure = jasmine.createSpy('onFailure');
-      this.ImprovementCardService.fetchCards().then(onSuccess, onFailure);
+      it('returns an empty list', function(done) {
+        var onSuccess = function(cards) {
+          expect(cards).toEqual([]);
+          done();
+        };
+        var onFailure = function(error) {
+          done.fail(error);
+        };
 
-      expect(onFailure).not.toHaveBeenCalled();
-      expect(onSuccess).toHaveBeenCalledWith([]);
+        this.ImprovementCardService.fetchCards().then(onSuccess, onFailure);
+      });
     });
   });
 });
