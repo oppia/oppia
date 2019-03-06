@@ -39,6 +39,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
 
     /** @constructor */
     var PlaythroughImprovementCard = function(issue) {
+      var that = this;
+
       /** @type {boolean} */
       this._isArchived = false;
       /** @type {string} */
@@ -46,7 +48,6 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       /** @type {string} */
       this._contentHtml = renderImprovementCardContentHtml(issue);
 
-      var that = this;
       /** @type {ImprovementAction[]} */
       this._actions = [
         ImprovementActionObjectFactory.createNew('Archive', function() {

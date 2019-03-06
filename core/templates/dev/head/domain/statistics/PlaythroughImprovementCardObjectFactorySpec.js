@@ -24,55 +24,55 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     this.PlaythroughIssueObjectFactory =
       $injector.get('PlaythroughIssueObjectFactory');
     this.PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
-    this.$httpBackend = $injector.get('$httpBackend');
 
     this.expId = '7';
     this.expVersion = 1;
+    this.PlaythroughIssuesService.initSession(this.expId, this.expVersion);
   }));
+
+  describe('.createNew', function() {
+  });
+
+  describe('.fetchCards', function() {
+  });
 
   describe('PlaythroughImprovementCard', function() {
     describe('.getActions', function() {
       beforeEach(function() {
-        this.PlaythroughIssuesService.initSession(this.expId, this.expVersion);
-
-        var issueType = 'EarlyQuit';
-        var issueCustomizationArgs = {
-          state_name: {value: 'Hola'},
-          time_spent_in_exp_in_msecs: {value: 5000},
-        };
-        var playthroughReferences = [];
-        var schemaVersion = 1;
-        var isValid = true;
-        this.issue = new this.PlaythroughIssueObjectFactory(
-          issueType, issueCustomizationArgs, playthroughReferences,
-          schemaVersion, isValid);
-        this.card =
-          this.PlaythroughImprovementCardObjectFactory.createNew(this.issue);
+        this.issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
+          issue_type: 'EarlyQuit',
+          issue_customization_args: {
+            state_name: {value: 'Hola'},
+            time_spent_in_exp_in_msecs: {value: 5000},
+          },
+          playthrough_ids: [],
+          schema_version: 1,
+          is_valid: true,
+        });
       });
 
-      it('contains actions in a specific order', function() {
-        var actions = this.card.getActions();
-        expect(actions.length).toEqual(1);
-        expect(actions[0].getName()).toEqual('Archive');
-      });
-
-      describe('Archive action', function() {
-        it('marks the card as resolved', function(done) {
-          var card = this.card;
-          var onActionCompletion = function() {
-            expect(card.isResolved()).toBe(true);
-            done();
-          };
-
-          var archiveCardAction = card.getActions()[0];
-          expect(card.isResolved()).toBe(false);
-
-          this.$httpBackend.expectPOST('/resolveissuehandler/7').respond(200);
-          archiveCardAction.performAction().then(onActionCompletion, done.fail);
-          this.$httpBackend.flush();
-
+      describe('Archive Action', function() {
+        beforeEach(inject(function($injector) {
+          this.$httpBackend = $injector.get('$httpBackend');
+        }));
+        afterEach(function() {
           this.$httpBackend.verifyNoOutstandingExpectation();
           this.$httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('marks the card as resolved', function() {
+          var card =
+            this.PlaythroughImprovementCardObjectFactory.createNew(this.issue);
+          var archiveCardAction = card.getActions()[0];
+
+          expect(card.isResolved()).toBe(false);
+          expect(archiveCardAction.getName()).toEqual('Archive');
+
+          this.$httpBackend.expectPOST('/resolveissuehandler/7').respond();
+          archiveCardAction.performAction();
+          this.$httpBackend.flush();
+
+          expect(card.isResolved()).toBe(true);
         });
       });
     });
