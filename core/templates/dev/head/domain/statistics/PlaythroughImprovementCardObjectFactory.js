@@ -50,8 +50,9 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       /** @type {ImprovementAction[]} */
       this._actions = [
         ImprovementActionObjectFactory.createNew('Archive', function() {
-          PlaythroughIssuesService.resolveIssue(issue);
-          that._isArchived = true;
+          return PlaythroughIssuesService.resolveIssue(issue).then(function() {
+            that._isArchived = true;
+          });
         }),
       ];
     };
