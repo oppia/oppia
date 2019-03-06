@@ -31,7 +31,7 @@ oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
     '0.0.0', '0.0.1', '0.0.2', '0.0.3'
   ];
 
-  MESSAGE_VALIDATORS = {
+  var MESSAGE_VALIDATORS = {
     heightChange: function(payload) {
       return isPositiveInteger(payload.height) && isBoolean(payload.scroll);
     },

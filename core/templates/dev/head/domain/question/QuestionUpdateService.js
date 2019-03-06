@@ -54,7 +54,7 @@ oppia.factory('QuestionUpdateService', [
     };
 
     var _getAllContentIds = function(state) {
-      allContentIdsSet = new Set();
+      var allContentIdsSet = new Set();
       allContentIdsSet.add(state.content.getContentId());
       state.interaction.answerGroups.forEach(function(answerGroup) {
         allContentIdsSet.add(answerGroup.outcome.feedback.getContentId());
@@ -75,15 +75,15 @@ oppia.factory('QuestionUpdateService', [
     };
 
     var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
-      diffList = Array.from(setA).filter(function(element) {
+      var diffList = Array.from(setA).filter(function(element) {
         return !setB.has(element);
       });
       return diffList;
     };
 
-    var _updateContentIdsToAudioTranslations = function(newState, oldState) {
-      newContentIds = _getAllContentIds(newState);
-      oldContentIds = _getAllContentIds(oldState);
+    var _updateContentIdsInAssets = function(newState, oldState) {
+      var newContentIds = _getAllContentIds(newState);
+      var oldContentIds = _getAllContentIds(oldState);
       var contentIdsToDelete = _getElementsInFirstSetButNotInSecond(
         oldContentIds, newContentIds);
       var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
@@ -91,9 +91,12 @@ oppia.factory('QuestionUpdateService', [
       contentIdsToDelete.forEach(function(contentId) {
         newState.contentIdsToAudioTranslations.deleteContentId(
           contentId);
+        newState.writtenTranslations.deleteContentId(
+          contentId);
       });
       contentIdsToAdd.forEach(function(contentId) {
         newState.contentIdsToAudioTranslations.addContentId(contentId);
+        newState.writtenTranslations.addContentId(contentId);
       });
     };
 
@@ -127,7 +130,7 @@ oppia.factory('QuestionUpdateService', [
         // for creating the change to send to the backend.
         updateFunction();
         var newStateData = question.getStateData();
-        _updateContentIdsToAudioTranslations(newStateData, oldStateData);
+        _updateContentIdsInAssets(newStateData, oldStateData);
         _applyPropertyChange(
           question, QUESTION_PROPERTY_QUESTION_STATE_DATA,
           newStateData.toBackendDict(),

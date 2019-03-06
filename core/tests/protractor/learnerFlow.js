@@ -38,8 +38,10 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 describe('Learner dashboard functionality', function() {
   var adminPage = null;
   var creatorDashboardPage = null;
+  var collectionEditorPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
   var libraryPage = null;
   var learnerDashboardPage = null;

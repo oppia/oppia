@@ -25,13 +25,14 @@ oppia.factory('interactiveMapRulesService', [
     var getDistanceInKm = function(point1, point2) {
       var latitude1 = degreesToRadians(point1[0]);
       var latitude2 = degreesToRadians(point2[0]);
-      latitudeDifference = degreesToRadians(point2[0] - point1[0]);
-      longitudeDifference = degreesToRadians(point2[1] - point1[1]);
+      var latitudeDifference = degreesToRadians(point2[0] - point1[0]);
+      var longitudeDifference = degreesToRadians(point2[1] - point1[1]);
 
       // Use the haversine formula
-      haversineOfCentralAngle = Math.pow(Math.sin(latitudeDifference / 2), 2) +
-      Math.cos(latitude1) * Math.cos(latitude2) *
-      Math.pow(Math.sin(longitudeDifference / 2), 2);
+      var haversineOfCentralAngle = (
+        Math.pow(Math.sin(latitudeDifference / 2), 2) +
+        Math.cos(latitude1) * Math.cos(latitude2) *
+        Math.pow(Math.sin(longitudeDifference / 2), 2));
 
       return RADIUS_OF_EARTH_KM *
         2 * Math.asin(Math.sqrt(haversineOfCentralAngle));

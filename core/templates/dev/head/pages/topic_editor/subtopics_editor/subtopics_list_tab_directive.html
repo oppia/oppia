@@ -9,14 +9,14 @@
                ng-repeat="(subtopicIndex, subtopic) in subtopics"
                dnd-list="subtopic.getSkillSummaries()"
                dnd-drop="endMoveSkill(subtopic.getId())">
-        <div class="subtopic-header">
-          <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 17" style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
-          <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 17" style="padding-left: 1.5vw;"><[subtopic.getTitle().substring(0,15)]>...</strong>
+        <div class="subtopic-header protractor-test-subtopic">
+          <strong class="protractor-test-subtopic-title" uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 17" style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
+          <strong class="protractor-test-subtopic-title" uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 17" style="padding-left: 1.5vw;"><[subtopic.getTitle().substring(0,15)]>...</strong>
           <div style="float: right;">
-            <span style="color: #1d7800;" ng-click="editSubtopic(subtopic)" aria-hidden="true">
+            <span class="protractor-test-edit-subtopic-button" style="color: #1d7800;" ng-click="editSubtopic(subtopic)" aria-hidden="true">
               <i class="material-icons md-18">edit</i>
             </span>
-            <span style="color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
+            <span class="protractor-test-delete-subtopic-button" style="color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
               <i class="material-icons md-18">&#xE14C;</i>
             </span>
           </div>
@@ -38,7 +38,7 @@
           </md-card>
         </div>
       </md-card>
-      <md-card class="subtopic new" ng-click="createSubtopic()">
+      <md-card class="subtopic new protractor-test-add-subtopic-card" ng-click="createSubtopic()">
         <span>
           <i class="material-icons">add</i> <span class="add-subtopic-text">Add Subtopic</span>
         </span>
@@ -51,7 +51,7 @@
            dnd-drop="endMoveSkill(null)">
     <h3> Uncategorized Skills </h3>
     <div style="max-height: 45vh; overflow-y: auto;">
-      <md-card class="skill-id"
+      <md-card class="skill-id protractor-test-uncategorized-skill-item"
                ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index"
                dnd-draggable="skillSummary"
                dnd-effect-allowed="move"

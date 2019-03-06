@@ -19,6 +19,7 @@
 describe('Topics and Skills Dashboard backend API service', function() {
   var TopicsAndSkillsDashboardBackendApiService = null;
   var $httpBackend = null;
+  var UrlInterpolationService = null;
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
 
   var sampleDataResults = {
