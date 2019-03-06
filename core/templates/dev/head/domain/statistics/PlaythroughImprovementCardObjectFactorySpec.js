@@ -36,7 +36,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       });
 
       describe('Archive Card action', function() {
-        it('resolves the card', function() {
+        it('marks the card as resolved', function() {
           var archiveCardAction = this.card.getResolutionActions()[0];
 
           expect(this.card.isResolved()).toBe(false);
