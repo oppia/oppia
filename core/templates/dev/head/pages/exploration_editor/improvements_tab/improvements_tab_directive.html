@@ -11,7 +11,7 @@
       </div>
     </md-card>
   </div>
-  <md-card ng-repeat="card in cards"
+  <md-card ng-repeat="card in getCards()"
            ng-if="!card.isResolved()"
            class="oppia-editor-card oppia-improvements-card md-default-theme">
     <h2 translate="<[card.getTitle()]>">

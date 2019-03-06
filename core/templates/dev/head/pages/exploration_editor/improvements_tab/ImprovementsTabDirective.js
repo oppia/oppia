@@ -28,17 +28,21 @@ oppia.directive('improvementsTab', [
       controller: [
         '$scope', 'ImprovementCardService',
         function($scope, ImprovementCardService) {
-          $scope.cards = [];
+          var fetchedCards = [];
           ImprovementCardService.fetchCards().then(function(cards) {
-            $scope.cards = cards;
+            fetchedCards = cards;
           });
+
+          $scope.getCards = function() {
+            return fetchedCards;
+          };
           $scope.getResolvedCardsCount = function() {
-            return $scope.cards.reduce(function(resolvedCardsCount, card) {
+            return fetchedCards.reduce(function(resolvedCardsCount, card) {
               return resolvedCardsCount + (card.isResolved() ? 1 : 0);
             }, 0);
           };
           $scope.getUnresolvedCardsCount = function() {
-            return $scope.cards.reduce(function(unresolvedCardsCount,card) {
+            return fetchedCards.reduce(function(unresolvedCardsCount,card) {
               return unresolvedCardsCount + (card.isResolved() ? 0 : 1);
             }, 0);
           };

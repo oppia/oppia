@@ -57,7 +57,7 @@ oppia.factory('ImprovementCardService', [
        */
       fetchCards: function() {
         if (cardCache === null) {
-          var promise = Promise.all(
+          return Promise.all(
             improvementCardObjectFactoryRegistry.map(function(cardFactory) {
               return cardFactory.fetchCards();
             })
