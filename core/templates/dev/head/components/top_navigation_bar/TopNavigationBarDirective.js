@@ -90,7 +90,7 @@ oppia.directive('topNavigationBar', [
           $scope.standardNavIsShown = (
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.currentUrl) === -1);
 
-          if($scope.userMenuIsShown) {
+          if ($scope.userMenuIsShown) {
             UserService.getLoginAndLogoutUrls().then(
               function(urlObject) {
                 $scope.logoutUrl = urlObject.logout_url;

@@ -108,27 +108,13 @@ class EditorLogoutHandler(base.BaseHandler):
         else:
             url_to_redirect_to = feconf.LIBRARY_INDEX_URL
 
-        self.redirect(super(EditorLogoutHandler, self)._get_logout_url(
-            url_to_redirect_to))
+        self.redirect(
+            current_user_services.create_logout_url(url_to_redirect_to))
 
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
-
-    def _get_logout_url(self, redirect_url_on_logout):
-        """This overrides the method in base.BaseHandler.
-        Returns logout url which will be handled by
-        EditorLogoutHandler.
-
-        Args:
-            redirect_url_on_logout: str. URL to redirect to on logout.
-
-        Returns:
-            str. logout url.
-        """
-        logout_url = utils.set_url_query_parameter(
-            '/exploration_editor_logout', 'return_url', redirect_url_on_logout)
-        return logout_url
+    pass
 
 
 class ExplorationPage(EditorHandler):
@@ -204,10 +190,7 @@ class ExplorationPage(EditorHandler):
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template(
-            'pages/exploration_editor/exploration_editor.html',
-            redirect_url_on_logout=(
-                '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id)))
+        self.render_template('pages/exploration_editor/exploration_editor.html')
 
 
 class ExplorationHandler(EditorHandler):

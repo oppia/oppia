@@ -14,6 +14,8 @@
 
 """Controllers for the profile page."""
 
+import urlparse
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -108,8 +110,7 @@ class PreferencesPage(base.BaseHandler):
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
         })
-        self.render_template(
-            'pages/preferences/preferences.html', redirect_url_on_logout='/')
+        self.render_template('pages/preferences/preferences.html')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -400,34 +401,49 @@ class UrlHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    def _get_redirect_url_on_logout(self, current_url):
+    def _get_logout_url(self, current_url):
+        """Prepares and returns logout url which will be handled by LogoutPage
+        handler.
+
+        Args:
+            current_url: str. The current url of the page.
+
+        Returns:
+            str. Logout URL to be handled by LogoutPage handler.
         """
-        """
-        print current_url
+
+        current_path = urlparse.urlsplit(current_url).path
         redirect_url_on_logout = current_url
-        if current_url == '/preferences':
+
+        if current_path == '/preferences':
             redirect_url_on_logout = '/'
-        elif current_url.split("/")[1] == feconf.SKILL_EDITOR_URL_PREFIX:
+        elif current_path == feconf.LEARNER_DASHBOARD_URL:
             redirect_url_on_logout = '/'
-        elif current_url == feconf.LEARNER_DASHBOARD_URL:
+        elif current_path == '/notifications_dashboard':
             redirect_url_on_logout = '/'
-        elif current_url.split("/")[1] == feconf.TOPIC_EDITOR_URL_PREFIX[1:]:
+        elif current_path == feconf.CREATOR_DASHBOARD_URL:
             redirect_url_on_logout = '/'
-        elif current_url.split("/")[1] == feconf.STORY_EDITOR_URL_PREFIX[1:]:
+        elif current_path == feconf.TOPICS_AND_SKILLS_DASHBOARD_URL:
             redirect_url_on_logout = '/'
-        elif current_url == '/notifications_dashboard':
+        elif current_path.split('/')[1] == feconf.SKILL_EDITOR_URL_PREFIX[1:]:
             redirect_url_on_logout = '/'
-        elif current_url == feconf.CREATOR_DASHBOARD_URL:
+        elif current_path.split('/')[1] == feconf.TOPIC_EDITOR_URL_PREFIX[1:]:
             redirect_url_on_logout = '/'
-        elif current_url == feconf.TOPICS_AND_SKILLS_DASHBOARD_URL:
+        elif current_path.split('/')[1] == feconf.STORY_EDITOR_URL_PREFIX[1:]:
             redirect_url_on_logout = '/'
-        elif current_url.split("/")[1] == feconf.EXPLORATION_URL_PREFIX[1:]:
-            exploration_id = current_url.split("/")[2]
-            print exploration_id
+        elif current_path.split('/')[1] == feconf.EDITOR_URL_PREFIX[1:]:
+            exploration_id = current_path.split('/')[2]
             redirect_url_on_logout = (
                 '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id))
 
-        return redirect_url_on_logout
+        if current_path.split('/')[1] == feconf.EDITOR_URL_PREFIX[1:]:
+            logout_url = utils.set_url_query_parameter(
+                '/exploration_editor_logout', 'return_url',
+                redirect_url_on_logout)
+        else:
+            logout_url = (
+                current_user_services.create_logout_url(redirect_url_on_logout))
+        return logout_url
 
     @acl_decorators.open_access
     def get(self):
@@ -435,8 +451,8 @@ class UrlHandler(base.BaseHandler):
         logout_url = None
         if self.user_id:
             if self.request and self.request.get('current_url'):
-                redirect_url_on_logout = self._get_redirect_url_on_logout(self.request.get('current_url'))
-                logout_url = current_user_services.create_logout_url(redirect_url_on_logout)
+                logout_url = (
+                    self._get_logout_url(self.request.get('current_url')))
             else:
                 raise self.InvalidInputException(
                     'Incomplete or empty GET parameters passed'
@@ -449,7 +465,6 @@ class UrlHandler(base.BaseHandler):
                     else self.request.get('current_url'))
                 login_url = (
                     current_user_services.create_login_url(target_url))
-                #self.render_json({'login_url': login_url})
             else:
                 raise self.InvalidInputException(
                     'Incomplete or empty GET parameters passed'
