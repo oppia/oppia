@@ -41,7 +41,14 @@ describe('ImprovementCardService', function() {
 
   describe('fetchCards', function() {
     describe('when all factories return empty cards', function() {
-      // TODO(brianrodri): Add boilerplate to force empty values.
+      var emptyArrayPromiser = function() {
+        return Promise.resolve([]);
+      };
+
+      beforeEach(function() {
+        spyOn(this.PlaythroughImprovementCardObjectFactory, 'fetchCards')
+          .and.callFake(emptyArrayPromiser);
+      });
 
       it('returns an empty list', function(done) {
         var onSuccess = function(cards) {

@@ -31,7 +31,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
    * exploration.
    */
   PlaythroughImprovementCard.fetchCards = function() {
-    return Promise.resolve([]);
+    return Promise.resolve([1, 2, 3]);
   };
 
   return PlaythroughImprovementCard;
