@@ -24,7 +24,7 @@ describe('ImprovementActionObjectFactory', function() {
   }));
 
   describe('createNew', function() {
-    it('stores the name and action', function() {
+    it('stores the name and action', function(done) {
       var flag = false;
       var returnValue = 42;
       var action =
@@ -35,8 +35,12 @@ describe('ImprovementActionObjectFactory', function() {
 
       expect(action.getName()).toEqual('Test');
       expect(flag).toBe(false);
-      expect(action.performAction()).toEqual(returnValue);
-      expect(flag).toBe(true);
+
+      action.performAction().then(function(actualReturnValue) {
+        expect(actualReturnValue).toEqual(returnValue);
+        expect(flag).toBe(true);
+        done();
+      });
     });
   });
 });
