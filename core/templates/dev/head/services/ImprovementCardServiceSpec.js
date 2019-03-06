@@ -24,7 +24,7 @@ describe('ImprovementCardService', function() {
       $injector.get('PlaythroughImprovementCardObjectFactory');
   }));
 
-  describe('getRegisteredCardObjectFactories', function() {
+  describe('.getRegisteredCardObjectFactories', function() {
     it('contains all known improvement card object factories', function() {
       var expectedFactories = [
         this.PlaythroughImprovementCardObjectFactory,
@@ -40,7 +40,7 @@ describe('ImprovementCardService', function() {
     });
   });
 
-  describe('fetchCards', function() {
+  describe('.fetchCards', function() {
     describe('when all factories return empty cards', function() {
       beforeEach(function() {
         var emptyCardsResolver = function() {
