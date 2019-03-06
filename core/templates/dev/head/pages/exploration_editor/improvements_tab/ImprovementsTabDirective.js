@@ -33,13 +33,13 @@ oppia.directive('improvementsTab', [
             $scope.cards = cards;
           });
           $scope.getResolvedCardsCount = function() {
-            $scope.cards.reduce(function(card) {
-              return card.isResolved() ? 1 : 0;
+            return $scope.cards.reduce(function(resolvedCardsCount, card) {
+              return resolvedCardsCount + (card.isResolved() ? 1 : 0);
             }, 0);
           };
           $scope.getUnresolvedCardsCount = function() {
-            $scope.cards.reduce(function(card) {
-              return card.isResolved() ? 0 : 1;
+            return $scope.cards.reduce(function(unresolvedCardsCount,card) {
+              return unresolvedCardsCount + (card.isResolved() ? 0 : 1);
             }, 0);
           };
         }

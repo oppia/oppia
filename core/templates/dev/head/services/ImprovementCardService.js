@@ -38,6 +38,8 @@ oppia.factory('ImprovementCardService', [
       PlaythroughImprovementCardObjectFactory,
     ]);
 
+    var cardCache = null;
+
     return {
       /** @returns {Object[]} */
       getImprovementCardObjectFactoryRegistry: function() {
@@ -54,14 +56,19 @@ oppia.factory('ImprovementCardService', [
        * the future.
        */
       fetchCards: function() {
-        return Promise.all(
-          improvementCardObjectFactoryRegistry.map(function(cardFactory) {
-            return cardFactory.fetchCards();
-          })
-        ).then(function(cardsFromFactories) {
-          // Flatten the cards into a single list before returning.
-          return [].concat.apply([], cardsFromFactories);
-        });
+        if (cardCache === null) {
+          var promise = Promise.all(
+            improvementCardObjectFactoryRegistry.map(function(cardFactory) {
+              return cardFactory.fetchCards();
+            })
+          ).then(function(cardsFromFactories) {
+            // Flatten the cards into a single list before returning.
+            cardCache = [].concat.apply([], cardsFromFactories);
+            return cardCache;
+          });
+        } else {
+          return Promise.resolve(cardCache);
+        }
       },
     };
   }
