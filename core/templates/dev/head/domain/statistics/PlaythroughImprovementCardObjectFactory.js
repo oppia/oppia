@@ -14,10 +14,28 @@
 
 /**
  * @fileoverview Factory for creating Playthrough Cards in the Improvements Tab.
+ *
+ * NOTE: For testing and organizational purposes, improvement card object
+ * factories should be registered in the ImprovementCardRegistryService! See
+ * the corresponding file to see what functions are expected from cards, and how
+ * to add new ones as necessary.
  */
 
-oppia.factory('PlaythroughImprovementCard', [function(){
+oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
+  /** @constructor */
   var PlaythroughImprovementCard = function() {
   };
+
+  /**
+   * Returns an array of Playthrough cards that are still open (i.e.,
+   * addressable).
+   *
+   * NOTE: Each call returns a fresh list of cards by preforming backend calls,
+   * hence we should prefer cacheing these return values whenever possible.
+   */
+  PlaythroughImprovementCard.fetchCards = function() {
+    return Promise.resolve([]);
+  };
+
   return PlaythroughImprovementCard;
 }]);
