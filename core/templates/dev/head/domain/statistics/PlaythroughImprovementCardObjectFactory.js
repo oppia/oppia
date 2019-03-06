@@ -30,11 +30,9 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
 
       var that = this;
       var archiveCardAction =
-        ImprovementActionObjectFactory.createNew(
-          'Archive Card', function() {
-            that._isArchived = true;
-          });
-      // TODO(brianrodri): Create a 'goToState' action.
+        ImprovementActionObjectFactory.createNew('Archive Card', function() {
+          that._isArchived = true;
+        });
       this._resolutionActions = [archiveCardAction];
     };
 
