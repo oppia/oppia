@@ -178,8 +178,8 @@ describe('ItemSelectionInputValidationService', function() {
   });
 
   it(
-    'Should give a warning, if max allowed choices = 1, and ' +
-    'Proper subset rule is used',
+    'should give a warning if max allowed choices = 1 and ' +
+    'Proper subset rule is used.',
     function() {
       // Modify values of customization arguments, to get warning
       customizationArguments.minAllowableSelectionCount.value = 0;
