@@ -22,15 +22,15 @@
  */
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
-  'ImprovementResolutionActionObjectFactory',
-  function(ImprovementResolutionActionObjectFactory) {
+  'ImprovementActionObjectFactory',
+  function(ImprovementActionObjectFactory) {
     /** @constructor */
     var PlaythroughImprovementCard = function() {
       this._isArchived = false;
 
       var that = this;
       var archiveCardAction =
-        ImprovementResolutionActionObjectFactory.createNew(
+        ImprovementActionObjectFactory.createNew(
           'Archive Card', function() {
             that._isArchived = true;
           });
@@ -50,7 +50,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       return '<b>TODO</b>: Fill with hexagons!';
     };
 
-    PlaythroughImprovementCard.prototype.getResolutionActions = function() {
+    PlaythroughImprovementCard.prototype.getActions = function() {
       return this._resolutionActions;
     };
 

@@ -24,20 +24,20 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   }));
 
   describe('PlaythroughImprovementCard', function() {
-    describe('.getResolutionActions', function() {
+    describe('.getActions', function() {
       beforeEach(function() {
         this.card = this.PlaythroughImprovementCardObjectFactory.createNew();
       });
 
       it('contains actions in a specific order', function() {
-        var resolutionActions = this.card.getResolutionActions();
-        expect(resolutionActions.length).toEqual(1);
-        expect(resolutionActions[0].getName()).toEqual('Archive Card');
+        var actions = this.card.getActions();
+        expect(actions.length).toEqual(1);
+        expect(actions[0].getName()).toEqual('Archive Card');
       });
 
       describe('Archive Card action', function() {
         it('marks the card as resolved', function() {
-          var archiveCardAction = this.card.getResolutionActions()[0];
+          var archiveCardAction = this.card.getActions()[0];
 
           expect(this.card.isResolved()).toBe(false);
           archiveCardAction.performAction();

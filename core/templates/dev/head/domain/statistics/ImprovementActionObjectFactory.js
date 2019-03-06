@@ -17,23 +17,23 @@
  * trying to resolve a particular improvement suggestion.
  */
 
-oppia.factory('ImprovementResolutionActionObjectFactory', [function() {
-  var ImprovementResolutionAction = function(name, action) {
+oppia.factory('ImprovementActionObjectFactory', [function() {
+  var ImprovementAction = function(name, action) {
     this._name = name;
     this._action = action;
   };
 
-  ImprovementResolutionAction.prototype.getName = function() {
+  ImprovementAction.prototype.getName = function() {
     return this._name;
   };
 
-  ImprovementResolutionAction.prototype.performAction = function() {
+  ImprovementAction.prototype.performAction = function() {
     this._action();
   };
 
   return {
     createNew: function(name, action) {
-      return new ImprovementResolutionAction(name, action);
+      return new ImprovementAction(name, action);
     },
   };
 }]);

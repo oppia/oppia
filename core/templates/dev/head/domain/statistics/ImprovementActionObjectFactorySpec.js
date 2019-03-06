@@ -13,21 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the ImprovementResolutionActionObjectFactory.
+ * @fileoverview Unit tests for the ImprovementActionObjectFactory.
  */
 
-describe('ImprovementResolutionActionObjectFactory', function() {
+describe('ImprovementActionObjectFactory', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
-    this.ImprovementResolutionActionObjectFactory =
-      $injector.get('ImprovementResolutionActionObjectFactory');
+    this.ImprovementActionObjectFactory =
+      $injector.get('ImprovementActionObjectFactory');
   }));
 
   describe('createNew', function() {
     it('stores the name and action', function() {
       var flag = false;
       var action =
-        this.ImprovementResolutionActionObjectFactory.createNew(
+        this.ImprovementActionObjectFactory.createNew(
           'Test', function() {
             flag = true;
           });
