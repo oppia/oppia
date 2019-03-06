@@ -28,12 +28,12 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
 
     var that = this;
     var archiveCardAction = {
-      name: "Archive Card",
+      name: 'Archive Card',
       perform: function() {
         that._isArchived = true;
       },
     };
-    // TODO(brianrodri): Create a "goToState" action.
+    // TODO(brianrodri): Create a 'goToState' action.
     this._resolutionActions = [archiveCardAction];
   };
 
@@ -42,11 +42,11 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
   };
 
   PlaythroughImprovementCard.prototype.getTitle = function() {
-    return "TODO";
+    return 'TODO';
   };
 
   PlaythroughImprovementCard.prototype.getContentHtml = function() {
-    return "<b>TODO</b>: Fill with hexagons!";
+    return '<b>TODO</b>: Fill with hexagons!';
   };
 
   PlaythroughImprovementCard.prototype.getResolutionActions = function() {
