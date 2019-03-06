@@ -127,7 +127,7 @@ oppia.factory('PlaythroughIssuesService', [
         }
       },
       resolveIssue: function(issue) {
-        PlaythroughIssuesBackendApiService.resolveIssue(
+        return PlaythroughIssuesBackendApiService.resolveIssue(
           issue, explorationId, explorationVersion);
       }
     };
