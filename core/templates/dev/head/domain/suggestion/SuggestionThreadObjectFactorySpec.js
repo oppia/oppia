@@ -30,7 +30,7 @@ describe('Suggestion thread object factory', function() {
   }));
 
   it('should create a new suggestion thread from a backend dict.', function() {
-    suggestionThreadBackendDict = {
+    var suggestionThreadBackendDict = {
       last_updated: 1000,
       original_author_username: 'author',
       status: 'accepted',
@@ -41,7 +41,7 @@ describe('Suggestion thread object factory', function() {
       thread_id: 'exploration.exp1.thread1'
     };
 
-    suggestionBackendDict = {
+    var suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
       suggestion_type: 'edit_exploration_state_content',
       target_type: 'exploration',
@@ -62,7 +62,7 @@ describe('Suggestion thread object factory', function() {
       },
       last_updated: 1000
     };
-    suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
+    var suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
       suggestionThreadBackendDict, suggestionBackendDict);
     expect(suggestionThread.status).toEqual('accepted');
     expect(suggestionThread.subject).toEqual('sample subject');
@@ -95,7 +95,7 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
       'new suggestion content');
 
-    messages = [{
+    var messages = [{
       text: 'message1'
     }, {
       text: 'message2'

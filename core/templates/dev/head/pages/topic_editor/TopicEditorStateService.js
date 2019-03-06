@@ -388,7 +388,7 @@ oppia.factory('TopicEditorStateService', [
               if (changeList[i].property_name === 'canonical_story_ids') {
                 if (changeList[i].new_value.length ===
                     changeList[i].old_value.length - 1) {
-                  deletedStoryId = changeList[i].old_value.filter(
+                  var deletedStoryId = changeList[i].old_value.filter(
                     function(storyId) {
                       return changeList[i].new_value.indexOf(storyId) === -1;
                     }
