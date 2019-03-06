@@ -58,12 +58,12 @@ install_node_module @types/q 1.5.1
 install_node_module @types/selenium-webdriver 2.53.43
 install_node_module uglify-js 3.3.11
 install_node_module yargs 3.29.0
-install_node_module yargs 3.29.0
-install_node_module webpack 
+install_node_module webpack 4.29.6
 install_node_module webpack-cli
 install_node_module clean-webpack-plugin
 install_node_module html-webpack-plugin 4.0.0-beta.5
 install_node_module karma-webpack
+install_node_module enhanced-resolve
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
 # GitPython, however the patches to it below (with the sed operations) lead to

@@ -16,6 +16,9 @@
  * @fileoverview Directive for the rule type selector.
  */
 
+require('../../pages/exploration_editor/ExplorationEditor.js');
+require('../../pages/state_editor/StatePropertyServices.js');
+
 oppia.directive('ruleTypeSelector', [function() {
   return {
     restrict: 'E',

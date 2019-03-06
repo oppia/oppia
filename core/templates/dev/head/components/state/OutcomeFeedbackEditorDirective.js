@@ -16,6 +16,9 @@
  * @fileoverview Directives for the outcome feedback editor.
  */
 
+require('../../domain/exploration/SubtitledHtmlObjectFactory.js');
+require('../../domain/utilities/UrlInterpolationService.js');
+
 oppia.directive('outcomeFeedbackEditor', [
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
   function(SubtitledHtmlObjectFactory, UrlInterpolationService) {

@@ -18,6 +18,9 @@ var path = require('path');
 
 module.exports = {
   mode: 'development',
+  resolve: {
+    modules: [path.resolve(__dirname, 'core/templates/dev/head')],
+  },  
   entry: {
     app: './core/templates/dev/head/app.js',
     about: './core/templates/dev/head/pages/about/About.js',
