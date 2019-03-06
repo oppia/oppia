@@ -42,7 +42,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
   };
 
   PlaythroughImprovementCard.prototype.getTitle = function() {
-    return "Test";
+    return "TODO";
   };
 
   PlaythroughImprovementCard.prototype.getContentHtml = function() {
@@ -58,7 +58,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
       return new PlaythroughImprovementCard();
     },
     fetchCards: function() {
-      return Promise.resolve([1, 2, 3]);
+      return Promise.resolve([]);
     },
   };
 }]);
