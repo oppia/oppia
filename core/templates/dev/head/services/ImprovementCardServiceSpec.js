@@ -22,19 +22,18 @@ describe('ImprovementCardService', function() {
     this.ImprovementCardService = $injector.get('ImprovementCardService');
     this.PlaythroughImprovementCardObjectFactory =
       $injector.get('PlaythroughImprovementCardObjectFactory');
+
+    this.expectedFactories = [this.PlaythroughImprovementCardObjectFactory];
   }));
 
   describe('.getRegisteredCardObjectFactories', function() {
     it('contains all known improvement card object factories', function() {
-      var expectedFactories = [
-        this.PlaythroughImprovementCardObjectFactory,
-      ];
       var actualFactories =
         this.ImprovementCardService.getRegisteredCardObjectFactories();
 
       // Ordering isn't important, so allow the checks to be flexible.
-      expect(actualFactories.length).toEqual(expectedFactories.length);
-      expectedFactories.forEach(function(expectedFactory) {
+      expect(actualFactories.length).toEqual(this.expectedFactories.length);
+      this.expectedFactories.forEach(function(expectedFactory) {
         expect(actualFactories).toContain(expectedFactory);
       });
     });
@@ -43,12 +42,11 @@ describe('ImprovementCardService', function() {
   describe('.fetchCards', function() {
     describe('from factories which all return empty cards', function() {
       beforeEach(function() {
-        var emptyCardsResolver = function() {
-          return Promise.resolve([]);
-        };
-
-        spyOn(this.PlaythroughImprovementCardObjectFactory, 'fetchCards')
-          .and.callFake(emptyCardsResolver);
+        this.expectedFactories.forEach(function(factory) {
+          spyOn(factory, 'fetchCards').and.callFake(function() {
+            return Promise.resolve([]);
+          });
+        });
       });
 
       it('returns an empty list', function(done) {
