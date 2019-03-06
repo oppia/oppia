@@ -22,9 +22,11 @@
       <[card.getTitle()]>
     </h2>
     <span ng-bind-html="card.getContentHtml()"></span>
-    <button ng-repeat="action in card.getResolutionActions()"
-            ng-click="action.performAction()">
-      <[action.getName()]>
-    </button>
+    <div>
+      <button ng-repeat="action in card.getResolutionActions()"
+              ng-click="action.performAction()">
+        <[action.getName()]>
+      </button>
+    </div>
   </md-card>
 </div>
