@@ -40,7 +40,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           var archiveCardAction = this.card.getResolutionActions()[0];
 
           expect(this.card.isResolved()).toBe(false);
-          archiveCardAction.resolve();
+          archiveCardAction.perform();
           expect(this.card.isResolved()).toBe(true);
         });
       });

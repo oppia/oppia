@@ -29,7 +29,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
     var that = this;
     var archiveCardAction = {
       name: "Archive Card",
-      resolve: function() {
+      perform: function() {
         that._isArchived = true;
       },
     };
