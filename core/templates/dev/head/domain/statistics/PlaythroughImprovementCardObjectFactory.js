@@ -24,41 +24,41 @@
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
   'ImprovementResolutionActionObjectFactory',
   function(ImprovementResolutionActionObjectFactory) {
-  /** @constructor */
-  var PlaythroughImprovementCard = function() {
-    this._isArchived = false;
+    /** @constructor */
+    var PlaythroughImprovementCard = function() {
+      this._isArchived = false;
 
-    var that = this;
-    var archiveCardAction = ImprovementResolutionActionObjectFactory.createNew(
-      'Archive Card', function() {
-        that._isArchived = true;
-      });
-    // TODO(brianrodri): Create a 'goToState' action.
-    this._resolutionActions = [archiveCardAction];
-  };
+      var that = this;
+      var archiveCardAction = ImprovementResolutionActionObjectFactory.createNew(
+        'Archive Card', function() {
+          that._isArchived = true;
+        });
+      // TODO(brianrodri): Create a 'goToState' action.
+      this._resolutionActions = [archiveCardAction];
+    };
 
-  PlaythroughImprovementCard.prototype.isResolved = function() {
-    return this._isArchived;
-  };
+    PlaythroughImprovementCard.prototype.isResolved = function() {
+      return this._isArchived;
+    };
 
-  PlaythroughImprovementCard.prototype.getTitle = function() {
-    return 'TODO';
-  };
+    PlaythroughImprovementCard.prototype.getTitle = function() {
+      return 'TODO';
+    };
 
-  PlaythroughImprovementCard.prototype.getContentHtml = function() {
-    return '<b>TODO</b>: Fill with hexagons!';
-  };
+    PlaythroughImprovementCard.prototype.getContentHtml = function() {
+      return '<b>TODO</b>: Fill with hexagons!';
+    };
 
-  PlaythroughImprovementCard.prototype.getResolutionActions = function() {
-    return this._resolutionActions;
-  };
+    PlaythroughImprovementCard.prototype.getResolutionActions = function() {
+      return this._resolutionActions;
+    };
 
-  return {
-    createNew: function() {
-      return new PlaythroughImprovementCard();
-    },
-    fetchCards: function() {
-      return Promise.resolve([]);
-    },
-  };
+    return {
+      createNew: function() {
+        return new PlaythroughImprovementCard();
+      },
+      fetchCards: function() {
+        return Promise.resolve([]);
+      },
+    };
 }]);
