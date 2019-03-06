@@ -29,12 +29,10 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         this.card = this.PlaythroughImprovementCardObjectFactory.createNew();
       });
 
-      it('contains specifically ordered actions', function() {
-        var resolutionActions = this.card.getResolutionActions();
-
-        expect(resolutionActions[0]).toEqual(jasmine.objectContaining(
-          {name: 'Archive Card'}
-        ));
+      it('contains actions in a specific order', function() {
+        expect(this.card.getResolutionActions()).toEqual([
+          jasmine.objectContaining({name: 'Archive Card'}),
+        ]);
       });
 
       describe('Archive Card action', function() {
