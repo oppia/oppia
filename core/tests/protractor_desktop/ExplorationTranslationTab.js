@@ -124,38 +124,40 @@ describe('Exploration translation', function() {
     explorationEditorMainTab.setInteraction('Continue');
     responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setDestination('final card', true, null);
+    // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorMainTab.moveToState('first');
     explorationEditorPage.saveChanges();
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.exitTutorial();
+
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
       '(0/8)');
 
     explorationEditorTranslationTab.openUploadAudioModal();
-    var audioToUpload = '../data/cafe.mp3';
-    var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
-    explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+    var relativePathOfAudioToUpload = '../data/cafe.mp3';
+    var audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
+    explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
     explorationEditorTranslationTab.saveUploadedAudio(true);
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
       '(1/8)');
     explorationEditorTranslationTab.openUploadAudioModal();
 
-    var audioToUpload = '../data/img.png';
-    var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
-    explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+    var relativePathOfAudioToUpload = '../data/img.png';
+    var audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
+    explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
     expect(explorationEditorTranslationTab.errorMessage === undefined).
       toBe(false);
     expect(explorationEditorTranslationTab.saveUploadedAudioButton.
       getAttribute('disabled')).toBe('true');
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
       '(1/8)');
-    audioToUpload = '../data/cafe-over-five-minutes.mp3';
-    audioAbsolutePath = path.resolve(__dirname, audioToUpload);
-    explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+    relativePathOfAudioToUpload = '../data/cafe-over-five-minutes.mp3';
+    audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
+    explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
     expect(explorationEditorTranslationTab.
-      errorMessageElement() === undefined).toBe(false);
+      audioOverFiveMinutesErrorMessageElement === undefined).toBe(false);
     explorationEditorTranslationTab.saveUploadedAudio();
     expect(explorationEditorTranslationTab.saveUploadedAudioButton.
       getAttribute('disabled')).toBe('true');
@@ -193,21 +195,21 @@ describe('Exploration translation', function() {
       explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.exitTutorial();
       explorationEditorTranslationTab.openUploadAudioModal();
-      var audioToUpload = '../data/cafe.mp3';
-      var audioAbsolutePath = path.resolve(__dirname, audioToUpload);
-      explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+      var relativePathOfAudioToUpload = '../data/cafe.mp3';
+      var audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
+      explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
       explorationEditorTranslationTab.saveUploadedAudio(true);
       explorationEditorPage.navigateToMainTab();
       explorationEditorMainTab.moveToState('Third');
       explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.openUploadAudioModal();
-      explorationEditorTranslationTab.audioElem().sendKeys(audioAbsolutePath);
+      explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
       explorationEditorTranslationTab.saveUploadedAudio(true);
-      expect(explorationEditorTranslationTab.colorOfFirstState()).
+      expect(explorationEditorTranslationTab.colorOfInitNode()).
         toBe(FEW_AUDIO_AVAILABLE_COLOR);
       expect(explorationEditorTranslationTab.colorOfNormalNode()).
         toBe(NO_AUDIO_AVAILABLE_COLOR);
-      expect(explorationEditorTranslationTab.colorOfThirdState()).
+      expect(explorationEditorTranslationTab.colorOfTerminalNode()).
         toBe(ALL_AUDIO_AVAILABLE_COLOR);
     });
 

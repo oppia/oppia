@@ -29,7 +29,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.errorMessage = element(by.css('div.error-message'));
 
-  this.colorOfFirstState = function() {
+  this.colorOfInitNode = function() {
     return (element.all(by.css(
       'rect.protractor-test-node-background.init-node')).last().
       getCssValue('fill'));
@@ -41,7 +41,7 @@ var ExplorationEditorTranslationTab = function() {
       getCssValue('fill'));
   };
 
-  this.colorOfThirdState = function() {
+  this.colorOfTerminalNode = function() {
     return (element.all(by.css(
       'rect.protractor-test-node-background.terminal-node')).last().
       getCssValue('fill'));
@@ -169,10 +169,7 @@ var ExplorationEditorTranslationTab = function() {
       element(by.cssContainingText('option', language)).click();
   };
 
-  this.audioElem = function() {
-    var audioElem = element(by.className('protractor-test-upload-audio'));
-    return audioElem;
-  };
+  this.audioElem = element(by.className('protractor-test-upload-audio'));
 
   this.expectContentTabContentToMatch = function(content) {
     waitFor.elementToBeClickable(
@@ -226,10 +223,8 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.errorMessageElement = function() {
-    var errorMessage = element(by.css('div.error-message'));
-    return errorMessage;
-  };
+  this.audioOverFiveMinutesErrorMessageElement = element(by.css(
+    'oppia-audio-file-upload-field-error-message'));
 
   this.expectFeedbackTabToBeActive = function() {
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
