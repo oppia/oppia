@@ -421,6 +421,11 @@ class UrlHandler(base.BaseHandler):
             redirect_url_on_logout = '/'
         elif current_url == feconf.TOPICS_AND_SKILLS_DASHBOARD_URL:
             redirect_url_on_logout = '/'
+        elif current_url.split("/")[1] == feconf.EXPLORATION_URL_PREFIX[1:]:
+            exploration_id = current_url.split("/")[2]
+            print exploration_id
+            redirect_url_on_logout = (
+                '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id))
 
         return redirect_url_on_logout
 
