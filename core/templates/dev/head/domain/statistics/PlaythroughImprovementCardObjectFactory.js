@@ -21,18 +21,18 @@
  * to add new ones as necessary.
  */
 
-oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
+oppia.factory('PlaythroughImprovementCardObjectFactory', [
+  'ImprovementResolutionActionObjectFactory',
+  function(ImprovementResolutionActionObjectFactory) {
   /** @constructor */
   var PlaythroughImprovementCard = function() {
     this._isArchived = false;
 
     var that = this;
-    var archiveCardAction = {
-      name: 'Archive Card',
-      perform: function() {
+    var archiveCardAction = ImprovementResolutionActionObjectFactory.createNew(
+      'Archive Card', function() {
         that._isArchived = true;
-      },
-    };
+      });
     // TODO(brianrodri): Create a 'goToState' action.
     this._resolutionActions = [archiveCardAction];
   };

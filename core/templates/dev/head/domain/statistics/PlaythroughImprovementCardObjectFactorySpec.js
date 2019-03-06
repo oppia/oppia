@@ -30,9 +30,9 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       });
 
       it('contains actions in a specific order', function() {
-        expect(this.card.getResolutionActions()).toEqual([
-          jasmine.objectContaining({name: 'Archive Card'}),
-        ]);
+        var resolutionActions = this.card.getResolutionActions();
+        expect(resolutionActions.length).toEqual(1);
+        expect(resolutionActions[0].getName()).toEqual('Archive Card');
       });
 
       describe('Archive Card action', function() {
@@ -40,7 +40,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           var archiveCardAction = this.card.getResolutionActions()[0];
 
           expect(this.card.isResolved()).toBe(false);
-          archiveCardAction.perform();
+          archiveCardAction.performAction();
           expect(this.card.isResolved()).toBe(true);
         });
       });
