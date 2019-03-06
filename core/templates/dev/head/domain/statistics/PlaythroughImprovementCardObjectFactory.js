@@ -27,11 +27,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
   };
 
   /**
-   * Returns an array of Playthrough cards that are still open (i.e.,
-   * addressable).
-   *
-   * NOTE: Each call returns a fresh list of cards by preforming backend calls,
-   * hence we should prefer cacheing these return values whenever possible.
+   * Returns a Promise of an array of Playthrough cards related to the current
+   * exploration.
    */
   PlaythroughImprovementCard.fetchCards = function() {
     return Promise.resolve([]);
