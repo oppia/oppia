@@ -58,17 +58,17 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
       describe('Archive action', function() {
         it('marks the card as resolved', function(done) {
-          var that = this;
-          var onSuccess = function() {
-            expect(that.card.isResolved()).toBe(true);
+          var card = this.card;
+          var onActionCompletion = function() {
+            expect(card.isResolved()).toBe(true);
             done();
           };
 
-          var archiveCardAction = this.card.getActions()[0];
-          expect(this.card.isResolved()).toBe(false);
+          var archiveCardAction = card.getActions()[0];
+          expect(card.isResolved()).toBe(false);
 
           this.$httpBackend.expectPOST('/resolveissuehandler/7').respond(200);
-          archiveCardAction.performAction().then(onSuccess, done.fail);
+          archiveCardAction.performAction().then(onActionCompletion, done.fail);
           this.$httpBackend.flush();
 
           this.$httpBackend.verifyNoOutstandingExpectation();
