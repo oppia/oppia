@@ -32,10 +32,10 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       it('contains actions in a specific order', function() {
         var actions = this.card.getActions();
         expect(actions.length).toEqual(1);
-        expect(actions[0].getName()).toEqual('Archive Card');
+        expect(actions[0].getName()).toEqual('Archive');
       });
 
-      describe('Archive Card action', function() {
+      describe('Archive action', function() {
         it('marks the card as resolved', function() {
           var archiveCardAction = this.card.getActions()[0];
 
