@@ -446,6 +446,8 @@ var constants = {
   "ACTIVITY_STATUS_PRIVATE": "private",
   "ACTIVITY_STATUS_PUBLIC": "public",
 
+  "SITE_FEEDBACK_FORM_URL": "/fake",
+
   "SYSTEM_USER_IDS": ["admin", "OppiaMigrationBot"],
 
   "//": [
@@ -496,7 +498,5 @@ var constants = {
           "content": {},
           "default_outcome": {}
       }
-  },
-
-  "CURRENT_STATES_SCHEMA_VERSION": 25
+  }
 };
