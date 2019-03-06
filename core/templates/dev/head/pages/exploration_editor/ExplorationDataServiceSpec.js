@@ -65,7 +65,7 @@ describe('Exploration data service', function() {
     }));
 
     beforeEach(function() {
-      expDataResponse = {
+      var expDataResponse = {
         draft_change_list_id: 3,
       };
 
@@ -94,7 +94,7 @@ describe('Exploration data service', function() {
 
 
     it('should autosave draft changes when draft ids match', function() {
-      errorCallback = function() {};
+      var errorCallback = function() {};
       spyOn(mockLocalStorageService, 'getExplorationDraft').
         and.returnValue(responseWhenDraftChangesAreValid);
       eds.getData(errorCallback).then(function(data) {
@@ -103,10 +103,9 @@ describe('Exploration data service', function() {
     });
 
     it('should call error callback when draft ids do not match', function() {
-      errorCallback = function() {};
+      var errorCallback = function() {};
       spyOn(mockLocalStorageService, 'getExplorationDraft').
         and.returnValue(responseWhenDraftChangesAreInvalid);
-      spyOn(window, 'errorCallback');
       eds.getData(errorCallback).then(function(data) {
         expect(errorCallback()).toHaveBeenCalled();
       });

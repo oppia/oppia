@@ -17,6 +17,7 @@
  */
 
 describe('Topic update service', function() {
+  var ContentIdsToAudioTranslationsObjectFactory = null;
   var TopicUpdateService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
@@ -26,10 +27,16 @@ describe('Topic update service', function() {
   var SubtopicPageContentsObjectFactory = null;
   var UndoRedoService = null;
   var _sampleTopic = null;
+  var _firstSkillSummary = null;
+  var _secondSkillSummary = null;
+  var _thirdSkillSummary = null;
+  var _sampleSubtopicPage = null;
 
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
+    ContentIdsToAudioTranslationsObjectFactory = $injector.get(
+      'ContentIdsToAudioTranslationsObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');

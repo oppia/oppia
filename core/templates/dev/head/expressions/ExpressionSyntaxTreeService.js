@@ -93,7 +93,7 @@ oppia.factory('ExpressionSyntaxTreeService', [
     // throws an error if not. If optional expectedMax is specified, it
     // verifies the number of args is in [expectedNum, expectedMax] range
     // inclusive.
-    var verifyNumArgs = function(args, expectedNum, expectedMax) {
+    var verifyNumArgs = function(args, expectedNum, expectedMax = expectedNum) {
       if (expectedMax === undefined) {
         expectedMax = expectedNum;
       }

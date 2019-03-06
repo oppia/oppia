@@ -39,6 +39,7 @@ oppia.factory('WinnowingPreprocessingService', [function() {
     getKGramHashes: function(tokens, tokenToId, K) {
       // Generate all possible k-gram hashes from tokens.
       var kGramHashes = [];
+      var kTokens;
       for (var i = 0; i < tokens.length - K + 1; i += 1) {
         kTokens = tokens.slice(i, i + K);
         kGramHashes.push(generateHashValue(kTokens, tokenToId));

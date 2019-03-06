@@ -19,6 +19,7 @@
 describe('Learner Dashboard Backend API Service', function() {
   var LearnerDashboardIdsBackendApiService = null;
   var $httpBackend = null;
+  var UrlInterpolationService = null;
 
   var sampleDataResults = {
     username: 'test',

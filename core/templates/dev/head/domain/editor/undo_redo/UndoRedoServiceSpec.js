@@ -33,13 +33,8 @@ describe('Undo/Redo Service', function() {
     };
   };
 
-  var _createChangeDomainObject = function(backendObj, applyFunc, reverseFunc) {
-    if (!applyFunc) {
-      applyFunc = function() {};
-    }
-    if (!reverseFunc) {
-      reverseFunc = function() {};
-    }
+  var _createChangeDomainObject = function(
+      backendObj, applyFunc = function() {}, reverseFunc = function() {}) {
     return ChangeObjectFactory.create(backendObj, applyFunc, reverseFunc);
   };
 

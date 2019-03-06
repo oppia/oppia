@@ -31,7 +31,7 @@ describe('Winnowing preprocessing functions', function() {
       };
       var tokens = ['a', 'b', 'a', 'c', 'b'];
       var expectedHashes = [3, 11, 7];
-      generatedHashes = service.getKGramHashes(tokens, tokenToId, 3);
+      var generatedHashes = service.getKGramHashes(tokens, tokenToId, 3);
 
       expect(generatedHashes.length).toEqual(3);
       expect(generatedHashes).toEqual(expectedHashes);

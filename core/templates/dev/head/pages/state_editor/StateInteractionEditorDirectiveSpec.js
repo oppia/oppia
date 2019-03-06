@@ -36,9 +36,10 @@ describe('State Interaction controller', function() {
       });
     });
 
-    var scope, ecs, cls, ess, siis, scas, idc, IS;
+    var scope, ecs, cls, ess, siis, scas, scs, idc, IS;
     var $httpBackend;
     var mockExplorationData;
+    var outerScope, directiveScope;
 
     beforeEach(module('directiveTemplates'));
     beforeEach(function() {

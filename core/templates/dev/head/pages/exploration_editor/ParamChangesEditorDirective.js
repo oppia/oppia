@@ -121,7 +121,7 @@ oppia.directive('paramChangesEditor', [
           };
 
           $scope.areDisplayedParamChangesValid = function() {
-            paramChanges = $scope.paramChangesService.displayed;
+            var paramChanges = $scope.paramChangesService.displayed;
 
             for (var i = 0; i < paramChanges.length; i++) {
               var paramName = paramChanges[i].name;

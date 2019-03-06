@@ -35,7 +35,7 @@ describe('Solution Verification Service', function() {
     });
   });
 
-  var ess, siis, scas, idc, sof, svs, IS, mockFunctions;
+  var ess, siis, scas, idc, sof, svs, see, IS, mockFunctions;
   var rootScope;
   var mockExplorationData;
   var successCallbackSpy, errorCallbackSpy;

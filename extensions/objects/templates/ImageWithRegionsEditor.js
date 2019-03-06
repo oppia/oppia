@@ -405,7 +405,7 @@ oppia.directive('imageWithRegionsEditor', [
               $scope.userIsCurrentlyResizing) {
               return;
             }
-            region = cornerAndDimensionsFromRegionArea(
+            var region = cornerAndDimensionsFromRegionArea(
               $scope.value.labeledRegions[
                 $scope.hoveredRegion].region.area);
             if (!$scope.xDirectionToggled && !$scope.yDirectionToggled) {

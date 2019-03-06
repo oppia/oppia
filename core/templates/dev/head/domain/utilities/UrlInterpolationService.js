@@ -135,15 +135,15 @@ oppia.factory('UrlInterpolationService', [
         var filledUrl = angular.copy(urlTemplate);
         var match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
         while (match) {
-          var varName = match[1];
-          if (!escapedInterpolationValues.hasOwnProperty(varName)) {
-            AlertsService.fatalWarning('Expected variable \'' + varName +
+          var currentVarName = match[1];
+          if (!escapedInterpolationValues.hasOwnProperty(currentVarName)) {
+            AlertsService.fatalWarning('Expected variable \'' + currentVarName +
               '\' when interpolating URL.');
             return null;
           }
           filledUrl = filledUrl.replace(
             INTERPOLATION_VARIABLE_REGEX,
-            escapedInterpolationValues[varName]);
+            escapedInterpolationValues[currentVarName]);
           match = filledUrl.match(INTERPOLATION_VARIABLE_REGEX);
         }
         return filledUrl;

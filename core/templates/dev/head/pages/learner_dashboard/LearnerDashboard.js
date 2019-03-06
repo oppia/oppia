@@ -529,7 +529,7 @@ oppia.controller('LearnerDashboard', [
                 throw new Error('Section name is not valid.');
               }
 
-              removeActivityUrl = (
+              var removeActivityUrl = (
                 UrlInterpolationService.interpolateUrl(
                   removeActivityUrlPrefix + '<activityType>/<activityId>', {
                     activityType: activityType,

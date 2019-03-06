@@ -19,6 +19,7 @@
 describe('Story node object factory', function() {
   var StoryNodeObjectFactory = null;
   var _sampleSubtopic = null;
+  var _sampleStoryNode = null;
 
   beforeEach(module('oppia'));
 

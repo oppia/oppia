@@ -20,6 +20,7 @@ describe('Question object factory', function() {
   var QuestionObjectFactory = null;
   var _sampleQuestion = null;
   var _sampleQuestionBackendDict = null;
+  var MisconceptionObjectFactory = null;
 
   beforeEach(module('oppia'));
 

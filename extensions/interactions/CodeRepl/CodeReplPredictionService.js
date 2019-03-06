@@ -51,7 +51,7 @@ oppia.factory('CodeReplPredictionService', [
     var predictionService = {
       getTokenizedProgram: function(programTokens, tokenToId) {
         // Tokenize Python programs in dataset for winnowing.
-        tokenizedProgram = [];
+        var tokenizedProgram = [];
 
         for (var i = 0; i < programTokens.length; i++) {
           var token = programTokens[i];
@@ -81,7 +81,7 @@ oppia.factory('CodeReplPredictionService', [
 
       getTokenizedProgramForCV: function(programTokens) {
         // Tokenize Python programs in dataset for winnowing.
-        tokenizedProgram = [];
+        var tokenizedProgram = [];
 
         for (var i = 0; i < programTokens.length; i++) {
           var token = programTokens[i];
@@ -206,7 +206,7 @@ oppia.factory('CodeReplPredictionService', [
             programHashes, T, K));
         // Calculte similarity of the input program with every program in
         // classifier data for k nearest neighbor classification.
-        similarityList = [];
+        var similarityList = [];
         Object.keys(fingerprintData).forEach(function(index) {
           var fingerprintA = fingerprintData[index].fingerprint;
           var similarity = predictionService.getProgramSimilarity(
@@ -305,7 +305,8 @@ oppia.factory('CodeReplPredictionService', [
         var programVector = CountVectorizerService.vectorize(
           tokenizedProgram, cvVocabulary);
 
-        predictionResult = SVMPredictionService.predict(svmData, programVector);
+        var predictionResult = SVMPredictionService.predict(
+          svmData, programVector);
         if (predictionResult.predictionConfidence >
             CODE_REPL_PREDICTION_SERVICE_THRESHOLD) {
           return predictionResult.predictionLabel;

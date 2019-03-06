@@ -132,6 +132,7 @@ describe('CodeRepl prediction service', function() {
 
       // To keep things simple, we will calculate accuracy score
       // and not F1 score.
+      var predictedAnswerGroup = null;
       for (var i = 0; i < trainingData.length; i++) {
         for (var j = 0; j < trainingData[i].answers.length; j++) {
           predictedAnswerGroup = service.predict(

@@ -165,7 +165,7 @@ var logicProofTeacher2 = (function() {
         field: 'reader view'
       });
     }
-    readerView = possibleReaderViews[0];
+    var readerView = possibleReaderViews[0];
     try {
       var antecedents = logicProofParser.parse(
         antecedentsString.replace(/ /g, ''), 'listOfBooleanTemplates');
@@ -211,9 +211,9 @@ var logicProofTeacher2 = (function() {
       template.expression, operators);
     for (var i = 0; i < template.substitutions.length; i++) {
       var newOutput = [];
-      for (key in template.substitutions[i]) {
+      for (var key in template.substitutions[i]) {
         newOutput.push(key + '->' + logicProofShared.displayExpression(
-          template.substitutions[i][key], operators, 0));
+          template.substitutions[i][key], operators));
       }
       output = output + '[' + newOutput.join(', ') + ']';
     }
@@ -248,7 +248,7 @@ var logicProofTeacher2 = (function() {
   var displayLineTemplateReaderView = function(
       readerView, operators, vocabulary) {
     var displayedFragments = [];
-    for (i = 0; i < readerView.length; i++) {
+    for (var i = 0; i < readerView.length; i++) {
       displayedFragments.push(displayLineFragmentTemplate(
         readerView[i], operators, vocabulary));
     }
@@ -258,7 +258,7 @@ var logicProofTeacher2 = (function() {
   // The message as seen by the teacher
   var displayMessage = function(message, operators) {
     var output = '';
-    for (i = 0; i < message.length; i++) {
+    for (var i = 0; i < message.length; i++) {
       if (message[i].format === 'expression') {
         if (message[i].content.type === 'element') {
           output += (message[i].content.hasOwnProperty('kind') ?
@@ -365,7 +365,7 @@ var logicProofTeacher2 = (function() {
    */
   var validateAndTypeMistakeEntry = function(mistakeEntry, language) {
     var availableOperators = [];
-    for (key in language.operators) {
+    for (var key in language.operators) {
       availableOperators[key] = language.operators[key];
     }
     // This is available to refer to the line number
@@ -377,7 +377,7 @@ var logicProofTeacher2 = (function() {
         output: 'integer'
       }]
     };
-    newLanguage = {
+    var newLanguage = {
       operators: availableOperators,
       types: language.types,
       kinds: language.kinds

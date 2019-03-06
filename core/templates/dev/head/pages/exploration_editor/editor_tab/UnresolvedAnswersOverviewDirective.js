@@ -85,8 +85,8 @@ oppia.directive('unresolvedAnswersOverview', [
                 'teach_oppia_modal_directive.html'),
               backdrop: true,
               controller: [
-                '$filter', '$http', '$injector', '$scope', '$uibModalInstance',
-                'AlertsService', 'AngularNameService',
+                '$filter', '$http', '$injector', '$log', '$scope',
+                '$uibModalInstance', 'AlertsService', 'AngularNameService',
                 'AnswerClassificationService', 'ContextService',
                 'ExplorationHtmlFormatterService', 'ExplorationStatesService',
                 'StateCustomizationArgsService', 'StateEditorService',
@@ -95,8 +95,8 @@ oppia.directive('unresolvedAnswersOverview', [
                 'DEFAULT_OUTCOME_CLASSIFICATION', 'EXPLICIT_CLASSIFICATION',
                 'TRAINING_DATA_CLASSIFICATION',
                 function(
-                    $filter, $http, $injector, $scope, $uibModalInstance,
-                    AlertsService, AngularNameService,
+                    $filter, $http, $injector, $log, $scope,
+                    $uibModalInstance, AlertsService, AngularNameService,
                     AnswerClassificationService, ContextService,
                     ExplorationHtmlFormatterService, ExplorationStatesService,
                     StateCustomizationArgsService, StateEditorService,
@@ -178,7 +178,7 @@ oppia.directive('unresolvedAnswersOverview', [
                   };
 
                   $scope.confirmAnswerAssignment = function(answerIndex) {
-                    answer = $scope.unresolvedAnswers[answerIndex];
+                    var answer = $scope.unresolvedAnswers[answerIndex];
                     $scope.unresolvedAnswers.splice(answerIndex, 1);
 
                     var classificationType = (

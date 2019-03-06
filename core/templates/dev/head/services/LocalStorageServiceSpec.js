@@ -21,6 +21,7 @@ describe('LocalStorageService', function() {
 
   describe('behavior in editor', function() {
     var LocalStorageService = null;
+    var ExplorationDraftObjectFactory = null;
     var explorationIdOne = '100';
     var draftChangeListIdOne = 2;
     var changeList = [];

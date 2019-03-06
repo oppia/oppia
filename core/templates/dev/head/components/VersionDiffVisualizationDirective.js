@@ -111,7 +111,7 @@ oppia.directive('versionDiffVisualization', [
         $scope.diffGraphSecondaryLabels = {};
         $scope.diffGraphNodeColors = {};
 
-        nodesData = $scope.getDiffData().nodes;
+        var nodesData = $scope.getDiffData().nodes;
         for (var nodeId in nodesData) {
           var nodeStateProperty = nodesData[nodeId].stateProperty;
           if (nodeStateProperty === STATE_PROPERTY_ADDED) {

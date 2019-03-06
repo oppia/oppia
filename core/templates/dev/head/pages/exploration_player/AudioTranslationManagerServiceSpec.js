@@ -19,7 +19,7 @@
 describe('Audio translation manager service', function() {
   beforeEach(module('oppia'));
 
-  var atms;
+  var atms, atof;
   var testAudioTranslations;
   var testAudioTranslations2;
   beforeEach(inject(function($injector) {

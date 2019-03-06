@@ -49,7 +49,7 @@ oppia.directive('audioTranslationBar', [
         $('.oppia-translation-tab').on('drop', function(evt) {
           evt.preventDefault();
           if (evt.target.classList.contains('oppia-drop-area-message')) {
-            files = evt.originalEvent.dataTransfer.files;
+            var files = evt.originalEvent.dataTransfer.files;
             scope.openAddAudioTranslationModal(files);
           }
           scope.showDropArea = false;

@@ -69,7 +69,7 @@ oppia.directive('logicQuestionEditor', [
 
         $scope.buildQuestion = function() {
           try {
-            builtQuestion = angular.copy(
+            var builtQuestion = angular.copy(
               logicProofTeacher.buildQuestion(
                 $scope.localValue.assumptionsString,
                 $scope.localValue.targetString,

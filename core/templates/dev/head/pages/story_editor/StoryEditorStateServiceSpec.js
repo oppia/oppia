@@ -21,6 +21,9 @@ describe('Story editor state service', function() {
   var StoryObjectFactory = null;
   var StoryUpdateService = null;
   var fakeEditableStoryBackendApiService = null;
+  var secondBackendStoryObject = null;
+  var $rootScope = null;
+  var $scope = null;
 
   var FakeEditableStoryBackendApiService = function() {
     var self = {};

@@ -421,7 +421,7 @@ var ExplorationEditorMainTab = function() {
         expect(addAnswerButton.isPresent()).toBeFalsy();
       },
       expectCannotDeleteRule: function(ruleNum) {
-        ruleElem = ruleBlock.get(ruleNum);
+        var ruleElem = ruleBlock.get(ruleNum);
         expect(deleteAnswerButton.isPresent()).toBeFalsy();
       },
       expectCannotDeleteResponse: function() {
@@ -438,6 +438,7 @@ var ExplorationEditorMainTab = function() {
       destName, createNewDest, refresherExplorationId) {
     expect(destName === null && createNewDest).toBe(false);
 
+    var targetOption = null;
     if (createNewDest) {
       targetOption = _NEW_STATE_OPTION;
     } else if (destName === null | destName === '(try again)') {

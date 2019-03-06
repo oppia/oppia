@@ -35,7 +35,7 @@ describe('Collection rights object factory', function() {
       owner_names: ['A']
     };
 
-    sampleCollectionRights = CollectionRightsObjectFactory.create(
+    var sampleCollectionRights = CollectionRightsObjectFactory.create(
       initialCollectionRightsBackendObject);
     var ownerNames = sampleCollectionRights.getOwnerNames();
     ownerNames.push('B');
@@ -53,7 +53,7 @@ describe('Collection rights object factory', function() {
         owner_names: ['A']
       };
 
-      sampleCollectionRights = CollectionRightsObjectFactory.create(
+      var sampleCollectionRights = CollectionRightsObjectFactory.create(
         initialCollectionRightsBackendObject);
       var ownerNames = sampleCollectionRights.getBindableOwnerNames();
       ownerNames.push('B');
@@ -71,7 +71,7 @@ describe('Collection rights object factory', function() {
       owner_names: ['A']
     };
 
-    sampleCollectionRights = CollectionRightsObjectFactory.create(
+    var sampleCollectionRights = CollectionRightsObjectFactory.create(
       initialCollectionRightsBackendObject);
     expect(sampleCollectionRights.isPrivate()).toBe(true);
     expect(sampleCollectionRights.isPublic()).toBe(false);
@@ -91,7 +91,7 @@ describe('Collection rights object factory', function() {
         owner_names: ['A']
       };
 
-      sampleCollectionRights = CollectionRightsObjectFactory.create(
+      var sampleCollectionRights = CollectionRightsObjectFactory.create(
         initialCollectionRightsBackendObject);
       expect(sampleCollectionRights.isPrivate()).toBe(true);
       expect(sampleCollectionRights.isPublic()).toBe(false);
@@ -113,7 +113,7 @@ describe('Collection rights object factory', function() {
       owner_names: ['A']
     };
 
-    sampleCollectionRights = CollectionRightsObjectFactory.create(
+    var sampleCollectionRights = CollectionRightsObjectFactory.create(
       initialCollectionRightsBackendObject);
     expect(sampleCollectionRights.isPrivate()).toBe(false);
     expect(sampleCollectionRights.isPublic()).toBe(true);
@@ -133,7 +133,7 @@ describe('Collection rights object factory', function() {
         owner_names: ['A']
       };
 
-      sampleCollectionRights = CollectionRightsObjectFactory.create(
+      var sampleCollectionRights = CollectionRightsObjectFactory.create(
         noUnpublishCollectionRightsBackendObject);
       expect(sampleCollectionRights.isPrivate()).toBe(false);
       expect(sampleCollectionRights.isPublic()).toBe(true);
@@ -170,7 +170,7 @@ describe('Collection rights object factory', function() {
       owner_names: ['A']
     };
 
-    sampleCollectionRights = CollectionRightsObjectFactory.create(
+    var sampleCollectionRights = CollectionRightsObjectFactory.create(
       noUnpublishCollectionRightsBackendObject);
 
     var emptyCollectionRightsBackendObject = (

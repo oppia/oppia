@@ -31,6 +31,8 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 describe('Library index page', function() {
   var libraryPage = null;
   var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
 
   beforeEach(function() {
@@ -203,6 +205,10 @@ describe('Library index page', function() {
 
 describe('Permissions for private explorations', function() {
   var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
+  var explorationPlayerPage = null;
+  var libraryPage = null;
 
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();

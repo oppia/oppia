@@ -44,7 +44,7 @@ oppia.factory('AudioPreloaderService', [
           _exploration.getStates(),
           sourceStateName);
       var audioFilenames = [];
-      allAudioTranslations = _exploration.getAllAudioTranslations(
+      var allAudioTranslations = _exploration.getAllAudioTranslations(
         languageCode);
       stateNamesInBfsOrder.forEach(function(stateName) {
         var allAudioTranslationsForState = allAudioTranslations[stateName];

@@ -24,6 +24,11 @@ describe('Topic editor state service', function() {
   var TopicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
   var fakeTopicRightsBackendApiService = null;
+  var secondSubtopicPageObject = null;
+  var secondBackendTopicObject = null;
+  var secondTopicRightsObject = null;
+  var $rootScope = null;
+  var $scope = null;
 
   var FakeEditableTopicBackendApiService = function() {
     var self = {};
@@ -168,7 +173,7 @@ describe('Topic editor state service', function() {
       }
     };
 
-    topicRightsObject = {
+    var topicRightsObject = {
       id: '0',
       can_edit_topic: 'true',
       is_published: 'true',
@@ -184,7 +189,7 @@ describe('Topic editor state service', function() {
       can_publish_topic: 'false'
     };
 
-    subtopicPageObject = {
+    var subtopicPageObject = {
       id: 'validTopicId-0',
       topic_id: 'validTopicId',
       page_contents: {
@@ -241,7 +246,7 @@ describe('Topic editor state service', function() {
       fakeEditableTopicBackendApiService, 'fetchSubtopicPage'
     ).and.callThrough();
 
-    subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
@@ -251,7 +256,7 @@ describe('Topic editor state service', function() {
   });
 
   it('should not add duplicate subtopic pages to the local cache', function() {
-    subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     expect(TopicEditorStateService.getCachedSubtopicPages().length).toEqual(1);
@@ -265,7 +270,7 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete newly created subtopic pages from the ' +
     'local cache', function() {
-    subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     subtopicPage.setId('validTopicId-1');
@@ -298,7 +303,7 @@ describe('Topic editor state service', function() {
     'existing subtopic pages from the local cache', function() {
     spyOn($rootScope, '$broadcast').and.callThrough();
 
-    subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
     subtopicPage.getPageContents().setHtml('<p>Data 1</p>');
@@ -323,7 +328,7 @@ describe('Topic editor state service', function() {
     'changing newly created subtopic pages from the local cache', function() {
     spyOn($rootScope, '$broadcast').and.callThrough();
 
-    subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
     subtopicPage.getPageContents().setHtml('<p>Data 1</p>');

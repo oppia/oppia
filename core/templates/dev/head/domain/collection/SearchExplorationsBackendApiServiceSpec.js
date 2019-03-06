@@ -60,7 +60,7 @@ describe('Exploration search backend API service', function() {
     var query = escape(btoa('count'));
 
     // Search result object returnable from the backend
-    searchResults = {
+    var searchResults = {
       collection_node_metadata_list: [{
         id: '12',
         objective:

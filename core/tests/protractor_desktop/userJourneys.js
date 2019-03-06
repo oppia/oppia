@@ -133,9 +133,9 @@ describe('Site language', function() {
       explorationEditorMainTab.setInteraction('EndExploration');
 
       // Save changes.
-      title = 'Language Test';
-      category = 'Languages';
-      objective = 'To test site language.';
+      var title = 'Language Test';
+      var category = 'Languages';
+      var objective = 'To test site language.';
       explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.setTitle(title);
       explorationEditorSettingsTab.setCategory(category);

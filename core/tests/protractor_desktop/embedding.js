@@ -85,9 +85,9 @@ describe('Embedding', function() {
     explorationEditorMainTab.setInteraction('EndExploration');
 
     // Save changes.
-    title = 'Protractor Test';
-    category = 'Mathematics';
-    objective = 'learn how to count permutations' +
+    var title = 'Protractor Test';
+    var category = 'Mathematics';
+    var objective = 'learn how to count permutations' +
       ' accurately and systematically';
     explorationEditorPage.navigateToSettingsTab();
 
@@ -283,9 +283,9 @@ describe('Embedding', function() {
       explorationEditorMainTab.setInteraction('EndExploration');
 
       // Save changes.
-      title = 'Language Test';
-      category = 'Languages';
-      objective = 'This is a Language Test for valid and invalid.';
+      var title = 'Language Test';
+      var category = 'Languages';
+      var objective = 'This is a Language Test for valid and invalid.';
       explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.setTitle(title);
       explorationEditorSettingsTab.setCategory(category);

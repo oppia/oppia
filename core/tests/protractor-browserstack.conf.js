@@ -148,9 +148,9 @@ exports.config = {
         if (allSuiteGroups[suiteIndex] === 'full') {
           continue;
         }
-        suiteGroup = allSuiteGroups[suiteIndex];
+        var suiteGroup = allSuiteGroups[suiteIndex];
         // The suiteFile is the first element of each suiteGroup array.
-        suiteFile = exports.config.suites[suiteGroup][0];
+        var suiteFile = exports.config.suites[suiteGroup][0];
         if (!suitesInFull.includes(suiteFile)) {
           // eslint-disable-next-line no-console
           console.log(

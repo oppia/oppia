@@ -30,8 +30,8 @@ oppia.directive('oppiaResponseMusicNotesInput', [
         '/interactions/MusicNotesInput/directives/' +
         'music_notes_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        _notes = [];
+        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        var _notes = [];
         for (var i = 0; i < _answer.length; i++) {
           if (_answer[i].readableNoteName) {
             _notes.push(_answer[i].readableNoteName);

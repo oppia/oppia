@@ -17,8 +17,16 @@ describe('FractionInputValidationService', function() {
 
   var currentState;
   var answerGroups, goodDefaultOutcome, customizationArgs;
-  var greaterThanMinusOneRule, equalsOneRule, equivalentToOneRule,
-    lessThanTwoRule;
+  var denominatorEqualsFiveRule, equalsOneAndHalfRule, equalsOneRule,
+    equalsThreeByTwoRule, equivalentToOneAndSimplestFormRule,
+    equivalentToOneRule, exactlyEqualToOneAndNotInSimplestFormRule,
+    HasFractionalPartExactlyEqualToOneAndHalfRule,
+    HasFractionalPartExactlyEqualToNegativeValue,
+    HasFractionalPartExactlyEqualToThreeHalfs,
+    HasFractionalPartExactlyEqualToTwoFifthsRule,
+    greaterThanMinusOneRule, integerPartEqualsOne,
+    integerPartEqualsZero, lessThanTwoRule, nonIntegerRule,
+    numeratorEqualsFiveRule, zeroDenominatorRule;
   var createFractionDict;
   var oof, agof, rof;
   beforeEach(function() {

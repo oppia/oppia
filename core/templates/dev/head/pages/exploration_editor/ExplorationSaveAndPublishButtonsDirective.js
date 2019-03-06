@@ -87,11 +87,11 @@ oppia.directive('explorationSaveAndPublishButtons', [
             }
           };
 
-          showLoadingDots = function() {
+          var showLoadingDots = function() {
             $scope.loadingDotsAreShown = true;
           };
 
-          hideLoadingDots = function() {
+          var hideLoadingDots = function() {
             $scope.loadingDotsAreShown = false;
           };
 

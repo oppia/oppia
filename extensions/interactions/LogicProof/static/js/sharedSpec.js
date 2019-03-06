@@ -17,10 +17,10 @@
  * interaction.
  */
 
-var errorWrapper = function(dubiousFunction, input, parameter) {
+var errorWrapper = function(dubiousFunction, input, parameter = null) {
   return function() {
     try {
-      if (parameter === undefined) {
+      if (parameter === null) {
         dubiousFunction(input);
       } else {
         dubiousFunction(input, parameter);

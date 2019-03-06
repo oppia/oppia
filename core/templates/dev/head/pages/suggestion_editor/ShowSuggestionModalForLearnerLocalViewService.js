@@ -17,8 +17,8 @@
  */
 
 oppia.factory('ShowSuggestionModalForLearnerLocalViewService', [
-  '$http', '$uibModal', 'UrlInterpolationService',
-  function($http, $uibModal, UrlInterpolationService) {
+  '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
+  function($http, $uibModal, AlertsService, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
       'learner_local_view_suggestion_modal_directive.html'
@@ -31,7 +31,7 @@ oppia.factory('ShowSuggestionModalForLearnerLocalViewService', [
         resolve: {},
         controller: 'ShowSuggestionModalForLearnerLocalView',
       }).result.then(function(result) {
-        data = {
+        var data = {
           suggestion_type: result.suggestion_type,
           target_type: result.target_type,
           target_id: result.target_id,
@@ -48,7 +48,7 @@ oppia.factory('ShowSuggestionModalForLearnerLocalViewService', [
             }
           }
         };
-        url = '/suggestionhandler/';
+        var url = '/suggestionhandler/';
 
         $http.post(url, data).error(function(res) {
           AlertsService.addWarning(res);

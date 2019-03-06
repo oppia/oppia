@@ -66,7 +66,7 @@ oppia.factory('StateGraphLayoutService', [
             var possibleTargetInd = trunkNodeIds.indexOf(
               adjacencyLists[sourceNodeId][i]);
             if (possibleTargetInd !== -1 && sourceInd < possibleTargetInd) {
-              targetInd = Math.min(possibleTargetInd, endInd + 1);
+              var targetInd = Math.min(possibleTargetInd, endInd + 1);
               if (targetInd - sourceInd > bestTargetInd - bestSourceInd) {
                 bestSourceInd = sourceInd;
                 bestTargetInd = targetInd;
