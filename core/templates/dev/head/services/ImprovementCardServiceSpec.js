@@ -23,7 +23,9 @@ describe('ImprovementCardService', function() {
     this.PlaythroughImprovementCardObjectFactory =
       $injector.get('PlaythroughImprovementCardObjectFactory');
 
-    this.expectedFactories = [this.PlaythroughImprovementCardObjectFactory];
+    this.expectedFactories = [
+      this.PlaythroughImprovementCardObjectFactory,
+    ];
   }));
 
   describe('.getImprovementCardRegistry', function() {
