@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the PlaythroughImprovementCardObjectFactory.
+ * @fileoverview Domain objects for the actionable items creators may take when
+ * trying to resolve a particular improvement suggestion.
  */
 
 oppia.factory('ImprovementResolutionActionObjectFactory', [function() {

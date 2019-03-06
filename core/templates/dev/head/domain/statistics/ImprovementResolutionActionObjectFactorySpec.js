@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the PlaythroughImprovementCardObjectFactory.
+ * @fileoverview Unit tests for the ImprovementResolutionActionObjectFactory.
  */
 
 describe('ImprovementResolutionActionObjectFactory', function() {
