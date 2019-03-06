@@ -22,22 +22,38 @@
  */
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
-  'ImprovementActionObjectFactory',
-  function(ImprovementActionObjectFactory) {
+  'ImprovementActionObjectFactory', 'PlaythroughIssuesService',
+  function(ImprovementActionObjectFactory, PlaythroughIssuesService) {
+    var renderImprovementCardContentHtml = function(issue) {
+      /** @type {string[]} */
+      var suggestions = PlaythroughIssuesService.renderIssueSuggestions(issue);
+      var contentHtml = '';
+      if (suggestions.length > 0) {
+        contentHtml = '<ul><li>' + suggestions.join('</li><li>') + '</li></ul>';
+      } else {
+        // Do not add suggestions to the HTML response.
+      }
+      // TODO(brianrodri): Add hexagons.
+      return contentHtml;
+    };
+
     /** @constructor */
-    var PlaythroughImprovementCard = function() {
+    var PlaythroughImprovementCard = function(issue) {
       /** @type {boolean} */
       this._isArchived = false;
+      /** @type {string} */
+      this._title = PlaythroughIssuesService.renderIssueStatement(issue);
+      /** @type {string} */
+      this._contentHtml = renderImprovementCardContentHtml(issue);
 
       var that = this;
-      var archiveCardAction =
-        ImprovementActionObjectFactory.createNew('Archive', function() {
-          that._isArchived = true;
-          // TODO(brianrodri): Add backend callout to mark playthrough issue as
-          // resolved.
-        });
       /** @type {ImprovementAction[]} */
-      this._resolutionActions = [archiveCardAction];
+      this._actions = [
+        ImprovementActionObjectFactory.createNew('Archive', function() {
+          PlaythroughIssuesService.resolveIssue(issue);
+          that._isArchived = true;
+        }),
+      ];
     };
 
     /**
@@ -50,7 +66,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
 
     /** @returns {string} - a simple summary of the Playthrough Issue */
     PlaythroughImprovementCard.prototype.getTitle = function() {
-      return 'TODO';
+      return this._title;
     };
 
     /**
@@ -58,7 +74,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
      * including sample playthroughs for creators to look at.
      */
     PlaythroughImprovementCard.prototype.getContentHtml = function() {
-      return '<b>TODO</b>: Fill with hexagons!';
+      return this._contentHtml;
     };
 
     /**
@@ -66,21 +82,24 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
      * take to resolve the card.
      */
     PlaythroughImprovementCard.prototype.getActions = function() {
-      return this._resolutionActions;
+      return this._actions;
     };
 
     return {
       /** @returns {PlaythroughImprovementCard} */
-      createNew: function() {
-        return new PlaythroughImprovementCard();
+      createNew: function(issue) {
+        return new PlaythroughImprovementCard(issue);
       },
       /**
        * @returns {Promise<PlaythroughImprovementCard[]>} - the list of
        * playthrough issues associated to the current exploration.
        */
       fetchCards: function() {
-        // TODO(brianrodri): Do a proper callout for real cards.
-        return Promise.resolve([new PlaythroughImprovementCard()]);
+        return PlaythroughIssuesService.getIssues().then(function(issues) {
+          return issues.map(function(issue) {
+            return new PlaythroughImprovementCard(issue);
+          });
+        });
       },
     };
   }

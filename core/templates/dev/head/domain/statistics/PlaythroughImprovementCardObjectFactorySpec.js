@@ -21,12 +21,27 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   beforeEach(inject(function($injector) {
     this.PlaythroughImprovementCardObjectFactory =
       $injector.get('PlaythroughImprovementCardObjectFactory');
+    this.PlaythroughIssueObjectFactory =
+      $injector.get('PlaythroughIssueObjectFactory');
+    this.PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
+
+    this.expId = '7';
+    this.expVersion = 1;
   }));
 
   describe('PlaythroughImprovementCard', function() {
     describe('.getActions', function() {
       beforeEach(function() {
-        this.card = this.PlaythroughImprovementCardObjectFactory.createNew();
+        this.PlaythroughIssuesService.initSession(this.expId, this.expVersion);
+        this.issue = new this.PlaythroughIssueObjectFactory(
+          'EarlyQuit',
+          /*issueCustomizationArgs=*/{
+            state_name: {value: 'Hola'},
+            time_spent_in_exp_in_msecs: {value: 5000},
+          },
+          /*learnerActions=*/[], 1, true);
+        this.card =
+          this.PlaythroughImprovementCardObjectFactory.createNew(this.issue);
       });
 
       it('contains actions in a specific order', function() {
