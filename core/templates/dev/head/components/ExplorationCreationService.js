@@ -115,7 +115,7 @@ oppia.factory('ExplorationCreationService', [
             AlertsService.addWarning(
               parsedResponse.error || 'Error communicating with server.');
             $rootScope.loadingMessage = '';
-            $scope.$apply();
+            $rootScope.$apply();
           });
         });
       }
