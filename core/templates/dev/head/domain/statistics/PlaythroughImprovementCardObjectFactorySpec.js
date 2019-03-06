@@ -33,13 +33,18 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     describe('.getActions', function() {
       beforeEach(function() {
         this.PlaythroughIssuesService.initSession(this.expId, this.expVersion);
+
+        var issueType = 'EarlyQuit';
+        var issueCustomizationArgs = {
+          state_name: {value: 'Hola'},
+          time_spent_in_exp_in_msecs: {value: 5000},
+        };
+        var playthroughReferences = [];
+        var schemaVersion = 1;
+        var isValid = true;
         this.issue = new this.PlaythroughIssueObjectFactory(
-          'EarlyQuit',
-          /*issueCustomizationArgs=*/{
-            state_name: {value: 'Hola'},
-            time_spent_in_exp_in_msecs: {value: 5000},
-          },
-          /*learnerActions=*/[], 1, true);
+          issueType, issueCustomizationArgs, playthroughReferences,
+          schemaVersion, isValid);
         this.card =
           this.PlaythroughImprovementCardObjectFactory.createNew(this.issue);
       });
