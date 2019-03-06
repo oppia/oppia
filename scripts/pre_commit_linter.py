@@ -1679,7 +1679,7 @@ class LintChecksManager(object):
                 print summary_message
                 summary_messages.append(summary_message)
 
-        return summary_message
+        return summary_messages
 
     def _check_html_tags_and_attributes(self, debug=False):
         """This function checks the indentation of lines in HTML files."""
