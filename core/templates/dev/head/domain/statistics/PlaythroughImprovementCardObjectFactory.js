@@ -30,7 +30,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
 
       var that = this;
       var archiveCardAction =
-        ImprovementActionObjectFactory.createNew('Archive Card', function() {
+        ImprovementActionObjectFactory.createNew('Archive', function() {
           that._isArchived = true;
           // TODO(brianrodri): Add callout to backend to mark as resolved.
         });
