@@ -196,7 +196,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 self.author_id_2))['suggestions'][1]
 
         # Create new content for exploration after edit.
-        self.new_content_after_edit = state_domain.SubtitledHtml(
+        new_content_after_edit = state_domain.SubtitledHtml(
             'content', 'new edit content html').to_dict()
 
         target_type = suggestion_models.TARGET_TYPE_EXPLORATION
@@ -209,7 +209,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'State 3',
             'old_value': self.new_content,
-            'new_value': self.new_content_after_edit
+            'new_value': new_content_after_edit
         }
 
         self.login(self.AUTHOR_EMAIL_2)
@@ -219,11 +219,11 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         # Put suggestion after some change.
         self.put_json(
             ('/suggestionactionhandler/edit/' + target_type + target_id
-                + suggestion_id), {
-                'action': 'edit',
-                'summary_message': 'summary message',
-                'change': change
-            }, csrf_token=csrf_token)
+             + suggestion_id), {
+                 'action': 'edit',
+                 'summary_message': 'summary message',
+                 'change': change
+                 }, csrf_token=csrf_token)
 
         # Get suggestion after edit.
         suggestion_after_edit = self.get_json(
