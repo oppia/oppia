@@ -41,13 +41,13 @@ describe('ImprovementCardService', function() {
 
   describe('fetchCards', function() {
     describe('when all factories return empty cards', function() {
-      var emptyArrayPromiser = function() {
+      var emptyCardsResolver = function() {
         return Promise.resolve([]);
       };
 
       beforeEach(function() {
         spyOn(this.PlaythroughImprovementCardObjectFactory, 'fetchCards')
-          .and.callFake(emptyArrayPromiser);
+          .and.callFake(emptyCardsResolver);
       });
 
       it('returns an empty list', function(done) {
