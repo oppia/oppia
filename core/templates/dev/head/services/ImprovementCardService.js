@@ -25,11 +25,9 @@
  *   - Card.prototype.isResolved() -> boolean
  *       A "member" function which returns whether the improvement which the
  *       card suggests has been resolved.
- *   - Card.prototype.resolve()
- *       A "member" function which marks the card as resolved.
  *   - Card.prototype.getTitle() -> string
  *   - Card.prototype.getContentHtml() -> string
- *   - Card.prototype.getResolutions() -> ImprovementResolution[]
+ *   - Card.prototype.getResolutions() -> ImprovementResolutionAction[]
  */
 
 oppia.factory('ImprovementCardService', [

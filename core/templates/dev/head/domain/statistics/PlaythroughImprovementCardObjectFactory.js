@@ -24,6 +24,15 @@
 oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
   /** @constructor */
   var PlaythroughImprovementCard = function() {
+    var that = this;
+    var archiveCardAction = {
+      name: "Archive Card",
+      resolve: function() {
+        that.resolve();
+      },
+    };
+
+    this._resolutions = [archiveCardAction];
   };
 
   /**
@@ -32,6 +41,25 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
    */
   PlaythroughImprovementCard.fetchCards = function() {
     return Promise.resolve([1, 2, 3]);
+  };
+
+  PlaythroughImprovementCard.prototype.isResolved = function() {
+    return false;
+  };
+
+  PlaythroughImprovementCard.prototype.resolve = function() {
+  };
+
+  PlaythroughImprovementCard.prototype.getTitle = function() {
+    return "Test";
+  };
+
+  PlaythroughImprovementCard.prototype.getContentHtml = function() {
+    return "<b>TODO</b>: Fill with hexagons!";
+  };
+
+  PlaythroughImprovementCard.prototype.getResolutions = function() {
+    return [archiveCardAction];
   };
 
   return PlaythroughImprovementCard;
