@@ -250,7 +250,7 @@ oppia.factory('ExplorationWarningsService', [
 
       if (_graphData) {
         var unreachableStateNames = _getUnreachableNodeNames(
-          [_graphData.initStateId], _graphData.nodes, _graphData.links, true);
+          [_graphData.initStateId], _graphData.nodes, _graphData.links);
 
         if (unreachableStateNames.length) {
           angular.forEach(
@@ -262,7 +262,7 @@ oppia.factory('ExplorationWarningsService', [
           // Only perform this check if all states are reachable.
           var deadEndStates = _getUnreachableNodeNames(
             _graphData.finalStateIds, _graphData.nodes,
-            _getReversedLinks(_graphData.links), false);
+            _getReversedLinks(_graphData.links));
           if (deadEndStates.length) {
             angular.forEach(deadEndStates, function(deadEndState) {
               _extendStateWarnings(

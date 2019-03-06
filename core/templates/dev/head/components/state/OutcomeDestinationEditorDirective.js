@@ -113,10 +113,11 @@ oppia.directive('outcomeDestinationEditor', [
             // has never been rendered at the time this computation is being
             // carried out.
             var stateNames = angular.copy(allStateNames);
+            var stateName = null;
             if (lastComputedArrangement) {
               var maxDepth = 0;
               var maxOffset = 0;
-              for (var stateName in lastComputedArrangement) {
+              for (stateName in lastComputedArrangement) {
                 maxDepth = Math.max(
                   maxDepth, lastComputedArrangement[stateName].depth);
                 maxOffset = Math.max(
@@ -127,7 +128,7 @@ oppia.directive('outcomeDestinationEditor', [
               var allStateScores = {};
               var unarrangedStateCount = 0;
               for (var i = 0; i < allStateNames.length; i++) {
-                var stateName = allStateNames[i];
+                stateName = allStateNames[i];
                 if (lastComputedArrangement.hasOwnProperty(stateName)) {
                   allStateScores[stateName] = (
                     lastComputedArrangement[stateName].depth * (maxOffset + 1) +

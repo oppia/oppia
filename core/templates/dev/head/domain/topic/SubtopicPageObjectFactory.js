@@ -88,7 +88,7 @@ oppia.factory('SubtopicPageObjectFactory', [
     // Create an interstitial subtopic page that would be displayed in the
     // editor until the actual subtopic page is fetched from the backend.
     SubtopicPage.createInterstitialSubtopicPage = function() {
-      return new SubtopicPage(null, null, null, 'en', {});
+      return new SubtopicPage(null, null, null, 'en');
     };
     return SubtopicPage;
   }

@@ -43,8 +43,8 @@ oppia.filter('convertUnicodeToHtml', [
 // character; if we see a '{{', this is the start of a parameter; if
 // we see a '}}'; this is the end of a parameter.
 oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
-  var assert = function(b) {
-    if (!b) {
+  var assert = function(text) {
+    if (!text) {
       throw 'Invalid unicode-string-with-parameters: ' + text;
     }
   };
@@ -157,7 +157,7 @@ oppia.filter('isFloat', [function() {
 
     var viewValue = '';
     try {
-      var viewValue = input.toString().trim();
+      viewValue = input.toString().trim();
     } catch (e) {
       return undefined;
     }
@@ -198,7 +198,7 @@ oppia.directive('applyValidation', ['$filter', function($filter) {
           }
 
           var filterArgs = {};
-          for (key in validatorSpec) {
+          for (var key in validatorSpec) {
             if (key !== 'id') {
               filterArgs[$filter('underscoresToCamelCase')(key)] =
                 angular.copy(validatorSpec[key]);

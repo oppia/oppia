@@ -108,7 +108,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
     };
 
     var _convertToSpeakableText = function(html) {
-      elt = $('<div>' + html + '</div>');
+      var elt = $('<div>' + html + '</div>');
       // Convert links into speakable text by extracting the readable value.
       elt.find('oppia-noninteractive-' + RTE_COMPONENT_NAMES.Link)
         .replaceWith(function() {

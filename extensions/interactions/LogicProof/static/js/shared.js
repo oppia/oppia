@@ -134,7 +134,7 @@ var logicProofShared = (function() {
    * @return {string} A string representing the expression.
    */
   var displayExpressionHelper = function(
-      expression, operators, desirabilityOfBrackets) {
+      expression, operators, desirabilityOfBrackets = 0) {
     var desirabilityOfBracketsBelow = (
       expression.top_kind_name === 'binary_connective' ||
       expression.top_kind_name === 'binary_relation' ||
@@ -324,7 +324,7 @@ var logicProofShared = (function() {
    *         what the user intended and did wrong.
    */
   var parseLineString = function(
-      inputString, operators, vocabulary, isTemplate) {
+      inputString, operators, vocabulary, isTemplate = false) {
     var unparsedArray = preParseLineString(inputString, operators, isTemplate);
 
     // We compile all words occurring in the vocabulary, to help us identify
@@ -558,11 +558,11 @@ var logicProofShared = (function() {
    *         largest (in lexicographic ordering) as this is likely to be closest
    *         to what the user intended.
    */
-  var assignTypesToExpression = function(untypedExpression, possibleTopTypes,
-      language, newKindsPermitted, permitDuplicateDummyNames) {
+  var assignTypesToExpression = function(
+      untypedExpression, possibleTopTypes,
+      language, newKindsPermitted = ['constant', 'variable'],
+      permitDuplicateDummyNames = false) {
     var operators = language.operators;
-    newKindsPermitted = newKindsPermitted || ['constant', 'variable'];
-    permitDuplicateDummyNames = permitDuplicateDummyNames || false;
 
     var _attemptTyping = function(topType, typingRule) {
       if (!operatorIsNew &&
@@ -635,12 +635,12 @@ var logicProofShared = (function() {
         throw err;
       }
       var updatedOperators = {};
-      for (key in operators) {
+      for (var key in operators) {
         updatedOperators[key] = operators[key];
       }
       if (operatorIsNew) {
         var _decorateTypes = function(types) {
-          decoratedTypes = [];
+          var decoratedTypes = [];
           for (var k = 0; k < types.length; k++) {
             decoratedTypes.push({
               type: types[k],
@@ -774,12 +774,10 @@ var logicProofShared = (function() {
    *          }
    * @raises: as before
    */
-  var assignTypesToExpressionArray = function(untypedArray, topTypes, language,
-      newKindsPermitted, isTemplate, numDummies) {
-    newKindsPermitted = newKindsPermitted || ['constant', 'variable'];
-    isTemplate = isTemplate || false;
-    numDummies = numDummies || 0;
-
+  var assignTypesToExpressionArray = function(
+      untypedArray, topTypes, language,
+      newKindsPermitted = ['constant', 'variable'], isTemplate = false,
+      numDummies = 0) {
     var partiallyTypedArrays = [[[]]];
     var partiallyUpdatedOperators = [[{}]];
     for (var key in language.operators) {
@@ -897,8 +895,7 @@ var logicProofShared = (function() {
   // Returns a list of all the names of operators in an expression. kinds is an
   // array specifying which kinds of operators to return; if it is not supplied
   // then all are returned
-  var getOperatorsFromExpression = function(expression, kinds) {
-    kinds = kinds || false;
+  var getOperatorsFromExpression = function(expression, kinds = false) {
     var output = getOperatorsFromExpressionArray(
       expression.arguments.concat(expression.dummies), kinds);
     return (output.indexOf(expression.top_operator_name) === -1 &&
@@ -907,8 +904,7 @@ var logicProofShared = (function() {
       output;
   };
 
-  var getOperatorsFromExpressionArray = function(array, kinds) {
-    kinds = kinds || false;
+  var getOperatorsFromExpressionArray = function(array, kinds = false) {
     var output = [];
     for (var i = 0; i < array.length; i++) {
       var newOutput = getOperatorsFromExpression(array[i], kinds);
@@ -937,7 +933,7 @@ var logicProofShared = (function() {
       } catch (err) {}
     }
     throw UserError('unknown_typing_error', {
-      expression: expression
+      array: array
     });
   };
 
