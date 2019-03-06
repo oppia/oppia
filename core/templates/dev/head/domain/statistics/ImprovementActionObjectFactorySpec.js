@@ -25,22 +25,20 @@ describe('ImprovementActionObjectFactory', function() {
 
   describe('createNew', function() {
     it('stores the name and action', function(done) {
-      var flag = false;
-      var returnValue = 42;
+      var testFlag = false;
       var action =
         this.ImprovementActionObjectFactory.createNew('Test', function() {
-          flag = true;
-          return returnValue;
+          testFlag = true;
         });
+      var onActionCompletion = function() {
+        expect(testFlag).toBe(true);
+        done();
+      };
 
       expect(action.getName()).toEqual('Test');
-      expect(flag).toBe(false);
+      expect(testFlag).toBe(false);
 
-      action.performAction().then(function(actualReturnValue) {
-        expect(actualReturnValue).toEqual(returnValue);
-        expect(flag).toBe(true);
-        done();
-      });
+      action.performAction().then(onActionCompletion, done.fail);
     });
   });
 });
