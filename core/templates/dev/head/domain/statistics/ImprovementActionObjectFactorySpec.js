@@ -26,14 +26,16 @@ describe('ImprovementActionObjectFactory', function() {
   describe('createNew', function() {
     it('stores the name and action', function() {
       var flag = false;
+      var returnValue = 42;
       var action =
         this.ImprovementActionObjectFactory.createNew('Test', function() {
           flag = true;
+          return returnValue;
         });
 
       expect(action.getName()).toEqual('Test');
       expect(flag).toBe(false);
-      action.performAction();
+      expect(action.performAction()).toEqual(returnValue);
       expect(flag).toBe(true);
     });
   });

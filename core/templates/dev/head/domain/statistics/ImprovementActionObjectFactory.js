@@ -35,9 +35,9 @@ oppia.factory('ImprovementActionObjectFactory', [function() {
     return this._name;
   };
 
-  /** Performs the associated action */
+  /** Performs the associated action and return its result */
   ImprovementAction.prototype.performAction = function() {
-    this._action();
+    return this._action();
   };
 
   return {
