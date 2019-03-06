@@ -16,7 +16,7 @@
  * @fileoverview Directive for general schema-based viewers.
  */
 
-require('../../domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.js');
 
 oppia.directive('schemaBasedViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -17,9 +17,9 @@
  */
 
 require('../embed_modal/ExplorationEmbedButtonService.js');
-require('../../domain/utilities/UrlInterpolationService.js');
-require('../../services/HtmlEscaperService.js');
-require('../../services/SiteAnalyticsService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/HtmlEscaperService.js');
+require('services/SiteAnalyticsService.js');
 
 oppia.directive('sharingLinks', [
   'UrlInterpolationService', function(UrlInterpolationService) {

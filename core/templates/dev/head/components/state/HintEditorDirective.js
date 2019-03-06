@@ -16,9 +16,9 @@
  * @fileoverview Directive for the hint editor.
  */
 
-require('../../domain/utilities/UrlInterpolationService.js');
-require('../../pages/state_editor/StatePropertyServices.js');
-require('../../services/EditabilityService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/state_editor/StatePropertyServices.js');
+require('services/EditabilityService.js');
 
 oppia.directive('hintEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

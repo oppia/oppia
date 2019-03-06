@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based viewer for unicode strings.
  */
 
-require('../../domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.js');
 
 oppia.directive('schemaBasedUnicodeViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {

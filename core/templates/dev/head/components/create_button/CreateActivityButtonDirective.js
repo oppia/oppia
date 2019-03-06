@@ -18,10 +18,10 @@
 
 require('../CollectionCreationService.js');
 require('../ExplorationCreationService.js');
-require('../../domain/utilities/BrowserCheckerService.js');
-require('../../services/contextual/UrlService.js');
-require('../../services/SiteAnalyticsService.js');
-require('../../services/UserService.js');
+require('domain/utilities/BrowserCheckerService.js');
+require('services/contextual/UrlService.js');
+require('services/SiteAnalyticsService.js');
+require('services/UserService.js');
 
 oppia.directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {

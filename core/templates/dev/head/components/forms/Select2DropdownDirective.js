@@ -16,7 +16,7 @@
  * @fileoverview Directive for the select2 autocomplete component.
  */
 
-require('../../domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.js');
 
 oppia.directive('select2Dropdown', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -16,7 +16,7 @@
  * @fileoverview Directive for the side navigation bar.
  */
 
-require('../../domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.js');
 
 oppia.directive('sideNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {

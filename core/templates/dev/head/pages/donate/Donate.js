@@ -16,9 +16,9 @@
  * @fileoverview Controllers for the donate page.
  */
 try {
-  require('../../domain/utilities/UrlInterpolationService.js');
-  require('../../services/SiteAnalyticsService.js');
-  require('../../services/contextual/WindowDimensionsService.js');
+  require('domain/utilities/UrlInterpolationService.js');
+  require('services/SiteAnalyticsService.js');
+  require('services/contextual/WindowDimensionsService.js');
 } catch (e) {
   if (!(e instanceof ReferenceError)) {
     throw e;

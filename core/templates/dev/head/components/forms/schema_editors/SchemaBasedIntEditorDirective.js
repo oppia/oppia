@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based editor for integers.
  */
 
-require('../../domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.js');
 
 oppia.directive('schemaBasedIntEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

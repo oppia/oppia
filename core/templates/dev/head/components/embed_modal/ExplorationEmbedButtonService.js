@@ -16,8 +16,8 @@
  * @fileoverview Service for the 'embed exploration' modal.
  */
 
-require('../../domain/utilities/UrlInterpolationService.js');
-require('../../services/SiteAnalyticsService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/SiteAnalyticsService.js');
 
 oppia.factory('ExplorationEmbedButtonService', [
   '$uibModal', 'SiteAnalyticsService', 'UrlInterpolationService',

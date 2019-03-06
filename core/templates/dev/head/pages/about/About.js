@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 try {
-  require('../../domain/utilities/UrlInterpolationService.js');
-  require('../../components/background/BackgroundBannerDirective.js');
+  require('domain/utilities/UrlInterpolationService.js');
+  require('components/background/BackgroundBannerDirective.js');
 } catch (e) {
   if (!(e instanceof ReferenceError)) {
     throw e;

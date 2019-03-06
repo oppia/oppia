@@ -18,8 +18,8 @@
  * dismissible.
  */
 
-require('../../domain/utilities/UrlInterpolationService.js');
-require('../../services/PromoBarService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/PromoBarService.js');
 
 oppia.directive('promoBar', [
   'PromoBarService', 'UrlInterpolationService',

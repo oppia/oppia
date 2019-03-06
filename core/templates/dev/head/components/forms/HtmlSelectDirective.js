@@ -16,7 +16,7 @@
  * @fileoverview Directive for the select supporting html
  */
 
-require('../../domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.js');
 
 // This directive allows user to put html into select's options.
 // 'options' should be an array of objects containing attributes 'id' and 'val'

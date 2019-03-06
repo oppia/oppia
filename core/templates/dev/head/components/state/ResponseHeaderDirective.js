@@ -16,11 +16,11 @@
  * @fileoverview Directive for the header of the response tiles.
  */
 
-require('../../domain/utilities/UrlInterpolationService.js');
-require('../../pages/exploration_editor/ExplorationEditor.js');
-require('../../pages/state_editor/StateEditorService.js');
-require('../../pages/state_editor/StatePropertyServices.js');
-require('../../services/EditabilityService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationEditor.js');
+require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/StatePropertyServices.js');
+require('services/EditabilityService.js');
 
 oppia.directive('responseHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {

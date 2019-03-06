@@ -16,15 +16,15 @@
  * @fileoverview Directive for the solution editor.
  */
 
-require('../../domain/utilities/UrlInterpolationService.js');
-require('../../domain/exploration/SolutionObjectFactory.js');
-require('../../pages/exploration_editor/editor_tab/SolutionVerificationService.js');
-require('../../pages/state_editor/StateEditorService.js');
-require('../../pages/state_editor/StatePropertyServices.js');
-require('../../services/AlertsService.js');
-require('../../services/ContextService.js');
-require('../../services/ExplorationHtmlFormatterService.js');
-require('../../services/AlertsService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('domain/exploration/SolutionObjectFactory.js');
+require('pages/exploration_editor/editor_tab/SolutionVerificationService.js');
+require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/StatePropertyServices.js');
+require('services/AlertsService.js');
+require('services/ContextService.js');
+require('services/ExplorationHtmlFormatterService.js');
+require('services/AlertsService.js');
 
 oppia.directive('solutionEditor', [
   '$uibModal', 'AlertsService', 'ContextService',

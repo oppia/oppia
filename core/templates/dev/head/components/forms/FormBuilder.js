@@ -16,7 +16,7 @@
  * @fileoverview Directives for schema-based form builders.
  */
 
-require('../../services/HtmlEscaperService.js');
+require('services/HtmlEscaperService.js');
 
 // NOTE TO DEVELOPERS: This forms framework accepts an external event
 // named 'schemaBasedFormsShown'. This should be called by clients
