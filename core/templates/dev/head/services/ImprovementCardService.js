@@ -27,7 +27,7 @@
  *       card suggests has been resolved.
  *   - Card.prototype.getTitle() -> string
  *   - Card.prototype.getContentHtml() -> string
- *   - Card.prototype.getResolutions() -> ImprovementResolutionAction[]
+ *   - Card.prototype.getResolutionActions() -> ImprovementResolutionAction[]
  */
 
 oppia.factory('ImprovementCardService', [
