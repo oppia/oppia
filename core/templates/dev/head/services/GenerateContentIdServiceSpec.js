@@ -23,6 +23,8 @@ describe('GenerateContentIdService', function() {
     $provide.value('COMPONENT_NAME_WORKED_EXAMPLE', 'worked_example');
   }));
   var gcis = null;
+  var scitat = null;
+  var citatof = null;
   var citatDict = {
     content: {},
     default_outcome: {},

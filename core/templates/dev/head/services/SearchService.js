@@ -171,7 +171,7 @@ oppia.factory('SearchService', [
         }
 
         for (var i = 1; i < querySegments.length; i++) {
-          var urlComponent = decodeURIComponent(querySegments[i]);
+          urlComponent = decodeURIComponent(querySegments[i]);
 
           var itemsType = null;
           if (urlComponent.indexOf('category') === 0) {

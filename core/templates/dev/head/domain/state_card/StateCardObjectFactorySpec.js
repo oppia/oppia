@@ -20,6 +20,8 @@ describe('State card object factory', function() {
   var StateCardObjectFactory = null;
   var InteractionObjectFactory = null;
   var ContentIdsToAudioTranslations = null;
+  var ContentIdsToAudioTranslationsObjectFactory = null;
+  var AudioTranslationObjectFactory = null;
   var _sampleCard = null;
 
   beforeEach(module('oppia'));

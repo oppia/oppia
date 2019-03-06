@@ -143,7 +143,7 @@ oppia.controller('Signup', [
         defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
       }
 
-      var requestParams = {
+      requestParams = {
         agreed_to_terms: agreedToTerms,
         can_receive_email_updates: null,
         default_dashboard: defaultDashboard

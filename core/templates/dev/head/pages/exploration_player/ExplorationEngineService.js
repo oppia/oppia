@@ -64,7 +64,7 @@ oppia.factory('ExplorationEngineService', [
 
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
-    var initialStateName = null;
+    var initStateName = null;
     var version = GLOBALS.explorationVersion;
 
     var randomFromArray = function(arr) {
