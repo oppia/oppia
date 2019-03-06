@@ -32,6 +32,7 @@ describe('ImprovementCardService', function() {
       var actualFactories =
         this.ImprovementCardService.getRegisteredCardObjectFactories();
 
+      // Ordering isn't important, so allow the checks to be flexible.
       expect(actualFactories.length).toEqual(expectedFactories.length);
       expectedFactories.forEach(function(expectedFactory) {
         expect(actualFactories).toContain(expectedFactory);
