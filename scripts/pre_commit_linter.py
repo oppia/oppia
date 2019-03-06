@@ -291,7 +291,7 @@ _PATHS_TO_INSERT = [
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pyjsparser-2.5.2'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
@@ -311,7 +311,7 @@ for path in _PATHS_TO_INSERT:
 
 import isort  # isort:skip
 import pycodestyle  # isort:skip
-import pyjsparser  # isort:skip
+import esprima  # isort:skip
 from pylint import lint  # isort:skip
 
 # pylint: enable=wrong-import-order
@@ -904,8 +904,7 @@ class LintChecksManager(object):
         """This function validates JavaScript files and returns the parsed
         contents as a Python dictionary.
         """
-        # Use Pyjsparser to parse a JS file as a Python dictionary.
-        parser = pyjsparser.PyJsParser()
+
         # Select JS files which need to be checked.
         files_to_check = [
             filename for filename in self.all_files if filename.endswith('.js')
@@ -919,8 +918,10 @@ class LintChecksManager(object):
         for filename in files_to_check:
             if self.verbose_mode_enabled:
                 print 'Validating and parsing %s file ...' % filename
-            content = FileCache.read(filename)
-            parsed_js_files[filename] = parser.parse(content)
+            content = FileCache.read(filename).decode('utf-8')
+
+            # Use esprima to parse a JS file.
+            parsed_js_files[filename] = esprima.parseScript(content)
         return parsed_js_files
 
     def _lint_all_files(self):
@@ -1071,77 +1072,77 @@ class LintChecksManager(object):
         summary_messages = []
 
         for filename in files_to_check:
-            parsed_dict = self.parsed_js_files[filename]
+            parsed_script = self.parsed_js_files[filename]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
-                parsed_nodes = parsed_dict['body']
+                parsed_nodes = parsed_script.body
                 for parsed_node in parsed_nodes:
                     # Check the type of the node.
-                    if parsed_node['type'] != 'ExpressionStatement':
+                    if parsed_node.type != 'ExpressionStatement':
                         continue
                     # Separate the expression part of the node.
-                    expression = parsed_node['expression']
+                    expression = parsed_node.expression
                     # Check whether the expression belongs to a directive.
                     expression_type_is_not_call = (
-                        expression['type'] != 'CallExpression')
+                        expression.type != 'CallExpression')
                     if expression_type_is_not_call:
                         continue
                     expression_callee_type_is_not_member = (
-                        expression['callee']['type'] != 'MemberExpression')
+                        expression.callee.type != 'MemberExpression')
                     if expression_callee_type_is_not_member:
                         continue
                     expression_callee_property_name_is_not_directive = (
-                        expression['callee']['property']['name'] != 'directive')
+                        expression.callee.property.name != 'directive')
                     if expression_callee_property_name_is_not_directive:
                         continue
                     # Separate the arguments of the expression.
-                    arguments = expression['arguments']
+                    arguments = expression.arguments
                     # The first argument of the expression is the
                     # name of the directive.
-                    if arguments[0]['type'] == 'Literal':
-                        directive_name = str(arguments[0]['value'])
+                    if arguments[0].type == 'Literal':
+                        directive_name = str(arguments[0].value)
                     arguments = arguments[1:]
                     for argument in arguments:
                         # Check the type of an argument.
-                        if argument['type'] != 'ArrayExpression':
+                        if argument.type != 'ArrayExpression':
                             continue
                         # Separate out the elements for the argument.
-                        elements = argument['elements']
+                        elements = argument.elements
                         for element in elements:
                             # Check the type of an element.
-                            if element['type'] != 'FunctionExpression':
+                            if element.type != 'FunctionExpression':
                                 continue
                             # Separate out the body of the element.
-                            body = element['body']
-                            if body['type'] != 'BlockStatement':
+                            body = element.body
+                            if body.type != 'BlockStatement':
                                 continue
                             # Further separate the body elements from the body.
-                            body_elements = body['body']
+                            body_elements = body.body
                             for body_element in body_elements:
                                 # Check if the body element is a return
                                 # statement.
                                 body_element_type_is_not_return = (
-                                    body_element['type'] != 'ReturnStatement')
+                                    body_element.type != 'ReturnStatement')
                                 body_element_arg_type_is_not_object = (
-                                    body_element['argument']['type'] != (
+                                    body_element.argument.type != (
                                         'ObjectExpression'))
                                 if (body_element_type_is_not_return or (
                                         body_element_arg_type_is_not_object)):
                                     continue
                                 # Separate the properties of the return node.
                                 return_node_properties = (
-                                    body_element['argument']['properties'])
+                                    body_element.argument.properties)
                                 # Loop over all the properties of the return
                                 # node to find out the scope key.
                                 for return_node_property in (
                                         return_node_properties):
                                     # Check whether the property is scope.
                                     property_key_is_an_identifier = (
-                                        return_node_property['key'][
-                                            'type'] == ('Identifier'))
+                                        return_node_property.key.type == (
+                                            'Identifier'))
                                     property_key_name_is_scope = (
-                                        return_node_property['key'][
-                                            'name'] == ('scope'))
+                                        return_node_property.key.name == (
+                                            'scope'))
                                     if (
                                             property_key_is_an_identifier and (
                                                 property_key_name_is_scope)):
@@ -1150,10 +1151,10 @@ class LintChecksManager(object):
                                         # If it is not, then check for scope:
                                         # true and report the error message.
                                         scope_value = (
-                                            return_node_property['value'])
-                                        if scope_value['type'] == (
+                                            return_node_property.value)
+                                        if scope_value.type == (
                                                 'Literal') and (
-                                                    scope_value['value']):
+                                                    scope_value.value):
                                             failed = True
                                             print (
                                                 'Please ensure that %s '
@@ -1162,7 +1163,7 @@ class LintChecksManager(object):
                                                 'true.' %
                                                 (directive_name, filename))
                                             print ''
-                                        elif scope_value['type'] != (
+                                        elif scope_value.type != (
                                                 'ObjectExpression'):
                                             # Check whether the directive has
                                             # scope: {} else report the error
@@ -1210,40 +1211,40 @@ class LintChecksManager(object):
         summary_messages = []
 
         for filename in files_to_check:
-            parsed_dict = self.parsed_js_files[filename]
+            parsed_script = self.parsed_js_files[filename]
             with _redirect_stdout(_TARGET_STDOUT):
-                parsed_nodes = parsed_dict['body']
+                parsed_nodes = parsed_script.body
                 for parsed_node in parsed_nodes:
-                    if parsed_node['type'] != 'ExpressionStatement':
+                    if parsed_node.type != 'ExpressionStatement':
                         continue
-                    expression = parsed_node['expression']
-                    if expression['type'] != 'CallExpression':
+                    expression = parsed_node.expression
+                    if expression.type != 'CallExpression':
                         continue
-                    if expression['callee']['type'] != 'MemberExpression':
+                    if expression.callee.type != 'MemberExpression':
                         continue
-                    property_name = expression['callee']['property']['name']
+                    property_name = expression.callee.property.name
                     if property_name not in properties_to_check:
                         continue
-                    arguments = expression['arguments']
-                    if arguments[0]['type'] == 'Literal':
-                        property_value = str(arguments[0]['value'])
+                    arguments = expression.arguments
+                    if arguments[0].type == 'Literal':
+                        property_value = str(arguments[0].value)
                     arguments = arguments[1:]
                     for argument in arguments:
-                        if argument['type'] != 'ArrayExpression':
+                        if argument.type != 'ArrayExpression':
                             continue
                         literal_args = []
                         function_args = []
                         dollar_imports = []
                         regular_imports = []
                         constant_imports = []
-                        elements = argument['elements']
+                        elements = argument.elements
                         for element in elements:
-                            if element['type'] == 'Literal':
-                                literal_args.append(str(element['value']))
-                            elif element['type'] == 'FunctionExpression':
-                                func_args = element['params']
+                            if element.type == 'Literal':
+                                literal_args.append(str(element.value))
+                            elif element.type == 'FunctionExpression':
+                                func_args = element.params
                                 for func_arg in func_args:
-                                    function_args.append(str(func_arg['name']))
+                                    function_args.append(str(func_arg.name))
                         for arg in function_args:
                             if arg.startswith('$'):
                                 dollar_imports.append(arg)
