@@ -18,20 +18,36 @@
  */
 
 oppia.factory('ImprovementActionObjectFactory', [function() {
+  /**
+   * @constructor
+   * @param {string} name - the name of the action. Should correspond to a I18N
+   *    name.
+   * @param {callback} action - function to run when the action is requested to
+   *    be performed.
+   */
   var ImprovementAction = function(name, action) {
     this._name = name;
     this._action = action;
   };
 
+  /** @returns {string} - the I18N-compatible name of the action */
   ImprovementAction.prototype.getName = function() {
     return this._name;
   };
 
+  /** Performs the associated action */
   ImprovementAction.prototype.performAction = function() {
     this._action();
   };
 
   return {
+    /**
+     * @returns {ImprovementAction}
+     * @param {string} name - the name of the action. Should correspond to a
+     *    I18N name.
+     * @param {callback} action - function to run when the action is requested
+     *    to be performed.
+     */
     createNew: function(name, action) {
       return new ImprovementAction(name, action);
     },

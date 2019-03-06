@@ -45,8 +45,8 @@ oppia.factory('ImprovementCardService', [
       },
 
       /**
-       * Returns a Promise of a list of open improvement cards for creators to
-       * take action upon.
+       * @returns {Promise<Object[]>} - a list of improvement cards related to
+       * the current exploration.
        *
        * IMPORTANT: DO NOT DEPEND ON THE ORDER OF CARDS RETURNED!!
        * When ordering matters, then *explicitly* sort the returned list.

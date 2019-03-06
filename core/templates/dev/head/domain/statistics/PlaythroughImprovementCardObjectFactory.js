@@ -26,37 +26,58 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
   function(ImprovementActionObjectFactory) {
     /** @constructor */
     var PlaythroughImprovementCard = function() {
+      /** @type {boolean} */
       this._isArchived = false;
 
       var that = this;
       var archiveCardAction =
         ImprovementActionObjectFactory.createNew('Archive', function() {
           that._isArchived = true;
-          // TODO(brianrodri): Add callout to backend to mark as resolved.
+          // TODO(brianrodri): Add backend callout to mark playthrough issue as
+          // resolved.
         });
+      /** @type {ImprovementAction[]} */
       this._resolutionActions = [archiveCardAction];
     };
 
+    /**
+     * @returns {boolean} - Whether the Playthrough Issue has been marked as
+     * manually resolved by the creator.
+     */
     PlaythroughImprovementCard.prototype.isResolved = function() {
       return this._isArchived;
     };
 
+    /** @returns {string} - a simple summary of the Playthrough Issue */
     PlaythroughImprovementCard.prototype.getTitle = function() {
       return 'TODO';
     };
 
+    /**
+     * @returns {string} - the HTML required to render the Playthrough items,
+     * including sample playthroughs for creators to look at.
+     */
     PlaythroughImprovementCard.prototype.getContentHtml = function() {
       return '<b>TODO</b>: Fill with hexagons!';
     };
 
+    /**
+     * @returns {ImprovementAction[]} - the list of action items a creator can
+     * take to resolve the card.
+     */
     PlaythroughImprovementCard.prototype.getActions = function() {
       return this._resolutionActions;
     };
 
     return {
+      /** @returns {PlaythroughImprovementCard} */
       createNew: function() {
         return new PlaythroughImprovementCard();
       },
+      /**
+       * @returns {Promise<PlaythroughImprovementCard[]>} - the list of
+       * playthrough issues associated to the current exploration.
+       */
       fetchCards: function() {
         // TODO(brianrodri): Do a proper callout for real cards.
         return Promise.resolve([new PlaythroughImprovementCard()]);
