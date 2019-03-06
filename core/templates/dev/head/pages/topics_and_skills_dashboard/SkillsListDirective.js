@@ -32,6 +32,7 @@ oppia.directive('skillsList', [
         getMergeableSkillSummaries: '&mergeableSkillSummaries',
         selectedSkill: '=',
         canDeleteSkill: '&userCanDeleteSkill',
+        canCreateSkill: '&userCanCreateSkill',
         isUnpublishedSkill: '&unpublishedSkill'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

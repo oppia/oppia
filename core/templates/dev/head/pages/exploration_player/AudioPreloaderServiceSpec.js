@@ -38,11 +38,13 @@ describe('Audio preloader service', function() {
 
   var aps, atls, eof, ecs;
   var $httpBackend = null;
+  var UrlInterpolationService = null;
   var $rootScope = null;
   var explorationDict;
   var requestUrl1, requestUrl2, requestUrl3, requestUrl4;
   beforeEach(inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
+    UrlInterpolationService = $injector.get('UrlInterpolationService');
     aps = $injector.get('AudioPreloaderService');
     atls = $injector.get('AudioTranslationLanguageService');
     eof = $injector.get('ExplorationObjectFactory');
@@ -96,6 +98,12 @@ describe('Audio preloader service', function() {
             answer_groups: [],
             hints: []
           },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
           classifier_model_id: null
         },
         'State 3': {
@@ -125,6 +133,11 @@ describe('Audio preloader service', function() {
             solution: null,
             answer_groups: [],
             hints: []
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {}
+            }
           },
           classifier_model_id: null
         },
@@ -163,6 +176,12 @@ describe('Audio preloader service', function() {
             solution: null,
             answer_groups: [],
             hints: []
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           classifier_model_id: null
         },
@@ -241,6 +260,13 @@ describe('Audio preloader service', function() {
               }
             }],
             hints: []
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           classifier_model_id: null
         }
