@@ -41,7 +41,7 @@ describe('ImprovementCardService', function() {
   });
 
   describe('.fetchCards', function() {
-    describe('when all factories return empty cards', function() {
+    describe('factories which all return empty cards', function() {
       beforeEach(function() {
         var emptyCardsResolver = function() {
           return Promise.resolve([]);
