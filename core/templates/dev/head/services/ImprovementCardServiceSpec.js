@@ -26,10 +26,10 @@ describe('ImprovementCardService', function() {
     this.expectedFactories = [this.PlaythroughImprovementCardObjectFactory];
   }));
 
-  describe('.getRegisteredCardObjectFactories', function() {
+  describe('.getImprovementCardRegistry', function() {
     it('contains all known improvement card object factories', function() {
       var actualFactories =
-        this.ImprovementCardService.getRegisteredCardObjectFactories();
+        this.ImprovementCardService.getImprovementCardRegistry();
 
       // Ordering isn't important, so allow the checks to be flexible.
       expect(actualFactories.length).toEqual(this.expectedFactories.length);

@@ -40,7 +40,7 @@ oppia.factory('ImprovementCardService', [
 
     return {
       /** @returns {Object[]} */
-      getRegisteredCardObjectFactories: function() {
+      getImprovementCardRegistry: function() {
         return improvementCardRegistry;
       },
 
@@ -58,9 +58,9 @@ oppia.factory('ImprovementCardService', [
           improvementCardRegistry.map(function(improvementCardObjectFactory) {
             return improvementCardObjectFactory.fetchCards();
           })
-        ).then(function(unresolvedCardsFromFactories) {
+        ).then(function(cardsFromFactories) {
           // Flatten the cards into a single list before returning.
-          return [].concat.apply([], unresolvedCardsFromFactories);
+          return [].concat.apply([], cardsFromFactories);
         });
       },
     };
