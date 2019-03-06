@@ -18,4 +18,34 @@
 
 describe('PlaythroughImprovementCardObjectFactory', function() {
   beforeEach(module('oppia'));
+  beforeEach(inject(function($injector) {
+    this.PlaythroughImprovementCardObjectFactory =
+      $injector.get('PlaythroughImprovementCardObjectFactory');
+  }));
+
+  describe('PlaythroughImprovementCard', function() {
+    describe('.getResolutionActions', function() {
+      beforeEach(function() {
+        this.card = this.PlaythroughImprovementCardObjectFactory.createNew();
+      });
+
+      it('contains specifically ordered actions', function() {
+        var resolutionActions = this.card.getResolutionActions();
+
+        expect(resolutionActions[0]).toEqual(jasmine.objectContaining(
+          {name: 'Archive Card'}
+        ));
+      });
+
+      describe('Archive Card action', function() {
+        it('resolves the card', function() {
+          var archiveCardAction = this.card.getResolutionActions()[0];
+
+          expect(this.card.isResolved()).toBe(false);
+          archiveCardAction.resolve();
+          expect(this.card.isResolved()).toBe(true);
+        });
+      });
+    });
+  });
 });

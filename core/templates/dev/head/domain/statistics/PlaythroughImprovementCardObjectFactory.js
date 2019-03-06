@@ -22,7 +22,7 @@
  */
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
-  /** TODO */
+  /** @constructor */
   var PlaythroughImprovementCard = function() {
     this._isArchived = false;
 
@@ -33,15 +33,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
         that._isArchived = true;
       },
     };
+    // TODO(brianrodri): Create a "goToState" action.
     this._resolutionActions = [archiveCardAction];
-  };
-
-  /**
-   * Returns a Promise of an array of Playthrough cards related to the current
-   * exploration.
-   */
-  PlaythroughImprovementCard.fetchCards = function() {
-    return Promise.resolve([1, 2, 3]);
   };
 
   PlaythroughImprovementCard.prototype.isResolved = function() {
@@ -60,5 +53,12 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [function() {
     return this._resolutionActions;
   };
 
-  return PlaythroughImprovementCard;
+  return {
+    createNew: function() {
+      return new PlaythroughImprovementCard();
+    },
+    fetchCards: function() {
+      return Promise.resolve([1, 2, 3]);
+    },
+  };
 }]);
