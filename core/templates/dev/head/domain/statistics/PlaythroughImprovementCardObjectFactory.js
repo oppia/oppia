@@ -58,6 +58,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
         return new PlaythroughImprovementCard();
       },
       fetchCards: function() {
+        // TODO(brianrodri): Do a proper callout for real cards.
         return Promise.resolve([new PlaythroughImprovementCard()]);
       },
     };
