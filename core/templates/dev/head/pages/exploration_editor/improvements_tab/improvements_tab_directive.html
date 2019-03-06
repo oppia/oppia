@@ -24,7 +24,8 @@
     <span ng-bind-html="card.getContentHtml()"></span>
     <div>
       <button ng-repeat="action in card.getActions()"
-              ng-click="action.performAction()">
+              ng-click="action.performAction()"
+              translate="<[action.getName()]>">
         <[action.getName()]>
       </button>
     </div>
