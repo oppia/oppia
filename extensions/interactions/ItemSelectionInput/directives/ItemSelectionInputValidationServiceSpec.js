@@ -192,7 +192,7 @@ describe('ItemSelectionInputValidationService', function() {
         type: WARNING_TYPES.ERROR,
         message: (
           'In answer group 1, ' +
-          'rule 1, Is proper subset, needs at least 2 options.')
+          'rule 1, the "proper subset" rule must include at least 2 options.')
       }]);
     });
 });

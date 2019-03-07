@@ -121,8 +121,7 @@ oppia.directive('stateResponses', [
                     ruleInputs.forEach(function(ruleInput) {
                       var choiceIndex = answerChoiceToIndex[ruleInput];
                       if (rule.type === 'Equals' ||
-                          rule.type === 'ContainsAtLeastOneOf' ||
-                          rule.type === 'IsProperSubsetOf') {
+                          rule.type === 'ContainsAtLeastOneOf') {
                         handledAnswersArray[choiceIndex] = true;
                       } else if (rule.type ===
                         'DoesNotContainAtLeastOneOf') {
