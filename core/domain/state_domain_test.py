@@ -578,40 +578,6 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             written_translations.to_dict(), written_translations_dict)
 
-    def test_get_available_languages_gives_correct_set_of_langauges(self):
-        written_translations_dict = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'html': 'hello',
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'html': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'content2': {
-                    'hi': {
-                        'html': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'html': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-
-        written_translations = state_domain.WrittenTranslations.from_dict(
-            written_translations_dict)
-        expected_available_languages = set(['en', 'hi'])
-
-        self.assertEqual(
-            written_translations.get_available_languages(),
-            expected_available_languages)
-
     def test_get_content_ids_for_text_translation_return_correct_list_of_content_id(self): # pylint: disable=line-too-long
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {}
