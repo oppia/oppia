@@ -413,30 +413,18 @@ class UrlHandler(base.BaseHandler):
         """
 
         current_path = urlparse.urlsplit(current_url).path
+        current_path_root = '/' + current_path.split('/')[1]
         redirect_url_on_logout = current_url
 
-        if current_path == '/preferences':
-            redirect_url_on_logout = '/'
-        elif current_path == feconf.LEARNER_DASHBOARD_URL:
-            redirect_url_on_logout = '/'
-        elif current_path == '/notifications_dashboard':
-            redirect_url_on_logout = '/'
-        elif current_path == feconf.CREATOR_DASHBOARD_URL:
-            redirect_url_on_logout = '/'
-        elif current_path == feconf.TOPICS_AND_SKILLS_DASHBOARD_URL:
-            redirect_url_on_logout = '/'
-        elif current_path.split('/')[1] == feconf.SKILL_EDITOR_URL_PREFIX[1:]:
-            redirect_url_on_logout = '/'
-        elif current_path.split('/')[1] == feconf.TOPIC_EDITOR_URL_PREFIX[1:]:
-            redirect_url_on_logout = '/'
-        elif current_path.split('/')[1] == feconf.STORY_EDITOR_URL_PREFIX[1:]:
-            redirect_url_on_logout = '/'
-        elif current_path.split('/')[1] == feconf.EDITOR_URL_PREFIX[1:]:
-            exploration_id = current_path.split('/')[2]
-            redirect_url_on_logout = (
-                '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id))
+        if current_path_root in feconf.PATH_WITH_CUSTOM_LOGOUT_REDIRECT:
+            if current_path_root == feconf.EDITOR_URL_PREFIX:
+                exploration_id = current_path.split('/')[2]
+                redirect_url_on_logout = (
+                    '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id))
+            else:
+                redirect_url_on_logout = '/'
 
-        if current_path.split('/')[1] == feconf.EDITOR_URL_PREFIX[1:]:
+        if current_path_root == feconf.EDITOR_URL_PREFIX:
             logout_url = utils.set_url_query_parameter(
                 '/exploration_editor_logout', 'return_url',
                 redirect_url_on_logout)
@@ -449,24 +437,17 @@ class UrlHandler(base.BaseHandler):
     def get(self):
         login_url = None
         logout_url = None
+        if not self.request or not self.request.get('current_url'):
+            raise self.InvalidInputException(
+                'Incomplete or empty GET parameters passed'
+            )
         if self.user_id:
-            if self.request and self.request.get('current_url'):
-                logout_url = (
-                    self._get_logout_url(self.request.get('current_url')))
-            else:
-                raise self.InvalidInputException(
-                    'Incomplete or empty GET parameters passed'
-                )
+            logout_url = self._get_logout_url(self.request.get('current_url'))
         else:
-            if self.request and self.request.get('current_url'):
-                target_url = (
-                    '/' if self.request.get('current_url').endswith(
-                        feconf.SPLASH_URL)
-                    else self.request.get('current_url'))
-                login_url = (
-                    current_user_services.create_login_url(target_url))
-            else:
-                raise self.InvalidInputException(
-                    'Incomplete or empty GET parameters passed'
-                )
+            target_url = (
+                '/' if self.request.get('current_url').endswith(
+                    feconf.SPLASH_URL)
+                else self.request.get('current_url'))
+            login_url = (
+                current_user_services.create_login_url(target_url))
         self.render_json({'login_url': login_url, 'logout_url': logout_url})

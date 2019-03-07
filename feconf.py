@@ -673,6 +673,8 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
+NOTIFICATIONS_DASHBOARD_URL = '/notifications_dashboard'
+PREFERENCES_URL = '/preferences'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
@@ -712,6 +714,12 @@ UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
+
+PATH_WITH_CUSTOM_LOGOUT_REDIRECT = (
+    [PREFERENCES_URL, LEARNER_DASHBOARD_URL, NOTIFICATIONS_DASHBOARD_URL,
+     CREATOR_DASHBOARD_URL, TOPICS_AND_SKILLS_DASHBOARD_URL,
+     SKILL_EDITOR_URL_PREFIX, TOPIC_EDITOR_URL_PREFIX, STORY_EDITOR_URL_PREFIX,
+     EDITOR_URL_PREFIX])
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
