@@ -30,12 +30,12 @@ oppia.directive('topNavigationBar', [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
-        'DebouncerService', 'DeviceInfoService',
+        'DebouncerService', 'DeviceInfoService', 'LOGOUT_REDIRECT_URL',
         function(
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
-            DebouncerService, DeviceInfoService) {
+            DebouncerService, DeviceInfoService, LOGOUT_REDIRECT_URL) {
           $scope.isModerator = null;
           $scope.isAdmin = null;
           $scope.isTopicManager = null;
@@ -86,23 +86,14 @@ oppia.directive('topNavigationBar', [
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURE_EDITORS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          $scope.logoutUrl = LOGOUT_REDIRECT_URL;
           $scope.userMenuIsShown = ($scope.currentUrl !== NAV_MODE_SIGNUP);
           $scope.standardNavIsShown = (
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.currentUrl) === -1);
 
-          // User menu is not shown during signup process. Hence there is no
-          // need to calculate logout url.
-          if ($scope.userMenuIsShown) {
-            UserService.getLoginAndLogoutUrls().then(
-              function(urlObject) {
-                $scope.logoutUrl = urlObject.logout_url;
-              }
-            );
-          }
-
           $scope.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
-            UserService.getLoginAndLogoutUrls().then(
+            UserService.getLoginUrl().then(
               function(urlObject) {
                 if (urlObject.login_url) {
                   $timeout(function() {

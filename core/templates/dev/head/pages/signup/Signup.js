@@ -197,7 +197,7 @@ oppia.controller('Signup', [
           function($scope, $uibModalInstance, SiteAnalyticsService,
               UserService, $timeout, $window) {
             $scope.continueRegistration = function() {
-              UserService.getLoginAndLogoutUrls().then(
+              UserService.getLoginUrl().then(
                 function(urlObject) {
                   if (urlObject.login_url) {
                     $timeout(function() {

@@ -19,7 +19,6 @@
 import datetime
 import imghdr
 import logging
-import re
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -82,34 +81,6 @@ def _require_valid_version(version_from_payload, exploration_version):
             'Trying to update version %s of exploration from version %s, '
             'which is too old. Please reload the page and try again.'
             % (exploration_version, version_from_payload))
-
-
-class EditorLogoutHandler(base.BaseHandler):
-    """Handles logout from editor page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.open_access
-    def get(self):
-        """Checks if exploration is published and redirects accordingly."""
-
-        url_to_redirect_to = str(self.request.get('return_url'))
-        url_to_redirect_to_regex = (
-            r'%s/(?P<exploration_id>[\w-]+)$' % feconf.EDITOR_URL_PREFIX)
-        is_valid_path = re.match(url_to_redirect_to_regex, url_to_redirect_to)
-
-        if is_valid_path:
-            exploration_id = is_valid_path.group(1)
-            exploration_rights = rights_manager.get_exploration_rights(
-                exploration_id, strict=False)
-
-            if exploration_rights is None or exploration_rights.is_private():
-                url_to_redirect_to = feconf.LIBRARY_INDEX_URL
-        else:
-            url_to_redirect_to = feconf.LIBRARY_INDEX_URL
-
-        self.redirect(
-            current_user_services.create_logout_url(url_to_redirect_to))
 
 
 class EditorHandler(base.BaseHandler):

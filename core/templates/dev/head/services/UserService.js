@@ -66,14 +66,13 @@ oppia.factory('UserService', [
           data: newProfileImageDataUrl
         });
       },
-      getLoginAndLogoutUrls: function() {
+      getLoginUrl: function() {
         var urlParameters = {
           current_url: $window.location.href
         };
         return $http.get('/url_handler', {params: urlParameters}).then(
           function(response) {
             return {
-              logout_url: response.data.logout_url,
               login_url: response.data.login_url,
             };
           }

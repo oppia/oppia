@@ -14,8 +14,6 @@
 
 """Controllers for the profile page."""
 
-import urlparse
-
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -401,53 +399,21 @@ class UrlHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    def _get_logout_url(self, current_url):
-        """Prepares and returns logout url which will be handled by LogoutPage
-        handler.
-
-        Args:
-            current_url: str. The current url of the page.
-
-        Returns:
-            str. Logout URL to be handled by LogoutPage handler.
-        """
-
-        current_path = urlparse.urlsplit(current_url).path
-        current_path_root = '/' + current_path.split('/')[1]
-        redirect_url_on_logout = current_url
-
-        if current_path_root in feconf.PATH_WITH_CUSTOM_LOGOUT_REDIRECT:
-            if current_path_root == feconf.EDITOR_URL_PREFIX:
-                exploration_id = current_path.split('/')[2]
-                redirect_url_on_logout = (
-                    '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id))
-            else:
-                redirect_url_on_logout = '/'
-
-        if current_path_root == feconf.EDITOR_URL_PREFIX:
-            logout_url = utils.set_url_query_parameter(
-                '/exploration_editor_logout', 'return_url',
-                redirect_url_on_logout)
-        else:
-            logout_url = (
-                current_user_services.create_logout_url(redirect_url_on_logout))
-        return logout_url
-
     @acl_decorators.open_access
     def get(self):
         login_url = None
-        logout_url = None
-        if not self.request or not self.request.get('current_url'):
-            raise self.InvalidInputException(
-                'Incomplete or empty GET parameters passed'
-            )
         if self.user_id:
-            logout_url = self._get_logout_url(self.request.get('current_url'))
+            self.render_json({'login_url': None})
         else:
-            target_url = (
-                '/' if self.request.get('current_url').endswith(
-                    feconf.SPLASH_URL)
-                else self.request.get('current_url'))
-            login_url = (
-                current_user_services.create_login_url(target_url))
-        self.render_json({'login_url': login_url, 'logout_url': logout_url})
+            if self.request and self.request.get('current_url'):
+                target_url = (
+                    '/' if self.request.get('current_url').endswith(
+                        feconf.SPLASH_URL)
+                    else self.request.get('current_url'))
+                login_url = (
+                    current_user_services.create_login_url(target_url))
+                self.render_json({'login_url': login_url})
+            else:
+                raise self.InvalidInputException(
+                    'Incomplete or empty GET parameters passed'
+                )

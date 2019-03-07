@@ -88,7 +88,7 @@ oppia.controller('Profile', [
 
       $scope.changeSubscriptionStatus = function() {
         if ($scope.userNotLoggedIn) {
-          UserService.getLoginAndLogoutUrls().then(
+          UserService.getLoginUrl().then(
             function(urlObject) {
               if (urlObject.login_url) {
                 window.location.href = urlObject.login_url;
