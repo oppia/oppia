@@ -83,6 +83,16 @@ class EmailTests(test_utils.GenericTestBase):
         valid_reply_to = gae_email_services.get_incoming_email_address(reply_to)
         self.assertEqual(messages[0].reply_to, valid_reply_to)
 
+    def test_sending_email_without_reply_to_id_not_add_reply_to_email(self):
+        # Tests that email does not have reply_to_id if not passed.
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            gae_email_services.send_mail(
+                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                'subject', 'body', 'html')
+        messages = self.mail_stub.get_sent_messages(
+            to=feconf.ADMIN_EMAIL_ADDRESS)
+        self.assertFalse(hasattr(messages, 'reply_to'))
+
     def test_that_email_not_sent_if_sender_address_is_malformed(self):
         malformed_sender_email = ''
         email_exception = (
