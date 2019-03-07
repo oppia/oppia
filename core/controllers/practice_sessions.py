@@ -39,5 +39,5 @@ class PracticeSessionsPage(base.BaseHandler):
 
         self.values.update({
             'topic_name': topic.name
-            })
+        })
         self.render_template('/pages/practice_session/practice_session.html')
