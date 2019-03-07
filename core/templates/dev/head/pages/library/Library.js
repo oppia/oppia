@@ -16,10 +16,6 @@
  * @fileoverview Data and controllers for the Oppia contributors' library page.
  */
 
-// NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
-// be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
-// LIBRARY_PAGE_MODES.GROUP should have the same value as
-// LIBRARY_PAGE_MODE_GROUP in feconf.py.
 oppia.constant('LIBRARY_PAGE_MODES', {
   GROUP: 'group',
   INDEX: 'index',
@@ -55,7 +51,17 @@ oppia.controller('Library', [
 
     $scope.activeGroupIndex = null;
 
-    $scope.pageMode = GLOBALS.PAGE_MODE;
+    $scope.pageMode = '';
+    var currentPath = $window.location.pathname;
+    if (currentPath === '/library') {
+      $scope.pageMode = LIBRARY_PAGE_MODES.INDEX;
+    } else if (currentPath === '/library/top_rated') {
+      $scope.pageMode = LIBRARY_PAGE_MODES.GROUP;
+    } else if (currentPath === '/search/find') {
+      $scope.pageMode = LIBRARY_PAGE_MODES.SEARCH;
+    } else {
+      $log.error('INVALID URL PATH: ' + currentPath);
+    }
     $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
 
     // Keeps track of the index of the left-most visible card of each group.

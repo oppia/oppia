@@ -24,7 +24,6 @@
   <script type="text/javascript">
     GLOBALS.LANGUAGE_CODES_AND_NAMES = JSON.parse(
       '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
-    GLOBALS.PAGE_MODE = JSON.parse('{{page_mode|js_string}}');
   </script>
 
   <style>
@@ -355,7 +354,7 @@
 
 {% block footer %}
   <div ng-controller="LibraryFooter">
-    <div ng-if="pageMode !== LIBRARY_PAGE_MODES.SEARCH">
+    <div ng-if="displayFooter">
       {% include 'pages/footer.html' %}
     </div>
   </div>
