@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-' This scripts simplify the directery struture of templates'
+""" This scripts simplify the directery struture of templates."""
 
 import os
 
