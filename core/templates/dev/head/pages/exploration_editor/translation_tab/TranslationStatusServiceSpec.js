@@ -153,7 +153,7 @@ describe('Translation status service', function() {
 
     it('should return correct status color for active state', function() {
       StateContentIdsToAudioTranslationsService.init(
-        'First', ess.getContentIdsToAudioTranslationsMemento('First'));
+        STATES[0], ess.getContentIdsToAudioTranslationsMemento(STATES[0]));
       var activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('content');
       expect(activeStateComponentStatus).toBe(ALL_AUDIO_AVAILABLE_COLOR);
@@ -161,7 +161,7 @@ describe('Translation status service', function() {
         .getActiveStateComponentStatusColor('feedback');
       expect(activeStateComponentStatus).toBe(FEW_AUDIO_AVAILABLE_COLOR);
       StateContentIdsToAudioTranslationsService.init(
-        'Second', ess.getContentIdsToAudioTranslationsMemento('Second'));
+        STATES[1], ess.getContentIdsToAudioTranslationsMemento(STATES[1]));
       activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('content');
       expect(activeStateComponentStatus).toBe(NO_AUDIO_AVAILABLE_COLOR);
@@ -169,7 +169,7 @@ describe('Translation status service', function() {
         .getActiveStateComponentStatusColor('feedback');
       expect(activeStateComponentStatus).toBe(NO_AUDIO_AVAILABLE_COLOR);
       StateContentIdsToAudioTranslationsService.init(
-        'Third', ess.getContentIdsToAudioTranslationsMemento('Third'));
+        STATES[2], ess.getContentIdsToAudioTranslationsMemento(STATES[2]));
       activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('content');
       expect(activeStateComponentStatus).toBe(ALL_AUDIO_AVAILABLE_COLOR);
@@ -178,7 +178,7 @@ describe('Translation status service', function() {
     it('should correctly return whether audio translation(s) of ' +
       'active state component need(s) update', function() {
       StateContentIdsToAudioTranslationsService.init(
-        'First', ess.getContentIdsToAudioTranslationsMemento('First'));
+        STATES[0], ess.getContentIdsToAudioTranslationsMemento(STATES[0]));
       var activeStateComponentNeedsUpdateStatus = tss
         .getActiveStateComponentNeedsUpdateStatus('content');
       expect(activeStateComponentNeedsUpdateStatus).toBe(true);
@@ -190,12 +190,12 @@ describe('Translation status service', function() {
     it('should return correct status color of a contentId of active state',
       function() {
         StateContentIdsToAudioTranslationsService.init(
-          'First', ess.getContentIdsToAudioTranslationsMemento('First'));
+          STATES[0], ess.getContentIdsToAudioTranslationsMemento(STATES[0]));
         var activeStateContentIdStatusColor = tss
           .getActiveStateContentIdStatusColor('content');
         expect(activeStateContentIdStatusColor).toBe(ALL_AUDIO_AVAILABLE_COLOR);
         StateContentIdsToAudioTranslationsService.init(
-          'Second', ess.getContentIdsToAudioTranslationsMemento('Second'));
+          STATES[1], ess.getContentIdsToAudioTranslationsMemento(STATES[1]));
         activeStateContentIdStatusColor = tss
           .getActiveStateContentIdStatusColor('content');
         expect(activeStateContentIdStatusColor).toBe(NO_AUDIO_AVAILABLE_COLOR);
@@ -204,12 +204,12 @@ describe('Translation status service', function() {
     it('should return whether audio translation(s) of active ' +
       'state contentId needs update status', function() {
       StateContentIdsToAudioTranslationsService.init(
-        'First', ess.getContentIdsToAudioTranslationsMemento('First'));
+        STATES[0], ess.getContentIdsToAudioTranslationsMemento(STATES[0]));
       var activeStateContentIdNeedsUpdateStatus = tss
         .getActiveStateContentIdNeedsUpdateStatus('content');
       expect(activeStateContentIdNeedsUpdateStatus).toBe(true);
       StateContentIdsToAudioTranslationsService.init(
-        'Third', ess.getContentIdsToAudioTranslationsMemento('Third'));
+        STATES[2], ess.getContentIdsToAudioTranslationsMemento(STATES[2]));
       activeStateContentIdNeedsUpdateStatus = tss
         .getActiveStateContentIdNeedsUpdateStatus('content');
       expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
