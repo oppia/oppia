@@ -183,12 +183,10 @@ describe('ItemSelectionInputValidationService', function() {
     function() {
       // Modify values of customization arguments to get warning.
       customizationArguments.minAllowableSelectionCount.value = 0;
-      customizationArguments.maxAllowableSelectionCount.value = 1;
 
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, IsProperSubsetValidOption,
         goodDefaultOutcome);
-      console.log(IsProperSubsetValidOption[0].rules[0].inputs.x.length);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
