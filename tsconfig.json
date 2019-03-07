@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-  	"allowJs": true,
   	"outDir": "compiled_js",
     "target": "es5",
     "typeRoots": ["./node_modules/@types", "typings"],
-    "types": ["angular", "angular-animate", "angular-mocks", "ckeditor", "d3", "googlemaps", "google.visualization", "jasmine", "jasmine-jquery", "jasminewd2", "jquery", "jqueryui", "mathjax", "mathjs", "mousetrap", "node", "select2", "selenium-webdriver"]
+    "types": ["angular", "angular-animate", "angular-mocks", "ckeditor", "d3", "google.visualization", "jasmine", "jasmine-jquery", "jasminewd2", "jquery", "jqueryui", "leaflet", "mathjax", "mathjs", "mousetrap", "select2", "selenium-webdriver"]
   }
 }

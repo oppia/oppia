@@ -103,6 +103,15 @@ describe('Question object factory', function() {
           content_3: {},
           content_4: {},
           content_5: {}
+        },
+        written_translations: {
+          translations_mapping: {
+            content_1: {},
+            content_2: {},
+            content_3: {},
+            content_4: {},
+            content_5: {}
+          }
         }
       },
       language_code: 'en',
@@ -131,11 +140,7 @@ describe('Question object factory', function() {
   });
 
   it('should correctly get backend dict', function() {
-    expect(
-      _sampleQuestion.toBackendDict(true).question_state_schema_version
-    ).toEqual(27);
-
-    expect(_sampleQuestion.toBackendDict(true, 27).id).toEqual(null);
+    expect(_sampleQuestion.toBackendDict(true).id).toEqual(null);
     expect(_sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 

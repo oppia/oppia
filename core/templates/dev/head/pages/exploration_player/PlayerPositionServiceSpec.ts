@@ -22,7 +22,9 @@ import 'angular-mocks';
 describe('Player position service', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  var pts, pps, scof;
+  var pts = null;
+  var pps = null;
+  var scof = null;
   beforeEach(angular.mock.inject(function($injector) {
     pts = $injector.get('PlayerTranscriptService');
     pps = $injector.get('PlayerPositionService');

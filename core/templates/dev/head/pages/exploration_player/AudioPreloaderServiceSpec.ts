@@ -101,6 +101,12 @@ describe('Audio preloader service', function() {
             answer_groups: [],
             hints: []
           },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
           classifier_model_id: null
         },
         'State 3': {
@@ -130,6 +136,11 @@ describe('Audio preloader service', function() {
             solution: null,
             answer_groups: [],
             hints: []
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {}
+            }
           },
           classifier_model_id: null
         },
@@ -168,6 +179,12 @@ describe('Audio preloader service', function() {
             solution: null,
             answer_groups: [],
             hints: []
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           classifier_model_id: null
         },
@@ -246,6 +263,13 @@ describe('Audio preloader service', function() {
               }
             }],
             hints: []
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           classifier_model_id: null
         }

@@ -78,7 +78,7 @@ oppia.factory('ExplorationDataService', [
           LocalStorageService.removeExplorationDraft(explorationId);
           successCallback(response);
         },
-        errorCallback());
+        errorCallback);
       },
       discardDraft: function(successCallback, errorCallback) {
         $http.post(explorationDraftAutosaveUrl, {}).then(function() {

@@ -143,8 +143,16 @@ exports.config = {
       '../../compiled_js/core/tests/protractor/subscriptionsFlow.js'
     ],
 
+    topicAndStoryEditor: [
+      'protractor_desktop/topicAndStoryEditor.js'
+    ],
+
     topicsAndSkillsDashboard: [
       '../../compiled_js/core/tests/protractor_desktop/topicsAndSkillsDashboard.js'
+    ],
+
+    skillEditorPage: [
+      'protractor_desktop/skillEditorPage.js'
     ],
 
     users: [

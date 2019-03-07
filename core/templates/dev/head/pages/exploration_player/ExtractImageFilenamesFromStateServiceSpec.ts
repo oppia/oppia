@@ -96,6 +96,12 @@ describe('Extracting Image file names in the state service', function() {
             answer_groups: [],
             hints: []
           },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
           classifier_model_id: null
         },
         'State 3': {
@@ -120,6 +126,12 @@ describe('Extracting Image file names in the state service', function() {
             solution: null,
             answer_groups: [],
             hints: []
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           classifier_model_id: null
         },
@@ -205,6 +217,14 @@ describe('Extracting Image file names in the state service', function() {
             ],
             hints: [],
             solution: null
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
           }
         },
         'State 4': {
@@ -304,6 +324,14 @@ describe('Extracting Image file names in the state service', function() {
                 ]
               }
             ]
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
           }
         },
         'State 5': {
@@ -489,6 +517,17 @@ describe('Extracting Image file names in the state service', function() {
             },
             hints: [],
             solution: null
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              feedback_3: {},
+              feedback_4: {},
+              feedback_5: {}
+            }
           }
         },
         'State 6': {
@@ -579,6 +618,16 @@ describe('Extracting Image file names in the state service', function() {
                       '</oppia-noninteractive-image></p>'
               }
             },
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              hint_1: {},
+              solution: {}
+            }
           },
           classifier_model_id: null
         }

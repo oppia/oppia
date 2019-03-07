@@ -1342,17 +1342,11 @@ def _validate_and_parse_js_files(all_files):
     parsed_js_files = dict()
     for filename in files_to_check:
         print 'Validating and parsing %s file ...' % filename
-        content = FileCache.read(filename)
+        content = FileCache.read(filename).decode('utf-8')
 
-        content_with_no_non_ascii_characters = ''
-
-        for char in content:
-            if 0 <= ord(char) <= 127:
-                content_with_no_non_ascii_characters = (
-                    content_with_no_non_ascii_characters + char)
         # Use esprima to parse a JS file.
-        parsed_js_files[filename] = esprima.parseScript(
-            content_with_no_non_ascii_characters)
+        parsed_js_files[filename] = esprima.parseScript(content)
+
     return parsed_js_files
 
 

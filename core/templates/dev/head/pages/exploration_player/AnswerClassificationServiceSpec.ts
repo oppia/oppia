@@ -121,7 +121,15 @@ describe('Answer classification service with string classifier disabled',
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
+        }
       });
     }));
 
@@ -225,7 +233,14 @@ describe('Answer classification service with string classifier disabled',
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       });
 
       expect(function() {
@@ -347,7 +362,15 @@ describe('Answer classification service with string classifier enabled',
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
+        }
       });
 
       stateClassifierMapping = {
@@ -503,7 +526,15 @@ describe('Answer classification service with training data classification',
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
+        }
       });
     }));
 

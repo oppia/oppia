@@ -891,6 +891,22 @@ def get_topic_rights(topic_id, strict=True):
     return get_topic_rights_from_model(model)
 
 
+def get_topic_rights_with_user(user_id):
+    """Retrieves the rights object for all topics assigned to given user.
+
+    Args:
+        user_id: str. ID of the user.
+
+    Returns:
+        list(TopicRights). The rights objects associated with the topics
+            assigned to given user.
+    """
+    topic_rights_models = topic_models.TopicRightsModel.get_by_user(user_id)
+    return [
+        get_topic_rights_from_model(model) for model in topic_rights_models
+        if model is not None]
+
+
 def get_all_topic_rights():
     """Returns the rights object of all topics present in the datastore.
 
@@ -943,6 +959,29 @@ def check_can_edit_subtopic_page(user):
         return True
 
     return False
+
+
+def deassign_user_from_all_topics(committer, user_id):
+    """Deassigns given user from all topics assigned to them.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        user_id: str. The ID of the user.
+
+    Raises:
+        Exception. The committer does not have rights to modify a role.
+    """
+    topic_rights_list = get_topic_rights_with_user(user_id)
+    for topic_rights in topic_rights_list:
+        topic_rights.manager_ids.remove(user_id)
+        commit_cmds = [topic_domain.TopicRightsChange({
+            'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+            'removed_user_id': user_id
+        })]
+        save_topic_rights(
+            topic_rights, committer.user_id,
+            'Removed all assigned topics from %s' % (user_id), commit_cmds)
 
 
 def assign_role(committer, assignee, new_role, topic_id):

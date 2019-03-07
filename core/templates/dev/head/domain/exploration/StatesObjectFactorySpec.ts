@@ -24,6 +24,7 @@ describe('States object factory', function() {
 
   describe('StatesObjectFactory', function() {
     var scope, sof, ssof, statesDict, statesWithAudioDict, atof;
+
     beforeEach(angular.mock.inject(function($injector) {
       ssof = $injector.get('StatesObjectFactory');
       sof = $injector.get('StateObjectFactory');
@@ -111,7 +112,14 @@ describe('States object factory', function() {
             hints: [],
             solution: null
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          },
         }
       };
 
@@ -216,7 +224,16 @@ describe('States object factory', function() {
             }],
             id: 'TextInput'
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              hint_1: {},
+              hint_2: {}
+            }
+          }
         },
         'second state': {
           content: {
@@ -264,7 +281,13 @@ describe('States object factory', function() {
             },
             id: 'TextInput'
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          }
         }
       };
     }));
@@ -305,7 +328,13 @@ describe('States object factory', function() {
             hints: [],
             id: 'TextInput'
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
         }));
     });
 

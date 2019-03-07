@@ -24,6 +24,7 @@ describe('Exploration object factory', function() {
 
   describe('ExplorationObjectFactory', function() {
     var scope, eof, atof, sof, explorationDict, exploration;
+
     beforeEach(angular.mock.inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       eof = $injector.get('ExplorationObjectFactory');
@@ -63,8 +64,13 @@ describe('Exploration object factory', function() {
             hints: [],
             id: 'TextInput'
           },
-          hints: [],
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
         },
         'second state': {
           content: {
@@ -93,8 +99,13 @@ describe('Exploration object factory', function() {
             hints: [],
             id: 'TextInput'
           },
-          hints: [],
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
         }
       };
 

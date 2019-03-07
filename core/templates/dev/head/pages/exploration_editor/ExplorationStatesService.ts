@@ -78,6 +78,9 @@ oppia.factory('ExplorationStatesService', [
         } else {
           return null;
         }
+      },
+      written_translations: function(writtenTranslations) {
+        return writtenTranslations.toBackendDict();
       }
     };
 
@@ -94,7 +97,8 @@ oppia.factory('ExplorationStatesService', [
       hints: ['interaction', 'hints'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
-      widget_customization_args: ['interaction', 'customizationArgs']
+      widget_customization_args: ['interaction', 'customizationArgs'],
+      written_translations: ['writtenTranslations']
     };
 
     var CONTENT_ID_EXTRACTORS = {
@@ -190,9 +194,11 @@ oppia.factory('ExplorationStatesService', [
           contentIdsToDelete.forEach(function(contentId) {
             newStateData.contentIdsToAudioTranslations.deleteContentId(
               contentId);
+            newStateData.writtenTranslations.deleteContentId(contentId);
           });
           contentIdsToAdd.forEach(function(contentId) {
             newStateData.contentIdsToAudioTranslations.addContentId(contentId);
+            newStateData.writtenTranslations.addContentId(contentId);
           });
         }
         var propertyRef = newStateData;
@@ -336,6 +342,13 @@ oppia.factory('ExplorationStatesService', [
         saveStateProperty(
           stateName, 'content_ids_to_audio_translations',
           newContentIdsToAudioTranslations);
+      },
+      getWrittenTranslationsMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'written_translations');
+      },
+      saveWrittenTranslations: function(stateName, newWrittenTranslations) {
+        saveStateProperty(
+          stateName, 'written_translations', newWrittenTranslations);
       },
       isInitialized: function() {
         return _states !== null;

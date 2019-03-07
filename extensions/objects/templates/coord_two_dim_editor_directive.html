@@ -1,7 +1,20 @@
-<div>
-  <div ui-map="map" ui-options="mapOptions"
-       style="width: 100%; height: 400px; max-width: 600px; max-height: 400px; margin: auto"
-       ui-event="{'map-click': 'registerClick($event, $params)'}">
-  </div>
-  <div ui-map-marker="mapMarker"></div>
+<div class="oppia-coord-two-dim-editor-container">
+  <leaflet id="coordTwoDimEditor"
+           class="oppia-coord-to-dim-editor-map"
+           event-broadcast="mapEvents"
+           lf-center="mapCenter"
+           markers="mapMarkers">
+  </leaflet>
 </div>
+<style>
+  .oppia-coord-to-dim-editor-map {
+    height: 250px;
+    margin: auto;
+    max-height: 250px;
+    max-width: 600px;
+    width: 100%;
+  }
+  .oppia-coord-two-dim-editor-container {
+    border: 2px solid grey;
+  }
+</style>
