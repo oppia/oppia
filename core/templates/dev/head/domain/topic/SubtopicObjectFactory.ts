@@ -104,14 +104,20 @@ oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
       }
     };
 
-    Subtopic.create = function(subtopicBackendDict, skillIdToDescriptionMap) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Subtopic['create'] = function(subtopicBackendDict, skillIdToDescriptionMap) {
       return new Subtopic(
         subtopicBackendDict.id, subtopicBackendDict.title,
         subtopicBackendDict.skill_ids, skillIdToDescriptionMap);
     };
 
-    Subtopic.createFromTitle = function(subtopicId, title) {
-      return Subtopic.create({
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Subtopic['createFromTitle'] = function(subtopicId, title) {
+      // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+      /* eslint-disable dot-notation */
+      return Subtopic['create']({
         id: subtopicId,
         title: title,
         skill_ids: []

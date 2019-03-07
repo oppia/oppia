@@ -89,7 +89,9 @@ oppia.factory('FractionObjectFactory', [
       return this.denominator <= this.numerator;
     };
 
-    Fraction.fromRawInputString = function(rawInput) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Fraction['fromRawInputString'] = function(rawInput) {
       var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
       if (INVALID_CHARS_REGEX.test(rawInput)) {
         throw new Error(FRACTION_PARSING_ERRORS.INVALID_CHARS);
@@ -131,7 +133,9 @@ oppia.factory('FractionObjectFactory', [
       return new Fraction(isNegative, wholeNumber, numerator, denominator);
     };
 
-    Fraction.fromDict = function(fractionDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Fraction['fromDict'] = function(fractionDict) {
       return new Fraction(
         fractionDict.isNegative,
         fractionDict.wholeNumber,

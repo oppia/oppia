@@ -46,14 +46,18 @@ oppia.factory('ParamSpecObjectFactory', [
      *    backend.
      * @returns {ParamSpec} - A new ParamSpec instance.
      */
-    ParamSpec.createFromBackendDict = function(paramSpecBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    ParamSpec['createFromBackendDict'] = function(paramSpecBackendDict) {
       return new ParamSpec(
         ParamTypeObjectFactory.getTypeFromBackendName(
           paramSpecBackendDict.obj_type));
     };
 
     /** @returns {ParamSpec} - A default instance for ParamSpec. */
-    ParamSpec.createDefault = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    ParamSpec['createDefault'] = function() {
       return new ParamSpec(ParamTypeObjectFactory.getDefaultType());
     };
 

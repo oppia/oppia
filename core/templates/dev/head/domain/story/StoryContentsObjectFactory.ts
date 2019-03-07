@@ -359,7 +359,9 @@ oppia.factory('StoryContentsObjectFactory', [
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // story python dict.
-    StoryContents.createFromBackendDict = function(storyContentsBackendObject) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    StoryContents['createFromBackendDict'] = function(storyContentsBackendObject) {
       var nodes = [];
       for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
         nodes.push(

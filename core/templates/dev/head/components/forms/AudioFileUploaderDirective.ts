@@ -75,8 +75,8 @@ oppia.directive('audioFileUploader', [
               // Only fire this event if validations pass.
               scope.onFileChanged(file);
             } else {
-              (<HTMLInputElement>document.getElementById(
-                scope.inputFieldFormId)).value('');
+              (<HTMLFormElement>document.getElementById(
+                scope.inputFieldFormId)).val('');
               scope.onFileCleared();
             }
             scope.$apply();

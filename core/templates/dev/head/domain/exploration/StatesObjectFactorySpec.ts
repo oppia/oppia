@@ -59,14 +59,20 @@ describe('States object factory', function() {
             },
             param_changes: [],
             labelled_as_correct: false,
-            param_changes: [],
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
           hints: [],
+          solution: null,
           id: 'TextInput'
         },
         param_changes: [],
+        written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+        }
       };
 
       statesDict = {

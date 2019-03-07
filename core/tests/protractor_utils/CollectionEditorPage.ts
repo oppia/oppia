@@ -17,8 +17,7 @@
  * tests.
  */
 
-import {protractor} from 'protractor/globals';
-import {element, browser, by} from 'protractor';
+import {element, browser, by, protractor} from 'protractor';
 
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');

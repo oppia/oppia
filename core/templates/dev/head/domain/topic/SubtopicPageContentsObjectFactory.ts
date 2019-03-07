@@ -56,7 +56,9 @@ oppia.factory('SubtopicPageContentsObjectFactory', [
         angular.copy(newContentIdsToAudioTranslations);
     };
 
-    SubtopicPageContents.createDefault = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    SubtopicPageContents['createDefault'] = function() {
       var contentIdsToAudioTranslations =
         ContentIdsToAudioTranslationsObjectFactory.createEmpty();
       contentIdsToAudioTranslations.addContentId('content');
@@ -73,7 +75,9 @@ oppia.factory('SubtopicPageContentsObjectFactory', [
       };
     };
 
-    SubtopicPageContents.createFromBackendDict = function(backendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    SubtopicPageContents['createFromBackendDict'] = function(backendDict) {
       return new SubtopicPageContents(
         SubtitledHtmlObjectFactory.createFromBackendDict(
           backendDict.subtitled_html),

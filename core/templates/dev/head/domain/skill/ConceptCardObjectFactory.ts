@@ -49,7 +49,7 @@ oppia.factory('ConceptCardObjectFactory', [
     };
 
     var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
-      diffList = Array.from(setA).filter(function(element) {
+      var diffList = Array.from(setA).filter(function(element) {
         return !setB.has(element);
       });
       return diffList;
@@ -57,14 +57,16 @@ oppia.factory('ConceptCardObjectFactory', [
 
     var _extractAvailableContentIdsFromWorkedExamples = function(
         workedExamples) {
-      contentIds = new Set();
+      var contentIds = new Set();
       workedExamples.forEach(function(workedExample) {
         contentIds.add(workedExample.getContentId());
       });
       return contentIds;
     };
 
-    ConceptCard.createFromBackendDict = function(conceptCardBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    ConceptCard['createFromBackendDict'] = function(conceptCardBackendDict) {
       return new ConceptCard(
         SubtitledHtmlObjectFactory.createFromBackendDict(
           conceptCardBackendDict.explanation),
@@ -87,12 +89,12 @@ oppia.factory('ConceptCardObjectFactory', [
     };
 
     ConceptCard.prototype.setWorkedExamples = function(workedExamples) {
-      oldContentIds = _extractAvailableContentIdsFromWorkedExamples(
+      var oldContentIds = _extractAvailableContentIdsFromWorkedExamples(
         this._workedExamples);
 
       this._workedExamples = workedExamples.slice();
 
-      newContentIds = _extractAvailableContentIdsFromWorkedExamples(
+      var newContentIds = _extractAvailableContentIdsFromWorkedExamples(
         this._workedExamples);
 
       var contentIdsToDelete = _getElementsInFirstSetButNotInSecond(
@@ -115,8 +117,10 @@ oppia.factory('ConceptCardObjectFactory', [
 
     // Create an interstitial concept card that would be displayed in the
     // editor until the actual skill is fetched from the backend.
-    ConceptCard.createInterstitialConceptCard = function() {
-      contentIdsToAudioTranslationsDict = {};
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    ConceptCard['createInterstitialConceptCard'] = function() {
+      var contentIdsToAudioTranslationsDict = {};
       contentIdsToAudioTranslationsDict[COMPONENT_NAME_EXPLANATION] = {};
       return new ConceptCard(
         SubtitledHtmlObjectFactory.createDefault(

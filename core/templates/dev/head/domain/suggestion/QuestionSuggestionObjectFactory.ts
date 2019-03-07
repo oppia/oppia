@@ -37,7 +37,9 @@ oppia.factory('QuestionSuggestionObjectFactory', [
       return this.suggestionId;
     };
 
-    Suggestion.createFromBackendDict = function(suggestionBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Suggestion['createFromBackendDict'] = function(suggestionBackendDict) {
       var question = QuestionObjectFactory.createFromBackendDict(
         suggestionBackendDict.change.question_dict);
       return new Suggestion(

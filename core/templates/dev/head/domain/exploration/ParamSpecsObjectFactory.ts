@@ -97,7 +97,9 @@ oppia.factory('ParamSpecsObjectFactory', [
      * @returns {ParamSpecs} - An instance with properties from the backend
      *    dict.
      */
-    ParamSpecs.createFromBackendDict = function(paramSpecsBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    ParamSpecs['createFromBackendDict'] = function(paramSpecsBackendDict) {
       var paramDict = {};
       Object.keys(paramSpecsBackendDict).forEach(function(paramName) {
         paramDict[paramName] = ParamSpecObjectFactory.createFromBackendDict(

@@ -130,13 +130,17 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       };
     };
 
-    NumberWithUnits.createCurrencyUnits = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    NumberWithUnits['createCurrencyUnits'] = function() {
       try {
         UnitsObjectFactory.createCurrencyUnits();
       } catch (parsingError) {}
     };
 
-    NumberWithUnits.fromRawInputString = function(rawInput) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    NumberWithUnits['fromRawInputString'] = function(rawInput) {
       rawInput = rawInput.trim();
       var type = '';
       var real = 0.0;
@@ -242,7 +246,9 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       return new NumberWithUnits(type, real, fractionObj, unitsObj);
     };
 
-    NumberWithUnits.fromDict = function(numberWithUnitsDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    NumberWithUnits['fromDict'] = function(numberWithUnitsDict) {
       return new NumberWithUnits(
         numberWithUnitsDict.type,
         numberWithUnitsDict.real,
@@ -264,7 +270,9 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
       return !('/*() '.includes(unit));
     };
 
-    Units.stringToLexical = function(units) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Units['stringToLexical'] = function(units) {
       units += '#';
       var unitList = [];
       var unit = '';
@@ -359,12 +367,19 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
       };
     };
 
-    Units.fromList = function(unitsList) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Units['fromList'] = function(unitsList) {
       return new Units(unitsList);
     };
 
-    Units.fromStringToList = function(unitsString) {
-      return unitToList(unitWithMultiplier(Units.stringToLexical(unitsString)));
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Units['fromStringToList'] = function(unitsString) {
+      // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+      /* eslint-disable dot-notation */
+      return unitToList(unitWithMultiplier(
+        Units['stringToLexical'](unitsString)));
     };
 
     Units.prototype.toString = function() {
@@ -380,7 +395,9 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
       return unit.trim();
     };
 
-    Units.createCurrencyUnits = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Units['createCurrencyUnits'] = function() {
       // Creates user-defined currency (base + sub) units.
       var keys = Object.keys(CURRENCY_UNITS);
       for (var i = 0; i < keys.length; i++) {
@@ -397,7 +414,9 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
       }
     };
 
-    Units.toMathjsCompatibleString = function(units) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Units['toMathjsCompatibleString'] = function(units) {
       // Makes the units compatible with the math.js allowed format.
       units = units.replace(/per/g, '/');
 
@@ -423,12 +442,20 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
       return units.trim();
     };
 
-    Units.fromRawInputString = function(units) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    Units['fromRawInputString'] = function(units) {
       try {
-        Units.createCurrencyUnits();
+        // TODO (ankita240796) Remove the bracket notation once Angular2
+        // gets in.
+        /* eslint-disable dot-notation */
+        Units['createCurrencyUnits']();
       } catch (parsingError) {}
 
-      var compatibleUnits = Units.toMathjsCompatibleString(units);
+      // TODO (ankita240796) Remove the bracket notation once Angular2
+      // gets in.
+      /* eslint-disable dot-notation */
+      var compatibleUnits = Units['toMathjsCompatibleString'](units);
       if (compatibleUnits !== '') {
         try {
           math.unit(compatibleUnits);
@@ -436,7 +463,9 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
           throw new Error(err);
         }
       }
-      return new Units(Units.fromStringToList(units));
+      // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+      /* eslint-disable dot-notation */
+      return new Units(Units['fromStringToList'](units));
     };
 
     return Units;

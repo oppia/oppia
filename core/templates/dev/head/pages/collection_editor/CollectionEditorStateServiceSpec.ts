@@ -34,7 +34,7 @@ describe('Collection editor state service', function() {
   // TODO(bhenning): Consider moving this to a more shareable location.
   var FakeEditableCollectionBackendApiService = function() {
     var self = {
-      BackendCollectionObject: null,
+      newBackendCollectionObject: null,
       failure: null,
       fetchCollection: null,
       updateCollection: null
@@ -60,7 +60,7 @@ describe('Collection editor state service', function() {
 
   var FakeCollectionRightsBackendApiService = function() {
     var self = {
-      BackendCollectionObject: null,
+      backendCollectionRightsObject: null,
       failure: null,
       fetchCollectionRights: null,
     };

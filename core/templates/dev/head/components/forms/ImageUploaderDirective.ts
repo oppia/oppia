@@ -66,7 +66,7 @@ oppia.directive('imageUploader', [
 
         $(elt).bind('drop', function(e) {
           onDragEnd(e);
-          var file = e.originalEvent.dataTransfer.files[0];
+          var file = (<DragEvent>e.originalEvent).dataTransfer.files[0];
           scope.errorMessage = validateUploadedFile(file, file.name);
           if (!scope.errorMessage) {
             // Only fire this event if validations pass.

@@ -52,12 +52,16 @@ oppia.factory('SubtitledHtmlObjectFactory', [
       return this.hasNoHtml();
     };
 
-    SubtitledHtml.createFromBackendDict = function(subtitledHtmlBackendDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    SubtitledHtml['createFromBackendDict'] = function(subtitledHtmlBackendDict) {
       return new SubtitledHtml(
         subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
     };
 
-    SubtitledHtml.createDefault = function(html, contentId) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    SubtitledHtml['createDefault'] = function(html, contentId) {
       return new SubtitledHtml(html, contentId);
     };
 

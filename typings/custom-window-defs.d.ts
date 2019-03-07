@@ -1,6 +1,7 @@
 interface Window {
 	GLOBALS?: any;
 	CodeMirror?: any;
+	Date?: any;
 	HTMLElement?: any;
 	safari?: any;
 	opera?: any;

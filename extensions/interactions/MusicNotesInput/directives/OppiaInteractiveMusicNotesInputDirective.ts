@@ -62,7 +62,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // This is needed in order for the scope to be retrievable during Karma
         // unit testing. See http://stackoverflow.com/a/29833832 for more
         // details.
-        element[0].isolateScope = function() {
+        element[0].getControllerScope = function() {
           return scope;
         };
 
@@ -198,11 +198,13 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         var initializeNoteSequence = function(initialNotesToAdd) {
           for (var i = 0; i < initialNotesToAdd.length; i++) {
             var initialNote = _convertReadableNoteToNote(initialNotesToAdd[i]);
-            initialNote.noteId = scope.generateNoteId();
-            initialNote.noteStart = {
-              num: i,
-              den: 1
-            };
+            initialNote = Object.assign(initialNote, {
+              noteId: scope.generateNoteId(),
+              noteStart: {
+                num: i,
+                den: 1
+              }
+            });
             scope._addNoteToNoteSequence(initialNote);
           }
         };
@@ -547,10 +549,11 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             // is less than 2, then they are close enough to set a position.
             // This gives some wiggle room for rounding differences.
             if (Math.abs(leftPos - getHorizontalPosition(i)) < 2) {
-              var note = {};
-              note.noteStart = {
-                num: i,
-                den: 1
+              var note = {
+                noteStart: {
+                  num: i,
+                  den: 1
+                }
               };
               return {
                 note: note

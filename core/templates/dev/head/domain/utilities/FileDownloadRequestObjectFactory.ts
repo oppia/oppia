@@ -23,7 +23,9 @@ oppia.factory('FileDownloadRequestObjectFactory', [
       this.canceler = canceler;
     };
 
-    FileDownloadRequest.createNew = function(filename, canceler) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    FileDownloadRequest['createNew'] = function(filename, canceler) {
       return new FileDownloadRequest(filename, canceler);
     };
 

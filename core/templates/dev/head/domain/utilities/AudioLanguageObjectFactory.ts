@@ -24,7 +24,9 @@ oppia.factory('AudioLanguageObjectFactory', [
       this.relatedLanguages = relatedLanguages;
     };
 
-    AudioLanguage.createFromDict = function(audioLanguageDict) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    AudioLanguage['createFromDict'] = function(audioLanguageDict) {
       return new AudioLanguage(
         audioLanguageDict.id,
         audioLanguageDict.description,

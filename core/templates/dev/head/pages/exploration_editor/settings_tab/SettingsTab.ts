@@ -253,10 +253,11 @@ oppia.controller('SettingsTab', [
             };
             $scope.getThumbnailBgColor = function() {
               var category = ExplorationCategoryService.displayed;
+              var color = null;
               if (!constants.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
-                var color = constants.DEFAULT_COLOR;
+                color = constants.DEFAULT_COLOR;
               } else {
-                var color = constants.CATEGORIES_TO_COLORS[category];
+                color = constants.CATEGORIES_TO_COLORS[category];
               }
               return color;
             };

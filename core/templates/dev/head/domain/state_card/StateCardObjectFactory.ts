@@ -185,7 +185,9 @@ oppia.factory('StateCardObjectFactory', [
      * @param {Interaction} interaction - An interaction object that stores all
      *        the properties of the card's interaction.
      */
-    StateCard.createNewCard = function(
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    StateCard['createNewCard'] = function(
         stateName, contentHtml, interactionHtml, interaction,
         contentIdsToAudioTranslations, contentId) {
       return new StateCard(

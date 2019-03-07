@@ -44,7 +44,6 @@ describe('CodeRepl interaction', function() {
       elt = angular.element('<' + TAG_NAME + '></' + TAG_NAME + '>');
       $compile(elt)(scope);
       scope.$digest();
-      ctrlScope = elt.isolateScope();
     }));
 
     afterEach(function() {

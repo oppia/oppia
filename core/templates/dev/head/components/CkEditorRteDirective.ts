@@ -107,7 +107,7 @@ oppia.directive('ckEditorRte', [
           floatSpaceDockedOffsetY: 15,
           extraAllowedContent: extraAllowedContentRules,
           sharedSpaces: {
-            top: el[0].children[0].children[0]
+            top: <HTMLElement>el[0].children[0].children[0]
           },
           skin: 'bootstrapck,/third_party/static/ckeditor-bootstrapck-1.0/',
           toolbar: [

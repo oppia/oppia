@@ -124,7 +124,9 @@ oppia.factory('LearnerDashboardActivityIdsObjectFactory', [function() {
       }
     });
 
-  LearnerDashboardActivityIds.createFromBackendDict = function(
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  LearnerDashboardActivityIds['createFromBackendDict'] = function(
       learnerDashboardActivityIdsDict) {
     return new LearnerDashboardActivityIds(
       learnerDashboardActivityIdsDict.incomplete_exploration_ids,

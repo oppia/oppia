@@ -27,7 +27,9 @@ oppia.factory('AnswerClassificationResultObjectFactory', [function() {
     this.createNew = null;
   };
 
-  AnswerClassificationResult.createNew = function(
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  AnswerClassificationResult['createNew'] = function(
       outcome, answerGroupIndex, ruleIndex, classificationCategorization) {
     return new AnswerClassificationResult(
       outcome, answerGroupIndex, ruleIndex, classificationCategorization);

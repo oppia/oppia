@@ -575,7 +575,7 @@ oppia.directive('filepathEditor', [
               };
               $scope.$apply();
             };
-            img.src = (<FileReader>e.target).result;
+            img.src = <string>((<FileReader>e.target).result);
           };
           reader.readAsDataURL(file);
         };

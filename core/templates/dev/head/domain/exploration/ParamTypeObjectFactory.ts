@@ -65,40 +65,58 @@ oppia.factory('ParamTypeObjectFactory', [function() {
    * @returns {ParamType} - The associated type, if any.
    * @throws {Error} - When the given type name isn't registered.
    */
-  ParamType.getTypeFromBackendName = function(backendName) {
-    if (!ParamType.registry.hasOwnProperty(backendName)) {
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  ParamType['getTypeFromBackendName'] = function(backendName) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    if (!ParamType['registry'].hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }
-    return ParamType.registry[backendName];
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    return ParamType['registry'][backendName];
   };
 
   /** @returns {ParamType} - Implementation-defined default parameter type. */
-  ParamType.getDefaultType = function() {
-    return ParamType.registry.UnicodeString;
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  ParamType['getDefaultType'] = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    return ParamType['registry'].UnicodeString;
   };
 
 
   // Type registration.
 
   /** @type {Object.<String, ParamType>} */
-  ParamType.registry = {};
-
-  ParamType.registry.UnicodeString = new ParamType({
-    validate: function(value) {
-      return (typeof value === 'string' || value instanceof String);
-    },
-    default_value: '',
-  });
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  ParamType['registry'] = {
+    UnicodeString: new ParamType({
+        validate: function(value) {
+          return (typeof value === 'string' || value instanceof String);
+        },
+        default_value: ''
+      })
+  };
 
   // To finalize type registration, we encode the name of each type into their
   // definition, then freeze them from modifications.
-  Object.keys(ParamType.registry).forEach(function(paramTypeName) {
-    var paramType = ParamType.registry[paramTypeName];
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  Object.keys(ParamType['registry']).forEach(function(paramTypeName) {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    var paramType = ParamType['registry'][paramTypeName];
     paramType._name = paramTypeName;
     Object.freeze(paramType);
   });
   // Finally, we freeze the registry itself.
-  Object.freeze(ParamType.registry);
+  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  Object.freeze(ParamType['registry']);
 
   return ParamType;
 }]);
