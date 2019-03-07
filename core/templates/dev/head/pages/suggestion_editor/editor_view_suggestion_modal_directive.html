@@ -35,6 +35,10 @@
     <[ errorMessage ]>
   </div>
   <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-  <button class="btn btn-danger protractor-test-exploration-reject-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject || reviewMessage.length == 0">Reject</button>
-  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
+  <span uib-tooltip="Enter Review Message" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
+    <button class="btn btn-danger protractor-test-exploration-reject-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject || reviewMessage.length == 0">Reject</button>
+  </span>
+  <span uib-tooltip="Enter Commit Message" tooltip-placement="bottom" tooltip-enable="commitMessage.length == 0">
+    <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
+  </span>
 </div>
