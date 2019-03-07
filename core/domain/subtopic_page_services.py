@@ -90,8 +90,9 @@ def get_subtopic_pages_with_ids(topic_id, subtopic_ids):
         subtopic_page_ids)
     subtopic_pages = []
     for subtopic_page_model in subtopic_page_models:
-        subtopic_pages.append(
-            get_subtopic_page_from_model(subtopic_page_model))
+        if subtopic_page_model is not None:
+            subtopic_pages.append(
+                get_subtopic_page_from_model(subtopic_page_model))
     return subtopic_pages
 
 
