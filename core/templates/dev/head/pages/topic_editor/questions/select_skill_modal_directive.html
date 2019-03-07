@@ -12,7 +12,7 @@
     attached to it. Please link a skill to this topic before adding questions.
   </div>
   <div class="list-group">
-    <a class="list-group-item"
+    <a class="list-group-item protractor-test-skill-item"
        ng-repeat="skillSummary in skillSummaries track by $index"
        ng-click="selectOrDeselectSkill(skillSummary.getId())"
        ng-class="{'list-group-item-success': selectedSkillId === skillSummary.getId()}">
@@ -23,7 +23,7 @@
 <div class="modal-footer" ng-switch="skillSummaries.length > 0">
   <div ng-switch-when="true">
     <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
-    <button class="btn btn-success" ng-disabled="selectedSkillId === null" ng-click="done()"> Done </button>
+    <button class="btn btn-success protractor-test-confirm-skill-button" ng-disabled="selectedSkillId === null" ng-click="done()"> Done </button>
   </div>
   <div ng-switch-when="false">
     <button class="btn btn-default" ng-click="ok()"> Ok </button>

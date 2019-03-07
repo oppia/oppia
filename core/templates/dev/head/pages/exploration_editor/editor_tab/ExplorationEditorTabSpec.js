@@ -18,7 +18,7 @@
 
 describe('Exploration editor tab controller', function() {
   describe('ExplorationEditorTab', function() {
-    var scope, ecs, ess, scs;
+    var scope, ecs, ess, scs, rootScope;
 
     beforeEach(module('oppia'));
     beforeEach(inject(function($controller, $injector, $rootScope) {

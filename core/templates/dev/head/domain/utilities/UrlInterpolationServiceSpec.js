@@ -172,8 +172,9 @@ describe('URL Interpolation Service', function() {
 
     // Non alpha-numeric will not match the pattern matching for finding a
     // parameter name.
-    expect('/test_url/<b@d!#$%^&*() p@r@m n@m3`~[]{}>', {}).toBe(
-      '/test_url/<b@d!#$%^&*() p@r@m n@m3`~[]{}>');
+    expect(uis.interpolateUrl(
+      '/test_url/<b@d!#$%^&*() p@r@m n@m3`~[]{}>', {}
+    )).toBe('/test_url/<b@d!#$%^&*() p@r@m n@m3`~[]{}>');
 
     // Parameter names cannot have spaces.
     expect(uis.interpolateUrl('/test_url/<parameter with spaces>', {

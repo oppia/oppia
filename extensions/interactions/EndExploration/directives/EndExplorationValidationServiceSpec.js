@@ -113,7 +113,7 @@ describe('EndExplorationValidationService', function() {
   it('should catch non-string value for recommended exploration ID',
     function() {
       customizationArguments.recommendedExplorationIds.value = [1];
-      warnings = validatorService.getAllWarnings(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
@@ -124,7 +124,7 @@ describe('EndExplorationValidationService', function() {
   it('should have warnings for non-list format of recommended exploration IDs',
     function() {
       customizationArguments.recommendedExplorationIds.value = 'ExpID0';
-      warnings = validatorService.getAllWarnings(
+      var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,

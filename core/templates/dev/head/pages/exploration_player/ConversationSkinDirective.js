@@ -230,8 +230,8 @@ oppia.animation('.conversation-skin-animate-cards', function() {
 });
 
 oppia.directive('conversationSkin', [
-  'UrlInterpolationService', 'UrlService',
-  function(UrlInterpolationService, UrlService) {
+  'UrlInterpolationService', 'UrlService', 'UserService',
+  function(UrlInterpolationService, UrlService, UserService) {
     return {
       restrict: 'E',
       scope: {},
@@ -259,9 +259,10 @@ oppia.directive('conversationSkin', [
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_AVAILABLE', 'FEEDBACK_POPOVER_PATH',
-        'FatigueDetectionService', 'NumberAttemptsService',
-        'PlayerCorrectnessFeedbackEnabledService', 'ContextService',
-        'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
+        'FatigueDetectionService', 'GuestCollectionProgressService',
+        'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
+        'ContextService', 'ConceptCardBackendApiService',
+        'ConceptCardObjectFactory',
         'RefresherExplorationConfirmationModalService', 'PAGE_CONTEXT',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'INTERACTION_SPECS',
         'EVENT_NEW_CARD_OPENED', 'HintsAndSolutionManagerService',
@@ -285,9 +286,10 @@ oppia.directive('conversationSkin', [
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_AVAILABLE, FEEDBACK_POPOVER_PATH,
-            FatigueDetectionService, NumberAttemptsService,
-            PlayerCorrectnessFeedbackEnabledService, ContextService,
-            ConceptCardBackendApiService, ConceptCardObjectFactory,
+            FatigueDetectionService, GuestCollectionProgressService,
+            NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
+            ContextService, ConceptCardBackendApiService,
+            ConceptCardObjectFactory,
             RefresherExplorationConfirmationModalService, PAGE_CONTEXT,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, INTERACTION_SPECS,
             EVENT_NEW_CARD_OPENED, HintsAndSolutionManagerService,
@@ -635,10 +637,10 @@ oppia.directive('conversationSkin', [
               var collectionAllowsGuestProgress = (
                 WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
                   GLOBALS.collectionId) !== -1);
-              if (collectionAllowsGuestProgress && !_isLoggedIn) {
+              if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
                 GuestCollectionProgressService.
                   recordExplorationCompletedInCollection(
-                    GLOBALS.collectionId, _explorationId);
+                    GLOBALS.collectionId, $scope.explorationId);
               }
 
               // For single state explorations, when the exploration reaches the
