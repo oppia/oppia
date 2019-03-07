@@ -102,6 +102,7 @@ describe('Translation status service', function() {
     var ALL_AUDIO_AVAILABLE_COLOR = '#16A765';
     var FEW_AUDIO_AVAILABLE_COLOR = '#E9B330';
     var NO_AUDIO_AVAILABLE_COLOR = '#D14836';
+    var STATES = ['First', 'Second', 'Third'];
     beforeEach(inject(function($injector) {
       tss = $injector.get('TranslationStatusService');
       ess = $injector.get('ExplorationStatesService');
@@ -140,13 +141,13 @@ describe('Translation status service', function() {
 
     it('should correctly return an object contaning status colors of all ' +
       'states in exploration', function() {
-      var stateNames = ess.getStateNames();
+      
       var stateWiseStatusColor = tss.getAllStateStatusColors();
-      expect(stateWiseStatusColor[stateNames[0]]).toBe(
+      expect(stateWiseStatusColor[STATES[0]]).toBe(
         FEW_AUDIO_AVAILABLE_COLOR);
-      expect(stateWiseStatusColor[stateNames[1]]).toBe(
+      expect(stateWiseStatusColor[STATES[1]]).toBe(
         NO_AUDIO_AVAILABLE_COLOR);
-      expect(stateWiseStatusColor[stateNames[2]]).toBe(
+      expect(stateWiseStatusColor[STATES[2]]).toBe(
         ALL_AUDIO_AVAILABLE_COLOR);
     });
 
