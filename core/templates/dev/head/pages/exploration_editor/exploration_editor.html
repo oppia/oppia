@@ -133,6 +133,7 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
   <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
@@ -145,13 +146,16 @@
 
   <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
   <script src="/templates/dev/head/filters/CapitalizeFilter.js"></script>
+  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
   <script src="/templates/dev/head/filters/FormatRtePreviewFilter.js"></script>
   <script src="/templates/dev/head/filters/FormatTimerFilter.js"></script>
+  <script src="/templates/dev/head/filters/NormalizeWhitespaceFilter.js"></script>
   <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
   <script src="/templates/dev/head/filters/ParameterizeRuleDescriptionFilter.js"></script>
   <script src="/templates/dev/head/filters/RemoveDuplicatesInArrayFilter.js"></script>
   <script src="/templates/dev/head/filters/ReplaceInputsWithEllipsesFilter.js"></script>
   <script src="/templates/dev/head/filters/SummarizeNonnegativeNumberFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateFilter.js"></script>
   <script src="/templates/dev/head/filters/TruncateAndCapitalizeFilter.js"></script>
   <script src="/templates/dev/head/filters/TruncateAtFirstEllipsisFilter.js"></script>
   <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
@@ -220,19 +224,19 @@
   <script src="/templates/dev/head/components/share/SharingLinksDirective.js"></script>
   <script src="/templates/dev/head/components/HintAndSolutionButtonsDirective.js"></script>
 
-  <script src="/templates/dev/head/components/AnswerGroupEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/CodemirrorMergeviewDirective.js"></script>
-  <script src="/templates/dev/head/components/HintEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/OutcomeEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/OutcomeDestinationEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/OutcomeFeedbackEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/ResponseHeaderDirective.js"></script>
-  <script src="/templates/dev/head/components/RuleEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/RuleTypeSelectorDirective.js"></script>
-  <script src="/templates/dev/head/components/SolutionEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/SolutionExplanationEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/AnswerGroupEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/HintEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/OutcomeEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/OutcomeDestinationEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/OutcomeFeedbackEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/ResponseHeaderDirective.js"></script>
+  <script src="/templates/dev/head/components/state/RuleEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/RuleTypeSelectorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/SolutionEditorDirective.js"></script>
+  <script src="/templates/dev/head/components/state/SolutionExplanationEditorDirective.js"></script>
   <script src="/templates/dev/head/components/StateGraphLayoutService.js"></script>
   <script src="/templates/dev/head/components/VersionDiffVisualizationDirective.js"></script>
+  <script src="/templates/dev/head/components/CodemirrorMergeviewDirective.js"></script>
   <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
   <script src="/templates/dev/head/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
   <script src="/templates/dev/head/components/RatingComputationService.js"></script>
@@ -332,6 +336,9 @@
   <script src="/templates/dev/head/pages/state_editor/StateEditorService.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StatePropertyServices.js"></script>
 
+  <script src="/templates/dev/head/components/CkEditorRteDirective.js"></script>
+  <script src="/templates/dev/head/components/CkEditorWidgetsInitializer.js"></script>
+
   <script src="/templates/dev/head/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/question/PretestQuestionBackendApiService.js"></script>
@@ -363,6 +370,7 @@
   <script src="/templates/dev/head/services/StateTopAnswersStatsService.js"></script>
   <script src="/templates/dev/head/services/ExplorationFeaturesService.js"></script>
   <script src="/templates/dev/head/services/ExplorationFeaturesBackendApiService.js"></script>
+  <script src="/templates/dev/head/services/ValidatorsService.js"></script>
 
   <script src="/templates/dev/head/domain/classifier/AnswerClassificationResultObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/classifier/ClassifierObjectFactory.js"></script>
