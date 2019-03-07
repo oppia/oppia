@@ -30,6 +30,12 @@ var constants = {
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
 
+  // These categories are shown in the library navbar.
+  "SEARCH_DROPDOWN_CATEGORIES": ["Algorithms", "Architecture", "Art",
+    "Biology", "Business", "Chemistry", "Economics", "English", "Geography",
+    "History", "Mathematics", "Medicine", "Music", "Programming", "Physics",
+    "Reading", "Statistics"],
+
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 

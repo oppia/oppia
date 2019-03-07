@@ -26,16 +26,16 @@ oppia.directive('searchBar', [
       controller: [
         '$scope', '$rootScope', '$timeout', '$window', '$location',
         '$translate', 'SearchService', 'NavigationService',
-        'DebouncerService', 'HtmlEscaperService',
-        'UrlService', 'ConstructTranslationIdsService',
+        'DebouncerService', 'HtmlEscaperService', 'UrlService',
+        'ConstructTranslationIdsService', 'SEARCH_DROPDOWN_CATEGORIES',
         function(
             $scope, $rootScope, $timeout, $window, $location,
             $translate, SearchService, NavigationService,
-            DebouncerService, HtmlEscaperService,
-            UrlService, ConstructTranslationIdsService) {
+            DebouncerService, HtmlEscaperService, UrlService,
+            ConstructTranslationIdsService, SEARCH_DROPDOWN_CATEGORIES) {
           $scope.isSearchInProgress = SearchService.isSearchInProgress;
           $scope.SEARCH_DROPDOWN_CATEGORIES = (
-            GLOBALS.SEARCH_DROPDOWN_CATEGORIES.map(
+            SEARCH_DROPDOWN_CATEGORIES.map(
               function(categoryName) {
                 return {
                   id: categoryName,

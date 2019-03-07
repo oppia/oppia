@@ -91,7 +91,6 @@ class LibraryPage(base.BaseHandler):
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
             'page_mode': page_mode,
-            'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('pages/library/library.html')
 
@@ -168,7 +167,6 @@ class LibraryGroupPage(base.BaseHandler):
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
             'page_mode': feconf.LIBRARY_PAGE_MODE_GROUP,
-            'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
         self.render_template('pages/library/library.html')
 

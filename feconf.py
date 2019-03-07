@@ -798,27 +798,6 @@ USER_QUERY_STATUS_FAILED = 'failed'
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
 
-# These categories are shown in the library navbar.
-SEARCH_DROPDOWN_CATEGORIES = sorted([
-    'Mathematics',
-    'Statistics',
-    'Algorithms',
-    'Programming',
-    'Biology',
-    'Chemistry',
-    'Physics',
-    'Medicine',
-    'English',
-    'Architecture',
-    'Art',
-    'Music',
-    'Reading',
-    'Business',
-    'Economics',
-    'Geography',
-    'History',
-])
-
 # The i18n id for the header of the "Featured Activities" category in the
 # library index page.
 LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
