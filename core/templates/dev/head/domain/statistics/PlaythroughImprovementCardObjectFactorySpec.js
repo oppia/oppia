@@ -37,7 +37,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   });
 
   describe('PlaythroughImprovementCard', function() {
-    describe('.getActions', function() {
+    describe('.getActionButtons', function() {
       beforeEach(function() {
         this.issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
@@ -63,7 +63,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         it('marks the card as resolved', function() {
           var card =
             this.PlaythroughImprovementCardObjectFactory.createNew(this.issue);
-          var archiveCardAction = card.getActions()[0];
+          var archiveCardAction = card.getActionButtons()[0];
 
           expect(card.isResolved()).toBe(false);
           expect(archiveCardAction.getName()).toEqual('Archive');
