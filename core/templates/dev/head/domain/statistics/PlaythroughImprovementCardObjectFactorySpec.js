@@ -30,9 +30,6 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     this.PlaythroughIssuesService.initSession(this.expId, this.expVersion);
   }));
 
-  describe('.createNew', function() {
-  });
-
   describe('.fetchCards', function() {
   });
 
