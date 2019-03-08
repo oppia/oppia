@@ -1545,8 +1545,8 @@ def _check_js_component_name_and_count(all_files, parsed_js_files):
                 # Check if the number of components in each file exceeds one.
                 if component_num > 1:
                     print (
-                        '%s -> Please ensure that there is exactly one component'
-                        ' in the file.' % (filename))
+                        '%s -> Please ensure that there is exactly one '
+                        'component in the file.' % (filename))
                     failed = True
                     break
                 # Separate the arguments of the expression.
@@ -1567,7 +1567,7 @@ def _check_js_component_name_and_count(all_files, parsed_js_files):
                             'matches the filename'
                             % (filename, component))
                         failed = True
-                # If the component is controller or factory, then the component's
+                # If the component is controller or factory, then the component
                 # name should exactly match the filename containing it. If the
                 # component's name is xxx then the filename should be xxx.js.
                 else:
@@ -2005,7 +2005,8 @@ def main():
     parsed_js_files = _validate_and_parse_js_files(
         all_files)
     linter_messages = _pre_commit_linter(all_files)
-    js_component_messages = _check_js_component_name_and_count(all_files, parsed_js_files)
+    js_component_messages = _check_js_component_name_and_count(
+        all_files, parsed_js_files)
     directive_scope_messages = _check_directive_scope(
         all_files, parsed_js_files)
     sorted_dependencies_messages = _check_sorted_dependencies(
