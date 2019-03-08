@@ -13,43 +13,41 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain objects for the actionable items creators may take when
- * trying to resolve a particular improvement suggestion.
+ * @fileoverview Domain objects for the actions creators may take when trying to
+ * resolve a particular improvement suggestion.
  */
 
 oppia.factory('ImprovementActionButtonObjectFactory', [function() {
   /**
    * @constructor
-   * @param {string} name - the name of the action. Should correspond to a I18N
-   *    name.
-   * @param {callback} action - function to run when the action is requested to
-   *    be performed.
+   * @param {string} name - the name of the action.
+   * @param {callback} actionFunc - function to run when the action is requested
+   *    to be performed.
    */
-  var ImprovementActionButton = function(name, action) {
+  var ImprovementActionButton = function(name, actionFunc) {
     this._name = name;
-    this._action = action;
+    this._actionFunc = actionFunc;
   };
 
-  /** @returns {string} - the I18N-compatible name of the action */
+  /** @returns {string} - the name of the action (text rendered in button). */
   ImprovementActionButton.prototype.getName = function() {
     return this._name;
   };
 
   /** Performs the associated action and return its result as a promise */
-  ImprovementActionButton.prototype.performAction = function() {
-    return Promise.resolve(this._action());
+  ImprovementActionButton.prototype.execute = function() {
+    return Promise.resolve(this._actionFunc());
   };
 
   return {
     /**
      * @returns {ImprovementActionButton}
-     * @param {string} name - the name of the action. Should correspond to a
-     *    I18N name.
-     * @param {callback} action - function to run when the action is requested
-     *    to be performed.
+     * @param {string} name - the name of the action.
+     * @param {callback} actionFunc - function to run when the action is
+     *    requested to be performed.
      */
-    createNew: function(name, action) {
-      return new ImprovementActionButton(name, action);
+    createNew: function(name, actionFunc) {
+      return new ImprovementActionButton(name, actionFunc);
     },
   };
 }]);

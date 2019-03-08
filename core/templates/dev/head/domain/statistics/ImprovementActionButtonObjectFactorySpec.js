@@ -25,13 +25,13 @@ describe('ImprovementActionButtonObjectFactory', function() {
 
   describe('.createNew', function() {
     it('stores the name and action', function(done) {
-      var testFlag = false;
+      var flagToSetOnCallback = false;
       var improvementAction =
         this.ImprovementActionButtonObjectFactory.createNew('Test', function() {
-          testFlag = true;
+          flagToSetOnCallback = true;
         });
       var onActionCompletion = function() {
-        expect(testFlag).toBe(true);
+        expect(flagToSetOnCallback).toBe(true);
         done();
       };
 

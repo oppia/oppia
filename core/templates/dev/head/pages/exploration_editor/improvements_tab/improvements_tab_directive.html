@@ -22,8 +22,7 @@
     </div>
     <div>
       <button ng-repeat="actionButton in card.getActionButtons()"
-              ng-click="actionButton.performAction()"
-              translate="<[actionButton.getName()]>">
+              ng-click="actionButton.execute()">
         <[actionButton.getName()]>
       </button>
     </div>

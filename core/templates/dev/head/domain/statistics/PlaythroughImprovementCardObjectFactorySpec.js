@@ -63,13 +63,13 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         it('marks the card as resolved', function() {
           var card =
             this.PlaythroughImprovementCardObjectFactory.createNew(this.issue);
-          var archiveCardAction = card.getActionButtons()[0];
+          var firstActionButton = card.getActionButtons()[0];
 
           expect(card.isResolved()).toBe(false);
-          expect(archiveCardAction.getName()).toEqual('Archive');
+          expect(firstActionButton.getName()).toEqual('Archive');
 
           this.$httpBackend.expectPOST('/resolveissuehandler/7').respond();
-          archiveCardAction.performAction();
+          firstActionButton.execute();
           this.$httpBackend.flush();
 
           expect(card.isResolved()).toBe(true);
