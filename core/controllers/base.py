@@ -87,7 +87,7 @@ class LogoutPage(webapp2.RequestHandler):
         # The str conversion is needed, otherwise an InvalidResponseError
         # asking for the 'Location' header value to be str instead of
         # 'unicode' will result.
-        url_to_redirect_to = str(self.request.get('return_url') or '/')
+        url_to_redirect_to = str('/')
         _clear_login_cookies(self.response.headers)
 
         if constants.DEV_MODE:

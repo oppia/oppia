@@ -564,10 +564,6 @@ tags: []
         """Returns the expected login URL."""
         return current_user_services.create_login_url(slug)
 
-    def get_expected_logout_url(self, slug):
-        """Returns the expected logout URL."""
-        return current_user_services.create_logout_url(slug)
-
     def _get_response(
             self, url, expected_content_type, params=None,
             expected_status_int=200):

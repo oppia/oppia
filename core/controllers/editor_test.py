@@ -261,6 +261,56 @@ class EditorTests(BaseEditorControllerTests):
         self.logout()
 
 
+class ExplorationEditorLogoutTest(BaseEditorControllerTests):
+    """Test handler for logout from exploration editor page."""
+
+    def test_logout_from_unpublished_exploration_editor(self):
+        """Logout from unpublished exploration should redirect
+        to library page.
+        """
+
+        unpublished_exp_id = '_unpublished_eid123'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            unpublished_exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        current_page_url = '%s/%s' % (
+            feconf.EDITOR_URL_PREFIX, unpublished_exp_id)
+        self.login(self.OWNER_EMAIL)
+        response = self.get_html_response(current_page_url)
+
+        response = self.get_html_response('/logout', expected_status_int=302)
+        self.assertEqual(response.status_int, 302)
+        self.assertEqual(
+            response.headers['location'], 'https://www.google.com/accounts' +
+            '/Logout?continue=http%3A//localhost/')
+        self.logout()
+
+    def test_logout_from_published_exploration_editor(self):
+        """Logout from published exploration should redirect
+        to same page.
+        """
+
+        published_exp_id = 'published_eid-123'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            published_exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        current_page_url = '%s/%s' % (
+            feconf.EDITOR_URL_PREFIX, published_exp_id)
+        self.login(self.OWNER_EMAIL)
+        response = self.get_html_response(current_page_url)
+
+        rights_manager.publish_exploration(self.owner, published_exp_id)
+
+        response = self.get_html_response('/logout', expected_status_int=302)
+        self.assertEqual(response.status_int, 302)
+        self.assertEqual(
+            response.headers['location'], 'https://www.google.com/accounts' +
+            '/Logout?continue=http%3A//localhost/')
+        self.logout()
+
+
 class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
 

@@ -197,11 +197,11 @@ oppia.controller('Signup', [
           function($scope, $uibModalInstance, SiteAnalyticsService,
               UserService, $timeout, $window) {
             $scope.continueRegistration = function() {
-              UserService.getLoginUrl().then(
-                function(urlObject) {
-                  if (urlObject.login_url) {
+              UserService.getLoginUrlAsync().then(
+                function(loginUrl) {
+                  if (loginUrl) {
                     $timeout(function() {
-                      $window.location = urlObject.login_url;
+                      $window.location = loginUrl;
                     }, 150);
                   } else {
                     throw Error('Login url not found.');
