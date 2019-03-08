@@ -132,7 +132,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
 
     NumberWithUnits.createCurrencyUnits = function() {
       try {
-        Units.createCurrencyUnits();
+        UnitsObjectFactory.createCurrencyUnits();
       } catch (parsingError) {}
     };
 
@@ -238,7 +238,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         }
       }
 
-      unitsObj = UnitsObjectFactory.fromRawInputString(units);
+      var unitsObj = UnitsObjectFactory.fromRawInputString(units);
       return new NumberWithUnits(type, real, fractionObj, unitsObj);
     };
 

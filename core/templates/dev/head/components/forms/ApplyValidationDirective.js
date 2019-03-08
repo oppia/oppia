@@ -37,7 +37,7 @@ oppia.directive('applyValidation', ['$filter', function($filter) {
           }
 
           var filterArgs = {};
-          for (key in validatorSpec) {
+          for (var key in validatorSpec) {
             if (key !== 'id') {
               filterArgs[$filter('underscoresToCamelCase')(key)] =
                 angular.copy(validatorSpec[key]);

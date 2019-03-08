@@ -52,7 +52,7 @@ oppia.directive('oppiaInteractiveSetInput', [
           var hasDuplicates = function(answer) {
             for (var i = 0; i < answer.length; i++) {
               for (var j = 0; j < i; j++) {
-                if (angular.equals(answer[i], answer[j], true)) {
+                if (angular.equals(answer[i], answer[j])) {
                   return true;
                 }
               }

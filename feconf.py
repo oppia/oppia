@@ -248,9 +248,13 @@ DEFAULT_MISCONCEPTION_NAME = ''
 DEFAULT_MISCONCEPTION_NOTES = ''
 # Default feedback for a newly-minted misconception.
 DEFAULT_MISCONCEPTION_FEEDBACK = ''
+# Default content_id for explanation subtitled html.
+DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
 
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
+# Default content id for the subtopic page's content.
+DEFAULT_SUBTOPIC_PAGE_CONTENT_ID = 'content'
 
 # Default ID of VM which is used for training classifier.
 DEFAULT_VM_ID = 'vm_default'
@@ -679,7 +683,6 @@ QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
-SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'

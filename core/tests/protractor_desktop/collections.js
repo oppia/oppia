@@ -30,6 +30,7 @@ var CollectionEditorPage =
 describe('Collections', function() {
   var adminPage = null;
   var creatorDashboardPage = null;
+  var collectionEditorPage = null;
   var collectionId = null;
   var firstExplorationId = null;
   var secondExplorationId = null;

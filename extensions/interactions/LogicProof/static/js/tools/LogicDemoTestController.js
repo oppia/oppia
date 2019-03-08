@@ -91,8 +91,9 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
 
   // LOCAL CHECK (for testing only)
   $scope.doLocalCheck = function() {
-    questionInstance = logicProofStudent.buildInstance($scope.questionData);
-    proof = logicProofStudent.buildProof($scope.proofString, questionInstance);
+    var questionInstance = logicProofStudent.buildInstance($scope.questionData);
+    var proof = logicProofStudent.buildProof(
+      $scope.proofString, questionInstance);
     $scope.localCheck = 'mistake not found';
     var parameters = {
       proof: proof,
