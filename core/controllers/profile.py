@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Controllers for the profile page."""
-
+import re
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -251,7 +251,8 @@ class SignupPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         return_url = str(self.request.get('return_url', self.request.uri))
-
+        if re.match('^/[^//]', return_url) is None:
+            return_url = '/'
         if user_services.has_fully_registered(self.user_id):
             self.redirect(return_url)
             return
