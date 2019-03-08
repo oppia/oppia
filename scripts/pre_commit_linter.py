@@ -752,7 +752,7 @@ def _pre_commit_linter(all_files):
     config_path_for_css_in_html = os.path.join(
         parent_dir, 'oppia', '.stylelintrc')
     config_path_for_oppia_css = os.path.join(
-        parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
+        parent_dir, 'oppia', 'core', 'templates',
         'css', '.stylelintrc')
     if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
         print ''
