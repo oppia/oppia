@@ -16,6 +16,6 @@ oppia.directive('playthroughImprovementCard', [
           };
         }
       ]
-    }
+    };
   }
 ]);
