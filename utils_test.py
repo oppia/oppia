@@ -158,6 +158,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(len(full_hash), 28)
         self.assertEqual(len(abbreviated_hash), 5)
         self.assertEqual(full_hash[:5], abbreviated_hash)
+        self.assertTrue(full_hash.isalnum())
 
     def test_vfs_construct_path(self):
         """Test vfs_construct_path method."""
