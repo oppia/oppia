@@ -26,7 +26,8 @@
  *       A "member" function which returns whether the improvement which the
  *       card suggests has been resolved.
  *   - Card.prototype.getTitle() -> string
- *   - Card.prototype.getContentHtml() -> string
+ *   - Card.prototype.getDirectiveType() -> string
+ *   - Card.prototype.getDirectiveData() -> string
  *   - Card.prototype.getActions() -> ImprovementAction[]
  */
 

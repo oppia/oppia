@@ -17,8 +17,8 @@
     <h2 translate="<[card.getTitle()]>">
       <[card.getTitle()]>
     </h2>
-    <div ng-switch="card.getType()">
-      <playthrough-improvement-card ng-switch-when="playthrough" data="card.getEscapedDirectiveData()"></playthrough-improvement-card>
+    <div ng-switch="card.getDirectiveType()">
+      <playthrough-improvement-card ng-switch-when="playthrough" data="card.getDirectiveData()"></playthrough-improvement-card>
     </div>
     <div>
       <button ng-repeat="actionButton in card.getActionButtons()"
