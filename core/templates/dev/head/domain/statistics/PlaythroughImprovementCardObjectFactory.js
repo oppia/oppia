@@ -41,7 +41,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       /** @type {boolean} */
       this._isArchived = false;
       /** @type {string} */
-      this._title = PlaythroughIssuesService.renderIssueStatement(playthroughIssue);
+      this._title =
+        PlaythroughIssuesService.renderIssueStatement(playthroughIssue);
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew('Archive', archiveThis),
@@ -72,7 +73,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
      * including sample playthroughs for creators to look at.
      */
     PlaythroughImprovementCard.prototype.getDirectiveType = function() {
-      return "playthrough";
+      return 'playthrough';
     };
 
     /** @returns {{suggestions: string[], playthroughIds: string[]}} */
