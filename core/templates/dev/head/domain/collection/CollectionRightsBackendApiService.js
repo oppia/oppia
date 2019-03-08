@@ -16,6 +16,9 @@
  * @fileoverview Service to change the rights of collections in the backend.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/collection_editor/CollectionEditor.js:');
+
 oppia.factory('CollectionRightsBackendApiService', [
   '$http', '$log', '$q', 'UrlInterpolationService',
   'COLLECTION_RIGHTS_URL_TEMPLATE',

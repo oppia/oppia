@@ -24,7 +24,6 @@ require('pages/state_editor/StatePropertyServices.js');
 require('services/AlertsService.js');
 require('services/ContextService.js');
 require('services/ExplorationHtmlFormatterService.js');
-require('services/AlertsService.js');
 
 oppia.directive('solutionEditor', [
   '$uibModal', 'AlertsService', 'ContextService',

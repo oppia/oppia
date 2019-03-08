@@ -16,6 +16,9 @@
  * @fileoverview Modal and functionality for the create topic button.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('services/AlertsService.js');
+
 oppia.factory('TopicCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
   'UrlInterpolationService',

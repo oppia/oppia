@@ -16,6 +16,10 @@
  * @fileoverview Service to send changes to a collection to the backend.
  */
 
+require('domain/collection/ReadOnlyCollectionBackendApiService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/collection_editor/CollectionEditor.js:');
+
 // TODO(bhenning): I think that this might be better merged with the
 // CollectionBackendApiService. However, that violates the principle of a
 // backend API service being available for exactly one URL. To fix this, the

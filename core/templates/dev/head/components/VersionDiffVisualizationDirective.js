@@ -17,6 +17,8 @@
  *   versions of an exploration.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.directive('versionDiffVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

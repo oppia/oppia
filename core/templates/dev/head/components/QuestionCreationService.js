@@ -16,6 +16,8 @@
  * @fileoverview Service to create the question.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.factory('QuestionCreationService', [
   '$http', '$q', 'UrlInterpolationService',
   function($http, $q, UrlInterpolationService) {

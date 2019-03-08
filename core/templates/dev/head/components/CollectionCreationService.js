@@ -16,6 +16,10 @@
  * @fileoverview Modal and functionality for the create collection button.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('services/AlertsService.js');
+require('services/SiteAnalyticsService.js');
+
 // TODO(bhenning): Refactor this to match the frontend design spec and reduce
 // duplicated code between CollectionCreationService and
 // ExplorationCreationService.

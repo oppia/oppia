@@ -18,6 +18,15 @@
  * the editor pages).
  */
 
+require('domain/sidebar/SidebarStatusService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/DebouncerService.js');
+require('services/NavigationService.js');
+require('services/SiteAnalyticsService.js');
+require('services/UserService.js');
+require('services/contextual/DeviceInfoService.js');
+require('services/contextual/WindowDimensionsService.js');
+
 oppia.directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

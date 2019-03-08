@@ -16,6 +16,16 @@
  * @fileoverview Directive for hint and solution buttons.
  */
 
+require('pages/exploration_player/ExplorationPlayerStateService.js');
+require('pages/exploration_player/HintsAndSolutionManagerService.js');
+require('pages/exploration_player/HintAndSolutionModalService.js');
+require('pages/exploration_player/PlayerConstants.js');
+require('pages/exploration_player/PlayerPositionService.js');
+require('pages/exploration_player/PlayerTranscriptService.js');
+require('pages/exploration_player/StatsReportingService.js');
+require('services/ContextService.js');
+require('services/contextual/DeviceInfoService.js');
+
 oppia.directive('hintAndSolutionButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

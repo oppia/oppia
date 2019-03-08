@@ -16,6 +16,13 @@
  * @fileoverview Component for an exploration summary tile.
  */
 
+require('components/RatingComputationService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/DateTimeFormatService.js');
+require('services/UserService.js');
+require('services/contextual/UrlService.js');
+require('services/contextual/WindowDimensionsService.js');
+
 oppia.directive('explorationSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

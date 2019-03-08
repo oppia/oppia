@@ -16,6 +16,10 @@
  * @fileoverview Summary tile for collections.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('services/DateTimeFormatService.js');
+require('services/UserService.js');
+
 oppia.constant(
   'COLLECTION_VIEWER_URL', '/collection/<collection_id>');
 oppia.constant(

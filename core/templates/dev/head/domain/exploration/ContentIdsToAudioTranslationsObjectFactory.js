@@ -17,6 +17,9 @@
  * ContentIdsToAudioTranslations domain objects.
  */
 
+require('domain/exploration/AudioTranslationObjectFactory.js');
+require('domain/utilities/LanguageUtilService.js');
+
 oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
   'AudioTranslationObjectFactory', 'LanguageUtilService',
   'COMPONENT_NAME_FEEDBACK', function(AudioTranslationObjectFactory,
