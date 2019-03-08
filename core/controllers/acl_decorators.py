@@ -24,6 +24,8 @@ from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import skill_services
+from core.domain import story_services
+from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_services
 from core.domain import user_services
@@ -1824,7 +1826,7 @@ def can_edit_skill(handler):
         return False
 
     def test_can_edit_skill(self, skill_id, **kwargs):
-        """ Test to see if user can edit a given skill by checking if
+        """Test to see if user can edit a given skill by checking if
         logged in and using can_user_edit_skill.
 
         Args:
@@ -2347,6 +2349,83 @@ def can_access_topic_viewer_page(handler):
             return handler(self, topic_name, **kwargs)
         else:
             raise self.PageNotFoundException
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
+def can_access_story_viewer_page(handler):
+    """Decorator to check whether user can access story viewer page.
+
+    Args:
+        handler: function.  The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can access the given story viewer page.
+    """
+
+    def test_can_access(self, story_id, **kwargs):
+        """Checks if the user can access story viewer page.
+
+        Args:
+            story_id: str. The unique id of the story.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        story = story_services.get_story_by_id(story_id, strict=False)
+
+        if story is None:
+            raise self.PageNotFoundException
+
+        story_rights = story_services.get_story_rights(
+            story_id, strict=False)
+
+        if story_rights.story_is_published:
+            return handler(self, story_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
+def can_access_subtopic_viewer_page(handler):
+    """Decorator to check whether user can access subtopic page viewer.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can access the give subtopic viewer page.
+    """
+
+    def test_can_access(self, topic_id, subtopic_id, **kwargs):
+        """Checks if the user can access subtopic viewer page.
+
+        Args:
+            topic_id: str. The id of the topic.
+            subtopic_id: str. The id of the Subtopic.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            topic_id, subtopic_id, strict=False)
+        if subtopic_page is None:
+            raise self.PageNotFoundException
+        else:
+            return handler(self, topic_id, subtopic_id, **kwargs)
     test_can_access.__wrapped__ = True
 
     return test_can_access

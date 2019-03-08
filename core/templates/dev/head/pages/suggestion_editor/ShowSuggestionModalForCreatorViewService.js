@@ -17,10 +17,10 @@
  */
 
 oppia.factory('ShowSuggestionModalForCreatorViewService', [
-  '$uibModal', '$rootScope',
-  'UrlInterpolationService', '$http',
-  function($uibModal, rootScope,
-      UrlInterpolationService, $http) {
+  '$http', '$log', '$rootScope',
+  '$uibModal', 'UrlInterpolationService',
+  function($http, $log, $rootScope,
+      $uibModal, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
       'creator_view_suggestion_modal_directive.html'
@@ -105,7 +105,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
 
         $http.put(url, data).then(function() {
           for (var i = 0; i < suggestionsToReviewList.length; i++) {
-            if (suggestionsToReviewList[i] === $scope.activeThread) {
+            if (suggestionsToReviewList[i] === activeThread) {
               suggestionsToReviewList.splice(i, 1);
               break;
             }

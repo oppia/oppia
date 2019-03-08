@@ -17,10 +17,10 @@
  */
 
 oppia.factory('NumberWithUnitsValidationService', [
-  'WARNING_TYPES', 'baseInteractionValidationService',
-  'NumberWithUnitsObjectFactory',
-  function(WARNING_TYPES, baseInteractionValidationService,
-      NumberWithUnitsObjectFactory) {
+  'NumberWithUnitsObjectFactory', 'baseInteractionValidationService',
+  'WARNING_TYPES',
+  function(NumberWithUnitsObjectFactory, baseInteractionValidationService,
+      WARNING_TYPES) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         return [];
@@ -37,23 +37,25 @@ oppia.factory('NumberWithUnitsValidationService', [
         } catch (parsingError) {}
 
         var checkEquality = function(earlierRule, laterRule) {
-          answer = NumberWithUnitsObjectFactory.fromDict(earlierRule.inputs.f);
-          inputs = NumberWithUnitsObjectFactory.fromDict(laterRule.inputs.f);
+          var answer = NumberWithUnitsObjectFactory.fromDict(
+            earlierRule.inputs.f);
+          var inputs = NumberWithUnitsObjectFactory.fromDict(
+            laterRule.inputs.f);
 
-          answerString = answer.toMathjsCompatibleString();
-          inputsString = inputs.toMathjsCompatibleString();
+          var answerString = answer.toMathjsCompatibleString();
+          var inputsString = inputs.toMathjsCompatibleString();
 
-          answerList = NumberWithUnitsObjectFactory.fromRawInputString(
+          var answerList = NumberWithUnitsObjectFactory.fromRawInputString(
             answerString).toDict();
-          inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
+          var inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
             inputsString).toDict();
           return angular.equals(answerList, inputsList);
         };
 
         var checkEquivalency = function(earlierRule, laterRule) {
-          earlierInput = NumberWithUnitsObjectFactory.fromDict(
+          var earlierInput = NumberWithUnitsObjectFactory.fromDict(
             earlierRule.inputs.f);
-          laterInput = NumberWithUnitsObjectFactory.fromDict(
+          var laterInput = NumberWithUnitsObjectFactory.fromDict(
             laterRule.inputs.f);
           if (earlierInput.type === 'fraction') {
             earlierInput.type = 'real';
@@ -63,8 +65,8 @@ oppia.factory('NumberWithUnitsValidationService', [
             laterInput.type = 'real';
             laterInput.real = laterInput.fraction.toFloat();
           }
-          earlierInputString = earlierInput.toMathjsCompatibleString();
-          laterInputString = laterInput.toMathjsCompatibleString();
+          var earlierInputString = earlierInput.toMathjsCompatibleString();
+          var laterInputString = laterInput.toMathjsCompatibleString();
           return math.unit(laterInputString).equals(math.unit(
             earlierInputString));
         };

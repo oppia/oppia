@@ -1,0 +1,32 @@
+<div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
+  <div class="oppia-rule-details-header">
+    <strong ng-if="outcomeHasFeedback">And afterwards, directs the learner to...</strong>
+    <strong ng-if="!outcomeHasFeedback">Oppia directs the learner to...</strong>
+  </div>
+  <div class="form-group" style="font-size: 1.1em;">
+    <span>
+      <select class="form-control" ng-model="outcome.dest" ng-options="choice.id as choice.text for choice in destChoices" style="width: 200px;" ng-change="onDestSelectorChange()">
+      </select>
+    </span>
+  </div>
+  <ng-form name="newStateNameForm">
+    <span ng-if="isCreatingNewState(outcome)">
+      <input type="text" focus-on="newStateNameInputField" name="newStateName" ng-model="outcome.newStateName" class="form-control protractor-test-add-state-input" tabindex="0" aria-invalid="false" ng-pattern="newStateNamePattern" required>
+    </span>
+    <p ng-show="newStateNameForm.newStateName.$error.pattern" class="help-block oppia-form-error" style="font-size: 0.85em;">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
+  </ng-form>
+
+  <div ng-if="isSelfLoop() && canEditRefresherExplorationId" style="margin-top: 12px;">
+    <b>Refresher exploration ID (optional):</b>
+    <input type="text" name="refresherExplorationId" ng-model="outcome.refresherExplorationId" class="form-control protractor-test-add-refresher-exploration-id" tabindex="0" aria-invalid="false" ng-pattern="globalIdPattern">
+  </div>
+  <div style="margin-top: 12px;" ng-if="canAddPrerequisiteSkill">
+    <b>Prerequisite skill ID (optional):&nbsp;</b>
+    <input type="text" name="missingPrerequisiteSkillId" ng-model="outcome.missingPrerequisiteSkillId" class="form-control" tabindex="0" aria-invalid="false" ng-model-options="{allowInvalid: true}" ng-pattern="explorationAndSkillIdPattern">
+    <p style="font-size: 0.8em;">
+      <i> Mention the skill that this state requires so that a learner who is stuck in the state can quickly learn the
+          required material and continue with the exploration.
+      </i>
+    </p>
+  </div>
+</div>

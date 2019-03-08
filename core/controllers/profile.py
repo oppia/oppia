@@ -222,7 +222,7 @@ class ProfilePictureHandler(base.BaseHandler):
 
 
 class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
-    """ Provides the dataURI of the profile picture of the specified user,
+    """Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID.
     """
 
@@ -385,6 +385,7 @@ class UserInfoHandler(base.BaseHandler):
             'is_admin': user_services.is_admin(self.user_id),
             'is_super_admin': (
                 current_user_services.is_current_user_super_admin()),
+            'is_topic_manager': user_services.is_topic_manager(self.user_id),
             'can_create_collections': bool(
                 role_services.ACTION_CREATE_COLLECTION in user_actions),
             'preferred_site_language_code': (

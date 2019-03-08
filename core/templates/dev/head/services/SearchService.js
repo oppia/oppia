@@ -19,8 +19,8 @@
 oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');
 
 oppia.factory('SearchService', [
-  '$http', '$rootScope', '$log', '$translate', 'SEARCH_DATA_URL',
-  function($http, $rootScope, $log, $translate, SEARCH_DATA_URL) {
+  '$http', '$log', '$rootScope', '$translate', 'SEARCH_DATA_URL',
+  function($http, $log, $rootScope, $translate, SEARCH_DATA_URL) {
     var _lastQuery = null;
     var _lastSelectedCategories = {};
     var _lastSelectedLanguageCodes = {};
@@ -171,7 +171,7 @@ oppia.factory('SearchService', [
         }
 
         for (var i = 1; i < querySegments.length; i++) {
-          var urlComponent = decodeURIComponent(querySegments[i]);
+          urlComponent = decodeURIComponent(querySegments[i]);
 
           var itemsType = null;
           if (urlComponent.indexOf('category') === 0) {

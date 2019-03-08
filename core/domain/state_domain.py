@@ -772,65 +772,82 @@ class WrittenTranslation(object):
                 self.needs_update)
 
 
-class ContentTranslations(object):
+class WrittenTranslations(object):
     """Value object representing a content translations which stores
     translated contents of all state contents (like hints, feedback etc.) in
     different languages linked through their content_id.
     """
 
-    def __init__(self, content_translations):
-        """Initializes a ContentTranslations domain object."""
-        self.content_translations = content_translations
+    def __init__(self, translations_mapping):
+        """Initializes a WrittenTranslations domain object."""
+        self.translations_mapping = translations_mapping
 
     def to_dict(self):
-        """Returns a dict representing this ContentTranslations domain object.
+        """Returns a dict representing this WrittenTranslations domain object.
 
         Returns:
-            dict. A dict, mapping all fields of ContentTranslations instance.
+            dict. A dict, mapping all fields of WrittenTranslations instance.
         """
-        content_translations_dict = {}
+        translations_mapping = {}
         for (content_id, language_code_to_written_translation) in (
-                self.content_translations.iteritems()):
-            content_translations_dict[content_id] = {}
+                self.translations_mapping.iteritems()):
+            translations_mapping[content_id] = {}
             for (language_code, written_translation) in (
                     language_code_to_written_translation.iteritems()):
-                content_translations_dict[content_id][language_code] = (
+                translations_mapping[content_id][language_code] = (
                     written_translation.to_dict())
+        written_translations_dict = {
+            'translations_mapping': translations_mapping
+        }
 
-        return content_translations_dict
+        return written_translations_dict
 
     @classmethod
-    def from_dict(cls, content_translations_dict):
-        """Return a ContentTranslations domain object from a dict.
+    def from_dict(cls, written_translations_dict):
+        """Return a WrittenTranslations domain object from a dict.
 
         Args:
-            content_translations_dict: dict. The dict representation of
-                ContentTranslations object.
+            written_translations_dict: dict. The dict representation of
+                WrittenTranslations object.
 
         Returns:
-            ContentTranslations. The corresponding ContentTranslations domain
+            WrittenTranslations. The corresponding WrittenTranslations domain
             object.
         """
-        content_translations = {}
+        translations_mapping = {}
         for (content_id, language_code_to_written_translation) in (
-                content_translations_dict.iteritems()):
-            content_translations[content_id] = {}
+                written_translations_dict['translations_mapping'].iteritems()):
+            translations_mapping[content_id] = {}
             for (language_code, written_translation) in (
                     language_code_to_written_translation.iteritems()):
-                content_translations[content_id][language_code] = (
+                translations_mapping[content_id][language_code] = (
                     WrittenTranslation.from_dict(written_translation))
 
-        return cls(content_translations)
+        return cls(translations_mapping)
 
-    def validate(self):
-        """Validates properties of the ContentTranslations.
+    def validate(self, expected_content_id_list):
+        """Validates properties of the WrittenTranslations.
+
+        Args:
+            expected_content_id_list: A list of content id which are expected to
+            be inside they WrittenTranslations.
 
         Raises:
-            ValidationError: One or more attributes of the ContentTranslations
+            ValidationError: One or more attributes of the WrittenTranslations
             are invalid.
         """
+        if expected_content_id_list is not None:
+            if not set(self.translations_mapping.keys()) == (
+                    set(expected_content_id_list)):
+                raise utils.ValidationError(
+                    'Expected state written_translations to match the listed '
+                    'content ids %s, found %s' % (
+                        expected_content_id_list,
+                        self.translations_mapping.keys())
+                    )
+
         for (content_id, language_code_to_written_translation) in (
-                self.content_translations.iteritems()):
+                self.translations_mapping.iteritems()):
             if not isinstance(content_id, basestring):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
@@ -851,18 +868,13 @@ class ContentTranslations(object):
 
                 written_translation.validate()
 
-    def get_available_languages(self):
-        """Returns a set of language available in the ContentTranslations.
+    def get_content_ids_for_text_translation(self):
+        """Returns a list of content_id available for text translation.
 
         Returns:
-            set(str). A set of languages available in the ContentTranslations.
+            list(str). A list of content id available for text translation.
         """
-        language_codes_set = set([])
-        for language_code_to_written_translation in (
-                self.content_translations.itervalues()):
-            for language_code in language_code_to_written_translation:
-                language_codes_set.add(language_code)
-        return language_codes_set
+        return self.translations_mapping.keys()
 
     def add_content_id_for_translation(self, content_id):
         """Adds a content id as a key for the translation into the
@@ -877,11 +889,11 @@ class ContentTranslations(object):
         if not isinstance(content_id, basestring):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
-        if content_id in self.content_translations:
+        if content_id in self.translations_mapping:
             raise Exception(
                 'The content_id %s already exist.' % content_id)
         else:
-            self.content_translations[content_id] = {}
+            self.translations_mapping[content_id] = {}
 
     def delete_content_id_for_translation(self, content_id):
         """Deletes a content id from the content_translation dict.
@@ -895,11 +907,11 @@ class ContentTranslations(object):
         if not isinstance(content_id, basestring):
             raise Exception(
                 'Expected content_id to be a string, received %s' % content_id)
-        if content_id not in self.content_translations:
+        if content_id not in self.translations_mapping:
             raise Exception(
                 'The content_id %s does not exist.' % content_id)
         else:
-            self.content_translations.pop(content_id, None)
+            self.translations_mapping.pop(content_id, None)
 
 
 class RuleSpec(object):
@@ -1109,7 +1121,8 @@ class State(object):
 
     def __init__(
             self, content, param_changes, interaction,
-            content_ids_to_audio_translations, classifier_model_id=None):
+            content_ids_to_audio_translations, written_translations,
+            classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -1121,6 +1134,8 @@ class State(object):
                 associated with this state.
             content_ids_to_audio_translations: dict. A dict representing audio
                 translations for corresponding content_id.
+            written_translations: WrittenTranslations. The written translations
+                for the state contents.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -1140,6 +1155,7 @@ class State(object):
         self.classifier_model_id = classifier_model_id
         self.content_ids_to_audio_translations = (
             content_ids_to_audio_translations)
+        self.written_translations = written_translations
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         """Validates various properties of the State.
@@ -1200,16 +1216,24 @@ class State(object):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
-        available_content_ids = self.content_ids_to_audio_translations.keys()
-        if not set(content_id_list) <= set(available_content_ids):
+        available_content_ids_in_audio_translations = (
+            self.content_ids_to_audio_translations.keys())
+
+        self.written_translations.validate(content_id_list)
+
+        if not set(content_id_list) == set(
+                available_content_ids_in_audio_translations):
             raise utils.ValidationError(
-                'Expected state content_ids_to_audio_translations to have all '
-                'of the listed content ids %s, found %s' %
-                (content_id_list, available_content_ids))
+                'Expected state content_ids_to_audio_translations to match the '
+                'listed content ids %s, found %s' % (
+                    content_id_list,
+                    available_content_ids_in_audio_translations))
+
         if not isinstance(self.content_ids_to_audio_translations, dict):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to be a dict,'
-                'received %s' % self.param_changes)
+                'received %s' % self.content_ids_to_audio_translations)
+
         for (content_id, audio_translations) in (
                 self.content_ids_to_audio_translations.iteritems()):
 
@@ -1307,18 +1331,35 @@ class State(object):
         """
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
+        content_ids_for_text_translations = (
+            self.written_translations.get_content_ids_for_text_translation())
         for content_id in content_ids_to_delete:
             if not content_id in self.content_ids_to_audio_translations:
                 raise Exception(
-                    'The content_id %s does not exist.' % content_id)
+                    'The content_id %s does not exist in '
+                    'content_ids_to_audio_translations.' % content_id)
+            elif not content_id in content_ids_for_text_translations:
+                raise Exception(
+                    'The content_id %s does not exist in written_translations.'
+                    % content_id)
             else:
                 self.content_ids_to_audio_translations.pop(content_id)
+                self.written_translations.delete_content_id_for_translation(
+                    content_id)
+
         for content_id in content_ids_to_add:
             if content_id in self.content_ids_to_audio_translations:
                 raise Exception(
-                    'The content_id %s already exists.' % content_id)
+                    'The content_id %s already exists in '
+                    'content_ids_to_audio_translations.' % content_id)
+            elif content_id in content_ids_for_text_translations:
+                raise Exception(
+                    'The content_id %s does not exist in written_translations.'
+                    % content_id)
             else:
                 self.content_ids_to_audio_translations[content_id] = {}
+                self.written_translations.add_content_id_for_translation(
+                    content_id)
 
     def update_content(self, content_dict):
         """Update the content of this state.
@@ -1551,6 +1592,15 @@ class State(object):
                 content_ids_to_audio_translations_dict.iteritems())
         }
 
+    def update_written_translations(self, written_translations):
+        """Update the written_translations of a state.
+
+        Args:
+            written_translations: WrittenTranslations. The new
+                WrittenTranslations object for the state.
+        """
+        self.written_translations = written_translations
+
     def to_dict(self):
         """Returns a dict representing this State domain object.
 
@@ -1574,7 +1624,8 @@ class State(object):
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
             'content_ids_to_audio_translations': (
-                content_ids_to_audio_translations_dict)
+                content_ids_to_audio_translations_dict),
+            'written_translations': self.written_translations.to_dict()
         }
 
     @classmethod
@@ -1603,6 +1654,7 @@ class State(object):
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
             content_ids_to_audio_translations,
+            WrittenTranslations.from_dict(state_dict['written_translations']),
             state_dict['classifier_model_id'])
 
     @classmethod
@@ -1626,7 +1678,9 @@ class State(object):
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),
-            copy.deepcopy(feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS))
+            copy.deepcopy(feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS),
+            WrittenTranslations.from_dict(
+                copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)))
 
     @classmethod
     def convert_html_fields_in_state(cls, state_dict, conversion_fn):

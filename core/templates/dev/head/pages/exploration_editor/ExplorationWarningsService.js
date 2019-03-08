@@ -23,14 +23,14 @@ oppia.constant('UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
 oppia.factory('ExplorationWarningsService', [
   '$injector', 'ExplorationParamChangesService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'GraphDataService', 'ImprovementsService',
-  'ParameterMetadataService', 'StateTopAnswersStatsService',
-  'SolutionValidityService', 'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
+  'ParameterMetadataService', 'SolutionValidityService',
+  'StateTopAnswersStatsService', 'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
   'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
   function(
       $injector, ExplorationParamChangesService, ExplorationStatesService,
       ExpressionInterpolationService, GraphDataService, ImprovementsService,
-      ParameterMetadataService, StateTopAnswersStatsService,
-      SolutionValidityService, INTERACTION_SPECS, STATE_ERROR_MESSAGES,
+      ParameterMetadataService, SolutionValidityService,
+      StateTopAnswersStatsService, INTERACTION_SPECS, STATE_ERROR_MESSAGES,
       UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD, WARNING_TYPES) {
     var _warningsList = [];
     var stateWarnings = {};
@@ -250,7 +250,7 @@ oppia.factory('ExplorationWarningsService', [
 
       if (_graphData) {
         var unreachableStateNames = _getUnreachableNodeNames(
-          [_graphData.initStateId], _graphData.nodes, _graphData.links, true);
+          [_graphData.initStateId], _graphData.nodes, _graphData.links);
 
         if (unreachableStateNames.length) {
           angular.forEach(
@@ -262,7 +262,7 @@ oppia.factory('ExplorationWarningsService', [
           // Only perform this check if all states are reachable.
           var deadEndStates = _getUnreachableNodeNames(
             _graphData.finalStateIds, _graphData.nodes,
-            _getReversedLinks(_graphData.links), false);
+            _getReversedLinks(_graphData.links));
           if (deadEndStates.length) {
             angular.forEach(deadEndStates, function(deadEndState) {
               _extendStateWarnings(

@@ -27,10 +27,10 @@
 oppia.constant('TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD', 0.7);
 
 oppia.factory('TextInputPredictionService', [
-  'SVMPredictionService', 'TextInputTokenizer',
-  'CountVectorizerService', 'TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD', function(
-      SVMPredictionService, TextInputTokenizer,
-      CountVectorizerService, TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
+  'CountVectorizerService', 'SVMPredictionService',
+  'TextInputTokenizer', 'TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD', function(
+      CountVectorizerService, SVMPredictionService,
+      TextInputTokenizer, TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
     return {
       predict: function(classifierData, textInput) {
         var cvVocabulary = classifierData.cv_vocabulary;
@@ -42,7 +42,8 @@ oppia.factory('TextInputPredictionService', [
 
         var textVector = CountVectorizerService.vectorize(
           textInputTokens, cvVocabulary);
-        predictionResult = SVMPredictionService.predict(svmData, textVector);
+        var predictionResult = SVMPredictionService.predict(
+          svmData, textVector);
         if (predictionResult.predictionConfidence >
             TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
           return predictionResult.predictionLabel;

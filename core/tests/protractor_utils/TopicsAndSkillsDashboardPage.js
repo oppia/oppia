@@ -22,6 +22,9 @@ var waitFor = require('./waitFor.js');
 
 var TopicsAndSkillsDashboardPage = function() {
   var DASHBOARD_URL = '/topics_and_skills_dashboard';
+  var topicNames = element.all(by.css('.protractor-test-topic-name'));
+  var skillDescriptions = element.all(
+    by.css('.protractor-test-skill-description'));
   var createTopicButton = element(
     by.css('.protractor-test-create-topic-button'));
   var deleteTopicButtons = element.all(
@@ -56,10 +59,30 @@ var TopicsAndSkillsDashboardPage = function() {
   var unusedSkillsTabButton = element(
     by.css('.protractor-test-unused-skills-tab')
   );
+  var assignSkillToTopicButtons = element.all(
+    by.css('.protractor-test-assign-skill-to-topic-button'));
+  var confirmMoveButton = element(
+    by.css('.protractor-test-confirm-move-button'));
 
   this.get = function() {
     browser.get(DASHBOARD_URL);
-    return waitFor.pageToFullyLoad();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToTopicWithIndex = function(index) {
+    topicsListItems.then(function(elems) {
+      elems[index].click();
+    });
+  };
+
+  this.assignSkillWithIndexToTopic = function(index, topicIndex) {
+    assignSkillToTopicButtons.then(function(elems) {
+      elems[index].click();
+      topicsListItems.then(function(topics) {
+        topics[index].click();
+        confirmMoveButton.click();
+      });
+    });
   };
 
   this.createTopicWithTitle = function(title) {
@@ -127,6 +150,19 @@ var TopicsAndSkillsDashboardPage = function() {
   this.expectNumberOfTopicsToBe = function(number) {
     topicsListItems.then(function(elems) {
       expect(elems.length).toBe(number);
+    });
+  };
+
+  this.expectTopicNameToBe = function(topicName, index) {
+    topicNames.then(function(elems) {
+      expect(elems[index].getText()).toEqual(topicName);
+    });
+  };
+
+
+  this.expectSkillDescriptionToBe = function(description, index) {
+    skillDescriptions.then(function(elems) {
+      expect(elems[index].getText()).toEqual(description);
     });
   };
 

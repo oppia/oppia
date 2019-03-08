@@ -17,18 +17,19 @@
  */
 
 oppia.factory('ImagePreloaderService', [
-  '$q', '$uibModal', 'ContextService', 'AssetsBackendApiService',
-  'UrlInterpolationService', 'ComputeGraphService',
-  'ExtractImageFilenamesFromStateService',
-  function($q, $uibModal, ContextService, AssetsBackendApiService,
-      UrlInterpolationService, ComputeGraphService,
-      ExtractImageFilenamesFromStateService) {
+  '$q', '$uibModal', 'AssetsBackendApiService', 'ComputeGraphService',
+  'ContextService', 'ExtractImageFilenamesFromStateService',
+  'UrlInterpolationService',
+  function($q, $uibModal, AssetsBackendApiService, ComputeGraphService,
+      ContextService, ExtractImageFilenamesFromStateService,
+      UrlInterpolationService) {
     var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
     var _filenamesOfImageCurrentlyDownloading = [];
     var _filenamesOfImageToBeDownloaded = [];
     var _filenamesOfImageFailedToDownload = [];
     var _exploration = null;
+    var _states = null;
     var _hasImagePreloaderServiceStarted = false;
     // imageLoadedCallback is an object of objects (identified by the filenames
     // which are being downloaded at the time they are required by the
@@ -233,9 +234,9 @@ oppia.factory('ImagePreloaderService', [
     var getDimensionsOfImage = function(filename) {
       var dimensionsRegex = RegExp(
         '[^/]+_height_([0-9]+)_width_([0-9]+)\.(png|jpeg|jpg|gif)$', 'g');
-      imageDimensions = dimensionsRegex.exec(filename);
+      var imageDimensions = dimensionsRegex.exec(filename);
       if (imageDimensions) {
-        dimensions = {
+        var dimensions = {
           height: Number(imageDimensions[1]),
           width: Number(imageDimensions[2])
         };

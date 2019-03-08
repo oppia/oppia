@@ -18,7 +18,7 @@
 
 describe('Sidebar state name controller', function() {
   describe('SidebarStateName', function() {
-    var scope, filter, ctrl, ecs, fs, ess;
+    var scope, filter, ctrl, ecs, fs, ess, rootScope, outerScope;
     var $httpBackend;
     var mockExplorationData;
 
@@ -75,7 +75,13 @@ describe('Sidebar state name controller', function() {
             },
             hints: []
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
         },
         'Second State': {
           content: {
@@ -98,7 +104,13 @@ describe('Sidebar state name controller', function() {
             },
             hints: []
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
         },
         'Third State': {
           content: {
@@ -128,7 +140,13 @@ describe('Sidebar state name controller', function() {
               value: 'something clever',
               parse_with_jinja: false
             }
-          }]
+          }],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
         }
       });
 

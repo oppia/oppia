@@ -25,7 +25,6 @@ where x.y.z is the new version of Oppia, e.g. 2.5.3.
 
 import argparse
 import json
-import os
 import re
 import subprocess
 import sys
@@ -67,8 +66,6 @@ else:
 
 # Construct the new branch name.
 NEW_BRANCH_NAME = 'release-%s' % TARGET_VERSION
-NEW_APP_YAML_VERSION = TARGET_VERSION.replace('.', '-')
-assert '.' not in NEW_APP_YAML_VERSION
 
 
 def _verify_target_branch_does_not_already_exist(remote_alias):
@@ -146,18 +143,15 @@ def _verify_target_version_is_consistent_with_latest_released_version():
 
 
 def _execute_branch_cut():
-    """Pushes the new release branch to Github.
+    """Pushes the new release branch to Github."""
 
-    Raises:
-         AssertionError: 'version: default' was not found in app.yaml.
-    """
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
     common.verify_local_repo_is_clean()
     common.verify_current_branch_name('develop')
 
     # Update the local repo.
-    remote_alias = common.get_remote_alias('https://github.com/oppia/oppia')
+    remote_alias = common.get_remote_alias('git@github.com:oppia/oppia.git')
     subprocess.call(['git', 'pull', remote_alias])
 
     _verify_target_branch_does_not_already_exist(remote_alias)
@@ -182,24 +176,6 @@ def _execute_branch_cut():
     # Cut a new release branch.
     print 'Cutting a new release branch: %s' % NEW_BRANCH_NAME
     subprocess.call(['git', 'checkout', '-b', NEW_BRANCH_NAME])
-
-    # Update the version in app.yaml.
-    print 'Updating the version number in app.yaml ...'
-    with open('app.yaml', 'r') as f:
-        content = f.read()
-        assert content.count('version: default') == 1
-    os.remove('app.yaml')
-    content = content.replace(
-        'version: default', 'version: %s' % NEW_APP_YAML_VERSION)
-    with open('app.yaml', 'w+') as f:
-        f.write(content)
-    print 'Version number updated.'
-
-    # Make a commit.
-    print 'Committing the change.'
-    subprocess.call([
-        'git', 'commit', '-a', '-m',
-        '"Update version number to %s"' % TARGET_VERSION])
 
     # Push the new release branch to GitHub.
     print 'Pushing new release branch to GitHub.'

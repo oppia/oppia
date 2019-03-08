@@ -30,6 +30,7 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('rich-text components', function() {
   var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
   var explorationPlayerPage = null;
 
   beforeEach(function() {

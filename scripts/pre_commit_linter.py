@@ -179,12 +179,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': r'text\/ng-template',
         'message': 'The directives must be directly referenced.',
-        'excluded_files': (
-            'core/templates/dev/head/pages/exploration_player/'
-            'feedback_popup_container_directive.html',
-            'core/templates/dev/head/pages/exploration_player/'
-            'input_response_pair_directive.html'
-        ),
+        'excluded_files': (),
         'excluded_dirs': (
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
@@ -289,7 +284,7 @@ _PATHS_TO_INSERT = [
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pyjsparser-2.5.2'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
@@ -309,7 +304,7 @@ for path in _PATHS_TO_INSERT:
 
 import isort  # isort:skip
 import pycodestyle  # isort:skip
-import pyjsparser  # isort:skip
+import esprima  # isort:skip
 from pylint import lint  # isort:skip
 
 # pylint: enable=wrong-import-order
@@ -1159,6 +1154,8 @@ def _check_docstrings(all_files):
     previous_line_message = (
         'There should not be any empty lines before the end of '
         'the multi-line docstring.')
+    space_after_triple_quotes_in_docstring_message = (
+        'There should be no space after """ in docstring.')
     failed = False
     is_docstring = False
     is_class_or_function = False
@@ -1182,6 +1179,16 @@ def _check_docstrings(all_files):
                             line.startswith('"""')):
                         is_docstring = True
                         is_class_or_function = False
+
+                # Check for space after """ in docstring.
+                if re.match(r'^""".+$', line) and is_docstring and (
+                        line[3] == ' '):
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1,
+                        space_after_triple_quotes_in_docstring_message)
+                    print ''
+                    is_docstring = False
 
                 # Check if single line docstring span two lines.
                 if line == '"""' and prev_line.startswith('"""') and (
@@ -1238,13 +1245,13 @@ def _check_docstrings(all_files):
 
                     is_docstring = False
 
-        # Check that the args in the docstring are listed in the same
-        # order as they appear in the function definition.
         docstring_checker = docstrings_checker.ASTDocStringChecker()
         for filename in files_to_check:
             ast_file = ast.walk(ast.parse(FileCache.read(filename)))
             func_defs = [n for n in ast_file if isinstance(n, ast.FunctionDef)]
             for func in func_defs:
+                # Check that the args in the docstring are listed in the same
+                # order as they appear in the function definition.
                 func_result = docstring_checker.check_docstrings_arg_order(func)
                 for error_line in func_result:
                     print '%s --> Func %s: %s' % (
@@ -1322,17 +1329,27 @@ def _check_html_directive_name(all_files):
     return summary_messages
 
 
-def _validate_and_parse_js_file(filename, content):
-    """This function validates a JavaScript file and returns the parsed contents
-    as a Python dictionary.
+def _validate_and_parse_js_files(all_files):
+    """This function validates JavaScript files and returns the parsed
+    contents as a Python dictionary.
     """
-    # Use Pyjsparser to parse a JS file as a Python dictionary.
-    parser = pyjsparser.PyJsParser()
-    print 'Validating and parsing %s file ...' % filename
-    return parser.parse(content)
+
+    # Select JS files which need to be checked.
+    files_to_check = [
+        filename for filename in all_files if filename.endswith('.js') and
+        not any(fnmatch.fnmatch(filename, pattern) for pattern in
+                EXCLUDED_PATHS)]
+    parsed_js_files = dict()
+    for filename in files_to_check:
+        print 'Validating and parsing %s file ...' % filename
+        content = FileCache.read(filename).decode('utf-8')
+
+        # Use esprima to parse a JS file.
+        parsed_js_files[filename] = esprima.parseScript(content)
+    return parsed_js_files
 
 
-def _check_directive_scope(all_files):
+def _check_directive_scope(all_files, parsed_js_files):
     """This function checks that all directives have an explicit
     scope: {} and it should not be scope: true.
     """
@@ -1340,82 +1357,81 @@ def _check_directive_scope(all_files):
     print '----------------------------------------'
     # Select JS files which need to be checked.
     files_to_check = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.js')]
+        filename for filename in all_files if filename.endswith('.js') and
+        not any(fnmatch.fnmatch(filename, pattern) for pattern in
+                EXCLUDED_PATHS)]
     failed = False
     summary_messages = []
 
     for filename in files_to_check:
-        content = FileCache.read(filename)
-        parsed_dict = _validate_and_parse_js_file(filename, content)
+        parsed_script = parsed_js_files[filename]
         with _redirect_stdout(_TARGET_STDOUT):
             # Parse the body of the content as nodes.
-            parsed_nodes = parsed_dict['body']
+            parsed_nodes = parsed_script.body
             for parsed_node in parsed_nodes:
                 # Check the type of the node.
-                if parsed_node['type'] != 'ExpressionStatement':
+                if parsed_node.type != 'ExpressionStatement':
                     continue
                 # Separate the expression part of the node.
-                expression = parsed_node['expression']
+                expression = parsed_node.expression
                 # Check whether the expression belongs to a directive.
                 expression_type_is_not_call = (
-                    expression['type'] != 'CallExpression')
+                    expression.type != 'CallExpression')
                 if expression_type_is_not_call:
                     continue
                 expression_callee_type_is_not_member = (
-                    expression['callee']['type'] != 'MemberExpression')
+                    expression.callee.type != 'MemberExpression')
                 if expression_callee_type_is_not_member:
                     continue
                 expression_callee_property_name_is_not_directive = (
-                    expression['callee']['property']['name'] != 'directive')
+                    expression.callee.property.name != 'directive')
                 if expression_callee_property_name_is_not_directive:
                     continue
                 # Separate the arguments of the expression.
-                arguments = expression['arguments']
+                arguments = expression.arguments
                 # The first argument of the expression is the
                 # name of the directive.
-                if arguments[0]['type'] == 'Literal':
-                    directive_name = str(arguments[0]['value'])
+                if arguments[0].type == 'Literal':
+                    directive_name = str(arguments[0].value)
                 arguments = arguments[1:]
                 for argument in arguments:
                     # Check the type of an argument.
-                    if argument['type'] != 'ArrayExpression':
+                    if argument.type != 'ArrayExpression':
                         continue
                     # Separate out the elements for the argument.
-                    elements = argument['elements']
+                    elements = argument.elements
                     for element in elements:
                         # Check the type of an element.
-                        if element['type'] != 'FunctionExpression':
+                        if element.type != 'FunctionExpression':
                             continue
                         # Separate out the body of the element.
-                        body = element['body']
-                        if body['type'] != 'BlockStatement':
+                        body = element.body
+                        if body.type != 'BlockStatement':
                             continue
                         # Further separate the body elements from the body.
-                        body_elements = body['body']
+                        body_elements = body.body
                         for body_element in body_elements:
                             # Check if the body element is a return statement.
                             body_element_type_is_not_return = (
-                                body_element['type'] != 'ReturnStatement')
+                                body_element.type != 'ReturnStatement')
                             body_element_argument_type_is_not_object = (
-                                body_element['argument']['type'] != (
+                                body_element.argument.type != (
                                     'ObjectExpression'))
                             if (body_element_type_is_not_return or (
                                     body_element_argument_type_is_not_object)):
                                 continue
                             # Separate the properties of the return node.
                             return_node_properties = (
-                                body_element['argument']['properties'])
+                                body_element.argument.properties)
                             # Loop over all the properties of the return node
                             # to find out the scope key.
                             for return_node_property in return_node_properties:
                                 # Check whether the property is scope.
                                 property_key_is_an_identifier = (
-                                    return_node_property['key']['type'] == (
+                                    return_node_property.key.type == (
                                         'Identifier'))
                                 property_key_name_is_scope = (
-                                    return_node_property['key']['name'] == (
+                                    return_node_property.key.name == (
                                         'scope'))
                                 if (
                                         property_key_is_an_identifier and (
@@ -1424,9 +1440,9 @@ def _check_directive_scope(all_files):
                                     # check if it is an Object Expression.
                                     # If it is not, then check for scope: true
                                     # and report the error message.
-                                    scope_value = return_node_property['value']
-                                    if scope_value['type'] == 'Literal' and (
-                                            scope_value['value']):
+                                    scope_value = return_node_property.value
+                                    if scope_value.type == 'Literal' and (
+                                            scope_value.value):
                                         failed = True
                                         print (
                                             'Please ensure that %s '
@@ -1435,7 +1451,7 @@ def _check_directive_scope(all_files):
                                             'true.' %
                                             (directive_name, filename))
                                         print ''
-                                    elif scope_value['type'] != (
+                                    elif scope_value.type != (
                                             'ObjectExpression'):
                                         # Check whether the directive has scope:
                                         # {} else report the error message.
@@ -1459,6 +1475,107 @@ def _check_directive_scope(all_files):
             summary_messages.append(summary_message)
 
         print ''
+
+    return summary_messages
+
+
+def _check_sorted_dependencies(all_files, parsed_js_files):
+    """This function checks that the dependencies which are
+    imported in the controllers/directives/factories in JS
+    files are in following pattern: dollar imports, regular
+    imports, and constant imports, all in sorted order.
+    """
+    print 'Starting sorted dependencies check'
+    print '----------------------------------------'
+    files_to_check = [
+        filename for filename in all_files if filename.endswith('.js') and
+        not any(fnmatch.fnmatch(filename, pattern) for pattern in
+                EXCLUDED_PATHS)]
+    properties_to_check = ['controller', 'directive', 'factory']
+    failed = False
+    summary_messages = []
+
+    for filename in files_to_check:
+        parsed_script = parsed_js_files[filename]
+        with _redirect_stdout(_TARGET_STDOUT):
+            parsed_nodes = parsed_script.body
+            for parsed_node in parsed_nodes:
+                if parsed_node.type != 'ExpressionStatement':
+                    continue
+                expression = parsed_node.expression
+                if expression.type != 'CallExpression':
+                    continue
+                if expression.callee.type != 'MemberExpression':
+                    continue
+                property_name = expression.callee.property.name
+                if property_name not in properties_to_check:
+                    continue
+                arguments = expression.arguments
+                if arguments[0].type == 'Literal':
+                    property_value = str(arguments[0].value)
+                arguments = arguments[1:]
+                for argument in arguments:
+                    if argument.type != 'ArrayExpression':
+                        continue
+                    literal_args = []
+                    function_args = []
+                    dollar_imports = []
+                    regular_imports = []
+                    constant_imports = []
+                    elements = argument.elements
+                    for element in elements:
+                        if element.type == 'Literal':
+                            literal_args.append(str(element.value))
+                        elif element.type == 'FunctionExpression':
+                            func_args = element.params
+                            for func_arg in func_args:
+                                function_args.append(str(func_arg.name))
+                    for arg in function_args:
+                        if arg.startswith('$'):
+                            dollar_imports.append(arg)
+                        elif re.search('[a-z]', arg):
+                            regular_imports.append(arg)
+                        else:
+                            constant_imports.append(arg)
+                    dollar_imports.sort()
+                    regular_imports.sort()
+                    constant_imports.sort()
+                    sorted_imports = (
+                        dollar_imports + regular_imports + constant_imports)
+                    if sorted_imports != function_args:
+                        failed = True
+                        print (
+                            'Please ensure that in %s in file %s, the '
+                            'injected dependencies should be in the '
+                            'following manner: dollar imports, regular '
+                            'imports and constant imports, all in sorted '
+                            'order.'
+                            % (property_value, filename))
+                    if sorted_imports != literal_args:
+                        failed = True
+                        print (
+       	                    'Please ensure that in %s in file %s, the '
+       	                    'stringfied dependencies should be in the '
+       	                    'following manner: dollar imports, regular '
+       	                    'imports and constant imports, all in sorted '
+       	                    'order.'
+       	                    % (property_value, filename))
+
+    with _redirect_stdout(_TARGET_STDOUT):
+        if failed:
+            summary_message = (
+                '%s  Sorted dependencies check failed' % (
+                    _MESSAGE_TYPE_FAILED))
+        else:
+            summary_message = (
+                '%s  Sorted dependencies check passed' % (
+                    _MESSAGE_TYPE_SUCCESS))
+
+    summary_messages.append(summary_message)
+    print summary_message
+    print ''
+    print '----------------------------------------'
+    print ''
 
     return summary_messages
 
@@ -1495,10 +1612,11 @@ def _match_line_breaks_in_controller_dependencies(all_files):
                 if stringfied_dependencies != function_parameters:
                     failed = True
                     print (
-                        '%s --> Please ensure that line breaks between '
-                        'the stringfied dependencies: "%s" and the function '
-                        'parameters: "%s" for the corresponding controller '
-                        'in this file exactly match.' % (
+                        'Please ensure that in file %s the line breaks pattern '
+                        'between the dependencies mentioned as strings:\n[%s]\n'
+                        'and the dependencies mentioned as function parameters:'
+                        '\n(%s)\nfor the corresponding controller should '
+                        'exactly match.' % (
                             filename, stringfied_dependencies,
                             function_parameters))
                     print ''
@@ -1529,6 +1647,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
     def __init__(self, filename, file_lines, debug, failed=False):
+        """Define various variables to parse HTML."""
         HTMLParser.HTMLParser.__init__(self)
         self.tag_stack = []
         self.debug = debug
@@ -1543,6 +1662,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             'param', 'source', 'track', 'wbr']
 
     def handle_starttag(self, tag, attrs):
+        """Handle start tag of a HTML line."""
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
         expected_indentation = self.indentation_level * self.indentation_width
@@ -1621,6 +1741,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                 self.failed = True
 
     def handle_endtag(self, tag):
+        """Handle end tag of a HTML line."""
         line_number, _ = self.getpos()
         tag_line = self.file_lines[line_number - 1]
         leading_spaces_count = len(tag_line) - len(tag_line.lstrip())
@@ -1654,6 +1775,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             print self.tag_stack
 
     def handle_data(self, data):
+        """Handle indentation level."""
         data_lines = data.split('\n')
         opening_block = tuple(['{% block', '{% macro', '{% if'])
         ending_block = tuple(['{% end', '{%- end'])
@@ -1772,8 +1894,13 @@ def main():
     files.
     """
     all_files = _get_all_files()
+    parsed_js_files = _validate_and_parse_js_files(
+        all_files)
     linter_messages = _pre_commit_linter(all_files)
-    directive_scope_messages = _check_directive_scope(all_files)
+    directive_scope_messages = _check_directive_scope(
+        all_files, parsed_js_files)
+    sorted_dependencies_messages = _check_sorted_dependencies(
+        all_files, parsed_js_files)
     controller_dependency_messages = (
         _match_line_breaks_in_controller_dependencies(all_files))
     html_directive_name_messages = _check_html_directive_name(all_files)
@@ -1789,7 +1916,8 @@ def main():
     copyright_notice_messages = _check_for_copyright_notice(all_files)
     _print_complete_summary_of_errors()
     all_messages = (
-        directive_scope_messages + controller_dependency_messages +
+        directive_scope_messages + sorted_dependencies_messages +
+        controller_dependency_messages +
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
         html_tag_and_attribute_messages + html_linter_messages +

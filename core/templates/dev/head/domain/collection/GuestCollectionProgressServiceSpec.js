@@ -20,6 +20,15 @@ describe('Guest collection progress service', function() {
   var GuestCollectionProgressService = null;
   var CollectionObjectFactory = null;
   var CollectionNodeObjectFactory = null;
+  var _collectionId0 = null;
+  var _collectionId1 = null;
+  var _expId0 = null;
+  var _expTitle0 = null;
+  var _expId1 = null;
+  var _expTitle1 = null;
+  var _expId2 = null;
+  var _expTitle2 = null;
+  var _collection0 = null;
 
   beforeEach(module('oppia'));
 

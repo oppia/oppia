@@ -150,7 +150,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATES_SCHEMA_VERSION = 26
+CURRENT_STATES_SCHEMA_VERSION = 27
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -214,6 +214,13 @@ DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
     'content': {},
     'default_outcome': {}
 }
+# Default written_translations dict for a default state template.
+DEFAULT_WRITTEN_TRANSLATIONS = {
+    'translations_mapping': {
+        'content': {},
+        'default_outcome': {}
+    }
+}
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -241,9 +248,13 @@ DEFAULT_MISCONCEPTION_NAME = ''
 DEFAULT_MISCONCEPTION_NOTES = ''
 # Default feedback for a newly-minted misconception.
 DEFAULT_MISCONCEPTION_FEEDBACK = ''
+# Default content_id for explanation subtitled html.
+DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
 
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
+# Default content id for the subtopic page's content.
+DEFAULT_SUBTOPIC_PAGE_CONTENT_ID = 'content'
 
 # Default ID of VM which is used for training classifier.
 DEFAULT_VM_ID = 'vm_default'
@@ -586,9 +597,9 @@ DEMO_COLLECTIONS = {
 # editor views.
 DISABLED_EXPLORATION_IDS = ['5']
 
-# Google Group embed URL for the Forum page.
-EMBEDDED_GOOGLE_GROUP_URL = (
-    'https://groups.google.com/forum/embed/?place=forum/oppia')
+# Oppia Google Group URL.
+GOOGLE_GROUP_URL = (
+    'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia')
 
 # External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
@@ -644,6 +655,7 @@ FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
+TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -671,7 +683,6 @@ QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
-SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
@@ -681,8 +692,10 @@ SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SPLASH_URL = '/splash'
+STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
+SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
@@ -857,9 +870,6 @@ CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'learners.')
 DONATE_PAGE_DESCRIPTION = (
     'Donate to The Oppia Foundation.')
-FORUM_PAGE_DESCRIPTION = (
-    'Engage with the Oppia community by discussing questions, bugs and '
-    'explorations in the forum.')
 LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
@@ -1002,4 +1012,13 @@ RTE_CONTENT_SPEC = {
         ]
 
     }
+}
+
+# A dict representing available landing pages, having subject as a key and list
+# of topics as the value.
+# Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
+# oppia constant defined in
+# core/templates/dev/head/pages/landing/TopicLandingPage.js file.
+AVAILABLE_LANDING_PAGES = {
+    'maths': ['fractions', 'ratios']
 }

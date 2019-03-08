@@ -18,9 +18,9 @@
  */
 
 oppia.factory('TranslationStatusService', [
-  'StateContentIdsToAudioTranslationsService', 'ExplorationStatesService',
+  'ExplorationStatesService', 'StateContentIdsToAudioTranslationsService',
   'TranslationLanguageService', 'INTERACTION_SPECS', function(
-      StateContentIdsToAudioTranslationsService, ExplorationStatesService,
+      ExplorationStatesService, StateContentIdsToAudioTranslationsService,
       TranslationLanguageService, INTERACTION_SPECS) {
     var NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var ALL_AUDIO_AVAILABLE_COLOR = '#16A765';
@@ -59,8 +59,8 @@ oppia.factory('TranslationStatusService', [
           }
           explorationAudioRequiredCount += allContentId.length;
           allContentId.forEach(function(contentId) {
-            availableTranslationLanguageCodes = contentIdsToAudioTranslations
-              .getAudioLanguageCodes(contentId);
+            var availableTranslationLanguageCodes = (
+              contentIdsToAudioTranslations.getAudioLanguageCodes(contentId));
             if (availableTranslationLanguageCodes.indexOf(langCode) > -1) {
               var audioTranslation = contentIdsToAudioTranslations
                 .getAudioTranslation(contentId, langCode);
@@ -133,7 +133,7 @@ oppia.factory('TranslationStatusService', [
       var contentIdList = _getContentIdListRelatedToComponent(componentName);
       var contentId = null;
       if (contentIdList) {
-        for (index in contentIdList) {
+        for (var index in contentIdList) {
           contentId = contentIdList[index];
           if (contentIdsToAudioTranslations
             .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
