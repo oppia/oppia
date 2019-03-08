@@ -280,56 +280,43 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             expected_status_int=400)
 
 
-class ExplorationQuestionsUnitTest(test_utils.GenericTestBase):
-    """Test the handler for initialising exploration with
-    state_classifier_mapping.
-    """
+class QuestionsUnitTest(test_utils.GenericTestBase):
+    """Test the handler for fetching questions"""
 
-    def test_get_exploration_pretests(self):
-        super(ExplorationQuestionsUnitTest, self).setUp()
-
+    def test_get_questions(self):
+        #Initialize data
+        super(QuestionsUnitTest, self).setUp()
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, 'user', 'Description')
+        self.save_new_skill(skill_id, 'user', 'Description')
+
         question_id = question_services.get_new_question_id()
         self.save_new_question(
             question_id, 'user',
             self._create_valid_question_data('ABC'))
+        question_services.create_new_question_skill_link(
+            question_id, skill_id)
+
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_2, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            question_id, skill_id)
-        question_services.create_new_question_skill_link(
             question_id_2, skill_id)
 
         # Call the handler.
-        json_response_1 = self.get_json(
-            '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
-                feconf.QUESTION_HANDLER, '1', skill_id))
+        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', skill_id)
+        json_response_1 = self.get_json(url)
         next_cursor = json_response_1['next_start_cursor']
-
         self.assertEqual(len(json_response_1['question_dicts']), 1)
         json_response_2 = self.get_json(
             '%s?question_count=%s&skill_ids=%s&start_cursor=%s' % (
-                feconf.QUESTION_HANDLER, '1', skill_id,
+                feconf.QUESTIONS_URL_PREFIX, '1', skill_id,
                 next_cursor))
         self.assertEqual(len(json_response_2['question_dicts']), 1)
         self.assertNotEqual(
             json_response_1['question_dicts'][0]['id'],
             json_response_2['question_dicts'][0]['id'])
-
-        # self.get_json(
-        #     '%s?story_id=%s' % (
-        #         feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, story_id),
-        #     expected_status_int=400)
-        #
-        # self.get_json(
-        #     '%s/%s?story_id=%s' % (
-        #         feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2, 'story'),
-        #     expected_status_int=400)
-
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
     """Test methods relating to exploration parameters."""

@@ -183,16 +183,4 @@ describe('Question backend Api service', function() {
     expect(failHandler).toHaveBeenCalledWith('Skill ids value is expected' +
       ' but is missing');
   });
-
-  it('should use the fail handler if skill ids is not comma separated ' +
-    'numbers', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    QuestionPlayerBackendApiService.fetchQuestions(
-      '1,2,abc', '1').then(successHandler, failHandler);
-    $rootScope.$digest();
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Skill ids should be comma ' +
-      'separated numbers');
-  });
 });
