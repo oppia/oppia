@@ -639,37 +639,6 @@ def is_valid_language_code(language_code):
     return language_code in language_codes
 
 
-def _get_short_language_description(full_language_description):
-    """Given one of the descriptions in constants.ALL_LANGUAGE_CODES, generates
-    the corresponding short description.
-
-    Args:
-        full_language_description: str. Short description of the language.
-
-    Returns:
-        str. Short description of the language.
-    """
-    if ' (' not in full_language_description:
-        return full_language_description
-    else:
-        ind = full_language_description.find(' (')
-        return full_language_description[:ind]
-
-
-def get_all_language_codes_and_names():
-    """It parses the list of language codes and their corresponding names,
-    defined in the app constants.
-
-    Returns:
-        list(dict(str, str)). List of dictionary containing language code and
-            name mapped to their corresponding value.
-    """
-    return [{
-        'code': lc['code'],
-        'name': _get_short_language_description(lc['description']),
-    } for lc in constants.ALL_LANGUAGE_CODES]
-
-
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent."""
     return urllib.unquote(escaped_string).decode('utf-8')

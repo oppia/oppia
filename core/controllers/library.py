@@ -83,8 +83,6 @@ class LibraryPage(base.BaseHandler):
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
-            'LANGUAGE_CODES_AND_NAMES': (
-                utils.get_all_language_codes_and_names()),
         })
         self.render_template('pages/library/library.html')
 
@@ -158,8 +156,6 @@ class LibraryGroupPage(base.BaseHandler):
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
-            'LANGUAGE_CODES_AND_NAMES': (
-                utils.get_all_language_codes_and_names()),
         })
         self.render_template('pages/library/library.html')
 
