@@ -34,7 +34,6 @@ class GaeCurrentUserServicesTests(test_utils.GenericTestBase):
             'https://www.google.com/accounts/Login' +
             '?continue=http%3A//localhost/signup%3Freturn_url%3Dsplash')
 
-
     def test_get_current_user(self):
         self.login(self.OWNER_EMAIL)
         current_user = gae_current_user_services.get_current_user()
