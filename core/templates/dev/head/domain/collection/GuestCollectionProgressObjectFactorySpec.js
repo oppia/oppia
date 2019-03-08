@@ -18,6 +18,10 @@
 
 describe('Guest collection progress object factory', function() {
   var GuestCollectionProgressObjectFactory = null;
+  var _collectionId0 = null;
+  var _collectionId1 = null;
+  var _expId0 = null;
+  var _expId1 = null;
 
   beforeEach(module('oppia'));
 

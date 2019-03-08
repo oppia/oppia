@@ -149,14 +149,14 @@ describe('Email Dashboard Services', function() {
       // Check that queries on page 1 are correct.
       service.getNextQueries().then(function(queries) {
         expect(queries.length).toEqual(10);
-        except(queries).toEqual(totalQueries.slice(10, 20));
+        expect(queries).toEqual(totalQueries.slice(10, 20));
       });
       expect(service.getCurrentPageIndex()).toEqual(1);
 
       // Check that queries on page 2 are correct.
       service.getNextQueries().then(function(queries) {
         expect(queries.length).toEqual(5);
-        except(queries).toEqual(totalQueries.slice(20, 25));
+        expect(queries).toEqual(totalQueries.slice(20, 25));
       });
       expect(service.getCurrentPageIndex()).toEqual(2);
 
@@ -184,7 +184,7 @@ describe('Email Dashboard Services', function() {
       // Check queries on page 2.
       service.getNextQueries().then(function(queries) {
         expect(queries.length).toEqual(6);
-        except(queries).toEqual(totalQueries.slice(20, 26));
+        expect(queries).toEqual(totalQueries.slice(20, 26));
       });
       expect(service.getCurrentPageIndex()).toEqual(2);
 

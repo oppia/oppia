@@ -108,7 +108,7 @@ describe('Skill Editor functionality', function() {
 
     skillEditorPage.get(skillId);
     skillEditorPage.moveToQuestionsTab();
-    skillEditorPage.expectNumberofQuestionsToBe(1);
+    skillEditorPage.expectNumberOfQuestionsToBe(1);
   });
 
   it('should create and delete misconceptions', function() {

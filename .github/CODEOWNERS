@@ -89,15 +89,16 @@
 
 
 # Lesson Analytics team.
-/core/domain/stats*.py @brianrodri
-/core/storage/statistics/ @brianrodri
-/core/templates/dev/head/domain/statistics/ @brianrodri
-/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @brianrodri
-/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @brianrodri
-/extensions/actions/ @brianrodri
-/extensions/answer_summarizers/ @brianrodri
-/extensions/issues/ @brianrodri
-/extensions/visualizations/ @brianrodri
+# TODO(brianrodri): Revert ownership to @brianrodri after 2019-03-31.
+/core/domain/stats*.py @seanlip
+/core/storage/statistics/ @seanlip
+/core/templates/dev/head/domain/statistics/ @seanlip
+/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @seanlip
+/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @seanlip
+/extensions/actions/ @seanlip
+/extensions/answer_summarizers/ @seanlip
+/extensions/issues/ @seanlip
+/extensions/visualizations/ @seanlip
 
 
 # Library page.

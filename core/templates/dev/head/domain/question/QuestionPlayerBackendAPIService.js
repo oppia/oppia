@@ -57,7 +57,7 @@ oppia.factory('QuestionPlayerBackendApiService', [
         errorCallback('Skill ids value is expected but is missing');
         return false;
       }
-      
+
       if (isNaN(questionCount)) {
         errorCallback('Question count has to be a number');
         return false;

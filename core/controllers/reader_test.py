@@ -281,10 +281,10 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
 
 
 class QuestionsUnitTest(test_utils.GenericTestBase):
-    """Test the handler for fetching questions"""
+    """Test the handler for fetching questions."""
 
     def test_get_questions(self):
-        #Initialize data
+        # Initialize data.
         super(QuestionsUnitTest, self).setUp()
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, 'user', 'Description')
@@ -317,6 +317,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.assertNotEqual(
             json_response_1['question_dicts'][0]['id'],
             json_response_2['question_dicts'][0]['id'])
+
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
     """Test methods relating to exploration parameters."""

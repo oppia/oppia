@@ -130,7 +130,7 @@ describe('SVM prediction functions', function() {
         0.98901676, 0.99349654, 0.98901676, 0.99351481];
 
       for (var i = 0; i < testx.length; i++) {
-        predictionResult = service.predict(svmData, testx[i]);
+        var predictionResult = service.predict(svmData, testx[i]);
         expect(predictionResult.predictionLabel).toEqual(predictions[i]);
         expect(
           Math.abs(predictionResult.predictionConfidence - probs[i])

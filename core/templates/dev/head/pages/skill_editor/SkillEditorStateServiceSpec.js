@@ -18,8 +18,11 @@
 
 describe('Skill editor state service', function() {
   var SkillEditorStateService, $q, $rootScope,
-    SkillObjectFactory, SkillUpdateService;
+    SkillObjectFactory, SkillUpdateService,
+    SkillRightsObjectFactory;
   var fakeEditableSkillBackendApiService = null;
+  var fakeSkillRightsBackendApiService = null;
+  var skillRightsObject = null;
 
   var FakeEditableSkillBackendApiService = function() {
     var self = {};

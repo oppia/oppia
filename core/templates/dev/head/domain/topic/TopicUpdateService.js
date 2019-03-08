@@ -498,7 +498,7 @@ oppia.factory('TopicUpdateService', [
       addCanonicalStoryId: function(topic, storyId) {
         var oldCanonicalStoryIdsList = angular.copy(
           topic.getCanonicalStoryIds());
-        newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
+        var newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
         newCanonicalStoryIdsList.push(storyId);
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_CANONICAL_STORY_IDS, newCanonicalStoryIdsList,

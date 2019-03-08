@@ -336,6 +336,7 @@ class PretestHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
+
 class StorePlaythroughHandler(base.BaseHandler):
     """Handles a useful playthrough coming in from the frontend to store it. If
     the playthrough already exists, it is updated in the datastore.
@@ -1010,6 +1011,7 @@ class FlagExplorationHandler(base.BaseHandler):
             self.payload.get('report_text'),
             self.user_id)
         self.render_json(self.values)
+
 
 class QuestionPlayerHandler(base.BaseHandler):
     """Provides questions with given skill ids."""
