@@ -868,19 +868,6 @@ class WrittenTranslations(object):
 
                 written_translation.validate()
 
-    def get_available_languages(self):
-        """Returns a set of language available in the WrittenTranslations.
-
-        Returns:
-            set(str). A set of languages available in the WrittenTranslations.
-        """
-        language_codes_set = set([])
-        for language_code_to_written_translation in (
-                self.translations_mapping.itervalues()):
-            for language_code in language_code_to_written_translation:
-                language_codes_set.add(language_code)
-        return language_codes_set
-
     def get_content_ids_for_text_translation(self):
         """Returns a list of content_id available for text translation.
 
