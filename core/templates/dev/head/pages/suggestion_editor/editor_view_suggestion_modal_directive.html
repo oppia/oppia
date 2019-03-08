@@ -14,9 +14,13 @@
     </div>
     <div class="oppia-suggestion-review-panel-container" style="float: right;">
       <strong>Suggested:</strong>
-      <div class="oppia-suggestion-review-panel">
+      <div class="oppia-suggestion-review-panel" ng-show="!isSuggestionEditorIsShown()">
         <angular-html-bind html-data="newContent">
         </angular-html-bind>
+      </div>
+      <div ng-show="isSuggestionEditorIsShown()">
+        <ck-editor-rte ng-model="editedContent"></ck-editor-rte>
+        <input type="text" class="form-control oppia-review-message" ng-model="summaryMessage" placeholder="Summarize your new changes">
       </div>
     </div>
   </section>
@@ -35,6 +39,8 @@
     <[ errorMessage ]>
   </div>
   <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
+  <button class="btn btn-info" ng-show="isEditButtonShow()" ng-click="editSuggestion()">Edit</button>
+  <button class="btn btn-info" ng-show="isSaveButtonShown()" ng-click="saveSuggestion()">Save</button>
   <button class="btn btn-danger protractor-test-exploration-reject-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
   <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
 </div>

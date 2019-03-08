@@ -29,6 +29,10 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
       '/pages/suggestion_editor/' +
       'editor_view_suggestion_modal_directive.html'
     );
+    var EDIT_SUGGESTION_URL_TEMPLATE = (
+      '/suggestionactionhandler/edit/<target_type>/<target_id>/' +
+      '<suggestion_id>'
+    );
 
     var _showEditStateContentSuggestionModal = function(
         activeThread, setActiveThread, isSuggestionHandled,
@@ -70,13 +74,13 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
             ThreadDataService.fetchThreads(function() {
               setActiveThread(activeThread.threadId);
             });
+            var suggestion = activeThread.getSuggestion();
+
+            var stateName = suggestion.stateName;
             // Immediately update editor to reflect accepted suggestion.
             if (
               result.action === SuggestionModalService.ACTION_ACCEPT_SUGGESTION
             ) {
-              var suggestion = activeThread.getSuggestion();
-
-              var stateName = suggestion.stateName;
               var stateDict = ExplorationDataService.data.states[stateName];
               var state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
@@ -92,7 +96,30 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
                 forceRefresh: true
               });
               $rootScope.$broadcast('refreshStateEditor');
-            }
+            } else if (resul.action === 'edit' &&
+                result.suggestionType === 'edit_exploration_state_content') {
+              url = UrlInterpolationService.interpolateUrl(
+                EDIT_SUGGESTION_URL_TEMPLATE, {
+                  target_type: activeThread.suggestion.targetType,
+                  target_id: activeThread.suggestion.targetId,
+                  suggestion_id: activeThread.suggestion.suggestionId,
+                }
+              )
+            data = {
+              action: result.action,
+              summary_message: result.summaryMessage,
+              change: {
+                cmd: 'edit_state_property',
+                property_name: 'content',
+                state_name: stateName,
+                old_value: result.oldContent,
+                new_value: {
+                  html: result.newSuggestionHtml
+                }
+              }
+            };
+            console.log(data)
+          }
           }, function() {
             $log.error('Error resolving suggestion');
           });
