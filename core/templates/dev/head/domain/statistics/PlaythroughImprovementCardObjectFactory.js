@@ -22,20 +22,16 @@
  */
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
-  'ImprovementActionObjectFactory', 'PlaythroughIssuesService',
-  function(ImprovementActionObjectFactory, PlaythroughIssuesService) {
-    var renderImprovementCardContentHtml = function(issue) {
-      /** @type {string[]} */
-      var suggestions = PlaythroughIssuesService.renderIssueSuggestions(issue);
-      var contentHtml = '<p>Here are some tips for resolving this card:</p>';
-
-      if (suggestions.length > 0) {
-        contentHtml +=
-          '<ul><li>' + suggestions.join('</li><li>') + '</li></ul>';
-      }
-
-      return contentHtml;
-    };
+  'HtmlEscaperService', 'ImprovementActionButtonObjectFactory',
+  'PlaythroughIssuesService',
+  function(
+      HtmlEscaperService, ImprovementActionButtonObjectFactory,
+      PlaythroughIssuesService) {
+    /**
+     * @typedef {Object} PlaythroughImprovementCard~DirectiveData
+     * @property {string[]} playthrough_ids
+     * @property {string[]} suggestions
+     */
 
     /** @constructor */
     var PlaythroughImprovementCard = function(issue) {
@@ -45,25 +41,23 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       this._isArchived = false;
       /** @type {string} */
       this._title = PlaythroughIssuesService.renderIssueStatement(issue);
-      /** @type {string} */
-      this._contentHtml = renderImprovementCardContentHtml(issue);
+      /** @type {PlaythroughIssue} */
+      this._issue = issue;
 
-      /** @type {ImprovementAction[]} */
-      this._actions = [
-        ImprovementActionObjectFactory.createNew('Archive', function() {
+      /** @type {PlaythroughImprovementCard~DirectiveData} */
+      this._directiveData = {
+        suggestions: PlaythroughIssuesService.renderIssueSuggestions(issue),
+        playthrough_ids: issue.playthroughIds,
+      };
+
+      /** @type {ImprovementActionButton[]} */
+      this._actionButtons = [
+        ImprovementActionButtonObjectFactory.createNew('Archive', function() {
           return PlaythroughIssuesService.resolveIssue(issue).then(function() {
             that._isArchived = true;
           });
         }),
       ];
-
-      issue.playthroughIds.forEach(function(playthroughId, index) {
-        var title = 'View Sample Playthrough #' + (index + 1);
-        that._actions.push(
-          ImprovementActionObjectFactory.createNew(title, function() {
-            PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
-          }));
-      });
     };
 
     /**
@@ -83,16 +77,21 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
      * @returns {string} - the HTML required to render the Playthrough items,
      * including sample playthroughs for creators to look at.
      */
-    PlaythroughImprovementCard.prototype.getContentHtml = function() {
-      return this._contentHtml;
+    PlaythroughImprovementCard.prototype.getType = function() {
+      return "playthrough";
+    };
+
+    /** @returns {string} */
+    PlaythroughImprovementCard.prototype.getEscapedDirectiveData = function() {
+      return HtmlEscaperService.objToEscapedJson(this._directiveData);
     };
 
     /**
-     * @returns {ImprovementAction[]} - the list of action items a creator can
-     * take to resolve the card.
+     * @returns {ImprovementActionButton[]} - the list of action items a creator
+     * can take to resolve the card.
      */
-    PlaythroughImprovementCard.prototype.getActions = function() {
-      return this._actions;
+    PlaythroughImprovementCard.prototype.getActionButtons = function() {
+      return this._actionButtons;
     };
 
     return {

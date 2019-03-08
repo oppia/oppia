@@ -17,7 +17,7 @@
  * trying to resolve a particular improvement suggestion.
  */
 
-oppia.factory('ImprovementActionObjectFactory', [function() {
+oppia.factory('ImprovementActionButtonObjectFactory', [function() {
   /**
    * @constructor
    * @param {string} name - the name of the action. Should correspond to a I18N
@@ -25,31 +25,31 @@ oppia.factory('ImprovementActionObjectFactory', [function() {
    * @param {callback} action - function to run when the action is requested to
    *    be performed.
    */
-  var ImprovementAction = function(name, action) {
+  var ImprovementActionButton = function(name, action) {
     this._name = name;
     this._action = action;
   };
 
   /** @returns {string} - the I18N-compatible name of the action */
-  ImprovementAction.prototype.getName = function() {
+  ImprovementActionButton.prototype.getName = function() {
     return this._name;
   };
 
   /** Performs the associated action and return its result as a promise */
-  ImprovementAction.prototype.performAction = function() {
+  ImprovementActionButton.prototype.performAction = function() {
     return Promise.resolve(this._action());
   };
 
   return {
     /**
-     * @returns {ImprovementAction}
+     * @returns {ImprovementActionButton}
      * @param {string} name - the name of the action. Should correspond to a
      *    I18N name.
      * @param {callback} action - function to run when the action is requested
      *    to be performed.
      */
     createNew: function(name, action) {
-      return new ImprovementAction(name, action);
+      return new ImprovementActionButton(name, action);
     },
   };
 }]);

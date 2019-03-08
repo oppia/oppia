@@ -17,12 +17,14 @@
     <h2 translate="<[card.getTitle()]>">
       <[card.getTitle()]>
     </h2>
-    <span ng-bind-html="card.getContentHtml()"></span>
+    <div ng-switch="card.getType()">
+      <playthrough-improvement-card ng-switch-when="playthrough" data="card.getEscapedDirectiveData()"></playthrough-improvement-card>
+    </div>
     <div>
-      <button ng-repeat="action in card.getActions()"
-              ng-click="action.performAction()"
-              translate="<[action.getName()]>">
-        <[action.getName()]>
+      <button ng-repeat="actionButton in card.getActionButtons()"
+              ng-click="actionButton.performAction()"
+              translate="<[actionButton.getName()]>">
+        <[actionButton.getName()]>
       </button>
     </div>
   </md-card>
