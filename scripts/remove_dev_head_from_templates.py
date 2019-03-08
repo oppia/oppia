@@ -28,13 +28,11 @@ for path, subdirs, files in os.walk(TEMPLATES_PATH):
             old_file = os.path.join(path, name)
             new_file = os.path.join(path, 'cleaned_' + name)
 
-            delete_list = ['/dev', '/head']
             fin = open(old_file)
             fout = open(new_file, 'w+')
 
             for line in fin:
-                for word in delete_list:
-                    line = line.replace(word, '')
+                line = line.replace('/dev/head', '')
                 fout.write(line)
 
             fin.close()
