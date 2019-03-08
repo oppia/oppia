@@ -45,17 +45,17 @@ handlers:
   secure: always
   application_readable: true
   expiration: "0"
-# Serve js scripts and css files under core/templates/dev/head.
+# Serve js scripts and css files under core/templates.
 # This regex allows us to recursively serve js scripts.
 # "\1" inserts text captured by the capture group in the URL pattern.
-- url: /templates/dev/head/(.*\.(js|css))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(js|css))$
+- url: /templates/(.*\.(js|css))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(js|css))$
   secure: always
   expiration: "0"
-- url: /templates/dev/head/(.*directive\.html)$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*directive\.html)$
+- url: /templates/(.*directive\.html)$
+  static_files: core/templates/\1
+  upload: core/templates/(.*directive\.html)$
   secure: always
   expiration: "0"
   application_readable: true

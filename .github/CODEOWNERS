@@ -10,30 +10,30 @@
 /core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08
 /core/storage/classifier/ @prasanna08
-/core/templates/dev/head/domain/classifier/ @prasanna08
+/core/templates/domain/classifier/ @prasanna08
 /extensions/classifiers/ @prasanna08
 
 
 # Audio and Translation team.
 /core/controllers/translator*.py @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/translation_tab/ @DubeySandeep
+/core/templates/pages/exploration_editor/translation_tab/ @DubeySandeep
 
 
 # Collection project.
 /core/domain/collection*.py @kevinlee12
 /core/storage/collection/ @kevinlee12
-/core/templates/dev/head/domain/collection/ @kevinlee12
-/core/templates/dev/head/pages/collection_editor/ @kevinlee12
-/core/templates/dev/head/pages/collection_player/ @kevinlee12
+/core/templates/domain/collection/ @kevinlee12
+/core/templates/pages/collection_editor/ @kevinlee12
+/core/templates/pages/collection_player/ @kevinlee12
 
 
 # Dashboard frontend pages.
-/core/templates/dev/head/domain/creator_dashboard/ @nithusha21
-/core/templates/dev/head/domain/learner_dashboard/ @nithusha21
-/core/templates/dev/head/pages/creator_dashboard/ @nithusha21
-/core/templates/dev/head/pages/email_dashboard/ @nithusha21
-/core/templates/dev/head/pages/learner_dashboard/ @nithusha21
-/core/templates/dev/head/pages/notifications_dashboard/ @nithusha21
+/core/templates/domain/creator_dashboard/ @nithusha21
+/core/templates/domain/learner_dashboard/ @nithusha21
+/core/templates/pages/creator_dashboard/ @nithusha21
+/core/templates/pages/email_dashboard/ @nithusha21
+/core/templates/pages/learner_dashboard/ @nithusha21
+/core/templates/pages/notifications_dashboard/ @nithusha21
 
 
 # Dev workflow team.
@@ -45,43 +45,43 @@
 /core/controllers/editor*.py @DubeySandeep
 /core/domain/exp*.py @DubeySandeep
 /core/storage/exploration/ @aks681
-/core/templates/dev/head/domain/editor/ @DubeySandeep
-/core/templates/dev/head/domain/exploration/ @DubeySandeep
-/core/templates/dev/head/domain/state/ @aks681
-/core/templates/dev/head/domain/state_card/ @aks681
-/core/templates/dev/head/pages/exploration_editor/editor_tab/ @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/history_tab/ @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/preview_tab/ @aks681
-/core/templates/dev/head/pages/exploration_editor/settings_tab/ @DubeySandeep
-/core/templates/dev/head/pages/exploration_player/ @aks681
-/core/templates/dev/head/pages/state_editor/ @aks681
-/core/templates/dev/head/components/state/ @aks681
+/core/templates/domain/editor/ @DubeySandeep
+/core/templates/domain/exploration/ @DubeySandeep
+/core/templates/domain/state/ @aks681
+/core/templates/domain/state_card/ @aks681
+/core/templates/pages/exploration_editor/editor_tab/ @DubeySandeep
+/core/templates/pages/exploration_editor/history_tab/ @DubeySandeep
+/core/templates/pages/exploration_editor/preview_tab/ @aks681
+/core/templates/pages/exploration_editor/settings_tab/ @DubeySandeep
+/core/templates/pages/exploration_player/ @aks681
+/core/templates/pages/state_editor/ @aks681
+/core/templates/components/state/ @aks681
 
 
 # Forms pages.
-/core/templates/dev/head/components/forms/ @DubeySandeep
+/core/templates/components/forms/ @DubeySandeep
 
 
 # Global components.
-/core/templates/dev/head/components/alerts/ @ankita240796
-/core/templates/dev/head/components/attribution_guide/ @ankita240796
-/core/templates/dev/head/components/background/ @ankita240796
-/core/templates/dev/head/components/embed_modal/ @ankita240796
-/core/templates/dev/head/components/loading/ @ankita240796
-/core/templates/dev/head/components/profile_link/ @ankita240796
-/core/templates/dev/head/components/promo/ @ankita240796
-/core/templates/dev/head/components/share/ @ankita240796
-/core/templates/dev/head/components/social_buttons/ @ankita240796
-/core/templates/dev/head/components/summary_tile/ @ankita240796
+/core/templates/components/alerts/ @ankita240796
+/core/templates/components/attribution_guide/ @ankita240796
+/core/templates/components/background/ @ankita240796
+/core/templates/components/embed_modal/ @ankita240796
+/core/templates/components/loading/ @ankita240796
+/core/templates/components/profile_link/ @ankita240796
+/core/templates/components/promo/ @ankita240796
+/core/templates/components/share/ @ankita240796
+/core/templates/components/social_buttons/ @ankita240796
+/core/templates/components/summary_tile/ @ankita240796
 
 
 # Global stylesheet.
-/core/templates/dev/head/css/oppia.css @ankita240796
+/core/templates/css/oppia.css @ankita240796
 
 
 # Interaction project.
-/core/templates/dev/head/domain/objects/ @kevinlee12
-/core/templates/dev/head/expressions/ @seanlip
+/core/templates/domain/objects/ @kevinlee12
+/core/templates/expressions/ @seanlip
 /extensions/dependencies/ @seanlip
 /extensions/interactions/ @kevinlee12
 /extensions/objects/ @seanlip
@@ -92,9 +92,9 @@
 # TODO(brianrodri): Revert ownership to @brianrodri after 2019-03-31.
 /core/domain/stats*.py @seanlip
 /core/storage/statistics/ @seanlip
-/core/templates/dev/head/domain/statistics/ @seanlip
-/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @seanlip
-/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @seanlip
+/core/templates/domain/statistics/ @seanlip
+/core/templates/pages/exploration_editor/improvements_tab/ @seanlip
+/core/templates/pages/exploration_editor/statistics_tab/ @seanlip
 /extensions/actions/ @seanlip
 /extensions/answer_summarizers/ @seanlip
 /extensions/issues/ @seanlip
@@ -103,14 +103,14 @@
 
 # Library page.
 /core/controllers/library*.py @kevinlee12
-/core/templates/dev/head/pages/library/ @kevinlee12
+/core/templates/pages/library/ @kevinlee12
 
 
 # Navigation bar project.
-/core/templates/dev/head/domain/sidebar/ @nithusha21
-/core/templates/dev/head/components/create_button/ @nithusha21
-/core/templates/dev/head/components/side_navigation_bar/ @nithusha21
-/core/templates/dev/head/components/top_navigation_bar/ @nithusha21
+/core/templates/domain/sidebar/ @nithusha21
+/core/templates/components/create_button/ @nithusha21
+/core/templates/components/side_navigation_bar/ @nithusha21
+/core/templates/components/top_navigation_bar/ @nithusha21
 
 
 # New structures team.
@@ -118,38 +118,38 @@
 /core/controllers/question*.py @aks681
 /core/domain/question*.py  @aks681
 /core/storage/question/ @aks681
-/core/templates/dev/head/domain/question/ @aks681
-/core/templates/dev/head/pages/question_editor/ @aks681
-/core/templates/dev/head/pages/questions_list/ @aks681
+/core/templates/domain/question/ @aks681
+/core/templates/pages/question_editor/ @aks681
+/core/templates/pages/questions_list/ @aks681
 
 # Skill project.
 /core/controllers/skill*.py @aks681
 /core/domain/skill*.py  @aks681
 /core/storage/skill/ @aks681
-/core/templates/dev/head/domain/skill/ @aks681
-/core/templates/dev/head/pages/skill_editor/ @aks681
+/core/templates/domain/skill/ @aks681
+/core/templates/pages/skill_editor/ @aks681
 
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py  @aks681
 /core/storage/story/ @aks681
-/core/templates/dev/head/domain/story/ @aks681
-/core/templates/dev/head/pages/story_editor/ @aks681
+/core/templates/domain/story/ @aks681
+/core/templates/pages/story_editor/ @aks681
 
 # Topic project.
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
 /core/controllers/topic_*.py @aks681
 /core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
-/core/templates/dev/head/domain/topic/ @aks681
-/core/templates/dev/head/domain/topic_viewer @aks681
-/core/templates/dev/head/pages/topic_editor/ @aks681
-/core/templates/dev/head/pages/topic_viewer/ @aks681
+/core/templates/domain/topic/ @aks681
+/core/templates/domain/topic_viewer @aks681
+/core/templates/pages/topic_editor/ @aks681
+/core/templates/pages/topic_viewer/ @aks681
 
 # Topics and skills dashboard project.
 /core/controllers/topics_and_skills_dashboard.py @aks681
-/core/templates/dev/head/domain/topics_and_skills_dashboard/ @aks681
-/core/templates/dev/head/pages/topics_and_skills_dashboard/ @aks681
+/core/templates/domain/topics_and_skills_dashboard/ @aks681
+/core/templates/pages/topics_and_skills_dashboard/ @aks681
 
 
 # Infrastructure.
@@ -159,17 +159,17 @@
 
 # Miscellaneous.
 /core/domain/html*.py @seanlip
-/core/templates/dev/head/pages/about/ @seanlip
-/core/templates/dev/head/pages/privacy/ @seanlip
-/core/templates/dev/head/pages/terms/ @seanlip
-/core/templates/dev/head/pages/tests/ @seanlip
-/core/templates/dev/head/domain/utilities/ @DubeySandeep
+/core/templates/pages/about/ @seanlip
+/core/templates/pages/privacy/ @seanlip
+/core/templates/pages/terms/ @seanlip
+/core/templates/pages/tests/ @seanlip
+/core/templates/domain/utilities/ @DubeySandeep
 /export/ @seanlip
 
 
 # Restricted pages.
-/core/templates/dev/head/pages/admin/ @seanlip
-/core/templates/dev/head/pages/moderator/ @seanlip
+/core/templates/pages/admin/ @seanlip
+/core/templates/pages/moderator/ @seanlip
 /.github/CODEOWNERS @seanlip
 
 
@@ -178,7 +178,7 @@
 
 
 # Rich text editor team.
-/core/templates/dev/head/components/CkEditorRteDirective.js @AllanYangZhou @bansalnitish
+/core/templates/components/CkEditorRteDirective.js @AllanYangZhou @bansalnitish
 /extensions/rich_text_components/ @AllanYangZhou @bansalnitish
 /extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
 
@@ -188,41 +188,41 @@
 /core/controllers/suggestion*.py @nithusha21
 /core/domain/suggestion*.py @nithusha21
 /core/storage/suggestion/ @nithusha21
-/core/templates/dev/head/domain/suggestion/ @nithusha21
-/core/templates/dev/head/pages/suggestion_editor/ @nithusha21
+/core/templates/domain/suggestion/ @nithusha21
+/core/templates/pages/suggestion_editor/ @nithusha21
 
 # Feedback project.
 /core/controllers/feedback*.py @nithusha21
 /core/domain/feedback*.py @nithusha21
 /core/storage/feedback/ @nithusha21
-/core/templates/dev/head/domain/feedback_message/ @nithusha21
-/core/templates/dev/head/domain/feedback_thread/ @nithusha21
-/core/templates/dev/head/pages/exploration_editor/feedback_tab/ @nithusha21
+/core/templates/domain/feedback_message/ @nithusha21
+/core/templates/domain/feedback_thread/ @nithusha21
+/core/templates/pages/exploration_editor/feedback_tab/ @nithusha21
 
 
 # Simple pages.
-/core/templates/dev/head/pages/contact/ @vojtechjelinek
-/core/templates/dev/head/pages/donate/ @vojtechjelinek
-/core/templates/dev/head/pages/error/ @vojtechjelinek
-/core/templates/dev/head/pages/get_started/ @vojtechjelinek
-/core/templates/dev/head/pages/landing/ @vojtechjelinek
-/core/templates/dev/head/pages/maintenance/ @vojtechjelinek
-/core/templates/dev/head/pages/preferences/ @vojtechjelinek
-/core/templates/dev/head/pages/signup/ @vojtechjelinek
-/core/templates/dev/head/pages/splash/ @vojtechjelinek
-/core/templates/dev/head/pages/teach/ @vojtechjelinek
-/core/templates/dev/head/pages/thanks/ @vojtechjelinek
+/core/templates/pages/contact/ @vojtechjelinek
+/core/templates/pages/donate/ @vojtechjelinek
+/core/templates/pages/error/ @vojtechjelinek
+/core/templates/pages/get_started/ @vojtechjelinek
+/core/templates/pages/landing/ @vojtechjelinek
+/core/templates/pages/maintenance/ @vojtechjelinek
+/core/templates/pages/preferences/ @vojtechjelinek
+/core/templates/pages/signup/ @vojtechjelinek
+/core/templates/pages/splash/ @vojtechjelinek
+/core/templates/pages/teach/ @vojtechjelinek
+/core/templates/pages/thanks/ @vojtechjelinek
 
 
 # Speed Improvement team.
 app.yaml @vojtechjelinek
 manifest.json @vojtechjelinek
-/core/templates/dev/head/pages/base.html @vojtechjelinek
-/core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
-/core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
-/core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
+/core/templates/pages/base.html @vojtechjelinek
+/core/templates/pages/footer_js_libs.html @vojtechjelinek
+/core/templates/pages/header_css_libs.html @vojtechjelinek
+/core/templates/pages/header_js_libs.html @vojtechjelinek
 
 
 # User’s profile page.
-/core/templates/dev/head/domain/user/ @kevinlee12
-/core/templates/dev/head/pages/profile/ @kevinlee12
+/core/templates/domain/user/ @kevinlee12
+/core/templates/pages/profile/ @kevinlee12

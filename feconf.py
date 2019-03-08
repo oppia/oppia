@@ -1018,7 +1018,7 @@ RTE_CONTENT_SPEC = {
 # of topics as the value.
 # Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
 # oppia constant defined in
-# core/templates/dev/head/pages/landing/TopicLandingPage.js file.
+# core/templates/pages/landing/TopicLandingPage.js file.
 AVAILABLE_LANDING_PAGES = {
     'maths': ['fractions', 'ratios']
 }

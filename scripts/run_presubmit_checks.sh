@@ -85,7 +85,7 @@ else
   BRANCH=develop
 fi
 
-FRONTEND_DIR='core/templates/dev/head'
+FRONTEND_DIR='core/templates/'
 
 echo "Comparing the current branch with $BRANCH"
 
