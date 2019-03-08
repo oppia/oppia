@@ -1512,12 +1512,12 @@ def _check_directive_scope(all_files, parsed_js_files):
     return summary_messages
 
 
-def _check_js_component_count(all_files, parsed_js_files):
+def _check_js_component_name_and_count(all_files, parsed_js_files):
     """This function ensures that all JS files have exactly
     one component and and that the name of the component
     matches the filename.
     """
-    print 'Starting js component count check'
+    print 'Starting js component name and count check'
     print '----------------------------------------'
     # Select JS files which need to be checked.
     files_to_check = [
@@ -1529,63 +1529,63 @@ def _check_js_component_count(all_files, parsed_js_files):
     component_name = ''
     components_to_check = ['controller', 'directive', 'factory', 'filter']
     for filename in files_to_check:
-        property_num = 0
-        # Filename without its path.
+        component_num = 0
+        # Filename without its path and extension.
         exact_filename = filename.split('/')[-1][:-3]
-        parsed_dict = parsed_js_files[filename]
+        parsed_script = parsed_js_files[filename]
         with _redirect_stdout(_TARGET_STDOUT):
             # Parse the body of the content as nodes.
-            parsed_nodes = parsed_dict['body']
+            parsed_nodes = parsed_script.body
             for parsed_node in parsed_nodes:
                 expression = _get_expression_from_node_if_one_exists(
                     parsed_node, components_to_check)
                 if not expression:
                     continue
+                component_num += 1
+                # Check if the number of components in each file exceeds one.
+                if component_num > 1:
+                    print (
+                        '%s -> Please ensure that there is exactly one component'
+                        ' in the file.' % (filename))
+                    failed = True
+                    break
                 # Separate the arguments of the expression.
-                arguments = expression['arguments']
+                arguments = expression.arguments
                 # The first argument of the expression is the
                 # name of the component.
-                component_name = arguments[0]['value']
-                property_num += 1
-                component = expression['callee']['property']['name']
-                if component == 'directive':
-                    if (component_name[0].upper() + component_name[1:] +
-                            'Directive' != (exact_filename)):
+                component_name = arguments[0].value
+                component = expression.callee.property.name
+
+                # If the component is directive or filter and its name is xxx
+                # then the filename containing it should be XxxDirective.js
+                # or XxxFilter.js respectively.
+                if component == 'directive' or component == 'filter':
+                    if (component_name[0].swapcase() + component_name[1:] +
+                            component.capitalize() != (exact_filename)):
                         print (
-                            '%s -> Please ensure that the %s name strictly '
+                            '%s -> Please ensure that the %s name '
                             'matches the filename'
                             % (filename, component))
                         failed = True
-                elif component == 'filter':
-                    if (component_name[0].upper() + component_name[1:] +
-                            'Filter' != (exact_filename)):
-                        print (
-                            '%s -> Please ensure that the %s name strictly '
-                            'matches the filename'
-                            % (filename, component))
-                        failed = True
+                # If the component is controller or factory, then the component's
+                # name should exactly match the filename containing it. If the
+                # component's name is xxx then the filename should be xxx.js.
                 else:
                     if component_name != exact_filename:
                         print (
-                            '%s -> Please ensure that the %s name strictly '
+                            '%s -> Please ensure that the %s name '
                             'matches the filename'
                             % (filename, component))
                         failed = True
 
-            if property_num > 1:
-                print (
-                    '%s -> Please ensure that there is exactly one component'
-                    ' in the file.' % (filename))
-                failed = True
-
     with _redirect_stdout(_TARGET_STDOUT):
         if failed:
-            summary_message = '%s  Js component count check failed' % (
+            summary_message = '%s  Js component name and count check failed' % (
                 _MESSAGE_TYPE_FAILED)
             print summary_message
             summary_messages.append(summary_message)
         else:
-            summary_message = '%s  Js component count check passed' % (
+            summary_message = '%s  Js component name and count check passed' % (
                 _MESSAGE_TYPE_SUCCESS)
             print summary_message
             summary_messages.append(summary_message)
@@ -2005,7 +2005,7 @@ def main():
     parsed_js_files = _validate_and_parse_js_files(
         all_files)
     linter_messages = _pre_commit_linter(all_files)
-    js_property_messages = _check_js_component_count(all_files, parsed_js_files)
+    js_component_messages = _check_js_component_name_and_count(all_files, parsed_js_files)
     directive_scope_messages = _check_directive_scope(
         all_files, parsed_js_files)
     sorted_dependencies_messages = _check_sorted_dependencies(
@@ -2026,7 +2026,7 @@ def main():
     _print_complete_summary_of_errors()
     all_messages = (
         directive_scope_messages + sorted_dependencies_messages +
-        controller_dependency_messages + js_property_messages +
+        controller_dependency_messages + js_component_messages +
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
         html_tag_and_attribute_messages + html_linter_messages +
