@@ -36,7 +36,7 @@ describe('ImprovementActionButtonObjectFactory', function() {
       };
 
       expect(improvementAction.getName()).toEqual('Test');
-      improvementAction.performAction().then(onActionCompletion, done.fail);
+      improvementAction.execute().then(onActionCompletion, done.fail);
     });
   });
 });
