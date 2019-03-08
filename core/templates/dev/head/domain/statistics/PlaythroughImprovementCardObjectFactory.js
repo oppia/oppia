@@ -14,11 +14,6 @@
 
 /**
  * @fileoverview Factory for creating Playthrough Cards in the Improvements Tab.
- *
- * NOTE: For testing and organizational purposes, improvement card object
- * factories should be registered in the ImprovementCardRegistryService! See
- * the corresponding file to see what functions are expected from cards, and how
- * to add new ones as necessary.
  */
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
