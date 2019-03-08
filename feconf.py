@@ -58,7 +58,7 @@ if not constants.DEV_MODE:
     FRONTEND_TEMPLATES_DIR = (
         os.path.join('backend_prod_files', 'templates', 'head'))
 else:
-    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
+    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates')
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
