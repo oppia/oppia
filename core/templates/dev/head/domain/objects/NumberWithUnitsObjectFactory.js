@@ -17,6 +17,8 @@
  * domain objects.
  */
 
+require('domain/objects/FractionObjectFactory.js');
+
 oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
   INVALID_VALUE:
     'Please ensure that value is either a fraction or a number',

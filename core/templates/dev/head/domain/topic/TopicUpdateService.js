@@ -19,8 +19,10 @@
  * undo/redo service.
  */
 
-// These should match the constants defined in core.domain.topic_domain.
+require('domain/editor/undo_redo/ChangeObjectFactory.js');
+require('domain/editor/undo_redo/UndoRedoService.js');
 
+// These should match the constants defined in core.domain.topic_domain.
 oppia.constant('CMD_ADD_SUBTOPIC', 'add_subtopic');
 oppia.constant('CMD_DELETE_SUBTOPIC', 'delete_subtopic');
 oppia.constant('CMD_ADD_UNCATEGORIZED_SKILL_ID', 'add_uncategorized_skill_id');

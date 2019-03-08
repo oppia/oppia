@@ -17,6 +17,10 @@
  * instances of Skill objects.
  */
 
+require('domain/skill/ConceptCardObjectFactory.js');
+require('domain/skill/MisconceptionObjectFactory.js');
+require('services/ValidatorsService.js');
+
 oppia.factory('SkillObjectFactory', [
   'ConceptCardObjectFactory', 'MisconceptionObjectFactory', 'ValidatorsService',
   function(

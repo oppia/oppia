@@ -15,6 +15,10 @@
 /**
  * @fileoverview Service to send changes to a topic to the backend.
  */
+
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/topic_editor/TopicEditor.js');
+
 oppia.constant(
   'TOPIC_EDITOR_STORY_URL_TEMPLATE', '/topic_editor_story_handler/<topic_id>');
 

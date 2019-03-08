@@ -17,6 +17,9 @@
  * from the backend.
  */
 
+require('services/AlertsService.js');
+require('services/ValidatorsService.js');
+
 oppia.factory('ExplorationSummaryBackendApiService', [
   '$http', '$q', 'AlertsService',
   'ValidatorsService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',

@@ -17,6 +17,8 @@
  * domain objects.
  */
 
+require('domain/exploration/SubtitledHtmlObjectFactory.js');
+
 oppia.factory('OutcomeObjectFactory', [
   'SubtitledHtmlObjectFactory',
   function(SubtitledHtmlObjectFactory) {

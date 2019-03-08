@@ -17,6 +17,11 @@
  * domain objects.
  */
 
+require('domain/exploration/AnswerGroupObjectFactory.js');
+require('domain/exploration/HintObjectFactory.js');
+require('domain/exploration/OutcomeObjectFactory.js');
+require('domain/exploration/SolutionObjectFactory.js');
+
 oppia.factory('InteractionObjectFactory', [
   'AnswerGroupObjectFactory', 'HintObjectFactory', 'OutcomeObjectFactory',
   'SolutionObjectFactory',

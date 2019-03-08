@@ -16,6 +16,10 @@
 * @fileoverview Service to handle the updating of a question.
 */
 
+require('domain/editor/undo_redo/ChangeObjectFactory.js');
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/question/QuestionObjectFactory.js');
+
 oppia.constant('QUESTION_PROPERTY_LANGUAGE_CODE', 'language_code');
 oppia.constant('QUESTION_PROPERTY_QUESTION_STATE_DATA', 'question_state_data');
 

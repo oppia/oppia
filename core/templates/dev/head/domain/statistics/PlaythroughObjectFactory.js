@@ -17,6 +17,8 @@
  *     domain objects.
  */
 
+require('domain/statistics/LearnerActionObjectFactory.js');
+
 oppia.factory('PlaythroughObjectFactory', [
   'LearnerActionObjectFactory', function(LearnerActionObjectFactory) {
     /**

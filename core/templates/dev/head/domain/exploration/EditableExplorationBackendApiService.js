@@ -16,21 +16,9 @@
  * @fileoverview Service to send changes to a exploration to the backend.
  */
 
-require('domain/collection/GuestCollectionProgressService.js');
-require('domain/exploration/AudioTranslationObjectFactory.js');
-require('domain/exploration/RuleObjectFactory.js');
-require('domain/utilities/LanguageUtilService.js');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.js');
 require('domain/utilities/UrlInterpolationService.js');
-require('pages/collection_editor/CollectionEditor.js:');
-require('pages/collection_editor/editor_tab/CollectionLinearizerService.js');
-require('pages/exploration_player/HintAndSolutionModalService.js');
 require('pages/exploration_player/PlayerConstants.js');
-require('pages/exploration_player/PlayerPositionService.js');
-require('pages/exploration_player/PlayerTranscriptService.js');
-require('pages/exploration_player/StatsReportingService.js');
-require('pages/topic_editor/TopicEditorStateService.js');
-require('services/AlertsService.js');
-require('services/contextual/DeviceInfoService.js');
 
 oppia.factory('EditableExplorationBackendApiService', [
   '$http', '$q', 'ReadOnlyExplorationBackendApiService',

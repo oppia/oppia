@@ -17,6 +17,9 @@
  * topic domain objects.
  */
 
+require('domain/skill/SkillSummaryObjectFactory.js');
+require('domain/topic/SubtopicObjectFactory.js');
+
 oppia.factory('TopicObjectFactory', [
   'SkillSummaryObjectFactory', 'SubtopicObjectFactory',
   function(SkillSummaryObjectFactory, SubtopicObjectFactory) {

@@ -17,6 +17,8 @@
  * hamburger-menu sidebar.
  */
 
+require('services/contextual/WindowDimensionsService.js');
+
 oppia.factory('SidebarStatusService', [
   'WindowDimensionsService', function(WindowDimensionsService) {
     var pendingSidebarClick = false;

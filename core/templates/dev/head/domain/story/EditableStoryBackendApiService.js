@@ -15,6 +15,9 @@
 /**
  * @fileoverview Service to send changes to a story to the backend.
  */
+
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.constant(
   'EDITABLE_STORY_DATA_URL_TEMPLATE',
   '/story_editor_handler/data/<topic_id>/<story_id>');

@@ -17,6 +17,12 @@
  * domain objects.
  */
 
+require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.js');
+require('domain/exploration/InteractionObjectFactory.js');
+require('domain/exploration/ParamChangesObjectFactory.js');
+require('domain/exploration/SubtitledHtmlObjectFactory.js');
+require('domain/exploration/WrittenTranslationsObjectFactory.js');
+
 oppia.factory('StateObjectFactory', [
   'ContentIdsToAudioTranslationsObjectFactory', 'InteractionObjectFactory',
   'ParamChangesObjectFactory', 'SubtitledHtmlObjectFactory',

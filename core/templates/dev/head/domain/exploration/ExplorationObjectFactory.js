@@ -17,6 +17,11 @@
  * domain objects.
  */
 
+require('domain/exploration/ParamChangesObjectFactory.js');
+require('domain/exploration/ParamSpecsObjectFactory.js');
+require('domain/exploration/StatesObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.factory('ExplorationObjectFactory', [
   '$log', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'StatesObjectFactory', 'UrlInterpolationService',

@@ -16,6 +16,8 @@
  * @fileoverview Service to send changes to a skill to the backend.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.constant(
   'EDITABLE_SKILL_DATA_URL_TEMPLATE',
   '/skill_editor_handler/data/<skill_id>');

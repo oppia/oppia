@@ -18,6 +18,8 @@
  * which defines them (represented as ParamSpec objects).
  */
 
+require('domain/exploration/ParamSpecObjectFactory.js');
+
 oppia.factory('ParamSpecsObjectFactory', [
   'ParamSpecObjectFactory',
   function(ParamSpecObjectFactory) {

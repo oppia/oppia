@@ -17,6 +17,9 @@
    thread domain objects.
  */
 
+require('domain/suggestion/QuestionSuggestionObjectFactory.js');
+require('domain/suggestion/SuggestionObjectFactory.js');
+
 oppia.factory('SuggestionThreadObjectFactory', [
   'QuestionSuggestionObjectFactory', 'SuggestionObjectFactory',
   function(QuestionSuggestionObjectFactory, SuggestionObjectFactory) {

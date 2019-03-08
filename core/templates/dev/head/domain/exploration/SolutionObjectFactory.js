@@ -17,6 +17,12 @@
  * domain objects.
  */
 
+require('domain/exploration/SubtitledHtmlObjectFactory.js');
+require('domain/objects/FractionObjectFactory.js');
+require('domain/objects/NumberWithUnitsObjectFactory.js');
+require('services/ExplorationHtmlFormatterService.js');
+require('services/HtmlEscaperService.js');
+
 oppia.factory('SolutionObjectFactory', [
   '$filter', 'ExplorationHtmlFormatterService', 'FractionObjectFactory',
   'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
