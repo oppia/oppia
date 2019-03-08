@@ -65,7 +65,7 @@ oppia.directive('cyclicTransitionsIssueDirective', [
 
           $scope.showPlaythrough = function(playthroughId) {
             var index = $scope.playthroughIds.indexOf(playthroughId);
-            PlaythroughIssuesService.showPlaythroughModal(playthroughId, index);
+            PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
           };
         }
       ]
