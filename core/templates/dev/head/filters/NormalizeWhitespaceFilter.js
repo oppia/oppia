@@ -16,6 +16,8 @@
  * @fileoverview NormalizeWhitespace filter for Oppia.
  */
 
+require('services/UtilsService.js');
+
 // Filter that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.
 oppia.filter('normalizeWhitespace', ['UtilsService', function(UtilsService) {

@@ -16,6 +16,8 @@
  * @fileoverview WrapTextWithEllipsis filter for Oppia.
  */
 
+require('services/UtilsService.js');
+
 oppia.filter('wrapTextWithEllipsis', [
   '$filter', 'UtilsService', function($filter, UtilsService) {
     return function(input, characterCount) {

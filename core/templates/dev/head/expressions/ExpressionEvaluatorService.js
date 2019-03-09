@@ -58,6 +58,9 @@
 // Constraints on the input arguments (number, types, and any other
 // constraints) as well as the output value and type should be documented.
 
+require('expressions/ExpressionParserService.js');
+require('expressions/ExpressionSyntaxTreeService.js');
+
 // Service for expression evaluation.
 oppia.factory('ExpressionEvaluatorService', [
   '$log', 'ExpressionParserService', 'ExpressionSyntaxTreeService',

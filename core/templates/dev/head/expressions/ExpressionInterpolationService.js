@@ -16,6 +16,11 @@
  * @fileoverview Service for interpolating expressions.
  */
 
+require('expressions/ExpressionEvaluatorService.js');
+require('expressions/ExpressionParserService.js');
+require('expressions/ExpressionSyntaxTreeService.js');
+require('services/HtmlEscaperService.js');
+
 // Interpolates an HTML or a unicode string containing expressions.
 // The input value is evaluated against the supplied environments.
 //

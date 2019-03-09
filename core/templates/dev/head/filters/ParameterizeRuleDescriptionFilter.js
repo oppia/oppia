@@ -16,6 +16,9 @@
  * @fileoverview ParameterizeRuleDescription filter for Oppia.
  */
 
+require('domain/objects/FractionObjectFactory.js');
+require('domain/objects/NumberWithUnitsObjectFactory.js');
+
 // Filter that changes {{...}} tags into the corresponding parameter input
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
