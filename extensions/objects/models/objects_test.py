@@ -196,6 +196,28 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
         self.check_normalization(objects.Html, mappings, invalid_values)
 
+    def test_translatable_html_validation(self):
+        """Tests objects of type TranslatableHtml."""
+        mappings = [
+            ({
+                'content_id': 'id1',
+                'html': '<p onclick="evil_function()">a paragraph</p>'
+            }, {
+                'content_id': u'id1',
+                'html': '<p>a paragraph</p>'
+            }), ({
+                'content_id': 'id2',
+                'html': '<iframe src="evil-site"></iframe>'
+            }, {
+                'content_id': u'id2',
+                'html': ''
+            })
+        ]
+        invalid_values = [30, {'a': 1}, [1, 2, 1], None]
+
+        self.check_normalization(
+            objects.TranslatableHtml, mappings, invalid_values)
+
     def test_normalized_string_validation(self):
         """Tests objects of type NormalizedString."""
         mappings = [

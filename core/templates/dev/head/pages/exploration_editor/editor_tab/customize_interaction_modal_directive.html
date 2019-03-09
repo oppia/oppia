@@ -33,7 +33,7 @@
       <h5 ng-if="StateInteractionIdService.displayed == 'DragAndDropSortInput'">
         <b>Note:</b> Please enter at least two choices.
       </h5>
-      <schema-based-editor ng-class="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}" local-value="StateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
+      <schema-based-editor ng-class="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}" local-value="StateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema" default-value="customizationArgSpec.default_value">
       </schema-based-editor>
       <div ng-if="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
       <div style="margin-bottom: 15px;"></div>

@@ -127,6 +127,23 @@ class Html(BaseObject):
     }
 
 
+class TranslatableHtml(BaseObject):
+    """Class to represent translatable html."""
+
+    description = 'A translatable html content.'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'html',
+            'schema': Html.SCHEMA
+        }, {
+            'name': 'content_id',
+            'schema': UnicodeString.SCHEMA
+        }]
+    }
+
+
 class NonnegativeInt(BaseObject):
     """Nonnegative integer class."""
 

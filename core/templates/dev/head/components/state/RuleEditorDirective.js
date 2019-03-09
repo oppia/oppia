@@ -140,7 +140,7 @@ oppia.directive('ruleEditor', [
                       function(choice) {
                         return {
                           id: choice.val,
-                          val: choice.label
+                          val: choice.label.html
                         };
                       }
                     );

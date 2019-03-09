@@ -41,5 +41,9 @@
         "denominator": 1
       },
       "units": []
+    },
+    "TranslatableHtml": {
+      "content_id": "",
+      "html": ""
     }
 }

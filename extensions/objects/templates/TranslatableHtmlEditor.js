@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,24 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for general schema-based editors.
+ * @fileoverview Directive for a translatable html editor.
  */
 
-oppia.directive('schemaBasedEditor', [
+oppia.directive('translatableHtmlEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
+      restrict: 'E',
       scope: {
-        schema: '&',
-        isDisabled: '&',
-        localValue: '=',
-        labelForFocusTarget: '&',
-        onInputBlur: '=',
-        onInputFocus: '=',
-        defaultValue: '='
+        getInitArgs: '&',
+        value: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/' +
-        'schema_based_editor_directive.html'),
-      restrict: 'E'
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/translatable_html_editor_directive.html'),
+      controller: ['$scope', function($scope) {
+        if ($scope.value.content_id === '') {
+          $scope.value.content_id = 'interaction_' + (
+            Math.random().toString(36).slice(-5));
+        }
+        $scope.schema = {
+          type: 'html'
+        };
+      }]
     };
   }]);

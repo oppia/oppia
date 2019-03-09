@@ -38,7 +38,8 @@ oppia.directive('schemaBasedListEditor', [
         // UI configuration. May be undefined.
         uiConfig: '&',
         validators: '&',
-        labelForFocusTarget: '&'
+        labelForFocusTarget: '&',
+        defaultValue: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_editors/' +
@@ -122,9 +123,12 @@ oppia.directive('schemaBasedListEditor', [
             if ($scope.isOneLineInput) {
               $scope.hideAddItemButton();
             }
-
-            $scope.localValue.push(
-              SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+            if ($scope.defaultValue) {
+              $scope.localValue.push(angular.copy($scope.defaultValue[0]));
+            } else {
+              $scope.localValue.push(
+                SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+            }
             FocusManagerService.setFocus(
               $scope.getFocusLabel($scope.localValue.length - 1));
           };

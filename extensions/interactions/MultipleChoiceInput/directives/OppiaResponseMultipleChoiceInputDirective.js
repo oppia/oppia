@@ -32,7 +32,7 @@ oppia.directive('oppiaResponseMultipleChoiceInput', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
-        $scope.response = _choices[_answer];
+        $scope.response = _choices[_answer].html;
       }]
     };
   }

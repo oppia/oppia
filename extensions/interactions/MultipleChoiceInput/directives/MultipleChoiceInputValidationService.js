@@ -32,13 +32,13 @@ oppia.factory('MultipleChoiceInputValidationService', [
         var numChoices = customizationArgs.choices.value.length;
         for (var i = 0; i < customizationArgs.choices.value.length; i++) {
           var choice = customizationArgs.choices.value[i];
-          if (choice.trim().length === 0) {
+          if (choice.html.trim().length === 0) {
             areAnyChoicesEmpty = true;
           }
-          if (seenChoices.indexOf(choice) !== -1) {
+          if (seenChoices.indexOf(choice.html) !== -1) {
             areAnyChoicesDuplicated = true;
           }
-          seenChoices.push(choice);
+          seenChoices.push(choice.html);
         }
 
         if (areAnyChoicesEmpty) {

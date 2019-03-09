@@ -42,7 +42,8 @@
                           local-value="$parent.localValue" is-disabled="isDisabled()"
                           item-schema="schema().items" len="schema().len"
                           ui-config="schema().ui_config" validators="schema().validators"
-                          label-for-focus-target="labelForFocusTarget()">
+                          label-for-focus-target="labelForFocusTarget()"
+                          default-value="defaultValue">
 </schema-based-list-editor>
 
 <schema-based-dict-editor ng-if="schema().type === 'dict' && !schema().choices"
