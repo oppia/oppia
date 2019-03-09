@@ -22,6 +22,13 @@ oppia.constant('LIBRARY_PAGE_MODES', {
   SEARCH: 'search'
 });
 
+oppia.constant('LIBRARY_PATHS_AND_MODES', {
+  '/library': 'index',
+  '/library/top_rated': 'group',
+  '/library/recently_published': 'group',
+  '/search/find': 'search'
+});
+
 oppia.controller('Library', [
   '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'ConstructTranslationIdsService',
@@ -30,7 +37,7 @@ oppia.controller('Library', [
   'SearchService',
   'UrlInterpolationService', 'UrlService', 'UserService',
   'WindowDimensionsService', 'ALL_CATEGORIES',
-  'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX',
+  'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_AND_MODES', 'LIBRARY_TILE_WIDTH_PX',
   function(
       $http, $log, $rootScope, $scope, $timeout, $uibModal, $window,
       AlertsService, ConstructTranslationIdsService,
@@ -39,7 +46,7 @@ oppia.controller('Library', [
       SearchService,
       UrlInterpolationService, UrlService, UserService,
       WindowDimensionsService, ALL_CATEGORIES,
-      LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX) {
+      LIBRARY_PAGE_MODES, LIBRARY_PATHS_AND_MODES, LIBRARY_TILE_WIDTH_PX) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -52,13 +59,7 @@ oppia.controller('Library', [
     $scope.activeGroupIndex = null;
 
     var currentPath = $window.location.pathname;
-    var libraryPathsAndModes = {
-      '/library': LIBRARY_PAGE_MODES.INDEX,
-      '/library/top_rated': LIBRARY_PAGE_MODES.GROUP,
-      '/library/recently_published': LIBRARY_PAGE_MODES.GROUP,
-      '/search/find': LIBRARY_PAGE_MODES.SEARCH
-    };
-    $scope.pageMode = libraryPathsAndModes[currentPath];
+    $scope.pageMode = LIBRARY_PATHS_AND_MODES[currentPath];
     if (!currentPath) {
       $log.error('INVALID URL PATH: ' + currentPath);
     }
