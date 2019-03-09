@@ -61,6 +61,8 @@ class UserSettings(object):
             agreed to the terms of the site.
         last_started_state_editor_tutorial: datetime.datetime or None. When
             the user last started the state editor tutorial.
+        last_started_state_translation_tutorial: datetime.datetime or None. When
+            the user last started the state translation tutorial.
         last_logged_in: datetime.datetime or None. When the user last logged in.
         last_created_an_exploration: datetime.datetime or None. When the user
             last created an exploration.
@@ -83,9 +85,9 @@ class UserSettings(object):
     def __init__(
             self, user_id, email, role, username=None,
             last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
-            last_logged_in=None, last_created_an_exploration=None,
-            last_edited_an_exploration=None, profile_picture_data_url=None,
-            default_dashboard=None,
+            last_started_state_translation_tutorial=None, last_logged_in=None,
+            last_created_an_exploration=None, last_edited_an_exploration=None,
+            profile_picture_data_url=None, default_dashboard=None,
             creator_dashboard_display_pref=(
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
             user_bio='', subject_interests=None, first_contribution_msec=None,
@@ -103,6 +105,8 @@ class UserSettings(object):
                 last agreed to the terms of the site.
             last_started_state_editor_tutorial: datetime.datetime or None. When
                 the user last started the state editor tutorial.
+            last_started_state_translation_tutorial: datetime.datetime or None.
+                When the user last started the state translation tutorial.
             last_logged_in: datetime.datetime or None. When the user last
                 logged in.
             last_created_an_exploration: datetime.datetime or None. When the
@@ -131,8 +135,10 @@ class UserSettings(object):
         self.role = role
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
-        self.last_started_state_editor_tutorial = (  # pylint: disable=invalid-name
+        self.last_started_state_editor_tutorial = (
             last_started_state_editor_tutorial)
+        self.last_started_state_translation_tutorial = (
+            last_started_state_translation_tutorial)
         self.last_logged_in = last_logged_in
         self.last_edited_an_exploration = last_edited_an_exploration
         self.last_created_an_exploration = last_created_an_exploration
@@ -396,6 +402,8 @@ def get_users_settings(user_ids):
                 last_agreed_to_terms=model.last_agreed_to_terms,
                 last_started_state_editor_tutorial=(
                     model.last_started_state_editor_tutorial),
+                last_started_state_translation_tutorial=(
+                    model.last_started_state_translation_tutorial),
                 last_logged_in=model.last_logged_in,
                 last_edited_an_exploration=model.last_edited_an_exploration,
                 last_created_an_exploration=(
@@ -632,6 +640,8 @@ def _save_user_settings(user_settings):
         last_agreed_to_terms=user_settings.last_agreed_to_terms,
         last_started_state_editor_tutorial=(
             user_settings.last_started_state_editor_tutorial),
+        last_started_state_translation_tutorial=(
+            user_settings.last_started_state_translation_tutorial),
         last_logged_in=user_settings.last_logged_in,
         last_edited_an_exploration=user_settings.last_edited_an_exploration,
         last_created_an_exploration=(
@@ -1014,6 +1024,19 @@ def record_user_started_state_editor_tutorial(user_id):
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_editor_tutorial = (
+        datetime.datetime.utcnow())
+    _save_user_settings(user_settings)
+
+
+def record_user_started_state_translation_tutorial(user_id):
+    """Updates last_started_state_translation_tutorial to the current datetime
+    for the user with given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.last_started_state_translation_tutorial = (
         datetime.datetime.utcnow())
     _save_user_settings(user_settings)
 

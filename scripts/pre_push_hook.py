@@ -295,6 +295,23 @@ def _install_hook():
         print 'Copied file to .git/hooks directory'
 
 
+def does_diff_include_js_files(files_to_lint):
+    """Returns true if diff includes JS files.
+
+    Args:
+        files_to_lint: list(str). List of files to be linted.
+
+    Returns:
+        bool. Status of JS files in diff.
+    """
+
+    js_files_to_check = [
+        filename for filename in files_to_lint if
+        filename.endswith('.js')]
+
+    return bool(js_files_to_check)
+
+
 def main():
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
@@ -326,7 +343,9 @@ def main():
                 if lint_status != 0:
                     print 'Push failed, please correct the linting issues above'
                     sys.exit(1)
-            frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
+            frontend_status = 0
+            if does_diff_include_js_files(files_to_lint):
+                frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'
                 sys.exit(1)

@@ -17,9 +17,9 @@
  */
 
 oppia.directive('adminConfigTab', [
-  '$http', 'AdminTaskManagerService', 'ADMIN_HANDLER_URL',
-  'UrlInterpolationService', function($http, AdminTaskManagerService,
-      ADMIN_HANDLER_URL, UrlInterpolationService) {
+  '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
+  'ADMIN_HANDLER_URL', function($http, AdminTaskManagerService,
+      UrlInterpolationService, ADMIN_HANDLER_URL) {
     return {
       restrict: 'E',
       scope: {

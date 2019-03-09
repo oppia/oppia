@@ -111,9 +111,12 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
                 question_summary_dicts_2 = (
                     json_response['question_summary_dicts'])
                 self.assertEqual(len(question_summary_dicts_2), 1)
+                self.assertEqual(
+                    question_summary_dicts[0]['skill_description'],
+                    'Skill Description')
                 self.assertNotEqual(
-                    question_summary_dicts[0]['id'],
-                    question_summary_dicts_2[0]['id'])
+                    question_summary_dicts[0]['summary']['id'],
+                    question_summary_dicts_2[0]['summary']['id'])
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
@@ -171,6 +174,11 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -192,6 +200,11 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                },
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -209,6 +222,11 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -354,6 +372,11 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             json_response = self.get_json(
                 '%s/%s/%s' % (
@@ -373,6 +396,11 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                         }
                     }
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 

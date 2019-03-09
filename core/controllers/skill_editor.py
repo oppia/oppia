@@ -15,8 +15,8 @@
 """Controllers for the skill editor."""
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import dependency_registry
 from core.domain import interaction_registry
 from core.domain import obj_services
@@ -161,15 +161,19 @@ class SkillEditorQuestionHandler(base.BaseHandler):
 
         start_cursor = self.request.get('cursor')
 
-        question_summaries, next_start_cursor = (
-            question_services.get_question_summaries_linked_to_skills(
+        question_summaries, skill_descriptions, next_start_cursor = (
+            question_services.get_question_summaries_and_skill_descriptions(
                 constants.NUM_QUESTIONS_PER_PAGE, [skill_id], start_cursor)
         )
-        question_summary_dicts = [
-            summary.to_dict() for summary in question_summaries]
+        return_dicts = []
+        for index, summary in enumerate(question_summaries):
+            return_dicts.append({
+                'summary': summary.to_dict(),
+                'skill_description': skill_descriptions[index]
+            })
 
         self.values.update({
-            'question_summary_dicts': question_summary_dicts,
+            'question_summary_dicts': return_dicts,
             'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)

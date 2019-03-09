@@ -18,23 +18,23 @@
  */
 
 oppia.factory('ResponsesService', [
-  '$rootScope', 'StateInteractionIdService', 'INTERACTION_SPECS',
-  'AnswerGroupsCacheService', 'StateEditorService',
-  'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
-  'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
-  'ContextService', 'StateContentIdsToAudioTranslationsService',
-  'SolutionValidityService', 'INFO_MESSAGE_SOLUTION_IS_VALID',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
+  '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
+  'ContextService', 'OutcomeObjectFactory',
+  'SolutionValidityService', 'SolutionVerificationService',
+  'StateEditorService', 'StateInteractionIdService',
+  'StateSolutionService', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
+  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INTERACTION_SPECS',
   function(
-      $rootScope, StateInteractionIdService, INTERACTION_SPECS,
-      AnswerGroupsCacheService, StateEditorService,
-      OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
-      StateSolutionService, SolutionVerificationService, AlertsService,
-      ContextService, StateContentIdsToAudioTranslationsService,
-      SolutionValidityService, INFO_MESSAGE_SOLUTION_IS_VALID,
+      $rootScope, AlertsService, AnswerGroupsCacheService,
+      ContextService, OutcomeObjectFactory,
+      SolutionValidityService, SolutionVerificationService,
+      StateEditorService, StateInteractionIdService,
+      StateSolutionService, COMPONENT_NAME_DEFAULT_OUTCOME,
+      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
-      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
+      INFO_MESSAGE_SOLUTION_IS_VALID, INTERACTION_SPECS) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -130,16 +130,6 @@ oppia.factory('ResponsesService', [
       callback(_answerGroupsMemento);
     };
 
-    var _updateAnswerGroupsAudioTranslation = function() {
-      StateContentIdsToAudioTranslationsService.displayed.
-        deleteAllFeedbackContentId();
-      for (var i = 0; i < _answerGroups.length; i++) {
-        StateContentIdsToAudioTranslationsService.displayed.addContentId(
-          _answerGroups[i].outcome.feedback.getContentId());
-      }
-      StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-    };
-
     var _saveDefaultOutcome = function(newDefaultOutcome) {
       var oldDefaultOutcome = _defaultOutcomeMemento;
       if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
@@ -191,27 +181,17 @@ oppia.factory('ResponsesService', [
           _answerGroups = [];
         }
 
-        // This is necessary in order to keep the audio translations of the
-        // answer groups in sync with the answer groups that are fetched from
-        // the cache.
-        _updateAnswerGroupsAudioTranslation();
-
         // Preserve the default outcome unless the interaction is terminal.
         // Recreate the default outcome if switching away from a terminal
         // interaction.
         if (newInteractionId) {
           if (INTERACTION_SPECS[newInteractionId].is_terminal) {
             _defaultOutcome = null;
-            StateContentIdsToAudioTranslationsService.displayed.deleteContentId(
-              COMPONENT_NAME_DEFAULT_OUTCOME);
           } else if (!_defaultOutcome) {
             _defaultOutcome = OutcomeObjectFactory.createNew(
               StateEditorService.getActiveStateName(),
               COMPONENT_NAME_DEFAULT_OUTCOME, '', []);
-            StateContentIdsToAudioTranslationsService.displayed.addContentId(
-              COMPONENT_NAME_DEFAULT_OUTCOME);
           }
-          _updateAnswerGroupsAudioTranslation();
         }
 
         _confirmedUnclassifiedAnswers = [];
@@ -340,11 +320,12 @@ oppia.factory('ResponsesService', [
             return choice.val;
           });
 
+          var key, newInputValue;
           _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
             var newRules = angular.copy(answerGroup.rules);
             newRules.forEach(function(rule) {
-              for (var key in rule.inputs) {
-                var newInputValue = [];
+              for (key in rule.inputs) {
+                newInputValue = [];
                 rule.inputs[key].forEach(function(item) {
                   var newIndex = newChoiceStrings.indexOf(item);
                   if (newIndex !== -1) {
@@ -403,21 +384,21 @@ oppia.factory('ResponsesService', [
               var newRules = angular.copy(answerGroup.rules);
               newRules.forEach(function(rule) {
                 if (rule.type === 'HasElementXAtPositionY') {
-                  for (var key in rule.inputs) {
-                    var newInputValue = '';
+                  for (key in rule.inputs) {
+                    newInputValue = '';
                     if (key === 'y') {
                       newInputValue = 1;
                     }
                     rule.inputs[key] = newInputValue;
                   }
                 } else if (rule.type === 'HasElementXBeforeElementY') {
-                  for (var key in rule.inputs) {
-                    var newInputValue = '';
+                  for (key in rule.inputs) {
+                    newInputValue = '';
                     rule.inputs[key] = newInputValue;
                   }
                 } else {
-                  for (var key in rule.inputs) {
-                    var newInputValue = [];
+                  for (key in rule.inputs) {
+                    newInputValue = [];
                     rule.inputs[key] = newInputValue;
                   }
                 }

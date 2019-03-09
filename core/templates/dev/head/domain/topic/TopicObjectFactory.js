@@ -18,8 +18,8 @@
  */
 
 oppia.factory('TopicObjectFactory', [
-  'SubtopicObjectFactory', 'SkillSummaryObjectFactory',
-  function(SubtopicObjectFactory, SkillSummaryObjectFactory) {
+  'SkillSummaryObjectFactory', 'SubtopicObjectFactory',
+  function(SkillSummaryObjectFactory, SubtopicObjectFactory) {
     var Topic = function(
         id, name, description, languageCode, canonicalStoryIds,
         additionalStoryIds, uncategorizedSkillIds,

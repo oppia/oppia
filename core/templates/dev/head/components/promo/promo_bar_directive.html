@@ -1,6 +1,6 @@
-<div class="oppia-toast-container toast-top-center" ng-if="promoIsVisible">
+<div class="oppia-toast-container toast-top-center" ng-if="promoBarIsEnabled && promoIsVisible">
   <div class="toast toast-info oppia-toast">
     <button type="button" class="toast-close-button" ng-click="dismissPromo()" role="button">&times;</button>
-    <div class="toast-message"><[getPromoMessage()]></div>
+    <div class="toast-message"><[promoBarMessage]></div>
   </div>
 </div>

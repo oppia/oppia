@@ -19,8 +19,8 @@ oppia.constant(
   'TOPIC_DATA_URL_TEMPLATE', '/topic_data_handler/<topic_name>');
 
 oppia.factory('TopicViewerBackendApiService', [
-  '$http', '$q', 'TOPIC_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-  function($http, $q, TOPIC_DATA_URL_TEMPLATE, UrlInterpolationService) {
+  '$http', '$q', 'UrlInterpolationService', 'TOPIC_DATA_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService, TOPIC_DATA_URL_TEMPLATE) {
     var topicDataDict = null;
     var _fetchTopicData = function(topicName, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(

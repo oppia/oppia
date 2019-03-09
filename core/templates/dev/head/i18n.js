@@ -38,10 +38,10 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
 });
 
 oppia.controller('I18nFooter', [
-  '$http', '$rootScope', '$scope', '$translate', '$timeout', '$cookies',
+  '$cookies', '$http', '$rootScope', '$scope', '$timeout', '$translate',
   'UserService',
   function(
-      $http, $rootScope, $scope, $translate, $timeout, $cookies,
+      $cookies, $http, $rootScope, $scope, $timeout, $translate,
       UserService) {
     // Changes the language of the translations.
     var preferencesDataUrl = '/preferenceshandler/data';

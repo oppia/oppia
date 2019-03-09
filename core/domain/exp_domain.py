@@ -47,6 +47,7 @@ STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = (
     'content_ids_to_audio_translations')
+STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
@@ -113,6 +114,7 @@ class ExplorationChange(object):
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+        STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
@@ -585,6 +587,9 @@ class Exploration(object):
                 } for content_id, audio_translations in (
                     sdict['content_ids_to_audio_translations'].iteritems())
             }
+            state.written_translations = (
+                state_domain.WrittenTranslations.from_dict(
+                    sdict['written_translations']))
 
             exploration.states[state_name] = state
 
@@ -643,12 +648,6 @@ class Exploration(object):
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
-        # TODO(sll): Remove this check once App Engine supports 3-letter
-        # language codes in search.
-        if len(self.language_code) != 2:
-            raise utils.ValidationError(
-                'Invalid language_code, it should have exactly 2 letters: %s' %
-                self.language_code)
 
         if not isinstance(self.tags, list):
             raise utils.ValidationError(
@@ -2082,6 +2081,102 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v25_dict_to_v26_dict(cls, states_dict):
+        """Converts from version 25 to 26. Version 26 adds a new
+        customization arg to DragAndDropSortInput interaction which allows
+        multiple sort items in the same position.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'DragAndDropSortInput':
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'allowMultipleItemsInSamePosition': {
+                        'value': False
+                    }
+                })
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v26_dict_to_v27_dict(cls, states_dict):
+        """Converts from version 26 to 27. Version 27 adds written_translations
+        dict to the state, which will allow translators to add translation
+        script for the state contents.
+
+        NOTE: This migration will also filter out the content_id from
+        content_ids_to_audio_translations such that the state passes the new
+        validation check safely. The earlier state validation used to check that
+        the set of all content ids present within the state is subset of the
+        content_ids_to_audio_translations keys, but the new validation will
+        check whether both are equal.
+
+         Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.itervalues():
+            state_content_id_list = []
+
+            # Add state card's content id into the state_content_id_list.
+            state_content_id_list.append(state_dict['content']['content_id'])
+
+            # Add answer_groups content id into the state_content_id_list.
+            for answer_group in state_dict['interaction']['answer_groups']:
+                answer_feedback = answer_group['outcome']['feedback']
+                state_content_id_list.append(answer_feedback['content_id'])
+
+            # If present, add default_outcome content id into
+            # state_content_id_list.
+            default_outcome = state_dict['interaction']['default_outcome']
+            if default_outcome is not None:
+                state_content_id_list.append(
+                    default_outcome['feedback']['content_id'])
+
+            # Add hints content id into state_content_id_list.
+            for hint in state_dict['interaction']['hints']:
+                state_content_id_list.append(hint['hint_content']['content_id'])
+
+            # If present, add solution content id into state_content_id_list.
+            solution = state_dict['interaction']['solution']
+            if solution:
+                state_content_id_list.append(
+                    solution['explanation']['content_id'])
+
+            # Filter content_ids_to_audio_translations with unwanted content id.
+            # These are the extra content id present within the
+            # content_ids_to_audio_translations dict which is of no use as html
+            # linked to these content_ids are not available in the state.
+            citat = state_dict['content_ids_to_audio_translations']
+            extra_content_ids_in_citat = (
+                set(citat.keys()) - set(state_content_id_list))
+            for content_id in extra_content_ids_in_citat:
+                state_dict['content_ids_to_audio_translations'].pop(content_id)
+
+            # Create written_translations using the state_content_id_list.
+            translations_mapping = {}
+            for content_id in state_content_id_list:
+                translations_mapping[content_id] = {}
+
+            state_dict['written_translations'] = {}
+            state_dict['written_translations']['translations_mapping'] = (
+                translations_mapping)
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2116,7 +2211,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 30
+    CURRENT_EXP_SCHEMA_VERSION = 32
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2471,7 +2566,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v17_dict_to_v18_dict(cls, exploration_dict):
-        """ Converts a v17 exploration dict into a v18 exploration dict.
+        """Converts a v17 exploration dict into a v18 exploration dict.
 
         Adds auto_tts_enabled property.
         """
@@ -2486,7 +2581,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v18_dict_to_v19_dict(cls, exploration_dict):
-        """ Converts a v18 exploration dict into a v19 exploration dict.
+        """Converts a v18 exploration dict into a v19 exploration dict.
 
         Adds audio translations to feedback, hints, and solutions.
         """
@@ -2500,7 +2595,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v19_dict_to_v20_dict(cls, exploration_dict):
-        """ Converts a v19 exploration dict into a v20 exploration dict.
+        """Converts a v19 exploration dict into a v20 exploration dict.
 
         Introduces a correctness property at the top level, and changes each
         answer group's "correct" field to "labelled_as_correct" instead.
@@ -2517,7 +2612,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v20_dict_to_v21_dict(cls, exploration_dict):
-        """ Converts a v20 exploration dict into a v21 exploration dict.
+        """Converts a v20 exploration dict into a v21 exploration dict.
 
         Adds a refresher_exploration_id field to each answer group outcome, and
         to the default outcome (if it exists).
@@ -2532,7 +2627,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v21_dict_to_v22_dict(cls, exploration_dict):
-        """ Converts a v21 exploration dict into a v22 exploration dict.
+        """Converts a v21 exploration dict into a v22 exploration dict.
 
         Moves the labelled_as_correct field from the answer group level to the
         outcome level, and adds two extra customization args to the
@@ -2548,7 +2643,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v22_dict_to_v23_dict(cls, exploration_dict):
-        """ Converts a v22 exploration dict into a v23 exploration dict.
+        """Converts a v22 exploration dict into a v23 exploration dict.
 
         Adds a new customization arg to FractionInput interactions
         which allows you to add custom placeholders.
@@ -2563,7 +2658,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v23_dict_to_v24_dict(cls, exploration_dict):
-        """ Converts a v23 exploration dict into a v24 exploration dict.
+        """Converts a v23 exploration dict into a v24 exploration dict.
 
         Adds training_data parameter to each answer group to store training
         data of corresponding answer group.
@@ -2578,7 +2673,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v24_dict_to_v25_dict(cls, exploration_dict):
-        """ Converts a v24 exploration dict into a v25 exploration dict.
+        """Converts a v24 exploration dict into a v25 exploration dict.
 
         Adds additional tagged_misconception_id and
         missing_prerequisite_skill_id fields to answer groups and outcomes
@@ -2594,7 +2689,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v25_dict_to_v26_dict(cls, exploration_dict):
-        """ Converts a v25 exploration dict into a v26 exploration dict.
+        """Converts a v25 exploration dict into a v26 exploration dict.
 
         Move audio_translations into a seperate dict.
         """
@@ -2661,6 +2756,35 @@ class Exploration(object):
         exploration_dict['states'] = cls._convert_states_v24_dict_to_v25_dict(
             exp_id, exploration_dict['states'])
         exploration_dict['states_schema_version'] = 25
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v30_dict_to_v31_dict(cls, exploration_dict):
+        """Converts a v30 exploration dict into a v31 exploration dict.
+
+        Adds a new customization arg to DragAndDropSortInput interactions
+        which allows multiple sort items in the same position.
+        """
+        exploration_dict['schema_version'] = 31
+
+        exploration_dict['states'] = cls._convert_states_v25_dict_to_v26_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 26
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v31_dict_to_v32_dict(cls, exploration_dict):
+        """Converts a v31 exploration dict into a v32 exploration dict.
+
+        Adds content_tranlations in state for adding text translation.
+        """
+        exploration_dict['schema_version'] = 32
+
+        exploration_dict['states'] = cls._convert_states_v26_dict_to_v27_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 27
 
         return exploration_dict
 
@@ -2846,6 +2970,16 @@ class Exploration(object):
             exploration_dict = cls._convert_v29_dict_to_v30_dict(
                 exp_id, exploration_dict)
             exploration_schema_version = 30
+
+        if exploration_schema_version == 30:
+            exploration_dict = cls._convert_v30_dict_to_v31_dict(
+                exploration_dict)
+            exploration_schema_version = 31
+
+        if exploration_schema_version == 31:
+            exploration_dict = cls._convert_v31_dict_to_v32_dict(
+                exploration_dict)
+            exploration_schema_version = 32
 
         return (exploration_dict, initial_schema_version)
 

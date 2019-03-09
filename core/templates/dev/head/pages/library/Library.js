@@ -27,19 +27,23 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 });
 
 oppia.controller('Library', [
-  '$scope', '$http', '$log', '$uibModal', '$rootScope', '$window', '$timeout',
-  'ConstructTranslationIdsService', 'UrlService', 'ALL_CATEGORIES',
-  'SearchService', 'WindowDimensionsService', 'UrlInterpolationService',
-  'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX', 'AlertsService',
-  'LearnerDashboardIdsBackendApiService', 'UserService',
-  'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
+  '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal', '$window',
+  'AlertsService', 'ConstructTranslationIdsService',
+  'LearnerDashboardActivityIdsObjectFactory',
+  'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
+  'SearchService',
+  'UrlInterpolationService', 'UrlService', 'UserService',
+  'WindowDimensionsService', 'ALL_CATEGORIES',
+  'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX',
   function(
-      $scope, $http, $log, $uibModal, $rootScope, $window, $timeout,
-      ConstructTranslationIdsService, UrlService, ALL_CATEGORIES,
-      SearchService, WindowDimensionsService, UrlInterpolationService,
-      LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX, AlertsService,
-      LearnerDashboardIdsBackendApiService, UserService,
-      LearnerDashboardActivityIdsObjectFactory, LearnerPlaylistService) {
+      $http, $log, $rootScope, $scope, $timeout, $uibModal, $window,
+      AlertsService, ConstructTranslationIdsService,
+      LearnerDashboardActivityIdsObjectFactory,
+      LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
+      SearchService,
+      UrlInterpolationService, UrlService, UserService,
+      WindowDimensionsService, ALL_CATEGORIES,
+      LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -152,7 +156,7 @@ oppia.controller('Library', [
         // elements flush left.
         // Transforms the group names into translation ids
         $scope.leftmostCardIndices = [];
-        for (i = 0; i < $scope.libraryGroups.length; i++) {
+        for (var i = 0; i < $scope.libraryGroups.length; i++) {
           $scope.leftmostCardIndices.push(0);
         }
       });
@@ -291,7 +295,7 @@ oppia.controller('Library', [
         $window.location.href = fullResultsUrl;
       } else {
         var selectedCategories = {};
-        for (i = 0; i < categories.length; i++) {
+        for (var i = 0; i < categories.length; i++) {
           selectedCategories[categories[i]] = true;
         }
 

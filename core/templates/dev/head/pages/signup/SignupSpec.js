@@ -103,5 +103,24 @@ describe('Signup controller', function() {
       expect(scope.warningI18nCode).toEqual(
         'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN');
     });
+
+    it(
+      'should show continue registration modal if user is logged ' +
+      'out in new tab',
+      function() {
+        spyOn(scope, 'showRegistrationSessionExpiredModal');
+        var errorResponseObject = {
+          status_code: 401,
+          error: (
+            'Sorry, you have been logged out [probably in another ' +
+            'window]. Please log in again. You will be redirected ' +
+            'to main page in a while!')
+        };
+        $httpBackend.expectPOST('/signuphandler/data').respond(
+          401, errorResponseObject);
+        scope.submitPrerequisitesForm(true, 'myUsername', false);
+        $httpBackend.flush();
+        expect(scope.showRegistrationSessionExpiredModal).toHaveBeenCalled();
+      });
   });
 });

@@ -70,8 +70,6 @@
       padding-top: 12px;
     }
   </style>
-
-  {% include 'pages/exploration_player/feedback_popup_container_directive.html' %}
 {% endblock %}
 
 {% block footer %}
@@ -80,8 +78,22 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <script src="/templates/dev/head/directives/AngularHtmlBindDirective.js"></script>
+  <script src="/templates/dev/head/directives/MathjaxBindDirective.js"></script>
+
+  <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
+  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
+  <script src="/templates/dev/head/filters/GetAbbreviatedTextFilter.js"></script>
+  <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
+  <script src="/templates/dev/head/filters/SummarizeNonnegativeNumberFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAndCapitalizeFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
+  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
 
   <script src="/extensions/objects/templates/MathLatexStringEditor.js"></script>
   <script src="/extensions/objects/templates/SanitizedUrlEditor.js"></script>
@@ -108,7 +120,10 @@
   <script src="/templates/dev/head/services/SpeechSynthesisChunkerService.js"></script>
   <script src="/templates/dev/head/services/ExplorationFeaturesService.js"></script>
   <script src="/templates/dev/head/services/ExplorationFeaturesBackendApiService.js"></script>
+  <script src="/templates/dev/head/services/ValidatorsService.js"></script>
 
+  <script src="/templates/dev/head/components/CkEditorRteDirective.js"></script>
+  <script src="/templates/dev/head/components/CkEditorWidgetsInitializer.js"></script>
   <script src="/templates/dev/head/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="/templates/dev/head/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="/templates/dev/head/components/profile_link/ProfileLinkImageDirective.js"></script>
@@ -120,6 +135,8 @@
   <script src="/templates/dev/head/domain/collection/GuestCollectionProgressObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/collection/GuestCollectionProgressService.js"></script>
   <script src="/templates/dev/head/domain/exploration/ContentIdsToAudioTranslationsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/WrittenTranslationObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/WrittenTranslationsObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/exploration/ExplorationObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
@@ -196,6 +213,9 @@
   <script src="/templates/dev/head/pages/exploration_player/AudioPreloaderService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/ImagePreloaderService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/ExtractImageFilenamesFromStateService.js"></script>
+  <script src="/templates/dev/head/pages/suggestion_editor/ShowSuggestionModalForLearnerLocalView.js"></script>
+  <script src="/templates/dev/head/pages/suggestion_editor/SuggestionModalService.js"></script>
+  <script src="/templates/dev/head/pages/suggestion_editor/ShowSuggestionModalForLearnerLocalViewService.js"></script>
 
   <script src="/templates/dev/head/expressions/ExpressionSyntaxTreeService.js"></script>
   <script src="/templates/dev/head/expressions/ExpressionEvaluatorService.js"></script>

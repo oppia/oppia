@@ -19,6 +19,7 @@
 describe('Creator Dashboard backend API service', function() {
   var CreatorDashboardBackendApiService = null;
   var $httpBackend = null;
+  var UrlInterpolationService = null;
   var SAMPLE_EXP_ID = 'hyuy4GUlvTqJ';
 
   var sampleDataResults = {
