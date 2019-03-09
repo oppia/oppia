@@ -477,7 +477,7 @@ def _get_all_files(input_path, input_files):
     Args:
         input_path: str. The path of the directory to be linted and checked.
         input_files: list(str). The list of files to be linted and checked,
-        ignored if input_path is specified.
+            ignored if input_path is specified.
 
     Returns:
         all_files: list(str). The list of files to be linted and checked.
