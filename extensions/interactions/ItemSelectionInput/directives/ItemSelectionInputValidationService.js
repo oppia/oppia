@@ -144,9 +144,6 @@ oppia.factory('ItemSelectionInputValidationService', [
               });
             });
           });
-          areAllChoicesCovered = handledAnswers.every(function(handledAnswer) {
-            return handledAnswer;
-          });
         }
         var answerChoiceToIndex = {};
         seenChoices.forEach(function(seenChoice, choiceIndex) {

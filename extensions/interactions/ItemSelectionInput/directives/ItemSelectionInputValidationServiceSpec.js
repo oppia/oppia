@@ -178,8 +178,8 @@ describe('ItemSelectionInputValidationService', function() {
   });
 
   it(
-    'should give a warning if number of rule inputs are lesser than 2 and ' +
-    'Proper subset rule is used.',
+    'if the number of elements in the rule input is less than 2, and the ' +
+    '"proper subset" rule is used.',
     function() {
       // Modify values of customization arguments to get warning.
       customizationArguments.minAllowableSelectionCount.value = 0;
