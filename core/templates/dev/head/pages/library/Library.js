@@ -51,15 +51,15 @@ oppia.controller('Library', [
 
     $scope.activeGroupIndex = null;
 
-    $scope.pageMode = '';
     var currentPath = $window.location.pathname;
-    if (currentPath === '/library') {
-      $scope.pageMode = LIBRARY_PAGE_MODES.INDEX;
-    } else if (currentPath === '/library/top_rated') {
-      $scope.pageMode = LIBRARY_PAGE_MODES.GROUP;
-    } else if (currentPath === '/search/find') {
-      $scope.pageMode = LIBRARY_PAGE_MODES.SEARCH;
-    } else {
+    var libraryPathsAndModes = {
+      '/library': LIBRARY_PAGE_MODES.INDEX,
+      '/library/top_rated': LIBRARY_PAGE_MODES.GROUP,
+      '/library/recently_published': LIBRARY_PAGE_MODES.GROUP,
+      '/search/find': LIBRARY_PAGE_MODES.SEARCH
+    };
+    $scope.pageMode = libraryPathsAndModes[currentPath];
+    if (!currentPath) {
       $log.error('INVALID URL PATH: ' + currentPath);
     }
     $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
