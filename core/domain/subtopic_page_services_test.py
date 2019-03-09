@@ -82,7 +82,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_ids = [2]
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
-        self.assertEqual(subtopic_pages, [])
+        self.assertEqual(subtopic_pages, [None])
 
     def test_get_subtopic_page_contents_by_id(self):
         self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
