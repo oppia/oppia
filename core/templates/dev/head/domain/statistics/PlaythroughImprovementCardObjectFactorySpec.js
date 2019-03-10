@@ -31,6 +31,73 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   }));
 
   describe('.fetchCards', function() {
+    it(
+      'creates a card for each issue in PlaythroughIssuesService',
+      function(done) {
+        var earlyQuitIssue =
+          this.PlaythroughIssueObjectFactory.createFromBackendDict({
+            issue_type: 'EarlyQuit',
+            issue_customization_args: {
+              state_name: {value: 'Hola'},
+              time_spent_in_exp_in_msecs: {value: 5000},
+            },
+            playthrough_ids: [],
+            schema_version: 1,
+            is_valid: true,
+          });
+        var multipleIncorrectSubmissionsIssue =
+          this.PlaythroughIssueObjectFactory.createFromBackendDict({
+            issue_type: 'MultipleIncorrectSubmissions',
+            issue_customization_args: {
+              state_name: {value: 'Hola'},
+              num_times_answered_incorrectly: {value: 4},
+            },
+            playthrough_ids: [],
+            schema_version: 1,
+            is_valid: true,
+          });
+        var cyclicTransitionsIssue =
+          this.PlaythroughIssueObjectFactory.createFromBackendDict({
+            issue_type: 'CyclicTransitions',
+            issue_customization_args: {
+              state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
+            },
+            playthrough_ids: [],
+            schema_version: 1,
+            is_valid: true,
+          });
+
+        var that = this;
+        var checkCards = function(cards) {
+          expect(cards.length).toEqual(3);
+
+          var earlyQuitCard = cards[0];
+          expect(earlyQuitCard.getTitle()).toEqual(
+            that.PlaythroughIssuesService.renderIssueStatement(
+              earlyQuitIssue));
+
+          var multipleIncorrectSubmissionsCard = cards[1];
+          expect(multipleIncorrectSubmissionsCard.getTitle()).toEqual(
+            that.PlaythroughIssuesService.renderIssueStatement(
+              multipleIncorrectSubmissionsIssue));
+
+          var cyclicTransitionsCard = cards[2];
+          expect(cyclicTransitionsCard.getTitle()).toEqual(
+            that.PlaythroughIssuesService.renderIssueStatement(
+              cyclicTransitionsIssue));
+        };
+
+        spyOn(this.PlaythroughIssuesService, 'getIssues').and.returnValue(
+          Promise.resolve([
+            earlyQuitIssue,
+            multipleIncorrectSubmissionsIssue,
+            cyclicTransitionsIssue,
+          ]));
+
+        this.PlaythroughImprovementCardObjectFactory.fetchCards()
+          .then(checkCards).then(done, done.fail);
+      }
+    );
   });
 
   describe('PlaythroughImprovementCard', function() {
@@ -57,19 +124,23 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           this.$httpBackend.verifyNoOutstandingRequest();
         });
 
-        it('marks the card as resolved', function() {
+        it('marks the card as resolved', function(done) {
           var card =
             this.PlaythroughImprovementCardObjectFactory.createNew(this.issue);
           var firstActionButton = card.getActionButtons()[0];
+          var checkIsResolved = function() {
+            expect(card.isResolved()).toBe(true);
+          };
+
+          this.$httpBackend.expectPOST('/resolveissuehandler/7').respond();
 
           expect(card.isResolved()).toBe(false);
           expect(firstActionButton.getName()).toEqual('Archive');
 
-          this.$httpBackend.expectPOST('/resolveissuehandler/7').respond();
-          firstActionButton.execute();
-          this.$httpBackend.flush();
+          firstActionButton.execute().then(checkIsResolved).then(
+            done, done.fail);
 
-          expect(card.isResolved()).toBe(true);
+          this.$httpBackend.flush();
         });
       });
     });
