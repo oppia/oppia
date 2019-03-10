@@ -97,6 +97,7 @@ class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
             expected_status_int=404)
         self.logout()
 
+
 class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the collection viewer controller using a sample collection."""
 
@@ -113,7 +114,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         # Login as the user who will play the collection.
         self.login(self.VIEWER_EMAIL)
 
-        # Request invalid collection from data handler
+        # Request invalid collection from data handler.
         response_dict = self.get_json(
             '%s/1' % feconf.COLLECTION_DATA_URL_PREFIX,
             expected_status_int=404)
