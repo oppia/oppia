@@ -14,17 +14,19 @@
   <md-card ng-repeat="card in getCards()"
            ng-if="!card.isResolved()"
            class="oppia-editor-card oppia-improvements-card md-default-theme">
-    <h2 translate="<[card.getTitle()]>">
-      <[card.getTitle()]>
-    </h2>
+    <div>
+      <h2 style="margin-top: 0"><[card.getTitle()]></h2>
+      <hr>
+    </div>
     <div ng-switch="card.getDirectiveType()">
       <playthrough-improvement-card ng-switch-when="playthrough"
                                     data="card.getDirectiveData()">
       </playthrough-improvement-card>
     </div>
-    <div>
+    <div class="text-right">
       <button ng-repeat="actionButton in card.getActionButtons()"
-              ng-click="actionButton.execute()">
+              ng-click="actionButton.execute()"
+              class="btn btn-default" style="margin-left: 15px">
         <[actionButton.getText()]>
       </button>
     </div>

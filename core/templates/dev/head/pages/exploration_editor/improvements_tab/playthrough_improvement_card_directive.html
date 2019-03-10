@@ -1,15 +1,15 @@
-<div class="row oppia-pt4">
-  <p class="oppia-issues-suggestion-header">To resolve this issue, the suggested approach is:</p>
+<div>
+  <strong>To resolve this issue, the suggested approach is:</strong>
   <ul class="oppia-issues-tips">
     <li ng-repeat="suggestion in data.suggestions" ng-bind-html="suggestion"></li>
   </ul>
 </div>
-<div class="row oppia-pt2">
-  <p class="oppia-issues-suggestion-header">Sample Playthroughs:</p>
+<div>
+  <strong>Sample Playthroughs:</strong>
 </div>
 <div class="text-center">
-  <div class="row">
-    <div ng-repeat="playthroughId in data.playthroughIds track by playthroughId" class="col-md-4" style="margin-left: -40px;">
+  <div>
+    <div ng-repeat="playthroughId in data.playthroughIds track by playthroughId" class="col-md-4">
       <div class="oppia-hexagon">
         <div class="oppia-issues-hexagon-text">
           <button type="button" ng-click="openPlaythroughModal(playthroughId, $index)" class="oppia-issues-playthrough-modal-btn oppia-issues-playthrough-content" style="padding-top: 20px; padding-right: 5px;">
@@ -18,5 +18,6 @@
         </div>
       </div>
     </div>
+    <div style="clear:both"></div>
   </div>
 </div>
