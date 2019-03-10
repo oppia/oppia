@@ -146,9 +146,6 @@ oppia.factory('ItemSelectionInputValidationService', [
           });
         }
         var answerChoiceToIndex = {};
-        seenChoices.forEach(function(seenChoice, choiceIndex) {
-          answerChoiceToIndex[seenChoice] = choiceIndex;
-        });
 
         answerGroups.forEach(function(answerGroup, answerIndex) {
           var rules = answerGroup.rules;
