@@ -46,12 +46,15 @@ FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
 
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('extensions', ''),
+    'dev_dir_for_js': os.path.join('compiled_js', 'extensions', ''),
     'staging_dir': os.path.join('backend_prod_files', 'extensions', ''),
     'out_dir': os.path.join('build', 'extensions', '')
 }
 TEMPLATES_DEV_DIR = os.path.join('templates', 'dev', 'head', '')
 TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('core', 'templates', 'dev', 'head', ''),
+    'dev_dir_for_js': os.path.join(
+        'compiled_js', 'core', 'templates', 'dev', 'head', ''),
     'staging_dir': os.path.join('backend_prod_files', 'templates', 'head', ''),
     'out_dir': os.path.join('build', 'templates', 'head', '')
 }
@@ -270,7 +273,13 @@ def _compare_file_count(first_dir_path, second_dir_path):
         ValueError: The source directory does not have the same file count as
             the target directory.
     """
-    first_dir_file_count = get_file_count(first_dir_path)
+
+    first_dir_file_count = 0;
+    if isinstance(first_dir_path, list):
+        for dir_path in first_dir_path:
+            first_dir_file_count += get_file_count(dir_path)
+    else:
+        first_dir_file_count = get_file_count(first_dir_path)
     second_dir_file_count = get_file_count(second_dir_path)
     if first_dir_file_count != second_dir_file_count:
         print 'Comparing %s vs %s' % (first_dir_path, second_dir_path)
@@ -712,7 +721,7 @@ def minify_func(source_path, target_path, file_hashes, filename):
     elif filename.endswith('.css') or filename.endswith('.js'):
         print 'Minifying %s' % source_path
         _minify(source_path, target_path)
-    else:
+    elif not filename.endswith('.ts'):
         print 'Copying %s' % source_path
         safe_copy_file(source_path, target_path)
 
@@ -892,6 +901,8 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         dirnames_dict: dict(str, str). This dict should contain three keys,
             with corresponding values as follows:
             - 'dev_dir': the directory that contains source files to be built.
+            - 'dev_dir_for_js': the directory that contains source js files
+                to be built.
             - 'staging_dir': the directory that contains minified files waiting
                 for final copy process.
             - 'out_dir': the final directory that contains built files with hash
@@ -904,6 +915,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             to be processed.
     """
     source_dir = dirnames_dict['dev_dir']
+    source_dir_for_js = dirnames_dict['dev_dir_for_js']
     staging_dir = dirnames_dict['staging_dir']
     out_dir = dirnames_dict['out_dir']
     build_tasks = collections.deque()
@@ -913,6 +925,8 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         ensure_directory_exists(staging_dir)
         build_tasks += generate_build_tasks_to_build_all_files_in_directory(
             source_dir, staging_dir, file_hashes)
+        build_tasks += generate_build_tasks_to_build_all_files_in_directory(
+            source_dir_for_js, staging_dir, file_hashes)
     else:
         # If staging dir exists, rebuild all HTML and Python files.
         file_extensions_to_always_rebuild = ('.html', '.py',)
@@ -926,20 +940,34 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             source_dir, staging_dir, filenames_to_always_rebuild, file_hashes)
 
         dev_dir_hashes = get_file_hashes(source_dir)
+        dev_dir_for_js_hashes = get_file_hashes(source_dir_for_js)
         # Clean up files in staging directory that cannot be found in file
         # hashes dictionary.
         _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
             dev_dir_hashes, staging_dir))
+        _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
+            dev_dir_for_js_hashes, staging_dir))
 
         print 'Getting files that have changed between %s and %s' % (
             source_dir, out_dir)
         recently_changed_filenames = get_recently_changed_filenames(
             dev_dir_hashes, out_dir)
-        if recently_changed_filenames:
-            print 'Re-building recently changed files at %s' % source_dir
-            build_tasks += generate_build_tasks_to_build_files_from_filepaths(
-                source_dir, staging_dir, recently_changed_filenames,
-                file_hashes)
+        print 'Getting files that have changed between %s and %s' % (
+            source_dir_for_js, out_dir)
+        recently_changed_filenames_for_js = get_recently_changed_filenames(
+            dev_dir_for_js_hashes, out_dir)
+        if recently_changed_filenames or recently_changed_filenames_for_js:
+
+            if recently_changed_filenames:
+                print 'Re-building recently changed files at %s' % source_dir
+                build_tasks += generate_build_tasks_to_build_files_from_filepaths(
+                    source_dir, staging_dir, recently_changed_filenames,
+                    file_hashes)
+            if recently_changed_filenames_for_js:
+                print 'Re-building recently changed files at %s' % source_dir_for_js
+                build_tasks += generate_build_tasks_to_build_files_from_filepaths(
+                    source_dir_for_js, staging_dir, recently_changed_filenames_for_js,
+                    file_hashes)
         else:
             print 'No changes detected. Using previously built files.'
 
@@ -1052,7 +1080,9 @@ def generate_build_directory():
     # Create hashes for all directories and files.
     HASH_DIRS = [
         ASSETS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
+        EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir_for_js'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir_for_js'],
         THIRD_PARTY_GENERATED_DEV_DIR]
     for HASH_DIR in HASH_DIRS:
         hashes.update(get_file_hashes(HASH_DIR))
@@ -1092,8 +1122,13 @@ def generate_build_directory():
     _execute_tasks(copy_tasks)
 
     SOURCE_DIRS = [
-        ASSETS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
+        ASSETS_DEV_DIR, [
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir_for_js']
+        ], [
+            TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
+            TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir_for_js']
+        ],
         THIRD_PARTY_GENERATED_DEV_DIR]
     _verify_build(SOURCE_DIRS, COPY_OUTPUT_DIRS, hashes)
     # Clean up un-hashed hashes.js.
@@ -1102,6 +1137,8 @@ def generate_build_directory():
 
 
 def compile_typescript_files():
+    print 'Compiling typescript...'
+
     cmd = '../node_modules/typescript/bin/tsc'
     subprocess.call(cmd)
 
