@@ -941,12 +941,14 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
 
         dev_dir_hashes = get_file_hashes(source_dir)
         dev_dir_for_js_hashes = get_file_hashes(source_dir_for_js)
+
         # Clean up files in staging directory that cannot be found in file
         # hashes dictionary.
+        dev_dir_hashes_for_all_files = {}
+        dev_dir_hashes_for_all_files.update(dev_dir_hashes)
+        dev_dir_hashes_for_all_files.update(dev_dir_for_js_hashes)
         _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
-            dev_dir_hashes, staging_dir))
-        _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
-            dev_dir_for_js_hashes, staging_dir))
+            dev_dir_hashes_for_all_files, staging_dir))
 
         print 'Getting files that have changed between %s and %s' % (
             source_dir, out_dir)
