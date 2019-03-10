@@ -330,32 +330,32 @@ class FileCache(object):
     _CACHE_LOCK_DICT_LOCK = threading.Lock()
 
     @classmethod
-    def read(cls, filename, mode='r'):
+    def read(cls, filepath, mode='r'):
         """Returns the data read from the file.
 
         Args:
-            filename: str. The file name from which data is to be read.
+            filepath: str. The file path from which data is to be read.
             mode: str. The mode in which the file is to be opened.
 
         Returns:
             str. The data read from the file.
         """
-        return cls._get_data(filename, mode)[0]
+        return cls._get_data(filepath, mode)[0]
 
     @classmethod
-    def readlines(cls, filename, mode='r'):
+    def readlines(cls, filepath, mode='r'):
         """Returns the tuple containing data line by line as read from the
         file.
 
         Args:
-            filename: str. The file name from which data is to be read.
+            filepath: str. The file path from which data is to be read.
             mode: str. The mode in which the file is to be opened.
 
         Returns:
             tuple(str). The tuple containing data line by line as read from the
                 file.
         """
-        return cls._get_data(filename, mode)[1]
+        return cls._get_data(filepath, mode)[1]
 
     @classmethod
     def _get_cache_lock(cls, key):
@@ -375,12 +375,12 @@ class FileCache(object):
         return cls._CACHE_LOCK_DICT[key]
 
     @classmethod
-    def _get_data(cls, filename, mode):
+    def _get_data(cls, filepath, mode):
         """Returns the collected data from the file corresponding to the given
-        filename.
+        filepath.
 
         Args:
-            filename: str. The file name from which data is to be read.
+            filepath: str. The file path from which data is to be read.
             mode: str. The mode in which the file is to be opened.
 
         Returns:
@@ -388,37 +388,37 @@ class FileCache(object):
                 as first element and tuple containing the text line by line as
                 second element.
         """
-        key = (filename, mode)
+        key = (filepath, mode)
         if key not in cls._CACHE_DATA_DICT:
             with cls._get_cache_lock(key):
                 if key not in cls._CACHE_DATA_DICT:
-                    with open(filename, mode) as f:
+                    with open(filepath, mode) as f:
                         lines = f.readlines()
                     cls._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return cls._CACHE_DATA_DICT[key]
 
 
-def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
+def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
     """Checks if file is excluded from the bad patterns check.
 
     Args:
         pattern: str. The pattern to be checked against.
-        filename: str. Name of the file.
+        filepath: str. Path of the file.
 
     Returns:
         bool: Whether to exclude the given file from this
         particular pattern check.
     """
-    return (any(filename.startswith(bad_pattern)
+    return (any(filepath.startswith(bad_pattern)
                 for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
-            or filename in BAD_PATTERNS[pattern]['excluded_files'])
+            or filepath in BAD_PATTERNS[pattern]['excluded_files'])
 
 
-def _get_changed_filenames():
+def _get_changed_filepaths():
     """Returns a list of modified files (both staged and unstaged)
 
     Returns:
-        a list of filenames of modified files.
+        a list of filepaths of modified files.
     """
     unstaged_files = subprocess.check_output([
         'git', 'diff', '--name-only',
@@ -444,11 +444,11 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     files_in_directory = []
     for _dir, _, files in os.walk(dir_path):
         for file_name in files:
-            filename = os.path.relpath(
+            filepath = os.path.relpath(
                 os.path.join(_dir, file_name), os.getcwd())
-            if not any([fnmatch.fnmatch(filename, gp) for gp in
+            if not any([fnmatch.fnmatch(filepath, gp) for gp in
                         excluded_glob_patterns]):
-                files_in_directory.append(filename)
+                files_in_directory.append(filepath)
     return files_in_directory
 
 
@@ -470,17 +470,18 @@ def _redirect_stdout(new_target):
         sys.stdout = old_target
 
 
-def _get_all_filenames(input_path, input_filenames):
-    """This function is used to return the filenames which needs to be linted and
-    checked.
+def _get_all_filepaths(input_path, input_filenames):
+    """This function is used to return the filepaths which needs to be linted
+    and checked.
 
     Args:
         input_path: str. The path of the directory to be linted and checked.
-        input_filenames: list(str). The list of filenames to be linted and checked,
-            ignored if input_path is specified.
+        input_filenames: list(str). The list of filenames to be linted and
+            checked, ignored if input_path is specified.
 
     Returns:
-        all_filenames: list(str). The list of filenames to be linted and checked.
+        all_filepaths: list(str). The list of filepaths to be linted and
+            checked.
     """
     eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     if input_path:
@@ -490,10 +491,10 @@ def _get_all_filenames(input_path, input_filenames):
             print '----------------------------------------'
             sys.exit(1)
         if os.path.isfile(input_path):
-            all_filenames = [input_path]
+            all_filepaths = [input_path]
         else:
             excluded_glob_patterns = FileCache.readlines(eslintignore_path)
-            all_filenames = _get_all_files_in_directory(
+            all_filepaths = _get_all_files_in_directory(
                 input_path, excluded_glob_patterns)
     elif input_filenames:
         valid_filepaths = []
@@ -507,20 +508,20 @@ def _get_all_filenames(input_path, input_filenames):
             print ('The following file(s) do not exist: %s\n'
                    'Exiting.' % invalid_filepaths)
             sys.exit(1)
-        all_filenames = valid_filepaths
+        all_filepaths = valid_filepaths
     else:
-        all_filenames = _get_changed_filenames()
-    all_filenames = [
-        filename for filename in all_filenames if not
+        all_filepaths = _get_changed_filepaths()
+    all_filepaths = [
+        filename for filename in all_filepaths if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
-    return all_filenames
+    return all_filepaths
 
 
-def _check_bad_pattern_in_file(filename, file_content, pattern):
+def _check_bad_pattern_in_file(filepath, file_content, pattern):
     """Detects whether the given pattern is present in the file.
 
     Args:
-        filename: str. Name of the file.
+        filepath: str. Path of the file.
         file_content: str. Contents of the file.
         pattern: dict. (regexp(regex pattern) : pattern to match,
             message(str) : message to show if pattern matches,
@@ -533,16 +534,16 @@ def _check_bad_pattern_in_file(filename, file_content, pattern):
         bool. True if there is bad pattern else false.
     """
     regexp = pattern['regexp']
-    if not (any(filename.startswith(excluded_dir)
+    if not (any(filepath.startswith(excluded_dir)
                 for excluded_dir in pattern['excluded_dirs'])
-            or filename in pattern['excluded_files']):
+            or filepath in pattern['excluded_files']):
         bad_pattern_count = 0
         for line_num, line in enumerate(file_content.split('\n'), 1):
             if line.endswith('disable-bad-pattern-check'):
                 continue
             if re.search(regexp, line):
                 print '%s --> Line %s: %s' % (
-                    filename, line_num, pattern['message'])
+                    filepath, line_num, pattern['message'])
                 print ''
                 bad_pattern_count += 1
         if bad_pattern_count:
@@ -558,13 +559,13 @@ class TagMismatchException(Exception):
 class CustomHTMLParser(HTMLParser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
-    def __init__(self, filename, file_lines, debug, failed=False):
+    def __init__(self, filepath, file_lines, debug, failed=False):
         """Define various variables to parse HTML."""
         HTMLParser.HTMLParser.__init__(self)
         self.tag_stack = []
         self.debug = debug
         self.failed = failed
-        self.filename = filename
+        self.filepath = filepath
         self.file_lines = file_lines
         self.indentation_level = 0
         self.indentation_width = 2
@@ -586,7 +587,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                 '%s --> Expected indentation '
                 'of %s, found indentation of %s '
                 'for %s tag on line %s ' % (
-                    self.filename, expected_indentation,
+                    self.filepath, expected_indentation,
                     column_number, tag, line_number))
             print ''
             self.failed = True
@@ -625,7 +626,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                         '%s --> The value %s of attribute '
                         '%s for the tag %s on line %s should '
                         'be enclosed within double quotes.' % (
-                            self.filename, value, attr,
+                            self.filepath, value, attr,
                             tag, line_number))
                     print ''
 
@@ -647,7 +648,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                     '%s --> Attribute for tag %s on line '
                     '%s should align with the leftmost '
                     'attribute on line %s ' % (
-                        self.filename, tag,
+                        self.filepath, tag,
                         line_num_of_error, line_number))
                 print ''
                 self.failed = True
@@ -663,11 +664,11 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                 self.tag_stack.pop())
         except IndexError:
             raise TagMismatchException('Error in line %s of file %s\n' % (
-                line_number, self.filename))
+                line_number, self.filepath))
 
         if last_starttag != tag:
             raise TagMismatchException('Error in line %s of file %s\n' % (
-                line_number, self.filename))
+                line_number, self.filepath))
 
         if leading_spaces_count != last_starttag_col_num and (
                 last_starttag_line_num != line_number):
@@ -675,7 +676,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                 '%s --> Indentation for end tag %s on line '
                 '%s does not match the indentation of the '
                 'start tag %s on line %s ' % (
-                    self.filename, tag, line_number,
+                    self.filepath, tag, line_number,
                     last_starttag, last_starttag_line_num))
             print ''
             self.failed = True
@@ -728,10 +729,10 @@ def _lint_css_files(
     result_list = []
     if not verbose_mode_enabled:
         print 'Linting CSS files.'
-    for _, filename in enumerate(files_to_lint):
+    for _, filepath in enumerate(files_to_lint):
         if verbose_mode_enabled:
-            print 'Linting: ', filename
-        proc_args = stylelint_cmd_args + [filename]
+            print 'Linting: ', filepath
+        proc_args = stylelint_cmd_args + [filepath]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -785,10 +786,10 @@ def _lint_js_files(
     eslint_cmd_args = [node_path, eslint_path, '--quiet']
     result_list = []
     print 'Linting JS files.'
-    for _, filename in enumerate(files_to_lint):
+    for _, filepath in enumerate(files_to_lint):
         if verbose_mode_enabled:
-            print 'Linting: ', filename
-        proc_args = eslint_cmd_args + [filename]
+            print 'Linting: ', filepath
+        proc_args = eslint_cmd_args + [filepath]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -883,20 +884,20 @@ class LintChecksManager(object):
     """Manages all the linting functions.
 
     Attributes:
-        all_filenames: list(str). The list of filenames to be linted.
+        all_filepaths: list(str). The list of filepaths to be linted.
         parsed_js_files: dict. Contains the content of JS files, after
             validating and parsing the files.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
 
-    def __init__(self, all_filenames, verbose_mode_enabled=False):
+    def __init__(self, all_filepaths, verbose_mode_enabled=False):
         """Constructs a LintChecksManager object.
 
         Args:
-            all_filenames: list(str). The list of filenames to be linted.
+            all_filepaths: list(str). The list of filepaths to be linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
-        self.all_filenames = all_filenames
+        self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
         self.parsed_js_files = self._validate_and_parse_js_files()
 
@@ -907,21 +908,22 @@ class LintChecksManager(object):
 
         # Select JS files which need to be checked.
         files_to_check = [
-            filename for filename in self.all_filenames if filename.endswith('.js')
-            and not any(fnmatch.fnmatch(filename, pattern) for pattern in
+            filepath for filepath in self.all_filepaths if (
+                filepath.endswith('.js'))
+            and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                         EXCLUDED_PATHS)]
         parsed_js_files = dict()
         if not files_to_check:
             return parsed_js_files
         if not self.verbose_mode_enabled:
             print 'Validating and parsing JS files ...'
-        for filename in files_to_check:
+        for filepath in files_to_check:
             if self.verbose_mode_enabled:
-                print 'Validating and parsing %s file ...' % filename
-            file_content = FileCache.read(filename).decode('utf-8')
+                print 'Validating and parsing %s file ...' % filepath
+            file_content = FileCache.read(filepath).decode('utf-8')
 
             # Use esprima to parse a JS file.
-            parsed_js_files[filename] = esprima.parseScript(file_content)
+            parsed_js_files[filepath] = esprima.parseScript(file_content)
         return parsed_js_files
 
     def _lint_all_files(self):
@@ -958,14 +960,16 @@ class LintChecksManager(object):
             sys.exit(1)
 
         js_files_to_lint = [
-            filename for filename in self.all_filenames if filename.endswith('.js')]
+            filepath for filepath in self.all_filepaths if filepath.endswith(
+                '.js')]
         py_files_to_lint = [
-            filename for filename in self.all_filenames if filename.endswith('.py')]
+            filepath for filepath in self.all_filepaths if filepath.endswith(
+                '.py')]
         html_files_to_lint_for_css = [
-            filename for filename in self.all_filenames if filename.endswith(
+            filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.html')]
         css_files_to_lint = [
-            filename for filename in self.all_filenames if filename.endswith(
+            filepath for filepath in self.all_filepaths if filepath.endswith(
                 'oppia.css')]
 
         css_in_html_result = multiprocessing.Queue()
@@ -1065,14 +1069,15 @@ class LintChecksManager(object):
             print '----------------------------------------'
         # Select JS files which need to be checked.
         files_to_check = [
-            filename for filename in self.all_filenames if filename.endswith('.js')
-            and not any(fnmatch.fnmatch(filename, pattern) for pattern in
+            filepath for filepath in self.all_filepaths if (
+                filepath.endswith('.js'))
+            and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                         EXCLUDED_PATHS)]
         failed = False
         summary_messages = []
 
-        for filename in files_to_check:
-            parsed_script = self.parsed_js_files[filename]
+        for filepath in files_to_check:
+            parsed_script = self.parsed_js_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
                 parsed_nodes = parsed_script.body
@@ -1161,7 +1166,7 @@ class LintChecksManager(object):
                                                 'directive in %s file '
                                                 'does not have scope set to '
                                                 'true.' %
-                                                (directive_name, filename))
+                                                (directive_name, filepath))
                                             print ''
                                         elif scope_value.type != (
                                                 'ObjectExpression'):
@@ -1173,7 +1178,7 @@ class LintChecksManager(object):
                                                 'Please ensure that %s '
                                                 'directive in %s file '
                                                 'has a scope: {}.' % (
-                                                    directive_name, filename))
+                                                    directive_name, filepath))
                                             print ''
 
         with _redirect_stdout(_TARGET_STDOUT):
@@ -1203,15 +1208,16 @@ class LintChecksManager(object):
             print '----------------------------------------'
 
         files_to_check = [
-            filename for filename in self.all_filenames if filename.endswith('.js')
-            and not any(fnmatch.fnmatch(filename, pattern) for pattern in
+            filepath for filepath in self.all_filepaths if (
+                filepath.endswith('.js'))
+            and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                         EXCLUDED_PATHS)]
         properties_to_check = ['controller', 'directive', 'factory']
         failed = False
         summary_messages = []
 
-        for filename in files_to_check:
-            parsed_script = self.parsed_js_files[filename]
+        for filepath in files_to_check:
+            parsed_script = self.parsed_js_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 parsed_nodes = parsed_script.body
                 for parsed_node in parsed_nodes:
@@ -1265,7 +1271,7 @@ class LintChecksManager(object):
                                 'following manner: dollar imports, regular '
                                 'imports and constant imports, all in sorted '
                                 'order.'
-                                % (property_value, filename))
+                                % (property_value, filepath))
                         if sorted_imports != literal_args:
                             failed = True
                             print (
@@ -1274,7 +1280,7 @@ class LintChecksManager(object):
                                 'following manner: dollar imports, regular '
                                 'imports and constant imports, all in sorted '
                                 'order.'
-                                % (property_value, filename))
+                                % (property_value, filepath))
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
@@ -1303,9 +1309,9 @@ class LintChecksManager(object):
             print 'Starting controller dependency line break check'
             print '----------------------------------------'
         files_to_check = [
-            filename for filename in self.all_filenames if not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in
-                EXCLUDED_PATHS) and filename.endswith('.js')]
+            filepath for filepath in self.all_filepaths if not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                EXCLUDED_PATHS) and filepath.endswith('.js')]
         failed = False
         summary_messages = []
 
@@ -1314,8 +1320,8 @@ class LintChecksManager(object):
             r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
             r'function\((?P<function_parameters>[\S\s]*?)\)')
         with _redirect_stdout(_TARGET_STDOUT):
-            for filename in files_to_check:
-                file_content = FileCache.read(filename)
+            for filepath in files_to_check:
+                file_content = FileCache.read(filepath)
                 matched_patterns = re.findall(pattern_to_match, file_content)
                 for matched_pattern in matched_patterns:
                     stringfied_dependencies, function_parameters = (
@@ -1334,7 +1340,7 @@ class LintChecksManager(object):
                             'as function parameters: \n(%s)\nfor the '
                             'corresponding controller should '
                             'exactly match.' % (
-                                filename, stringfied_dependencies,
+                                filepath, stringfied_dependencies,
                                 function_parameters))
                         print ''
 
@@ -1365,9 +1371,9 @@ class LintChecksManager(object):
         total_files_checked = 0
         total_error_count = 0
         files_to_check = [
-            filename for filename in self.all_filenames if not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in
-                EXCLUDED_PATHS) and filename.endswith('.js')]
+            filepath for filepath in self.all_filepaths if not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                EXCLUDED_PATHS) and filepath.endswith('.js')]
         failed = False
         summary_messages = []
         # For RegExp explanation, please see https://regex101.com/r/gU7oT6/37.
@@ -1375,20 +1381,20 @@ class LintChecksManager(object):
             r'templateUrl: UrlInterpolationService\.[A-z\(]+' +
             r'(?P<directive_name>[^\)]+)')
         with _redirect_stdout(_TARGET_STDOUT):
-            for filename in files_to_check:
-                file_content = FileCache.read(filename)
+            for filepath in files_to_check:
+                file_content = FileCache.read(filepath)
                 total_files_checked += 1
                 matched_patterns = re.findall(pattern_to_match, file_content)
                 for matched_pattern in matched_patterns:
                     matched_pattern = matched_pattern.split()
-                    directive_filename = ''.join(matched_pattern).replace(
+                    directive_filepath = ''.join(matched_pattern).replace(
                         '\'', '').replace('+', '')
-                    if not directive_filename.endswith('_directive.html'):
+                    if not directive_filepath.endswith('_directive.html'):
                         failed = True
                         total_error_count += 1
                         print (
                             '%s --> Please ensure that this file ends'
-                            'with _directive.html.' % directive_filename)
+                            'with _directive.html.' % directive_filepath)
                         print ''
 
             if failed:
@@ -1420,18 +1426,18 @@ class LintChecksManager(object):
             print '----------------------------------------'
         summary_messages = []
         files_to_check = [
-            filename for filename in self.all_filenames if not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in
-                EXCLUDED_PATHS) and filename.endswith('.py')]
+            filepath for filepath in self.all_filepaths if not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                EXCLUDED_PATHS) and filepath.endswith('.py')]
         failed = False
         with _redirect_stdout(_TARGET_STDOUT):
-            for filename in files_to_check:
+            for filepath in files_to_check:
                 # This line prints the error message along with file path
                 # and returns True if it finds an error else returns False
                 # If check is set to True, isort simply checks the file and
                 # if check is set to False, it autocorrects import-order errors.
                 if (isort.SortImports(
-                        filename, check=True, show_diff=(
+                        filepath, check=True, show_diff=(
                             True)).incorrectly_sorted):
                     failed = True
                     print ''
@@ -1463,9 +1469,9 @@ class LintChecksManager(object):
             print '----------------------------------------'
         summary_messages = []
         files_to_check = [
-            filename for filename in self.all_filenames if not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in
-                EXCLUDED_PATHS) and filename.endswith('.py')]
+            filepath for filepath in self.all_filepaths if not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                EXCLUDED_PATHS) and filepath.endswith('.py')]
         missing_period_message = (
             'There should be a period at the end of the docstring.')
         multiline_docstring_message = (
@@ -1483,8 +1489,8 @@ class LintChecksManager(object):
         is_docstring = False
         is_class_or_function = False
         with _redirect_stdout(_TARGET_STDOUT):
-            for filename in files_to_check:
-                file_content = FileCache.readlines(filename)
+            for filepath in files_to_check:
+                file_content = FileCache.readlines(filepath)
                 file_length = len(file_content)
                 for line_num in range(file_length):
                     line = file_content[line_num].strip()
@@ -1508,7 +1514,7 @@ class LintChecksManager(object):
                             line[3] == ' '):
                         failed = True
                         print '%s --> Line %s: %s' % (
-                            filename, line_num + 1,
+                            filepath, line_num + 1,
                             space_after_triple_quotes_in_docstring_message)
                         print ''
                         is_docstring = False
@@ -1518,7 +1524,7 @@ class LintChecksManager(object):
                             is_docstring):
                         failed = True
                         print '%s --> Line %s: %s' % (
-                            filename, line_num, single_line_docstring_message)
+                            filepath, line_num, single_line_docstring_message)
                         print ''
                         is_docstring = False
 
@@ -1531,7 +1537,7 @@ class LintChecksManager(object):
                                 ALLOWED_TERMINATING_PUNCTUATIONS):
                             failed = True
                             print '%s --> Line %s: %s' % (
-                                filename, line_num + 1, missing_period_message)
+                                filepath, line_num + 1, missing_period_message)
                             print ''
                         is_docstring = False
 
@@ -1544,7 +1550,7 @@ class LintChecksManager(object):
                             if prev_line == '':
                                 failed = True
                                 print '%s --> Line %s: %s' % (
-                                    filename, line_num, previous_line_message)
+                                    filepath, line_num, previous_line_message)
                                 print ''
                             # Check for punctuation at end of docstring.
                             else:
@@ -1558,7 +1564,7 @@ class LintChecksManager(object):
                                         no_word_is_present_in_excluded_phrases):
                                     failed = True
                                     print '%s --> Line %s: %s' % (
-                                        filename, line_num,
+                                        filepath, line_num,
                                         missing_period_message)
                                     print ''
 
@@ -1567,15 +1573,15 @@ class LintChecksManager(object):
                         elif not any(word in line for word in EXCLUDED_PHRASES):
                             failed = True
                             print '%s --> Line %s: %s' % (
-                                filename, line_num + 1,
+                                filepath, line_num + 1,
                                 multiline_docstring_message)
                             print ''
 
                         is_docstring = False
 
             docstring_checker = docstrings_checker.ASTDocStringChecker()
-            for filename in files_to_check:
-                ast_file = ast.walk(ast.parse(FileCache.read(filename)))
+            for filepath in files_to_check:
+                ast_file = ast.walk(ast.parse(FileCache.read(filepath)))
                 func_defs = [n for n in ast_file if isinstance(
                     n, ast.FunctionDef)]
                 for func in func_defs:
@@ -1585,7 +1591,7 @@ class LintChecksManager(object):
                         func)
                     for error_line in func_result:
                         print '%s --> Func %s: %s' % (
-                            filename, func.name, error_line)
+                            filepath, func.name, error_line)
                         print ''
                         failed = True
 
@@ -1610,16 +1616,16 @@ class LintChecksManager(object):
             print '----------------------------------------'
         summary_messages = []
         files_to_check = [
-            filename for filename in self.all_filenames if not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in
-                EXCLUDED_PATHS) and filename.endswith('.py')]
+            filepath for filepath in self.all_filepaths if not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                EXCLUDED_PATHS) and filepath.endswith('.py')]
         message = 'There should be a period at the end of the comment.'
         failed = False
         space_regex = re.compile(r'^#[^\s].*$')
         capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
         with _redirect_stdout(_TARGET_STDOUT):
-            for filename in files_to_check:
-                file_content = FileCache.readlines(filename)
+            for filepath in files_to_check:
+                file_content = FileCache.readlines(filepath)
                 file_length = len(file_content)
                 for line_num in range(file_length):
                     line = file_content[line_num].strip()
@@ -1641,7 +1647,7 @@ class LintChecksManager(object):
                                 no_word_is_present_in_excluded_phrases):
                             failed = True
                             print '%s --> Line %s: %s' % (
-                                filename, line_num + 1, message)
+                                filepath, line_num + 1, message)
                             print ''
 
                     # Check that comment starts with a space and is not a
@@ -1653,7 +1659,7 @@ class LintChecksManager(object):
                             'of the comment.')
                         failed = True
                         print '%s --> Line %s: %s' % (
-                            filename, line_num + 1, message)
+                            filepath, line_num + 1, message)
                         print ''
 
                     # Check that comment starts with a capital letter.
@@ -1664,7 +1670,7 @@ class LintChecksManager(object):
                             ' to begin the content of the comment.')
                         failed = True
                         print '%s --> Line %s: %s' % (
-                            filename, line_num + 1, message)
+                            filepath, line_num + 1, message)
                         print ''
 
             print ''
@@ -1689,21 +1695,21 @@ class LintChecksManager(object):
             print '----------------------------------------'
 
         html_files_to_lint = [
-            filename for filename in self.all_filenames if filename.endswith(
+            filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.html')]
 
         failed = False
         summary_messages = []
 
         with _redirect_stdout(_TARGET_STDOUT):
-            for filename in html_files_to_lint:
-                file_content = FileCache.read(filename)
-                file_lines = FileCache.readlines(filename)
-                parser = CustomHTMLParser(filename, file_lines, debug)
+            for filepath in html_files_to_lint:
+                file_content = FileCache.read(filepath)
+                file_lines = FileCache.readlines(filepath)
+                parser = CustomHTMLParser(filepath, file_lines, debug)
                 parser.feed(file_content)
 
                 if len(parser.tag_stack) != 0:
-                    raise TagMismatchException('Error in file %s\n' % filename)
+                    raise TagMismatchException('Error in file %s\n' % filepath)
 
                 if parser.failed:
                     failed = True
@@ -1737,7 +1743,7 @@ class LintChecksManager(object):
         summary_messages = []
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
         html_files_to_lint = [
-            filename for filename in self.all_filenames if filename.endswith(
+            filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.html')]
         if self.verbose_mode_enabled:
             print 'Starting HTML linter...'
@@ -1745,10 +1751,10 @@ class LintChecksManager(object):
         print ''
         if not self.verbose_mode_enabled:
             print 'Linting HTML files.'
-        for filename in html_files_to_lint:
-            proc_args = htmllint_cmd_args + [filename]
+        for filepath in html_files_to_lint:
+            proc_args = htmllint_cmd_args + [filepath]
             if self.verbose_mode_enabled:
-                print 'Linting %s file' % filename
+                print 'Linting %s file' % filepath
             with _redirect_stdout(_TARGET_STDOUT):
                 proc = subprocess.Popen(
                     proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -1795,55 +1801,55 @@ class LintChecksManager(object):
         total_files_checked = 0
         total_error_count = 0
         summary_messages = []
-        all_filenames = [
-            filename for filename in self.all_filenames if not (
-                filename.endswith('pre_commit_linter.py') or
+        all_filepaths = [
+            filepath for filepath in self.all_filepaths if not (
+                filepath.endswith('pre_commit_linter.py') or
                 any(
-                    fnmatch.fnmatch(filename, pattern)
+                    fnmatch.fnmatch(filepath, pattern)
                     for pattern in EXCLUDED_PATHS)
                 )]
         failed = False
         with _redirect_stdout(_TARGET_STDOUT):
-            for filename in all_filenames:
-                file_content = FileCache.read(filename)
+            for filepath in all_filepaths:
+                file_content = FileCache.read(filepath)
                 total_files_checked += 1
                 for pattern in BAD_PATTERNS:
                     if (pattern in file_content and
-                            not _is_filename_excluded_for_bad_patterns_check(
-                                pattern, filename)):
+                            not _is_filepath_excluded_for_bad_patterns_check(
+                                pattern, filepath)):
                         failed = True
                         print '%s --> %s' % (
-                            filename, BAD_PATTERNS[pattern]['message'])
+                            filepath, BAD_PATTERNS[pattern]['message'])
                         print ''
                         total_error_count += 1
 
-                if filename.endswith('.js'):
+                if filepath.endswith('.js'):
                     for regexp in BAD_PATTERNS_JS_REGEXP:
                         if _check_bad_pattern_in_file(
-                                filename, file_content, regexp):
+                                filepath, file_content, regexp):
                             failed = True
                             total_error_count += 1
 
-                if filename.endswith('.html'):
+                if filepath.endswith('.html'):
                     for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
                         if _check_bad_pattern_in_file(
-                                filename, file_content, regexp):
+                                filepath, file_content, regexp):
                             failed = True
                             total_error_count += 1
 
-                if filename.endswith('.py'):
+                if filepath.endswith('.py'):
                     for regexp in BAD_PATTERNS_PYTHON_REGEXP:
                         if _check_bad_pattern_in_file(
-                                filename, file_content, regexp):
+                                filepath, file_content, regexp):
                             failed = True
                             total_error_count += 1
 
-                if filename == 'constants.js':
+                if filepath == 'constants.js':
                     for pattern in REQUIRED_STRINGS_CONSTANTS:
                         if pattern not in file_content:
                             failed = True
                             print '%s --> %s' % (
-                                filename,
+                                filepath,
                                 REQUIRED_STRINGS_CONSTANTS[pattern]['message'])
                             print ''
                             total_error_count += 1
@@ -1874,14 +1880,15 @@ class LintChecksManager(object):
             print 'Starting copyright notice check'
             print '----------------------------------------'
         js_files_to_check = [
-            filename for filename in self.all_filenames if filename.endswith(
-                '.js') and (not filename.endswith(GENERATED_FILE_PATHS)) and (
-                    not filename.endswith(CONFIG_FILE_PATHS))]
+            filepath for filepath in self.all_filepaths if filepath.endswith(
+                '.js') and (not filepath.endswith(GENERATED_FILE_PATHS)) and (
+                    not filepath.endswith(CONFIG_FILE_PATHS))]
         py_files_to_check = [
-            filename for filename in self.all_filenames if filename.endswith(
-                '.py') and (not filename.endswith('__init__.py'))]
+            filepath for filepath in self.all_filepaths if filepath.endswith(
+                '.py') and (not filepath.endswith('__init__.py'))]
         sh_files_to_check = [
-            filename for filename in self.all_filenames if filename.endswith('.sh')]
+            filepath for filepath in self.all_filepaths if filepath.endswith(
+                '.sh')]
         all_files_to_check = (
             js_files_to_check + py_files_to_check + sh_files_to_check)
         regexp_to_check = (
@@ -1891,9 +1898,9 @@ class LintChecksManager(object):
         summary_messages = []
 
         with _redirect_stdout(_TARGET_STDOUT):
-            for filename in all_files_to_check:
+            for filepath in all_files_to_check:
                 has_copyright_notice = False
-                for line in FileCache.readlines(filename)[:5]:
+                for line in FileCache.readlines(filepath)[:5]:
                     if re.search(regexp_to_check, line):
                         has_copyright_notice = True
                         break
@@ -1902,7 +1909,7 @@ class LintChecksManager(object):
                     failed = True
                     print (
                         '%s --> Please add a proper copyright notice to this '
-                        'file.' % (filename))
+                        'file.' % (filepath))
                     print ''
 
             if failed:
@@ -1975,8 +1982,9 @@ def main():
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
-    all_filenames = _get_all_filenames(parsed_args.path, parsed_args.files)
-    lint_checks_manager = LintChecksManager(all_filenames, verbose_mode_enabled)
+    all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
+    print all_filepaths
+    lint_checks_manager = LintChecksManager(all_filepaths, verbose_mode_enabled)
     all_messages = lint_checks_manager.perform_all_lint_checks()
     _print_complete_summary_of_errors()
 
