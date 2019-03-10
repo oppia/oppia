@@ -124,27 +124,6 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         this.$uibModal = $injector.get('$uibModal');
       }));
 
-      it('keeps the card after cancel', function(done) {
-        var card = this.card;
-        var issue = this.issue;
-        var discardActionButton = card.getActionButtons()[0];
-        var resolveIssueSpy =
-          spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.stub();
-
-        spyOn(this.$uibModal, 'open').and.returnValue({
-          result: Promise.reject()  // Returned when cancel button is pressed.
-        });
-
-        expect(card.isResolved()).toBe(false);
-        discardActionButton.execute().then(function() {
-          done.fail('dismiss button unexpectedly succeeded.');
-        }, function() {
-          expect(resolveIssueSpy).not.toHaveBeenCalled();
-          expect(card.isResolved()).toBe(false);
-          done();
-        });
-      });
-
       it('marks the card as resolved after confirmation', function(done) {
         var card = this.card;
         var issue = this.issue;
@@ -163,6 +142,27 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           done();
         }, function() {
           done.fail('dismiss button unexpectedly failed.');
+        });
+      });
+
+      it('keeps the card after cancel', function(done) {
+        var card = this.card;
+        var issue = this.issue;
+        var discardActionButton = card.getActionButtons()[0];
+        var resolveIssueSpy =
+          spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.stub();
+
+        spyOn(this.$uibModal, 'open').and.returnValue({
+          result: Promise.reject()  // Returned when cancel button is pressed.
+        });
+
+        expect(card.isResolved()).toBe(false);
+        discardActionButton.execute().then(function() {
+          done.fail('dismiss button unexpectedly succeeded.');
+        }, function() {
+          expect(resolveIssueSpy).not.toHaveBeenCalled();
+          expect(card.isResolved()).toBe(false);
+          done();
         });
       });
     });
