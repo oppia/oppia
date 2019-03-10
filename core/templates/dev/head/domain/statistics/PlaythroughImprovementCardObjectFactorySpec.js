@@ -132,7 +132,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.stub();
 
         spyOn(this.$uibModal, 'open').and.returnValue({
-          result: Promise.resolve()  // Returned when confirm button is pressed.
+          result: Promise.resolve(), // Returned when confirm button is pressed.
         });
 
         expect(card.isResolved()).toBe(false);
@@ -153,7 +153,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.stub();
 
         spyOn(this.$uibModal, 'open').and.returnValue({
-          result: Promise.reject()  // Returned when cancel button is pressed.
+          result: Promise.reject(), // Returned when cancel button is pressed.
         });
 
         expect(card.isResolved()).toBe(false);
