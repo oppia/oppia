@@ -93,8 +93,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
       this.PlaythroughImprovementCardObjectFactory.fetchCards()
         .then(checkCards, done.fail);
-      }
-    );
+    });
   });
 
   describe('PlaythroughImprovementCard', function() {
