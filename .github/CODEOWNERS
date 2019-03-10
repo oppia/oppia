@@ -20,6 +20,7 @@
 
 
 # Collection project.
+/core/controllers/collection*.py @kevinlee12
 /core/domain/collection*.py @kevinlee12
 /core/storage/collection/ @kevinlee12
 /core/templates/domain/collection/ @kevinlee12
@@ -28,6 +29,7 @@
 
 
 # Dashboard frontend pages.
+/core/controllers/creator_dashboard*.py @nithusha21
 /core/templates/domain/creator_dashboard/ @nithusha21
 /core/templates/domain/learner_dashboard/ @nithusha21
 /core/templates/pages/creator_dashboard/ @nithusha21
@@ -37,7 +39,6 @@
 
 
 # Dev workflow team.
-/core/tests/ @apb7
 /scripts/ @apb7
 
 
@@ -168,13 +169,19 @@
 
 
 # Restricted pages.
+<<<<<<< HEAD
 /core/templates/pages/admin/ @seanlip
 /core/templates/pages/moderator/ @seanlip
+=======
+/core/controllers/admin*.py @seanlip
+/core/templates/dev/head/pages/admin/ @seanlip
+/core/templates/dev/head/pages/moderator/ @seanlip
+>>>>>>> e647b691c04831e228f1da2bdfd9fce72b76dcb3
 /.github/CODEOWNERS @seanlip
 
 
 # QA team.
-/core/tests/ @nithusha21
+/core/tests/ @apb7 @nithusha21
 
 
 # Rich text editor team.
@@ -215,12 +222,22 @@
 
 
 # Speed Improvement team.
+<<<<<<< HEAD
 app.yaml @vojtechjelinek
 manifest.json @vojtechjelinek
 /core/templates/pages/base.html @vojtechjelinek
 /core/templates/pages/footer_js_libs.html @vojtechjelinek
 /core/templates/pages/header_css_libs.html @vojtechjelinek
 /core/templates/pages/header_js_libs.html @vojtechjelinek
+=======
+/app.yaml @vojtechjelinek
+/manifest.json @seanlip @vojtechjelinek
+/core/templates/dev/head/pages/base.html @vojtechjelinek
+/core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
+/core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
+/core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
+/scripts/install_third_party.sh @seanlip @vojtechjelinek
+>>>>>>> e647b691c04831e228f1da2bdfd9fce72b76dcb3
 
 
 # User’s profile page.

@@ -33,7 +33,7 @@ var createExploration = function() {
 
 // Creates a new exploration and wait for the exploration tutorial to start.
 var createExplorationAndStartTutorial = function() {
-  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
   creatorDashboardPage.clickCreateActivityButton();
@@ -43,7 +43,7 @@ var createExplorationAndStartTutorial = function() {
  * Only Admin users can create collections.
  */
 var createCollectionAsAdmin = function() {
-  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   creatorDashboardPage.get();
   creatorDashboardPage.clickCreateActivityButton();
   var activityCreationModal = element(
@@ -57,7 +57,7 @@ var createCollectionAsAdmin = function() {
  * Creating exploration for Admin users.
  */
 var createExplorationAsAdmin = function() {
-  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   creatorDashboardPage.get();
   creatorDashboardPage.clickCreateActivityButton();
   var activityCreationModal = element(

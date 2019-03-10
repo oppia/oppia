@@ -68,8 +68,8 @@ oppia.factory('PlayerTranscriptService', [
         if (pairs.length > 0 && card.getLastOppiaResponse() === null) {
           throw Error(
             'Trying to add an input before the response for the previous ' +
-            'input has been received.',
-            transcript);
+            'input has been received.'
+          );
         }
         if (!isHint) {
           numAnswersSubmitted += 1;

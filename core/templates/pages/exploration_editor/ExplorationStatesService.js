@@ -101,30 +101,30 @@ oppia.factory('ExplorationStatesService', [
       written_translations: ['writtenTranslations']
     };
 
-    CONTENT_ID_EXTRACTORS = {
+    var CONTENT_ID_EXTRACTORS = {
       answer_groups: function(answerGroups) {
-        contentIds = new Set();
+        var contentIds = new Set();
         answerGroups.forEach(function(answerGroup) {
           contentIds.add(answerGroup.outcome.feedback.getContentId());
         });
         return contentIds;
       },
       default_outcome: function(defaultOutcome) {
-        contentIds = new Set();
+        var contentIds = new Set();
         if (defaultOutcome) {
           contentIds.add(defaultOutcome.feedback.getContentId());
         }
         return contentIds;
       },
       hints: function(hints) {
-        contentIds = new Set();
+        var contentIds = new Set();
         hints.forEach(function(hint) {
           contentIds.add(hint.hintContent.getContentId());
         });
         return contentIds;
       },
       solution: function(solution) {
-        contentIds = new Set();
+        var contentIds = new Set();
         if (solution) {
           contentIds.add(solution.explanation.getContentId());
         }
@@ -133,7 +133,7 @@ oppia.factory('ExplorationStatesService', [
     };
 
     var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
-      diffList = Array.from(setA).filter(function(element) {
+      var diffList = Array.from(setA).filter(function(element) {
         return !setB.has(element);
       });
       return diffList;

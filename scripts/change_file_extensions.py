@@ -37,7 +37,7 @@ def change_extension(path_list, current_extension, new_extension):
 
 if __name__ == '__main__':
     change_extension(
-        ['./assets', './core', './extensions'],
+        ['./core', './extensions'],
         '.js',
         '.ts'
     )

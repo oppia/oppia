@@ -78,8 +78,8 @@ oppia.factory('DragAndDropSortInputValidationService', [
 
         var checkRedundancy = function(earlierRule, laterRule) {
           var noOfMismatches = 0;
-          inputs = earlierRule.inputs.x;
-          answer = laterRule.inputs.x;
+          var inputs = earlierRule.inputs.x;
+          var answer = laterRule.inputs.x;
           for (var i = 0; i < math.min(inputs.length, answer.length); i++) {
             for (var j = 0; j < math.max(answer[i].length, inputs[i].length);
               j++) {

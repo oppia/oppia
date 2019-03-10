@@ -132,6 +132,7 @@ describe('Editable exploration backend API service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
+      var exploration = null;
 
       // Loading a exploration the first time should fetch it from the backend.
       $httpBackend.expect('GET', '/createhandler/data/0').respond(
@@ -165,6 +166,7 @@ describe('Editable exploration backend API service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
+      var exploration = null;
 
       $httpBackend.expect('GET', '/explorehandler/init/0')
         .respond(sampleDataResults);
@@ -202,6 +204,7 @@ describe('Editable exploration backend API service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
+      var exploration = null;
 
       $httpBackend.expect('GET', '/createhandler/data/0')
         .respond(sampleDataResults);

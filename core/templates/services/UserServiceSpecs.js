@@ -17,7 +17,7 @@
  */
 
 describe('User Service', function() {
-  var UserService;
+  var UserService, $httpBackend, UrlInterpolationService;
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
