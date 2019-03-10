@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for EditableSkillBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Editable skill backend API service', function() {
   var EditableSkillBackendApiService = null;

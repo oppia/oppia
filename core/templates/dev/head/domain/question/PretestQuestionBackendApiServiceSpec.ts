@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for PretestQuestionBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Pretest question backend API service', function() {
   var PretestQuestionBackendApiService = null;

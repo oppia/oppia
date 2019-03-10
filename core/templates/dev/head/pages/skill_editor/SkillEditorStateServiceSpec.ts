@@ -16,8 +16,6 @@
 * @fileoverview Unit tests for SkillEditorStateService.js
 */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Skill editor state service', function() {
   var SkillEditorStateService, $q, $rootScope,

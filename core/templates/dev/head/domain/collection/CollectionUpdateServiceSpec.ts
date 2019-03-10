@@ -16,8 +16,6 @@
  * @fileoverview Tests for Collection update service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Collection update service', function() {
   var CollectionUpdateService = null;

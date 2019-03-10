@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Pencil Code Editor rules.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Pencil Code Editor rules service', function() {
   beforeEach(angular.mock.module('oppia'));

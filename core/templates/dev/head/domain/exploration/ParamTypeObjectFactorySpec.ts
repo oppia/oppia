@@ -16,8 +16,6 @@
  * @fileoverview Description of this file.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('ParamType objects', function() {
   var ParamType = null;

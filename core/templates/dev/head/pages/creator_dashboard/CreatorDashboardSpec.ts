@@ -17,15 +17,13 @@
  * user's explorations.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Creator dashboard controller', function() {
   describe('CreatorDashboard', function() {
     var scope, ctrl;
     var mockDashboardBackendApiService;
     var dashboardData = {
-      explorationsList: [{
+      explorations_list: [{
         category: 'Featured category',
         id: 'featured_exp_id',
         num_open_threads: 2,
@@ -40,14 +38,14 @@ describe('Creator dashboard controller', function() {
         status: 'private',
         title: 'Private exploration'
       }],
-      collectionsList: [],
-      dashboardStats: {
+      collections_list: [],
+      dashboard_stats: {
         total_plays: 2,
         average_ratings: 3,
         num_ratings: 2,
         total_open_feedback: 1
       },
-      lastWeekStats: {
+      last_week_stats: {
         total_plays: 1,
         average_ratings: 4,
         num_ratings: 1,
@@ -87,10 +85,10 @@ describe('Creator dashboard controller', function() {
     ));
 
     it('should have the correct data for creator dashboard', function() {
-      expect(scope.explorationsList).toEqual(dashboardData.explorationsList);
-      expect(scope.collectionsList).toEqual(dashboardData.collectionsList);
-      expect(scope.dashboardStats).toEqual(dashboardData.dashboardStats);
-      expect(scope.lastWeekStats).toEqual(dashboardData.lastWeekStats);
+      expect(scope.explorationsList).toEqual(dashboardData.explorations_list);
+      expect(scope.collectionsList).toEqual(dashboardData.collections_list);
+      expect(scope.dashboardStats).toEqual(dashboardData.dashboard_stats);
+      expect(scope.lastWeekStats).toEqual(dashboardData.last_week_stats);
     });
   });
 });

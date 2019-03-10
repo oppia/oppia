@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('User info factory', function() {
   var UserInfoObjectFactory = null;

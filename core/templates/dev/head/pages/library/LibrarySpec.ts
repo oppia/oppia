@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Library controller', function() {
   beforeEach(angular.mock.module('oppia'));

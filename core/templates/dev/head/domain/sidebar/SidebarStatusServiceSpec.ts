@@ -16,8 +16,6 @@
  * @fileoverview Tests for SidebarStatusService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('SidebarStatusService', function() {
   var SidebarStatusService, $window;

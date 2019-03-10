@@ -15,8 +15,6 @@
 /**
  * @fileoverview unit tests for number with units object type factory service.
  */
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('NumberWithUnitsObjectFactory', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -16,8 +16,6 @@
  * @fileoverview Tests for GuestCollectionProgressService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Guest collection progress service', function() {
   var GuestCollectionProgressService = null;

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('GraphInputValidationService', function() {
   var WARNING_TYPES, validatorService;

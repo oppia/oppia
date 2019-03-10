@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for AudioLanguageObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('AudioLanguage object factory', function() {
   var audioLanguage = null;

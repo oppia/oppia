@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Topic editor state service', function() {
   var TopicEditorStateService = null;

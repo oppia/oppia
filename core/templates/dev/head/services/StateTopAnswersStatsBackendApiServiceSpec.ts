@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for StateTopAnswersStatsBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('StateTopAnswersStatsBackendApiService', function() {
   beforeEach(angular.mock.module('oppia'));

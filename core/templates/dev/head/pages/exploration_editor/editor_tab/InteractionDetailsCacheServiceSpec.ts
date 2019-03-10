@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Interaction Details Cache Service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Interaction Details Cache Service', function() {
   describe('InteractionDetailsCache', function() {

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for math expression rules.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Math expression input rules service', function() {
   beforeEach(angular.mock.module('oppia'));

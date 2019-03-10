@@ -16,8 +16,6 @@
  * @fileoverview Tests that ratings are being displayed correctly.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Rating display directive', function() {
   var outerScope, ctrlScope;

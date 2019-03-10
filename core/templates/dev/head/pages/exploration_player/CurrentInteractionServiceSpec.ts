@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for CurrentInteractionService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Current Interaction Service', function() {
   beforeEach(angular.mock.module('oppia'));

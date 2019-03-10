@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the playthrough service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('PlaythroughService', function() {
   beforeEach(angular.mock.module('oppia'));

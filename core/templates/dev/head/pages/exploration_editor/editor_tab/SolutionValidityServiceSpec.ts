@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Solution Validity Service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Solution Validity Service', function() {
   describe('SolutionValidityService', function() {

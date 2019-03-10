@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Code REPL rules.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Code REPL rules service', function() {
   beforeEach(angular.mock.module('oppia'));

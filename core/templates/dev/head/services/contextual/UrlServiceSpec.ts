@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the BackgroundMaskService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Url Service', function() {
   var UrlService = null;

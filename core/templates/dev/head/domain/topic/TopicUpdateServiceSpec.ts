@@ -16,8 +16,6 @@
  * @fileoverview Tests for Topic update service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Topic update service', function() {
   var ContentIdsToAudioTranslationsObjectFactory = null;

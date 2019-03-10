@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for TopicViewerBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Topic viewer backend API service', function() {
   var TopicViewerBackendApiService = null;

@@ -16,8 +16,6 @@
  * @fileoverview Tests for AdminRouterService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Admin router service', function() {
   var AdminRouterService = null;

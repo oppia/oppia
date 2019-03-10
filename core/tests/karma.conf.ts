@@ -10,12 +10,12 @@ module.exports = function(config) {
   config.set({
     basePath: '../../',
     // jasmine-jquery is used to load contents of external JSON files in tests.
-    frameworks: ['jasmine-jquery', 'jasmine', 'karma-typescript'],
+    frameworks: ['jasmine-jquery', 'jasmine'],
     files: [
-      'core/tests/karma-globals.ts',
+      'compiled_js/core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
-      'assets/constants.js',
-      'assets/rich_text_components_definitions.js',
+      'compiled_js/assets/constants.js',
+      'compiled_js/assets/rich_text_components_definitions.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.2.1/jquery.min.js',
@@ -29,13 +29,13 @@ module.exports = function(config) {
       'third_party/static/angular-recorder-1.4.1/dist' +
       '/angular-audio-recorder.min.js',
       generatedJs,
-      'core/templates/dev/head/*.ts',
+      'compiled_js/core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
-      'core/templates/dev/head/**/*.ts',
+      'compiled_js/core/templates/dev/head/**/*.js',
       'core/templates/dev/head/**/*_directive.html',
-      'extensions/**/*.ts',
+      'compiled_js/extensions/**/*.js',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
@@ -58,8 +58,8 @@ module.exports = function(config) {
       }
     ],
     exclude: [
-      'core/templates/dev/head/**/*-e2e.ts',
-      'extensions/**/protractor.ts',
+      'compiled_js/core/templates/dev/head/**/*-e2e.js',
+      'compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**'
     ],
     proxies: {
@@ -70,15 +70,10 @@ module.exports = function(config) {
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
-      'core/tests/karma-globals.ts': ['karma-typescript'],
-      'core/templates/dev/head/(*Spec).ts': ['karma-typescript'],
-      'core/templates/dev/head/**/(*Spec).ts': ['karma-typescript'],
-      'extensions/(*Spec).ts': ['karma-typescript'],
-      'extensions/**/(*Spec).ts': ['karma-typescript'],
-      'core/templates/dev/head/!(*Spec).ts': ['karma-typescript', 'coverage'],
-      'core/templates/dev/head/**/!(*Spec).ts': ['karma-typescript', 'coverage'],
-      'extensions/!(*Spec).ts': ['karma-typescript', 'coverage'],
-      'extensions/**/!(*Spec).ts': ['karma-typescript', 'coverage'],
+      'compiled_js/core/templates/dev/head/!(*Spec).js': ['coverage'],
+      'compiled_js/core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+      'compiled_js/extensions/!(*Spec).js': ['coverage'],
+      'compiled_js/extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
@@ -86,7 +81,7 @@ module.exports = function(config) {
       'extensions/interactions/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures']
     },
-    reporters: ['progress', 'coverage', 'karma-typescript'],
+    reporters: ['progress', 'coverage'],
     coverageReporter: {
       reporters: [{
         type: 'html'
@@ -120,8 +115,7 @@ module.exports = function(config) {
       'karma-chrome-launcher',
       'karma-ng-html2js-preprocessor',
       'karma-json-fixtures-preprocessor',
-      'karma-coverage',
-      'karma-typescript'
+      'karma-coverage'
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',
@@ -136,9 +130,6 @@ module.exports = function(config) {
     },
     jsonFixturesPreprocessor: {
       variableName: '__fixtures__'
-    },
-    karmaTypescriptConfig: {
-      tsconfig: "tsconfig.json"
     }
   });
 };

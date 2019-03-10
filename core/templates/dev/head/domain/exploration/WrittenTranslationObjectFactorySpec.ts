@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the WrittenTranslation object factory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('WrittenTranslation object factory', function() {
   beforeEach(angular.mock.module('oppia'));

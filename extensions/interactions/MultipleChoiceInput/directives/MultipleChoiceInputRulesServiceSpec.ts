@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for multiple choice input rules.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Multiple choice input rules service', function() {
   beforeEach(angular.mock.module('oppia'));

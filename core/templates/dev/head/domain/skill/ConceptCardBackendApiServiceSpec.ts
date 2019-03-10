@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for ConceptCardBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Concept card backend API service', function() {
   var ConceptCardBackendApiService = null;

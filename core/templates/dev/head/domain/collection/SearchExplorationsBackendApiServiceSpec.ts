@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for SearchExplorationsBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Exploration search backend API service', function() {
   var SearchExplorationsBackendApiService = null;

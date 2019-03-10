@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Number with Units rules.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Number with Units rules service', function() {
   beforeEach(angular.mock.module('oppia'));

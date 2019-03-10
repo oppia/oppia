@@ -16,8 +16,6 @@
  * @fileoverview Tests for GuestCollectionProgressObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Guest collection progress object factory', function() {
   var GuestCollectionProgressObjectFactory = null;

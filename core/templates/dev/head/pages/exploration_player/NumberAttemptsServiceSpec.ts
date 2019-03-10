@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the number attempts service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Number attempts service', function() {
   beforeEach(angular.mock.module('oppia'));

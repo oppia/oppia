@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for state rules stats service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('State Rules Stats Service', function() {
   var StateRulesStatsService = null;

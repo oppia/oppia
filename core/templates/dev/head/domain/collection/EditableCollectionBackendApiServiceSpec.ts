@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for EditableCollectionBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Editable collection backend API service', function() {
   var EditableCollectionBackendApiService = null;

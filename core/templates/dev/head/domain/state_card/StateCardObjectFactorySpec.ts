@@ -16,8 +16,6 @@
  * @fileoverview Tests for StateCardObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('State card object factory', function() {
   var StateCardObjectFactory = null;

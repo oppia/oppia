@@ -16,8 +16,6 @@
  * @fileoverview Tests for CollectionLinearizerService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Collection linearizer service', function() {
   var CollectionObjectFactory = null;

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for StoryEditorStateService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Story editor state service', function() {
   var StoryEditorStateService = null;

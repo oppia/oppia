@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for EditableStoryBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Editable story backend API service', function() {
   var EditableStoryBackendApiService = null;

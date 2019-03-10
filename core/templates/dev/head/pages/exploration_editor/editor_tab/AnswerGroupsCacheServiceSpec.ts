@@ -15,8 +15,6 @@
 /**
  * @fileoverview Unit tests for Answer Groups Cache Service.
  */
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Answer Groups Cache Service', function() {
   describe('AnswerGroupsCache', function() {

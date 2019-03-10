@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the editor prerequisites page.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Signup controller', function() {
   describe('SignupCtrl', function() {
@@ -121,7 +119,7 @@ describe('Signup controller', function() {
         };
         $httpBackend.expectPOST('/signuphandler/data').respond(
           401, errorResponseObject);
-        scope.submitPrerequisitesForm(true, 'myUsername', false);
+        scope.submitPrerequisitesForm(true, 'myUsername', 'no');
         $httpBackend.flush();
         expect(scope.showRegistrationSessionExpiredModal).toHaveBeenCalled();
       });

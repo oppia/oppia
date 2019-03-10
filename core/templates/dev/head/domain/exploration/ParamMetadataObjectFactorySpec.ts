@@ -16,8 +16,6 @@
 * @fileoverview Unit tests for ParamMetadataObjectFactory.
 */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('ParameterMetadata object factory', function() {
   var parameterMetadata = null;

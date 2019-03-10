@@ -16,9 +16,6 @@
  * @fileoverview Unit tests code repl prediction service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
-
 describe('CodeRepl prediction service', function() {
   beforeEach(angular.mock.module('oppia'));
 

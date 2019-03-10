@@ -16,8 +16,6 @@
  * @fileoverview Tests for CollectionValidationService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Collection validation service', function() {
   var CollectionValidationService = null;

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for TopicRightsBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Topic rights backend API service', function() {
   var TopicRightsBackendApiService = null;

@@ -16,8 +16,6 @@
  * @fileoverview Tests for SkillSummaryObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Skill summary object factory', function() {
   var SkillSummaryObjectFactory = null;

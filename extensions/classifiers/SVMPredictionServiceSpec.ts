@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the SVM prediction functions.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('SVM prediction functions', function() {
   beforeEach(angular.mock.module('oppia'));

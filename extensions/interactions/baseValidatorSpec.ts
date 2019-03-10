@@ -24,8 +24,6 @@
  * tests to ensure it is working properly.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Interaction validator', function() {
   var scope, filter, bivs, WARNING_TYPES, agof;

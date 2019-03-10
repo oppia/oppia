@@ -16,8 +16,6 @@
  * @fileoverview Tests for FeedbackThreadSummaryObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Feedback thread object factory', function() {
   var FeedbackThreadSummaryObjectFactory = null;

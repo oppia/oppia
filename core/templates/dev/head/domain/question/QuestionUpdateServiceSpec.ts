@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for question update service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Question update service', function() {
   var QuestionUpdateService = null;

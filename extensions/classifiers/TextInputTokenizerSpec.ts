@@ -16,8 +16,6 @@
  * @fileoverview Unit tests text input tokenizer.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Text Input tokenizer', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Exploration object factory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Exploration object factory', function() {
   beforeEach(angular.mock.module('oppia'));

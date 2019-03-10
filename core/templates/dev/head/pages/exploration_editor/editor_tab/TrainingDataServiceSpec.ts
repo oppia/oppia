@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the training data service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('TrainingDataService', function() {
   var $httpBackend;

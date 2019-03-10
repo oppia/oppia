@@ -16,8 +16,6 @@
 * @fileoverview Unit tests for SuggestionObjectFactory.
 */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Suggestion object factory', function() {
   beforeEach(function() {

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the issues backend api service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('PlaythroughIssuesBackendApiService', function() {
   beforeEach(angular.mock.module('oppia'));

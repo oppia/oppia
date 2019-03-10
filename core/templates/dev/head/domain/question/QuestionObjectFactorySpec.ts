@@ -16,8 +16,6 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;

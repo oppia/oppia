@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for statistics services.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('StateImprovementSuggestionService', function() {
   beforeEach(angular.mock.module('oppia'));

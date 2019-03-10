@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for CollectionRightsBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Collection rights backend API service', function() {
   var CollectionRightsBackendApiService = null;

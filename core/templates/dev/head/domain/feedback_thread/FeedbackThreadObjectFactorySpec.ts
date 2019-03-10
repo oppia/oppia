@@ -16,8 +16,6 @@
 * @fileoverview Unit tests for FeedbackThreadObjectFactory.
 */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Feedback thread object factory', function() {
   beforeEach(angular.mock.module('oppia'));

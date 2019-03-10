@@ -16,8 +16,6 @@
  * @fileoverview Tests for TopicRightsObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Topic rights object factory', function() {
   var TopicRightsObjectFactory = null;

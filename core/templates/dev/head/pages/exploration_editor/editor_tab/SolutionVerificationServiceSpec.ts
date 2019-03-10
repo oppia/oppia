@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Solution Verification Service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Solution Verification Service', function() {
   beforeEach(function() {

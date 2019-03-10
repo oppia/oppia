@@ -16,9 +16,6 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
-
 describe('User Service', function() {
   var UserService, $httpBackend, UrlInterpolationService;
 

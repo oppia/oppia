@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for AssetsBackendApiService
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Assets Backend API Service', function() {
   var AssetsBackendApiService = null;

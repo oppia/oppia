@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Sidebar state name controller', function() {
   describe('SidebarStateName', function() {

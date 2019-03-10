@@ -16,8 +16,6 @@
  * @fileoverview Tests for Story update service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Story update service', function() {
   var StoryUpdateService = null;

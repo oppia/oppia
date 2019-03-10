@@ -16,8 +16,6 @@
  * @fileoverview unit tests for the local save services.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('LocalStorageService', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -16,8 +16,6 @@
  * @fileoverview Tests that the utility functions are working as expected.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Utils Service', function() {
   var UtilsService;

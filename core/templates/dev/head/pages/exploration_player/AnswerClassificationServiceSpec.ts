@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Answer classification service with string classifier disabled',
   function() {

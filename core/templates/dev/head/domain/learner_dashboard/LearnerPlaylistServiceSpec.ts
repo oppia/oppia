@@ -16,8 +16,6 @@
  * @fileoverview Tests for LearnerPlaylistService.js.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;

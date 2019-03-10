@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the audio translation manager service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Audio translation manager service', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -16,8 +16,6 @@
 * @fileoverview Unit tests for SkillObjectFactory.
 */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Skill object factory', function() {
   beforeEach(angular.mock.module('oppia'));

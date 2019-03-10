@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the learner parameters service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Learner parameters service', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the FocusManagerService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Focus Manager Service', function() {
   var FocusManagerService;

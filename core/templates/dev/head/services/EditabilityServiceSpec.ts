@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for EditabilityService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('EditabilityService', function() {
   var EditabilityService = null;

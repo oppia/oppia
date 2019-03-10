@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Exploration data service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Exploration data service', function() {
   beforeEach(angular.mock.module('oppia'));

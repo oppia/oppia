@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Code Normalizer Service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Code Normalization', function() {
   beforeEach(angular.mock.module('oppia'));

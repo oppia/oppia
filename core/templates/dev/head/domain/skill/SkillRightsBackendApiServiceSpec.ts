@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for SkillRightsBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Skill rights backend API service', function() {
   var SkillRightsBackendApiService = null;

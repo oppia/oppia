@@ -18,8 +18,6 @@
  * feedback tab of the exploration editor.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Thread Status Display Service', function() {
   beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));

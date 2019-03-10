@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the controller of 'State Interactions'.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('State Interaction controller', function() {
   describe('StateInteraction', function() {

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the audio preloader service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Audio preloader service', function() {
   beforeEach(function() {

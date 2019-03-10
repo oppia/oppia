@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Param Specs object factory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('ParamSpecs', function() {
   var ParamSpecsObjectFactory = null;

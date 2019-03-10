@@ -16,8 +16,6 @@
  * @fileoverview Unit test for the Translation language service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Translation language service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {

@@ -16,8 +16,6 @@
  * @fileoverview Tests that average ratings are being computed correctly.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Search service', function() {
   var SearchService;

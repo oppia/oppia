@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for ReadOnlyExplorationBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Read only exploration backend API service', function() {
   var ReadOnlyExplorationBackendApiService = null;

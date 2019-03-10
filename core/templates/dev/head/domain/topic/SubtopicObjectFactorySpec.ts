@@ -16,8 +16,6 @@
  * @fileoverview Tests for SubtopicObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Subtopic object factory', function() {
   var SubtopicObjectFactory = null;

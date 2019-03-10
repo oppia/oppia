@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for EditableTopicBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Editable topic backend API service', function() {
   var EditableTopicBackendApiService = null;

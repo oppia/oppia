@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Solution object factory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Solution object factory', function() {
   beforeEach(angular.mock.module('oppia'));

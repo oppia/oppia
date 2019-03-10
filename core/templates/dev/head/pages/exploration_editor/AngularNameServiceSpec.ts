@@ -16,8 +16,6 @@
  * @fileoverview Unit test for the Angular names service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Angular names service', function() {
   beforeEach(angular.mock.module('oppia'));

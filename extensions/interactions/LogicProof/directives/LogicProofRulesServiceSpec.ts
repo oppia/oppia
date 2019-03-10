@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Logic Proof rules.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Logic Proof rules service', function() {
   beforeEach(angular.mock.module('oppia'));

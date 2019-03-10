@@ -16,8 +16,6 @@
  * @fileoverview Unit tests to check that all the relevant rules exist.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Rule spec services', function() {
   var rulesServices = {};

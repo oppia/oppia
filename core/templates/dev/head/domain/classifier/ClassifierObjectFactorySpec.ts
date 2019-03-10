@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the ClassifierObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Classifier Object Factory', function() {
   var ClassifierObjectFactory;

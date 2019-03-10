@@ -16,8 +16,6 @@
  * @fileoverview unit tests for outcome object factory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Outcome object factory', function() {
   var oof;

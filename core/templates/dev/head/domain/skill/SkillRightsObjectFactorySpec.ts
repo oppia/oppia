@@ -16,8 +16,6 @@
  * @fileoverview Tests for SkillRightsObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Skill rights object factory', function() {
   var SkillRightsObjectFactory = null;

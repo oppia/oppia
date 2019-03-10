@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('States object factory', function() {
   beforeEach(angular.mock.module('oppia'));
@@ -329,7 +327,10 @@ describe('States object factory', function() {
                 content_id: 'default_outcome',
                 html: ''
               },
-              param_changes: []
+              param_changes: [],
+              labelled_as_correct: false,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             hints: [],
             id: 'TextInput'

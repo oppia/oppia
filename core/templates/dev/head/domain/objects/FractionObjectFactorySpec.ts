@@ -15,8 +15,6 @@
 /**
  * @fileoverview unit tests for the fraction object type factory service.
  */
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('FractionObjectFactory', function() {
   beforeEach(angular.mock.module('oppia'));

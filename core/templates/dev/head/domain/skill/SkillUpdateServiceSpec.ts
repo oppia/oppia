@@ -16,8 +16,6 @@
 * @fileoverview Unit tests for SkillUpdateService.
 */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Skill update service', function() {
   var SkillUpdateService,

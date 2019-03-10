@@ -16,8 +16,6 @@
  * @fileoverview Tests for AdminTaskManagerService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Admin task manager service', function() {
   var AdminTaskManagerService = null;

@@ -17,8 +17,6 @@
  * data for the feedback tab of the exploration editor.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('retrieving threads service', function() {
   var expId = '12345';

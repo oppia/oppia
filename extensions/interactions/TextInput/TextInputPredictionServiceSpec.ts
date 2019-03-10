@@ -16,8 +16,6 @@
  * @fileoverview Unit tests text input prediction service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Text Input Prediction Service', function() {
   var $rootScope = null;

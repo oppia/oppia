@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for ReadOnlyCollectionBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Read only collection backend API service', function() {
   var ReadOnlyCollectionBackendApiService = null;

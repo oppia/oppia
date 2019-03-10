@@ -16,8 +16,6 @@
  * @fileoverview Tests for CollectionRightsObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Collection rights object factory', function() {
   var CollectionRightsObjectFactory = null;

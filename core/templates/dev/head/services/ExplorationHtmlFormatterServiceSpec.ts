@@ -17,8 +17,6 @@
  * by both the learner and editor views
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Exploration Html Formatter Service', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for IdGenerationService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('IdGenerationService', function() {
   var IdGenerationService = null;

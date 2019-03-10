@@ -15,8 +15,6 @@
  * @fileoverview Unit tests for AutoplayedVideosService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('AutoplayedVideosService', function() {
   var AutoplayedVideosService = null;

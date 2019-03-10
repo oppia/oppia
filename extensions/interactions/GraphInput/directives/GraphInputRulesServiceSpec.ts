@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Graph Input rules.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Graph Input service', function() {
   beforeEach(angular.mock.module('oppia'));

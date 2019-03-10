@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Hints/Solution Manager service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('HintsAndSolutionManager service', function() {
   var $timeout;

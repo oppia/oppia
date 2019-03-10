@@ -16,8 +16,6 @@
  * @fileoverview Unit test for the Translation tab active content id service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Translation tab active content id service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {

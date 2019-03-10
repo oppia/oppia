@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the winnowing preprocessing functions.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Winnowing preprocessing functions', function() {
   beforeEach(angular.mock.module('oppia'));

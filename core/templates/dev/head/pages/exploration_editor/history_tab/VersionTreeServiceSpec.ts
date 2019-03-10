@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Versions Tree Service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Versions tree service', function() {
   beforeEach(angular.mock.module('oppia'));

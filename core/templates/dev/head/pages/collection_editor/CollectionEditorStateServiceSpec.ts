@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for CollectionEditorStateService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;

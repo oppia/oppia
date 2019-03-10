@@ -16,8 +16,6 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('ExplorationStatesService', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -16,8 +16,6 @@
 * @fileoverview Unit tests for MisconceptionObjectFacfory.
 */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Misconception object factory', function() {
   beforeEach(angular.mock.module('oppia'));

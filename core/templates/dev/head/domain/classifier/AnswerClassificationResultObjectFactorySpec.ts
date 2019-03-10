@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the AnswerClassificationResultObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Answer classification result object factory', function() {
   var oof, acrof;

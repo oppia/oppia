@@ -16,8 +16,6 @@
 * @fileoverview Unit tests for SuggestionThreadObjectFactory.
 */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Suggestion thread object factory', function() {
   beforeEach(function() {

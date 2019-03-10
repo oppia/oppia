@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Interactive Map rules.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Numeric Input service', function() {
   beforeEach(angular.mock.module('oppia'));

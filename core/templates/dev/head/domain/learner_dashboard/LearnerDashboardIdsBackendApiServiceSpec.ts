@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for LearnerDashboardIdsBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Learner Dashboard Backend API Service', function() {
   var LearnerDashboardIdsBackendApiService = null;

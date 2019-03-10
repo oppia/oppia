@@ -17,8 +17,6 @@
  * of the exploration editor page.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Exploration rights service', function() {
   beforeEach(angular.mock.module('oppia'));

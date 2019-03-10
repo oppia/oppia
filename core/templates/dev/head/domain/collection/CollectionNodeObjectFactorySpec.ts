@@ -16,8 +16,6 @@
  * @fileoverview Tests for CollectionNodeObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Collection node object factory', function() {
   var CollectionNodeObjectFactory = null;

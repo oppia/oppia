@@ -17,8 +17,6 @@
  *   editor page.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Change list service', function() {
   beforeEach(angular.mock.module('oppia'));

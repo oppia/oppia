@@ -16,8 +16,6 @@
  * @fileoverview Tests for UndoRedoService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Undo/Redo Service', function() {
   var UndoRedoService = null;

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Music Notes rules.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Music Notes Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));

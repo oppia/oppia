@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the Compare versions Service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Compare versions service', function() {
   beforeEach(angular.mock.module('oppia'));

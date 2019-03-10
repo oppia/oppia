@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the prediction algorithm registry service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Prediction algorithm registry service', function() {
   beforeEach(angular.mock.module('oppia'));

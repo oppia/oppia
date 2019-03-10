@@ -16,8 +16,6 @@
  * @fileoverview Unit test for DateTimeFormatService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Datetime Formatter', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for UrlInterpolationService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('URL Interpolation Service', function() {
   var uis = null;

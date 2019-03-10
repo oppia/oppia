@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the CodeRepl interaction.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('CodeRepl interaction', function() {
   describe('CodeRepl tests', function() {

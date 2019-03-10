@@ -16,8 +16,6 @@
  * @fileoverview Tests for StoryObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Story object factory', function() {
   var StoryObjectFactory = null;

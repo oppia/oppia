@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for ExpressionInterpolationService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Expression interpolation service', function() {
   beforeEach(angular.mock.module('oppia'));

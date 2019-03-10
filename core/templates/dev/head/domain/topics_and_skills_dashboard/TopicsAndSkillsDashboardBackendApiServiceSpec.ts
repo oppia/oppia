@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Topics and Skills Dashboard backend API service', function() {
   var TopicsAndSkillsDashboardBackendApiService = null;

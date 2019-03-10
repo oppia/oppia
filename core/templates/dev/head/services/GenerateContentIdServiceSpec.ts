@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for GenerateContentIdService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('GenerateContentIdService', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the state content editor directive.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, citat, scitat;

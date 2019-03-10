@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Item Selection rules.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Item Selection rules service', function() {
   beforeEach(angular.mock.module('oppia'));

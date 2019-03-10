@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for ContentIdsToAudioTranslations object factory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('ContentIdsToAudioTranslations object factory', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {

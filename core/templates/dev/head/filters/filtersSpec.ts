@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for custom filters.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Testing filters', function() {
   var filterNames = [

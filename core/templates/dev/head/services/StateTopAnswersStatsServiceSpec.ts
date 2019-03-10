@@ -19,8 +19,6 @@
 
 var joC = jasmine.objectContaining;
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('StateTopAnswersStatsService', function() {
   beforeEach(angular.mock.module('oppia'));

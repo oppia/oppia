@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for SpeechSynthesisChunkerService.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Speech Synthesis Chunker Service', function() {
   var SpeechSynthesisChunkerService = null;

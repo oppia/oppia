@@ -16,8 +16,6 @@
  * @fileoverview Tests that the resource service is working as expected.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Promo bar Service', function() {
   var PromoBarService, $httpBackend;

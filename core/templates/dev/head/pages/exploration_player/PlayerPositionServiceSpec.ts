@@ -16,8 +16,6 @@
 * @fileoverview Unit tests for the player position service.
 */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Player position service', function() {
   beforeEach(angular.mock.module('oppia'));

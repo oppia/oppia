@@ -16,8 +16,6 @@
  * @fileoverview Tests for LearnerDashboardActivityIdsObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Learner dashboard activity ids object factory', function() {
   var LearnerDashboardActivityIdsObjectFactory = null;

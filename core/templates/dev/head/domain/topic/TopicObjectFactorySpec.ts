@@ -16,8 +16,6 @@
  * @fileoverview Tests for TopicObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Topic object factory', function() {
   var TopicObjectFactory = null;

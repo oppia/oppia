@@ -16,8 +16,6 @@
  * @fileoverview Tests for the form builders.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('HTML to text', function() {
   beforeEach(angular.mock.module('oppia'));

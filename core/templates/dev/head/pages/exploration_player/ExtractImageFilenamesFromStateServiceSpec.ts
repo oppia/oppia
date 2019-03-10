@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the extracting image files in state service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Extracting Image file names in the state service', function() {
   beforeEach(function() {

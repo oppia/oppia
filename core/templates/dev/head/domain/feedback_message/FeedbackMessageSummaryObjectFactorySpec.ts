@@ -16,8 +16,6 @@
  * @fileoverview Tests for FeedbackMessageSummaryObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Feedback message object factory', function() {
   var FeedbackMessageSummaryObjectFactory = null;

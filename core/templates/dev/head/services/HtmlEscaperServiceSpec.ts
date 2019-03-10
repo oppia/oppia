@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for HTML serialization and escaping services.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('HTML escaper', function() {
   beforeEach(angular.mock.module('oppia'));

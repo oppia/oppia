@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Validators Service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Validators service', function() {
   beforeEach(angular.mock.module('oppia'));

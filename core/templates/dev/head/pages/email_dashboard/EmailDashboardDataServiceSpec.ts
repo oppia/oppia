@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the email dashboard page.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Email Dashboard Services', function() {
   beforeEach(angular.mock.module('oppia'));

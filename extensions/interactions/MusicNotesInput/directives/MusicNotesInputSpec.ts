@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the MusicNotesInput interaction.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('MusicNotesInput interaction', function() {
   describe('MusicNotesInput tests', function() {

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for LanguageUtilService
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Language util service', function() {
   var lus = null;

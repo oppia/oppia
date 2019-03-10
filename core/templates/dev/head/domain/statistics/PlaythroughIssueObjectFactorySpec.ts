@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the PlaythroughIssueObjectFactory.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Playthrough Issue Object Factory', function() {
   beforeEach(angular.mock.module('oppia'));

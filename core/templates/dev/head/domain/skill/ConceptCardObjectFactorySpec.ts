@@ -16,8 +16,6 @@
 * @fileoverview Unit tests for ConceptCardObjectFactory.
 */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Concept card object factory', function() {
   beforeEach(angular.mock.module('oppia'));

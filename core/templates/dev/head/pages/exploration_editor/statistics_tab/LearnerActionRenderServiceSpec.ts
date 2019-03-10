@@ -19,8 +19,6 @@
  * jasmine.any(Object).
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Learner Action Render Service', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the image preloader service.
  */
 
-import * as angular from 'angular';
-import 'angular-mocks';
 
 describe('Image preloader service', function() {
   beforeEach(function() {
