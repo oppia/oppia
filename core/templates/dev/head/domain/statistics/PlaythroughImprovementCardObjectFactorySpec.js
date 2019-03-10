@@ -115,11 +115,11 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     describe('.getActionButtons', function() {
       it('contains a specific sequence of buttons', function() {
         expect(this.card.getActionButtons().length).toEqual(1);
-        expect(this.card.getActionButtons()[0].getName()).toEqual('Archive');
+        expect(this.card.getActionButtons()[0].getName()).toEqual('Discard');
       });
     });
 
-    describe('Archive Action Button', function() {
+    describe('Discard Action Button', function() {
       beforeEach(inject(function($injector) {
         this.$httpBackend = $injector.get('$httpBackend');
       }));
@@ -129,12 +129,12 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       });
 
       it('marks the card as resolved', function() {
-        var archiveActionButton = this.card.getActionButtons()[0];
+        var discardActionButton = this.card.getActionButtons()[0];
 
         expect(this.card.isResolved()).toBe(false);
         // 7 is the exploration ID we assigned in the first beforeEach clause.
         this.$httpBackend.expectPOST('/resolveissuehandler/7').respond();
-        archiveActionButton.execute();
+        discardActionButton.execute();
         this.$httpBackend.flush();
         expect(this.card.isResolved()).toBe(true);
       });

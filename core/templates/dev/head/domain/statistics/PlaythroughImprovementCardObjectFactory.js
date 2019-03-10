@@ -16,29 +16,31 @@
  * @fileoverview Factory for creating Playthrough Cards in the Improvements Tab.
  */
 
+oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');
+
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
   'HtmlEscaperService', 'ImprovementActionButtonObjectFactory',
-  'PlaythroughIssuesService',
+  'PlaythroughIssuesService', 'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
   function(
       HtmlEscaperService, ImprovementActionButtonObjectFactory,
-      PlaythroughIssuesService) {
+      PlaythroughIssuesService, PLAYTHROUGH_IMPROVEMENT_CARD_TYPE) {
     /** @constructor */
     var PlaythroughImprovementCard = function(issue) {
       var that = this;
-      var archiveThis = function() {
+      var discardThis = function() {
         return PlaythroughIssuesService.resolveIssue(issue).then(function() {
-          that._isArchived = true;
+          that._isDiscarded = true;
         });
       };
 
       /** @type {boolean} */
-      this._isArchived = false;
+      this._isDiscarded = false;
       /** @type {string} */
       this._title =
         PlaythroughIssuesService.renderIssueStatement(issue);
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
-        ImprovementActionButtonObjectFactory.createNew('Archive', archiveThis),
+        ImprovementActionButtonObjectFactory.createNew('Discard', discardThis),
       ];
       /** @type {{suggestions: string[], playthroughIds: string[]}} */
       this._directiveData = {
@@ -53,30 +55,36 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
      * manually resolved by the creator.
      */
     PlaythroughImprovementCard.prototype.isResolved = function() {
-      return this._isArchived;
+      return this._isDiscarded;
     };
 
-    /** @returns {string} - a simple summary of the Playthrough Issue */
+    /** @returns {string} - A simple summary of the Playthrough Issue */
     PlaythroughImprovementCard.prototype.getTitle = function() {
       return this._title;
     };
 
     /**
-     * @returns {string} - the HTML required to render the Playthrough items,
-     * including sample playthroughs for creators to look at.
+     * @returns {string} - The directive card type used to render details about
+     *    this card's data.
      */
     PlaythroughImprovementCard.prototype.getDirectiveType = function() {
-      return 'playthrough';
+      return PLAYTHROUGH_IMPROVEMENT_CARD_TYPE;
     };
 
-    /** @returns {{suggestions: string[], playthroughIds: string[]}} */
+    /**
+     * Provides the data necessary for the associated card directive to render
+     * the details of this playthrough card. The associated directive is named:
+     * PlaythroughImprovementCardDirective.js.
+     *
+     * @returns {{suggestions: string[], playthroughIds: string[]}}
+     */
     PlaythroughImprovementCard.prototype.getDirectiveData = function() {
       return this._directiveData;
     };
 
     /**
-     * @returns {ImprovementActionButton[]} - the list of action items a creator
-     * can take to resolve the card.
+     * @returns {ImprovementActionButton[]} - The list of action buttons
+     *    displayed on the card.
      */
     PlaythroughImprovementCard.prototype.getActionButtons = function() {
       return this._actionButtons;
@@ -88,7 +96,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
         return new PlaythroughImprovementCard(issue);
       },
       /**
-       * @returns {Promise<PlaythroughImprovementCard[]>} - the list of
+       * @returns {Promise<PlaythroughImprovementCard[]>} - The list of
        * playthrough issues associated to the current exploration.
        */
       fetchCards: function() {
