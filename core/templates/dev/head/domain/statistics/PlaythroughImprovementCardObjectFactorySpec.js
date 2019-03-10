@@ -31,7 +31,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   }));
 
   describe('.fetchCards', function() {
-    it('returns a card for each issue', function(done) {
+    it('returns a card for each existing issue', function(done) {
       var earlyQuitIssue =
         this.PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
@@ -84,14 +84,12 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         done();
       };
 
-      spyOn(this.PlaythroughIssuesService, 'getIssues')
-        .and.callFake(function() {
-          return Promise.resolve([
-            earlyQuitIssue,
-            multipleIncorrectSubmissionsIssue,
-            cyclicTransitionsIssue,
-          ]);
-        });
+      spyOn(this.PlaythroughIssuesService, 'getIssues').and.returnValue(
+        Promise.resolve([
+          earlyQuitIssue,
+          multipleIncorrectSubmissionsIssue,
+          cyclicTransitionsIssue,
+        ]));
 
       this.PlaythroughImprovementCardObjectFactory.fetchCards()
         .then(checkCards, done.fail);
@@ -100,41 +98,46 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   });
 
   describe('PlaythroughImprovementCard', function() {
+    beforeEach(function() {
+      this.issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
+        issue_type: 'EarlyQuit',
+        issue_customization_args: {
+          state_name: {value: 'Hola'},
+          time_spent_in_exp_in_msecs: {value: 5000},
+        },
+        playthrough_ids: [],
+        schema_version: 1,
+        is_valid: true,
+      });
+      this.card =
+        this.PlaythroughImprovementCardObjectFactory.createNew(this.issue);
+    });
+
     describe('.getActionButtons', function() {
-      describe('Archive Action', function() {
-        beforeEach(inject(function($injector) {
-          this.$httpBackend = $injector.get('$httpBackend');
-        }));
-        afterEach(function() {
-          this.$httpBackend.verifyNoOutstandingExpectation();
-          this.$httpBackend.verifyNoOutstandingRequest();
-        });
+      it('contains a specific sequence of buttons', function() {
+        expect(this.card.getActionButtons().length).toEqual(1);
+        expect(this.card.getActionButtons()[0].getName()).toEqual('Archive');
+      });
+    });
 
-        it('marks the card as resolved', function() {
-          var issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
-            issue_type: 'EarlyQuit',
-            issue_customization_args: {
-              state_name: {value: 'Hola'},
-              time_spent_in_exp_in_msecs: {value: 5000},
-            },
-            playthrough_ids: [],
-            schema_version: 1,
-            is_valid: true,
-          });
+    describe('Archive Action Button', function() {
+      beforeEach(inject(function($injector) {
+        this.$httpBackend = $injector.get('$httpBackend');
+      }));
+      afterEach(function() {
+        this.$httpBackend.verifyNoOutstandingExpectation();
+        this.$httpBackend.verifyNoOutstandingRequest();
+      });
 
-          var card =
-            this.PlaythroughImprovementCardObjectFactory.createNew(issue);
+      it('marks the card as resolved', function() {
+        var archiveActionButton = this.card.getActionButtons()[0];
 
-          var firstActionButton = card.getActionButtons()[0];
-
-          expect(card.isResolved()).toBe(false);
-          expect(firstActionButton.getName()).toEqual('Archive');
-
-          this.$httpBackend.expectPOST('/resolveissuehandler/7').respond();
-          firstActionButton.execute();
-          this.$httpBackend.flush();
-          expect(card.isResolved()).toBe(true);
-        });
+        expect(this.card.isResolved()).toBe(false);
+        // 7 is the exploration ID we assigned in the first beforeEach clause.
+        this.$httpBackend.expectPOST('/resolveissuehandler/7').respond();
+        archiveActionButton.execute();
+        this.$httpBackend.flush();
+        expect(this.card.isResolved()).toBe(true);
       });
     });
   });
