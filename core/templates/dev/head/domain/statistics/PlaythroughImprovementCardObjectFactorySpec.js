@@ -30,6 +30,9 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     this.PlaythroughIssuesService.initSession(expId, expVersion);
   }));
 
+  describe('.createNew', function() {
+  });
+
   describe('.fetchCards', function() {
     it('returns a card for each existing issue', function(done) {
       var earlyQuitIssue =
@@ -81,7 +84,6 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         expect(cards[1].getTitle())
           .toEqual(multipleIncorrectSubmissionsCardTitle);
         expect(cards[2].getTitle()).toEqual(cyclicTransitionsCardTitle);
-        done();
       };
 
       spyOn(this.PlaythroughIssuesService, 'getIssues').and.returnValue(
@@ -92,7 +94,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         ]));
 
       this.PlaythroughImprovementCardObjectFactory.fetchCards()
-        .then(checkCards, done.fail);
+        .then(checkCards).then(done, done.fail);
     });
   });
 
