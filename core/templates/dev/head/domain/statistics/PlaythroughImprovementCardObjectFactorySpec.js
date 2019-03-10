@@ -93,8 +93,8 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           cyclicTransitionsIssue,
         ]));
 
-      this.PlaythroughImprovementCardObjectFactory.fetchCards()
-        .then(checkCards).then(done, done.fail);
+      this.PlaythroughImprovementCardObjectFactory.fetchCards().then(checkCards)
+        .then(done, done.fail);
     });
   });
 
