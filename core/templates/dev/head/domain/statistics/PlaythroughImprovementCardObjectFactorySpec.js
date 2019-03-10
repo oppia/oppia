@@ -78,14 +78,6 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         this.PlaythroughIssuesService.renderIssueStatement(
           cyclicTransitionsIssue);
 
-      var checkCards = function(cards) {
-        expect(cards.length).toEqual(3);
-        expect(cards[0].getTitle()).toEqual(earlyQuitCardTitle);
-        expect(cards[1].getTitle())
-          .toEqual(multipleIncorrectSubmissionsCardTitle);
-        expect(cards[2].getTitle()).toEqual(cyclicTransitionsCardTitle);
-      };
-
       spyOn(this.PlaythroughIssuesService, 'getIssues').and.returnValue(
         Promise.resolve([
           earlyQuitIssue,
@@ -93,8 +85,14 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           cyclicTransitionsIssue,
         ]));
 
-      this.PlaythroughImprovementCardObjectFactory.fetchCards().then(checkCards)
-        .then(done, done.fail);
+      this.PlaythroughImprovementCardObjectFactory.fetchCards()
+        .then(function(cards) {
+          expect(cards.length).toEqual(3);
+          expect(cards[0].getTitle()).toEqual(earlyQuitCardTitle);
+          expect(cards[1].getTitle())
+            .toEqual(multipleIncorrectSubmissionsCardTitle);
+          expect(cards[2].getTitle()).toEqual(cyclicTransitionsCardTitle);
+        }).then(done, done.fail);
     });
   });
 
