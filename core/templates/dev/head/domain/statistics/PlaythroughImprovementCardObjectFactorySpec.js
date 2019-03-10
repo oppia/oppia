@@ -115,7 +115,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     describe('.getActionButtons', function() {
       it('contains a specific sequence of buttons', function() {
         expect(this.card.getActionButtons().length).toEqual(1);
-        expect(this.card.getActionButtons()[0].getName()).toEqual('Discard');
+        expect(this.card.getActionButtons()[0].getText()).toEqual('Discard');
       });
     });
 
