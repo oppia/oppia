@@ -169,14 +169,9 @@
 
 
 # Restricted pages.
-<<<<<<< HEAD
+/core/controllers/admin*.py @seanlip
 /core/templates/pages/admin/ @seanlip
 /core/templates/pages/moderator/ @seanlip
-=======
-/core/controllers/admin*.py @seanlip
-/core/templates/dev/head/pages/admin/ @seanlip
-/core/templates/dev/head/pages/moderator/ @seanlip
->>>>>>> e647b691c04831e228f1da2bdfd9fce72b76dcb3
 /.github/CODEOWNERS @seanlip
 
 
@@ -222,22 +217,13 @@
 
 
 # Speed Improvement team.
-<<<<<<< HEAD
-app.yaml @vojtechjelinek
-manifest.json @vojtechjelinek
+/app.yaml @vojtechjelinek
+/manifest.json @seanlip @vojtechjelinek
 /core/templates/pages/base.html @vojtechjelinek
 /core/templates/pages/footer_js_libs.html @vojtechjelinek
 /core/templates/pages/header_css_libs.html @vojtechjelinek
 /core/templates/pages/header_js_libs.html @vojtechjelinek
-=======
-/app.yaml @vojtechjelinek
-/manifest.json @seanlip @vojtechjelinek
-/core/templates/dev/head/pages/base.html @vojtechjelinek
-/core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
-/core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
-/core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
 /scripts/install_third_party.sh @seanlip @vojtechjelinek
->>>>>>> e647b691c04831e228f1da2bdfd9fce72b76dcb3
 
 
 # User’s profile page.
