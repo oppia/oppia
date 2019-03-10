@@ -36,7 +36,7 @@ oppia.factory('ImprovementActionButtonObjectFactory', [function() {
 
   /** Performs the associated action and return its result as a promise */
   ImprovementActionButton.prototype.execute = function() {
-    return Promise.resolve(this._actionFunc());
+    return this._actionFunc();
   };
 
   return {

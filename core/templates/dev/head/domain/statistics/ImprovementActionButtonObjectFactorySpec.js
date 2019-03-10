@@ -24,19 +24,17 @@ describe('ImprovementActionButtonObjectFactory', function() {
   }));
 
   describe('.createNew', function() {
-    it('stores the name and action', function(done) {
+    it('stores the name and action', function() {
       var flagToSetOnCallback = false;
       var improvementAction =
         this.ImprovementActionButtonObjectFactory.createNew('Test', function() {
           flagToSetOnCallback = true;
         });
-      var onActionCompletion = function() {
-        expect(flagToSetOnCallback).toBe(true);
-        done();
-      };
 
       expect(improvementAction.getName()).toEqual('Test');
-      improvementAction.execute().then(onActionCompletion, done.fail);
+      expect(flagToSetOnCallback).toBe(false);
+      improvementAction.execute();
+      expect(flagToSetOnCallback).toBe(true);
     });
   });
 });

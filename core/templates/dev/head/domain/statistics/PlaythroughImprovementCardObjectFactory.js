@@ -23,12 +23,10 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       HtmlEscaperService, ImprovementActionButtonObjectFactory,
       PlaythroughIssuesService) {
     /** @constructor */
-    var PlaythroughImprovementCard = function(playthroughIssue) {
+    var PlaythroughImprovementCard = function(issue) {
       var that = this;
       var archiveThis = function() {
-        return PlaythroughIssuesService.resolveIssue(
-          playthroughIssue
-        ).then(function() {
+        return PlaythroughIssuesService.resolveIssue(issue).then(function() {
           that._isArchived = true;
         });
       };
@@ -37,7 +35,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       this._isArchived = false;
       /** @type {string} */
       this._title =
-        PlaythroughIssuesService.renderIssueStatement(playthroughIssue);
+        PlaythroughIssuesService.renderIssueStatement(issue);
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew('Archive', archiveThis),
@@ -45,8 +43,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       /** @type {{suggestions: string[], playthroughIds: string[]}} */
       this._directiveData = {
         suggestions:
-          PlaythroughIssuesService.renderIssueSuggestions(playthroughIssue),
-        playthroughIds: playthroughIssue.playthroughIds,
+          PlaythroughIssuesService.renderIssueSuggestions(issue),
+        playthroughIds: issue.playthroughIds,
       };
     };
 
@@ -86,8 +84,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
 
     return {
       /** @returns {PlaythroughImprovementCard} */
-      createNew: function(playthroughIssue) {
-        return new PlaythroughImprovementCard(playthroughIssue);
+      createNew: function(issue) {
+        return new PlaythroughImprovementCard(issue);
       },
       /**
        * @returns {Promise<PlaythroughImprovementCard[]>} - the list of
@@ -95,8 +93,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
        */
       fetchCards: function() {
         return PlaythroughIssuesService.getIssues().then(function(issues) {
-          return issues.map(function(playthroughIssue) {
-            return new PlaythroughImprovementCard(playthroughIssue);
+          return issues.map(function(issue) {
+            return new PlaythroughImprovementCard(issue);
           });
         });
       },

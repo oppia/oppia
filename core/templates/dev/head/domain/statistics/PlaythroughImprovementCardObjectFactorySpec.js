@@ -23,87 +23,17 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       $injector.get('PlaythroughImprovementCardObjectFactory');
     this.PlaythroughIssueObjectFactory =
       $injector.get('PlaythroughIssueObjectFactory');
-    this.PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
 
-    this.expId = '7';
-    this.expVersion = 1;
-    this.PlaythroughIssuesService.initSession(this.expId, this.expVersion);
+    var expId = '7';
+    var expVersion = 1;
+    this.PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
+    this.PlaythroughIssuesService.initSession(expId, expVersion);
   }));
 
   describe('.fetchCards', function() {
-    it(
-      'creates a card for each issue in PlaythroughIssuesService',
-      function(done) {
-        var earlyQuitIssue =
-          this.PlaythroughIssueObjectFactory.createFromBackendDict({
-            issue_type: 'EarlyQuit',
-            issue_customization_args: {
-              state_name: {value: 'Hola'},
-              time_spent_in_exp_in_msecs: {value: 5000},
-            },
-            playthrough_ids: [],
-            schema_version: 1,
-            is_valid: true,
-          });
-        var multipleIncorrectSubmissionsIssue =
-          this.PlaythroughIssueObjectFactory.createFromBackendDict({
-            issue_type: 'MultipleIncorrectSubmissions',
-            issue_customization_args: {
-              state_name: {value: 'Hola'},
-              num_times_answered_incorrectly: {value: 4},
-            },
-            playthrough_ids: [],
-            schema_version: 1,
-            is_valid: true,
-          });
-        var cyclicTransitionsIssue =
-          this.PlaythroughIssueObjectFactory.createFromBackendDict({
-            issue_type: 'CyclicTransitions',
-            issue_customization_args: {
-              state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
-            },
-            playthrough_ids: [],
-            schema_version: 1,
-            is_valid: true,
-          });
-
-        var that = this;
-        var checkCards = function(cards) {
-          expect(cards.length).toEqual(3);
-
-          var earlyQuitCard = cards[0];
-          expect(earlyQuitCard.getTitle()).toEqual(
-            that.PlaythroughIssuesService.renderIssueStatement(
-              earlyQuitIssue));
-
-          var multipleIncorrectSubmissionsCard = cards[1];
-          expect(multipleIncorrectSubmissionsCard.getTitle()).toEqual(
-            that.PlaythroughIssuesService.renderIssueStatement(
-              multipleIncorrectSubmissionsIssue));
-
-          var cyclicTransitionsCard = cards[2];
-          expect(cyclicTransitionsCard.getTitle()).toEqual(
-            that.PlaythroughIssuesService.renderIssueStatement(
-              cyclicTransitionsIssue));
-        };
-
-        spyOn(this.PlaythroughIssuesService, 'getIssues').and.returnValue(
-          Promise.resolve([
-            earlyQuitIssue,
-            multipleIncorrectSubmissionsIssue,
-            cyclicTransitionsIssue,
-          ]));
-
-        this.PlaythroughImprovementCardObjectFactory.fetchCards()
-          .then(checkCards).then(done, done.fail);
-      }
-    );
-  });
-
-  describe('PlaythroughImprovementCard', function() {
-    describe('.getActionButtons', function() {
-      beforeEach(function() {
-        this.issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
+    it('returns a card for each issue', function(done) {
+      var earlyQuitIssue =
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
           issue_type: 'EarlyQuit',
           issue_customization_args: {
             state_name: {value: 'Hola'},
@@ -113,8 +43,64 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           schema_version: 1,
           is_valid: true,
         });
-      });
+      var earlyQuitCardTitle =
+        this.PlaythroughIssuesService.renderIssueStatement(earlyQuitIssue);
 
+      var multipleIncorrectSubmissionsIssue =
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
+          issue_type: 'MultipleIncorrectSubmissions',
+          issue_customization_args: {
+            state_name: {value: 'Hola'},
+            num_times_answered_incorrectly: {value: 4},
+          },
+          playthrough_ids: [],
+          schema_version: 1,
+          is_valid: true,
+        });
+      var multipleIncorrectSubmissionsCardTitle =
+        this.PlaythroughIssuesService.renderIssueStatement(
+          multipleIncorrectSubmissionsIssue);
+
+      var cyclicTransitionsIssue =
+        this.PlaythroughIssueObjectFactory.createFromBackendDict({
+          issue_type: 'CyclicTransitions',
+          issue_customization_args: {
+            state_names: {value: ['Hola', 'Me Llamo', 'Hola']},
+          },
+          playthrough_ids: [],
+          schema_version: 1,
+          is_valid: true,
+        });
+      var cyclicTransitionsCardTitle =
+        this.PlaythroughIssuesService.renderIssueStatement(
+          cyclicTransitionsIssue);
+
+      var checkCards = function(cards) {
+        expect(cards.length).toEqual(3);
+        expect(cards[0].getTitle()).toEqual(earlyQuitCardTitle);
+        expect(cards[1].getTitle())
+          .toEqual(multipleIncorrectSubmissionsCardTitle);
+        expect(cards[2].getTitle()).toEqual(cyclicTransitionsCardTitle);
+        done();
+      };
+
+      spyOn(this.PlaythroughIssuesService, 'getIssues')
+        .and.callFake(function() {
+          return Promise.resolve([
+            earlyQuitIssue,
+            multipleIncorrectSubmissionsIssue,
+            cyclicTransitionsIssue,
+          ]);
+        });
+
+      this.PlaythroughImprovementCardObjectFactory.fetchCards()
+        .then(checkCards, done.fail);
+      }
+    );
+  });
+
+  describe('PlaythroughImprovementCard', function() {
+    describe('.getActionButtons', function() {
       describe('Archive Action', function() {
         beforeEach(inject(function($injector) {
           this.$httpBackend = $injector.get('$httpBackend');
@@ -124,23 +110,30 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           this.$httpBackend.verifyNoOutstandingRequest();
         });
 
-        it('marks the card as resolved', function(done) {
-          var card =
-            this.PlaythroughImprovementCardObjectFactory.createNew(this.issue);
-          var firstActionButton = card.getActionButtons()[0];
-          var checkIsResolved = function() {
-            expect(card.isResolved()).toBe(true);
-          };
+        it('marks the card as resolved', function() {
+          var issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
+            issue_type: 'EarlyQuit',
+            issue_customization_args: {
+              state_name: {value: 'Hola'},
+              time_spent_in_exp_in_msecs: {value: 5000},
+            },
+            playthrough_ids: [],
+            schema_version: 1,
+            is_valid: true,
+          });
 
-          this.$httpBackend.expectPOST('/resolveissuehandler/7').respond();
+          var card =
+            this.PlaythroughImprovementCardObjectFactory.createNew(issue);
+
+          var firstActionButton = card.getActionButtons()[0];
 
           expect(card.isResolved()).toBe(false);
           expect(firstActionButton.getName()).toEqual('Archive');
 
-          firstActionButton.execute().then(checkIsResolved).then(
-            done, done.fail);
-
+          this.$httpBackend.expectPOST('/resolveissuehandler/7').respond();
+          firstActionButton.execute();
           this.$httpBackend.flush();
+          expect(card.isResolved()).toBe(true);
         });
       });
     });
