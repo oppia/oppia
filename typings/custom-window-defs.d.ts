@@ -1,17 +1,17 @@
 interface Window {
-	GLOBALS?: any;
+	BlobBuilder?: any;
 	CodeMirror?: any;
 	Date?: any;
+	GLOBALS?: any;
 	HTMLElement?: any;
-	safari?: any;
-	opera?: any;
-	MathJax?: any;
+	MSBlobBuilder?: any;
 	Math?: any;
+	MathJax?: any;
+	MozBlobBuilder?: any;
+	WebKitBlobBuilder?: any;
+	__fixtures__?: any;
 	decodeURIComponent?: any;
 	encodeURIComponent?: any;
-	BlobBuilder?: any;
-	WebKitBlobBuilder?: any;
-	MozBlobBuilder?: any;
-	MSBlobBuilder?: any;
-	__fixtures__?: any;
+	opera?: any;
+	safari?: any;
 }

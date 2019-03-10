@@ -3,78 +3,78 @@ interface ICustomScope extends ng.IScope {
     uiConfig?: any;
 
     // AlertMessageDirective.ts
-    getMessage?: any;
+    getMessage?: (() => any);
     toastr?: any;
     AlertsService?: any;
 
     // AudioFileUploaderDirective.ts
-    inputFieldClassName?: any;
-    inputFieldFormId?: any;
-    onFileCleared?: any;
+    inputFieldClassName?: string;
+    inputFieldFormId?: string;
+    onFileCleared?: (() => void);
     droppedFile?: any;
 
     // AudioFileUploaderDirective.ts, ImageUploaderDirective.ts
-    errorMessage?: any;
-    onFileChanged?: any;
+    errorMessage?: string;
+    onFileChanged?: ((file: any, fileName?: string) => void);
 
     // ImageUploaderDirective.ts
-    fileInputClassName?: any;
+    fileInputClassName?: string;
 
     // FormBuilder.ts
     validators?: any;
 
     // ObjectEditorDirective.ts, ValueGeneratorEditorDirective.ts
-    objType?: any;
+    objType?: string;
     initArgs?: any;
-    getInitArgs?: any;
+    getInitArgs?: (() => any);
 
     // ObjectEditorDirective.ts
-    alwaysEditable?: any;
-    isEditable?: any;
-    getAlwaysEditable?: any;
-    getIsEditable?: any;
+    alwaysEditable?: boolean;
+    isEditable?: boolean;
+    getAlwaysEditable?: (() => boolean);
+    getIsEditable?: (() => boolean);
 
     // ValueGeneratorEditorDirective.ts, Copier.ts, RandomSelector.ts
-    generatorId?: any;
+    generatorId?: string;
 
     // ValueGeneratorEditorDirective.ts
-    getObjType?: any;
-    getGeneratorId?: any;
+    getObjType?: (() => string);
+    getGeneratorId?: (() => string);
 
     // AudioTranslationBarDirective.ts
-    showDropArea?: any;
-    getRecorderController?: any;
-    openAddAudioTranslationModal?: any;
+    showDropArea?: boolean;
+    getRecorderController?: (() => void);
+    openAddAudioTranslationModal?: ((files: any) => void);
 
     // ConversationSkinDirective.ts
-    directiveTemplate?: any;
+    directiveTemplate?: string;
 
     // Copier.ts, RandomSelector.ts
-    getTemplateUrl?: any;
+    getTemplateUrl?: (() => string);
 
     // OppiaInteractiveMusicNotesInputDirective.ts
-    SOUNDFONT_URL?: any;
-    sequenceToGuess?: any;
-    interactionIsActive?: any;
-    getLastAnswer?: any;
-    initialSequence?: any;
-    reinitStaff?: any;
-    noteSequence?: any;
+    CONTAINER_HEIGHT?: number;
+    CONTAINER_WIDTH?: number;
+    HORIZONTAL_GRID_SPACING?: number;
+    SOUNDFONT_URL?: string;
+    VERTICAL_GRID_SPACING?: number;
+    _addNoteToNoteSequence?: ((note: any) => void);
     _currentNoteId?: any;
-    generateNoteId?: any;
-    init?: any;
-    CONTAINER_WIDTH?: any;
-    CONTAINER_HEIGHT?: any;
-    HORIZONTAL_GRID_SPACING?: any;
-    VERTICAL_GRID_SPACING?: any;
-    submitAnswer?: any;
-    staffBottom?: any;
-    staffTop?: any;
-    playSequenceToGuess?: any;
-    playCurrentSequence?: any;
-    clearSequence?: any;
-    topPositionForCenterOfTopStaffLine?: any;
-    _addNoteToNoteSequence?: any;
-    _removeNotesFromNoteSequenceWithId?: any;
-    _sortNoteSequence?: any;
+    _removeNotesFromNoteSequenceWithId?: ((noteId: string) => void);
+    _sortNoteSequence?: (() => void);
+    clearSequence?: (() => void);
+    generateNoteId?: (() => string);
+    getLastAnswer?: (() => string);
+    init?: (() => void);
+    initialSequence?: string;
+    interactionIsActive?: boolean;
+    noteSequence?: any;
+    playCurrentSequence?: (() => void);
+    playSequenceToGuess?: (() => void);
+    reinitStaff?: (() => void);
+    sequenceToGuess?: any;
+    staffBottom?: number;
+    staffTop?: number;
+    submitAnswer?: (() => void);
+    topPositionForCenterOfTopStaffLine?: number;
 }
