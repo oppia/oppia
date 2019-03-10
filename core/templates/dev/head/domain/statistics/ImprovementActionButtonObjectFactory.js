@@ -28,7 +28,7 @@ oppia.factory('ImprovementActionButtonObjectFactory', [function() {
     this._actionFunc = actionFunc;
   };
 
-  /** @returns {string} - the text of the action (text rendered in button). */
+  /** @returns {string} - The text of the action (text rendered in button). */
   ImprovementActionButton.prototype.getText = function() {
     return this._text;
   };
