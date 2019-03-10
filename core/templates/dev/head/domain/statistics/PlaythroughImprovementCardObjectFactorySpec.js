@@ -121,22 +121,25 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
     describe('Discard Action Button', function() {
       beforeEach(inject(function($injector) {
-        this.$httpBackend = $injector.get('$httpBackend');
+        this.$uibModal = $injector.get('$uibModal');
+        spyOn(this.$uibModal, 'open').and.callFake(function() {
+          return {result: Promise.resolve()};
+        });
       }));
-      afterEach(function() {
-        this.$httpBackend.verifyNoOutstandingExpectation();
-        this.$httpBackend.verifyNoOutstandingRequest();
-      });
 
-      it('marks the card as resolved', function() {
-        var discardActionButton = this.card.getActionButtons()[0];
+      it('marks the card as resolved', function(done) {
+        var card = this.card;
+        var issue = this.issue;
+        var discardActionButton = card.getActionButtons()[0];
+        var resolveIssueSpy =
+          spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.stub();
 
-        expect(this.card.isResolved()).toBe(false);
-        // 7 is the exploration ID we assigned in the first beforeEach clause.
-        this.$httpBackend.expectPOST('/resolveissuehandler/7').respond();
-        discardActionButton.execute();
-        this.$httpBackend.flush();
-        expect(this.card.isResolved()).toBe(true);
+        expect(card.isResolved()).toBe(false);
+        discardActionButton.execute().then(function() {
+          expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
+          expect(card.isResolved()).toBe(true);
+          done();
+        });
       });
     });
   });

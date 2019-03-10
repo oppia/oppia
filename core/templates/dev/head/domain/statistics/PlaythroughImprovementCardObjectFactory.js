@@ -30,20 +30,18 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
     var PlaythroughImprovementCard = function(issue) {
       var that = this;
       var discardThis = function() {
-        $uibModal.open({
+        return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/confirmation_modal_directive.html'),
           backdrop: true,
           controller: [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {
-              $scope.buttonClass = 'btn-danger';
               $scope.confirmationMessage =
                 'Are you sure you want to discard this card?';
               $scope.confirmationButtonText = 'Discard';
+              $scope.confirmationButtonClass = 'btn-danger';
               $scope.action = function() {
-                PlaythroughIssuesService.resolveIssue(issue);
-                that._isDiscarded = true;
                 $uibModalInstance.close();
               };
               $scope.cancel = function() {
@@ -51,6 +49,10 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
               };
             }
           ]
+        }).result.then(function() {
+          // console.log('DELETED! D:');
+          PlaythroughIssuesService.resolveIssue(issue);
+          that._isDiscarded = true;
         });
       };
 
