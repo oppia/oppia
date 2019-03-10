@@ -3831,15 +3831,6 @@ span.oppia-issues-learner-action {
   margin-bottom: 2em;
 }
 
-.oppia-issues-hexagon-text {
-  position: absolute;
-  z-index: 1000;
-  width: 100%;
-  text-align: center;
-  font-size: 20px;
-  color: white;
-}
-
 .oppia-issues-playthrough-modal-btn {
   background: transparent;
   border-radius: 0;
@@ -3853,16 +3844,19 @@ span.oppia-issues-learner-action {
   width: 200px;
   height: 115.47px;
   background-color: #009A8B;
-  margin: 20px 0;
+  margin: 15px 0;
   border-left: solid 2px #009A8B;
   border-right: solid 2px #009A8B;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
 }
 
 .oppia-hexagon:before,
 .oppia-hexagon:after {
   content: "";
   position: absolute;
-  z-index: 1;
+  z-index: -1;
   width: 141.42px;
   height: 141.42px;
   -webkit-transform: scaleY(0.5774) rotate(-45deg);
