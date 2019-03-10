@@ -81,6 +81,7 @@ describe('Item Selection rules service', function() {
       expect(isirs.IsProperSubsetOf(['a'], RULE_INPUT)).toBe(true);
       expect(isirs.IsProperSubsetOf(['a', 'b'], RULE_INPUT)).toBe(true);
       expect(isirs.IsProperSubsetOf(['a', 'b', 'c'], RULE_INPUT)).toBe(false);
+      expect(isirs.IsProperSubsetOf(['d', 'e'], RULE_INPUT)).toBe(false);
       expect(isirs.IsProperSubsetOf(
         ['a', 'b', 'c', 'd'], RULE_INPUT)).toBe(false);
       expect(isirs.IsProperSubsetOf(
