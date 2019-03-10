@@ -20,21 +20,20 @@
 oppia.factory('ImprovementActionButtonObjectFactory', [function() {
   /**
    * @constructor
-   * @param {string} name - the name of the action.
-   * @param {callback} actionFunc - function to run when the action is requested
-   *    to be performed.
+   * @param {string} text - The text displayed on the button.
+   * @param {callback} actionFunc - Function to run when the button is clicked.
    */
-  var ImprovementActionButton = function(name, actionFunc) {
-    this._name = name;
+  var ImprovementActionButton = function(text, actionFunc) {
+    this._text = text;
     this._actionFunc = actionFunc;
   };
 
-  /** @returns {string} - the name of the action (text rendered in button). */
-  ImprovementActionButton.prototype.getName = function() {
-    return this._name;
+  /** @returns {string} - the text of the action (text rendered in button). */
+  ImprovementActionButton.prototype.getText = function() {
+    return this._text;
   };
 
-  /** Performs the associated action and return its result as a promise */
+  /** Performs the associated action and return its result. */
   ImprovementActionButton.prototype.execute = function() {
     return this._actionFunc();
   };
@@ -42,12 +41,12 @@ oppia.factory('ImprovementActionButtonObjectFactory', [function() {
   return {
     /**
      * @returns {ImprovementActionButton}
-     * @param {string} name - the name of the action.
-     * @param {callback} actionFunc - function to run when the action is
-     *    requested to be performed.
+     * @param {string} text - The text displayed on the button.
+     * @param {callback} actionFunc - Function to run when the button is
+     *    clicked.
      */
-    createNew: function(name, actionFunc) {
-      return new ImprovementActionButton(name, actionFunc);
+    createNew: function(text, actionFunc) {
+      return new ImprovementActionButton(text, actionFunc);
     },
   };
 }]);

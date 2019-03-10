@@ -23,7 +23,7 @@
     <div>
       <button ng-repeat="actionButton in card.getActionButtons()"
               ng-click="actionButton.execute()">
-        <[actionButton.getName()]>
+        <[actionButton.getText()]>
       </button>
     </div>
   </md-card>

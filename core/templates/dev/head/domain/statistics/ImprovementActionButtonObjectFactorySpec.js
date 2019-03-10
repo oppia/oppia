@@ -31,7 +31,7 @@ describe('ImprovementActionButtonObjectFactory', function() {
           flagToSetOnCallback = true;
         });
 
-      expect(improvementAction.getName()).toEqual('Test');
+      expect(improvementAction.getText()).toEqual('Test');
       expect(flagToSetOnCallback).toBe(false);
       improvementAction.execute();
       expect(flagToSetOnCallback).toBe(true);
