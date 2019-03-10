@@ -50,7 +50,6 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
             }
           ]
         }).result.then(function() {
-          // console.log('DELETED! D:');
           PlaythroughIssuesService.resolveIssue(issue);
           that._isDiscarded = true;
         });
