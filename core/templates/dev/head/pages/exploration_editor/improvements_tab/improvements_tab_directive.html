@@ -22,7 +22,8 @@
       <div class="text-right">
         <button ng-repeat="actionButton in card.getActionButtons()"
                 ng-click="actionButton.execute()"
-                class="btn btn-success" style="margin-left: 15px">
+                confirm="Are you sure?"
+                class="btn <[actionButton.getCssClass()]>" style="margin-left: 15px">
           <[actionButton.getText()]>
         </button>
       </div>

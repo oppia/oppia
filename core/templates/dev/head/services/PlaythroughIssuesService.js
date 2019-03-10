@@ -58,7 +58,7 @@ oppia.factory('PlaythroughIssuesService', [
     var renderMultipleIncorrectIssueSuggestions = function(stateName) {
       var suggestions = [$sce.trustAsHtml(
         'Check the wording of the card <span class="state_link">"' +
-        stateName + '</span> to ensure it is not confusing.'
+        stateName + '"</span> to ensure it is not confusing.'
       ), $sce.trustAsHtml(
         'Consider addressing the answers submitted in the sample playthroughs' +
         ' explicitly, using answer groups.'
@@ -73,7 +73,7 @@ oppia.factory('PlaythroughIssuesService', [
         'Check that the concept presented in <span class="state_link">"' +
         stateNames[0] + '"</span> has been reinforced sufficiently by the ' +
         'time the learner gets to <span class="state_link">"' +
-        stateNames[finalIndex] + '</span>.'
+        stateNames[finalIndex] + '"</span>.'
       )];
       return suggestions;
     };

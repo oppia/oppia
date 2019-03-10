@@ -19,17 +19,38 @@
 oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
-  'HtmlEscaperService', 'ImprovementActionButtonObjectFactory',
-  'PlaythroughIssuesService', 'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
+  '$uibModal', 'HtmlEscaperService', 'ImprovementActionButtonObjectFactory',
+  'PlaythroughIssuesService', 'UrlInterpolationService',
+  'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
   function(
-      HtmlEscaperService, ImprovementActionButtonObjectFactory,
-      PlaythroughIssuesService, PLAYTHROUGH_IMPROVEMENT_CARD_TYPE) {
+      $uibModal, HtmlEscaperService, ImprovementActionButtonObjectFactory,
+      PlaythroughIssuesService, UrlInterpolationService,
+      PLAYTHROUGH_IMPROVEMENT_CARD_TYPE) {
     /** @constructor */
     var PlaythroughImprovementCard = function(issue) {
       var that = this;
       var discardThis = function() {
-        return PlaythroughIssuesService.resolveIssue(issue).then(function() {
-          that._isDiscarded = true;
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/confirmation_modal_directive.html'),
+          backdrop: true,
+          controller: [
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
+              $scope.buttonClass = 'btn-danger';
+              $scope.confirmationMessage =
+                'Are you sure you want to discard this card?';
+              $scope.confirmationButtonText = 'Discard';
+              $scope.action = function() {
+                PlaythroughIssuesService.resolveIssue(issue);
+                that._isDiscarded = true;
+                $uibModalInstance.close();
+              };
+              $scope.cancel = function() {
+                $uibModalInstance.dismiss('cancel');
+              };
+            }
+          ]
         });
       };
 
@@ -40,7 +61,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
         PlaythroughIssuesService.renderIssueStatement(issue);
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
-        ImprovementActionButtonObjectFactory.createNew('Discard', discardThis),
+        ImprovementActionButtonObjectFactory.createNew(
+          'Discard', discardThis, 'btn-danger'),
       ];
       /** @type {{suggestions: string[], playthroughIds: string[]}} */
       this._directiveData = {
