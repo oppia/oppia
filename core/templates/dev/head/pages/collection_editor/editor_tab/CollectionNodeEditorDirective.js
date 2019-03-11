@@ -18,6 +18,12 @@
  * and also delete the collection node represented by this directive.
  */
 
+require('domain/collection/CollectionUpdateService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/collection_editor/CollectionEditorStateService.js');
+require('pages/collection_editor/editor_tab/CollectionLinearizerService.js');
+require('services/AlertsService.js');
+
 oppia.directive('collectionNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

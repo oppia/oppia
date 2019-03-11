@@ -16,6 +16,17 @@
  * @fileoverview Directive for creating a new collection node.
  */
 
+require('domain/collection/CollectionNodeObjectFactory.js');
+require('domain/collection/CollectionUpdateService.js');
+require('domain/collection/SearchExplorationsBackendApiService.js');
+require('domain/summary/ExplorationSummaryBackendApiService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/collection_editor/CollectionEditorStateService.js');
+require('pages/collection_editor/editor_tab/CollectionLinearizerService.js');
+require('services/AlertsService.js');
+require('services/SiteAnalyticsService.js');
+require('services/ValidatorsService.js');
+
 oppia.directive('collectionNodeCreator', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

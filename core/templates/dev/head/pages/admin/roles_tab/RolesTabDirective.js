@@ -16,6 +16,9 @@
  * @fileoverview Directive for the Roles tab in the admin panel.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/admin/AdminTaskManagerService.js');
+
 oppia.directive('adminRolesTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_ROLE_HANDLER_URL',

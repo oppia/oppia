@@ -16,6 +16,10 @@
  * @fileoverview Directive for the navigation bar in the admin panel.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/admin/AdminRouterService.js');
+require('services/UserService.js');
+
 oppia.directive('adminNavbar', [
   'AdminRouterService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
   'PROFILE_URL_TEMPLATE',

@@ -16,6 +16,8 @@
  * @fileoverview Directive for the jobs tab in the admin panel.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.directive('adminJobsTab', [
   '$http', '$timeout', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE',

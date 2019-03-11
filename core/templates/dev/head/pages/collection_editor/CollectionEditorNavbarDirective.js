@@ -16,6 +16,16 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
+require('domain/collection/CollectionRightsBackendApiService.js');
+require('domain/collection/CollectionUpdateService.js');
+require('domain/collection/CollectionValidationService.js');
+require('domain/collection/EditableCollectionBackendApiService.js');
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/collection_editor/CollectionEditorStateService.js');
+require('pages/exploration_editor/RouterService.js');
+require('services/AlertsService.js');
+
 oppia.directive('collectionEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

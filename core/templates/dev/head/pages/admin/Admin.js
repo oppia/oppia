@@ -16,6 +16,11 @@
  * @fileoverview Data and controllers for the Oppia admin page.
  */
 
+require('domain/objects/NumberWithUnitsObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/admin/AdminRouterService.js');
+require('services/UtilsService.js');
+
 oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
 oppia.constant('ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
 oppia.constant('PROFILE_URL_TEMPLATE', '/profile/<username>');

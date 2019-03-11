@@ -17,6 +17,9 @@
  * permissions.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/collection_editor/CollectionEditorStateService.js');
+
 oppia.directive('collectionPermissionsCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

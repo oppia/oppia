@@ -16,6 +16,8 @@
  * @fileoverview Controller for the settings tab of the collection editor.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.directive('collectionSettingsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

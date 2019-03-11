@@ -16,6 +16,9 @@
  * @fileoverview Directive for the configuration tab in the admin panel.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/admin/AdminTaskManagerService.js');
+
 oppia.directive('adminConfigTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL', function($http, AdminTaskManagerService,

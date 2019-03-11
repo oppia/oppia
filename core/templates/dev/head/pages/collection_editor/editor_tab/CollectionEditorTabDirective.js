@@ -16,6 +16,10 @@
  * @fileoverview Controller for the main tab of the collection editor.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/collection_editor/CollectionEditorStateService.js');
+require('pages/collection_editor/editor_tab/CollectionLinearizerService.js');
+
 oppia.directive('collectionMainTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

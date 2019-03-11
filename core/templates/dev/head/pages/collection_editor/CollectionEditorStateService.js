@@ -18,6 +18,13 @@
  * retrieving the collection, saving it, and listening for changes.
  */
 
+require('domain/collection/CollectionObjectFactory.js');
+require('domain/collection/CollectionRightsBackendApiService.js');
+require('domain/collection/CollectionRightsObjectFactory.js');
+require('domain/collection/EditableCollectionBackendApiService.js');
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('services/AlertsService.js');
+
 oppia.constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
 oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
 

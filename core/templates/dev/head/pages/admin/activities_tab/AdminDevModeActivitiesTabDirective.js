@@ -17,6 +17,10 @@
  * is in developer mode.
  */
 
+require('domain/objects/NumberWithUnitsObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/admin/AdminTaskManagerService.js');
+
 oppia.directive('adminDevModeActivitiesTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL',
