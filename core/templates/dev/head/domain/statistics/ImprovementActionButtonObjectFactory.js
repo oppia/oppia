@@ -22,7 +22,7 @@ oppia.factory('ImprovementActionButtonObjectFactory', [function() {
    * @constructor
    * @param {string} text - The text displayed on the button.
    * @param {callback} actionFunc - Function to run when the button is clicked.
-   * @param {string} [cssClass=btn-default] - the CSS class to render the button
+   * @param {string} [cssClass=btn-default] - The CSS class to render the button
    *    with.
    */
   var ImprovementActionButton = function(text, actionFunc, cssClass) {
@@ -52,11 +52,11 @@ oppia.factory('ImprovementActionButtonObjectFactory', [function() {
      * @param {string} text - The text displayed on the button.
      * @param {callback} actionFunc - Function to run when the button is
      *    clicked.
-     * @param {string} [cssClass=btn-default] - the CSS class to render the
+     * @param {string} [cssClass=btn-default] - The CSS class to render the
      *    button with.
      */
-    createNew: function(text, actionFunc, type) {
-      return new ImprovementActionButton(text, actionFunc, type);
+    createNew: function(text, actionFunc, cssClass) {
+      return new ImprovementActionButton(text, actionFunc, cssClass);
     },
   };
 }]);
