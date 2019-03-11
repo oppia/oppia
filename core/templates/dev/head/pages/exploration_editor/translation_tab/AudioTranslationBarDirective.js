@@ -30,17 +30,17 @@ oppia.directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
-          if (!scope.showDropArea) {
-            scope.showDropArea = true;
-            scope.$digest();
-          }
+          scope.dropAreaIsAccessible = GLOBALS.can_translate;
+          scope.userIsGuest = !GLOBALS.userIsLoggedIn;
+          scope.$digest();
           return false;
         });
 
         $('.oppia-main-body').on('dragleave', function(evt) {
           evt.preventDefault();
           if (evt.pageX === 0 || evt.pageY === 0) {
-            scope.showDropArea = false;
+            scope.dropAreaIsAccessible = false;
+            scope.userIsGuest = false;
             scope.$digest();
           }
           return false;
@@ -48,11 +48,12 @@ oppia.directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('drop', function(evt) {
           evt.preventDefault();
-          if (evt.target.classList.contains('oppia-drop-area-message')) {
-            var files = evt.originalEvent.dataTransfer.files;
+          if (evt.target.classList.contains('oppia-drop-area-message') &&
+            scope.dropAreaIsAccessible) {
+            files = evt.originalEvent.dataTransfer.files;
             scope.openAddAudioTranslationModal(files);
           }
-          scope.showDropArea = false;
+          scope.dropAreaIsAccessible = false;
           scope.$digest();
           return false;
         });
