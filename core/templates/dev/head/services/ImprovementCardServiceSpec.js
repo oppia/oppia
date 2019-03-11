@@ -45,6 +45,8 @@ describe('ImprovementCardService', function() {
   });
 
   describe('.fetchCards', function() {
+    // Each individual factory should test their own fetchCards function.
+
     describe('from factories which all return empty cards', function() {
       beforeEach(function() {
         this.expectedFactories.forEach(function(factory) {
