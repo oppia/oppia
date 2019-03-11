@@ -45,7 +45,7 @@ describe('MusicNotesInput interaction', function() {
         '<' + TAG_NAME + ' last-answer="null"></' + TAG_NAME + '>');
       $compile(elt)(scope);
       scope.$digest();
-      ctrlScope = elt[0].isolateScope();
+      ctrlScope = elt[0].getControllerScope();
     }));
 
     afterEach(function() {
