@@ -80,5 +80,13 @@ oppia.factory('NavigationService', [function() {
       }
     }
   };
+
+  navigation.onMouseoverDropdown = function(evt) {
+    angular.element(evt.currentTarget).parent().addClass('open');
+  };
+
+  navigation.onMouseoutDropdown = function(evt) {
+    angular.element(evt.currentTarget).parent().removeClass('open');
+  };
   return navigation;
 }]);

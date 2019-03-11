@@ -17,10 +17,10 @@
  */
 
 oppia.directive('adminNavbar', [
-  'AdminRouterService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
+  'AdminRouterService', 'NavigationService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
   'PROFILE_URL_TEMPLATE',
   function(
-      AdminRouterService, UrlInterpolationService, ADMIN_TAB_URLS,
+      AdminRouterService, NavigationService, UrlInterpolationService, ADMIN_TAB_URLS,
       PROFILE_URL_TEMPLATE) {
     return {
       restrict: 'E',
@@ -63,15 +63,12 @@ oppia.directive('adminNavbar', [
         $scope.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/logo/288x128_logo_white.png');
 
-        $scope.profileDropdownIsActive = false;
-        $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
-          angular.element(evt.currentTarget).parent().addClass('open');
-          $scope.profileDropdownIsActive = true;
+        $scope.onMouseoverDropdown = function(evt) {
+          NavigationService.onMouseoverDropdown(evt);
         };
 
-        $scope.onMouseoutProfilePictureOrDropdown = function(evt) {
-          angular.element(evt.currentTarget).parent().removeClass('open');
-          $scope.profileDropdownIsActive = false;
+        $scope.onMouseoutDropdown = function(evt) {
+          NavigationService.onMouseoutDropdown(evt);
         };
       }]
     };
