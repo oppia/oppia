@@ -28,7 +28,6 @@ oppia.controller('Admin', [
   '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',
   function($http, $location, $scope, AdminRouterService, DEV_MODE) {
     $scope.userEmail = GLOBALS.USER_EMAIL;
-    $scope.logoutUrl = GLOBALS.LOGOUT_URL;
     $scope.inDevMode = DEV_MODE;
 
     $scope.statusMessage = '';

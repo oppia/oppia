@@ -34,10 +34,6 @@ class GaeCurrentUserServicesTests(test_utils.GenericTestBase):
             'https://www.google.com/accounts/Login' +
             '?continue=http%3A//localhost/signup%3Freturn_url%3Dsplash')
 
-    def test_create_logout_url(self):
-        logout_url = gae_current_user_services.create_logout_url('splash')
-        self.assertEqual(logout_url, '/logout?return_url=splash')
-
     def test_get_current_user(self):
         self.login(self.OWNER_EMAIL)
         current_user = gae_current_user_services.get_current_user()
