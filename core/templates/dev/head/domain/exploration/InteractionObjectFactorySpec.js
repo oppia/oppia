@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ describe('Interaction object factory', function() {
   var solutionDict = null;
   var hintsDict = null;
   var interactionDict = null;
+
   beforeEach(module('oppia'));
+
   beforeEach(inject(function($injector) {
     iof = $injector.get('InteractionObjectFactory');
     oof = $injector.get('OutcomeObjectFactory');
@@ -179,6 +181,7 @@ describe('Interaction object factory', function() {
     testInteraction.setHints([newHint]);
     expect(testInteraction.hints).toEqual([newHint]);
   });
+
   it('should correctly copy from other interaction', function() {
     var newAnswerGroups = [{
       rule_specs: [],
