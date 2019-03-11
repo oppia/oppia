@@ -17,20 +17,20 @@
  */
 
 oppia.factory('UserService', [
-  '$cookies', '$http', '$q', '$window', 'UrlInterpolationService', 'UserInfoObjectFactory',
-  'DEFAULT_PROFILE_IMAGE_PATH',
-  function($cookies, $http, $q, $window, UrlInterpolationService, UserInfoObjectFactory,
-      DEFAULT_PROFILE_IMAGE_PATH) {
+  '$cookies', '$http', '$q', '$window', 'UrlInterpolationService',
+  'UserInfoObjectFactory', 'DEFAULT_PROFILE_IMAGE_PATH',
+  function($cookies, $http, $q, $window, UrlInterpolationService,
+      UserInfoObjectFactory, DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
     var userInfo = null;
 
-    // TODO(userIsLoggedIn): Find a way to substitute out constants.DEV_MODE so that we
-    // can check ACSID, SACSID cookies.
-    //if DEV_MODE = false, we have to check ACSID and SACSID cookies.
-    var current_url =  $window.location.href
-    var userIsLoggedIn = ($cookies.get('dev_appserver_login')!==undefined
-    && !current_url.includes("signup"));
+    // TODO(userIsLoggedIn): Find a way to substitute out constants.DEV_MODE
+    // so that we can check ACSID, SACSID cookies.
+    // if DEV_MODE = false, we have to check ACSID and SACSID cookies.
+    var currentUrl = $window.location.href;
+    var userIsLoggedIn = $cookies.get('dev_appserver_login') !== undefined &&
+    !currentUrl.includes('signup');
 
     var getUserInfoAsync = function() {
       if (userIsLoggedIn) {
