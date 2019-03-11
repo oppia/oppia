@@ -19,11 +19,11 @@
 oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
-  '$uibModal', 'HtmlEscaperService', 'ImprovementActionButtonObjectFactory',
+  '$uibModal', 'ImprovementActionButtonObjectFactory',
   'PlaythroughIssuesService', 'UrlInterpolationService',
   'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
   function(
-      $uibModal, HtmlEscaperService, ImprovementActionButtonObjectFactory,
+      $uibModal, ImprovementActionButtonObjectFactory,
       PlaythroughIssuesService, UrlInterpolationService,
       PLAYTHROUGH_IMPROVEMENT_CARD_TYPE) {
     /** @constructor */
