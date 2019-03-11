@@ -77,9 +77,9 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
       fetchPlaythrough: function(expId, playthroughId) {
         return $http.get(getFullPlaythroughUrl(expId, playthroughId)).then(
           function(response) {
-            var playthroughDict = response.data;
+            var playthroughBackendDict = response.data;
             return PlaythroughObjectFactory.createFromBackendDict(
-              playthroughDict);
+              playthroughBackendDict);
           });
       },
       resolveIssue: function(issue, expId, expVersion) {
