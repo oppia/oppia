@@ -23,8 +23,8 @@ oppia.directive('playthroughImprovementCard', [
         '/pages/exploration_editor/improvements_tab/' +
         'playthrough_improvement_card_directive.html'),
       controller: [
-        '$scope', '$attrs', 'HtmlEscaperService', 'PlaythroughIssuesService',
-        function($scope, $attrs, HtmlEscaperService, PlaythroughIssuesService) {
+        '$scope', 'PlaythroughIssuesService',
+        function($scope, PlaythroughIssuesService) {
           $scope.openPlaythroughModal = function(playthroughId, index) {
             PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
           };
