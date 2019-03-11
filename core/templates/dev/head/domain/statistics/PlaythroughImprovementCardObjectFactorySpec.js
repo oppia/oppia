@@ -23,6 +23,8 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       $injector.get('PlaythroughImprovementCardObjectFactory');
     this.PlaythroughIssueObjectFactory =
       $injector.get('PlaythroughIssueObjectFactory');
+    this.PLAYTHROUGH_IMPROVEMENT_CARD_TYPE =
+      $injector.get('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE');
 
     var expId = '7';
     var expVersion = 1;
@@ -47,6 +49,13 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
 
       expect(card.getTitle()).toEqual(
         this.PlaythroughIssuesService.renderIssueStatement(issue));
+      expect(card.getDirectiveData()).toEqual({
+        suggestions:
+          this.PlaythroughIssuesService.renderIssueSuggestions(issue),
+        playthroughIds: ['1', '2'],
+      });
+      expect(card.getDirectiveType()).toEqual(
+        this.PLAYTHROUGH_IMPROVEMENT_CARD_TYPE);
     });
   });
 
