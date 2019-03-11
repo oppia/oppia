@@ -42,15 +42,11 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
         schema_version: 1,
         is_valid: true,
       });
+
       var card = this.PlaythroughImprovementCardObjectFactory.createNew(issue);
 
       expect(card.getTitle()).toEqual(
         this.PlaythroughIssuesService.renderIssueStatement(issue));
-      expect(card.getDirectiveData()).toEqual({
-        suggestions:
-          this.PlaythroughIssuesService.renderIssueSuggestions(issue),
-        playthroughIds: ['1', '2'],
-      });
     });
   });
 
