@@ -64,24 +64,12 @@ describe('States object factory', function() {
           id: 'TextInput'
         },
         param_changes: [],
-<<<<<<< HEAD
-<<<<<<< HEAD
         written_translations: {
           translations_mapping: {
             content: {},
             default_outcome: {}
           }
         },
-=======
->>>>>>> 0a4fae6... Fix remaining errors
-=======
-        written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-        }
->>>>>>> a946972... Remove final errors
       };
 
       statesDict = {
