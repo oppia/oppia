@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-  	"allowJs": true,
-  	"lib": ["es2017", "dom"],
-  	"noImplicitUseStrict": true,
-  	"outDir": "compiled_js",
+    "allowJs": true,
+    "lib": ["es2017", "dom"],
+    "noImplicitUseStrict": true,
+    "outDir": "compiled_js",
     "target": "es5",
     "typeRoots": ["./node_modules/@types", "typings"],
     "types": ["angular", "angular-animate", "angular-mocks", "ckeditor", "d3", "google.visualization", "jasmine", "jasmine-jquery", "jasminewd2", "jquery", "jqueryui", "leaflet", "mathjax", "mathjs", "mousetrap", "node", "select2", "selenium-webdriver"]

@@ -20,7 +20,7 @@
 describe('CodeRepl interaction', function() {
   describe('CodeRepl tests', function() {
     var $httpBackend, $templateCache;
-    var elt, scope, ctrlScope;
+    var elt, scope;
 
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));

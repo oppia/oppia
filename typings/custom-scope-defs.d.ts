@@ -1,5 +1,5 @@
 interface ICustomScope extends ng.IScope {
-	// CkEditorRteDirective.ts
+    // CkEditorRteDirective.ts
     uiConfig?: any;
 
     // AlertMessageDirective.ts
