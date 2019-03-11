@@ -26,7 +26,10 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       $uibModal, ImprovementActionButtonObjectFactory,
       PlaythroughIssuesService, UrlInterpolationService,
       PLAYTHROUGH_IMPROVEMENT_CARD_TYPE) {
-    /** @constructor */
+    /**
+     * @constructor
+     * @param {PlaythroughIssue} issue - The issue this card is referring to.
+     */
     var PlaythroughImprovementCard = function(issue) {
       var that = this;
       var discardThis = function() {
