@@ -17,7 +17,7 @@ oppia.directive('playthroughImprovementCard', [
     return {
       restrict: 'E',
       scope: {
-        data: '=',
+        getData: '&data',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/improvements_tab/' +

@@ -29,12 +29,21 @@ describe('ImprovementActionButtonObjectFactory', function() {
       var improvementAction =
         this.ImprovementActionButtonObjectFactory.createNew('Test', function() {
           flagToSetOnCallback = true;
-        });
+        }, 'btn-success');
 
       expect(improvementAction.getText()).toEqual('Test');
+      expect(improvementAction.getCssClass()).toEqual('btn-success');
       expect(flagToSetOnCallback).toBe(false);
       improvementAction.execute();
       expect(flagToSetOnCallback).toBe(true);
+    });
+
+    it('uses btn-default as class by default', function() {
+      var improvementAction =
+        this.ImprovementActionButtonObjectFactory.createNew('Test', function() {
+        });
+
+      expect(improvementAction.getCssClass()).toEqual('btn-default');
     });
   });
 });

@@ -27,10 +27,7 @@ oppia.factory('ImprovementActionButtonObjectFactory', [function() {
   var ImprovementActionButton = function(text, actionFunc, cssClass) {
     this._text = text;
     this._actionFunc = actionFunc;
-    if (cssClass === undefined) {
-      cssClass = 'btn-default';
-    }
-    this._cssClass = cssClass;
+    this._cssClass = cssClass === undefined ? 'btn-default' : cssClass;
   };
 
   /** @returns {string} - The text of the action (text rendered in button). */
