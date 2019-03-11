@@ -22,15 +22,14 @@ require('services/UserService.js');
 
 oppia.directive('adminNavbar', [
   'AdminRouterService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
-  'PROFILE_URL_TEMPLATE',
+  'LOGOUT_URL', 'PROFILE_URL_TEMPLATE',
   function(
       AdminRouterService, UrlInterpolationService, ADMIN_TAB_URLS,
-      PROFILE_URL_TEMPLATE) {
+      LOGOUT_URL, PROFILE_URL_TEMPLATE) {
     return {
       restrict: 'E',
       scope: {
-        getUserEmail: '&userEmail',
-        getLogoutUrl: '&logoutUrl'
+        getUserEmail: '&userEmail'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/' +
@@ -66,6 +65,8 @@ oppia.directive('adminNavbar', [
 
         $scope.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/logo/288x128_logo_white.png');
+
+        $scope.logoutUrl = LOGOUT_URL;
 
         $scope.profileDropdownIsActive = false;
         $scope.onMouseoverProfilePictureOrDropdown = function(evt) {

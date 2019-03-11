@@ -130,6 +130,8 @@ oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
 oppia.constant('FEEDBACK_POPOVER_PATH',
   '/pages/exploration_player/feedback_popup_container_directive.html');
 
+oppia.constant('LOGOUT_URL', '/logout');
+
 // Whether to enable the promo bar functionality. This does not actually turn on
 // the promo bar, as that is gated by a config value (see config_domain). This
 // merely avoids checking for whether the promo bar is enabled for every Oppia
