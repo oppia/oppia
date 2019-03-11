@@ -117,6 +117,10 @@ describe('Url Service', function() {
     expect(
       UrlService.getTopicNameFromLearnerUrl()
     ).toBe('topic name');
+    mockLocation.pathname = '/practice_session/topic%20name';
+    expect(
+      UrlService.getTopicNameFromLearnerUrl()
+    ).toBe('topic name');
     mockLocation.pathname = '/topc/abcdefgijklm';
     expect(function() {
       UrlService.getTopicNameFromLearnerUrl();
