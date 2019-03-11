@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain objects for the actions creators may take when trying to
+ * @fileoverview Domain objects for the buttons creators may click to attempt to
  * resolve a particular improvement suggestion.
  */
 
