@@ -17,11 +17,11 @@
  */
 
 oppia.directive('adminNavbar', [
-  'AdminRouterService', 'NavigationService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
-  'PROFILE_URL_TEMPLATE',
+  'AdminRouterService', 'NavigationService', 'UrlInterpolationService',
+  'ADMIN_TAB_URLS', 'PROFILE_URL_TEMPLATE',
   function(
-      AdminRouterService, NavigationService, UrlInterpolationService, ADMIN_TAB_URLS,
-      PROFILE_URL_TEMPLATE) {
+      AdminRouterService, NavigationService, UrlInterpolationService,
+      ADMIN_TAB_URLS, PROFILE_URL_TEMPLATE) {
     return {
       restrict: 'E',
       scope: {
