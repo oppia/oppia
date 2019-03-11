@@ -163,6 +163,17 @@ oppia.directive('topNavigationBar', [
             }
           });
 
+          $scope.DropdownIsActive = false;
+          $scope.onMouseoverDropdown = function(evt) {
+            angular.element(evt.currentTarget).parent().addClass('open');
+            $scope.DropdownIsActive = true;
+          };
+
+          $scope.onMouseoutDropdown = function(evt) {
+            angular.element(evt.currentTarget).parent().removeClass('open');
+            $scope.DropdownIsActive = false;
+          };
+
           $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
           var currentWindowWidth = WindowDimensionsService.getWidth();
           $scope.navElementsVisibilityStatus = {};
