@@ -34,6 +34,7 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
       $http, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
       UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
       RESOLVE_ISSUE_URL) {
+    /** @type {PlaythroughIssue[]} */
     var cachedIssues = null;
 
     var getFullIssuesUrl = function(explorationId) {
@@ -87,8 +88,18 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
           exp_issue_dict: issue.toBackendDict(),
           exp_version: expVersion
         }).then(function() {
-          // Invalidate the cache to force users to refetch from the backend.
-          cachedIssues = null;
+          var issueIndex = cachedIssues.findIndex(function(cachedIssue) {
+            return Object.is(cachedIssue, issue);
+          });
+          if (issueIndex === -1) {
+            var invalidIssueError = new Error(
+              'an issue which was not fetched from the backend has been ' +
+              'resolved');
+            return Promise.reject(invalidIssueError);
+          } else {
+            cachedIssues.splice(issueIndex, 1);
+            return Promise.resolve();
+          }
         });
       },
     };
