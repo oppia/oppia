@@ -83,13 +83,13 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
               playthroughBackendDict);
           });
       },
-      resolveIssue: function(issue, expId, expVersion) {
+      resolveIssue: function(issueToResolve, expId, expVersion) {
         return $http.post(getFullResolveIssueUrl(expId), {
-          exp_issue_dict: issue.toBackendDict(),
+          exp_issue_dict: issueToResolve.toBackendDict(),
           exp_version: expVersion
         }).then(function() {
           var issueIndex = cachedIssues.findIndex(function(cachedIssue) {
-            return angular.equals(cachedIssue, issue);
+            return angular.equals(cachedIssue, issueToResolve);
           });
           if (issueIndex === -1) {
             var invalidIssueError = new Error(
