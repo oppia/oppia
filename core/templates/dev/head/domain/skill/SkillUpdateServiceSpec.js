@@ -18,6 +18,7 @@
 
 describe('Skill update service', function() {
   var SkillUpdateService,
+    SubtitledHtmlObjectFactory,
     SkillObjectFactory,
     MisconceptionObjectFactory,
     UndoRedoService;
@@ -46,7 +47,7 @@ describe('Skill update service', function() {
       feedback: 'test feedback'
     };
 
-    skillContentsDict = {
+    var skillContentsDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',

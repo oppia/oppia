@@ -83,6 +83,11 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 content_ids_to_audio_translations_dict,
             'subtitled_html': {
                 'content_id': 'content', 'html': 'hello world'
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {}
+                }
             }
         }
         self.subtopic_page.update_page_contents_html({

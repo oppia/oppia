@@ -276,7 +276,7 @@ describe('Answer classification service with string classifier enabled',
 
     var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
       STATISTICAL_CLASSIFICATION;
-    var acs, scms, sof, oof, acrof, $stateName, state, state2,
+    var acs, scms, sof, oof, acrof, stateName, state, state2,
       registryService, stateClassifierMapping;
     beforeEach(inject(function($injector) {
       acs = $injector.get('AnswerClassificationService');
@@ -446,7 +446,7 @@ describe('Answer classification service with training data classification',
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     var EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION;
-    var acs, sof, oof, acrof, $stateName, state, state2,
+    var acs, sof, oof, acrof, stateName, state, state2,
       registryService, stateClassifierMapping;
     beforeEach(inject(function($injector) {
       acs = $injector.get('AnswerClassificationService');

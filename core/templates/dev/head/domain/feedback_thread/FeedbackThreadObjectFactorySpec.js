@@ -25,7 +25,7 @@ describe('Feedback thread object factory', function() {
   }));
 
   it('should create a new feedback thread from a backend dict.', function() {
-    feedbackThreadBackendDict = {
+    var feedbackThreadBackendDict = {
       last_updated: 1000,
       original_author_username: 'author',
       status: 'accepted',
@@ -36,7 +36,7 @@ describe('Feedback thread object factory', function() {
       thread_id: 'exp1.thread1'
     };
 
-    feedbackThread = FeedbackThreadObjectFactory.createFromBackendDict(
+    var feedbackThread = FeedbackThreadObjectFactory.createFromBackendDict(
       feedbackThreadBackendDict);
     expect(feedbackThread.status).toEqual('accepted');
     expect(feedbackThread.subject).toEqual('sample subject');
@@ -48,7 +48,7 @@ describe('Feedback thread object factory', function() {
     expect(feedbackThread.threadId).toEqual('exp1.thread1');
     expect(feedbackThread.isSuggestionThread()).toEqual(false);
 
-    messages = [{
+    var messages = [{
       text: 'message1'
     }, {
       text: 'message2'
