@@ -89,7 +89,7 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
           exp_version: expVersion
         }).then(function() {
           var issueIndex = cachedIssues.findIndex(function(cachedIssue) {
-            return Object.is(cachedIssue, issue);
+            return angular.equals(cachedIssue, issue);
           });
           if (issueIndex === -1) {
             var invalidIssueError = new Error(
