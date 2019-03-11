@@ -47,7 +47,7 @@ oppia.factory('PlaythroughIssuesService', [
       var suggestions = [
         ('Review the cards up to and including "' +
           issue.issueCustomizationArgs.state_name.value + '" for errors, ' +
-          'ambiguities or insufficient motivation.'),
+          'ambiguities, or insufficient motivation.'),
       ];
       return suggestions;
     };
@@ -57,7 +57,7 @@ oppia.factory('PlaythroughIssuesService', [
         ('Check the wording of the card "' + stateName + '" to ensure it is ' +
           'not confusing.'),
         ('Consider addressing the answers submitted in the sample ' +
-          'playthroughs explicitly, using answer groups.'),
+          'playthroughs explicitly using answer groups.'),
       ];
       return suggestions;
     };
