@@ -98,7 +98,6 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
             return Promise.reject(invalidIssueError);
           } else {
             cachedIssues.splice(issueIndex, 1);
-            return Promise.resolve();
           }
         });
       },
