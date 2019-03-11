@@ -38,6 +38,7 @@ oppia.factory('ImprovementCardService', [
       PlaythroughImprovementCardObjectFactory,
     ]);
 
+    /** @type {Object[]} */
     var cardCache = null;
 
     return {
