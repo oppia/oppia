@@ -60,8 +60,7 @@ oppia.factory('ImprovementCardService', [
           })
         ).then(function(cardsFromFactories) {
           // Flatten the cards into a single list before returning.
-          cardCache = [].concat.apply([], cardsFromFactories);
-          return cardCache;
+          return [].concat.apply([], cardsFromFactories);
         });
       },
     };
