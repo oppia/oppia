@@ -67,8 +67,8 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
               exp_version: explorationVersion
             }
           }).then(function(response) {
-            var unresolvedIssuesDicts = response.data;
-            cachedIssues = unresolvedIssuesDicts.map(
+            var unresolvedIssueBackendDicts = response.data;
+            cachedIssues = unresolvedIssueBackendDicts.map(
               PlaythroughIssueObjectFactory.createFromBackendDict);
             return cachedIssues;
           });
