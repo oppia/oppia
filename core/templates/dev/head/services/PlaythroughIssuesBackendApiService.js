@@ -61,17 +61,18 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
       fetchIssues: function(explorationId, explorationVersion) {
         if (cachedIssues !== null) {
           return Promise.resolve(cachedIssues);
+        } else {
+          return $http.get(getFullIssuesUrl(explorationId), {
+            params: {
+              exp_version: explorationVersion
+            }
+          }).then(function(response) {
+            var unresolvedIssuesDicts = response.data;
+            cachedIssues = unresolvedIssuesDicts.map(
+              PlaythroughIssueObjectFactory.createFromBackendDict);
+            return cachedIssues;
+          });
         }
-        return $http.get(getFullIssuesUrl(explorationId), {
-          params: {
-            exp_version: explorationVersion
-          }
-        }).then(function(response) {
-          var unresolvedIssuesDicts = response.data;
-          cachedIssues = unresolvedIssuesDicts.map(
-            PlaythroughIssueObjectFactory.createFromBackendDict);
-          return cachedIssues;
-        });
       },
       fetchPlaythrough: function(expId, playthroughId) {
         return $http.get(getFullPlaythroughUrl(expId, playthroughId)).then(
