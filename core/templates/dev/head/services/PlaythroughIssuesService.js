@@ -17,13 +17,13 @@
  */
 
 oppia.factory('PlaythroughIssuesService', [
-  '$sce', '$uibModal', 'PlaythroughIssuesBackendApiService',
-  'UrlInterpolationService', 'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
-  'ISSUE_TYPE_EARLY_QUIT', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  '$uibModal', 'PlaythroughIssuesBackendApiService', 'UrlInterpolationService',
+  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
+  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
-      $sce, $uibModal, PlaythroughIssuesBackendApiService,
-      UrlInterpolationService, ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
-      ISSUE_TYPE_EARLY_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+      $uibModal, PlaythroughIssuesBackendApiService, UrlInterpolationService,
+      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
+      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
@@ -34,47 +34,42 @@ oppia.factory('PlaythroughIssuesService', [
     };
 
     var renderMultipleIncorrectIssueStatement = function(stateName) {
-      var statement =
-        'Several learners submitted answers to card "' + stateName +
+      return 'Several learners submitted answers to card "' + stateName +
         '" several times, then gave up and quit.';
-      return statement;
     };
 
     var renderCyclicTransitionsIssueStatement = function(stateName) {
-      return (
-        'Several learners ended up in a cyclic loop revisiting card "' +
-        stateName + '" many times.');
+      return 'Several learners ended up in a cyclic loop revisiting card "' +
+        stateName + '" many times.';
     };
 
     var renderEarlyQuitIssueSuggestions = function(issue) {
-      var suggestions = [$sce.trustAsHtml(
-        'Review the cards up to and including <span class="state_link">' +
-        '"' + issue.issueCustomizationArgs.state_name.value + '"</span> for' +
-        ' errors, ambiguities or insufficient motivation.'
-      )];
+      var suggestions = [
+        ('Review the cards up to and including "' +
+          issue.issueCustomizationArgs.state_name.value + '" for errors, ' +
+          'ambiguities or insufficient motivation.'),
+      ];
       return suggestions;
     };
 
     var renderMultipleIncorrectIssueSuggestions = function(stateName) {
-      var suggestions = [$sce.trustAsHtml(
-        'Check the wording of the card <span class="state_link">"' +
-        stateName + '"</span> to ensure it is not confusing.'
-      ), $sce.trustAsHtml(
-        'Consider addressing the answers submitted in the sample playthroughs' +
-        ' explicitly, using answer groups.'
-      )];
+      var suggestions = [
+        ('Check the wording of the card "' + stateName + '" to ensure it is ' +
+          'not confusing.'),
+        ('Consider addressing the answers submitted in the sample ' +
+          'playthroughs explicitly, using answer groups.'),
+      ];
       return suggestions;
     };
 
     var renderCyclicTransitionsIssueSuggestions = function(issue) {
       var stateNames = issue.issueCustomizationArgs.state_names.value;
       var finalIndex = stateNames.length - 1;
-      var suggestions = [$sce.trustAsHtml(
-        'Check that the concept presented in <span class="state_link">"' +
-        stateNames[0] + '"</span> has been reinforced sufficiently by the ' +
-        'time the learner gets to <span class="state_link">"' +
-        stateNames[finalIndex] + '"</span>.'
-      )];
+      var suggestions = [
+        ('Check that the concept presented in "' + stateNames[0] + '" has ' +
+          'been reinforced sufficiently by the time the learner gets to "' +
+          stateNames[finalIndex] + '".'),
+      ];
       return suggestions;
     };
 
