@@ -36,9 +36,9 @@ oppia.directive('improvementsTab', [
           $scope.getCards = function() {
             return fetchedCards;
           };
-          $scope.getUnresolvedCardsCount = function() {
+          $scope.getOpenCardCount = function() {
             return fetchedCards.filter(function(card) {
-              return !card.isResolved();
+              return card.isOpen();
             }).length;
           };
         }

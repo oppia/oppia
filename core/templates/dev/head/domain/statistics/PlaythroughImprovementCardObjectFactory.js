@@ -77,11 +77,11 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
     };
 
     /**
-     * @returns {boolean} - Whether the Playthrough Issue has been marked as
-     * manually resolved by the creator.
+     * @returns {boolean} - Whether the improvement which this card suggests is
+     * open, i.e., still relevant and actionable.
      */
-    PlaythroughImprovementCard.prototype.isResolved = function() {
-      return this._isDiscarded;
+    PlaythroughImprovementCard.prototype.isOpen = function() {
+      return !this._isDiscarded;
     };
 
     /** @returns {string} - A simple summary of the Playthrough Issue */

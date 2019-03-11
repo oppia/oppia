@@ -161,10 +161,10 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           result: Promise.resolve(), // Returned when confirm button is pressed.
         });
 
-        expect(card.isResolved()).toBe(false);
+        expect(card.isOpen()).toBe(true);
         discardActionButton.execute().then(function() {
           expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
-          expect(card.isResolved()).toBe(true);
+          expect(card.isOpen()).toBe(false);
           done();
         }, function() {
           done.fail('dismiss button unexpectedly failed.');
@@ -182,12 +182,12 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
           result: Promise.reject(), // Returned when cancel button is pressed.
         });
 
-        expect(card.isResolved()).toBe(false);
+        expect(card.isOpen()).toBe(true);
         discardActionButton.execute().then(function() {
           done.fail('dismiss button unexpectedly succeeded.');
         }, function() {
           expect(resolveIssueSpy).not.toHaveBeenCalled();
-          expect(card.isResolved()).toBe(false);
+          expect(card.isOpen()).toBe(true);
           done();
         });
       });

@@ -21,9 +21,9 @@
  *       A "static" function that can be called on the factory itself. It should
  *       return a Promise of an array of cards associated to the current
  *       exploration.
- *   - Card.prototype.isResolved() -> boolean
+ *   - Card.prototype.isOpen() -> boolean
  *       A "member" function which returns whether the improvement which the
- *       card suggests has been resolved.
+ *       card suggests is open, i.e., still relevant and actionable.
  *   - Card.prototype.getTitle() -> string
  *   - Card.prototype.getDirectiveType() -> string
  *   - Card.prototype.getDirectiveData() -> *
