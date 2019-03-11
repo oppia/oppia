@@ -16,6 +16,9 @@
  * @fileoverview Controller for landing page.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('services/SiteAnalyticsService.js');
+
 // Note: This oppia constant needs to be keep in sync with
 // AVAILABLE_LANDING_PAGES constant defined in feconf.py file.
 oppia.constant('TOPIC_LANDING_PAGE_DATA', {
@@ -38,6 +41,8 @@ oppia.constant('TOPIC_LANDING_PAGE_DATA', {
     }
   }
 });
+
+
 
 oppia.controller('TopicLandingPage', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',

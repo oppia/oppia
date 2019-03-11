@@ -17,6 +17,8 @@
  * in collection player.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.directive('collectionFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

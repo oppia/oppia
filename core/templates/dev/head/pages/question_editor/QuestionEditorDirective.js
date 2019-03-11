@@ -15,6 +15,19 @@
 /**
  * @fileoverview Controller for the questions editor directive.
  */
+
+require('components/QuestionCreationService.js');
+require('domain/question/EditableQuestionBackendApiService.js');
+require('domain/question/QuestionObjectFactory.js');
+require('domain/question/QuestionUpdateService.js');
+require('pages/exploration_editor/editor_tab/ResponsesService.js');
+require('pages/exploration_editor/editor_tab/SolutionValidityService.js');
+require('pages/state_editor/StateEditorService.js');
+require('pages/topic_editor/TopicEditorStateService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/AlertsService.js');
+require('services/EditabilityService.js');
+
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 oppia.directive('questionEditor', [

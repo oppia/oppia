@@ -16,6 +16,17 @@
  * @fileoverview Data and controllers for the Oppia contributors' library page.
  */
 
+require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.js');
+require('domain/learner_dashboard/LearnerDashboardIdsBackendApiService.js');
+require('domain/learner_dashboard/LearnerPlaylistService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/AlertsService.js');
+require('services/ConstructTranslationIdsService.js');
+require('services/SearchService.js');
+require('services/UserService.js');
+require('services/contextual/UrlService.js');
+require('services/contextual/WindowDimensionsService.js');
+
 // NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
 // be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
 // LIBRARY_PAGE_MODES.GROUP should have the same value as

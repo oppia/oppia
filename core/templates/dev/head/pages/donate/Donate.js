@@ -15,15 +15,11 @@
 /**
  * @fileoverview Controllers for the donate page.
  */
-try {
-  require('domain/utilities/UrlInterpolationService.js');
-  require('services/SiteAnalyticsService.js');
-  require('services/contextual/WindowDimensionsService.js');
-} catch (e) {
-  if (!(e instanceof ReferenceError)) {
-    throw e;
-  }
-}
+
+require('domain/utilities/UrlInterpolationService.js');
+require('services/SiteAnalyticsService.js');
+require('services/contextual/WindowDimensionsService.js');
+
 oppia.controller('Donate', [
   '$http', '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'WindowDimensionsService',

@@ -16,6 +16,8 @@
  * @fileoverview Controllers for the error page.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.controller('Error', [
   '$scope', 'UrlInterpolationService',
   function(

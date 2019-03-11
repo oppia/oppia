@@ -16,6 +16,16 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.js');
+require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.js');
+require('domain/learner_dashboard/LearnerDashboardBackendApiService.js');
+require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js');
+require('pages/suggestion_editor/ShowSuggestionModalForLearnerViewService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/AlertsService.js');
+require('services/DateTimeFormatService.js');
+require('services/UserService.js');
+
 oppia.constant('LEARNER_DASHBOARD_SECTION_I18N_IDS', {
   INCOMPLETE: 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION',
   COMPLETED: 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION',

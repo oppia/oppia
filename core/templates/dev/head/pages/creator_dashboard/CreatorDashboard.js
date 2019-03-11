@@ -16,6 +16,20 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+require('components/ExplorationCreationService.js');
+require('components/RatingComputationService.js');
+require('domain/creator_dashboard/CreatorDashboardBackendApiService.js');
+require('domain/question/QuestionObjectFactory.js');
+require('domain/suggestion/SuggestionObjectFactory.js');
+require('domain/suggestion/SuggestionThreadObjectFactory.js');
+require('domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js');
+require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js');
+require('pages/suggestion_editor/ShowSuggestionModalForCreatorViewService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/AlertsService.js');
+require('services/DateTimeFormatService.js');
+require('services/UserService.js');
+
 oppia.constant('EXPLORATION_DROPDOWN_STATS', {
   OPEN_FEEDBACK: 'open_feedback'
 });

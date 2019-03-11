@@ -16,6 +16,13 @@
  * @fileoverview Controller for the learner's view of a collection.
  */
 
+require('domain/collection/CollectionObjectFactory.js');
+require('domain/collection/CollectionPlaythroughObjectFactory.js');
+require('domain/collection/GuestCollectionProgressService.js');
+require('domain/collection/ReadOnlyCollectionBackendApiService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/AlertsService.js');
+
 oppia.constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
 

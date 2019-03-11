@@ -16,6 +16,14 @@
  * @fileoverview Directive for the Search Bar.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('services/ConstructTranslationIdsService.js');
+require('services/DebouncerService.js');
+require('services/HtmlEscaperService.js');
+require('services/NavigationService.js');
+require('services/SearchService.js');
+require('services/contextual/UrlService.js');
+
 oppia.directive('searchBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

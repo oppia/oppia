@@ -16,6 +16,10 @@
  * @fileoverview Directive for showing search results.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('services/SiteAnalyticsService.js');
+require('services/UserService.js');
+
 oppia.directive('searchResults', [
   '$q', 'UrlInterpolationService', function($q, UrlInterpolationService) {
     return {

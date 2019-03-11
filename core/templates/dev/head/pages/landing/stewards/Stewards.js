@@ -16,6 +16,11 @@
  * @fileoverview Controller for the stewards landing page.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('services/SiteAnalyticsService.js');
+require('services/contextual/UrlService.js');
+require('services/contextual/WindowDimensionsService.js');
+
 oppia.controller('Stewards', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'UrlService', 'WindowDimensionsService',
