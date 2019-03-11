@@ -93,7 +93,7 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
           });
           if (issueIndex === -1) {
             var invalidIssueError = new Error(
-              'an issue which was not fetched from the backend has been ' +
+              'An issue which was not fetched from the backend has been ' +
               'resolved');
             return Promise.reject(invalidIssueError);
           } else {
