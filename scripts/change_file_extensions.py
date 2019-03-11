@@ -17,7 +17,7 @@
 """Utility script to change file extensions."""
 
 import os
-
+import subprocess
 
 def change_extension(path_list, current_extension, new_extension):
     """Method to change file extensions."""
@@ -32,12 +32,13 @@ def change_extension(path_list, current_extension, new_extension):
     for complete_file_name in files:
         filename, file_extension = os.path.splitext(complete_file_name)
         if file_extension == current_extension:
-            os.rename(complete_file_name, filename + new_extension)
+            subprocess.call(
+                ['git', 'mv', complete_file_name, filename + new_extension])
 
 
 if __name__ == '__main__':
     change_extension(
         ['./core', './extensions'],
-        '.ts',
-        '.js'
+        '.js',
+        '.ts'
     )
