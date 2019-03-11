@@ -88,8 +88,8 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
           exp_issue_dict: issueToResolve.toBackendDict(),
           exp_version: expVersion
         }).then(function() {
-          var issueIndex = cachedIssues.findIndex(function(cachedIssue) {
-            return angular.equals(cachedIssue, issueToResolve);
+          var issueIndex = cachedIssues.findIndex(function(issue) {
+            return angular.equals(issue, issueToResolve);
           });
           if (issueIndex === -1) {
             var invalidIssueError = new Error(
