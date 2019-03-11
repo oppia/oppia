@@ -33,7 +33,7 @@ describe('ImprovementCardService', function() {
       var actualFactories =
         this.ImprovementCardService.getImprovementCardObjectFactoryRegistry();
 
-      // The factories should not be modifiable.
+      // The registry should not be modifiable.
       expect(Object.isFrozen(actualFactories)).toBe(true);
 
       // Ordering isn't important, so allow the checks to be flexible.
