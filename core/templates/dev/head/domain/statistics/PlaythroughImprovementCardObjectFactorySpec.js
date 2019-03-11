@@ -31,6 +31,27 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
   }));
 
   describe('.createNew', function() {
+    it('retrieves data from passed issue', function() {
+      var issue = this.PlaythroughIssueObjectFactory.createFromBackendDict({
+        issue_type: 'EarlyQuit',
+        issue_customization_args: {
+          state_name: {value: 'Hola'},
+          time_spent_in_exp_in_msecs: {value: 5000},
+        },
+        playthrough_ids: ['1', '2'],
+        schema_version: 1,
+        is_valid: true,
+      });
+      var card = this.PlaythroughImprovementCardObjectFactory.createNew(issue);
+
+      expect(card.getTitle()).toEqual(
+        this.PlaythroughIssuesService.renderIssueStatement(issue));
+      expect(card.getDirectiveData()).toEqual({
+        suggestions:
+          this.PlaythroughIssuesService.renderIssueSuggestions(issue),
+        playthroughIds: ['1', '2'],
+      });
+    });
   });
 
   describe('.fetchCards', function() {
