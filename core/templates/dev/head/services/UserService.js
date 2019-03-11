@@ -17,16 +17,23 @@
  */
 
 oppia.factory('UserService', [
-  '$http', '$q', '$window', 'UrlInterpolationService', 'UserInfoObjectFactory',
+  '$http', '$q', '$window', '$cookies', 'UrlInterpolationService', 'UserInfoObjectFactory',
   'DEFAULT_PROFILE_IMAGE_PATH',
-  function($http, $q, $window, UrlInterpolationService, UserInfoObjectFactory,
+  function($http, $q, $window, $cookies, UrlInterpolationService, UserInfoObjectFactory,
       DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
     var userInfo = null;
 
+    // TODO(userIsLoggedIn): Find a way to substitute out constants.DEV_MODE so that we
+    // can check ACSID, SACSID cookies.
+    //if DEV_MODE = false, we have to check ACSID and SACSID cookies.
+    var current_url =  $window.location.href
+    var userIsLoggedIn = ($cookies.get('dev_appserver_login')!==undefined
+    && !current_url.includes("signup"));
+
     var getUserInfoAsync = function() {
-      if (GLOBALS.userIsLoggedIn) {
+      if (userIsLoggedIn) {
         if (userInfo) {
           return $q.resolve(userInfo);
         }
@@ -47,7 +54,7 @@ oppia.factory('UserService', [
           UrlInterpolationService.getStaticImageUrl(
             DEFAULT_PROFILE_IMAGE_PATH));
 
-        if (GLOBALS.userIsLoggedIn) {
+        if (userIsLoggedIn) {
           return $http.get(
             '/preferenceshandler/profile_picture'
           ).then(function(response) {
