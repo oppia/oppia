@@ -7,7 +7,7 @@
       </div>
     </md-card>
   </div>
-  <div style="padding: 0 15px">
+  <div>
     <md-card ng-repeat="card in getCards()" ng-if="!card.isResolved()"
              class="oppia-editor-card oppia-improvement-card md-default-theme">
       <div>
@@ -22,7 +22,7 @@
       <div class="text-right">
         <button ng-repeat="actionButton in card.getActionButtons()"
                 ng-click="actionButton.execute()"
-                class="btn <[actionButton.getCssClass()]>">
+                class="btn <[actionButton.getCssClass()]>" style="margin-left: 15px">
           <[actionButton.getText()]>
         </button>
       </div>
