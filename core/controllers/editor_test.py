@@ -161,9 +161,6 @@ class EditorTests(BaseEditorControllerTests):
         # Validates if the current NEW_STATE_TEMPLATE is the latest version
         # by validating it.
         exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
-        self.assertEqual(
-            feconf.CURRENT_STATES_SCHEMA_VERSION,
-            constants.CURRENT_STATES_SCHEMA_VERSION)
 
 
     def test_that_default_exploration_cannot_be_published(self):

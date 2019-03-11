@@ -21,8 +21,13 @@ describe('Question update service', function() {
   var QuestionObjectFactory = null;
   var QuestionUndoRedoService = null;
   var StateObjectFactory = null;
+  var SubtitledHtmlObjectFactory = null;
   var sampleQuestion = null;
   var sampleStateTwo = null;
+  var sampleStateDict = null;
+  var expectedOutputStateDict = null;
+  var expectedOutputState = null;
+  var sampleQuestionBackendObject = null;
 
   beforeEach(module('oppia'));
 
@@ -33,7 +38,7 @@ describe('Question update service', function() {
     StateObjectFactory = $injector.get('StateObjectFactory');
     SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
-    var sampleStateDict = {
+    sampleStateDict = {
       name: 'question',
       classifier_model_id: 0,
       content: {
@@ -46,22 +51,37 @@ describe('Question update service', function() {
           rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
           outcome: {
             dest: 'Me Llamo',
-            feedback: {html: 'buen trabajo!'},
+            feedback: {
+              content_id: 'feedback_1',
+              html: 'buen trabajo!'
+            },
             labelled_as_correct: true
           }
         }],
         default_outcome: {
           dest: 'Hola',
-          feedback: {html: 'try again!'},
+          feedback: {
+            content_id: 'default_outcome',
+            html: 'try again!'
+          },
           labelled_as_correct: false
         },
         hints: [],
         id: 'TextInput',
       },
-      content_ids_to_audio_translations: {}
+      content_ids_to_audio_translations: {
+        content: {},
+        default_outcome: {}
+      },
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
     };
 
-    var expectedOutputStateDict = {
+    expectedOutputStateDict = {
       name: 'question',
       classifier_model_id: 0,
       content: {
@@ -74,25 +94,40 @@ describe('Question update service', function() {
           rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
           outcome: {
             dest: 'Me Llamo',
-            feedback: {html: 'buen trabajo!'},
+            feedback: {
+              content_id: 'feedback_1',
+              html: 'buen trabajo!'
+            },
             labelled_as_correct: true
           }
         }],
         default_outcome: {
           dest: 'Hola',
-          feedback: {html: 'try again!'},
+          feedback: {
+            content_id: 'default_outcome',
+            html: 'try again!'
+          },
           labelled_as_correct: false
         },
         hints: [],
         id: 'TextInput',
       },
-      content_ids_to_audio_translations: {}
+      content_ids_to_audio_translations: {
+        content: {},
+        default_outcome: {}
+      },
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
     };
 
     expectedOutputState = StateObjectFactory.createFromBackendDict(
       'question', expectedOutputStateDict);
 
-    var sampleQuestionBackendObject = {
+    sampleQuestionBackendObject = {
       id: '0',
       question_state_data: sampleStateDict,
       language_code: 'en',

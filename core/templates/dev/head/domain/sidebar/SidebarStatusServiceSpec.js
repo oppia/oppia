@@ -17,7 +17,7 @@
  */
 
 describe('SidebarStatusService', function() {
-  var SidebarStatusService;
+  var SidebarStatusService, $window;
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector, _$window_) {

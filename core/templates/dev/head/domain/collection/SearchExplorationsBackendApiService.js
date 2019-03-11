@@ -24,7 +24,7 @@ oppia.factory('SearchExplorationsBackendApiService', [
       SEARCH_EXPLORATION_URL_TEMPLATE) {
     var _fetchExplorations = function(
         searchQuery, successCallback, errorCallback) {
-      queryUrl = UrlInterpolationService.interpolateUrl(
+      var queryUrl = UrlInterpolationService.interpolateUrl(
         SEARCH_EXPLORATION_URL_TEMPLATE, {
           query: btoa(searchQuery)
         }

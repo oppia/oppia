@@ -70,7 +70,14 @@ describe('StateImprovementSuggestionService', function() {
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       }
     };
 
@@ -116,7 +123,14 @@ describe('StateImprovementSuggestionService', function() {
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        },
       },
       end: {
         content: {
@@ -158,7 +172,14 @@ describe('StateImprovementSuggestionService', function() {
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        },
       }
     };
 
@@ -204,7 +225,14 @@ describe('StateImprovementSuggestionService', function() {
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        },
       },
       'State 2': {
         content: {
@@ -246,7 +274,14 @@ describe('StateImprovementSuggestionService', function() {
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        },
       }
     };
 

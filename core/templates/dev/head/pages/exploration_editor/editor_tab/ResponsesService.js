@@ -320,11 +320,12 @@ oppia.factory('ResponsesService', [
             return choice.val;
           });
 
+          var key, newInputValue;
           _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
             var newRules = angular.copy(answerGroup.rules);
             newRules.forEach(function(rule) {
-              for (var key in rule.inputs) {
-                var newInputValue = [];
+              for (key in rule.inputs) {
+                newInputValue = [];
                 rule.inputs[key].forEach(function(item) {
                   var newIndex = newChoiceStrings.indexOf(item);
                   if (newIndex !== -1) {
@@ -383,21 +384,21 @@ oppia.factory('ResponsesService', [
               var newRules = angular.copy(answerGroup.rules);
               newRules.forEach(function(rule) {
                 if (rule.type === 'HasElementXAtPositionY') {
-                  for (var key in rule.inputs) {
-                    var newInputValue = '';
+                  for (key in rule.inputs) {
+                    newInputValue = '';
                     if (key === 'y') {
                       newInputValue = 1;
                     }
                     rule.inputs[key] = newInputValue;
                   }
                 } else if (rule.type === 'HasElementXBeforeElementY') {
-                  for (var key in rule.inputs) {
-                    var newInputValue = '';
+                  for (key in rule.inputs) {
+                    newInputValue = '';
                     rule.inputs[key] = newInputValue;
                   }
                 } else {
-                  for (var key in rule.inputs) {
-                    var newInputValue = [];
+                  for (key in rule.inputs) {
+                    newInputValue = [];
                     rule.inputs[key] = newInputValue;
                   }
                 }

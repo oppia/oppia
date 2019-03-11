@@ -29,7 +29,7 @@ oppia.factory('ExplorationFeaturesService', [function() {
       settings.isImprovementsTabEnabled =
         featuresData.is_improvements_tab_enabled;
       settings.isPlaythroughRecordingEnabled =
-        featuresData.is_playthrough_recording_enabled;
+        featuresData.is_exploration_whitelisted;
       if (explorationData.param_changes &&
           explorationData.param_changes.length > 0) {
         this.enableParameters();

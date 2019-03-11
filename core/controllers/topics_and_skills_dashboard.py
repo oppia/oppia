@@ -202,6 +202,13 @@ class MergeSkillHandler(base.BaseHandler):
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
                 'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': old_skill.superseding_skill_id,
+                'new_value': new_skill_id
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
                     skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
                 'old_value': False,
                 'new_value': True
