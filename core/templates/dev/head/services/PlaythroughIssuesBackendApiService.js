@@ -86,6 +86,9 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
         return $http.post(getFullResolveIssueUrl(expId), {
           exp_issue_dict: issue.toBackendDict(),
           exp_version: expVersion
+        }).then(function() {
+          // Invalidate the cache to force users to refetch from the backend.
+          cachedIssues = null;
         });
       },
     };
