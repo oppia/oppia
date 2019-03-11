@@ -16,8 +16,7 @@
  * @fileoverview Service for consolidating and accessing the types of
  * improvement cards that can be rendered in the Improvements Tab.
  *
- * All Improvement Cards must provide the following functions (which are
- * enforced by unit tests):
+ * All Improvement Cards should provide the following functions:
  *   - Card.fetchCards() -> Promise<Card[]>
  *       A "static" function that can be called on the factory itself. It should
  *       return a Promise of an array of cards associated to the current
@@ -28,7 +27,7 @@
  *   - Card.prototype.getTitle() -> string
  *   - Card.prototype.getDirectiveType() -> string
  *   - Card.prototype.getDirectiveData() -> string
- *   - Card.prototype.getActions() -> ImprovementAction[]
+ *   - Card.prototype.getActionButtons() -> ImprovementActionButton[]
  */
 
 oppia.factory('ImprovementCardService', [
