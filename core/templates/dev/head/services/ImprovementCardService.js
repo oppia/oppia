@@ -26,7 +26,7 @@
  *       card suggests has been resolved.
  *   - Card.prototype.getTitle() -> string
  *   - Card.prototype.getDirectiveType() -> string
- *   - Card.prototype.getDirectiveData() -> string
+ *   - Card.prototype.getDirectiveData() -> *
  *   - Card.prototype.getActionButtons() -> ImprovementActionButton[]
  */
 
