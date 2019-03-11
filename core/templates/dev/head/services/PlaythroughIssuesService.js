@@ -88,15 +88,11 @@ oppia.factory('PlaythroughIssuesService', [
       },
       getIssues: function() {
         return PlaythroughIssuesBackendApiService.fetchIssues(
-          explorationId, explorationVersion).then(function(issues) {
-          return issues;
-        });
+          explorationId, explorationVersion);
       },
       getPlaythrough: function(playthroughId) {
         return PlaythroughIssuesBackendApiService.fetchPlaythrough(
-          explorationId, playthroughId).then(function(playthrough) {
-          return playthrough;
-        });
+          explorationId, playthroughId);
       },
       renderIssueStatement: function(issue) {
         var issueType = issue.issueType;
