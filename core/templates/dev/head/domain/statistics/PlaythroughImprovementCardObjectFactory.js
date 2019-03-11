@@ -117,7 +117,10 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
     };
 
     return {
-      /** @returns {PlaythroughImprovementCard} */
+      /**
+       * @returns {PlaythroughImprovementCard}
+       * @param {PlaythroughIssue} issue - The issue this card is referring to.
+       */
       createNew: function(issue) {
         return new PlaythroughImprovementCard(issue);
       },
