@@ -93,8 +93,7 @@ oppia.directive('audioTranslationBar', [
           $scope.checkingMicrophonePermission = false;
           $scope.audioTimerIsShown = true;
           $scope.audioIsCurrentlyBeingSaved = false;
-
-          // 82 belongs to the keycode for 'R'  
+          // 82 belongs to the keycode for 'R'
           // Used as shortcut key for recording
           document.body.onkeyup = function(e) {
             if (e.keyCode === 82) {
