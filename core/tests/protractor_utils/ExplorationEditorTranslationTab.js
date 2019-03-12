@@ -139,41 +139,26 @@ var ExplorationEditorTranslationTab = function() {
   var numericalStatus = element(
     by.css('.protractor-test-translation-numerical-status'));
 
-  var numericalStatusAccessibility = element(
-    by.css('.protractor-test-translation-numerical-status'));
-
   var translationTabContentAccessibility = element(
-    by.css('.protractor-test-translation-content-accessibility'));
+    by.css('.protractor-accessibility-test-translation-content'));
 
   var translationTabFeedbackAccessibility = element(
-    by.css('.protractor-test-translation-feedback-accessibility'));
+    by.css('.protractor-accessibility-test-translation-feedback'));
 
   var translationTabHintAccessibility = element(
-    by.css('.protractor-test-translation-hint-accessibility'));
+    by.css('.protractor-accessibility-test-translation-hint'));
 
   var translationTabSolutionAccessibility = element(
-    by.css('.protractor-test-translation-solution-accessibility'));
+    by.css('.protractor-accessibility-test-translation-solution'));
 
   var translationTabStartRecordingAccessibility = element(
-    by.css('.protractor-test-translation-start-record-accessibility'));
+    by.css('.protractor-accessibility-test-translation-start-record'));
 
   var translationTabUploadRecordingAccessibility = element(
-    by.css('.protractor-test-translation-upload-audio-accessibility'));
+    by.css('.protractor-accessibility-test-translation-upload-audio'));
 
   var translationTabPlayRecordingAccessibility = element(
-    by.css('.protractor-test-translation-play-recorded-audio-accessibility'));
-
-  var translationTabStopRecordingAccessibility = element(
-    by.css('.protractor-test-translation-stop-recording-accessibility'));
-
-  var translationTabReRecordingAccessibility = element(
-    by.css('.protractor-test-translation-re-recording-accessibility'));
-
-  var translationTabSaveRecordingAccessibility = element(
-    by.css('.protractor-test-translation-save-recording-accessibility'));
-
-  var translationTabCancelRecordingAccessibility = element(
-    by.css('.protractor-test-translation-cancel-recording-accessibility'));
+    by.css('.protractor-accessibility-test-translation-play-recorded-audio'));
 
   var _selectLanguage = function(language) {
     element(by.css('protractor-test-translation-language-selector')).
@@ -220,7 +205,7 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectNumericalStatusAccessibilityToMatch = function(content) {
-    expect(numericalStatusAccessibility.getAttribute(
+    expect(numericalStatus.getAttribute(
       'aria-label')).toMatch(content);
   };
 

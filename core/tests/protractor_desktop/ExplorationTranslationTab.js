@@ -170,9 +170,9 @@ describe('Exploration translation', function() {
 
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
-      'n item translated out of m items');
+      '0 item translated out of 8 items');
     explorationEditorTranslationTab.expectContentAccessibilityToMatch(
-      'Contents of Lesson');
+      'Content of the card');
     explorationEditorTranslationTab.expectFeedbackAccessibilityToMatch(
       'Feedbacks');
     explorationEditorTranslationTab.expectHintAccessibilityToMatch(
