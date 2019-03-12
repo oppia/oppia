@@ -1936,9 +1936,9 @@ class LintChecksManager(object):
     def _check_codeowner_file(self):
         """Checks the CODEOWNERS file for any uncovered dirs/files and also
         checks that every pattern in the CODEOWNERS file matches at least one
-        file/dir. Note that this checks the CODEOWNERS file according to the glob
-        patterns supported by Python2.7 environment. For more information please
-        refer https://docs.python.org/2/library/glob.html.
+        file/dir. Note that this checks the CODEOWNERS file according to the
+        glob patterns supported by Python2.7 environment. For more information
+        please refer https://docs.python.org/2/library/glob.html.
         """
         if self.verbose_mode_enabled:
             print 'Starting CODEOWNERS file check'
@@ -1948,35 +1948,39 @@ class LintChecksManager(object):
             codeowner_file = '.github/CODEOWNERS'
             failed = False
             summary_messages = []
-            # Checks whether every pattern in the CODEOWNERS file matches at least
-            # one dir/file.
+            # Checks whether every pattern in the CODEOWNERS file matches at
+            # least one dir/file.
             path_patterns = []
-            for line_num, line in enumerate(FileCache.readlines(codeowner_file)):
+            for line_num, line in enumerate(FileCache.readlines(
+                    codeowner_file)):
                 if line.strip() != '' and line.strip()[0] != '#':
                     if '@' not in line:
                         print ('%s --> Pattern on line %s doesn\'t have'
-                            'codeowner' % (codeowner_file, line_num))
+                               'codeowner' % (codeowner_file, line_num))
                         failed = True
                     else:
                         line_in_concern = line.split('@')[0].strip()
                         if line_in_concern.endswith('/'):
                             line_in_concern = line_in_concern[:-1]
                         if not glob.glob(line_in_concern.replace('/', '', 1)):
-                            print ('%s --> Pattern on line %s doesn\'t match any '
-                                'file or directory' % (codeowner_file, line_num))
+                            print ('%s --> Pattern on line %s doesn\'t match '
+                                   'any file or directory' % (
+                                       codeowner_file, line_num))
                             failed = True
                         if (not line_in_concern.startswith('/') and
-                                not './' + line_in_concern in CODEOWNER_FILE_PATHS):
-                            print ('%s --> Pattern on line %s is invalid. Use full '
-                                'path relative to the root directory' % (
-                                    codeowner_file, line_num))
+                                not './' +
+                                line_in_concern in CODEOWNER_FILE_PATHS):
+                            print ('%s --> Pattern on line %s is invalid. Use '
+                                   'full path relative to the root directory'
+                                   % (codeowner_file, line_num))
                             failed = True
                         if '**' in line_in_concern:
-                            print ('%s --> Pattern on line %s is invalid. \'**\' '
-                                'wildcard not allowed' % (
-                                    codeowner_file, line_num))
+                            print ('%s --> Pattern on line %s is invalid. '
+                                   '\'**\' wildcard not allowed' % (
+                                        codeowner_file, line_num))
                             failed = True
-                        path_patterns.append(line_in_concern.replace('/', '', 1))
+                        path_patterns.append(line_in_concern.replace(
+                            '/', '', 1))
 
             # Checks that every dir/file is covered under CODEOWNERS.
             for root, _, filename in os.walk('.'):
@@ -1987,7 +1991,8 @@ class LintChecksManager(object):
                     if any(root.startswith(
                             x) for x in CODEOWNER_DIR_PATHS) or is_root_file:
                         match = False
-                        if file_name.endswith('.pyc') or file_name == '__init__.py':
+                        if file_name.endswith(
+                                '.pyc') or file_name == '__init__.py':
                             match = True
                             continue
                         for path_to_match in path_patterns:
@@ -2004,7 +2009,7 @@ class LintChecksManager(object):
                                 break
                         if not match and self.verbose_mode_enabled:
                             print ('WARNING! %s/%s is not covered under '
-                                'CODEOWNERS' % (root, file_name))
+                                   'CODEOWNERS' % (root, file_name))
 
             if failed:
                 summary_message = '%s   CODEOWNERS file check failed' % (
