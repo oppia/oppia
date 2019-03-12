@@ -156,9 +156,9 @@ oppia.factory('ItemSelectionInputValidationService', [
                     warningsList.push({
                       type: WARNING_TYPES.ERROR,
                       message: (
-                      'In answer group ' + (answerIndex + 1) + ', ' +
-                      'rule ' + (ruleIndex + 1) + ', the "proper subset" ' +
-                      'rule must include at least 2 options.')
+                        'In answer group ' + (answerIndex + 1) + ', ' +
+                        'rule ' + (ruleIndex + 1) + ', the "proper subset" ' +
+                        'rule must include at least 2 options.')
                     });
                   }
                 }
