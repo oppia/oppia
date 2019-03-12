@@ -144,8 +144,7 @@ oppia.factory('ItemSelectionInputValidationService', [
               });
             });
           });
-        }
-        else {
+        } else {
           answerGroups.forEach(function(answerGroup, answerIndex) {
             var rules = answerGroup.rules;
             rules.forEach(function(rule, ruleIndex) {
