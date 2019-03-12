@@ -23,19 +23,19 @@ import utils
 
 class ParamSpecUnitTests(test_utils.GenericTestBase):
     """Tests for parameter domain objects."""
-    # Unittest to test to_dict function.
+
     def test_to_dict(self):
+        # Unit test to test to_dict function.
         initial_vals = {
             'obj_type': 'UnicodeString',
         }
         param_spec_obj = param_domain.ParamSpec('UnicodeString')
-        # ParamSpec.from_dict(initial_vals)
         self.assertDictEqual(
             initial_vals,
             param_spec_obj.to_dict())
 
-    # Unittest to test from_dict function.
     def test_from_dict(self):
+        # Unit test to test from_dict function.
         initial_vals = {
             'obj_type': 'UnicodeString',
         }
@@ -45,8 +45,8 @@ class ParamSpecUnitTests(test_utils.GenericTestBase):
             param_spec_obj.to_dict(),
             obj_from_dict.to_dict())
 
-    # UnitTest to test validate function in ParamSpec class.
     def test_param_spec_validation(self):
+        # Unit test to test validate function in ParamSpec class.
         """Test validation of param specs."""
         param_spec = param_domain.ParamSpec('FakeType')
         with self.assertRaisesRegexp(TypeError, 'is not a valid object class'):
@@ -65,8 +65,8 @@ class ParamSpecUnitTests(test_utils.GenericTestBase):
 
 class ParamChangeUnitTests(test_utils.GenericTestBase):
 
-    # Unittest to test to_dict function.
     def test_to_dict(self):
+        # Unit test to test to_dict function.
         initial_vals = {
             'name': 'abc',
             'generator_id': 'Copier',
@@ -74,13 +74,12 @@ class ParamChangeUnitTests(test_utils.GenericTestBase):
         }
         param_change_obj = param_domain.ParamChange(
             'abc', 'Copier', {'value': '3'})
-        # ParamSpec.from_dict(initial_vals)
         self.assertDictEqual(
             initial_vals,
             param_change_obj.to_dict())
 
-    # Unittest to test from_dict function.
     def test_from_dict(self):
+        # Unit test to test from_dict function.
         initial_vals = {
             'name': 'abc',
             'generator_id': 'Copier',
@@ -93,34 +92,36 @@ class ParamChangeUnitTests(test_utils.GenericTestBase):
             param_change_obj.to_dict(),
             obj_from_dict.to_dict())
 
-
-    # UnitTest to test validate function in ParamChange class.
-    def test_param_change_validation(self):
-        """Test validation of parameter changes."""
+    def test_validation_error_raised_param_change_name_not_a_string(
+            self):
         # Raise an error because the name is not a string.
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected param_change name to be a string'
             ):
             param_domain.ParamChange(1, 'Copier', {}).validate()
 
+    def test_validation_error_raised_invalid_name(self):
         # Raise an error because the name is invalid.
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Only parameter names with characters'
             ):
             param_domain.ParamChange('¡hola', 'Copier', {}).validate()
 
+    def test_validation_error_invalid_generator_id(self):
         # Raise an error because no such generator type exists.
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid generator id'
             ):
             param_domain.ParamChange('abc', 'InvalidGenerator', {}).validate()
 
+    def test_validation_error_customization_args_not_a_dict(self):
         # Raise an error because customization_args is not a dict.
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected a dict'
             ):
             param_domain.ParamChange('abc', 'Copier', ['a', 'b']).validate()
 
+    def test_validation_error_customization_arg_name_not_a_string(self):
         # Raise an error because the customization_arg name is not a string.
         with self.assertRaisesRegexp(
             Exception, 'Invalid parameter change customization_arg name'
