@@ -17,7 +17,7 @@
  */
 
 describe('Promo bar Service', function() {
-  var PromoBarService;
+  var PromoBarService, $httpBackend;
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {

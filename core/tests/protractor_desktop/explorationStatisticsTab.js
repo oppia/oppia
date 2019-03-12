@@ -252,6 +252,11 @@ describe('Issues visualization', function() {
 });
 
 describe('Statistics tab', function() {
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
+  var explorationPlayerPage = null;
+
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();

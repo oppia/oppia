@@ -23,6 +23,10 @@ describe('Collection editor state service', function() {
   var CollectionUpdateService = null;
   var fakeEditableCollectionBackendApiService = null;
   var fakeCollectionRightsBackendApiService = null;
+  var secondBackendCollectionObject = null;
+  var unpublishablePublicCollectionRightsObject = null;
+  var $rootScope = null;
+  var $scope = null;
 
   // TODO(bhenning): Consider moving this to a more shareable location.
   var FakeEditableCollectionBackendApiService = function() {
@@ -121,7 +125,7 @@ describe('Collection editor state service', function() {
       }]
     };
 
-    privateCollectionRightsObject = {
+    var privateCollectionRightsObject = {
       collection_id: '5',
       can_edit: 'true',
       can_unpublish: 'false',

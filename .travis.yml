@@ -106,7 +106,7 @@ install:
 - bash scripts/install_third_party.sh
 
 script:
-- if [ "$RUN_LINT" == 'true' ]; then python scripts/third_party_size_check.py; python scripts/pre_commit_linter.py --path=.; fi
+- if [ "$RUN_LINT" == 'true' ]; then python scripts/third_party_size_check.py; python scripts/pre_commit_linter.py --path=. --verbose; fi
 # These lines are commented out because these checks are being run on CircleCI
 # here: https://circleci.com/gh/oppia/oppia
 # Travis aborts test run if nothing is printed back to STDOUT for some time.

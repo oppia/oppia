@@ -18,6 +18,7 @@
 
 describe('Topic rights object factory', function() {
   var TopicRightsObjectFactory = null;
+  var sampleTopicRights = null;
 
   beforeEach(module('oppia'));
 
@@ -55,7 +56,7 @@ describe('Topic rights object factory', function() {
       can_publish_topic: false
     };
 
-    exampleTopicRights = TopicRightsObjectFactory.createFromBackendDict(
+    var exampleTopicRights = TopicRightsObjectFactory.createFromBackendDict(
       exampleTopicRightsBackendObject);
 
     expect(function() {
