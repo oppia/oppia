@@ -1,0 +1,55 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Practice Session: {{ topic_name }} - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <div class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak">
+    <span class="oppia-navbar-breadcrumb-separator"></span>
+    <span>
+      Practice Session
+    </span>
+  </div>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <background-banner></background-banner>
+  <div ng-controller="PracticeSession" class="oppia-practice_session-container" style="position: relative;">
+    <div class="oppia-practice-session">
+      Practice Session
+    </div>
+  </div>
+  <style>
+
+    .oppia-practice_session-container .oppia-practice-session {
+      color: #01645c;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 3em;
+      margin-top: 0px;
+      margin-bottom: 25px;
+      padding-top: 66.5px;
+      text-align: center;
+    }
+    .oppia-practice_session-containerr {
+      color: black;
+      font-family: 'Roboto', Arial, sans-serif;
+      margin: 0 auto;
+      text-decoration: none;
+    }
+
+    @media(max-width: 925px) {
+      .oppia-practice_session-containerr {
+        max-width: 95%;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
+
+  <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
+  <script src="/templates/dev/head/pages/practice_session/PracticeSession.js"></script>
+{% endblock footer_js %}
