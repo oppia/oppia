@@ -1552,7 +1552,6 @@ class LintChecksManager(object):
                                 print '%s --> Line %s: %s' % (
                                     filepath, line_num, previous_line_message)
                                 print ''
-
                             # Check for punctuation at end of docstring.
                             else:
                                 last_char_is_invalid = prev_line[-1] not in (
