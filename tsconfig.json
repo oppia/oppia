@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "baseUrl": "../node_modules",
     "lib": ["es2017", "dom"],
     "noImplicitUseStrict": true,
     "outDir": "local_compiled_js",
