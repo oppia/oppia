@@ -156,7 +156,7 @@ var ExplorationEditorTranslationTab = function() {
       feedbackTabButton, 'Feedback Tab button is not clickable');
     feedbackTabButton.click();
     expect(feedbackList.count()).toEqual(contents.length);
-    for (index in contents) {
+    for (var index in contents) {
       translationFeedback(index).click();
       expect(translationFeedbackText(index).getText()).toMatch(contents[index]);
     }
@@ -166,7 +166,7 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.elementToBeClickable(
       hintsTabButton, 'Hints Tab button is not clickable');
     hintsTabButton.click();
-    for (index in contents) {
+    for (var index in contents) {
       translationHint(index).click();
       expect(translationHintText(index).getText()).toMatch(contents[index]);
     }

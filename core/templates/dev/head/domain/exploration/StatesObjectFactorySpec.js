@@ -20,7 +20,7 @@ describe('States object factory', function() {
   beforeEach(module('oppia'));
 
   describe('StatesObjectFactory', function() {
-    var scope, sof, statesDict, statesWithAudioDict, atof;
+    var scope, sof, ssof, statesDict, statesWithAudioDict, atof;
     beforeEach(inject(function($injector) {
       ssof = $injector.get('StatesObjectFactory');
       sof = $injector.get('StateObjectFactory');

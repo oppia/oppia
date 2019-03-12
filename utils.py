@@ -424,8 +424,11 @@ def convert_to_hash(input_string, max_length):
             'Expected string, received %s of type %s' %
             (input_string, type(input_string)))
 
-    encoded_string = base64.urlsafe_b64encode(
-        hashlib.sha1(input_string.encode('utf-8')).digest())
+    # Encodes strings using the character set [A-Za-z0-9].
+    encoded_string = base64.b64encode(
+        hashlib.sha1(input_string.encode('utf-8')).digest(),
+        altchars='ab'
+    ).replace('=', 'c')
 
     return encoded_string[:max_length]
 

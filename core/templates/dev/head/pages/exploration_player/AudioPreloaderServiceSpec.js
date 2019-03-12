@@ -38,11 +38,13 @@ describe('Audio preloader service', function() {
 
   var aps, atls, eof, ecs;
   var $httpBackend = null;
+  var UrlInterpolationService = null;
   var $rootScope = null;
   var explorationDict;
   var requestUrl1, requestUrl2, requestUrl3, requestUrl4;
   beforeEach(inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
+    UrlInterpolationService = $injector.get('UrlInterpolationService');
     aps = $injector.get('AudioPreloaderService');
     atls = $injector.get('AudioTranslationLanguageService');
     eof = $injector.get('ExplorationObjectFactory');
