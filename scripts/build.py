@@ -714,7 +714,8 @@ def minify_func(source_path, target_path, file_hashes, filename):
         - HTML files: Remove whitespaces, interpolates paths in HTML to include
         hashes in source directory and save edited file at target directory.
         - CSS or JS files: Minify and save at target directory.
-        - TS files: Compile and minify JS file and save at target directory.
+        - TS files: Compile TS file and save minified JS file at target
+            directory.
         - Other files: Copy the file from source directory to target directory.
     """
     if filename.endswith('.html'):
@@ -727,12 +728,16 @@ def minify_func(source_path, target_path, file_hashes, filename):
         _minify(source_path, target_path)
     elif filename.endswith('.ts'):
         compile_typescript_files(source_path)
-        target_path = target_path.replace('.ts', '.js')
-        minified_target_path = target_path.replace('.js', '_min.js')
-        print 'Minifying %s' % target_path
-        _minify(target_path, minified_target_path)
-        os.remove(target_path)
-        os.rename(minified_target_path, target_path)
+        compiled_target_path = target_path.replace('.ts', '.js')
+        minified_target_path = target_path.replace('.ts', '_min.js')
+        while not os.path.isfile(compiled_target_path):
+            continue
+        print 'Minifying %s' % compiled_target_path
+        _minify(compiled_target_path, minified_target_path)
+        while not os.path.isfile(minified_target_path):
+            continue
+        os.remove(compiled_target_path)
+        os.rename(minified_target_path, compiled_target_path)
     else:
         print 'Copying %s' % source_path
         safe_copy_file(source_path, target_path)
@@ -1155,12 +1160,14 @@ def build():
     parser.add_option(
         '--minify_third_party_libs_only', action='store_true', default=False,
         dest='minify_third_party_libs_only')
+    parser.add_option(
+        '--compile', action='store_true', default=False, dest='compile')
     options = parser.parse_args()[0]
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
-    if not options.prod_mode:
+    if not options.prod_mode or options.compile:
         print 'Compiling typescript files...'
         cmd = '../node_modules/typescript/bin/tsc'
         subprocess.check_call(cmd)
