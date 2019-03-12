@@ -23,8 +23,8 @@ from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 
-(topic_models, base_models, ) = models.Registry.import_models([
-    models.NAMES.topic, models.NAMES.base_model])
+(base_models, topic_models, ) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.topic])
 
 
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
@@ -83,6 +83,21 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
         self.assertEqual(subtopic_pages, [None])
+        subtopic_ids = [self.subtopic_id, 2]
+        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
+            self.TOPIC_ID, subtopic_ids)
+        expected_subtopic_pages = [self.subtopic_page.to_dict(), None]
+        self.assertEqual([subtopic_pages[0].to_dict(), subtopic_pages[1]],
+            expected_subtopic_pages)
+        subtopic_ids = []
+        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
+            self.TOPIC_ID, subtopic_ids)
+        self.assertEqual(subtopic_pages, [])
+        subtopic_ids = [2, 2]
+        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
+            self.TOPIC_ID, subtopic_ids)
+        self.assertEqual(subtopic_pages, [None, None])
+
 
     def test_get_subtopic_page_contents_by_id(self):
         self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(

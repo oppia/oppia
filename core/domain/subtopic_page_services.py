@@ -106,6 +106,7 @@ def get_subtopic_page_contents_by_id(topic_id, subtopic_id, strict=True):
         subtopic_id: int. The id of the subtopic.
         strict: bool. Whether to fail noisily if no subtopic page with the given
             id exists in the datastore.
+
     Returns:
         SubtopicPageContents or None: The page contents for a subtopic page,
             or None if subtopic page does not exist.
