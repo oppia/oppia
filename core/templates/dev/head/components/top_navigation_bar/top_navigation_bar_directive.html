@@ -32,14 +32,14 @@
            aria-haspopup="true"
            aria-expanded="false"
            tabindex="0"
-           ng-mouseover="openSubmenu($event, 'aboutMenu')"
-           ng-mouseleave="closeSubmenuIfNotMobile($event)">
+           ng-mouseover="onMouseoverDropdown($event)"
+           ng-mouseleave="onMouseoutDropdown($event)">
           <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
           <span class="caret"></span>
         </a>
         <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
-            ng-mouseover="openSubmenu($event, 'aboutMenu')"
-            ng-mouseleave="closeSubmenuIfNotMobile($event)"
+            ng-mouseover="onMouseoverDropdown($event)"
+            ng-mouseleave="onMouseoutDropdown($event)"
             role="menu">
           <li><a ng-keydown="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE})" class="oppia-navbar-tab-content protractor-test-about-link" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
           <li><a class="oppia-navbar-tab-content protractor-test-get-started-link " href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
@@ -63,8 +63,8 @@
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
     <li ng-class="{'open' : activeMenuName === 'profileMenu'}" uib-dropdown ng-if="userIsLoggedIn" class="protractor-test-profile-dropdown">
       <a uib-dropdown-toggle class="oppia-navbar-dropdown-toggle"
-         ng-mouseover="openSubmenu($event, 'profileMenu')"
-         ng-mouseleave="closeSubmenuIfNotMobile($event)"
+         ng-mouseover="onMouseoverDropdown($event)"
+         ng-mouseleave="onMouseoutDropdown($event)"
          ng-keydown="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
          role="menuitem"
          aria-haspopup="true"
@@ -101,8 +101,8 @@
       </a>
 
       <ul uib-dropdown-menu class="uib-dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu"
-          ng-mouseover="openSubmenu($event, 'profileMenu')"
-          ng-mouseleave="closeSubmenuIfNotMobile($event)">
+          ng-mouseover="onMouseoverDropdown($event)"
+          ng-mouseleave="onMouseoutDropdown($event)">
         <li>
           <a ng-click="closeSubmenuIfNotMobile($event)" ng-href="<[profilePageUrl]>"
              class="protractor-test-profile-link"

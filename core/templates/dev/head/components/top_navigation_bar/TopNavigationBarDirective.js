@@ -122,19 +122,12 @@ oppia.directive('topNavigationBar', [
            * @param {String} menuName - name of menu, on which
            * open/close action to be performed (aboutMenu,profileMenu).
            */
-          $scope.openSubmenu = function(evt, menuName) {
-            // Focus on the current target before opening its submenu.
-            NavigationService.openSubmenu(evt, menuName);
-          };
           $scope.blurNavigationLinks = function(evt) {
             // This is required because if about submenu is in open state
             // and when you hover on library, both will be highlighted,
             // To avoid that, blur all the a's in nav, so that only one
             // will be highlighted.
             $('nav a').blur();
-          };
-          $scope.closeSubmenu = function(evt) {
-            NavigationService.closeSubmenu(evt);
           };
           $scope.closeSubmenuIfNotMobile = function(evt) {
             if (DeviceInfoService.isMobileDevice()) {
@@ -166,6 +159,13 @@ oppia.directive('topNavigationBar', [
               $scope.$apply();
             }
           });
+
+          $scope.onMouseoverDropdown = function(evt) {
+            NavigationService.onMouseoverDropdown(evt);
+          };
+          $scope.onMouseoutDropdown = function(evt) {
+            NavigationService.onMouseoutDropdown(evt);
+          };
 
           $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
           var currentWindowWidth = WindowDimensionsService.getWidth();
