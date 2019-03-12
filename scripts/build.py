@@ -49,7 +49,7 @@ EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'staging_dir': os.path.join('backend_prod_files', 'extensions', ''),
     'out_dir': os.path.join('build', 'extensions', '')
 }
-TEMPLATES_DEV_DIR = os.path.join('templates')
+TEMPLATES_DEV_DIR = os.path.join('templates', '')
 TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('core', 'templates', ''),
     'staging_dir': os.path.join('backend_prod_files', 'templates', 'head', ''),
