@@ -29,10 +29,18 @@ oppia.factory('UserService', [
     // so that we can check ACSID, SACSID cookies.
     // if DEV_MODE = false, we have to check ACSID and SACSID cookies.
     var currentUrl = $window.location.href;
-    var userIsLoggedIn = $cookies.get('dev_appserver_login') !== undefined &&
-    !currentUrl.includes('signup');
-
+    var isUserLoggedIn = function() {
+      var userIsLoggedIn_ = $cookies.get('dev_appserver_login') !== undefined ||
+      $cookies.get('ACSID') !== undefined ||
+      $cookies.get('SACSID') !== undefined;
+      if (currentUrl.includes('signup')) {
+        userIsLoggedIn_ = false;
+      }
+      return userIsLoggedIn_;
+    };
     var getUserInfoAsync = function() {
+      // var userIsLoggedIn = window.userIsLoggedIn;
+      var userIsLoggedIn = isUserLoggedIn();
       if (userIsLoggedIn) {
         if (userInfo) {
           return $q.resolve(userInfo);
@@ -53,7 +61,7 @@ oppia.factory('UserService', [
         var profilePictureDataUrl = (
           UrlInterpolationService.getStaticImageUrl(
             DEFAULT_PROFILE_IMAGE_PATH));
-
+        var userIsLoggedIn = isUserLoggedIn();
         if (userIsLoggedIn) {
           return $http.get(
             '/preferenceshandler/profile_picture'

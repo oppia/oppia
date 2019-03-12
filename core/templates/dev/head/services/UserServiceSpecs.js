@@ -18,10 +18,22 @@
 
 describe('User Service', function() {
   var UserService, $httpBackend, UrlInterpolationService;
-
+  var $cookies;
   beforeEach(module('oppia'));
+  module('ngCookies');
+
+  module({$cookies: {
+    store: {},
+    put: function(key, value) {
+      this.store[key] = value;
+    },
+    get: function(key) {
+      return this.store[key];
+    }
+  }});
   beforeEach(inject(function($injector) {
     UserService = $injector.get('UserService');
+    $cookies = $injector.get('$cookies');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
@@ -32,7 +44,7 @@ describe('User Service', function() {
     $httpBackend.expect('GET', requestUrl).respond(200, {
       profile_picture_data_url: 'image data'
     });
-
+    $cookies.put('dev_appserver_login', 'temp');
     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
       expect(dataUrl).toBe('image data');
     });
