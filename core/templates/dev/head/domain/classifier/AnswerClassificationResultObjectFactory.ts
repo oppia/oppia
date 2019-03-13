@@ -24,7 +24,6 @@ oppia.factory('AnswerClassificationResultObjectFactory', [function() {
     this.answerGroupIndex = answerGroupIndex;
     this.ruleIndex = ruleIndex;
     this.classificationCategorization = classificationCategorization;
-    this.createNew = null;
   };
 
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
