@@ -70,7 +70,7 @@ UGLIFY_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
 # Files with these extensions shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
+FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.unmin.js')
 # Files with these name patterns shouldn't be moved to build directory, and will
 # not be served in production. (This includes protractor.ts files in
 # /extensions.)
@@ -90,6 +90,10 @@ FILEPATHS_NOT_TO_RENAME = (
 FILEPATHS_PROVIDED_TO_FRONTEND = (
     'images/*', 'videos/*', 'i18n/*', '*_directive.html', '*.png', '*.json')
 
+# When deleting files from staging directory, js suffix is replaced with ts
+# since files in source dir are ts files and hashes are mapped to them. The
+# files which are present as js files in source directory are listed here
+# to avoid changing their suffix.
 FILES_NOT_TO_REPLACE_WITH_TS = (
     'constants.js', 'rich_text_component_definitions.js')
 
@@ -720,12 +724,12 @@ def minify_func(source_path, target_path, file_hashes, filename):
         _minify(source_path, target_path)
     elif filename.endswith('.ts'):
         compile_typescript_files(source_path)
-        compiled_target_path = target_path.replace('.ts', '.js')
-        minified_target_path = target_path.replace('.ts', '_min.js')
+        compiled_source_path = target_path.replace('.ts', '.js')
+        compiled_target_path = target_path.replace('.ts', '.unmin.js')
+        os.path.rename(compiled_source_path, compiled_target_path)
+        minified_target_path = target_path.replace('.ts', '.js')
         print 'Minifying %s' % compiled_target_path
         _minify(compiled_target_path, minified_target_path)
-        os.remove(compiled_target_path)
-        os.rename(minified_target_path, compiled_target_path)
     else:
         print 'Copying %s' % source_path
         safe_copy_file(source_path, target_path)
@@ -850,6 +854,8 @@ def generate_delete_tasks_to_remove_deleted_files(
             if not any(
                     target_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 relative_path = os.path.relpath(target_path, staging_directory)
+                # Replace .js with .ts in files since source files are ts files
+                # but files in staging directory are compiled js files.
                 if not relative_path.endswith(FILES_NOT_TO_REPLACE_WITH_TS):
                     relative_path = relative_path.replace('.js', '.ts')
                 # Remove file found in staging directory but not in source
