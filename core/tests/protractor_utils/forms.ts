@@ -635,9 +635,8 @@ var CodeMirrorChecker = function(elem) {
       // codemirror has loaded. The (2i)th line contains a line number and the
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
-      var lineNumber = null;
       for (var i = 0; i < textArray.length; i += 2) {
-        lineNumber = textArray[i];
+        var lineNumber = textArray[i];
         var lineText = textArray[i + 1];
         if (!compareDict.hasOwnProperty(lineNumber)) {
           throw Error('Line ' + lineNumber + ' not found in CodeMirror');
@@ -652,10 +651,11 @@ var CodeMirrorChecker = function(elem) {
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
           compareDict);
       } else {
-        for (lineNumber in compareDict) {
-          if (compareDict[lineNumber].checked !== true) {
+        for (var dictLineNumber in compareDict) {
+          if (compareDict[dictLineNumber].checked !== true) {
             throw Error('Expected line ' + lineNumber + ': \'' +
-              compareDict[lineNumber].text + '\' to be found in CodeMirror');
+              compareDict[dictLineNumber].text + '\' to be found in CodeMirror'
+            );
           }
         }
       }
