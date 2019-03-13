@@ -274,12 +274,7 @@ def _compare_file_count(first_dir_path, second_dir_path):
             the target directory.
     """
 
-    first_dir_file_count = 0;
-    if isinstance(first_dir_path, list):
-        for dir_path in first_dir_path:
-            first_dir_file_count += get_file_count(dir_path)
-    else:
-        first_dir_file_count = get_file_count(first_dir_path)
+    first_dir_file_count = get_file_count(first_dir_path)
     second_dir_file_count = get_file_count(second_dir_path)
     if first_dir_file_count != second_dir_file_count:
         print 'Comparing %s vs %s' % (first_dir_path, second_dir_path)
