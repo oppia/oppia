@@ -71,12 +71,10 @@ else:
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 
 if not constants.DEV_MODE:
-    VISUALIZATIONS_DIR_FOR_JS = os.path.join(
+    VISUALIZATIONS_DIR = os.path.join(
         'local_compiled_js', 'extensions', 'visualizations')
 else:
-    VISUALIZATIONS_DIR_FOR_JS = os.path.join(
-        'extensions', 'visualizations')
-VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
+    VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'objects', 'object_defaults.json')
