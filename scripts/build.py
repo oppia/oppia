@@ -72,9 +72,9 @@ UGLIFY_FILE = os.path.join(
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
 # Files with these name patterns shouldn't be moved to build directory, and will
-# not be served in production. (This includes protractor.js files in
+# not be served in production. (This includes protractor.ts files in
 # /extensions.)
-JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
+TS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.ts', 'protractor.ts')
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -515,8 +515,8 @@ def hash_should_be_inserted(filepath):
 
 def should_file_be_built(filepath):
     """Determines if the file should be built.
-        - JS files: Returns False if filepath matches with pattern in
-        JS_FILENAME_SUFFIXES_TO_IGNORE, else returns True.
+        - TS files: Returns False if filepath matches with pattern in
+        TS_FILENAME_SUFFIXES_TO_IGNORE, else returns True.
         - Python files: Returns False if filepath ends with _test.py, else
         returns True
         - Other files: Returns False if filepath matches with pattern in
@@ -528,9 +528,9 @@ def should_file_be_built(filepath):
     Returns:
         bool. True if filepath should be built, else False.
     """
-    if filepath.endswith('.js'):
+    if filepath.endswith('.ts'):
         return not any(
-            filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
+            filepath.endswith(p) for p in TS_FILENAME_SUFFIXES_TO_IGNORE)
     elif filepath.endswith('_test.py'):
         return False
     else:

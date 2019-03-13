@@ -13,6 +13,8 @@ declare var PencilCodeEmbed: any;
 declare var constants: any;
 declare var GLOBALS: any;
 declare var oppia: any;
+declare var hashes: any;
+declare var richTextComponents: any;
 declare var logicProofConversion: any;
 declare var logicProofShared: any;
 declare var logicProofParser: any;
