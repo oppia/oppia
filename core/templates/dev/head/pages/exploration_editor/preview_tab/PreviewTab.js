@@ -123,7 +123,8 @@ oppia.controller('PreviewTab', [
     $scope.resetPreview = function() {
       $scope.previewWarning = '';
       $scope.isExplorationPopulated = false;
-      initStateNameForPreview = ExplorationInitStateNameService.savedMemento;
+      var initStateNameForPreview = (
+        ExplorationInitStateNameService.savedMemento);
       $timeout(function() {
         var explorationId = ContextService.getExplorationId();
         EditableExplorationBackendApiService.fetchApplyDraftExploration(

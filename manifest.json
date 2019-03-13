@@ -103,11 +103,11 @@
         }
       },
       "angularAudio": {
-        "version": "1.7.4",
+        "version": "f403ea9e86de141278d410bade8ef1f43e6d188c",
         "downloadFormat": "zip",
-        "url": "https://github.com/danielstern/ngAudio/archive/1.7.4.zip",
+        "url": "https://github.com/danielstern/ngAudio/archive/f403ea9e86de141278d410bade8ef1f43e6d188c.zip",
         "rootDirPrefix": "ngAudio-",
-        "targetDirPrefix": "angular-audio-",
+        "targetDir": "angular-audio-f403ea",
         "bundle": {
           "js": ["app/angular.audio.js"]
         }
@@ -271,6 +271,30 @@
           "css": ["css/font-awesome.css"],
           "fontsPath": "fonts"
         }
+      },
+      "angularUiLeaflet": {
+        "version": "1.0.3",
+        "downloadFormat": "files",
+        "url": "https://raw.githubusercontent.com/angular-ui/ui-leaflet/v1.0.3/dist",
+        "rootDirPrefix": "angular-ui-leaflet-",
+        "targetDirPrefix": "angular-ui-leaflet-",
+        "files": ["ui-leaflet.min.no-header.js"]
+      },
+      "leaflet": {
+        "version": "1.4.0",
+        "downloadFormat": "files",
+        "url": "https://unpkg.com/leaflet@1.4.0/dist",
+        "rootDirPrefix": "leaflet-",
+        "targetDirPrefix": "leaflet-",
+        "files": ["leaflet.js", "leaflet.css"]
+      },
+      "angular-simple-logger": {
+        "version": "0.1.7",
+        "downloadFormat": "files",
+        "url": "https://raw.githubusercontent.com/nmccready/angular-simple-logger/0.1.7/dist",
+        "rootDirPrefix": "angular-simple-logger-",
+        "targetDirPrefix": "angular-simple-logger-",
+        "files": ["angular-simple-logger.min.js"]
       },
       "guppy": {
         "version": "b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba",
@@ -454,13 +478,6 @@
         "url": "https://github.com/angular-ui/ui-codemirror/archive/src0.1.2.zip",
         "rootDirPrefix": "ui-codemirror-src",
         "targetDirPrefix": "ui-codemirror-"
-      },
-      "uiMap": {
-        "version": "0.5.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-map/archive/v0.5.0.zip",
-        "rootDirPrefix": "ui-map-",
-        "targetDirPrefix": "ui-map-"
       },
       "uiSortable": {
         "version": "0.17.1",

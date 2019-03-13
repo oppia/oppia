@@ -1,7 +1,7 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-if="!isLoadingSkill()">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
-      <button class="btn btn-default oppia-save-draft-button"
+      <button class="btn btn-default oppia-save-draft-button protractor-test-save-or-publish-skill"
               ng-class="{'btn-success': isSkillSaveable(), 'save-draft-button-padding': getChangeListCount()}"
               ng-click="saveChanges()"
               style="float: left;"
@@ -76,7 +76,7 @@
       </li>
     </ul>
   </li>
-  <li class="icon"
+  <li class="icon protractor-test-questions-tab"
       style="margin-right: 20px;"
       ng-class="{'active': getActiveTabName() === 'questions'}"
       ng-click="selectQuestionsTab()">

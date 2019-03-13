@@ -23,17 +23,19 @@ oppia.directive('questionsTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/questions/questions_tab_directive.html'),
       controller: [
-        '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
-        'TopicEditorStateService', 'QuestionCreationService', 'UrlService',
-        'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
+        '$scope', '$http', '$log', '$q', '$uibModal', '$window',
+        'AlertsService', 'TopicEditorStateService', 'QuestionCreationService',
+        'UrlService', 'EditableQuestionBackendApiService',
+        'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
         'QuestionUndoRedoService', 'UndoRedoService',
         'NUM_QUESTIONS_PER_PAGE', function(
-            $scope, $http, $q, $uibModal, $window, AlertsService,
-            TopicEditorStateService, QuestionCreationService, UrlService,
-            EditableQuestionBackendApiService, EditableSkillBackendApiService,
+            $scope, $http, $log, $q, $uibModal, $window,
+            AlertsService, TopicEditorStateService, QuestionCreationService,
+            UrlService, EditableQuestionBackendApiService,
+            EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionSuggestionObjectFactory, SuggestionThreadObjectFactory,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
@@ -70,7 +72,7 @@ oppia.directive('questionsTab', [
             $scope.emptyMisconceptionsList = [];
           };
 
-          loadSuggestedQuestionsAsync = function() {
+          var loadSuggestedQuestionsAsync = function() {
             $scope.questionSuggestionThreads = [];
             var suggestionsPromise = $http.get(
               '/suggestionlisthandler', {

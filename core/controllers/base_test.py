@@ -74,13 +74,15 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         with self.swap(constants, 'DEV_MODE', True):
             response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
-                          response.body)
+            self.assertIn(
+                '<div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>',
+                response.body)
 
         with self.swap(constants, 'DEV_MODE', False):
             response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
-                          response.body)
+            self.assertIn(
+                '<div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>',
+                response.body)
 
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
@@ -271,8 +273,8 @@ class EscapingTests(test_utils.GenericTestBase):
         ))
 
     def test_jinja_autoescaping(self):
-        form_url = '<[angular_tag]> x{{51 * 3}}y'
-        with self.swap(feconf, 'SITE_FEEDBACK_FORM_URL', form_url):
+        dangerous_field_contents = '<[angular_tag]> x{{51 * 3}}y'
+        with self.swap(constants, 'DEV_MODE', dangerous_field_contents):
             response = self.get_html_response('/fake')
 
             self.assertIn('&lt;[angular_tag]&gt;', response.body)
@@ -330,9 +332,7 @@ class LogoutPageTests(test_utils.GenericTestBase):
         # cookies have expired after hitting the logout url.
         current_page = '/explore/0'
         response = self.get_html_response(current_page)
-        response = self.get_html_response(
-            current_user_services.create_logout_url(
-                current_page), expected_status_int=302)
+        response = self.get_html_response('/logout', expected_status_int=302)
         expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
         self.assertTrue(

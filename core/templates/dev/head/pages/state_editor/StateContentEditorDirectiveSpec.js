@@ -17,7 +17,8 @@
  */
 
 describe('State content editor directive', function() {
-  var outerScope, ctrlScope, shof, cls, scs, es, ess;
+  var outerScope, ctrlScope, shof, cls, scs, es, ess, citat, scitat;
+  var mockExplorationData;
 
   var _getContent = function(contentId, contentString) {
     return shof.createFromBackendDict({
@@ -99,7 +100,14 @@ describe('State content editor directive', function() {
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       },
       'Second State': {
         content: {
@@ -138,7 +146,14 @@ describe('State content editor directive', function() {
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       },
       'Third State': {
         content: {
@@ -184,7 +199,14 @@ describe('State content editor directive', function() {
             value: 'something clever',
             parse_with_jinja: false
           }
-        }]
+        }],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       }
     });
 

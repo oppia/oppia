@@ -26,37 +26,21 @@ oppia.directive('improvementsTab', [
         '/pages/exploration_editor/improvements_tab/' +
         'improvements_tab_directive.html'),
       controller: [
-        '$scope', function($scope) {
-          // NOTE: The constants used in this controller are intentionally
-          // hard-coded to demonstrate that the Improvements Tab is configured
-          // correctly. The numbers are arbitrary, and were simply copied from
-          // the [design doc](https://bit.ly/2Bp7YLS).
+        '$scope', 'ImprovementCardService',
+        function($scope, ImprovementCardService) {
+          var fetchedCards = [];
+          ImprovementCardService.fetchCards().then(function(cards) {
+            fetchedCards = cards;
+          });
 
-          $scope.resolvedIssueCount = 13;
-          $scope.archivedIssueCount = 30;
-
-          var issueTypeMaterialIconMapping = {
-            feedback: 'feedback',
-            playthrough: 'gamepad',
-            unresolved_answer: 'help',
+          $scope.getCards = function() {
+            return fetchedCards;
           };
-
-          $scope.issueTypeToMaterialIcon = function(issueType) {
-            if (issueTypeMaterialIconMapping.hasOwnProperty(issueType)) {
-              return issueTypeMaterialIconMapping[issueType];
-            } else {
-              return '';
-            }
+          $scope.getOpenCardCount = function() {
+            return fetchedCards.filter(function(card) {
+              return card.isOpen();
+            }).length;
           };
-
-          $scope.openIssueData = [{
-            issue_description: ('I18N_IMPROVEMENTS_TAB_PLAYTHROUGH_ISSUES_' +
-                                'MULTIPLE_INCORRECT_ANSWERS_DESCRIPTION'),
-            issue_type: 'playthrough',
-          }, {
-            issue_description: 'I18N_IMPROVEMENTS_TAB_FEEDBACK_DESCRIPTION',
-            issue_type: 'feedback',
-          }];
         }
       ],
     };

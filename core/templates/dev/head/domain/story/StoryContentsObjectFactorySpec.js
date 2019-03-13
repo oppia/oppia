@@ -19,6 +19,7 @@
 describe('Story contents object factory', function() {
   var StoryContentsObjectFactory = null;
   var _sampleSubtopic = null;
+  var _sampleStoryContents = null;
 
   beforeEach(module('oppia'));
 
@@ -84,7 +85,7 @@ describe('Story contents object factory', function() {
       nodes: [],
       next_node_id: 'node_1'
     };
-    storyContents = StoryContentsObjectFactory.createFromBackendDict(
+    var storyContents = StoryContentsObjectFactory.createFromBackendDict(
       sampleStoryContentsBackendDict);
     storyContents.addNode('Title 1');
     expect(storyContents.getInitialNodeId()).toEqual('node_1');
