@@ -25,9 +25,9 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-tab-welcome-modal'));
 
   this.saveUploadedAudioButton = element(
-    by.className('protractor-test-save-button'));
+    by.css('.protractor-test-save-button'));
 
-  this.errorMessage = element(by.css('div.error-message'));
+  this.wrongFileTypeErrorMessage = element(by.css('div.error-message')).getText();
 
   this.colorOfInitNode = function() {
     return (element.all(by.css(
@@ -35,9 +35,9 @@ var ExplorationEditorTranslationTab = function() {
       getCssValue('fill'));
   };
 
-  this.colorOfNormalNode = function() {
+  this.colorsOfNormalNode = function(index) {
     return (element.all(by.css(
-      'rect.protractor-test-node-background.normal-node')).last().
+      'rect.protractor-test-node-background.normal-node')).
       getCssValue('fill'));
   };
 
@@ -138,6 +138,8 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-solution-tab'));
 
   var contentTabText = element(by.css('.protractor-test-content-text'));
+  var audioOverFiveMinutesErrorMessageElement = element(by.className(
+    'oppia-audio-file-upload-field-error-message'));
   var uploadAudioButton = element.all(
     by.className('protractor-test-upload-audio-button')).last();
 
@@ -161,7 +163,7 @@ var ExplorationEditorTranslationTab = function() {
 
   var solutionTabText = element(by.css('.protractor-test-solution-text'));
 
-  var numericalStatus = element(
+  this.numericalStatus = element(
     by.css('.protractor-test-translation-numerical-status'));
 
   var _selectLanguage = function(language) {
@@ -207,7 +209,7 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectNumericalStatusToMatch = function(content) {
-    expect(numericalStatus.getText()).toMatch(content);
+    expect(this.numericalStatus.getText()).toMatch(content);
   };
 
   this.changeTranslationLanguage = function(language) {
@@ -223,8 +225,12 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.audioOverFiveMinutesErrorMessageElement = element(by.css(
-    'oppia-audio-file-upload-field-error-message'));
+  this.audioOverFiveMinutesErrorMessage = function() {
+    waitFor.visibilityOf(
+      audioOverFiveMinutesErrorMessageElement,
+      'Audio above 300 seconds error is not visible');
+    return audioOverFiveMinutesErrorMessageElement.getText();
+  };
 
   this.expectFeedbackTabToBeActive = function() {
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]

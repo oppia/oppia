@@ -25,18 +25,69 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage');
 
 describe('Exploration translation', function() {
+  var creatorDashboardPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
   var explorationEditorSettingsTab = null;
   var explorationEditorTranslationTab = null;
+  var libraryPage = null;
+});
 
-  beforeEach(function() {
+
+  beforeAll(function() {
+  	creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
+
+  	// Create a common exploration for testing.
+    users.createUser('user2@translationTab.com', 'user2TranslationTab');
+    users.login('user2@translationTab.com');
+    workflow.createExploration();
+
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'This is first card.'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('This is feedback1.'),
+      'second', true, 'Equals', 6);
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
+    explorationEditorMainTab.addHint('This is hint1.');
+    explorationEditorMainTab.addHint('This is hint2.');
+    explorationEditorMainTab.addSolution('NumericInput', {
+      correctAnswer: 6,
+      explanation: 'This is solution.'
+    });
+    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'This is second card.'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('This is feedback1.'),
+      'third', true, 'Equals', 6);
+    explorationEditorMainTab.moveToState('third');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('This is third card.'));
+    explorationEditorMainTab.setInteraction('Continue');
+    responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setDestination('final card', true, null);
+    // Setup a terminating state.
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle('tests');
+    explorationEditorSettingsTab.setCategory('Algorithms');
+    explorationEditorSettingsTab.setObjective('Test');
+    explorationEditorPage.saveChanges('Done!');
+    users.logout();
   });
 
   it('should walkthrough translation tutorial when user clicks next',
@@ -51,6 +102,7 @@ describe('Exploration translation', function() {
       explorationEditorTranslationTab.playTutorial();
       explorationEditorTranslationTab.finishTutorial();
       users.logout();
+      general.checkForConsoleErrors([]);
     });
 
   it('should have all the state contents', function() {
@@ -96,75 +148,64 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.expectHintsTabContentsToMatch(
       ['This is hint1.', 'This is hint2.']);
     users.logout();
+    general.checkForConsoleErrors([]);
   });
 
   it('should have a correct numerical status', function() {
-    users.createUser('user2@translationTab.com', 'user2TranslationTab');
     users.login('user2@translationTab.com');
-    workflow.createExploration();
-
-    explorationEditorMainTab.setStateName('first');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'This is first card.'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse(
-      'NumericInput', forms.toRichText('This is feedback1.'),
-      'second', true, 'Equals', 6);
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
-    explorationEditorMainTab.addHint('This is hint1.');
-    explorationEditorMainTab.addHint('This is hint2.');
-    explorationEditorMainTab.addSolution('NumericInput', {
-      correctAnswer: 6,
-      explanation: 'This is solution.'
-    });
-    explorationEditorMainTab.moveToState('second');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('This is second card.'));
-    explorationEditorMainTab.setInteraction('Continue');
-    responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setDestination('final card', true, null);
-    // Setup a terminating state.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorMainTab.moveToState('first');
-    explorationEditorPage.saveChanges();
+    creatorDashboardPage.get();
+    // Test using common exploration.
+    creatorDashboardPage.editExploration('tests');
+    
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.exitTutorial();
-
+    // To check absence of any audio translation in exploration initially.
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
-      '(0/8)');
-
+      '(0/11)');
     explorationEditorTranslationTab.openUploadAudioModal();
     var relativePathOfAudioToUpload = '../data/cafe.mp3';
-    var audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
     explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
     explorationEditorTranslationTab.saveUploadedAudio(true);
+    /** To check correct display of numerical status after
+    *   the upload of audio translation in exploration.
+    */
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
-      '(1/8)');
+      '(1/11)');
     explorationEditorTranslationTab.openUploadAudioModal();
-
-    var relativePathOfAudioToUpload = '../data/img.png';
-    var audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
+    relativePathOfAudioToUpload = '../data/img.png';
+    audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
     explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
-    expect(explorationEditorTranslationTab.errorMessage === undefined).
-      toBe(false);
-    expect(explorationEditorTranslationTab.saveUploadedAudioButton.
-      getAttribute('disabled')).toBe('true');
+    /** To check behaviour on attempting to
+    *   upload an image as audio translation.
+    */
+    expect(explorationEditorTranslationTab.wrongFileTypeErrorMessage)
+    .toContain('This file is not recognized as an audio file.');
+    expect(explorationEditorTranslationTab.saveUploadedAudioButton
+      .getAttribute('disabled')).toBe('true');
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
-      '(1/8)');
+      '(1/11)');
     relativePathOfAudioToUpload = '../data/cafe-over-five-minutes.mp3';
     audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
     explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
-    expect(explorationEditorTranslationTab.
-      audioOverFiveMinutesErrorMessageElement === undefined).toBe(false);
     explorationEditorTranslationTab.saveUploadedAudio();
-    expect(explorationEditorTranslationTab.saveUploadedAudioButton.
-      getAttribute('disabled')).toBe('true');
+    /** To check behaviour on attempting to upload an 
+    *   audio translation with length above 300 seconds.
+    */
+    expect(explorationEditorTranslationTab.audioOverFiveMinutesErrorMessage())
+    .toContain('The uploaded file is 301.87 seconds long.');
+    expect(explorationEditorTranslationTab.saveUploadedAudioButton
+      .getAttribute('disabled')).toBe('true');
     explorationEditorTranslationTab.expectNumericalStatusToMatch(
-      '(1/8)');
-
+      '(1/11)');
     users.logout();
+
+    general.checkForConsoleErrors(
+      ['Failed to load resource: the server responded with a status of 400' +
+       '(Bad Request)', {'status_code':400,
+       'error':'Audio files must be under 300 seconds in length.' +
+       ' The uploaded file is 301.87 seconds long.'}]);
   });
 
   it('should provide correct status color for each state in the graph view',
@@ -172,45 +213,39 @@ describe('Exploration translation', function() {
       var ALL_AUDIO_AVAILABLE_COLOR = 'rgb(22, 167, 101)';
       var FEW_AUDIO_AVAILABLE_COLOR = 'rgb(233, 179, 48)';
       var NO_AUDIO_AVAILABLE_COLOR = 'rgb(209, 72, 54)';
+      var relativePathOfAudioToUpload = '../data/cafe.mp3';
+      var audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
 
-      users.createUser('user@correctstatus.com', 'correctStatus');
-      users.login('user@correctstatus.com');
-      workflow.createExploration();
-
-      explorationEditorMainTab.setStateName('First');
-      explorationEditorMainTab.setContent(forms.toRichText(
-        'This is first card.'));
-      explorationEditorMainTab.setInteraction('NumericInput');
-      explorationEditorMainTab.addResponse(
-        'NumericInput', forms.toRichText('This is feedback.'),
-        'Second', true, 'Equals', 6);
-      explorationEditorMainTab.moveToState('Second');
-      explorationEditorMainTab.setInteraction('Continue');
-      var responseEditor = explorationEditorMainTab.
-        getResponseEditor('default');
-      responseEditor.setDestination('Third', true, null);
-      explorationEditorMainTab.moveToState('Third');
-      explorationEditorMainTab.setInteraction('EndExploration');
-      explorationEditorMainTab.moveToState('First');
+      users.login('user2@translationTab.com');
+      creatorDashboardPage.get();
+      // Test using common exploration.
+      creatorDashboardPage.editExploration('tests');
+      explorationEditorMainTab.moveToState('second');
       explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.exitTutorial();
       explorationEditorTranslationTab.openUploadAudioModal();
-      var relativePathOfAudioToUpload = '../data/cafe.mp3';
-      var audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
       explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
       explorationEditorTranslationTab.saveUploadedAudio(true);
       explorationEditorPage.navigateToMainTab();
-      explorationEditorMainTab.moveToState('Third');
+      explorationEditorMainTab.moveToState('final card');
       explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.openUploadAudioModal();
       explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
       explorationEditorTranslationTab.saveUploadedAudio(true);
-      expect(explorationEditorTranslationTab.colorOfInitNode()).
-        toBe(FEW_AUDIO_AVAILABLE_COLOR);
-      expect(explorationEditorTranslationTab.colorOfNormalNode()).
-        toBe(NO_AUDIO_AVAILABLE_COLOR);
+      var colorsOfNormalNodes = explorationEditorTranslationTab.colorsOfNormalNode();
+      /** To check correct status color for 'second', 'third' 
+      *   and 'final card' states.
+      */
+      colorsOfNormalNodes.then(
+        function(colorsOfStates) {
+          colorsOfStates.sort();
+          expect(colorsOfStates[0]).toBe(NO_AUDIO_AVAILABLE_COLOR);
+          expect(colorsOfStates[1]).toBe(FEW_AUDIO_AVAILABLE_COLOR);
+        });
       expect(explorationEditorTranslationTab.colorOfTerminalNode()).
         toBe(ALL_AUDIO_AVAILABLE_COLOR);
+      
+      general.checkForConsoleErrors([]);
     });
 
   it(
@@ -268,6 +303,7 @@ describe('Exploration translation', function() {
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
       workflow.publishExploration();
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
+      general.checkForConsoleErrors([]);
     });
 
 
@@ -281,9 +317,5 @@ describe('Exploration translation', function() {
       'this is card 1'));
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
-  });
-
-  afterEach(function() {
     general.checkForConsoleErrors([]);
   });
-});
