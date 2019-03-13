@@ -1141,7 +1141,7 @@ def compile_typescript_files(filepath):
         '../node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
         '-lib %s -noImplicitUseStrict %s -rootDir %s -skipLibCheck %s '
         '-target %s -typeRoots %s %s typings/*') % (
-            out_dir, allow_jS, lib, no_implicit_use_strict, root_dir,
+            out_dir, allow_js, lib, no_implicit_use_strict, root_dir,
             skip_lib_check, target, type_roots, filepath)
     subprocess.check_call(cmd, shell=True)
 
