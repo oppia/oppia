@@ -168,6 +168,7 @@ oppia.factory('ExplorationObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Exploration['createFromBackendDict'] = function(explorationBackendDict) {
+    /* eslint-enable dot-notation */
       return new Exploration(
         explorationBackendDict.init_state_name,
         ParamChangesObjectFactory.createFromBackendList(

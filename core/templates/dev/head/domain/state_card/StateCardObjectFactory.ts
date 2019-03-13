@@ -188,6 +188,7 @@ oppia.factory('StateCardObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     StateCard['createNewCard'] = function(
+    /* eslint-enable dot-notation */
         stateName, contentHtml, interactionHtml, interaction,
         contentIdsToAudioTranslations, contentId) {
       return new StateCard(

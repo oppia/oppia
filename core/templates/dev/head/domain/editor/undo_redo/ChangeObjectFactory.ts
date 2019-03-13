@@ -65,6 +65,7 @@ oppia.factory('ChangeObjectFactory', [function() {
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   Change['create'] = function(
+  /* eslint-enable dot-notation */
       backendChangeObject, applyChangeToObject, reverseChangeToObject) {
     return new Change(
       backendChangeObject, applyChangeToObject, reverseChangeToObject);

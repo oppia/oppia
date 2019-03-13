@@ -92,6 +92,7 @@ oppia.factory('CollectionNodeObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     CollectionNode['create'] = function(collectionNodeBackendObject) {
+    /* eslint-enable dot-notation */
       return new CollectionNode(collectionNodeBackendObject);
     };
 
@@ -100,10 +101,12 @@ oppia.factory('CollectionNodeObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     CollectionNode['createFromExplorationId'] = function(explorationId) {
+    /* eslint-enable dot-notation */
       // TODO (ankita240796) Remove the bracket notation once Angular2
       // gets in.
       /* eslint-disable dot-notation */
       return CollectionNode['create']({
+      /* eslint-enable dot-notation */
         exploration_id: explorationId,
         exploration_summary: null
       });

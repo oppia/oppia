@@ -57,6 +57,7 @@ oppia.factory('AnswerStatsObjectFactory', [function() {
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   AnswerStats['createFromBackendDict'] = function(backendDict) {
+  /* eslint-enable dot-notation */
     // TODO(brianrodri): Use a proper service which takes the state's
     // interaction type into account for generating the answer's HTML.
     var answerHtml = (typeof backendDict.answer === 'string') ?

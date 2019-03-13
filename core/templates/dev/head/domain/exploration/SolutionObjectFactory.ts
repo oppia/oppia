@@ -41,6 +41,7 @@ oppia.factory('SolutionObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Solution['createFromBackendDict'] = function(solutionBackendDict) {
+    /* eslint-enable dot-notation */
       return new Solution(
         solutionBackendDict.answer_is_exclusive,
         solutionBackendDict.correct_answer,
@@ -51,6 +52,7 @@ oppia.factory('SolutionObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Solution['createNew'] = function(
+    /* eslint-enable dot-notation */
         answerIsExclusive, correctAnswer, explanationHtml, explanationId) {
       return new Solution(
         answerIsExclusive,

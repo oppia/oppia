@@ -68,6 +68,7 @@ oppia.factory('TopicRightsObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     TopicRights['createFromBackendDict'] = function(topicRightsBackendObject) {
+    /* eslint-enable dot-notation */
       return new TopicRights(
         topicRightsBackendObject.published,
         topicRightsBackendObject.can_publish_topic,
@@ -91,6 +92,7 @@ oppia.factory('TopicRightsObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     TopicRights['createInterstitialRights'] = function() {
+    /* eslint-enable dot-notation */
       return new TopicRights(false, false, false);
     };
 

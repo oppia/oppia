@@ -37,6 +37,7 @@ oppia.factory('SuggestionThreadObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SuggestionThread['createFromBackendDicts'] = function(
+    /* eslint-enable dot-notation */
         suggestionThreadBackendDict, suggestionBackendDict) {
       var suggestion;
       if (suggestionBackendDict.suggestion_type === 'add_question') {

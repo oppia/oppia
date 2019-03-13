@@ -33,12 +33,14 @@ oppia.factory('RuleObjectFactory', [function() {
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   Rule['createNew'] = function(type, inputs) {
+  /* eslint-enable dot-notation */
     return new Rule(type, inputs);
   };
 
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   Rule['createFromBackendDict'] = function(ruleDict) {
+  /* eslint-enable dot-notation */
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
   };
 

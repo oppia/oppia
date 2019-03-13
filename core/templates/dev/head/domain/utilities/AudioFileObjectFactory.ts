@@ -26,6 +26,7 @@ oppia.factory('AudioFileObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     AudioFile['createNew'] = function(filename, data) {
+    /* eslint-enable dot-notation */
       return new AudioFile(filename, data);
     };
 

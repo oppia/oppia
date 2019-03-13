@@ -100,6 +100,7 @@ oppia.factory('ParamSpecsObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ParamSpecs['createFromBackendDict'] = function(paramSpecsBackendDict) {
+    /* eslint-enable dot-notation */
       var paramDict = {};
       Object.keys(paramSpecsBackendDict).forEach(function(paramName) {
         paramDict[paramName] = ParamSpecObjectFactory.createFromBackendDict(

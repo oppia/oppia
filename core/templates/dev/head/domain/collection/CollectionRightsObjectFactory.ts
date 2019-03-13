@@ -94,6 +94,7 @@ oppia.factory('CollectionRightsObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     CollectionRights['create'] = function(collectionRightsBackendObject) {
+    /* eslint-enable dot-notation */
       return new CollectionRights(angular.copy(collectionRightsBackendObject));
     };
 
@@ -116,6 +117,7 @@ oppia.factory('CollectionRightsObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     CollectionRights['createEmptyCollectionRights'] = function() {
+    /* eslint-enable dot-notation */
       return new CollectionRights({
         owner_names: []
       });

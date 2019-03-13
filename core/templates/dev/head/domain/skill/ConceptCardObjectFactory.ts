@@ -67,6 +67,7 @@ oppia.factory('ConceptCardObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ConceptCard['createFromBackendDict'] = function(conceptCardBackendDict) {
+    /* eslint-enable dot-notation */
       return new ConceptCard(
         SubtitledHtmlObjectFactory.createFromBackendDict(
           conceptCardBackendDict.explanation),
@@ -120,6 +121,7 @@ oppia.factory('ConceptCardObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ConceptCard['createInterstitialConceptCard'] = function() {
+    /* eslint-enable dot-notation */
       var contentIdsToAudioTranslationsDict = {};
       contentIdsToAudioTranslationsDict[COMPONENT_NAME_EXPLANATION] = {};
       return new ConceptCard(

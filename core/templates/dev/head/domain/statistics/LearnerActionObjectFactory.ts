@@ -54,6 +54,7 @@ oppia.factory('LearnerActionObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     LearnerAction['createNew'] = function(
+    /* eslint-enable dot-notation */
         actionType, actionCustomizationArgs, schemaVersion) {
       schemaVersion = schemaVersion || LEARNER_ACTION_SCHEMA_LATEST_VERSION;
       return new LearnerAction(
@@ -76,6 +77,7 @@ oppia.factory('LearnerActionObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     LearnerAction['createFromBackendDict'] = function(learnerActionBackendDict) {
+    /* eslint-enable dot-notation */
       return new LearnerAction(
         learnerActionBackendDict.action_type,
         learnerActionBackendDict.action_customization_args,

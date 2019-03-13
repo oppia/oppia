@@ -48,6 +48,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   CollectionPlaythrough['hasFinishedCollection'] = function() {
+  /* eslint-enable dot-notation */
     return this._nextExplorationId === null;
   };
 
@@ -72,6 +73,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   CollectionPlaythrough['createFromBackendObject'] = function(
+  /* eslint-enable dot-notation */
       collectionPlaythroughBackendObject) {
     return new CollectionPlaythrough(
       collectionPlaythroughBackendObject.next_exploration_id,
@@ -81,6 +83,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   CollectionPlaythrough['create'] = function(
+  /* eslint-enable dot-notation */
       nextExplorationId, completedExplorationIds) {
     return new CollectionPlaythrough(
       nextExplorationId, angular.copy(completedExplorationIds));

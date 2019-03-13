@@ -33,6 +33,7 @@ oppia.factory('HintObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Hint['createFromBackendDict'] = function(hintBackendDict) {
+    /* eslint-enable dot-notation */
       return new Hint(
         SubtitledHtmlObjectFactory.createFromBackendDict(
           hintBackendDict.hint_content));
@@ -41,6 +42,7 @@ oppia.factory('HintObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Hint['createNew'] = function(hintContentId, hintContent) {
+    /* eslint-enable dot-notation */
       return new Hint(
         SubtitledHtmlObjectFactory.createDefault(hintContent, hintContentId));
     };

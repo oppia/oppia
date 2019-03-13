@@ -55,6 +55,7 @@ oppia.factory('SubtitledHtmlObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SubtitledHtml['createFromBackendDict'] = function(subtitledHtmlBackendDict) {
+    /* eslint-enable dot-notation */
       return new SubtitledHtml(
         subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
     };
@@ -62,6 +63,7 @@ oppia.factory('SubtitledHtmlObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SubtitledHtml['createDefault'] = function(html, contentId) {
+    /* eslint-enable dot-notation */
       return new SubtitledHtml(html, contentId);
     };
 

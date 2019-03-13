@@ -35,6 +35,7 @@ oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   FeedbackMessageSummary['createNewMessage'] = function(
+  /* eslint-enable dot-notation */
       newMessageId, newMessageText, authorUsername, authorPictureDataUrl) {
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
@@ -44,6 +45,7 @@ oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   FeedbackMessageSummary['createFromBackendDict'] = function(
+  /* eslint-enable dot-notation */
       feedbackMessageSummaryBackendDict) {
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,

@@ -104,6 +104,7 @@ oppia.factory('StoryObjectFactory', ['StoryContentsObjectFactory',
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Story['createFromBackendDict'] = function(storyBackendDict) {
+    /* eslint-enable dot-notation */
       return new Story(
         storyBackendDict.id, storyBackendDict.title,
         storyBackendDict.description, storyBackendDict.notes,
@@ -119,6 +120,7 @@ oppia.factory('StoryObjectFactory', ['StoryContentsObjectFactory',
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Story['createInterstitialStory'] = function() {
+    /* eslint-enable dot-notation */
       return new Story(
         null, 'Story title loading', 'Story description loading',
         'Story notes loading', null, 'en', 1

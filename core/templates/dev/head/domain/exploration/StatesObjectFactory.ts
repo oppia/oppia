@@ -137,6 +137,7 @@ oppia.factory('StatesObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     States['createFromBackendDict'] = function(statesBackendDict) {
+    /* eslint-enable dot-notation */
       var stateObjectsDict = {};
       for (var stateName in statesBackendDict) {
         stateObjectsDict[stateName] = StateObjectFactory.createFromBackendDict(

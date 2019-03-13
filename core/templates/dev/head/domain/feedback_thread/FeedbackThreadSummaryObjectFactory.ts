@@ -57,6 +57,7 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   FeedbackThreadSummary['create'] = function(
+  /* eslint-enable dot-notation */
       status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
       lastMessageRead, secondLastMessageRead, authorLastMessage,
       authorSecondLastMessage, explorationTitle, explorationId, threadId) {
@@ -69,6 +70,7 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
   FeedbackThreadSummary['createFromBackendDict'] = function(
+  /* eslint-enable dot-notation */
       feedbackThreadSummaryBackendDict) {
     return new FeedbackThreadSummary(
       feedbackThreadSummaryBackendDict.status,

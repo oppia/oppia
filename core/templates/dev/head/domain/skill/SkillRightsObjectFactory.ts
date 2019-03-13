@@ -54,6 +54,7 @@ oppia.factory('SkillRightsObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SkillRights['createFromBackendDict'] = function(skillRightsBackendDict) {
+    /* eslint-enable dot-notation */
       return new SkillRights(
         skillRightsBackendDict.skill_id,
         skillRightsBackendDict.creator_id,
@@ -72,6 +73,7 @@ oppia.factory('SkillRightsObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SkillRights['createInterstitialSkillRights'] = function() {
+    /* eslint-enable dot-notation */
       return new SkillRights(null, null, true, false);
     };
 

@@ -133,6 +133,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['createCurrencyUnits'] = function() {
+    /* eslint-enable dot-notation */
       try {
         UnitsObjectFactory.createCurrencyUnits();
       } catch (parsingError) {}
@@ -141,6 +142,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['fromRawInputString'] = function(rawInput) {
+    /* eslint-enable dot-notation */
       rawInput = rawInput.trim();
       var type = '';
       var real = 0.0;
@@ -249,6 +251,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     NumberWithUnits['fromDict'] = function(numberWithUnitsDict) {
+    /* eslint-enable dot-notation */
       return new NumberWithUnits(
         numberWithUnitsDict.type,
         numberWithUnitsDict.real,
@@ -273,6 +276,7 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Units['stringToLexical'] = function(units) {
+    /* eslint-enable dot-notation */
       units += '#';
       var unitList = [];
       var unit = '';
@@ -370,16 +374,20 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Units['fromList'] = function(unitsList) {
+    /* eslint-enable dot-notation */
       return new Units(unitsList);
     };
 
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Units['fromStringToList'] = function(unitsString) {
-      // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-      /* eslint-disable dot-notation */
+    /* eslint-enable dot-notation */
       return unitToList(unitWithMultiplier(
+        // TODO (ankita240796) Remove the bracket notation once Angular2 gets
+        // in.
+        /* eslint-disable dot-notation */
         Units['stringToLexical'](unitsString)));
+        /* eslint-enable dot-notation */
     };
 
     Units.prototype.toString = function() {
@@ -398,6 +406,7 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Units['createCurrencyUnits'] = function() {
+    /* eslint-enable dot-notation */
       // Creates user-defined currency (base + sub) units.
       var keys = Object.keys(CURRENCY_UNITS);
       for (var i = 0; i < keys.length; i++) {
@@ -417,6 +426,7 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Units['toMathjsCompatibleString'] = function(units) {
+    /* eslint-enable dot-notation */
       // Makes the units compatible with the math.js allowed format.
       units = units.replace(/per/g, '/');
 
@@ -445,17 +455,20 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Units['fromRawInputString'] = function(units) {
+    /* eslint-enable dot-notation */
       try {
         // TODO (ankita240796) Remove the bracket notation once Angular2
         // gets in.
         /* eslint-disable dot-notation */
         Units['createCurrencyUnits']();
+        /* eslint-enable dot-notation */
       } catch (parsingError) {}
 
       // TODO (ankita240796) Remove the bracket notation once Angular2
       // gets in.
       /* eslint-disable dot-notation */
       var compatibleUnits = Units['toMathjsCompatibleString'](units);
+      /* eslint-enable dot-notation */
       if (compatibleUnits !== '') {
         try {
           math.unit(compatibleUnits);
@@ -466,6 +479,7 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
       // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
       /* eslint-disable dot-notation */
       return new Units(Units['fromStringToList'](units));
+      /* eslint-enable dot-notation */
     };
 
     return Units;

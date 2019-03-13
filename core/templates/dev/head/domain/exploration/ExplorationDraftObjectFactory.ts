@@ -45,6 +45,7 @@ oppia.factory('ExplorationDraftObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ExplorationDraft['createFromLocalStorageDict'] = function(
+    /* eslint-enable dot-notation */
         explorationDraftDict) {
       return new ExplorationDraft(
         explorationDraftDict.draftChanges,
@@ -54,6 +55,7 @@ oppia.factory('ExplorationDraftObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     ExplorationDraft['toLocalStorageDict'] = function(
+    /* eslint-enable dot-notation */
         changeList, draftChangeListId) {
       return {
         draftChanges: changeList,

@@ -333,6 +333,7 @@ oppia.factory('TopicObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Topic['create'] = function(topicBackendDict, skillIdToDescriptionDict) {
+    /* eslint-enable dot-notation */
       var subtopics = topicBackendDict.subtopics.map(function(subtopic) {
         return SubtopicObjectFactory.create(subtopic, skillIdToDescriptionDict);
       });
@@ -352,6 +353,7 @@ oppia.factory('TopicObjectFactory', [
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Topic['createInterstitialTopic'] = function() {
+    /* eslint-enable dot-notation */
       return new Topic(
         null, 'Topic name loading', 'Topic description loading',
         'en', [], [], [], 1, 1, [], {}
