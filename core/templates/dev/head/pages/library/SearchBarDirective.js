@@ -25,16 +25,14 @@ oppia.directive('searchBar', [
         'search_bar_directive.html'),
       controller: [
         '$scope', '$rootScope', '$timeout', '$window', '$location',
-        '$translate', 'SearchService', 'NavigationService',
-        'LanguageUtilService', 'DebouncerService', 'HtmlEscaperService',
-        'UrlService', 'ConstructTranslationIdsService',
-        'SEARCH_DROPDOWN_CATEGORIES',
+        '$translate', 'ConstructTranslationIdsService', 'DebouncerService',
+        'HtmlEscaperService', 'LanguageUtilService', 'NavigationService',
+        'SearchService', 'UrlService', 'SEARCH_DROPDOWN_CATEGORIES',
         function(
             $scope, $rootScope, $timeout, $window, $location,
-            $translate, SearchService, NavigationService,
-            LanguageUtilService, DebouncerService, HtmlEscaperService,
-            UrlService, ConstructTranslationIdsService,
-            SEARCH_DROPDOWN_CATEGORIES) {
+            $translate, ConstructTranslationIdsService, DebouncerService,
+            HtmlEscaperService, LanguageUtilService, NavigationService,
+            SearchService, UrlService, SEARCH_DROPDOWN_CATEGORIES) {
           $scope.isSearchInProgress = SearchService.isSearchInProgress;
           $scope.SEARCH_DROPDOWN_CATEGORIES = (
             SEARCH_DROPDOWN_CATEGORIES.map(
@@ -76,8 +74,8 @@ oppia.directive('searchBar', [
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
             $scope.activeMenuName = NavigationService.activeMenuName;
           };
-          $scope.ALL_LANGUAGE_CODES =
-            LanguageUtilService.getLanguageIdsAndTexts();
+          $scope.ALL_LANGUAGE_CODES = (
+            LanguageUtilService.getLanguageIdsAndTexts());
 
           $scope.searchQuery = '';
           $scope.selectionDetails = {

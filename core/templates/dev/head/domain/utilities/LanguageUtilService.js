@@ -39,7 +39,6 @@ oppia.factory('LanguageUtilService', [
         return fullLanguageDescription.substring(0, ind);
       }
     };
-
     var languageIdsAndTexts = (
       ALL_LANGUAGE_CODES.map(function(languageItem) {
         return {

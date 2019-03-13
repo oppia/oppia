@@ -349,7 +349,7 @@
 
 {% block footer %}
   <div ng-controller="LibraryFooter">
-    <div ng-if="displayFooter">
+    <div ng-if="canDisplayFooter">
       {% include 'pages/footer.html' %}
     </div>
   </div>
