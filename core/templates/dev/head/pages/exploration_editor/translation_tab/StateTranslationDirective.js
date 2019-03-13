@@ -80,7 +80,7 @@ oppia.directive('stateTranslation', [
               $rootScope.$broadcast('showTranslationTabBusyModal');
               return;
             }
-            var activecontentId = null;
+            var activeContentId = null;
             if (tabId === $scope.TAB_ID_CONTENT) {
               activeContentId = $scope.stateContent.getContentId();
             } else if (tabId === $scope.TAB_ID_FEEDBACK) {

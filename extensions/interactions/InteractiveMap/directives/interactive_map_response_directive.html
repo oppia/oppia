@@ -1,1 +1,19 @@
-<img ng-src="<[staticMapUrl]>" style="margin: 3px auto; display: block;">
+<div>
+  <div class="oppia-overlay-map-response"></div>
+  <leaflet id="interactiveMapResponse"
+           defaults="mapOptions.defaults"
+           lf-center="mapOptions.center"
+           markers="mapOptions.mapMarkers"
+           height="150px"
+           width="150px">
+  </leaflet>
+</div>
+<style>
+  .oppia-overlay-map-response {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    opacity: 0.5;
+    z-index: 1001;
+  }
+</style>

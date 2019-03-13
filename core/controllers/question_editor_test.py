@@ -124,6 +124,19 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
                 }, csrf_token=csrf_token, expected_status_int=400)
             self.logout()
 
+    def test_post_with_incorrect_question_schema_returns_400(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            question_dict = self.question.to_dict()
+            del question_dict['question_state_data']['content']
+            self.post_json(
+                '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id), {
+                    'question_dict': question_dict
+                }, csrf_token=csrf_token, expected_status_int=400)
+            self.logout()
+
     def test_post_with_admin_email_allows_question_creation(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.ADMIN_EMAIL)

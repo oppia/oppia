@@ -108,7 +108,14 @@ describe('TrainingDataService', function() {
           hints: [],
           confirmed_unclassified_answers: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        },
       }
     });
 
@@ -230,7 +237,7 @@ describe('TrainingDataService', function() {
     tds.associateWithAnswerGroup(0, 'second answer');
     tds.associateWithAnswerGroup(0, 'another answer');
 
-    state = ess.getState('State');
+    var state = ess.getState('State');
     expect(state.interaction.answerGroups[0].trainingData).toEqual([
       'text answer', 'second answer', 'another answer'
     ]);
@@ -249,7 +256,7 @@ describe('TrainingDataService', function() {
     tds.associateWithAnswerGroup(0, 'another answer');
     tds.associateWithDefaultResponse('second answer');
 
-    state = ess.getState('State');
+    var state = ess.getState('State');
     expect(state.interaction.answerGroups[0].trainingData).toEqual([
       'text answer', 'another answer'
     ]);

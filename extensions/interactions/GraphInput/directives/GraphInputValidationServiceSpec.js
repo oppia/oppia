@@ -15,6 +15,7 @@
 describe('GraphInputValidationService', function() {
   var WARNING_TYPES, validatorService;
   var currentState, customizationArguments, answerGroups, goodDefaultOutcome;
+  var oof, agof, rof;
 
   beforeEach(function() {
     module('oppia');

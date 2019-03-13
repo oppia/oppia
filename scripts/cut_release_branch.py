@@ -151,7 +151,7 @@ def _execute_branch_cut():
     common.verify_current_branch_name('develop')
 
     # Update the local repo.
-    remote_alias = common.get_remote_alias('https://github.com/oppia/oppia')
+    remote_alias = common.get_remote_alias('git@github.com:oppia/oppia.git')
     subprocess.call(['git', 'pull', remote_alias])
 
     _verify_target_branch_does_not_already_exist(remote_alias)

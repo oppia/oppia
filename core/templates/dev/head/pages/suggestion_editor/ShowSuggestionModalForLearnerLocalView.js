@@ -43,7 +43,7 @@ oppia.controller('ShowSuggestionModalForLearnerLocalView', [
       SuggestionModalService.cancelSuggestion($uibModalInstance);
     };
     $scope.submitSuggestion = function() {
-      data = {
+      var data = {
         target_id: ExplorationEngineService.getExplorationId(),
         version: ExplorationEngineService.getExplorationVersion(),
         stateName: stateName,

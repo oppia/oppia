@@ -67,7 +67,8 @@ oppia.factory('ChangeListService', [
       solution: true,
       state_name: true,
       widget_customization_args: true,
-      widget_id: true
+      widget_id: true,
+      written_translations: true
     };
 
     var autosaveChangeListOnChange = function(explorationChangeList) {

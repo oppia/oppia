@@ -320,6 +320,12 @@ class SanitizedUrl(BaseObject):
 
     SCHEMA = {
         'type': 'unicode',
+        'validators': [{
+            'id': 'is_nonempty'
+        }],
+        'ui_config': {
+            'placeholder': 'https://www.example.com'
+        },
         'post_normalizers': [{
             'id': 'sanitize_url'
         }]

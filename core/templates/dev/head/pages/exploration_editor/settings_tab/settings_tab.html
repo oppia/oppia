@@ -7,11 +7,11 @@
           <div role="form" class="form-horizontal">
             <exploration-title-editor label-text="Title"
                                       focus-label="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
-                                      form-style="{display:'table-cell', width:'16.66666667%'}"
+                                      form-style="<[::formStyle]>"
                                       on-input-field-blur="saveExplorationTitle()">
             </exploration-title-editor>
             <exploration-objective-editor label-text="Goal"
-                                          form-style="{display:'table-cell', width:'16.66666667%'}"
+                                          form-style="<[::formStyle]>"
                                           on-input-field-blur="saveExplorationObjective()">
             </exploration-objective-editor>
 

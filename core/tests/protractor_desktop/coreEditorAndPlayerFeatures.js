@@ -39,6 +39,7 @@ describe('Core exploration functionality', function() {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
 
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();

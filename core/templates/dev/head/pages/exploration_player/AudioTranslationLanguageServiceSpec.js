@@ -85,7 +85,7 @@ describe('Audio translation language service', function() {
     expect(atls.getLanguageOptionsForDropdown()).toEqual([]);
 
     // When preferredLanguageCode is not set.
-    var preferredLanguageCode = null;
+    preferredLanguageCode = null;
     atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode, automaticTextToSpeechEnabled);
     expect(atls.getLanguageOptionsForDropdown()).toEqual([]);

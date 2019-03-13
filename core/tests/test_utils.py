@@ -564,10 +564,6 @@ tags: []
         """Returns the expected login URL."""
         return current_user_services.create_login_url(slug)
 
-    def get_expected_logout_url(self, slug):
-        """Returns the expected logout URL."""
-        return current_user_services.create_logout_url(slug)
-
     def _get_response(
             self, url, expected_content_type, params=None,
             expected_status_int=200):
@@ -1547,9 +1543,10 @@ tags: []
             Skill. A newly-created skill.
         """
         skill = skill_domain.Skill.create_default_skill(skill_id, description)
-        if misconceptions:
+        if misconceptions is not None:
             skill.misconceptions = misconceptions
-        if skill_contents:
+            skill.next_misconception_id = len(misconceptions) + 1
+        if skill_contents is not None:
             skill.skill_contents = skill_contents
         skill.language_code = language_code
         skill.version = 0

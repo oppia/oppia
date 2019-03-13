@@ -250,6 +250,10 @@ oppia.directive('stateHintsEditor', [
                 StateHintsService.saveDisplayedValue();
                 $scope.onSaveHints(StateHintsService.displayed);
               }
+
+              if (index === $scope.activeHintIndex) {
+                $scope.activeHintIndex = null;
+              }
             });
           };
 

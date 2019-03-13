@@ -721,11 +721,6 @@ class Exploration(object):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
-            if self.language_code in (
-                    state.written_translations.get_available_languages()):
-                raise utils.ValidationError(
-                    'This exploration has a text translation in its own '
-                    'language.')
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
