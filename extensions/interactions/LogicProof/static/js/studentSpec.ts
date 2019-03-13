@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for LogicProof interaction student components.
  */
 
-errorWrapper = function(
+var errorWrapper = function(
     dubiousFunction, input1 = null, input2 = null, input3 = null,
     input4 = null, input5 = null, input6 = null) {
   return function() {

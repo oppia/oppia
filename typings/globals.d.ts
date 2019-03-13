@@ -1,5 +1,4 @@
 declare var BlobBuilder: any;
-declare var errorWrapper: any;
 declare var MIDI: any;
 declare var Guppy: any;
 declare var Sk: any;
