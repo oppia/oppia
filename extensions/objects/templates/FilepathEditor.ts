@@ -418,7 +418,7 @@ oppia.directive('filepathEditor', [
           var cropHeight = $scope.cropArea.y2 - $scope.cropArea.y1;
           var position = $scope.mousePositionWithinCropArea;
 
-          // Position and size.
+          // Position, size, cursor and background.
           var styles = {
             left: $scope.cropArea.x1 + 'px',
             top: $scope.cropArea.y1 + 'px',
