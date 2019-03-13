@@ -50,8 +50,13 @@ describe('Image preloader service', function() {
   var requestUrl1, requestUrl2, requestUrl3, requestUrl4, requestUrl5;
   beforeEach(inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
+    var requestUrl = '/gcs_resource_bucket_handler';
+    $httpBackend.expect('GET', requestUrl).respond(200, {
+      gcs_resource_bucket_name: null
+    });
     UrlInterpolationService = $injector.get('UrlInterpolationService');
     ips = $injector.get('ImagePreloaderService');
+    $httpBackend.flush();
     eof = $injector.get('ExplorationObjectFactory');
     ecs = $injector.get('ContextService');
     abas = $injector.get('AssetsBackendApiService');

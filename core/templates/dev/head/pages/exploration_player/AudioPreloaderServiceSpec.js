@@ -44,8 +44,13 @@ describe('Audio preloader service', function() {
   var requestUrl1, requestUrl2, requestUrl3, requestUrl4;
   beforeEach(inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
+    var requestUrl = '/gcs_resource_bucket_handler';
+    $httpBackend.expect('GET', requestUrl).respond(200, {
+      gcs_resource_bucket_name: null
+    });
     UrlInterpolationService = $injector.get('UrlInterpolationService');
     aps = $injector.get('AudioPreloaderService');
+    $httpBackend.flush();
     atls = $injector.get('AudioTranslationLanguageService');
     eof = $injector.get('ExplorationObjectFactory');
     ecs = $injector.get('ContextService');

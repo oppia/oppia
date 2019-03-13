@@ -27,13 +27,18 @@ describe('Assets Backend API Service', function() {
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
+    $httpBackend = $injector.get('$httpBackend');
+    var requestUrl = '/gcs_resource_bucket_handler';
+    $httpBackend.expect('GET', requestUrl).respond(200, {
+      gcs_resource_bucket_name: null
+    });
     AssetsBackendApiService = $injector.get(
       'AssetsBackendApiService');
+    $httpBackend.flush();
     FileDownloadRequestObjectFactory = $injector.get(
       'FileDownloadRequestObjectFactory');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');
-    $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
   }));

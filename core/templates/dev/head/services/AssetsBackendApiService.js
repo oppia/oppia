@@ -23,9 +23,24 @@ oppia.factory('AssetsBackendApiService', [
   function(
       $http, $q, AudioFileObjectFactory, FileDownloadRequestObjectFactory,
       ImageFileObjectFactory, UrlInterpolationService, DEV_MODE) {
-    if (!DEV_MODE && !GLOBALS.GCS_RESOURCE_BUCKET_NAME) {
-      throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
-    }
+    var AUDIO_DOWNLOAD_URL_TEMPLATE = '';
+    var IMAGE_DOWNLOAD_URL_TEMPLATE = '';
+    $http.get('/gcs_resource_bucket_handler', {}).then(
+      function(response) {
+        var GCS_RESOURCE_BUCKET_NAME = response.data.gcs_resource_bucket_name;
+        if (!DEV_MODE && !GCS_RESOURCE_BUCKET_NAME) {
+          throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
+        }
+        var GCS_PREFIX = ('https://storage.googleapis.com/' +
+          GCS_RESOURCE_BUCKET_NAME + '/exploration');
+        AUDIO_DOWNLOAD_URL_TEMPLATE = (
+          (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
+          '/<exploration_id>/assets/audio/<filename>');
+        IMAGE_DOWNLOAD_URL_TEMPLATE = (
+          (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
+          '/<exploration_id>/assets/image/<filename>');
+      }
+    );
 
     // List of filenames that have been requested for but have
     // yet to return a response.
@@ -34,15 +49,6 @@ oppia.factory('AssetsBackendApiService', [
 
     var ASSET_TYPE_AUDIO = 'audio';
     var ASSET_TYPE_IMAGE = 'image';
-
-    var GCS_PREFIX = ('https://storage.googleapis.com/' +
-      GLOBALS.GCS_RESOURCE_BUCKET_NAME + '/exploration');
-    var AUDIO_DOWNLOAD_URL_TEMPLATE = (
-      (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-      '/<exploration_id>/assets/audio/<filename>');
-    var IMAGE_DOWNLOAD_URL_TEMPLATE = (
-      (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-      '/<exploration_id>/assets/image/<filename>');
 
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';

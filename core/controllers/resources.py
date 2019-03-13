@@ -23,6 +23,7 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import fs_domain
 from core.domain import value_generators_domain
+from core.platform.app_identity import gae_app_identity_services
 import feconf
 
 
@@ -87,6 +88,19 @@ class AssetDevHandler(base.BaseHandler):
             self.response.write(raw)
         except:
             raise self.PageNotFoundException
+
+
+class GcsResourceBucketHandler(base.BaseHandler):
+    """Retrieves application's bucket name for GCS resources."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        self.render_json({
+            'gcs_resource_bucket_name': (
+                gae_app_identity_services.get_gcs_resource_bucket_name())
+        })
 
 
 class PromoBarHandler(base.BaseHandler):

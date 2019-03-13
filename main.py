@@ -291,6 +291,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
+    get_redirect_route(
+        r'/gcs_resource_bucket_handler', resources.GcsResourceBucketHandler),
     get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
 
     get_redirect_route(
