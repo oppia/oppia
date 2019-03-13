@@ -74,9 +74,9 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
           return allowedList;
         };
 
-        $scope.selectedItem = function(choiceListIndex, selectedRank) {
+        $scope.selectedItem = function(choiceListIndex, selectedRankString) {
           var choiceHtml = $scope.choices[choiceListIndex].id;
-          selectedRank = parseInt(selectedRank) - 1;
+          selectedRank = parseInt(selectedRankString) - 1;
           errorMessage = '';
           // Reorder the $scope.choices array to make it consistent with the
           // selected rank.
