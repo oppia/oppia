@@ -21,20 +21,20 @@ oppia.constant(
   '/explorehandler/store_playthrough/<exploration_id>');
 
 oppia.factory('PlaythroughService', [
-  '$http', 'LearnerActionObjectFactory', 'PlaythroughIssuesService',
+  '$http', 'ExplorationFeaturesService', 'LearnerActionObjectFactory',
   'PlaythroughObjectFactory', 'StopwatchObjectFactory',
   'UrlInterpolationService', 'ACTION_TYPE_ANSWER_SUBMIT',
-  'ACTION_TYPE_EXPLORATION_START', 'ACTION_TYPE_EXPLORATION_QUIT',
+  'ACTION_TYPE_EXPLORATION_QUIT', 'ACTION_TYPE_EXPLORATION_START',
   'CURRENT_ACTION_SCHEMA_VERSION', 'CURRENT_ISSUE_SCHEMA_VERSION',
   'EARLY_QUIT_THRESHOLD_IN_SECS', 'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
   'ISSUE_TYPE_EARLY_QUIT', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'NUM_INCORRECT_ANSWERS_THRESHOLD', 'NUM_REPEATED_CYCLES_THRESHOLD',
   'PAGE_CONTEXT', 'STORE_PLAYTHROUGH_URL',
   function(
-      $http, LearnerActionObjectFactory, PlaythroughIssuesService,
+      $http, ExplorationFeaturesService, LearnerActionObjectFactory,
       PlaythroughObjectFactory, StopwatchObjectFactory,
       UrlInterpolationService, ACTION_TYPE_ANSWER_SUBMIT,
-      ACTION_TYPE_EXPLORATION_START, ACTION_TYPE_EXPLORATION_QUIT,
+      ACTION_TYPE_EXPLORATION_QUIT, ACTION_TYPE_EXPLORATION_START,
       CURRENT_ACTION_SCHEMA_VERSION, CURRENT_ISSUE_SCHEMA_VERSION,
       EARLY_QUIT_THRESHOLD_IN_SECS, ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
       ISSUE_TYPE_EARLY_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
@@ -202,9 +202,8 @@ oppia.factory('PlaythroughService', [
     };
 
     var isPlaythroughDiscarded = function() {
-      return !isLearnerInSamplePopulation ||
-        !PlaythroughIssuesService.isExplorationEligibleForPlaythroughIssues(
-          playthrough.expId);
+      return !ExplorationFeaturesService.isPlaythroughRecordingEnabled() ||
+        !isLearnerInSamplePopulation;
     };
 
     return {
@@ -331,6 +330,6 @@ oppia.factory('PlaythroughService', [
             storePlaythrough(true);
           }
         }
-      }
+      },
     };
   }]);

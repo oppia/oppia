@@ -20,10 +20,6 @@ oppia.constant(
   'FETCH_ISSUES_URL', '/issuesdatahandler/<exploration_id>');
 
 oppia.constant(
-  'FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST',
-  '/playthroughdatahandler/whitelist');
-
-oppia.constant(
   'FETCH_PLAYTHROUGH_URL',
   '/playthroughdatahandler/<exploration_id>/<playthrough_id>');
 
@@ -32,15 +28,14 @@ oppia.constant(
 
 oppia.factory('PlaythroughIssuesBackendApiService', [
   '$http', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',
-  'UrlInterpolationService', 'FETCH_ISSUES_URL',
-  'FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST', 'FETCH_PLAYTHROUGH_URL',
+  'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
   'RESOLVE_ISSUE_URL',
   function(
       $http, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
-      UrlInterpolationService, FETCH_ISSUES_URL,
-      FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST, FETCH_PLAYTHROUGH_URL,
+      UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
       RESOLVE_ISSUE_URL) {
-    var whitelistCache = null;
+    /** @type {PlaythroughIssue[]} */
+    var cachedIssues = null;
 
     var getFullIssuesUrl = function(explorationId) {
       return UrlInterpolationService.interpolateUrl(
@@ -65,41 +60,46 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
     };
     return {
       fetchIssues: function(explorationId, explorationVersion) {
-        return $http.get(getFullIssuesUrl(explorationId), {
-          params: {
-            exp_version: explorationVersion
-          }
-        }).then(function(response) {
-          var unresolvedIssuesDicts = response.data;
-          return unresolvedIssuesDicts.map(
-            PlaythroughIssueObjectFactory.createFromBackendDict);
-        });
+        if (cachedIssues !== null) {
+          return Promise.resolve(cachedIssues);
+        } else {
+          return $http.get(getFullIssuesUrl(explorationId), {
+            params: {
+              exp_version: explorationVersion
+            }
+          }).then(function(response) {
+            var unresolvedIssueBackendDicts = response.data;
+            cachedIssues = unresolvedIssueBackendDicts.map(
+              PlaythroughIssueObjectFactory.createFromBackendDict);
+            return cachedIssues;
+          });
+        }
       },
       fetchPlaythrough: function(expId, playthroughId) {
         return $http.get(getFullPlaythroughUrl(expId, playthroughId)).then(
           function(response) {
-            var playthroughDict = response.data;
+            var playthroughBackendDict = response.data;
             return PlaythroughObjectFactory.createFromBackendDict(
-              playthroughDict);
+              playthroughBackendDict);
           });
       },
-      resolveIssue: function(issue, expId, expVersion) {
-        $http.post(getFullResolveIssueUrl(expId), {
-          exp_issue_dict: issue.toBackendDict(),
+      resolveIssue: function(issueToResolve, expId, expVersion) {
+        return $http.post(getFullResolveIssueUrl(expId), {
+          exp_issue_dict: issueToResolve.toBackendDict(),
           exp_version: expVersion
+        }).then(function() {
+          var issueIndex = cachedIssues.findIndex(function(issue) {
+            return angular.equals(issue, issueToResolve);
+          });
+          if (issueIndex === -1) {
+            var invalidIssueError = new Error(
+              'An issue which was not fetched from the backend has been ' +
+              'resolved');
+            return Promise.reject(invalidIssueError);
+          } else {
+            cachedIssues.splice(issueIndex, 1);
+          }
         });
-      },
-      fetchWhitelistedExplorationsForPlaythroughs: function() {
-        if (whitelistCache !== null) {
-          return Promise.resolve(whitelistCache);
-        } else {
-          return $http.get(FETCH_PLAYTHROUGH_EXPLORATION_WHITELIST).then(
-            function(response) {
-              whitelistCache =
-                response.data.whitelisted_exploration_ids_for_playthroughs;
-              return whitelistCache;
-            });
-        }
       },
     };
   }]);

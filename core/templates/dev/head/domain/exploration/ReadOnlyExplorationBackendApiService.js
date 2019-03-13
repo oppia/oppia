@@ -17,10 +17,10 @@
  * about explorations from the backend.
  */
 oppia.factory('ReadOnlyExplorationBackendApiService', [
-  '$http', '$q', 'EXPLORATION_DATA_URL_TEMPLATE',
-  'EXPLORATION_VERSION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-  function($http, $q, EXPLORATION_DATA_URL_TEMPLATE,
-      EXPLORATION_VERSION_DATA_URL_TEMPLATE, UrlInterpolationService) {
+  '$http', '$q', 'UrlInterpolationService',
+  'EXPLORATION_DATA_URL_TEMPLATE', 'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService,
+      EXPLORATION_DATA_URL_TEMPLATE, EXPLORATION_VERSION_DATA_URL_TEMPLATE) {
     // Maps previously loaded explorations to their IDs.
     var _explorationCache = [];
 

@@ -5,7 +5,7 @@
 <div class="conversation-skin-future-tutor-card" aria-hidden="true">
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
-      <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content"
+      <angular-html-bind class="oppia-rte-viewer oppia-learner-view-card-top-content"
                          html-data="nextCard.getContentHtml()">
       </angular-html-bind>
     </div>
@@ -81,7 +81,7 @@
   <div ng-if="isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
     <div class="conversation-skin-final-ratings-header" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
-    <div popover-placement="bottom" uib-popover-template="'popover/feedback'" popover-trigger="click">
+    <div popover-placement="bottom" uib-popover-template="'<[getFeedbackPopoverUrl()]>'" popover-trigger="click">
       <rating-display rating-value="userRating" is-editable="true" on-edit="submitUserRating"
                       class="conversation-skin-final-ratings-display">
       </rating-display>
@@ -240,33 +240,11 @@ otherwise they will interfere with the iframed conversation skin directive.
     z-index: 2;
   }
 
-  /* These rules must be kept in sync with corresponding rules in oppia.css
-     (those with '.oppia-rte-editor > p,
-       .form-control.oppia-rte-content > div > p' selectors specifying
-      the same line-height, margin-top and margin-bottom attributes)
-  */
-  .rte-viewer > p {
-    line-height: 1.846;
-  }
-  .rte-viewer > p:first-child {
-    margin-top: 0px;
-  }
-  .rte-viewer > p:last-child {
-    margin-bottom: 0px;
-  }
-
-  .rte-viewer {
-    border-radius: 2px;
-    display: inline-block;
-    max-width: 100%;
-    position: relative;
-    text-align: left;
-  }
-
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-learner-answer-content {
     margin-bottom: 12px;
     padding: 8px 12px;
+    overflow: auto;
     word-wrap: break-word;
   }
 

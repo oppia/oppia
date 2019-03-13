@@ -14,8 +14,8 @@
 
 """Controllers for queries relating to recent commits."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import exp_services
 import feconf
 

@@ -2,18 +2,18 @@
   <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
   <div ng-if="!data.isHint">
     <div ng-if="getShortAnswerHtml()"
-         popover-placement="bottom" uib-popover-template="'popover/answer'"
+         popover-placement="bottom" uib-popover-template="'<[getAnswerPopoverUrl()]>'"
          popover-trigger="click" style="cursor: pointer;">
-      <angular-html-bind class="rte-viewer conversation-skin-learner-answer-content" html-data="getShortAnswerHtml()">
+      <angular-html-bind class="oppia-rte-viewer conversation-skin-learner-answer-content" html-data="getShortAnswerHtml()">
       </angular-html-bind>
     </div>
     <div ng-if="!getShortAnswerHtml()">
-      <angular-html-bind class="rte-viewer conversation-skin-learner-answer-content" html-data="getAnswerHtml()">
+      <angular-html-bind class="oppia-rte-viewer conversation-skin-learner-answer-content" html-data="getAnswerHtml()">
       </angular-html-bind>
     </div>
   </div>
   <div ng-if="data.isHint">
-    <div class="rte-viewer conversation-skin-learner-answer-content">
+    <div class="oppia-rte-viewer conversation-skin-learner-answer-content">
       <[data.learnerInput | translate]>
     </div>
   </div>
@@ -30,7 +30,7 @@
   <div>
     <angular-html-bind ng-if="data.oppiaResponse !== null"
                        html-data="data.oppiaResponse"
-                       class="rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
+                       class="oppia-rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
                        ng-class="getFeedbackAudioHighlightClass()">
     </angular-html-bind>
   </div>
@@ -69,10 +69,3 @@
     border-color: rgba(236, 239, 241, 0.4) transparent transparent rgba(236, 239, 241, 0.4);
   }
 </style>
-
-<script type="text/ng-template" id="popover/answer">
-  <div style="max-height: 300px; overflow-y: scroll;">
-    <angular-html-bind html-data="getAnswerHtml()">
-    </angular-html-bind>
-  </div>
-</script>

@@ -1,0 +1,127 @@
+<style>
+  answer-group-editor .oppia-rule-header {
+    color: rgb(120, 120, 120);
+    overflow: hidden;
+    padding-left: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  answer-group-editor .oppia-multiple-choice-rule p {
+    display: inline;
+  }
+  answer-group-editor .oppia-multiple-choice-rule p::before {
+    content: ' ';
+  }
+  answer-group-editor .oppia-add-rule-button {
+    background-color: rgba(165,165,165,0.9);
+    border: 0;
+    border-radius: 0;
+    color: white;
+    opacity: 0.9;
+    padding: 7px;
+    width: 100%;
+  }
+
+  answer-group-editor .oppia-add-rule-button:active,
+  answer-group-editor .oppia-add-rule-button:focus,
+  answer-group-editor .oppia-add-rule-button:hover,
+  answer-group-editor .oppia-modify-training-data-button:active,
+  answer-group-editor .oppia-modify-training-data-button:focus,
+  answer-group-editor .oppia-modify-training-data-button:hover {
+    background-color: rgba(165,165,165,1);
+    color: white;
+    opacity: 1;
+  }
+  answer-group-editor .oppia-delete-rule-button {
+    cursor: pointer;
+    opacity: 0.5;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 20px;
+  }
+  answer-group-editor .oppia-delete-rule-button:hover {
+    opacity: 1;
+  }
+
+  answer-group-editor .oppia-modify-training-data-button {
+    background-color: rgba(165,165,165,0.9);
+    border: 0;
+    border-radius: 0;
+    color: white;
+    opacity: 0.9;
+    padding: 7px;
+    width: 100%;
+    margin-top: 4%;
+  }
+</style>
+
+<div style="height: 100%;">
+  <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
+  <div ng-if="rules">
+    <strong>
+      If the learner's answer...
+    </strong>
+    <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist" ng-model="rules">
+      <li ng-repeat="rule in rules" ng-class="{'active': activeRuleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block protractor-test-rule-block" style="margin-top: 0;" ng-style="$last ? {'border-bottom': '1px solid #ccc'} : {}">
+        <a ng-click="openRuleEditor($index)" ng-hide="activeRuleIndex === $index" class="oppia-rule-tab protractor-test-answer-tab" ng-class="{'oppia-rule-tab-disabled': !isEditable}">
+          <div class="oppia-rule-header">
+            <span ng-if="$index > 0">or</span>
+            <span ng-if="getCurrentInteractionId() !== 'MultipleChoiceInput' && $index !== activeRuleIndex">
+              <[rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices]>...
+            </span>
+            <span ng-if="getCurrentInteractionId() === 'MultipleChoiceInput'">
+              <angular-html-bind class="oppia-multiple-choice-rule" html-data="rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices">
+              </angular-html-bind>...
+            </span>
+          </div>
+        </a>
+        <span ng-if="isEditable && rules.length > 1"
+              class="oppia-delete-rule-button oppia-transition-200 protractor-test-delete-answer"
+              ng-click="deleteRule($index)">
+          <i class="material-icons md-18">&#xE5CD;</i>
+        </span>
+
+        <div ng-if="activeRuleIndex === $index">
+          <div class="oppia-editor-card-section">
+            <div class="oppia-rule-body-container">
+              <rule-editor rule="rule" is-editable="isEditable" is-editing-rule-inline="true" on-cancel-rule-edit="cancelActiveRuleEdit()" on-save-rule="saveRules()" class="protractor-test-answer-body">
+              </rule-editor>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <button type="button" ng-if="isEditable" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer" ng-click="addNewRule()">
+      + Add Another Possible Answer
+    </button>
+
+    <div ng-if="isEditable && isCurrentInteractionTrainable() && isMLEnabled() && !isInQuestionMode()">
+      <button type="button" class="btn btn-default btn-lg oppia-modify-training-data-button" ng-click="openTrainingDataEditor()">
+        <i class="material-icons md-24">playlist_add</i> Modify Training Data
+      </button>
+    </div>
+  </div>
+
+  <br ng-if="rules">
+
+  <outcome-editor is-editable="isEditable"
+                  display-feedback="displayFeedback"
+                  on-save-dest="getOnSaveAnswerGroupDestFn()"
+                  on-save-feedback="getOnSaveAnswerGroupFeedbackFn()"
+                  on-save-correctness-label="getOnSaveAnswerGroupCorrectnessLabelFn()"
+                  outcome="outcome"
+                  add-state="addState"
+                  warnings-are-suppressed="suppressWarnings()"
+                  show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired">
+  </outcome-editor>
+
+  <div ng-if="isInQuestionMode() && getTaggedMisconceptionId() !== null && !outcome.labelledAsCorrect">
+    <label> Tagged Misconception: </label>
+    <[misconceptionName]>
+  </div>
+  <button type="button" ng-if="isEditable && isInQuestionMode() && rules && !outcome.labelledAsCorrect && misconceptions.length > 0" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer" style="padding-top: 5px;" ng-click="tagAnswerGroupWithMisconception()">
+    Tag with misconception
+  </button>
+</div>

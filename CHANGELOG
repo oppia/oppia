@@ -1,5 +1,142 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.7.3 (16 February 2019)
+------------------------
+Infrastructural changes
+* Improvements to PlaythroughAudit (#6239)
+* Add None/deleted checks to DeleteIllegalPlaythroughsOneOffJob (#6195)
+* Fix Content-Disposition headers being unicode instead of str (#6192)
+* Fix check for clean working tree in common.py (#6191)
+* Fix #4666: Fixes correctness test for Text Input Prediction Service  (#6120)
+* Fix #5975: Create One-off Job to Remove Invalid Playthroughs (#6131)
+* Fix #5371: One Off Job to populate message_count in GeneralFeedbackThreadModel (#5999)
+* Fix #6104: Use sub-process in pre_push_hook (#6114)
+* Fix part of #5591: Migrate Playthrough Feature Data into ExplorationFeaturesService (#6044)
+* Fix part of #5002: Move ALLOW_YAML_FILE_UPLOAD from feconf to constants (#5989)
+* Fix part of #5002: Remove GLOBALS from HTML (#6050)
+* Add audio translation schema for subtopic pages (#5823)
+* Remove automatic backups script. (#5956)
+* Fix classifier models when exploration is reverted and add test case for auto migrations (#5888)
+
+Improvements to the editors and players
+* Fix #6188: Fix word-break in explorations (#6187)
+* Changed word-break to word-wrap (#6189)
+* Fix #5745: Redesign audio bar of the translation tab. (#6167)
+* Fix #5822: Add customization option to allow multiple sort items in the same position in Drag and drop interaction (#6177)
+* UI changes to topic and skill editor (#6091)
+* Fix #5019: The continue button is now visible with long feedback (#6136)
+* Fix #6122: Add $log service to prevent the error arising on rejecting suggestions (#6124)
+* Fix #4407: KaTeX text no longer goes outside text container in MathExpressionInput (#6130)
+* Fix #4833: Prevents text overflow  in answer statistics page (#6137)
+* Fix #6078: Updating publish button after modal is dismissed (#6096)
+* Fix #5729: Adds a numerical progress status in the translation tab (#6097)
+* Fix #6055: Prevents content overflow in save draft modal (#6079)
+* Fix #5771: Ensure that the active tab of translation tab is maintained every time save draft/publish changes is clicked (#6076)
+* Fix #3074: Added height limit warning for card content (#5997)
+* Fix bugs in new structure editors (#6084)
+* Fix #6064: Changes backdrop controls to static for exploration publish modal (#6071)
+
+Improvements to testing suites
+* Reorder e2e test suites into more logical categorization (#6036)
+* Fix part of #5134: Adding tests for core.domain.collection_jobs_one_off (#6061)
+* Fix part of #4057: Adding tests to increase coverage of OutcomeObjectFactory.js (#6098)
+* Fix part of #5134: Making the coverage of email_jobs_one_off to 100% (#6026)
+* Fix #5839: Filter slow network logs for mobile tests on Browserstack (#6090)
+* Fix #5923: Refactoring and clean up backend tests (#6074)
+* Fix part of #5134: Added test for fs_domain.py (#5988)
+* Fix #4829: Reduce code redundancy in backend testing (#5838)
+* Fixes error in backend tests redirection when trying to test a specific module within a test file (#6054)
+
+Documentation and development workflow
+* Fixes part of #4374: Update docstrings in the python backend code (#6028)
+* Enable missing docstrings check (#6073)
+
+Miscellaneous bug fixes and updates
+* Fix #6128: Successfully load mobile view in '/parents' page (#6259)
+* Fix #6118: Improved spacing between reload buttons on admin page (#6123)
+* Fix #6089: Moved common css to oppia.css and removed extra comments for sync (#6107)
+* Fix #6117: The Role tab tooltip on the admin page is now placed correctly (#6119)
+* Fix #5678: Add swipeable carousel to Library page in mobile view (#6087)
+* Fix #5751: Remove G+ from the sharing icons. (#6058)
+* Fix #6056: Makes the resize of text box vertical (#6057)
+* Routine update to translations. (#6164)
+
+
+v2.7.2 (14 January 2019)
+------------------------
+Updates to landing pages
+* Small landing page changes based on feedback from Kefeh (#5951)
+* Fix #5978: Stewards page content alignment (#6042)
+
+Analytics for creators
+* Hide playthrough issues on exploration editor stats tab if exploration isn't whitelisted (#5947)
+* Fixes #5860: Fix fraction display in statistics tab (#5976)
+* Rename playthrough-related issues services/directives/factories (#5990)
+* Fix #5798: Introduce Improvements tab to exploration editor (#5991)
+* Introduce FetchPlaythroughWhitelistHandler (#5966)
+
+Generalized review system
+* Fix #4995: Remove complex logic from the storage layer, and add domain/service layer for emails (#5940)
+* Fix error while displaying suggestion threads on learner dashboard page (#5965)
+
+Development workflow
+* Fix #5761: --test_target flag redirects to the corresponding test file if needed (#6014)
+* Fix #5885: Only run front end tests when front end files are changed (#5936)
+* Fix #5782: Added custom check to remove backslash continuation (#5964)
+* Fix #5529: Print python lint errors at the end of the check (#6005)
+* Add try/except block in pre-commit linter (#6019)
+* Enforce variables to be in snake case (#5943)
+* Fix #5876: Check that cls arguments come first in function args (#5919)
+* Fix part of #6024: Consolidate file access in the pre-commit linter (#6023)
+* Fix #5938: Lint checks should run only for files changed by the user (#6033)
+* Introduce eslint: space-before-blocks rule (#6048)
+* Fix max-len error (#5994)
+* Fix false positive Travis build in pre-commit linter (#6002)
+* Fix #6040: Fix issues in develop which led to lint test failures (#6038)
+
+New structures
+* Implement editing of questions (#5614)
+* Allow admins to assign topic managers to topics (#5971)
+* Split ENABLE_NEW_STRUCTURES flag to 2 flags for editors and players (#5987)
+
+Test coverage
+* Fix part of #5134: Add more tests to increase coverage of core.controllers.classifier (#5926)
+* Fix part of #5134: Add tests for core.controllers.custom_landing_pages. (#5925)
+* Fix part of #5134: Add core.platform.models tests (#5944)
+
+Code health and documentation
+* Upgrade pylint to 1.9.3 and fix some docstring issues (#5935)
+* Fix code duplication in ExplorationPlayerStateService (#6000)
+* Fix #4968: Move customization args method from state_domain to customization_args_util (#6015)
+* Fix parts of #4374: Add docstrings to Python files. (#5928, #5969, #5977, #6006, #6013, #6027, #6035, #6041)
+
+Improvements to editor features
+* Fix #5933: Changed code editor prompt in test exploration to be more explicit (#5941)
+* Fix #5853: Remove weird image artifact in rich-text editor (#5954)
+* Fix #5039: Add continue button in preview mode (#5962)
+* Fix #5949: Make RTE spacing uniform (#5953)
+* Fix #5701: Alert user to save changes before publishing (#5948)
+* Fix #5980: Make line-spacing consistent within a paragraph (#5981)
+* Add questions list tab and create question functionality to skill editor (#5920)
+* Fix #5973: Fix the changed space when the text is added just below the image (#5996)
+* Fix #5982: Fix modal overflow issue by using word-break property (#5983)
+* Fix #3972: Fix the faulty vertical offset (#6030)
+* Fix #6016: Limited the selection area of multiple choice option (#6029)
+* Fix #6056: Prevent the text box in the Save Draft modal from flowing out of the modal boundaries (#6057)
+* Fix #6064: Change backdrop controls to static for exploratoin publication modal (#6071)
+
+Updates to the library and splash pages
+* Fix #4936: The drop down menus work similar to the keyboard behavior for the About and Profile dropdowns (#5974)
+* Fix #3972: Fix the faulty vertical offset (#6030)
+* Fix #5755: Add padding to cards to fix alignment issue on mobile view (#5968)
+
+Infrastructure changes
+* Fix part of #3950: Remove Jinja ifs from exploration_player.html (#5958)
+* Fix part of #3950: Remove Jinja ifs from collection player (#5869)
+* Add more debugging info to help identify cause of undefined states (#5827)
+* Fix part of #5002: Remove NAV_MODE from side navigation bar (#6008)
+
+
 v2.7.1 (20 December 2018)
 -------------------------
 Updates to landing pages:

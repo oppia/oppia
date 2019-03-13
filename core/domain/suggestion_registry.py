@@ -503,6 +503,11 @@ class SuggestionAddQuestion(BaseSuggestion):
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
         question_services.add_question(self.author_id, question)
+        skill = skill_services.get_skill_by_id(
+            self.change.skill_id, strict=False)
+        if skill is None:
+            raise utils.ValidationError(
+                'The skill with the given id doesn\'t exist.')
         question_services.create_new_question_skill_link(
             question_dict['id'], self.change.skill_id)
 

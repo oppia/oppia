@@ -20,18 +20,20 @@
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
-  '$scope', '$http', '$uibModal', 'AlertsService', 'ExplorationStatesService',
-  'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
-  'StatesObjectFactory', 'StateImprovementSuggestionService',
-  'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-  'PlaythroughIssuesService', 'RouterService', 'StateRulesStatsService',
+  '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
+  'DateTimeFormatService', 'ExplorationDataService',
+  'ExplorationFeaturesService',
+  'ExplorationStatesService', 'ReadOnlyExplorationBackendApiService',
+  'RouterService', 'StateImprovementSuggestionService',
+  'StateRulesStatsService', 'StatesObjectFactory', 'UrlInterpolationService',
   'IMPROVE_TYPE_INCOMPLETE',
   function(
-      $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
-      ExplorationDataService, ComputeGraphService, DateTimeFormatService,
-      StatesObjectFactory, StateImprovementSuggestionService,
-      ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-      PlaythroughIssuesService, RouterService, StateRulesStatsService,
+      $http, $scope, $uibModal, AlertsService, ComputeGraphService,
+      DateTimeFormatService, ExplorationDataService,
+      ExplorationFeaturesService,
+      ExplorationStatesService, ReadOnlyExplorationBackendApiService,
+      RouterService, StateImprovementSuggestionService,
+      StateRulesStatsService, StatesObjectFactory, UrlInterpolationService,
       IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
@@ -84,8 +86,8 @@ oppia.controller('StatisticsTab', [
           var initStateName = response.exploration.init_state_name;
 
           $scope.playthroughsAreAvailable =
-            PlaythroughIssuesService.isExplorationEligibleForPlaythroughIssues(
-              ExplorationDataService.explorationId);
+            ExplorationFeaturesService.isPlaythroughRecordingEnabled() &&
+            !ExplorationFeaturesService.isImprovementsTabEnabled();
           $scope.statsGraphData = ComputeGraphService.compute(
             initStateName, states);
           var improvements = (

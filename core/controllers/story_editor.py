@@ -15,8 +15,8 @@
 """Controllers for the story editor."""
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -51,8 +51,7 @@ class StoryEditorPage(base.BaseHandler):
             'story_title': story.title,
         })
 
-        self.render_template(
-            'pages/story_editor/story_editor.html', redirect_url_on_logout='/')
+        self.render_template('pages/story_editor/story_editor.html')
 
 
 class EditableStoryDataHandler(base.BaseHandler):

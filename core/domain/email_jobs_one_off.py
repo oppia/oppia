@@ -35,7 +35,8 @@ class EmailHashRegenerationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(email_model):
         email_model.put()
+        yield ('SUCCESS', 1)
 
     @staticmethod
-    def reduce(email_model_id, value):
-        pass
+    def reduce(key, values):
+        yield (key, len(values))

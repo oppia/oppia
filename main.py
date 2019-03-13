@@ -18,6 +18,7 @@ import logging
 
 # pylint: disable=relative-import
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import classifier
@@ -28,12 +29,14 @@ from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
 from core.controllers import editor
 from core.controllers import email_dashboard
+from core.controllers import features
 from core.controllers import feedback
 from core.controllers import learner_dashboard
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
+from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
 from core.controllers import reader
@@ -41,13 +44,14 @@ from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import skill_editor
 from core.controllers import story_editor
+from core.controllers import story_viewer
 from core.controllers import subscriptions
+from core.controllers import subtopic_viewer
 from core.controllers import suggestion
 from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import translator
-from core.domain import acl_decorators
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -184,7 +188,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
     get_redirect_route(r'/contact', pages.ContactPage),
 
-    get_redirect_route(r'/forum', pages.ForumPage),
+    get_redirect_route(r'/forum', pages.ForumRedirectPage),
     get_redirect_route(r'/donate', pages.DonatePage),
     get_redirect_route(r'/thanks', pages.ThanksPage),
     get_redirect_route(r'/terms', pages.TermsPage),
@@ -199,7 +203,7 @@ URLS = MAPREDUCE_HANDLERS + [
         admin.AdminTopicsCsvFileDownloader),
 
     get_redirect_route(
-        r'/notifications_dashboard',
+        feconf.NOTIFICATIONS_DASHBOARD_URL,
         creator_dashboard.NotificationsDashboardPage),
     get_redirect_route(
         r'/notificationsdashboardhandler/data',
@@ -224,6 +228,16 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<skill_id>' % feconf.NEW_QUESTION_URL,
         question_editor.QuestionCreationHandler),
+    get_redirect_route(
+        r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
+        practice_sessions.PracticeSessionsPage),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
+        story_viewer.StoryPageDataHandler),
+    get_redirect_route(
+        r'%s/<topic_id>/<subtopic_id>' %
+        feconf.SUBTOPIC_DATA_HANDLER,
+        subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
@@ -281,10 +295,14 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
+    get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
 
     get_redirect_route(
         r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
-        custom_landing_pages.FractionLandingPage),
+        custom_landing_pages.FractionLandingRedirectPage),
+    get_redirect_route(
+        r'%s' % feconf.TOPIC_LANDING_PAGE_URL,
+        custom_landing_pages.TopicLandingPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),
@@ -330,7 +348,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(r'/preferences', profile.PreferencesPage),
+    get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
@@ -353,9 +371,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
     get_redirect_route(
-        r'/explorehandler/features/<exploration_id>',
-        editor.ExplorationFeaturesHandler),
-    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
     get_redirect_route(
@@ -367,6 +382,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_PRETESTS_URL_PREFIX,
         reader.PretestHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_FEATURES_PREFIX,
+        features.ExplorationFeaturesHandler),
     get_redirect_route(
         '/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler),
@@ -467,6 +485,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler),
+    get_redirect_route(
+        r'/createhandler/started_translation_tutorial_event/<exploration_id>',
+        translator.StartedTranslationTutorialEventHandler),
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',
         editor.EditorAutosaveHandler),
@@ -619,8 +640,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
-    get_redirect_route(
-        r'/exploration_editor_logout', editor.EditorLogoutHandler),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
@@ -630,9 +649,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/ml/nextjobhandler', classifier.NextJobHandler),
 
-    get_redirect_route(
-        r'/playthroughdatahandler/whitelist',
-        editor.FetchPlaythroughWhitelistHandler),
     get_redirect_route(
         r'/playthroughdatahandler/<exploration_id>/<playthrough_id>',
         editor.FetchPlaythroughHandler),

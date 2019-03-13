@@ -17,9 +17,9 @@
  */
 
 oppia.directive('skillMisconceptionsEditor', [
-  'UrlInterpolationService', 'SkillUpdateService', 'SkillEditorStateService',
+  'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
   function(
-      UrlInterpolationService, SkillUpdateService, SkillEditorStateService) {
+      SkillEditorStateService, SkillUpdateService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

@@ -17,27 +17,28 @@
  */
 
 oppia.factory('ExplorationSaveService', [
-  '$uibModal', '$timeout', '$rootScope', '$log', '$q',
-  'AlertsService', 'ExplorationDataService', 'ExplorationStatesService',
-  'ExplorationTagsService', 'ExplorationTitleService',
-  'ExplorationObjectiveService', 'ExplorationCategoryService',
-  'ExplorationLanguageCodeService', 'ExplorationRightsService',
-  'ExplorationWarningsService', 'ExplorationDiffService',
-  'ExplorationInitStateNameService', 'RouterService',
-  'FocusManagerService', 'ChangeListService', 'SiteAnalyticsService',
-  'StatesObjectFactory', 'UrlInterpolationService',
-  'AutosaveInfoModalsService',
+  '$log', '$q', '$rootScope', '$timeout', '$uibModal',
+  'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
+  'ExplorationCategoryService', 'ExplorationDataService',
+  'ExplorationDiffService', 'ExplorationInitStateNameService',
+  'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
+  'ExplorationRightsService', 'ExplorationStatesService',
+  'ExplorationTagsService',
+  'ExplorationTitleService', 'ExplorationWarningsService',
+  'FocusManagerService',
+  'RouterService', 'SiteAnalyticsService', 'StatesObjectFactory',
+  'UrlInterpolationService',
   function(
-      $uibModal, $timeout, $rootScope, $log, $q,
-      AlertsService, ExplorationDataService, ExplorationStatesService,
-      ExplorationTagsService, ExplorationTitleService,
-      ExplorationObjectiveService, ExplorationCategoryService,
-      ExplorationLanguageCodeService, ExplorationRightsService,
-      ExplorationWarningsService, ExplorationDiffService,
-      ExplorationInitStateNameService, RouterService,
-      FocusManagerService, ChangeListService, SiteAnalyticsService,
-      StatesObjectFactory, UrlInterpolationService,
-      AutosaveInfoModalsService) {
+      $log, $q, $rootScope, $timeout, $uibModal,
+      AlertsService, AutosaveInfoModalsService, ChangeListService,
+      ExplorationCategoryService, ExplorationDataService,
+      ExplorationDiffService, ExplorationInitStateNameService,
+      ExplorationLanguageCodeService, ExplorationObjectiveService,
+      ExplorationRightsService, ExplorationStatesService,
+      ExplorationTagsService,
+      ExplorationTitleService, ExplorationWarningsService, FocusManagerService,
+      RouterService, SiteAnalyticsService, StatesObjectFactory,
+      UrlInterpolationService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
@@ -129,8 +130,6 @@ oppia.factory('ExplorationSaveService', [
 
             $scope.cancel = function() {
               $uibModalInstance.dismiss('cancel');
-              AlertsService.clearWarnings();
-              whenModalClosed.resolve();
             };
           }
         ]
@@ -152,6 +151,9 @@ oppia.factory('ExplorationSaveService', [
               ExplorationDataService.explorationId);
             whenModalClosed.resolve();
           });
+      }, function() {
+        AlertsService.clearWarnings();
+        whenModalClosed.resolve();
       });
 
       return whenModalClosed.promise;
@@ -399,15 +401,7 @@ oppia.factory('ExplorationSaveService', [
                 };
 
                 $scope.cancel = function() {
-                  whenModalsClosed.resolve();
-                  ExplorationTitleService.restoreFromMemento();
-                  ExplorationObjectiveService.restoreFromMemento();
-                  ExplorationCategoryService.restoreFromMemento();
-                  ExplorationLanguageCodeService.restoreFromMemento();
-                  ExplorationTagsService.restoreFromMemento();
-
                   $uibModalInstance.dismiss('cancel');
-                  AlertsService.clearWarnings();
                 };
               }
             ]
@@ -446,6 +440,14 @@ oppia.factory('ExplorationSaveService', [
                   whenModalsClosed.resolve();
                 });
             }
+          }, function() {
+            whenModalsClosed.resolve();
+            ExplorationTitleService.restoreFromMemento();
+            ExplorationObjectiveService.restoreFromMemento();
+            ExplorationCategoryService.restoreFromMemento();
+            ExplorationLanguageCodeService.restoreFromMemento();
+            ExplorationTagsService.restoreFromMemento();
+            AlertsService.clearWarnings();
           });
         } else {
           // No further metadata is needed. Open the publish modal immediately.

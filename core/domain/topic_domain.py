@@ -29,6 +29,7 @@ import utils
 
 CMD_CREATE_NEW = 'create_new'
 CMD_CHANGE_ROLE = 'change_role'
+CMD_REMOVE_MANAGER_ROLE = 'remove_manager_role'
 CMD_PUBLISH_TOPIC = 'publish_topic'
 CMD_UNPUBLISH_TOPIC = 'unpublish_topic'
 
@@ -163,7 +164,7 @@ class TopicRightsChange(object):
     """Domain object for changes made to a topic rights object."""
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'assignee_id', 'new_role', 'old_role'
+        'assignee_id', 'new_role', 'old_role', 'removed_user_id'
     ]
 
     def __init__(self, change_dict):
@@ -190,6 +191,8 @@ class TopicRightsChange(object):
             self.assignee_id = change_dict['assignee_id']
             self.new_role = change_dict['new_role']
             self.old_role = change_dict['old_role']
+        elif self.cmd == CMD_REMOVE_MANAGER_ROLE:
+            self.removed_user_id = change_dict['removed_user_id']
         elif self.cmd == CMD_CREATE_NEW:
             pass
         elif self.cmd == CMD_PUBLISH_TOPIC:
@@ -410,6 +413,15 @@ class Topic(object):
         for subtopic in self.subtopics:
             skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
         return skill_ids
+
+    def get_all_uncategorized_skill_ids(self):
+        """Returns ids of all the uncategorized skills present in the topic.
+
+        Returns:
+            list(str). The list of all the uncategorized skill ids present
+            in the topic.
+        """
+        return self.uncategorized_skill_ids
 
     def delete_story(self, story_id):
         """Removes a story from the canonical_story_ids list.
@@ -656,6 +668,18 @@ class Topic(object):
                 'The skill id %s is not present in the topic.'
                 % uncategorized_skill_id)
         self.uncategorized_skill_ids.remove(uncategorized_skill_id)
+
+    def get_all_subtopics(self):
+        """Returns all subtopics in the topic.
+
+        Returns:
+            list(dict). The list of all subtopics present
+                in topic.
+        """
+        subtopics = []
+        for _, subtopic in enumerate(self.subtopics):
+            subtopics.append(subtopic.to_dict())
+        return subtopics
 
     def get_subtopic_index(self, subtopic_id):
         """Gets the index of the subtopic with the given id in the subtopics

@@ -19,11 +19,11 @@
  */
 
 oppia.factory('TrainingDataService', [
-  '$rootScope', '$http', 'ResponsesService', 'RuleObjectFactory',
-  'ExplorationStatesService', 'StateEditorService', 'GraphDataService',
+  '$http', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
+  'ResponsesService', 'RuleObjectFactory', 'StateEditorService',
   function(
-      $rootScope, $http, ResponsesService, RuleObjectFactory,
-      ExplorationStatesService, StateEditorService, GraphDataService) {
+      $http, $rootScope, ExplorationStatesService, GraphDataService,
+      ResponsesService, RuleObjectFactory, StateEditorService) {
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
       for (var i = 0; i < trainingData.length; i++) {

@@ -53,7 +53,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.STORY_ID, title='A title')
         story_services.save_new_story(self.albert_id, story)
         self.assertEqual(
-            story.schema_version,
+            story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
 
         # Start migration job.
@@ -67,7 +67,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         updated_story = (
             story_services.get_story_by_id(self.STORY_ID))
         self.assertEqual(
-            updated_story.schema_version,
+            updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
 
         output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
@@ -121,7 +121,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             'A description', 'A note')
         story = (
             story_services.get_story_by_id(self.STORY_ID))
-        self.assertEqual(story.schema_version, 1)
+        self.assertEqual(story.story_contents_schema_version, 1)
 
         # Start migration job.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
@@ -134,7 +134,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         updated_story = (
             story_services.get_story_by_id(self.STORY_ID))
         self.assertEqual(
-            updated_story.schema_version,
+            updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
 
         output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long

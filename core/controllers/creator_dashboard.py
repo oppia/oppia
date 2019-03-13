@@ -17,8 +17,8 @@ activities.
 """
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
@@ -67,8 +67,7 @@ class NotificationsDashboardPage(base.BaseHandler):
             'meta_description': feconf.CREATOR_DASHBOARD_PAGE_DESCRIPTION,
         })
         self.render_template(
-            'pages/notifications_dashboard/notifications_dashboard.html',
-            redirect_url_on_logout='/')
+            'pages/notifications_dashboard/notifications_dashboard.html')
 
 
 class NotificationsDashboardHandler(base.BaseHandler):
@@ -137,7 +136,6 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_ids))
 
         self.values.update({
-            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD,
             'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
@@ -149,9 +147,7 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
-        self.render_template(
-            'pages/creator_dashboard/creator_dashboard.html',
-            redirect_url_on_logout='/')
+        self.render_template('pages/creator_dashboard/creator_dashboard.html')
 
 
 class CreatorDashboardHandler(base.BaseHandler):
@@ -420,7 +416,7 @@ class UploadExplorationHandler(base.BaseHandler):
         yaml_content = self.request.get('yaml_file')
 
         new_exploration_id = exp_services.get_new_exploration_id()
-        if feconf.ALLOW_YAML_FILE_UPLOAD:
+        if constants.ALLOW_YAML_FILE_UPLOAD:
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.user_id, yaml_content, new_exploration_id, [],
                 strip_audio_translations=True)

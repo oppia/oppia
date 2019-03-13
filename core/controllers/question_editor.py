@@ -17,8 +17,8 @@ and are created.
 """
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -46,14 +46,16 @@ class QuestionCreationHandler(base.BaseHandler):
                 (question_dict['id'] is not None) or
                 ('question_state_data' not in question_dict) or
                 ('language_code' not in question_dict) or
-                (question_dict['version'] != 1) or
-                (question_dict['question_state_schema_version'] != (
-                    feconf.CURRENT_STATES_SCHEMA_VERSION))):
+                (question_dict['version'] != 1)):
             raise self.InvalidInputException
 
-
+        question_dict['question_state_schema_version'] = (
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
-        question = question_domain.Question.from_dict(question_dict)
+        try:
+            question = question_domain.Question.from_dict(question_dict)
+        except:
+            raise self.InvalidInputException
         question_services.add_question(self.user_id, question)
         question_services.create_new_question_skill_link(
             question.id, skill_id)
@@ -112,11 +114,8 @@ class EditableQuestionDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The question with the given id doesn\'t exist.')
 
-        associated_skill_ids = [link.skill_id for link in (
-            question_services.get_question_skill_links_of_question(
-                question_id))]
-        associated_skills = skill_services.get_multi_skills(
-            associated_skill_ids)
+        associated_skills = question_services.get_skills_linked_to_question(
+            question_id)
         associated_skill_dicts = [
             skill.to_dict() for skill in associated_skills]
 
@@ -140,8 +139,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
                 'The question with the given id doesn\'t exist.')
 
         commit_message = self.payload.get('commit_message')
-        if not question_id:
-            raise self.PageNotFoundException
+
         if not commit_message:
             raise self.PageNotFoundException
         if not self.payload.get('change_list'):

@@ -14,8 +14,8 @@
 
 """Controllers for the learner dashboard."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
@@ -33,9 +33,7 @@ class LearnerDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        self.render_template(
-            'pages/learner_dashboard/learner_dashboard.html',
-            redirect_url_on_logout='/')
+        self.render_template('pages/learner_dashboard/learner_dashboard.html')
 
 
 class LearnerDashboardHandler(base.BaseHandler):

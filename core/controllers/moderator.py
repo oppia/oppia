@@ -14,8 +14,8 @@
 
 """Controllers for the moderator page."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import email_manager

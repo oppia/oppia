@@ -75,7 +75,7 @@ oppia.controller('LearnerDashboard', [
   'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
   'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
-  'UserService',
+  'ShowSuggestionModalForLearnerViewService', 'UserService',
   function(
       $scope, $rootScope, $q, $window, $http, $uibModal,
       AlertsService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
@@ -85,7 +85,7 @@ oppia.controller('LearnerDashboard', [
       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
       DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
       FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory,
-      UserService) {
+      ShowSuggestionModalForLearnerViewService, UserService) {
     $scope.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
     $scope.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (
@@ -469,36 +469,14 @@ oppia.controller('LearnerDashboard', [
     };
 
     $scope.showSuggestionModal = function(newContent, oldContent, description) {
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/' +
-          'learner_view_suggestion_modal_directive.html'),
-        backdrop: true,
-        resolve: {
-          newContent: function() {
-            return newContent;
-          },
-          oldContent: function() {
-            return oldContent;
-          },
-          description: function() {
-            return description;
-          }
-        },
-        controller: [
-          '$scope', '$uibModalInstance', 'newContent', 'oldContent',
-          'description',
-          function($scope, $uibModalInstance, newContent, oldContent,
-              description) {
-            $scope.newContent = newContent;
-            $scope.oldContent = oldContent;
-            $scope.description = description;
-            $scope.cancel = function() {
-              $uibModalInstance.dismiss('cancel');
-            };
-          }
-        ]
-      });
+      ShowSuggestionModalForLearnerViewService.showSuggestionModal(
+        'edit_exploration_state_content',
+        {
+          newContent: newContent,
+          oldContent: oldContent,
+          description: description
+        }
+      );
     };
 
     $scope.openRemoveActivityModal = function(
@@ -551,7 +529,7 @@ oppia.controller('LearnerDashboard', [
                 throw new Error('Section name is not valid.');
               }
 
-              removeActivityUrl = (
+              var removeActivityUrl = (
                 UrlInterpolationService.interpolateUrl(
                   removeActivityUrlPrefix + '<activityType>/<activityId>', {
                     activityType: activityType,

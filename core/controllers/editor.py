@@ -19,11 +19,10 @@
 import datetime
 import imghdr
 import logging
-import re
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import email_manager
@@ -84,51 +83,9 @@ def _require_valid_version(version_from_payload, exploration_version):
             % (exploration_version, version_from_payload))
 
 
-class EditorLogoutHandler(base.BaseHandler):
-    """Handles logout from editor page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.open_access
-    def get(self):
-        """Checks if exploration is published and redirects accordingly."""
-
-        url_to_redirect_to = str(self.request.get('return_url'))
-        url_to_redirect_to_regex = (
-            r'%s/(?P<exploration_id>[\w-]+)$' % feconf.EDITOR_URL_PREFIX)
-        is_valid_path = re.match(url_to_redirect_to_regex, url_to_redirect_to)
-
-        if is_valid_path:
-            exploration_id = is_valid_path.group(1)
-            exploration_rights = rights_manager.get_exploration_rights(
-                exploration_id, strict=False)
-
-            if exploration_rights is None or exploration_rights.is_private():
-                url_to_redirect_to = feconf.LIBRARY_INDEX_URL
-        else:
-            url_to_redirect_to = feconf.LIBRARY_INDEX_URL
-
-        self.redirect(super(EditorLogoutHandler, self)._get_logout_url(
-            url_to_redirect_to))
-
-
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
-
-    def _get_logout_url(self, redirect_url_on_logout):
-        """This overrides the method in base.BaseHandler.
-        Returns logout url which will be handled by
-        EditorLogoutHandler.
-
-        Args:
-            redirect_url_on_logout: str. URL to redirect to on logout.
-
-        Returns:
-            str. logout url.
-        """
-        logout_url = utils.set_url_query_parameter(
-            '/exploration_editor_logout', 'return_url', redirect_url_on_logout)
-        return logout_url
+    pass
 
 
 class ExplorationPage(EditorHandler):
@@ -204,10 +161,7 @@ class ExplorationPage(EditorHandler):
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template(
-            'pages/exploration_editor/exploration_editor.html',
-            redirect_url_on_logout=(
-                '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id)))
+        self.render_template('pages/exploration_editor/exploration_editor.html')
 
 
 class ExplorationHandler(EditorHandler):
@@ -223,13 +177,14 @@ class ExplorationHandler(EditorHandler):
         # are not used by that tab.
         version = self.request.get('v', default_value=None)
         apply_draft = self.request.get('apply_draft', default_value=False)
-
         try:
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id, apply_draft=apply_draft,
                 version=version)
             exploration_data['show_state_editor_tutorial_on_load'] = (
                 self.user_id and not self.has_seen_editor_tutorial)
+            exploration_data['show_state_translation_tutorial_on_load'] = (
+                self.user_id and not self.has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
 
@@ -258,6 +213,8 @@ class ExplorationHandler(EditorHandler):
                 self.user_id, exploration_id)
             exploration_data['show_state_editor_tutorial_on_load'] = (
                 self.user_id and not self.has_seen_editor_tutorial)
+            exploration_data['show_state_translation_tutorial_on_load'] = (
+                self.user_id and not self.has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
         self.values.update(exploration_data)
@@ -713,22 +670,6 @@ class ResolveIssueHandler(EditorHandler):
         self.render_json({})
 
 
-class FetchPlaythroughWhitelistHandler(EditorHandler):
-    """Handles fetching the whitelisted exploration ids which will record and
-    render playthroughs.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handle GET requests for the playthrough whitelist of explorations."""
-        self.render_json({
-            'whitelisted_exploration_ids_for_playthroughs':
-                config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value
-        })
-
-
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
@@ -798,6 +739,7 @@ class StartedTutorialEventHandler(EditorHandler):
     def post(self, unused_exploration_id):
         """Handles GET requests."""
         user_services.record_user_started_state_editor_tutorial(self.user_id)
+        self.render_json({})
 
 
 class EditorAutosaveHandler(ExplorationHandler):
@@ -877,18 +819,4 @@ class TopUnresolvedAnswersHandler(EditorHandler):
 
         self.render_json({
             'unresolved_answers': unresolved_answers_with_frequency
-        })
-
-
-class ExplorationFeaturesHandler(EditorHandler):
-    """Returns features the given exploration is configured to support."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_play_exploration
-    def get(self, unused_exploration_id):
-        """Handles GET requests for an exploration's features."""
-        self.render_json({
-            'is_improvements_tab_enabled':
-                config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value,
         })

@@ -18,10 +18,10 @@
  */
 
 oppia.factory('RefresherExplorationConfirmationModalService', [
-  '$uibModal', 'UrlInterpolationService', 'UrlService',
-  'ExplorationEngineService',
-  function($uibModal, UrlInterpolationService, UrlService,
-      ExplorationEngineService) {
+  '$uibModal', 'ExplorationEngineService', 'UrlInterpolationService',
+  'UrlService',
+  function($uibModal, ExplorationEngineService, UrlInterpolationService,
+      UrlService) {
     return {
       displayRedirectConfirmationModal: function(
           refresherExplorationId, redirectConfirmationCallback) {

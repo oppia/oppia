@@ -33,6 +33,14 @@ var checkForConsoleErrors = function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   browser.manage().logs().get('browser').then(function(browserLogs) {
     var fatalErrors = [];
+    // The mobile tests run on the latest version of Chrome.
+    // The newer versions report 'Slow Network' as a console error.
+    // This causes the tests to fail, therefore, we remove such logs.
+    if (browser.isMobile) {
+      browserLogs = browserLogs.filter(function(browserLog) {
+        return !(browserLog.message.includes(' Slow network is detected.'));
+      });
+    }
     for (var i = 0; i < browserLogs.length; i++) {
       if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
         var errorFatal = true;

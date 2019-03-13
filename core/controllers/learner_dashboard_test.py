@@ -301,6 +301,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         messages_summary = response_dict['message_summary_list']
 
         # Check the summary of the second message.
+        self.assertEqual(len(messages_summary), 2)
         second_message = messages_summary[1]
         self.assertDictContainsSubset({
             'text': 'Message 1',
@@ -308,3 +309,27 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         }, second_message)
 
         self.logout()
+
+    def test_anonymous_feedback_is_recorded_correctly(self):
+        self.post_json(
+            '/explorehandler/give_feedback/%s' % self.EXP_ID_1,
+            {
+                'feedback': 'This is an anonymous feedback message.',
+            }
+        )
+
+        self.login(self.EDITOR_EMAIL)
+        response_dict = self.get_json(
+            '%s/%s' %
+            (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
+
+        # Get the message summary of the thread.
+        thread_url = '%s/%s' % (
+            feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL, thread_id)
+        response_dict = self.get_json(thread_url)
+        messages_summary = response_dict['message_summary_list'][0]
+
+        self.assertEqual(messages_summary['author_username'], None)
+        self.assertEqual(messages_summary['author_picture_data_url'], None)

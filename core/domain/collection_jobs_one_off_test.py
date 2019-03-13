@@ -75,7 +75,9 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         after_converted_yaml = updated_collection.to_yaml()
         self.assertEqual(after_converted_yaml, yaml_before_migration)
 
-        output = collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = (
+            collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(
+                job_id))
         expected = [[u'collection_migrated',
                      [u'1 collections successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -115,12 +117,14 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             collection_services.get_collection_by_id(self.COLLECTION_ID)
 
-        output = collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = (
+            collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(
+                job_id))
         expected = [[u'collection_deleted',
                      [u'Encountered 1 deleted collections.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
-    def test_migrate_colections_failing_strict_validation(self):
+    def test_migrate_collections_failing_strict_validation(self):
         """Tests that the collection migration job migrates collections which
         do not pass strict validation.
         """
@@ -162,6 +166,55 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
         self.assertEqual(
             new_model.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+
+    def test_migration_job_skips_collection_failing_validation(self):
+        """Tests that the collection migration job skips the collection
+        failing validation and does not attempt to migrate.
+        """
+        # Create a collection directly using the model and with an
+        # invalid language code.
+        collection_title = 'A title'
+        collection_category = 'A category'
+        collection_language_code = 'abc'
+        collection_schema_version = 2
+        rights_manager.create_new_collection_rights(
+            self.COLLECTION_ID, self.albert_id)
+        model = collection_models.CollectionModel(
+            id=self.COLLECTION_ID,
+            category=collection_title,
+            title=collection_category,
+            language_code=collection_language_code,
+            objective='An objective',
+            tags=[],
+            schema_version=collection_schema_version
+        )
+        model.commit(self.albert_id, 'Made a new collection!', [{
+            'cmd': collection_services.CMD_CREATE_NEW,
+            'title': collection_title,
+            'category': collection_category,
+        }])
+
+        # Start migration job on sample collection.
+        job_id = (
+            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
+        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates the collection failing
+        # validation is being ignored.
+        self.process_and_flush_pending_tasks()
+
+        # Check that the version number of the new model is same as old model.
+        new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
+        self.assertEqual(new_model.schema_version, collection_schema_version)
+
+        output = (
+            collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(
+                job_id))
+        expected = [[u'validation_error',
+                     [u'Collection %s failed validation: Invalid '
+                      u'language code: %s'
+                      % (self.COLLECTION_ID, collection_language_code)]]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_migrates_collection_nodes(self):
         """Tests that the collection migration job migrates content from

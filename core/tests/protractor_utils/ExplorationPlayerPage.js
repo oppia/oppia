@@ -26,6 +26,8 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-conversation-input'));
   var suggestionDescriptionInput = element(
     by.css('.protractor-test-suggestion-description-input'));
+  var closeSuggestionModalButton = element(
+    by.css('.protractor-test-exploration-close-suggestion-modal-btn'));
   var conversationContent = element.all(
     by.css('.protractor-test-conversation-content'));
   var conversationFeedback = element.all(
@@ -122,6 +124,14 @@ var ExplorationPlayerPage = function() {
       returnToParentButton,
       '"Return to Parent" button takes too long to be clickable');
     returnToParentButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.clickOnCloseSuggestionModalButton = function() {
+    waitFor.elementToBeClickable(
+      closeSuggestionModalButton,
+      '"Close suggestion modal" button takes too long to be clickable');
+    closeSuggestionModalButton.click();
     waitFor.pageToFullyLoad();
   };
 

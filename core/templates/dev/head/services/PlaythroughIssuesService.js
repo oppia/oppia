@@ -17,65 +17,59 @@
  */
 
 oppia.factory('PlaythroughIssuesService', [
-  '$sce', 'PlaythroughIssuesBackendApiService',
+  '$uibModal', 'PlaythroughIssuesBackendApiService', 'UrlInterpolationService',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
-      $sce, PlaythroughIssuesBackendApiService,
+      $uibModal, PlaythroughIssuesBackendApiService, UrlInterpolationService,
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var issues = null;
     var explorationId = null;
     var explorationVersion = null;
     var currentPlaythrough = null;
-    var whitelistedExplorationIds = null;
 
     var renderEarlyQuitIssueStatement = function() {
       return 'Several learners exited the exploration in less than a minute.';
     };
 
     var renderMultipleIncorrectIssueStatement = function(stateName) {
-      var statement =
-        'Several learners submitted answers to card "' + stateName +
+      return 'Several learners submitted answers to card "' + stateName +
         '" several times, then gave up and quit.';
-      return statement;
     };
 
     var renderCyclicTransitionsIssueStatement = function(stateName) {
-      return (
-        'Several learners ended up in a cyclic loop revisiting card "' +
-        stateName + '" many times.');
+      return 'Several learners ended up in a cyclic loop revisiting card "' +
+        stateName + '" many times.';
     };
 
     var renderEarlyQuitIssueSuggestions = function(issue) {
-      var suggestions = [$sce.trustAsHtml(
-        'Review the cards up to and including <span class="state_link">' +
-        '"' + issue.issueCustomizationArgs.state_name.value + '"</span> for' +
-        ' errors, ambiguities or insufficient motivation.'
-      )];
+      var suggestions = [
+        ('Review the cards up to and including "' +
+          issue.issueCustomizationArgs.state_name.value + '" for errors, ' +
+          'ambiguities, or insufficient motivation.'),
+      ];
       return suggestions;
     };
 
     var renderMultipleIncorrectIssueSuggestions = function(stateName) {
-      var suggestions = [$sce.trustAsHtml(
-        'Check the wording of the card <span class="state_link">"' +
-        stateName + '</span> to ensure it is not confusing.'
-      ), $sce.trustAsHtml(
-        'Consider addressing the answers submitted in the sample playthroughs' +
-        ' explicitly, using answer groups.'
-      )];
+      var suggestions = [
+        ('Check the wording of the card "' + stateName + '" to ensure it is ' +
+          'not confusing.'),
+        ('Consider addressing the answers submitted in the sample ' +
+          'playthroughs explicitly using answer groups.'),
+      ];
       return suggestions;
     };
 
     var renderCyclicTransitionsIssueSuggestions = function(issue) {
       var stateNames = issue.issueCustomizationArgs.state_names.value;
       var finalIndex = stateNames.length - 1;
-      var suggestions = [$sce.trustAsHtml(
-        'Check that the concept presented in <span class="state_link">"' +
-        stateNames[0] + '"</span> has been reinforced sufficiently by the ' +
-        'time the learner gets to <span class="state_link">"' +
-        stateNames[finalIndex] + '</span>.'
-      )];
+      var suggestions = [
+        ('Check that the concept presented in "' + stateNames[0] + '" has ' +
+          'been reinforced sufficiently by the time the learner gets to "' +
+          stateNames[finalIndex] + '".'),
+      ];
       return suggestions;
     };
 
@@ -87,40 +81,18 @@ oppia.factory('PlaythroughIssuesService', [
        *    be targeting.
        * @param {number} newExplorationVersion - the version of the exploration
        *    the service will be targeting.
-       * @param {string[]=} testOnlyWhitelistedExplorationIds - a utility
-       *    parameter for tests to avoid making backend calls. This parameter
-       *    allows more explicit testing of the whitelist.
        */
-      initSession: function(
-          newExplorationId, newExplorationVersion,
-          testOnlyWhitelistedExplorationIds) {
+      initSession: function(newExplorationId, newExplorationVersion) {
         explorationId = newExplorationId;
         explorationVersion = newExplorationVersion;
-        if (testOnlyWhitelistedExplorationIds !== undefined) {
-          whitelistedExplorationIds = testOnlyWhitelistedExplorationIds;
-        } else {
-          PlaythroughIssuesBackendApiService
-            .fetchWhitelistedExplorationsForPlaythroughs().then(
-              function(newWhitelistedExplorationIds) {
-                whitelistedExplorationIds = newWhitelistedExplorationIds;
-              });
-        }
-      },
-      isExplorationEligibleForPlaythroughIssues: function(explorationId) {
-        return whitelistedExplorationIds !== null &&
-          whitelistedExplorationIds.indexOf(explorationId) !== -1;
       },
       getIssues: function() {
         return PlaythroughIssuesBackendApiService.fetchIssues(
-          explorationId, explorationVersion).then(function(issues) {
-          return issues;
-        });
+          explorationId, explorationVersion);
       },
       getPlaythrough: function(playthroughId) {
         return PlaythroughIssuesBackendApiService.fetchPlaythrough(
-          explorationId, playthroughId).then(function(playthrough) {
-          return playthrough;
-        });
+          explorationId, playthroughId);
       },
       renderIssueStatement: function(issue) {
         var issueType = issue.issueType;
@@ -146,8 +118,119 @@ oppia.factory('PlaythroughIssuesService', [
         }
       },
       resolveIssue: function(issue) {
-        PlaythroughIssuesBackendApiService.resolveIssue(
+        return PlaythroughIssuesBackendApiService.resolveIssue(
           issue, explorationId, explorationVersion);
-      }
+      },
+      openPlaythroughModal: function(playthroughId, index) {
+        this.getPlaythrough(playthroughId).then(function(playthrough) {
+          $uibModal.open({
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/statistics_tab/' +
+              'playthrough_modal_directive.html'),
+            backdrop: true,
+            resolve: {
+              playthrough: function() {
+                return playthrough;
+              },
+              playthroughIndex: function() {
+                return index;
+              }
+            },
+            controller: [
+              '$scope', '$uibModalInstance', 'playthroughIndex',
+              'playthrough', 'AlertsService', 'LearnerActionRenderService',
+              function(
+                  $scope, $uibModalInstance, playthroughIndex,
+                  playthrough, AlertsService, LearnerActionRenderService) {
+                $scope.playthroughIndex = playthroughIndex;
+
+                $scope.displayBlocks =
+                  LearnerActionRenderService.getDisplayBlocks(
+                    playthrough.actions);
+                $scope.reversedDisplayBlocks =
+                  $scope.displayBlocks.slice().reverse();
+
+                var blockActionIndexMapping = {};
+                $scope.displayBlocks.reduce(
+                  function(runningTotal, displayBlock, i) {
+                    blockActionIndexMapping[i] =
+                      runningTotal - displayBlock.length;
+                    return blockActionIndexMapping[i];
+                  }, playthrough.actions.length + 1);
+
+                $scope.maxHidden = $scope.displayBlocks.length - 1;
+
+                $scope.getDisplayBlockIndex = function(displayBlock) {
+                  return $scope.displayBlocks.indexOf(displayBlock);
+                };
+
+                $scope.isDisplayBlockOnInitDisplay = function(block) {
+                  return $scope.getDisplayBlockIndex(block) === 0;
+                };
+
+                $scope.createDisplayBlockNavId = function(block) {
+                  return $scope.getDisplayBlockIndex(block) + 1;
+                };
+
+                $scope.renderBlockHtml = function(displayBlock) {
+                  var index = $scope.getDisplayBlockIndex(displayBlock);
+                  return LearnerActionRenderService.renderDisplayBlockHTML(
+                    displayBlock, blockActionIndexMapping[index]);
+                };
+
+                var getRemainingActionsElements = function(pIdx, i) {
+                  return document.getElementById(
+                    'remainingActions' + pIdx.toString() + i.toString());
+                };
+
+                /**
+                 * Shows the remaining display blocks and the arrow div. If
+                 * there is only one display block, the arrow div is not
+                 * shown at all. If the current shown display block is the
+                 * second last display block, the arrow div is hidden after
+                 * the final display block is shown. Else, the following
+                 * display block is displayed.
+                 */
+                $scope.showRemainingActions = function(pIdx) {
+                  // If there is only one display block left to be shown,
+                  // the arrow is not required.
+                  if ($scope.maxHidden === 1) {
+                    getRemainingActionsElements(pIdx, $scope.maxHidden)
+                      .style.display = 'block';
+                    document.getElementById('arrowDiv').style.display = 'none';
+                  } else {
+                    var currentShown = 0;
+                    var i;
+                    for (i = $scope.maxHidden; i > 0; i--) {
+                      if (getRemainingActionsElements(pIdx, i).style.display ===
+                          'block') {
+                        currentShown = i;
+                        break;
+                      }
+                    }
+                    if (currentShown === 0) {
+                      getRemainingActionsElements(pIdx, currentShown + 1)
+                        .style.display = 'block';
+                    } else if (currentShown === $scope.maxHidden - 1) {
+                      getRemainingActionsElements(pIdx, $scope.maxHidden)
+                        .style.display = 'block';
+                      document.getElementById('arrowDiv').style.display =
+                        'none';
+                    } else {
+                      getRemainingActionsElements(pIdx, currentShown + 1)
+                        .style.display = 'block';
+                    }
+                  }
+                };
+
+                $scope.cancel = function() {
+                  $uibModalInstance.dismiss('cancel');
+                  AlertsService.clearWarnings();
+                };
+              }
+            ]
+          });
+        });
+      },
     };
   }]);

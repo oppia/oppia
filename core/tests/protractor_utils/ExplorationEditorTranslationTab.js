@@ -19,6 +19,92 @@
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorTranslationTab = function() {
+  var dismissWelcomeModalButton = element(
+    by.css('.protractor-test-translation-tab-dismiss-welcome-modal'));
+  var translationWelcomeModal = element(
+    by.css('.protractor-test-translation-tab-welcome-modal'));
+
+  this.exitTutorial = function() {
+    // If the translation welcome modal shows up, exit it.
+    translationWelcomeModal.isPresent().then(function(isVisible) {
+      if (isVisible) {
+        waitFor.elementToBeClickable(
+          dismissWelcomeModalButton,
+          'Welcome modal is taking too long to appear');
+        dismissWelcomeModalButton.click();
+      }
+    });
+
+    waitFor.invisibilityOf(
+      translationWelcomeModal,
+      'Translation welcome modal takes too long to disappear');
+
+    // Otherwise, if the translation tutorial shows up, exit it.
+    element.all(by.css('.skipBtn')).then(function(buttons) {
+      if (buttons.length === 1) {
+        buttons[0].click();
+      } else if (buttons.length !== 0) {
+        throw 'Expected to find at most one \'exit tutorial\' button';
+      }
+    });
+  };
+
+  this.finishTutorial = function() {
+    // Finish the tutorial.
+    var finishTutorialButton = element.all(by.buttonText('Finish'));
+    waitFor.elementToBeClickable(
+      finishTutorialButton.first(),
+      'Finish Tutorial Stage button is not clickable');
+    finishTutorialButton.then(function(buttons) {
+      if (buttons.length === 1) {
+        buttons[0].click();
+      } else {
+        throw Error('There is more than 1 Finish button!');
+      }
+    });
+  };
+  this.playTutorial = function() {
+    var tutorialTabHeadings = [
+      'Translations In Oppia',
+      'Choose Language',
+      'Choose a Card to Translate',
+      'Choose a Part of the Card to Translate',
+      'Recording Audio',
+      'Re-record/Re-upload audio'
+    ];
+    tutorialTabHeadings.forEach(function(heading) {
+      var tutorialTabHeadingElement = element(by.cssContainingText(
+        '.popover-title', heading));
+      waitFor.visibilityOf(
+        tutorialTabHeadingElement, 'Tutorial: ' + heading + 'is not visible');
+      // Progress to the next instruction in the tutorial.
+      var nextTutorialStageButton = element.all(by.css('.nextBtn'));
+      waitFor.elementToBeClickable(
+        nextTutorialStageButton.first(),
+        'Next Tutorial Stage button is not clickable');
+      nextTutorialStageButton.then(function(buttons) {
+        if (buttons.length === 1) {
+          buttons[0].click();
+          waitFor.invisibilityOf(
+            tutorialTabHeadingElement,
+            'Tutorial stage takes too long to disappear');
+        } else {
+          throw Error('There is more than one Next button!');
+        }
+      });
+    });
+  };
+
+  this.startTutorial = function() {
+    waitFor.visibilityOf(
+      translationWelcomeModal,
+      'Translation welcome modal takes too long to appear');
+    element(by.css('.protractor-test-translation-tab-start-tutorial')).click();
+    waitFor.visibilityOf(
+      element(by.css('.ng-joyride-title')),
+      'Translation tutorial modal takes too long to appear');
+  };
+
   var contentTabButton = element(
     by.css('.protractor-test-translation-content-tab'));
   var feedbackTabButton = element(
@@ -50,6 +136,9 @@ var ExplorationEditorTranslationTab = function() {
 
   var solutionTabText = element(by.css('.protractor-test-solution-text'));
 
+  var numericalStatus = element(
+    by.css('.protractor-test-translation-numerical-status'));
+
   var _selectLanguage = function(language) {
     element(by.css('.protractor-test-translation-language-selector')).
       element(by.cssContainingText('option', language)).click();
@@ -67,7 +156,7 @@ var ExplorationEditorTranslationTab = function() {
       feedbackTabButton, 'Feedback Tab button is not clickable');
     feedbackTabButton.click();
     expect(feedbackList.count()).toEqual(contents.length);
-    for (index in contents) {
+    for (var index in contents) {
       translationFeedback(index).click();
       expect(translationFeedbackText(index).getText()).toMatch(contents[index]);
     }
@@ -77,7 +166,7 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.elementToBeClickable(
       hintsTabButton, 'Hints Tab button is not clickable');
     hintsTabButton.click();
-    for (index in contents) {
+    for (var index in contents) {
       translationHint(index).click();
       expect(translationHintText(index).getText()).toMatch(contents[index]);
     }
@@ -90,9 +179,26 @@ var ExplorationEditorTranslationTab = function() {
     expect(solutionTabText.getText()).toMatch(content);
   };
 
+  this.expectNumericalStatusToMatch = function(content) {
+    expect(numericalStatus.getText()).toMatch(content);
+  };
+
   this.changeTranslationLanguage = function(language) {
     _selectLanguage(language);
     waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToFeedbackTab = function() {
+    waitFor.elementToBeClickable(
+      feedbackTabButton,
+      'Feedback tab of translation page is not clickable');
+    feedbackTabButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.expectFeedbackTabToBeActive = function() {
+    expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
+    ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
   };
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;

@@ -23,6 +23,7 @@ $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
 install_node_module ajv 5.0.0
+install_node_module babel-eslint 10.0.1
 install_node_module browserstack-local 1.3.3
 install_node_module dotenv 6.0.0
 install_node_module eslint 4.19.0
@@ -41,6 +42,26 @@ install_node_module postcss-syntax 0.10.0
 install_node_module stylelint 9.2.1
 install_node_module stylelint-config-standard 18.2.0
 install_node_module through2 2.0.0
+install_node_module typescript 3.3.3
+install_node_module @types/angular 1.6.54
+install_node_module @types/angular-animate 1.5.10
+install_node_module @types/angular-mocks 1.7.0
+install_node_module @types/ckeditor 4.9.2
+install_node_module @types/d3 3.5.40
+install_node_module @types/google.visualization 0.0.46
+install_node_module @types/jasmine 3.3.8
+install_node_module @types/jasmine-jquery 1.5.33
+install_node_module @types/jasminewd2 2.0.6
+install_node_module @types/jquery 3.3.29
+install_node_module @types/jqueryui 1.12.1
+install_node_module @types/leaflet 1.4.0
+install_node_module @types/mathjax 0.0.35
+install_node_module @types/mathjs 5.0.0
+install_node_module @types/mousetrap 1.6.1
+install_node_module @types/node 6.14.3
+install_node_module @types/select2 4.0.48
+install_node_module @types/q 1.5.1
+install_node_module @types/selenium-webdriver 2.53.43
 install_node_module uglify-js 3.3.11
 install_node_module yargs 3.29.0
 
@@ -148,36 +169,6 @@ if [ ! -d "$TOOLS_DIR/isort-4.2.15" ]; then
   rm isort-4.2.15.tar.gz
 fi
 
-# Install smmap.
-echo Checking if smmap is installed in third_party
-if [ ! -d "$TOOLS_DIR/smmap-0.9.0" ]; then
-  echo Installing smmap
-  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o smmap-0.9.0.tar.gz -L https://files.pythonhosted.org/packages/bc/aa/b744b3761fff1b10579df996a2d2e87f124ae07b8336e37edc89cc502f86/smmap-0.9.0.tar.gz
-  tar xzf smmap-0.9.0.tar.gz -C $TOOLS_DIR
-  rm smmap-0.9.0.tar.gz
-fi
-
-# Install gitdb.
-echo Checking if gitdb is installed in third_party
-if [ ! -d "$TOOLS_DIR/gitdb-0.6.4" ]; then
-  echo Installing gitdb
-  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o gitdb-0.6.4.tar.gz -L https://files.pythonhosted.org/packages/e3/95/7e5d7261feb46c0539ac5e451be340ddd64d78c5118f2d893b052c76fe8c/gitdb-0.6.4.tar.gz
-  tar xzf gitdb-0.6.4.tar.gz -C $TOOLS_DIR
-  rm gitdb-0.6.4.tar.gz
-fi
-
-# Install GitPython.
-echo Checking if GitPython is installed in third_party
-if [ ! -d "$TOOLS_DIR/GitPython-2.1.11" ]; then
-  echo Installing GitPython
-  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o GitPython-2.1.11.tar.gz -L https://files.pythonhosted.org/packages/4d/e8/98e06d3bc954e3c5b34e2a579ddf26255e762d21eb24fede458eff654c51/GitPython-2.1.11.tar.gz
-  tar xzf GitPython-2.1.11.tar.gz -C $TOOLS_DIR
-  rm GitPython-2.1.11.tar.gz
-fi
-
 # Install pycodestyle.
 echo Checking if pycodestyle is installed in third_party
 if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
@@ -188,14 +179,14 @@ if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
   rm pycodestyle-2.3.1.tar.gz
 fi
 
-# Install pyjsparser.
-echo Checking if pyjsparser is installed in third_party
-if [ ! -d "$TOOLS_DIR/pyjsparser-2.5.2" ]; then
-  echo Installing pyjsparser
+# Install esprima.
+echo Checking if esprima is installed in third_party
+if [ ! -d "$TOOLS_DIR/esprima-4.0.1" ]; then
+  echo Installing esprima
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o pyjsparser-2.5.2.tar.gz -L https://pypi.python.org/packages/17/3d/59f7f0cd6a7cdab611b36d8921c9d2d6c5564033d938ec2eb934cdca0e48/pyjsparser-2.5.2.tar.gz
-  tar xzf pyjsparser-2.5.2.tar.gz -C $TOOLS_DIR
-  rm pyjsparser-2.5.2.tar.gz
+  curl -o esprima-4.0.1.tar.gz -L https://files.pythonhosted.org/packages/cc/a1/50fccd68a12bcfc27adfc9969c090286670a9109a0259f3f70943390b721/esprima-4.0.1.tar.gz
+  tar xzf esprima-4.0.1.tar.gz -C $TOOLS_DIR
+  rm esprima-4.0.1.tar.gz
 fi
 
 # Python API for browsermob-proxy.

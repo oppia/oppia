@@ -16,26 +16,33 @@
 
 """Controllers for custom landing pages."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
+import feconf
 
 
-class FractionLandingPage(base.BaseHandler):
-    """Page showing the landing page for fractions. It will randomly select a
-    version out of the four versions of fractions landing page and display it.
-    """
+class FractionLandingRedirectPage(base.BaseHandler):
+    """The handler redirecting to the Fractions landing page."""
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        viewer_type = self.request.get('viewerType')
+        self.redirect('/learn/maths/fractions')
 
-        if not viewer_type:
-            viewer_type = 'teacher'
-            self.redirect('/fractions?viewerType=%s' % viewer_type)
 
-        self.render_template(
-            'pages/landing/fractions/landing_page_%s.html' % viewer_type)
+class TopicLandingPage(base.BaseHandler):
+    """Page showing the topic landing page."""
+
+    @acl_decorators.open_access
+    def get(self, subject, topic):
+        """Handles GET requests."""
+        if subject in feconf.AVAILABLE_LANDING_PAGES:
+            if topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
+                self.render_template('pages/landing/topic_landing_page.html')
+            else:
+                raise self.PageNotFoundException
+        else:
+            raise self.PageNotFoundException
 
 
 class StewardsLandingPage(base.BaseHandler):

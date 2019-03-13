@@ -19,8 +19,8 @@
     </tr>
     <tr ng-repeat="topic in getTopicSummaries()" class="list-item">
       <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
-          <span> <[topic.name]> </span>
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary protractor-test-topics-list-item">
+          <span class="protractor-test-topic-name"> <[topic.name]> </span>
         </a>
       </td>
       <td>
@@ -52,7 +52,7 @@
         </a>
       </td>
       <td ng-if="canDeleteTopic()" class="delete-icon">
-        <span ng-click="deleteTopic(topic.id)" class="fa fa-trash list-summary"> </span>
+        <span ng-click="deleteTopic(topic.id)" class="fa fa-trash list-summary protractor-test-delete-topic-button"> </span>
       </td>
     </tr>
   </table>

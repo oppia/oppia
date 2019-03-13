@@ -17,7 +17,8 @@
  */
 
 describe('State content editor directive', function() {
-  var outerScope, ctrlScope, shof, cls, scs, es, ess;
+  var outerScope, ctrlScope, shof, cls, scs, es, ess, citat, scitat;
+  var mockExplorationData;
 
   var _getContent = function(contentId, contentString) {
     return shof.createFromBackendDict({
@@ -99,7 +100,14 @@ describe('State content editor directive', function() {
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       },
       'Second State': {
         content: {
@@ -138,7 +146,14 @@ describe('State content editor directive', function() {
           },
           hints: []
         },
-        param_changes: []
+        param_changes: [],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       },
       'Third State': {
         content: {
@@ -184,7 +199,14 @@ describe('State content editor directive', function() {
             value: 'something clever',
             parse_with_jinja: false
           }
-        }]
+        }],
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
+        }
       }
     });
 
@@ -196,11 +218,13 @@ describe('State content editor directive', function() {
 
     outerScope = $rootScope.$new();
     outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
+    outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired = (
+      jasmine.createSpy(''));
     var elem = angular.element(
       '<state-content-editor ' +
       'on-save-state-content="saveStateContent" ' +
-      'on-save-content-ids-to-audio-translations=' +
-      '"saveContentIdsToAudioTranslations">' +
+      'show-mark-all-audio-as-needing-update-modal-if-required=' +
+      '"showMarkAllAudioAsNeedingUpdateModalIfRequired">' +
       '</state-content-editor>');
     var compiledElem = $compile(elem)(outerScope);
     outerScope.$digest();
@@ -237,6 +261,9 @@ describe('State content editor directive', function() {
       'content', 'And now for something completely different.');
     ctrlScope.onSaveContentButtonClicked();
     expect(outerScope.saveStateContent).toHaveBeenCalled();
+    expect(
+      outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired)
+      .toHaveBeenCalled();
   });
 
   it('should not save changes to content when edit is cancelled', function() {

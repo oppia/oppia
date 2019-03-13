@@ -18,11 +18,11 @@
  */
 
 oppia.factory('AssetsBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'AudioFileObjectFactory',
-  'ImageFileObjectFactory', 'FileDownloadRequestObjectFactory', 'DEV_MODE',
+  '$http', '$q', 'AudioFileObjectFactory', 'FileDownloadRequestObjectFactory',
+  'ImageFileObjectFactory', 'UrlInterpolationService', 'DEV_MODE',
   function(
-      $http, $q, UrlInterpolationService, AudioFileObjectFactory,
-      ImageFileObjectFactory, FileDownloadRequestObjectFactory, DEV_MODE) {
+      $http, $q, AudioFileObjectFactory, FileDownloadRequestObjectFactory,
+      ImageFileObjectFactory, UrlInterpolationService, DEV_MODE) {
     if (!DEV_MODE && !GLOBALS.GCS_RESOURCE_BUCKET_NAME) {
       throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
@@ -212,8 +212,7 @@ oppia.factory('AssetsBackendApiService', [
           if (_isCached(filename)) {
             resolve(AudioFileObjectFactory.createNew(
               filename, assetsCache[filename]));
-          } else if (!_isAssetCurrentlyBeingRequested(filename,
-            ASSET_TYPE_AUDIO)) {
+          } else {
             _fetchFile(explorationId, filename, ASSET_TYPE_AUDIO,
               resolve, reject);
           }
@@ -224,8 +223,7 @@ oppia.factory('AssetsBackendApiService', [
           if (_isCached(filename)) {
             resolve(ImageFileObjectFactory.createNew(
               filename, assetsCache[filename]));
-          } else if (!_isAssetCurrentlyBeingRequested(filename,
-            ASSET_TYPE_IMAGE)) {
+          } else {
             _fetchFile(explorationId, filename, ASSET_TYPE_IMAGE,
               resolve, reject);
           }

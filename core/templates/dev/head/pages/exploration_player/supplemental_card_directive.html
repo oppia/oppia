@@ -8,7 +8,7 @@
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
     <div>
-      <angular-html-bind class="rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback" html-data="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()">
+      <angular-html-bind class="oppia-rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback" html-data="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()">
       </angular-html-bind>
     </div>
     <br>
@@ -43,7 +43,10 @@
     right: 12px;
     text-align: left;
     transition: all 350ms;
-    z-index: 500;
+    /* The z-index value of leaflet map attribution is 1000, to make it go lower
+       in stack we have used 1001.
+    */
+    z-index: 1001;
   }
 
   .conversation-skin-help-card.ng-enter,
@@ -64,6 +67,8 @@
   }
 
   .conversation-skin-help-card-content {
+    max-height: 235px;
+    overflow-y: auto;
     width: 270px;
   }
 

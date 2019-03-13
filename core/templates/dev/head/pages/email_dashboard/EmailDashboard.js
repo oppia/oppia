@@ -17,8 +17,8 @@
  */
 
 oppia.controller('EmailDashboard', [
-  '$scope', '$rootDirective', 'EmailDashboardDataService', 'UserService',
-  function($scope, $rootDirective, EmailDashboardDataService, UserService) {
+  '$rootScope', '$scope', 'EmailDashboardDataService', 'UserService',
+  function($rootScope, $scope, EmailDashboardDataService, UserService) {
     $scope.username = '';
     $rootScope.loadingMessage = 'Loading';
     UserService.getUserInfoAsync().then(function(userInfo) {

@@ -17,11 +17,11 @@
  */
 
 oppia.factory('AudioPlayerService', [
-  '$q', '$timeout', 'ngAudio', 'AssetsBackendApiService',
-  'ContextService', 'AudioTranslationManagerService',
+  '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
+  'ContextService', 'ngAudio',
   function(
-      $q, $timeout, ngAudio, AssetsBackendApiService,
-      ContextService, AudioTranslationManagerService) {
+      $q, $timeout, AssetsBackendApiService, AudioTranslationManagerService,
+      ContextService, ngAudio) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
     var _currentTrackDuration = null;

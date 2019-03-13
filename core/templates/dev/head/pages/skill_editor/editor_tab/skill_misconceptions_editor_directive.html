@@ -3,7 +3,7 @@
     <div class="oppia-editor-card-section">
       <strong style="font-size: 1.4em;">Misconceptions</strong>
       <div style="padding-bottom: 12px; color: #595959;">
-        <span style="font-size:.8em;">
+        <span style="font-size:.79em;">
           <i>
             These misconceptions represent common mistakes that are made by students when trying to apply this skill.
           </i>
@@ -15,10 +15,10 @@
             ng-model="misconceptions">
           <li ng-repeat="misconception in misconceptions"
               ng-class="{'active': activeMisconceptionIndex === $index, 'last-element': $index === misconceptions.length - 1}"
-              class="oppia-rule-block oppia-prevent-selection"
+              class="oppia-rule-block oppia-prevent-selection protractor-test-misconception-list-item"
               style="margin-top: 0;">
             <a ng-click="changeActiveMisconceptionIndex($index)"
-               class="oppia-rule-tab"
+               class="oppia-rule-tab protractor-test-misconception-<[$index]>"
                ng-class="{'oppia-rule-tab-active': activeMisconceptionIndex === $index}">
               <summary-list-header index="$index"
                                    disable-sorting="true"
@@ -42,7 +42,7 @@
         </ul>
       </div>
       <button type="button"
-              class="btn"
+              class="btn protractor-test-add-misconception-modal-button"
               style="background-color: rgba(5,140,166,0.9); color: white;"
               ng-click="openAddMisconceptionModal()">
         + Add Misconception

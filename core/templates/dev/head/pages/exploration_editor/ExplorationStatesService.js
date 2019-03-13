@@ -19,19 +19,17 @@
  */
 
 oppia.factory('ExplorationStatesService', [
-  '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
-  'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
-  'StateEditorService', 'ValidatorsService', 'StatesObjectFactory',
-  'SolutionValidityService', 'AngularNameService',
-  'AnswerClassificationService', 'ContextService',
-  'UrlInterpolationService',
+  '$filter', '$injector', '$location', '$log', '$q', '$rootScope', '$uibModal',
+  'AlertsService', 'AngularNameService', 'AnswerClassificationService',
+  'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
+  'SolutionValidityService', 'StateEditorService', 'StatesObjectFactory',
+  'UrlInterpolationService', 'ValidatorsService',
   function(
-      $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
-      ExplorationInitStateNameService, AlertsService, ChangeListService,
-      StateEditorService, ValidatorsService, StatesObjectFactory,
-      SolutionValidityService, AngularNameService,
-      AnswerClassificationService, ContextService,
-      UrlInterpolationService) {
+      $filter, $injector, $location, $log, $q, $rootScope, $uibModal,
+      AlertsService, AngularNameService, AnswerClassificationService,
+      ChangeListService, ContextService, ExplorationInitStateNameService,
+      SolutionValidityService, StateEditorService, StatesObjectFactory,
+      UrlInterpolationService, ValidatorsService) {
     var _states = null;
 
     var stateAddedCallbacks = [];
@@ -80,6 +78,9 @@ oppia.factory('ExplorationStatesService', [
         } else {
           return null;
         }
+      },
+      written_translations: function(writtenTranslations) {
+        return writtenTranslations.toBackendDict();
       }
     };
 
@@ -96,7 +97,46 @@ oppia.factory('ExplorationStatesService', [
       hints: ['interaction', 'hints'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
-      widget_customization_args: ['interaction', 'customizationArgs']
+      widget_customization_args: ['interaction', 'customizationArgs'],
+      written_translations: ['writtenTranslations']
+    };
+
+    var CONTENT_ID_EXTRACTORS = {
+      answer_groups: function(answerGroups) {
+        var contentIds = new Set();
+        answerGroups.forEach(function(answerGroup) {
+          contentIds.add(answerGroup.outcome.feedback.getContentId());
+        });
+        return contentIds;
+      },
+      default_outcome: function(defaultOutcome) {
+        var contentIds = new Set();
+        if (defaultOutcome) {
+          contentIds.add(defaultOutcome.feedback.getContentId());
+        }
+        return contentIds;
+      },
+      hints: function(hints) {
+        var contentIds = new Set();
+        hints.forEach(function(hint) {
+          contentIds.add(hint.hintContent.getContentId());
+        });
+        return contentIds;
+      },
+      solution: function(solution) {
+        var contentIds = new Set();
+        if (solution) {
+          contentIds.add(solution.explanation.getContentId());
+        }
+        return contentIds;
+      }
+    };
+
+    var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
+      var diffList = Array.from(setA).filter(function(element) {
+        return !setB.has(element);
+      });
+      return diffList;
     };
 
     var _setState = function(stateName, stateData, refreshGraph) {
@@ -144,6 +184,23 @@ oppia.factory('ExplorationStatesService', [
         var newStateData = _states.getState(stateName);
         var accessorList = PROPERTY_REF_DATA[backendName];
 
+        if (CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
+          var oldContentIds = CONTENT_ID_EXTRACTORS[backendName](oldValue);
+          var newContentIds = CONTENT_ID_EXTRACTORS[backendName](newValue);
+          var contentIdsToDelete = _getElementsInFirstSetButNotInSecond(
+            oldContentIds, newContentIds);
+          var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
+            newContentIds, oldContentIds);
+          contentIdsToDelete.forEach(function(contentId) {
+            newStateData.contentIdsToAudioTranslations.deleteContentId(
+              contentId);
+            newStateData.writtenTranslations.deleteContentId(contentId);
+          });
+          contentIdsToAdd.forEach(function(contentId) {
+            newStateData.contentIdsToAudioTranslations.addContentId(contentId);
+            newStateData.writtenTranslations.addContentId(contentId);
+          });
+        }
         var propertyRef = newStateData;
         for (var i = 0; i < accessorList.length - 1; i++) {
           propertyRef = propertyRef[accessorList[i]];
@@ -286,6 +343,13 @@ oppia.factory('ExplorationStatesService', [
           stateName, 'content_ids_to_audio_translations',
           newContentIdsToAudioTranslations);
       },
+      getWrittenTranslationsMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'written_translations');
+      },
+      saveWrittenTranslations: function(stateName, newWrittenTranslations) {
+        saveStateProperty(
+          stateName, 'written_translations', newWrittenTranslations);
+      },
       isInitialized: function() {
         return _states !== null;
       },
@@ -414,7 +478,7 @@ oppia.factory('ExplorationStatesService', [
       },
       registerOnStateAnswerGroupsSavedCallback: function(callback) {
         stateAnswerGroupsSavedCallbacks.push(callback);
-      },
+      }
     };
   }
 ]);

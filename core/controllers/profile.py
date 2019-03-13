@@ -14,8 +14,8 @@
 
 """Controllers for the profile page."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import email_manager
 from core.domain import role_services
 from core.domain import subscription_services
@@ -108,8 +108,7 @@ class PreferencesPage(base.BaseHandler):
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
         })
-        self.render_template(
-            'pages/preferences/preferences.html', redirect_url_on_logout='/')
+        self.render_template('pages/preferences/preferences.html')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -222,7 +221,7 @@ class ProfilePictureHandler(base.BaseHandler):
 
 
 class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
-    """ Provides the dataURI of the profile picture of the specified user,
+    """Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID.
     """
 
@@ -385,6 +384,7 @@ class UserInfoHandler(base.BaseHandler):
             'is_admin': user_services.is_admin(self.user_id),
             'is_super_admin': (
                 current_user_services.is_current_user_super_admin()),
+            'is_topic_manager': user_services.is_topic_manager(self.user_id),
             'can_create_collections': bool(
                 role_services.ACTION_CREATE_COLLECTION in user_actions),
             'preferred_site_language_code': (

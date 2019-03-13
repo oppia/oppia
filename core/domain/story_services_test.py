@@ -512,6 +512,15 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
             self.assertEqual(
                 completed_node.to_dict(), self.nodes[ind].to_dict())
 
+    def test_get_pending_nodes_in_story(self):
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
+
+        for _, pending_node in enumerate(
+                story_services.get_pending_nodes_in_story(
+                    self.owner_id, self.STORY_1_ID)):
+            self.assertEqual(
+                pending_node.to_dict(), self.nodes[1].to_dict())
+
     def test_record_completed_node_in_story_context(self):
         # Ensure that node completed within the context of a story are
         # recorded correctly. This test actually validates both

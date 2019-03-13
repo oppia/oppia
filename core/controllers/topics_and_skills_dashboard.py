@@ -17,8 +17,8 @@ are created.
 """
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
@@ -38,7 +38,7 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
 
         self.render_template(
             'pages/topics_and_skills_dashboard/'
-            'topics_and_skills_dashboard.html', redirect_url_on_logout='/')
+            'topics_and_skills_dashboard.html')
 
 
 class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
@@ -188,9 +188,24 @@ class MergeSkillHandler(base.BaseHandler):
             raise self.PageNotFoundException
         old_skill_id = self.payload.get('old_skill_id')
         new_skill_id = self.payload.get('new_skill_id')
+        new_skill = skill_services.get_skill_by_id(new_skill_id, strict=False)
+        if new_skill is None:
+            raise self.PageNotFoundException(
+                Exception('The new skill with the given id doesn\'t exist.'))
+        old_skill = skill_services.get_skill_by_id(old_skill_id, strict=False)
+        if old_skill is None:
+            raise self.PageNotFoundException(
+                Exception('The old skill with the given id doesn\'t exist.'))
         question_services.update_skill_ids_of_questions(
-            old_skill_id, new_skill_id)
+            old_skill_id, old_skill.description, new_skill_id)
         changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': old_skill.superseding_skill_id,
+                'new_value': new_skill_id
+            }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
                 'property_name': (

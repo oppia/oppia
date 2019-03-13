@@ -2,7 +2,7 @@
   <md-card class="oppia-page-card oppia-long-text">
     <div class="story-title">
       <label for="storyTitle" class="form-heading">Story Title</label>
-      <input id="storyTitle" type="text" class="form-control"
+      <input id="storyTitle" type="text" class="form-control protractor-test-story-title-field"
              ng-model="editableTitle" ng-blur="updateStoryTitle(editableTitle)"
              placeholder="Enter a title for the story." maxlength="20" ng-trim="false">
       <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 20">
@@ -12,7 +12,7 @@
 
     <div class="story-description" ng-class="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">
       <label for="storyDescription" class="form-heading">Story Description</label>
-      <textarea type="text" class="form-control"
+      <textarea type="text" class="form-control protractor-test-story-description-field"
                 ng-model="editableDescription"
                 ng-change="updateStoryDescriptionStatus(editableDescription)"
                 ng-blur="updateStoryDescription(editableDescription)"
@@ -27,8 +27,7 @@
       <div class="oppia-editor-card-body">
         <label class="form-heading">Notes</label>
         <div ng-if="!notesEditorIsShown" style="padding-top: 0.5em; padding-bottom: 1em;">
-          <div ng-class="oppia-editable-section"
-               ng-click="openNotesEditor()">
+          <div ng-class="oppia-editable-section" ng-click="openNotesEditor()" class="protractor-test-open-story-notes-editor-button">
             <i class="material-icons oppia-editor-edit-icon pull-right"
                title="Edit Story Notes">&#xE254;
             </i>
@@ -38,7 +37,7 @@
               <span class="oppia-placeholder" ng-show="editableNotes === ''">
                   Add notes about the story to help other contributors.
               </span>
-              <angular-html-bind html-data="editableNotes">
+              <angular-html-bind class="protractor-test-story-notes" html-data="editableNotes">
               </angular-html-bind>
             </div>
             <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
@@ -47,12 +46,12 @@
           </div>
         </div>
 
-        <div ng-if="notesEditorIsShown">
+        <div ng-if="notesEditorIsShown" class="protractor-test-story-notes-rte">
           <schema-based-editor schema="NOTES_SCHEMA" local-value="editableNotes">
           </schema-based-editor>
           <div class="editor-buttons">
             <button type="button"
-                    class="btn btn-success oppia-save-state-item-button pull-right"
+                    class="btn btn-success oppia-save-state-item-button pull-right protractor-test-save-story-notes-button"
                     ng-disabled="!editableNotes"
                     ng-click="updateNotes(editableNotes)">
               Save
@@ -74,7 +73,7 @@
                    ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
                    ng-click="setNodeToEdit(node.getId())">
             <div class="story-editor-node-title">
-              <[node.getTitle()]>
+              <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
             </div>
             <span style="font-size: 0.8em; width: 15vw;" ng-if="disconnectedNodeIds.indexOf(node.getId()) !== -1">
               <i>This chapter is not reachable from any other chapter</i>
@@ -86,7 +85,7 @@
               </span>
             </span>
             <span class="story-editor-delete-node">
-              <span ng-click="deleteNode(node.getId())" aria-hidden="true">
+              <span class="protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())" aria-hidden="true">
                 <i class="material-icons md-18">&#xE14C;</i>
               </span>
             </span>
@@ -100,7 +99,9 @@
                              outline="node.getOutline()"
                              exploration-id="node.getExplorationId()"
                              outline-finalized="node.getOutlineStatus()"
-                             destination-node-ids="node.getDestinationNodeIds()">
+                             destination-node-ids="node.getDestinationNodeIds()"
+                             prerequisite-skill-ids="node.getPrerequisiteSkillIds()"
+                             acquired-skill-ids="node.getAcquiredSkillIds()">
           </story-node-editor>
         </div>
       </div>
@@ -109,7 +110,7 @@
       <p class="no-chapters-message" style="padding-top: 6px;">
         This story has no chapters.
       </p>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200"
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-chapter-button"
               style="color: white; text-decoration: none;"
               ng-click="createNode()">
         Create Chapter

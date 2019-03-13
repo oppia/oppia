@@ -968,13 +968,6 @@ class Collection(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        # TODO(sll): Remove this check once App Engine supports 3-letter
-        # language codes in search.
-        if len(self.language_code) != 2:
-            raise utils.ValidationError(
-                'Invalid language_code, it should have exactly 2 letters: %s' %
-                self.language_code)
-
         if not isinstance(self.tags, list):
             raise utils.ValidationError(
                 'Expected tags to be a list, received %s' % self.tags)

@@ -42,6 +42,7 @@
 	"I18N_ACTION_BROWSE_LESSONS": "Lektionen durchsuchen",
 	"I18N_ACTION_CREATE_EXPLORATION": "Eine Erforschung erstellen",
 	"I18N_ACTION_CREATE_LESSON": "Eigene Lektion erstellen",
+	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Diese Karte ist ziemlich lang. Studenten könnten die Interesse verlieren. Ziehe in Erwägung, sie zu kürzen oder in zwei Karten aufzuteilen.",
 	"I18N_CONTACT_PAGE_HEADING": "Mach mit!",
 	"I18N_CONTACT_PAGE_PARAGRAPH_1": "Danke für dein Interesse an einer Mithilfe am Oppia-Projekt!",
 	"I18N_CONTACT_PAGE_PARAGRAPH_10": "Das Oppia-Projekt ist vollständig quelloffen und wird von einer großen Gemeinschaft an Freiwilligen auf <a href=\"https://github.com/oppia/oppia/\">GitHub</a> verwaltet. Wir benötigen Programmierer, Designer und Texter. Wenn du aushelfen möchtest, schreibe uns bitte ein paar Zeilen! Der beste Weg um anzufangen ist die Anleitungen auf unserer <a href=\"https://github.com/oppia/oppia/wiki\">GitHub-Wikiseite</a> zu befolgen.",
@@ -525,6 +526,7 @@
 	"I18N_TOPNAV_SIGN_IN": "Anmelden",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Mit Google anmelden",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Mit Oppia unterrichten",
+	"I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "Verwaltungsseite für Themen und Fähigkeiten",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Du hast insgesamt <[totalSubscribers]> Abonnenten.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Abmelden",
 	"I18N_WORKED_EXAMPLE": "Gelungenes Beispiel"

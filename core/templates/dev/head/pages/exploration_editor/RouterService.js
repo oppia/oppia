@@ -64,7 +64,16 @@ oppia.factory('RouterService', [
 
       if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
         activeTabName = TABS.TRANSLATION.name;
-        $rootScope.$broadcast('refreshTranslationTab');
+        var waitForStatesToLoad = $interval(function() {
+          if (ExplorationStatesService.isInitialized()) {
+            $interval.cancel(waitForStatesToLoad);
+            if (!StateEditorService.getActiveStateName()) {
+              StateEditorService.setActiveStateName(
+                ExplorationInitStateNameService.savedMemento);
+            }
+            $rootScope.$broadcast('refreshTranslationTab');
+          }
+        }, 300);
       } else if (newPath.indexOf(TABS.PREVIEW.path) === 0) {
         activeTabName = TABS.PREVIEW.name;
         _doNavigationWithState(newPath, SLUG_PREVIEW);

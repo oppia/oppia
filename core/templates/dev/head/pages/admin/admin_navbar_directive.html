@@ -105,7 +105,7 @@
             <hr class="oppia-top-right-menu-item-separator">
             <li>
               <a ng-click="onMouseoutProfilePictureOrDropdown($event)"
-                 ng-href="<[getLogoutUrl()]>"
+                 ng-href="<[logoutUrl]>"
                  style="color: #00376d">
                 Logout
               </a>
@@ -128,7 +128,7 @@
                ng-href="<[::ADMIN_TAB_URLS.ROLES]>"
                ng-class="{active: isRolesTabOpen()}"
                uib-tooltip="Roles"
-               tooltip-placemnt="bottom">
+               tooltip-placement="bottom">
               Roles
             </a>
           </li>

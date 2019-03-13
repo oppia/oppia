@@ -452,8 +452,8 @@ class StoryContents(object):
             # starting node before starting the story. Also, this list models
             # the skill IDs acquired by a learner as they progress through the
             # story.
-            simulated_skill_ids = self.nodes[
-                starting_node_index].prerequisite_skill_ids
+            simulated_skill_ids = copy.deepcopy(
+                self.nodes[starting_node_index].prerequisite_skill_ids)
 
             # The following loop employs a Breadth First Search from the given
             # starting node and makes sure that the user has acquired all the
@@ -554,8 +554,8 @@ class Story(object):
 
     def __init__(
             self, story_id, title, description, notes,
-            story_contents, schema_version, language_code, version,
-            created_on=None, last_updated=None):
+            story_contents, story_contents_schema_version, language_code,
+            version, created_on=None, last_updated=None):
         """Constructs a Story domain object.
 
         Args:
@@ -567,7 +567,8 @@ class Story(object):
             story_contents: StoryContents. The StoryContents instance
                 representing the contents (like nodes) that are part of the
                 story.
-            schema_version: int. The schema version for the story nodes object.
+            story_contents_schema_version: int. The schema version for the
+                story contents object.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
             version: int. The version of the story.
@@ -581,7 +582,7 @@ class Story(object):
         self.description = description
         self.notes = html_cleaner.clean(notes)
         self.story_contents = story_contents
-        self.schema_version = schema_version
+        self.story_contents_schema_version = story_contents_schema_version
         self.language_code = language_code
         self.created_on = created_on
         self.last_updated = last_updated
@@ -604,16 +605,18 @@ class Story(object):
             raise utils.ValidationError(
                 'Expected notes to be a string, received %s' % self.notes)
 
-        if not isinstance(self.schema_version, int):
+        if not isinstance(self.story_contents_schema_version, int):
             raise utils.ValidationError(
-                'Expected schema version to be an integer, received %s' %
-                self.schema_version)
+                'Expected story contents schema version to be an integer, '
+                'received %s' % self.story_contents_schema_version)
 
-        if self.schema_version != feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
+        if (self.story_contents_schema_version !=
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
             raise utils.ValidationError(
-                'Expected schema version to be %s, received %s' % (
+                'Expected story contents schema version to be %s, '
+                'received %s' % (
                     feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
-                    self.schema_version))
+                    self.story_contents_schema_version))
 
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
@@ -695,7 +698,7 @@ class Story(object):
             'description': self.description,
             'notes': self.notes,
             'language_code': self.language_code,
-            'schema_version': self.schema_version,
+            'story_contents_schema_version': self.story_contents_schema_version,
             'version': self.version,
             'story_contents': self.story_contents.to_dict()
         }

@@ -30,18 +30,16 @@ oppia.directive('stateContentEditor', [
       scope: {
         getStateContentPlaceholder: '&stateContentPlaceholder',
         onSaveStateContent: '=',
-        onSaveContentIdsToAudioTranslations: '='
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_content_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'StateContentService', 'EditabilityService',
+        '$scope', 'StateContentService', 'EditabilityService',
         'EditorFirstTimeEventsService',
-        'StateContentIdsToAudioTranslationsService',
         function(
-            $scope, $uibModal, StateContentService, EditabilityService,
-            EditorFirstTimeEventsService,
-            StateContentIdsToAudioTranslationsService) {
+            $scope, StateContentService, EditabilityService,
+            EditorFirstTimeEventsService) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
@@ -53,30 +51,24 @@ oppia.directive('stateContentEditor', [
 
           $scope.contentEditorIsOpen = false;
           $scope.isEditable = EditabilityService.isEditable;
+          $scope.cardHeightLimitWarningIsShown = true;
+
+          $scope.isCardHeightLimitReached = function() {
+            var shadowPreviewCard = $(
+              '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
+            );
+            var height = shadowPreviewCard.height();
+            return (height > 630);
+          };
+
+          $scope.hideCardHeightLimitWarning = function() {
+            $scope.cardHeightLimitWarningIsShown = false;
+          };
 
           var saveContent = function() {
             StateContentService.saveDisplayedValue();
             $scope.onSaveStateContent(StateContentService.displayed);
             $scope.contentEditorIsOpen = false;
-          };
-
-          var openMarkAllAudioAsNeedingUpdateModal = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/forms/' +
-                'mark_all_audio_as_needing_update_modal_directive.html'),
-              backdrop: true,
-              resolve: {},
-              controller: 'MarkAllAudioAsNeedingUpdateController'
-            }).result.then(function() {
-              var contentId = StateContentService.displayed.getContentId();
-              StateContentIdsToAudioTranslationsService.displayed
-                .markAllAudioAsNeedingUpdate(contentId);
-              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations(
-                StateContentIdsToAudioTranslationsService.displayed
-              );
-            });
           };
 
           $scope.$on('externalSave', function() {
@@ -98,10 +90,9 @@ oppia.directive('stateContentEditor', [
             var contentHasChanged = (
               savedContent.getHtml() !==
               StateContentService.displayed.getHtml());
-            if (StateContentIdsToAudioTranslationsService.displayed
-              .hasUnflaggedAudioTranslations(savedContent.getContentId()) &&
-              contentHasChanged) {
-              openMarkAllAudioAsNeedingUpdateModal();
+            if (contentHasChanged) {
+              var contentId = StateContentService.displayed.getContentId();
+              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
             }
             saveContent();
           };

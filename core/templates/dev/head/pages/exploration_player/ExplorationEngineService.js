@@ -25,33 +25,31 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
 oppia.factory('ExplorationEngineService', [
-  '$http', '$rootScope', '$q', 'AlertsService', 'AnswerClassificationService',
-  'AudioPreloaderService', 'AudioTranslationLanguageService',
-  'EditableExplorationBackendApiService', 'ContextService',
-  'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
-  'ExpressionInterpolationService', 'GuestCollectionProgressService',
+  '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
+  'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
+  'EditableExplorationBackendApiService', 'ExplorationHtmlFormatterService',
+  'ExplorationObjectFactory', 'ExpressionInterpolationService',
+  'FocusManagerService', 'GuestCollectionProgressService',
   'ImagePreloaderService', 'LanguageUtilService', 'LearnerParamsService',
   'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
-  'PlayerTranscriptService', 'PlaythroughService', 'INTERACTION_SPECS',
-  'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
+  'PlayerTranscriptService', 'ReadOnlyExplorationBackendApiService',
+  'StateCardObjectFactory', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService', 'UserService',
-  'WindowDimensionsService', 'DEFAULT_PROFILE_IMAGE_PATH',
+  'WindowDimensionsService', 'DEFAULT_PROFILE_IMAGE_PATH', 'INTERACTION_SPECS',
   'PAGE_CONTEXT', 'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
-  'FocusManagerService', 'StateCardObjectFactory',
   function(
-      $http, $rootScope, $q, AlertsService, AnswerClassificationService,
-      AudioPreloaderService, AudioTranslationLanguageService,
-      EditableExplorationBackendApiService, ContextService,
-      ExplorationHtmlFormatterService, ExplorationObjectFactory,
-      ExpressionInterpolationService, GuestCollectionProgressService,
+      $http, $q, $rootScope, AlertsService, AnswerClassificationService,
+      AudioPreloaderService, AudioTranslationLanguageService, ContextService,
+      EditableExplorationBackendApiService, ExplorationHtmlFormatterService,
+      ExplorationObjectFactory, ExpressionInterpolationService,
+      FocusManagerService, GuestCollectionProgressService,
       ImagePreloaderService, LanguageUtilService, LearnerParamsService,
       NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
-      PlayerTranscriptService, PlaythroughService, INTERACTION_SPECS,
-      ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
+      PlayerTranscriptService, ReadOnlyExplorationBackendApiService,
+      StateCardObjectFactory, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService, UserService,
-      WindowDimensionsService, DEFAULT_PROFILE_IMAGE_PATH,
-      PAGE_CONTEXT, WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
-      FocusManagerService, StateCardObjectFactory) {
+      WindowDimensionsService, DEFAULT_PROFILE_IMAGE_PATH, INTERACTION_SPECS,
+      PAGE_CONTEXT, WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var answerIsBeingProcessed = false;
@@ -66,7 +64,7 @@ oppia.factory('ExplorationEngineService', [
 
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
-    var initialStateName = null;
+    var initStateName = null;
     var version = GLOBALS.explorationVersion;
 
     var randomFromArray = function(arr) {
