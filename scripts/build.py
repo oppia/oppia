@@ -1123,20 +1123,25 @@ def generate_build_directory():
     print 'Build completed.'
 
 
-def compile_typescript_files(
-        file, outDir='backend_prod_files', allowJS='true',
-        lib='es2017,dom', noImplicitUseStrict='true', rootDir='.',
-        skipLibCheck='true', target='es5',
-        typeRoots='../node_modules/@types'):
+def compile_typescript_files(filepath):
 
-    print 'Compiling %s...' % file
+    print 'Compiling %s...' % filepath
+
+    out_dir = 'backend_prod_files'
+    allow_js = 'true'
+    lib = 'es2017,dom'
+    no_implicit_use_strict = 'true'
+    root_dir = '.'
+    skip_lib_check = 'true'
+    target = 'es5'
+    type_roots = '../node_modules/@types'
 
     cmd = (
         '../node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
         '-lib %s -noImplicitUseStrict %s -rootDir %s -skipLibCheck %s '
-        '-target %s -typeRoots %s %s typings/*') %(
-        outDir, allowJS, lib, noImplicitUseStrict, rootDir, skipLibCheck,
-        target, typeRoots, file)
+        '-target %s -typeRoots %s %s typings/*') % (
+            out_dir, allow_jS, lib, no_implicit_use_strict, root_dir,
+            skip_lib_check, target, type_roots, filepath)
     subprocess.check_call(cmd, shell=True)
 
 
