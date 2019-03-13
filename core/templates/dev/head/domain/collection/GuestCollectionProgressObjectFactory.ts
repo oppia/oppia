@@ -73,8 +73,9 @@ oppia.factory('GuestCollectionProgressObjectFactory', [
     // created.
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
-    GuestCollectionProgress['createFromJson'] = function(collectionProgressJson) {
+    GuestCollectionProgress['createFromJson'] = function(
     /* eslint-enable dot-notation */
+        collectionProgressJson) {
       if (collectionProgressJson) {
         return new GuestCollectionProgress(JSON.parse(collectionProgressJson));
       } else {

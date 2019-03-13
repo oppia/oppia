@@ -68,7 +68,8 @@ describe('Creator Dashboard backend API service', function() {
   var ERROR_STATUS_CODE = 500;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module(
+    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(angular.mock.inject(function($injector) {
     CreatorDashboardBackendApiService = $injector.get(

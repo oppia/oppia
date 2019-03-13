@@ -387,7 +387,7 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
         // in.
         /* eslint-disable dot-notation */
         Units['stringToLexical'](unitsString)));
-        /* eslint-enable dot-notation */
+      /* eslint-enable dot-notation */
     };
 
     Units.prototype.toString = function() {

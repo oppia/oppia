@@ -26,7 +26,8 @@ describe('Editable collection backend API service', function() {
   var UndoRedoService = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module(
+    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(angular.mock.inject(function($injector) {
     EditableCollectionBackendApiService = $injector.get(

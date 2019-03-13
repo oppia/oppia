@@ -101,11 +101,11 @@ oppia.factory('ParamTypeObjectFactory', [function() {
   ParamType['registry'] = {
   /* eslint-enable dot-notation */
     UnicodeString: new ParamType({
-        validate: function(value) {
-          return (typeof value === 'string' || value instanceof String);
-        },
-        default_value: ''
-      })
+      validate: function(value) {
+        return (typeof value === 'string' || value instanceof String);
+      },
+      default_value: ''
+    })
   };
 
   // To finalize type registration, we encode the name of each type into their

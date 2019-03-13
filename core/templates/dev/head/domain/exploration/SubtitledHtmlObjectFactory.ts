@@ -54,8 +54,9 @@ oppia.factory('SubtitledHtmlObjectFactory', [
 
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
-    SubtitledHtml['createFromBackendDict'] = function(subtitledHtmlBackendDict) {
+    SubtitledHtml['createFromBackendDict'] = function(
     /* eslint-enable dot-notation */
+        subtitledHtmlBackendDict) {
       return new SubtitledHtml(
         subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
     };

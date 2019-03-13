@@ -51,8 +51,9 @@ oppia.factory('WrittenTranslationObjectFactory', [function() {
 
   // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
-  WrittenTranslation['createFromBackendDict'] = function(translationBackendDict) {
+  WrittenTranslation['createFromBackendDict'] = function(
   /* eslint-enable dot-notation */
+      translationBackendDict) {
     return new WrittenTranslation(
       translationBackendDict.html,
       translationBackendDict.needs_update);

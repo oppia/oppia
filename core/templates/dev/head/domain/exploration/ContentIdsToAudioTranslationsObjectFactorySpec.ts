@@ -195,18 +195,19 @@ describe('ContentIdsToAudioTranslations object factory', function() {
       }).toThrowError('Unable to find the given content id.');
     });
 
-    it('should check whether the text is fully translated', angular.mock.inject(function() {
-      expect(citat.isFullyTranslated('content')).toBe(true);
-      citat.deleteAudioTranslation('content', 'hi');
-      expect(citat.isFullyTranslated('content')).toBe(false);
-      citat.deleteAudioTranslation('content', 'en');
-      expect(citat.isFullyTranslated('content')).toBe(false);
-      expect(function() {
-        citat.deleteAudioTranslation('content', 'hi-en');
-      }).toThrowError(
-        'Trying to remove non-existing translation for ' +
-        'language code hi-en');
-    }));
+    it('should check whether the text is fully translated', angular.mock.inject(
+      function() {
+        expect(citat.isFullyTranslated('content')).toBe(true);
+        citat.deleteAudioTranslation('content', 'hi');
+        expect(citat.isFullyTranslated('content')).toBe(false);
+        citat.deleteAudioTranslation('content', 'en');
+        expect(citat.isFullyTranslated('content')).toBe(false);
+        expect(function() {
+          citat.deleteAudioTranslation('content', 'hi-en');
+        }).toThrowError(
+          'Trying to remove non-existing translation for ' +
+          'language code hi-en');
+      }));
 
     it('should add audio translation in a given content id', function() {
       citat.addAudioTranslation('hint_2', 'en', 'filename11.mp3', 1000);

@@ -1085,7 +1085,6 @@ class LintChecksManager(object):
         js_and_ts_messages = []
         while not js_and_ts_stdout.empty():
             js_and_ts_messages.append(js_and_ts_stdout.get())
-            print 'Hi'
 
         print ''
         print '\n'.join(js_and_ts_messages)
@@ -1113,10 +1112,10 @@ class LintChecksManager(object):
         if self.verbose_mode_enabled:
             print 'Starting directive scope check'
             print '----------------------------------------'
-        # Select JS files which need to be checked.
+        # Select JS and TS files which need to be checked.
         files_to_check = [
             filepath for filepath in self.all_filepaths if (
-                filepath.endswith('.js'))
+                filepath.endswith(('.js', '.ts')))
             and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                         EXCLUDED_PATHS)]
         failed = False
@@ -1255,7 +1254,7 @@ class LintChecksManager(object):
 
         files_to_check = [
             filepath for filepath in self.all_filepaths if (
-                filepath.endswith('.js'))
+                filepath.endswith(('.js', '.ts')))
             and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                         EXCLUDED_PATHS)]
         properties_to_check = ['controller', 'directive', 'factory']
@@ -1357,7 +1356,7 @@ class LintChecksManager(object):
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS) and filepath.endswith('.js')]
+                EXCLUDED_PATHS) and filepath.endswith(('.js', '.ts'))]
         failed = False
         summary_messages = []
 
@@ -1869,7 +1868,7 @@ class LintChecksManager(object):
                         print ''
                         total_error_count += 1
 
-                if filepath.endswith('.js'):
+                if filepath.endswith(('.js', '.ts')):
                     for regexp in BAD_PATTERNS_JS_REGEXP:
                         if _check_bad_pattern_in_file(
                                 filepath, file_content, regexp):
@@ -1926,8 +1925,8 @@ class LintChecksManager(object):
             print 'Starting copyright notice check'
             print '----------------------------------------'
         js_files_to_check = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.js') and (not filepath.endswith(GENERATED_FILE_PATHS)) and (
+            filepath for filepath in self.all_filepaths if filepath.endswith((
+                '.js', '.ts')) and (not filepath.endswith(GENERATED_FILE_PATHS)) and (
                     not filepath.endswith(CONFIG_FILE_PATHS))]
         py_files_to_check = [
             filepath for filepath in self.all_filepaths if filepath.endswith(

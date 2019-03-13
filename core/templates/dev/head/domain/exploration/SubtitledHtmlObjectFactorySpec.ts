@@ -43,11 +43,12 @@ describe('SubtitledHtml object factory', function() {
       expect(subtitledHtml.getContentId()).toEqual('content_id');
     }));
 
-    it('should correctly check existence of HTML', angular.mock.inject(function() {
-      expect(subtitledHtml.hasNoHtml()).toBe(false);
-      subtitledHtml.setHtml('');
-      expect(subtitledHtml.hasNoHtml()).toBe(true);
-    }));
+    it('should correctly check existence of HTML', angular.mock.inject(
+      function() {
+        expect(subtitledHtml.hasNoHtml()).toBe(false);
+        subtitledHtml.setHtml('');
+        expect(subtitledHtml.hasNoHtml()).toBe(true);
+      }));
 
     it('should correctly check emptiness', angular.mock.inject(function() {
       expect(subtitledHtml.isEmpty()).toBe(false);
@@ -59,12 +60,13 @@ describe('SubtitledHtml object factory', function() {
       expect(subtitledHtml.isEmpty()).toBe(false);
     }));
 
-    it('should convert to backend dict correctly', angular.mock.inject(function() {
-      expect(subtitledHtml.toBackendDict()).toEqual({
-        content_id: 'content_id',
-        html: '<p>some html</p>'
-      });
-    }));
+    it('should convert to backend dict correctly', angular.mock.inject(
+      function() {
+        expect(subtitledHtml.toBackendDict()).toEqual({
+          content_id: 'content_id',
+          html: '<p>some html</p>'
+        });
+      }));
 
     it('should create default object', angular.mock.inject(function() {
       var defaultSubtitledHtml = shof.createDefault('test html', 'content_id');
