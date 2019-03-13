@@ -385,5 +385,10 @@ oppia.controller('SettingsTab', [
     $scope.closeRolesForm = function() {
       $scope.isRolesFormOpen = false;
     };
+
+    // Meathod to check if title is given
+    $scope.hasTitleNotBeenGiven = function() {
+      return ExplorationTitleService.displayed.length === 0;
+    };
   }
 ]);

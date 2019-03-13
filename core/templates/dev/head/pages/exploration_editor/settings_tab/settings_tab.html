@@ -286,11 +286,12 @@
                   </span>
                 </div>
 
-                <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
+                <input type="submit" class="btn btn-default protractor-test-save-role" value="Save" ng-disabled="hasTitleNotBeenGiven()">
                 <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
                         ng-show="isRolesFormOpen">
                   Cancel
                 </button>
+                <p ng-show="hasTitleNotBeenGiven()" class="text-danger">*Title is needed in order to invite users</p>
               </form>
             </div>
           </div>
