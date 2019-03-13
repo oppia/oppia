@@ -86,7 +86,8 @@ oppia.controller('StatisticsTab', [
           var initStateName = response.exploration.init_state_name;
 
           $scope.playthroughsAreAvailable =
-            ExplorationFeaturesService.isPlaythroughRecordingEnabled();
+            ExplorationFeaturesService.isPlaythroughRecordingEnabled() &&
+            !ExplorationFeaturesService.isImprovementsTabEnabled();
           $scope.statsGraphData = ComputeGraphService.compute(
             initStateName, states);
           var improvements = (

@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,36 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * @fileoverview Controllers for the exploration improvements tab in the
- * exploration editor.
- */
-
-oppia.directive('improvementsTab', [
+oppia.directive('playthroughImprovementCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        getData: '&data',
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/improvements_tab/' +
-        'improvements_tab_directive.html'),
+        'playthrough_improvement_card_directive.html'),
       controller: [
-        '$scope', 'ImprovementCardService',
-        function($scope, ImprovementCardService) {
-          var fetchedCards = [];
-          ImprovementCardService.fetchCards().then(function(cards) {
-            fetchedCards = cards;
-          });
-
-          $scope.getCards = function() {
-            return fetchedCards;
-          };
-          $scope.getOpenCardCount = function() {
-            return fetchedCards.filter(function(card) {
-              return card.isOpen();
-            }).length;
+        '$scope', 'PlaythroughIssuesService',
+        function($scope, PlaythroughIssuesService) {
+          $scope.openPlaythroughModal = function(playthroughId, index) {
+            PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
           };
         }
-      ],
+      ]
     };
-  }]);
+  }
+]);
