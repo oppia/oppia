@@ -40,13 +40,13 @@ describe('Exploration translation', function() {
 
 
   beforeAll(function() {
-  	creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
 
-  	// Create a common exploration for testing.
+    // Create a common exploration for testing.
     users.createUser('user2@translationTab.com', 'user2TranslationTab');
     users.login('user2@translationTab.com');
     workflow.createExploration();
