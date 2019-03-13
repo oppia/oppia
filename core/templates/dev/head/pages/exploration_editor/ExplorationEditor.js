@@ -388,6 +388,13 @@ oppia.controller('ExplorationEditor', [
         '</ul>')
     }];
 
+    // Remove save from tutorial if user does not has edit rights for
+    // exploration since in that case Save Draft button will not be visible
+    // on the create page.
+    if (!GLOBALS.can_edit) {
+      $scope.EDITOR_TUTORIAL_OPTIONS.splice(9, 1);
+    }
+
     // Replace the ng-joyride template with one that uses <[...]> interpolators
     // instead of/ {{...}} interpolators.
     var ngJoyrideTemplate = $templateCache.get('ng-joyride-title-tplv1.html');
