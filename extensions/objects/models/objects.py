@@ -131,6 +131,10 @@ class TranslatableHtml(BaseObject):
     """Class to represent translatable html."""
 
     description = 'A translatable html content.'
+    default_value = {
+        'content_id': '',
+        'html': ''
+    }
 
     SCHEMA = {
         'type': 'dict',

@@ -1216,9 +1216,20 @@ class State(object):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
+
+        if self.interaction.id is not None:
+            interaction_can_have_translations = (
+                interaction_registry.Registry.get_interaction_by_id(
+                    self.interaction.id).can_have_translations)
+            if interaction_can_have_translations:
+                for content_id in self._get_customization_args_content_ids():
+                    if content_id in content_id_list:
+                        raise utils.ValidationError(
+                            'Found a duplicate content id %s' % content_id)
+                    content_id_list.append(content_id)
+
         available_content_ids_in_audio_translations = (
             self.content_ids_to_audio_translations.keys())
-
         self.written_translations.validate(content_id_list)
 
         if not set(content_id_list) == set(
@@ -1388,11 +1399,33 @@ class State(object):
         Args:
             interaction_id: str. The new interaction id to set.
         """
+        if interaction_id is None:
+            interaction_can_have_translations = (
+                interaction_registry.Registry.get_interaction_by_id(
+                    self.interaction.id).can_have_translations)
+            if interaction_can_have_translations:
+                unwanted_content_ids = (
+                    self._get_customization_args_content_ids())
+                self._update_content_ids_in_assets(unwanted_content_ids, [])
         self.interaction.id = interaction_id
         # TODO(sll): This should also clear interaction.answer_groups (except
         # for the default rule). This is somewhat mitigated because the client
         # updates interaction_answer_groups directly after this, but we should
         # fix it.
+
+    def _get_customization_args_content_ids(self):
+        """Returns a list of content id present within the customization_args
+        of interaction.
+        """
+        path_to_translatable_html = (
+            interaction_registry.Registry.get_interaction_by_id(
+                self.interaction.id).path_to_customization_args_content_id)
+        translatable_html_list = self.interaction.customization_args
+        for node in path_to_translatable_html:
+            translatable_html_list = translatable_html_list[node]
+
+        return [translatable_html['content_id'] for translatable_html in (
+            translatable_html_list)]
 
     def update_interaction_customization_args(self, customization_args):
         """Update the customization_args of InteractionInstance domain object.
@@ -1400,7 +1433,25 @@ class State(object):
         Args:
             customization_args: dict. The new customization_args to set.
         """
+        interaction_can_have_translations = False
+        if self.interaction.id is not None:
+            interaction_can_have_translations = (
+                interaction_registry.Registry.get_interaction_by_id(
+                    self.interaction.id).can_have_translations)
+
+        if interaction_can_have_translations:
+            if any(self.interaction.customization_args):
+                old_content_id_list = self._get_customization_args_content_ids()
+            else:
+                old_content_id_list = []
+
         self.interaction.customization_args = customization_args
+
+        if interaction_can_have_translations:
+            new_content_id_list = self._get_customization_args_content_ids()
+
+            self._update_content_ids_in_assets(
+                old_content_id_list, new_content_id_list)
 
     def update_interaction_answer_groups(self, answer_groups_list):
         """Update the list of AnswerGroup in IteractioInstancen domain object.

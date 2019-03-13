@@ -56,7 +56,13 @@ describe('MultipleChoiceInputValidationService', function() {
 
     customizationArguments = {
       choices: {
-        value: ['Option 1', 'Option 2']
+        value: [{
+          content_id: 'interaction_123',
+          html: 'Option 1'
+        }, {
+          content_id: 'interaction_123',
+          html: 'Option 1'
+        }]
       }
     };
 
@@ -91,7 +97,7 @@ describe('MultipleChoiceInputValidationService', function() {
   });
 
   it('should expect non-empty and unique choices', function() {
-    customizationArguments.choices.value[0] = '';
+    customizationArguments.choices.value[0].html = '';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -100,7 +106,7 @@ describe('MultipleChoiceInputValidationService', function() {
       message: 'Please ensure the choices are nonempty.'
     }]);
 
-    customizationArguments.choices.value[0] = 'Option 2';
+    customizationArguments.choices.value[0].html = 'Option 2';
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);

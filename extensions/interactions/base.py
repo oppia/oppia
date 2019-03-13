@@ -110,6 +110,8 @@ class BaseInteraction(object):
     default_outcome_heading = None
     # Whether the solution feature supports this interaction.
     can_have_solution = None
+    # Whether the customization arg can have audio and text translations.
+    can_have_translations = False
     # Whether to show a Submit button in the progress navigation area. This is
     # a generic submit button so do not use this if special interaction-specific
     # behavior is required. The interaction directive must also register
@@ -132,6 +134,12 @@ class BaseInteraction(object):
         return [
             domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
+
+    @property
+    def path_to_customization_args_content_id(self):
+        """The path to the content_id inside customization_args."""
+        if self.can_have_translations:
+            return copy.deepcopy(self._path_to_customization_args_content_id)
 
     @property
     def answer_visualization_specs(self):
@@ -248,6 +256,7 @@ class BaseInteraction(object):
             'default_outcome_heading': self.default_outcome_heading,
             'rule_descriptions': self._rule_description_strings,
             'can_have_solution': self.can_have_solution,
+            'can_have_translations': self.can_have_translations,
             'show_generic_submit_button': self.show_generic_submit_button,
         }
 
