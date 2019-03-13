@@ -240,6 +240,8 @@
 {% block footer_js %}
   {{ super() }}
   <script src="/templates/components/background/BackgroundBannerDirective.js"></script>
+  <script src="/templates/components/TopicCreationService.js"></script>
+  <script src="/templates/components/SkillCreationService.js"></script>
 
   <script src="/templates/pages/topics_and_skills_dashboard/SelectTopicsDirective.js"></script>
   <script src="/templates/pages/topics_and_skills_dashboard/SkillsListDirective.js"></script>
@@ -252,4 +254,5 @@
   <script src="/templates/domain/skill/EditableSkillBackendApiService.js"></script>
   <script src="/templates/domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js"></script>
   <script src="/templates/domain/skill/EditableSkillBackendApiService.js"></script>
+
 {% endblock footer_js %}

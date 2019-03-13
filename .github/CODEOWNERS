@@ -154,25 +154,21 @@
 
 
 # Infrastructure.
-/core/storage/ @seanlip
 /core/platform/ @seanlip
 
 
 # Miscellaneous.
-/core/domain/html*.py @seanlip
 /core/templates/pages/about/ @seanlip
 /core/templates/pages/privacy/ @seanlip
 /core/templates/pages/terms/ @seanlip
 /core/templates/pages/tests/ @seanlip
 /core/templates/domain/utilities/ @DubeySandeep
-/export/ @seanlip
 
 
 # Restricted pages.
 /core/controllers/admin*.py @seanlip
 /core/templates/pages/admin/ @seanlip
 /core/templates/pages/moderator/ @seanlip
-/.github/CODEOWNERS @seanlip
 
 
 # QA team.
@@ -218,14 +214,28 @@
 
 # Speed Improvement team.
 /app.yaml @vojtechjelinek
-/manifest.json @seanlip @vojtechjelinek
 /core/templates/pages/base.html @vojtechjelinek
 /core/templates/pages/footer_js_libs.html @vojtechjelinek
 /core/templates/pages/header_css_libs.html @vojtechjelinek
 /core/templates/pages/header_js_libs.html @vojtechjelinek
-/scripts/install_third_party.sh @seanlip @vojtechjelinek
 
 
 # User’s profile page.
 /core/templates/domain/user/ @kevinlee12
 /core/templates/pages/profile/ @kevinlee12
+
+
+# Critical files.
+#
+# IMPORTANT NOTE: Please ensure that these files are always located at the end
+# of the CODEOWNERS file, since later rows override earlier ones. For details,
+# see the example at the bottom of this page:
+#
+#     https://help.github.com/en/articles/about-code-owners
+#
+/manifest.json @seanlip @vojtechjelinek
+/scripts/install_third_party.sh @seanlip @vojtechjelinek
+/core/storage/ @seanlip
+/core/domain/html*.py @seanlip
+/export/ @seanlip
+/.github/CODEOWNERS @seanlip
