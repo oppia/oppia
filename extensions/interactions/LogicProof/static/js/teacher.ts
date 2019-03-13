@@ -41,11 +41,12 @@ var logicProofTeacher = (function() {
    *         words that are reserved for the vocabulary.
    */
   var buildQuestion = function(assumptionsString, targetString, vocabulary) {
+    var assumptions;
     if (assumptionsString.replace(/ /g, '') === '') {
-      var assumptions = [];
+      assumptions = [];
     } else {
       try {
-        var assumptions = logicProofParser.parse(
+        assumptions = logicProofParser.parse(
           assumptionsString.replace(/ /g, ''), 'listOfExpressions');
       } catch (err) {
         var error = new logicProofShared.UserError('unparseable', {

@@ -46,15 +46,12 @@ FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
 
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('extensions', ''),
-    'dev_dir_for_js': os.path.join('compiled_js', 'extensions', ''),
     'staging_dir': os.path.join('backend_prod_files', 'extensions', ''),
     'out_dir': os.path.join('build', 'extensions', '')
 }
 TEMPLATES_DEV_DIR = os.path.join('templates', 'dev', 'head', '')
 TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('core', 'templates', 'dev', 'head', ''),
-    'dev_dir_for_js': os.path.join(
-        'compiled_js', 'core', 'templates', 'dev', 'head', ''),
     'staging_dir': os.path.join('backend_prod_files', 'templates', 'head', ''),
     'out_dir': os.path.join('build', 'templates', 'head', '')
 }
@@ -730,12 +727,8 @@ def minify_func(source_path, target_path, file_hashes, filename):
         compile_typescript_files(source_path)
         compiled_target_path = target_path.replace('.ts', '.js')
         minified_target_path = target_path.replace('.ts', '_min.js')
-        while not os.path.isfile(compiled_target_path):
-            continue
         print 'Minifying %s' % compiled_target_path
         _minify(compiled_target_path, minified_target_path)
-        while not os.path.isfile(minified_target_path):
-            continue
         os.remove(compiled_target_path)
         os.rename(minified_target_path, compiled_target_path)
     else:
@@ -1136,7 +1129,7 @@ def compile_typescript_files(
         skipLibCheck='true', target='es5',
         typeRoots='../node_modules/@types'):
 
-    print 'Compiling %s...' %file
+    print 'Compiling %s...' % file
 
     cmd = (
         '../node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
