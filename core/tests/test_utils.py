@@ -1367,7 +1367,7 @@ tags: []
             description=description,
             title=title,
             language_code=language_code,
-            schema_version=1,
+            story_contents_schema_version=1,
             notes=notes,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT
         )
@@ -1553,13 +1553,12 @@ tags: []
         skill_services.save_new_skill(owner_id, skill)
         return skill
 
-    def save_new_skill_with_story_and_skill_contents_schema_version(
-            self, skill_id, owner_id,
-            description, next_misconception_id, misconceptions=None,
-            skill_contents=None, misconceptions_schema_version=1,
-            skill_contents_schema_version=1,
+    def save_new_skill_with_defined_schema_versions(
+            self, skill_id, owner_id, description, next_misconception_id,
+            misconceptions=None, skill_contents=None,
+            misconceptions_schema_version=1, skill_contents_schema_version=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Saves a new default skill with a default version 1 misconceptions
+        """Saves a new default skill with the given versions for misconceptions
         and skill contents.
 
         This function should only be used for creating skills in tests
