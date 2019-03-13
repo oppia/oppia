@@ -60,7 +60,7 @@ oppia.controller('Library', [
 
     var currentPath = $window.location.pathname;
     $scope.pageMode = LIBRARY_PATHS_AND_MODES[currentPath];
-    if (!currentPath) {
+    if (!$scope.pageMode) {
       $log.error('INVALID URL PATH: ' + currentPath);
     }
     $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
