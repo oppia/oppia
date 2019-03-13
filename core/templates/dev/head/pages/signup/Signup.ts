@@ -128,13 +128,6 @@ oppia.controller('Signup', [
         return;
       }
 
-      var requestParams = {
-        agreed_to_terms: agreedToTerms,
-        can_receive_email_updates: null,
-        default_dashboard: null,
-        username: null
-      };
-
       var defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
       var returnUrl = window.decodeURIComponent(
         UrlService.getUrlParams().return_url);
@@ -145,7 +138,12 @@ oppia.controller('Signup', [
         defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
       }
 
-      requestParams.default_dashboard = defaultDashboard;
+      var requestParams = {
+        agreed_to_terms: agreedToTerms,
+        can_receive_email_updates: null,
+        default_dashboard: defaultDashboard,
+        username: null
+      };
 
       if (!$scope.hasUsername) {
         requestParams.username = username;
