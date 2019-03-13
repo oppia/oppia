@@ -358,6 +358,17 @@ p:last-child {
   margin: 1.4em 0;
 }
 
+/* This will prevent the enlargment of the text in the RTE that is
+  nested inside the p and span tag. !important is added to override
+  the inline css.*/
+.oppia-rte p span {
+  font-size: 1em !important;
+}
+
+.oppia-rte-editor p span {
+  font-size: 1em !important;
+}
+
 .oppia-long-text-image {
   display: block;
   margin-left: auto;
