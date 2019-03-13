@@ -43,6 +43,7 @@ install_node_module stylelint 9.2.1
 install_node_module stylelint-config-standard 18.2.0
 install_node_module through2 2.0.0
 install_node_module typescript 3.3.3
+install_node_module @typescript-eslint/parser 1.4.2
 install_node_module @types/angular 1.6.54
 install_node_module @types/angular-animate 1.5.10
 install_node_module @types/angular-mocks 1.7.0

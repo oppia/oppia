@@ -61,6 +61,7 @@ import fnmatch
 import multiprocessing
 import os
 import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -247,12 +248,13 @@ EXCLUDED_PATHS = (
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4')
+    '*.mp3', '*.mp4', 'typings/*', 'local_compiled_js/*',
+    'compiled_js_for_parsing/*')
 
 GENERATED_FILE_PATHS = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
-    'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/ExpressionParserService.js')
+    'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
+    'extensions/interactions/LogicProof/static/js/generatedParser.ts',
+    'core/templates/dev/head/expressions/ExpressionParserService.ts')
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
@@ -760,7 +762,7 @@ def _lint_css_files(
     print 'CSS linting finished.'
 
 
-def _lint_js_files(
+def _lint_js_and_ts_files(
         node_path, eslint_path, files_to_lint, stdout, result,
         verbose_mode_enabled):
     """Prints a list of lint errors in the given list of JavaScript files.
@@ -776,16 +778,16 @@ def _lint_js_files(
     start_time = time.time()
     num_files_with_errors = 0
 
-    num_js_files = len(files_to_lint)
+    num_js_and_ts_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
         print 'There are no JavaScript files to lint.'
         return
 
-    print 'Total js files: ', num_js_files
+    print 'Total js and ts files: ', num_js_and_ts_files
     eslint_cmd_args = [node_path, eslint_path, '--quiet']
     result_list = []
-    print 'Linting JS files.'
+    print 'Linting JS and TS files.'
     for _, filepath in enumerate(files_to_lint):
         if verbose_mode_enabled:
             print 'Linting: ', filepath
@@ -807,13 +809,15 @@ def _lint_js_files(
     if num_files_with_errors:
         for error in result_list:
             result.put(error)
-        result.put('%s    %s JavaScript files' % (
+        result.put('%s    %s JavaScript and Typescript files' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
-        result.put('%s   %s JavaScript files linted (%.1f secs)' % (
-            _MESSAGE_TYPE_SUCCESS, num_js_files, time.time() - start_time))
+        result.put(
+            '%s   %s JavaScript and Typescript files linted (%.1f secs)' % (
+                _MESSAGE_TYPE_SUCCESS, num_js_and_ts_files,
+                time.time() - start_time))
 
-    print 'Js linting finished.'
+    print 'Js and Ts linting finished.'
 
 
 def _lint_py_files(
@@ -899,32 +903,73 @@ class LintChecksManager(object):
         """
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
-        self.parsed_js_files = self._validate_and_parse_js_files()
+        self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
 
-    def _validate_and_parse_js_files(self):
-        """This function validates JavaScript files and returns the parsed
-        contents as a Python dictionary.
+    def _validate_and_parse_js_and_ts_files(self):
+        """This function validates JavaScript and Typescript files and
+        returns the parsed contents as a Python dictionary.
         """
 
         # Select JS files which need to be checked.
         files_to_check = [
             filepath for filepath in self.all_filepaths if (
-                filepath.endswith('.js'))
+                filepath.endswith(('.js', '.ts')))
             and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                         EXCLUDED_PATHS)]
-        parsed_js_files = dict()
+        parsed_js_and_ts_files = dict()
         if not files_to_check:
-            return parsed_js_files
+            return parsed_js_and_ts_files
         if not self.verbose_mode_enabled:
-            print 'Validating and parsing JS files ...'
+            print 'Validating and parsing JS and TS files ...'
         for filepath in files_to_check:
             if self.verbose_mode_enabled:
                 print 'Validating and parsing %s file ...' % filepath
             file_content = FileCache.read(filepath).decode('utf-8')
 
-            # Use esprima to parse a JS file.
-            parsed_js_files[filepath] = esprima.parseScript(file_content)
-        return parsed_js_files
+            try:
+                # Use esprima to parse a JS or TS file.
+                parsed_js_and_ts_files[filepath] = esprima.parseScript(
+                    file_content)
+            except Exception as e:
+                # Compile typescript file which has syntax not valid for JS
+                # file.
+                if filepath.endswith('.js'):
+                    raise Exception(e)
+                compiled_js_filepath = self._compile_ts_file(filepath)
+                file_content = FileCache.read(compiled_js_filepath).decode(
+                    'utf-8')
+                parsed_js_and_ts_files[filepath] = esprima.parseScript(
+                    file_content)
+
+        print 'Removing compiled js used in parsing'
+        dirpath = 'compiled_js_for_parsing'
+        if os.path.exists(dirpath):
+            shutil.rmtree(dirpath)
+
+        return parsed_js_and_ts_files
+
+    def _compile_ts_file(self, filepath):
+        """Compiles a typescript file and returns the path for compiled
+        js file.
+        """
+        out_dir = 'compiled_js_for_parsing'
+        allow_js = 'true'
+        lib = 'es2017,dom'
+        no_implicit_use_strict = 'true'
+        skip_lib_check = 'true'
+        target = 'es5'
+        type_roots = '../node_modules/@types'
+        cmd = (
+            '../node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+            '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+            '%s -target %s -typeRoots %s %s typings/*') % (
+                out_dir, allow_js, lib, no_implicit_use_strict,
+                skip_lib_check, target, type_roots, filepath)
+        subprocess.call(cmd, shell=True)
+        filename = os.path.basename(filepath)
+        compiled_js_filename = filename.replace('.ts', '.js')
+        compiled_js_filepath = os.path.join(out_dir, compiled_js_filename)
+        return compiled_js_filepath
 
     def _lint_all_files(self):
         """This function is used to check if node-eslint dependencies are
@@ -959,9 +1004,9 @@ class LintChecksManager(object):
             print '         or node-stylelint and its dependencies.'
             sys.exit(1)
 
-        js_files_to_lint = [
+        js_and_ts_files_to_lint = [
             filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.js')]
+                ('.js', '.ts'))]
         py_files_to_lint = [
             filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.py')]
@@ -995,13 +1040,13 @@ class LintChecksManager(object):
                 css_files_to_lint, css_stdout,
                 css_result, self.verbose_mode_enabled)))
 
-        js_result = multiprocessing.Queue()
-        js_stdout = multiprocessing.Queue()
+        js_and_ts_result = multiprocessing.Queue()
+        js_and_ts_stdout = multiprocessing.Queue()
 
         linting_processes.append(multiprocessing.Process(
-            target=_lint_js_files, args=(
-                node_path, eslint_path, js_files_to_lint,
-                js_stdout, js_result, self.verbose_mode_enabled)))
+            target=_lint_js_and_ts_files, args=(
+                node_path, eslint_path, js_and_ts_files_to_lint,
+                js_and_ts_stdout, js_and_ts_result, self.verbose_mode_enabled)))
 
         py_result = multiprocessing.Queue()
 
@@ -1020,7 +1065,7 @@ class LintChecksManager(object):
 
         file_groups_to_lint = [
             html_files_to_lint_for_css, css_files_to_lint,
-            js_files_to_lint, py_files_to_lint]
+            js_and_ts_files_to_lint, py_files_to_lint]
         number_of_files_to_lint = sum(
             len(file_group) for file_group in file_groups_to_lint)
 
@@ -1037,18 +1082,19 @@ class LintChecksManager(object):
             except ZeroDivisionError:
                 break
 
-        js_messages = []
-        while not js_stdout.empty():
-            js_messages.append(js_stdout.get())
+        js_and_ts_messages = []
+        while not js_and_ts_stdout.empty():
+            js_and_ts_messages.append(js_and_ts_stdout.get())
+            print 'Hi'
 
         print ''
-        print '\n'.join(js_messages)
+        print '\n'.join(js_and_ts_messages)
 
         summary_messages = []
 
         result_queues = [
             css_in_html_result, css_result,
-            js_result, py_result]
+            js_and_ts_result, py_result]
 
         for result_queue in result_queues:
             while not result_queue.empty():
@@ -1077,7 +1123,7 @@ class LintChecksManager(object):
         summary_messages = []
 
         for filepath in files_to_check:
-            parsed_script = self.parsed_js_files[filepath]
+            parsed_script = self.parsed_js_and_ts_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
                 parsed_nodes = parsed_script.body
@@ -1217,7 +1263,7 @@ class LintChecksManager(object):
         summary_messages = []
 
         for filepath in files_to_check:
-            parsed_script = self.parsed_js_files[filepath]
+            parsed_script = self.parsed_js_and_ts_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 parsed_nodes = parsed_script.body
                 for parsed_node in parsed_nodes:
@@ -2000,4 +2046,4 @@ def main():
 
 
 if __name__ == '__main__':
-    pass
+    main()
