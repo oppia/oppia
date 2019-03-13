@@ -83,7 +83,7 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
           // $scope.choices.splice(selectedRank, 0, $scope.choices.splice(
           // choiceListIndex, 1)[0]);
           var choiceHtmlHasBeenAdded = false;
-          $scope.maxPrevIndex = math.max(parseInt(selectedRank + 1),
+          $scope.maxPrevIndex = math.max(selectedRank + 1,
             $scope.maxPrevIndex);
 
           for (var i = 0; i < $scope.value.length; i++) {
