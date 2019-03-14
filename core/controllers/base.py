@@ -513,7 +513,7 @@ class BaseHandler(webapp2.RequestHandler):
 class Error404Handler(BaseHandler):
     """Handles 404 errors."""
 
-    REQUIRE_PAYLOAD_CSRF_CHECK = True
+    pass
 
 
 class CsrfTokenManager(object):
