@@ -17,9 +17,14 @@
  */
 
 describe('Interaction object factory', function() {
+  var iof = null;
+  var oof = null;
+  var agof = null;
+  var hof = null;
+  var sof = null;
   var testInteraction = null;
-  var answerGroups = null;
-  var defaultOutcome = null;
+  var answerGroupsDict = null;
+  var defaultOutcomeDict = null;
   var solutionDict = null;
   var hintsDict = null;
   var interactionDict = null;
@@ -32,25 +37,31 @@ describe('Interaction object factory', function() {
     agof = $injector.get('AnswerGroupObjectFactory');
     hof = $injector.get('HintObjectFactory');
     sof = $injector.get('SolutionObjectFactory');
-    defaultOutcome = {
+    defaultOutcomeDict = {
       dest: 'dest_default',
-      feedback: 'feedback',
+      feedback: {
+        content_id: 'default_outcome',
+        html: ''
+      },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     };
-    answerGroups = [{
+    answerGroupsDict = [{
       rule_specs: [],
       outcome: {
         dest: 'dest_1',
-        feedback: 'feedback',
+        feedback: {
+          content_id: 'outcome_1',
+          html: ''
+        },
         labelled_as_correct: false,
         param_changes: [],
         refresher_exploration_id: null,
         missing_prerequisite_skill_id: null
       },
-      training_data: 'training_data',
+      training_data: ['training_data'],
       tagged_misconception_id: 'tagged_misconception_id'
     }];
     hintsDict = [
@@ -78,10 +89,14 @@ describe('Interaction object factory', function() {
     };
 
     interactionDict = {
-      answer_groups: answerGroups,
+      answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: [],
-      default_outcome: defaultOutcome,
+      customization_args: {
+        customArg: {
+          value: 'custom_value'
+        }
+      },
+      default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'interaction_id',
       solution: solutionDict
@@ -101,26 +116,32 @@ describe('Interaction object factory', function() {
       rule_specs: [],
       outcome: {
         dest: 'dest_3',
-        feedback: 'feedback',
+        feedback: {
+          content_id: 'outcome_3',
+          html: ''
+        },
         labelled_as_correct: false,
         param_changes: [],
         refresher_exploration_id: null,
         missing_prerequisite_skill_id: null
       },
-      training_data: 'training_data',
+      training_data: ['training_data'],
       tagged_misconception_id: 'tagged_misconception_id'
     };
     expect(testInteraction.answerGroups).toEqual([agof.createFromBackendDict({
       rule_specs: [],
       outcome: {
         dest: 'dest_1',
-        feedback: 'feedback',
+        feedback: {
+          content_id: 'outcome_1',
+          html: ''
+        },
         labelled_as_correct: false,
         param_changes: [],
         refresher_exploration_id: null,
         missing_prerequisite_skill_id: null
       },
-      training_data: 'training_data',
+      training_data: ['training_data'],
       tagged_misconception_id: 'tagged_misconception_id'
     })]);
     newAnswerGroup = agof.createFromBackendDict(newAnswerGroup);
@@ -131,7 +152,10 @@ describe('Interaction object factory', function() {
   it('should correctly set the new default outcome', function() {
     var newDefaultOutcomeDict = {
       dest: 'dest_default_new',
-      feedback: 'feedback_new',
+      feedback: {
+        content_id: 'default_outcome_new',
+        html: ''
+      },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
@@ -139,14 +163,32 @@ describe('Interaction object factory', function() {
     };
     newDefaultOutcome = oof.createFromBackendDict(newDefaultOutcomeDict);
     expect(testInteraction.defaultOutcome).toEqual(
-      oof.createFromBackendDict(defaultOutcome));
+      oof.createFromBackendDict({
+        dest: 'dest_default',
+        feedback: {
+          content_id: 'default_outcome',
+          html: ''
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      }));
     testInteraction.setDefaultOutcome(newDefaultOutcome);
     expect(testInteraction.defaultOutcome).toEqual(newDefaultOutcome);
   });
 
   it('should correctly set the new customization args', function() {
-    var newCustomizationArgs = ['arg_1_new', 'arg_2_new'];
-    expect(testInteraction.customizationArgs).toEqual([]);
+    var newCustomizationArgs = {
+      customArgNew: {
+        value: 'custom_value_new'
+      }
+    };
+    expect(testInteraction.customizationArgs).toEqual({
+      customArg: {
+        value: 'custom_value'
+      }
+    });
     testInteraction.setCustomizationArgs(newCustomizationArgs);
     expect(testInteraction.customizationArgs).toEqual(newCustomizationArgs);
   });
@@ -162,19 +204,26 @@ describe('Interaction object factory', function() {
     };
     newSolution = sof.createFromBackendDict(newSolutionDict);
     expect(testInteraction.solution).toEqual(
-      sof.createFromBackendDict(solutionDict));
+      sof.createFromBackendDict({
+        answer_is_exclusive: false,
+        correct_answer: 'This is a correct answer!',
+        explanation: {
+          content_id: 'solution',
+          html: 'This is the explanation to the answer'
+        }
+      }));
     testInteraction.setSolution(newSolution);
     expect(testInteraction.solution).toEqual(newSolution);
   });
 
   it('should correctly set the new hint', function() {
-    var newHintsDict = {
+    var newHintDict = {
       hint_content: {
         html: '<p>New Hint</p>',
         content_id: 'content_id_new'
       }
     };
-    newHint = hof.createFromBackendDict(newHintsDict);
+    newHint = hof.createFromBackendDict(newHintDict);
     expect(testInteraction.hints).toEqual(hintsDict.map(function(hintDict) {
       return hof.createFromBackendDict(hintDict);
     }));
@@ -187,24 +236,30 @@ describe('Interaction object factory', function() {
       rule_specs: [],
       outcome: {
         dest: 'dest_1_new',
-        feedback: 'feedback_new',
+        feedback: {
+          content_id: 'outcome_1_new',
+          html: ''
+        },
         labelled_as_correct: false,
         param_changes: [],
         refresher_exploration_id: null,
         missing_prerequisite_skill_id: null
       },
-      training_data: 'training_data_new',
+      training_data: ['training_data_new'],
       tagged_misconception_id: 'tagged_misconception_id_new'
     }];
     var newDefaultOutcome = {
       dest: 'dest_default_new',
-      feedback: 'feedback_new',
+      feedback: {
+        content_id: 'default_outcome_new',
+        html: ''
+      },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     };
-    var newHintsDict = [
+    var newHintDict = [
       {
         hint_content: {
           html: '<p>New Hint</p>',
@@ -225,7 +280,7 @@ describe('Interaction object factory', function() {
       confirmed_unclassified_answers: [],
       customization_args: [],
       default_outcome: newDefaultOutcome,
-      hints: newHintsDict,
+      hints: newHintDict,
       id: 'interaction_id_new',
       solution: newSolutionDict
     };
