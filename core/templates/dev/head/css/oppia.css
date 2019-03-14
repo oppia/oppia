@@ -358,9 +358,13 @@ p:last-child {
   margin: 1.4em 0;
 }
 
-/* This will prevent the enlargment of the text in the RTE that is
-  nested inside the p and span tag. !important is added to override
-  the inline css.*/
+/* This will prevent the enlargment of the text in the RTE. A span tag gets
+   introduced when a user selects the text from the end of first line, goes to the
+   second one and then write some text to replace that. The span tag carries
+   along with it a style=font-size:1.6em;, due to which the text is enlarged.
+   This size is taken similar to font-size in the body element. There is as
+   such no way to remove !important as of now, its a CKEditor bug
+   (refer issue #6206). */
 .oppia-rte p span {
   font-size: 1em !important;
 }
