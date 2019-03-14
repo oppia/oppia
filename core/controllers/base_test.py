@@ -332,9 +332,7 @@ class LogoutPageTests(test_utils.GenericTestBase):
         # cookies have expired after hitting the logout url.
         current_page = '/explore/0'
         response = self.get_html_response(current_page)
-        response = self.get_html_response(
-            current_user_services.create_logout_url(
-                current_page), expected_status_int=302)
+        response = self.get_html_response('/logout', expected_status_int=302)
         expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
         self.assertTrue(

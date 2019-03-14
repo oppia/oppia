@@ -55,18 +55,18 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
         Exception: The schema version of the story_contents is outside of what
         is supported at present.
     """
-    story_schema_version = versioned_story_contents['schema_version']
-    if not (1 <= story_schema_version
+    story_contents_schema_version = versioned_story_contents['schema_version']
+    if not (1 <= story_contents_schema_version
             <= feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d story schemas at '
             'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
 
-    while (story_schema_version <
+    while (story_contents_schema_version <
            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
         story_domain.Story.update_story_contents_from_model(
-            versioned_story_contents, story_schema_version)
-        story_schema_version += 1
+            versioned_story_contents, story_contents_schema_version)
+        story_contents_schema_version += 1
 
 
 # Repository GET methods.
@@ -101,13 +101,12 @@ def get_story_from_model(story_model):
 
     # Ensure the original story model does not get altered.
     versioned_story_contents = {
-        'schema_version': story_model.schema_version,
-        'story_contents': copy.deepcopy(
-            story_model.story_contents)
+        'schema_version': story_model.story_contents_schema_version,
+        'story_contents': copy.deepcopy(story_model.story_contents)
     }
 
-    # Migrate the story if it is not using the latest schema version.
-    if (story_model.schema_version !=
+    # Migrate the story contents if it is not using the latest schema version.
+    if (story_model.story_contents_schema_version !=
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
         _migrate_story_contents_to_latest_schema(
             versioned_story_contents)
@@ -243,7 +242,7 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         description=story.description,
         title=story.title,
         language_code=story.language_code,
-        schema_version=story.schema_version,
+        story_contents_schema_version=story.story_contents_schema_version,
         notes=story.notes,
         story_contents=story.story_contents.to_dict()
     )
@@ -420,7 +419,8 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.title = story.title
     story_model.notes = story.notes
     story_model.language_code = story.language_code
-    story_model.schema_version = story.schema_version
+    story_model.story_contents_schema_version = (
+        story.story_contents_schema_version)
     story_model.story_contents = story.story_contents.to_dict()
     story_model.version = story.version
     change_dicts = [change.to_dict() for change in change_list]

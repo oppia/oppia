@@ -284,7 +284,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
     """Test the handler for fetching questions."""
 
     def setUp(self):
-        """Before each individual test, initialize data"""
+        """Before each individual test, initialize data."""
         super(QuestionsUnitTest, self).setUp()
 
         self.skill_id = skill_services.get_new_skill_id()
