@@ -199,9 +199,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         new_content_after_edit = state_domain.SubtitledHtml(
             'content', 'new edit content html').to_dict()
 
-        target_type = suggestion_models.TARGET_TYPE_EXPLORATION
-        target_id = '/exp1'
-        suggestion_id = '/' + suggestion['suggestion_id']
+        suggestion_id = suggestion['suggestion_id']
 
         # Change that needs to be done in submitted suggestion.
         change = {
@@ -218,12 +216,11 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         # Put suggestion after some change.
         self.put_json(
-            ('/suggestionactionhandler/edit/' + target_type + target_id
-             + suggestion_id), {
-                 'action': 'edit',
-                 'summary_message': 'summary message',
-                 'change': change
-                 }, csrf_token=csrf_token)
+            ('/suggestionactionhandler/edit/' + suggestion_id), {
+                'action': 'edit',
+                'summary_message': 'summary message',
+                'change': change
+                }, csrf_token=csrf_token)
 
         # Get suggestion after edit.
         suggestion_after_edit = self.get_json(
