@@ -197,17 +197,17 @@ oppia.factory('SiteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics(
         'ClickButtonOnStewardsPage', 'click', viewerType + ':' + buttonText);
     },
-    registerSaveAudioRecordingEvent: function(explorationId) {
+    registerSaveRecordedAudioEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'SaveRecordingButton', 'click', explorationId);
+        'SaveRecordedAudio', 'click', explorationId);
     },
     registerStartAudioRecordingEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'StartRecordingButton', 'click', explorationId);
+        'StartAudioRecording', 'click', explorationId);
     },
     registerUploadAudioEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
-        'UploadingAudioFileButton', 'click', explorationId);
+        'UploadRecordedAudio', 'click', explorationId);
     },
   };
 }]);

@@ -212,7 +212,7 @@ oppia.directive('audioTranslationBar', [
 
           $scope.saveRecordedAudio = function() {
             $scope.audioIsCurrentlyBeingSaved = true;
-            SiteAnalyticsService.registerSaveAudioRecordingEvent();
+            SiteAnalyticsService.registerSaveRecordedAudioEvent();
             var filename = generateNewFilename();
             var fileType = 'audio/mp3';
             var contentId = $scope.contentId;
