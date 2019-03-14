@@ -122,7 +122,7 @@ var createAndPublishExploration = function(
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = function(roleName, username) {
   element(
-    by.model('ExplorationTitleService.displayed')).sendKeys('Chuck Norris');
+    by.model('explorationTitleService.displayed')).sendKeys('Chuck Norris');
   element(by.css('.protractor-test-edit-roles')).click();
   element(by.css('.protractor-test-role-username')).sendKeys(username);
   element(by.css('.protractor-test-role-select')).
