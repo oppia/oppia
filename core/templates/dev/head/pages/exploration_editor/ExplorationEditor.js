@@ -264,6 +264,16 @@ oppia.controller('ExplorationEditor', [
     var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
     var _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
 
+    var saveButtonElement = {
+      type: 'element',
+      selector: _ID_TUTORIAL_SAVE_BUTTON,
+      heading: 'Save',
+      text: (
+        'When you\'re done making changes, ' +
+        'be sure to save your work.<br><br>'),
+      placement: 'bottom'
+    };
+
     $scope.EDITOR_TUTORIAL_OPTIONS = [{
       type: 'title',
       heading: 'Creating in Oppia',
@@ -357,15 +367,7 @@ oppia.controller('ExplorationEditor', [
         'At any time, you can click the <b>preview</b> button to play ' +
         'through your exploration.'),
       placement: 'bottom'
-    }, {
-      type: 'element',
-      selector: _ID_TUTORIAL_SAVE_BUTTON,
-      heading: 'Save',
-      text: (
-        'When you\'re done making changes, ' +
-        'be sure to save your work.<br><br>'),
-      placement: 'bottom'
-    }, {
+    }, saveButtonElement, {
       type: 'title',
       heading: 'Tutorial Complete',
       text: (
@@ -392,7 +394,8 @@ oppia.controller('ExplorationEditor', [
     // exploration since in that case Save Draft button will not be visible
     // on the create page.
     if (!GLOBALS.can_edit) {
-      $scope.EDITOR_TUTORIAL_OPTIONS.splice(9, 1);
+      var index = $scope.EDITOR_TUTORIAL_OPTIONS.indexOf(saveButtonElement);
+      $scope.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
     }
 
     // Replace the ng-joyride template with one that uses <[...]> interpolators
