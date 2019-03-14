@@ -203,7 +203,7 @@ URLS = MAPREDUCE_HANDLERS + [
         admin.AdminTopicsCsvFileDownloader),
 
     get_redirect_route(
-        r'/notifications_dashboard',
+        feconf.NOTIFICATIONS_DASHBOARD_URL,
         creator_dashboard.NotificationsDashboardPage),
     get_redirect_route(
         r'/notificationsdashboardhandler/data',
@@ -348,7 +348,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(r'/preferences', profile.PreferencesPage),
+    get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
@@ -640,8 +640,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
-    get_redirect_route(
-        r'/exploration_editor_logout', editor.EditorLogoutHandler),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
