@@ -61,21 +61,21 @@ oppia.controller('ShowSuggestionModalForEditorView', [
 
     $scope.isEditButtonShow = function() {
       return $scope.editButtonShown;
-    }
+    };
 
     $scope.isSuggestionEditorIsShown = function() {
       return $scope.suggestionEditorShown;
-    }
+    };
 
     $scope.isSaveButtonShown = function() {
       return (!$scope.editButtonShown &&
         $scope.suggestionEditorShown);
-   }
+    };
 
     $scope.editSuggestion = function() {
       $scope.editButtonShown = false;
       $scope.suggestionEditorShown = true;
-    }
+    };
 
     $scope.saveSuggestion = function() {
       $scope.editButtonShown = true;
@@ -87,7 +87,7 @@ oppia.controller('ShowSuggestionModalForEditorView', [
         suggestionType: $scope.suggestionType,
         oldContent: $scope.oldContent
       });
-    }
+    };
 
     $scope.acceptSuggestion = function() {
       SuggestionModalService.acceptSuggestion(
