@@ -64,18 +64,20 @@ oppia.directive('audioTranslationBar', [
         '$filter', '$rootScope', '$scope', '$timeout', '$uibModal',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
-        'IdGenerationService', 'StateContentIdsToAudioTranslationsService',
+        'IdGenerationService', 'SiteAnalyticsService',
+        'StateContentIdsToAudioTranslationsService',
         'StateEditorService', 'TranslationLanguageService',
         'recorderService', 'TranslationTabActiveContentIdService',
-        'RECORDING_TIME_LIMIT', 'SiteAnalyticsService',
+        'RECORDING_TIME_LIMIT',
         function(
             $filter, $rootScope, $scope, $timeout, $uibModal,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
-            IdGenerationService, StateContentIdsToAudioTranslationsService,
+            IdGenerationService , SiteAnalyticsService,
+            StateContentIdsToAudioTranslationsService,
             StateEditorService, TranslationLanguageService,
             recorderService, TranslationTabActiveContentIdService,
-            RECORDING_TIME_LIMIT, SiteAnalyticsService) {
+            RECORDING_TIME_LIMIT) {
           $scope.RECORDER_ID = 'recorderId';
           $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
           $scope.audioBlob = null;
@@ -167,7 +169,7 @@ oppia.directive('audioTranslationBar', [
               $scope.unsupportedBrowser = true;
               $scope.cannotRecord = true;
             } else {
-              SiteAnalyticsService.registerClickStartRecordingButtonEvent();
+              SiteAnalyticsService.registerStartAudioRecordingEvent();
               $scope.unsupportedBrowser = false;
               showPermissionAndStartRecording();
             }
@@ -210,7 +212,7 @@ oppia.directive('audioTranslationBar', [
 
           $scope.saveRecordedAudio = function() {
             $scope.audioIsCurrentlyBeingSaved = true;
-            SiteAnalyticsService.registerClickSaveRecordedAudioButtonEvent();
+            SiteAnalyticsService.registerSaveAudioRecordingEvent();
             var filename = generateNewFilename();
             var fileType = 'audio/mp3';
             var contentId = $scope.contentId;
@@ -413,7 +415,7 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.openAddAudioTranslationModal = function(audioFile) {
-            SiteAnalyticsService.registerClickUploadRecordedAudioButtonEvent();
+            SiteAnalyticsService.registerUploadAudioEvent();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/translation_tab/' +
