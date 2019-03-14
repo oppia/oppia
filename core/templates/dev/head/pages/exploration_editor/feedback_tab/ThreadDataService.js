@@ -46,9 +46,9 @@ oppia.factory('ThreadDataService', [
     // Number of open threads that need action
     var _openThreadsCount = 0;
 
-    var _fetchThreads = function(successCallback) {
+    var _fetchThreads = function(successCallback = function() {}) {
       var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
-      params = {
+      var params = {
         target_type: 'exploration',
         target_id: _expId
       };
@@ -81,9 +81,7 @@ oppia.factory('ThreadDataService', [
             }
           }
         }
-        if (successCallback) {
-          successCallback();
-        }
+        successCallback();
       });
     };
 

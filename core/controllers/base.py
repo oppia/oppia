@@ -84,11 +84,8 @@ class LogoutPage(webapp2.RequestHandler):
         page (or the home page if no follow-up page is specified).
         """
 
-        # The str conversion is needed, otherwise an InvalidResponseError
-        # asking for the 'Location' header value to be str instead of
-        # 'unicode' will result.
-        url_to_redirect_to = str(self.request.get('return_url') or '/')
         _clear_login_cookies(self.response.headers)
+        url_to_redirect_to = '/'
 
         if constants.DEV_MODE:
             self.redirect(users.create_logout_url(url_to_redirect_to))
@@ -300,21 +297,7 @@ class BaseHandler(webapp2.RequestHandler):
             'attachment; filename=%s' % filename)
         self.response.write(values)
 
-    def _get_logout_url(self, redirect_url_on_logout):
-        """Prepares and returns logout url which will be handled
-        by LogoutPage handler.
-
-        Args:
-            redirect_url_on_logout: str. URL to redirect to on logout.
-
-        Returns:
-            str. Logout URL to be handled by LogoutPage handler.
-        """
-        return current_user_services.create_logout_url(redirect_url_on_logout)
-
-    def render_template(
-            self, filepath, iframe_restriction='DENY',
-            redirect_url_on_logout=None):
+    def render_template(self, filepath, iframe_restriction='DENY'):
         """Prepares an HTML response to be sent to the client.
 
         Args:
@@ -325,7 +308,6 @@ class BaseHandler(webapp2.RequestHandler):
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
-            redirect_url_on_logout: str or None. URL to redirect to on logout.
         """
         values = self.values
 
@@ -344,7 +326,6 @@ class BaseHandler(webapp2.RequestHandler):
                 app_identity_services.get_gcs_resource_bucket_name()),
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
-            'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id)
         })
@@ -359,14 +340,6 @@ class BaseHandler(webapp2.RequestHandler):
             values['meta_description'] = (
                 'Oppia is a free, open-source learning platform. Join the '
                 'community to create or try an exploration today!')
-
-        if redirect_url_on_logout is None:
-            redirect_url_on_logout = self.request.uri
-
-        if self.user_id:
-            values['logout_url'] = self._get_logout_url(redirect_url_on_logout)
-        else:
-            values['logout_url'] = None
 
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler

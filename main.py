@@ -36,6 +36,7 @@ from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
+from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
 from core.controllers import reader
@@ -45,6 +46,7 @@ from core.controllers import skill_editor
 from core.controllers import story_editor
 from core.controllers import story_viewer
 from core.controllers import subscriptions
+from core.controllers import subtopic_viewer
 from core.controllers import suggestion
 from core.controllers import topic_editor
 from core.controllers import topic_viewer
@@ -201,7 +203,7 @@ URLS = MAPREDUCE_HANDLERS + [
         admin.AdminTopicsCsvFileDownloader),
 
     get_redirect_route(
-        r'/notifications_dashboard',
+        feconf.NOTIFICATIONS_DASHBOARD_URL,
         creator_dashboard.NotificationsDashboardPage),
     get_redirect_route(
         r'/notificationsdashboardhandler/data',
@@ -227,8 +229,15 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<skill_id>' % feconf.NEW_QUESTION_URL,
         question_editor.QuestionCreationHandler),
     get_redirect_route(
+        r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
+        practice_sessions.PracticeSessionsPage),
+    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
+    get_redirect_route(
+        r'%s/<topic_id>/<subtopic_id>' %
+        feconf.SUBTOPIC_DATA_HANDLER,
+        subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
@@ -290,7 +299,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
-        custom_landing_pages.FractionLandingPage),
+        custom_landing_pages.FractionLandingRedirectPage),
+    get_redirect_route(
+        r'%s' % feconf.TOPIC_LANDING_PAGE_URL,
+        custom_landing_pages.TopicLandingPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),
@@ -336,7 +348,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(r'/preferences', profile.PreferencesPage),
+    get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
@@ -632,8 +644,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
-    get_redirect_route(
-        r'/exploration_editor_logout', editor.EditorLogoutHandler),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),

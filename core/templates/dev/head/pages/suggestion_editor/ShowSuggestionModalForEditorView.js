@@ -31,6 +31,8 @@ oppia.controller('ShowSuggestionModalForEditorView', [
     $scope.suggestionEditorShown = false;
     $scope.editButtonShown = true;
     $scope.canEdit = EditabilityService.isEditable();
+    $scope.commitMessage = '';
+    $scope.reviewMessage = '';
     $scope.canReject = $scope.canEdit && $scope.isNotHandled;
     $scope.canAccept = $scope.canEdit && $scope.isNotHandled &&
       suggestionIsValid && !unsavedChangesExist;

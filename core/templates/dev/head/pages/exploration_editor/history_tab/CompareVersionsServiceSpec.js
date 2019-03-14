@@ -24,6 +24,7 @@ describe('Compare versions service', function() {
     var vts = null;
     var treeParents = null;
     var $httpBackend = null;
+    var mockExplorationData = null;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
     beforeEach(function() {
@@ -79,7 +80,13 @@ describe('Compare versions service', function() {
             },
             hints: []
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
         };
         newStateData.interaction.answer_groups =
           statesDetails[stateName].ruleDests.map(function(ruleDestName) {

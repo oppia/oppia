@@ -143,7 +143,7 @@ oppia.controller('Signup', [
         defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
       }
 
-      var requestParams = {
+      requestParams = {
         agreed_to_terms: agreedToTerms,
         can_receive_email_updates: null,
         default_dashboard: defaultDashboard
@@ -197,11 +197,11 @@ oppia.controller('Signup', [
           function($scope, $uibModalInstance, SiteAnalyticsService,
               UserService, $timeout, $window) {
             $scope.continueRegistration = function() {
-              UserService.getLoginAndLogoutUrls().then(
-                function(urlObject) {
-                  if (urlObject.login_url) {
+              UserService.getLoginUrlAsync().then(
+                function(loginUrl) {
+                  if (loginUrl) {
                     $timeout(function() {
-                      $window.location = urlObject.login_url;
+                      $window.location = loginUrl;
                     }, 150);
                   } else {
                     throw Error('Login url not found.');

@@ -64,6 +64,13 @@ describe('ExplorationStatesService', function() {
             id: 'TextInput',
             solution: null
           },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          },
           classifier_model_id: 0,
         }
       });
