@@ -166,8 +166,6 @@
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9": "जब शिक्षार्थी आपकी अन्वेषण के माध्यम से जाते हैं, तो वे आपको समस्याओं के बारे में चेतावनी देने या इसे बेहतर बनाने के लिए विचार साझा करने के लिए आपको फ़ीडबैक भेज सकते हैं।",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING": "अपना अन्वेषण सुधारें",
 	"I18N_GET_STARTED_PAGE_TITLE": "शुरू हो जाओ",
-	"I18N_IMPROVEMENTS_TAB_FEEDBACK_DESCRIPTION": "एक शिक्षार्थी को आपके अन्वेषण के बारे में कुछ कहना था।",
-	"I18N_IMPROVEMENTS_TAB_PLAYTHROUGH_ISSUES_CYCLIC_TRANSITIONS_DESCRIPTION": "एक खिलाड़ी ने कार्ड के अनुक्रम के माध्यम से बार-बार साइकिल चलाने के बाद एक अन्वेषण छोड़ दिया है।",
 	"I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "अंश को X/x के रूप में दर्ज करें अथवा एक मिश्रित संख्या को x x/x के रूप में दर्ज करें",
 	"I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "\nएक अंश को x/x के रूप में दर्ज करें।",
 	"I18N_INTERACTIONS_GRAPH_ADD_EDGE": "धार जोड़े",
