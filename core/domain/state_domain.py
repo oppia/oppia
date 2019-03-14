@@ -1217,7 +1217,7 @@ class State(object):
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
 
-        if self.interaction.id is not None:
+        if not allow_null_interaction and self.interaction.id is not None:
             interaction_can_have_translations = (
                 interaction_registry.Registry.get_interaction_by_id(
                     self.interaction.id).can_have_translations)
