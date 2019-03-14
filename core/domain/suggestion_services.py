@@ -557,7 +557,7 @@ def check_can_resubmit_suggestion(suggestion_id, user_id):
     return suggestion.author_id == user_id
 
 
-def check_can_edit_suggestion(credentials_to_check, user_id):
+def check_can_edit_suggestion(credentials_to_check, user_id, user):
     """Checks whether the user have permission to edit suggestion or not.
 
     Args:
@@ -565,6 +565,8 @@ def check_can_edit_suggestion(credentials_to_check, user_id):
             are needed for checking whether a user have permission or not for
             edit suggestion.
         user_id: str. Id of a user.
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
 
     Returns:
         users_which_have_rights: dict(str, str). Dict whose key value pairs
@@ -589,7 +591,7 @@ def check_can_edit_suggestion(credentials_to_check, user_id):
             return users_which_have_rights
 
         if rights_manager.check_can_edit_activity(
-                user_id, exploration_rights):
+                user, exploration_rights):
             users_which_have_rights['exploration_author'] = True
             return users_which_have_rights
 
@@ -601,6 +603,6 @@ def check_can_edit_suggestion(credentials_to_check, user_id):
             return users_which_have_rights
 
         if rights_manager.check_can_edit_activity(
-                user_id, collection_rights):
+                user, collection_rights):
             users_which_have_rights['collection_author'] = True
             return users_which_have_rights

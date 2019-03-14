@@ -17,11 +17,11 @@
  */
 
 oppia.factory('ShowSuggestionModalForEditorViewService', [
-  '$log', '$rootScope', '$uibModal',
+  '$http', '$log', '$rootScope', '$uibModal',
   'ExplorationDataService', 'ExplorationStatesService',
   'StateObjectFactory', 'SuggestionModalService',
   'ThreadDataService', 'UrlInterpolationService',
-  function($log, $rootScope, $uibModal,
+  function($http, $log, $rootScope, $uibModal,
       ExplorationDataService, ExplorationStatesService,
       StateObjectFactory, SuggestionModalService,
       ThreadDataService, UrlInterpolationService) {
@@ -68,61 +68,71 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
         },
         controller: 'ShowSuggestionModalForEditorView'
       }).result.then(function(result) {
-        ThreadDataService.resolveSuggestion(
-          activeThread.threadId, result.action, result.commitMessage,
-          result.reviewMessage, result.audioUpdateRequired, function() {
-            ThreadDataService.fetchThreads(function() {
-              setActiveThread(activeThread.threadId);
-            });
-            var suggestion = activeThread.getSuggestion();
+        var suggestion = activeThread.getSuggestion();
+        var stateName = suggestion.stateName;
 
-            var stateName = suggestion.stateName;
-            // Immediately update editor to reflect accepted suggestion.
-            if (
-              result.action === SuggestionModalService.ACTION_ACCEPT_SUGGESTION
-            ) {
-              var stateDict = ExplorationDataService.data.states[stateName];
-              var state = StateObjectFactory.createFromBackendDict(
-                stateName, stateDict);
-              state.content.setHtml(
-                activeThread.getReplacementHtmlFromSuggestion());
-              if (result.audioUpdateRequired) {
-                state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
-                  state.content.getContentId());
-              }
-              ExplorationDataService.data.version += 1;
-              ExplorationStatesService.setState(stateName, state);
-              $rootScope.$broadcast('refreshVersionHistory', {
-                forceRefresh: true
-              });
-              $rootScope.$broadcast('refreshStateEditor');
-            } else if (resul.action === 'edit' &&
+        if (result.action === 'edit' &&
                 result.suggestionType === 'edit_exploration_state_content') {
-              url = UrlInterpolationService.interpolateUrl(
-                EDIT_SUGGESTION_URL_TEMPLATE, {
-                  target_type: activeThread.suggestion.targetType,
-                  target_id: activeThread.suggestion.targetId,
-                  suggestion_id: activeThread.suggestion.suggestionId,
-                }
-              )
-            data = {
-              action: result.action,
-              summary_message: result.summaryMessage,
-              change: {
-                cmd: 'edit_state_property',
-                property_name: 'content',
-                state_name: stateName,
-                old_value: result.oldContent,
-                new_value: {
-                  html: result.newSuggestionHtml
-                }
+          url = UrlInterpolationService.interpolateUrl(
+            EDIT_SUGGESTION_URL_TEMPLATE, {
+              target_type: activeThread.suggestion.targetType,
+              target_id: activeThread.suggestion.targetId,
+              suggestion_id: activeThread.suggestion.suggestionId,
+            }
+          ),
+          data = {
+            action: result.action,
+            summary_message: result.summaryMessage,
+            change: {
+              cmd: 'edit_state_property',
+              property_name: 'content',
+              state_name: stateName,
+              old_value: result.oldContent,
+              new_value: {
+                html: result.newSuggestionHtml
               }
-            };
-            console.log(data)
+            }
+          };
+          // Amkaing ajax request for update suggestion
+          $http.put(url, data);
+
+          if (response) {
+            suggestion.newValue.html = response.data.new_value;
           }
-          }, function() {
-            $log.error('Error resolving suggestion');
-          });
+        } else {
+          ThreadDataService.resolveSuggestion(
+            activeThread.threadId, result.action, result.commitMessage,
+            result.reviewMessage, result.audioUpdateRequired, function() {
+              ThreadDataService.fetchThreads(function() {
+                setActiveThread(activeThread.threadId);
+              });
+
+              // Immediately update editor to reflect accepted suggestion.
+              if (
+                result.action === (
+                  SuggestionModalService.ACTION_ACCEPT_SUGGESTION)
+              ) {
+                var stateDict = ExplorationDataService.data.states[stateName];
+                var state = StateObjectFactory.createFromBackendDict(
+                  stateName, stateDict);
+                state.content.setHtml(
+                  activeThread.getReplacementHtmlFromSuggestion());
+                if (result.audioUpdateRequired) {
+                  (state.contentIdsToAudioTranslations.
+                    markAllAudioAsNeedingUpdate(
+                      state.content.getContentId()));
+                }
+                ExplorationDataService.data.version += 1;
+                ExplorationStatesService.setState(stateName, state);
+                $rootScope.$broadcast('refreshVersionHistory', {
+                  forceRefresh: true
+                });
+                $rootScope.$broadcast('refreshStateEditor');
+              }
+            }, function() {
+              $log.error('Error resolving suggestion');
+            });
+        }
       });
     };
 

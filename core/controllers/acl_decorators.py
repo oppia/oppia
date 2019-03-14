@@ -335,7 +335,7 @@ def can_edit_suggestion(handler):
 
         users_which_having_rights = (
             suggestion_services.check_can_edit_suggestion(
-                credentials_to_check, self.user_id))
+                credentials_to_check, self.user_id, self.user))
 
         if users_which_having_rights['author']:
             return handler(self, credentials_to_check['suggestion_id'])
