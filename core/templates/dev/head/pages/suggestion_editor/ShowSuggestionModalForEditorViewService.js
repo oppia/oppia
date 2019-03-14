@@ -30,8 +30,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
       'editor_view_suggestion_modal_directive.html'
     );
     var EDIT_SUGGESTION_URL_TEMPLATE = (
-      '/suggestionactionhandler/edit/<target_type>/<target_id>/' +
-      '<suggestion_id>'
+      '/suggestionactionhandler/edit/<suggestion_id>'
     );
 
     var _showEditStateContentSuggestionModal = function(
@@ -75,8 +74,6 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
                 result.suggestionType === 'edit_exploration_state_content') {
           url = UrlInterpolationService.interpolateUrl(
             EDIT_SUGGESTION_URL_TEMPLATE, {
-              target_type: activeThread.suggestion.targetType,
-              target_id: activeThread.suggestion.targetId,
               suggestion_id: activeThread.suggestion.suggestionId,
             }
           ),

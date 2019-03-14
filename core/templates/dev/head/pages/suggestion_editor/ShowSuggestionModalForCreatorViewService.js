@@ -64,8 +64,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
         var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/resubmit/<suggestion_id>');
         var EDIT_SUGGESTION_URL_TEMPLATE = (
-          '/suggestionactionhandler/edit/<target_type>/<target_id>/' +
-          '<suggestion_id>');
+          '/suggestionactionhandler/edit/<suggestion_id>');
         var HANDLE_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/<target_type>/<target_id>/<suggestion_id>');
 
@@ -95,8 +94,6 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
           result.suggestionType === 'edit_exploration_state_content') {
           url = UrlInterpolationService.interpolateUrl(
             EDIT_SUGGESTION_URL_TEMPLATE, {
-              target_type: activeThread.suggestion.targetType,
-              target_id: activeThread.suggestion.targetId,
               suggestion_id: activeThread.suggestion.suggestionId,
             }
           );

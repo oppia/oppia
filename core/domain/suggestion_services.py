@@ -557,52 +557,41 @@ def check_can_resubmit_suggestion(suggestion_id, user_id):
     return suggestion.author_id == user_id
 
 
-def check_can_edit_suggestion(credentials_to_check, user_id, user):
+def check_can_edit_suggestion(user, suggestion_id):
     """Checks whether the user have permission to edit suggestion or not.
 
     Args:
-        credentials_to_check: dict(str, str). Dict having key value pairs that
-            are needed for checking whether a user have permission or not for
-            edit suggestion.
-        user_id: str. Id of a user.
         user: UserActionsInfo. Object having user_id, role and actions for
             given user.
+        suggestion_id: str. Id of a suggestion.
 
     Returns:
         users_which_have_rights: dict(str, str). Dict whose key value pairs
             describes whether a user have permisson or not.
     """
 
-    suggestion_id = credentials_to_check['suggestion_id']
-    users_which_have_rights = {'author': False, 'exploration_author': False,
-                               'collection_author': False,
-                               'page_not_found': False}
     suggestion = get_suggestion_by_id(suggestion_id)
+    user_id = user.user_id
 
     if suggestion.author_id == user_id:
-        users_which_have_rights['author'] = True
-        return users_which_have_rights
+        return True
 
-    if credentials_to_check['target_type'] == 'exploration':
+    if suggestion.target_type == 'exploration':
         exploration_rights = rights_manager.get_exploration_rights(
-            credentials_to_check['target_id'])
+            suggestion.target_id)
         if exploration_rights is None:
-            users_which_have_rights['page_not_found'] = True
-            return users_which_have_rights
+            return False
 
         if rights_manager.check_can_edit_activity(
                 user, exploration_rights):
-            users_which_have_rights['exploration_author'] = True
-            return users_which_have_rights
+            return True
 
-    elif credentials_to_check['target_type'] == 'collection':
+    elif suggestion.target_type == 'collection':
         collection_rights = rights_manager.get_collection_rights(
-            credentials_to_check['target_id'])
+            suggestion.target_id)
         if collection_rights is None:
-            users_which_have_rights['page_not_found'] = True
-            return users_which_have_rights
+            return False
 
         if rights_manager.check_can_edit_activity(
                 user, collection_rights):
-            users_which_have_rights['collection_author'] = True
-            return users_which_have_rights
+            return True

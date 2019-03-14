@@ -314,11 +314,11 @@ def can_edit_suggestion(handler):
             a user has permission to edit a given suggestion.
     """
 
-    def test_can_edit_suggestion(self, **kwargs):
+    def test_can_edit_suggestion(self, suggestion_id):
         """Checks if the user can edit the suggestion.
 
         Args:
-            **kwargs: dict(str, str). Credentials to check for permisssion.
+            suggestion_id: str. Id of a suggestion.
 
         Returns:
             *. The return value of the decorated function.
@@ -329,36 +329,17 @@ def can_edit_suggestion(handler):
             UnauthorizedUserException: The user does not have
                 credentials to edit a suggestion.
         """
-        credentials_to_check = kwargs
+
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        users_which_having_rights = (
-            suggestion_services.check_can_edit_suggestion(
-                credentials_to_check, self.user_id, self.user))
+        user_have_right = suggestion_services.check_can_edit_suggestion(
+            self.user, suggestion_id)
+        if user_have_right:
+            return handler(self, suggestion_id)
 
-        if users_which_having_rights['author']:
-            return handler(self, credentials_to_check['suggestion_id'])
-
-        elif credentials_to_check['target_type'] == 'exploration':
-            if users_which_having_rights['page_not_found']:
-                raise base.UserFacingExceptions.PageNotFoundException
-
-            if users_which_having_rights['exploration_author']:
-                return handler(self, credentials_to_check['suggestion_id'])
-            else:
-                raise base.UserFacingExceptions.UnauthorizedUserException(
-                    'You do not have credentials to edit this suggestion.')
-
-        elif credentials_to_check['target_type'] == 'collection':
-            if users_which_having_rights['page_not_found']:
-                raise base.UserFacingExceptions.PageNotFoundException
-
-            if users_which_having_rights['collection_author']:
-                return handler(self, credentials_to_check['suggestion_id'])
-            else:
-                raise base.UserFacingExceptions.UnauthorizedUserException(
-                    'You do not have credentials to edit this suggestion.')
+        raise base.UserFacingExceptions.UnauthorizedUserException(
+            'You do not have credentials to edit this suggestion.')
 
     test_can_edit_suggestion.__wrapped__ = True
 
