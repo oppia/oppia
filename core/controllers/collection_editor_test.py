@@ -178,6 +178,9 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
         self.assertEqual(2, json_response['collection']['version'])
+        self.assertEqual(
+            self.json_dict['change_list'][0]['new_value'],
+            json_response['collection']['title'])
         self.logout()
 
     def test_collection_rights_handler(self):
