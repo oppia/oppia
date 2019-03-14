@@ -471,8 +471,7 @@ oppia.directive('conversationSkin', [
                unwanted scrolling in the new card. */
             $location.hash(null);
             $scope.pendingCardWasSeenBefore = false;
-            if (
-              PlayerTranscriptService.hasEncounteredStateBefore(
+            if (PlayerTranscriptService.hasEncounteredStateBefore(
                 $scope.displayedCard.getStateName())) {
               $scope.pendingCardWasSeenBefore = true;
             }
