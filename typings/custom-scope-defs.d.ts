@@ -45,6 +45,8 @@ interface ICustomScope extends ng.IScope {
     showDropArea?: boolean;
     getRecorderController?: (() => void);
     openAddAudioTranslationModal?: ((files: any) => void);
+    userIsGuest?: boolean;
+    dropAreaIsAccessible?: boolean;
 
     // ConversationSkinDirective.ts
     directiveTemplate?: string;

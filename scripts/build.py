@@ -70,11 +70,11 @@ UGLIFY_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
 # Files with these extensions shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')
+FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.unmin.js')
 # Files with these name patterns shouldn't be moved to build directory, and will
-# not be served in production. (This includes protractor.js files in
+# not be served in production. (This includes protractor.ts files in
 # /extensions.)
-JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
+TS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.ts', 'protractor.ts')
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -89,6 +89,13 @@ FILEPATHS_NOT_TO_RENAME = (
 # JS hashes object.
 FILEPATHS_PROVIDED_TO_FRONTEND = (
     'images/*', 'videos/*', 'i18n/*', '*_directive.html', '*.png', '*.json')
+
+# When deleting files from staging directory, js suffix is replaced with ts
+# since files in source dir are ts files and hashes are mapped to them. The
+# files which are present as js files in source directory are listed here
+# to avoid changing their suffix.
+FILES_NOT_TO_REPLACE_WITH_TS = (
+    'constants.js', 'rich_text_component_definitions.js')
 
 HASH_BLOCK_SIZE = 2**20
 
@@ -270,6 +277,7 @@ def _compare_file_count(first_dir_path, second_dir_path):
         ValueError: The source directory does not have the same file count as
             the target directory.
     """
+
     first_dir_file_count = get_file_count(first_dir_path)
     second_dir_file_count = get_file_count(second_dir_path)
     if first_dir_file_count != second_dir_file_count:
@@ -506,8 +514,8 @@ def hash_should_be_inserted(filepath):
 
 def should_file_be_built(filepath):
     """Determines if the file should be built.
-        - JS files: Returns False if filepath matches with pattern in
-        JS_FILENAME_SUFFIXES_TO_IGNORE, else returns True.
+        - TS files: Returns False if filepath matches with pattern in
+        TS_FILENAME_SUFFIXES_TO_IGNORE, else returns True.
         - Python files: Returns False if filepath ends with _test.py, else
         returns True
         - Other files: Returns False if filepath matches with pattern in
@@ -519,9 +527,9 @@ def should_file_be_built(filepath):
     Returns:
         bool. True if filepath should be built, else False.
     """
-    if filepath.endswith('.js'):
+    if filepath.endswith('.ts'):
         return not any(
-            filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
+            filepath.endswith(p) for p in TS_FILENAME_SUFFIXES_TO_IGNORE)
     elif filepath.endswith('_test.py'):
         return False
     else:
@@ -702,6 +710,8 @@ def minify_func(source_path, target_path, file_hashes, filename):
         - HTML files: Remove whitespaces, interpolates paths in HTML to include
         hashes in source directory and save edited file at target directory.
         - CSS or JS files: Minify and save at target directory.
+        - TS files: Compile TS file and save minified JS file at target
+            directory.
         - Other files: Copy the file from source directory to target directory.
     """
     if filename.endswith('.html'):
@@ -712,6 +722,14 @@ def minify_func(source_path, target_path, file_hashes, filename):
     elif filename.endswith('.css') or filename.endswith('.js'):
         print 'Minifying %s' % source_path
         _minify(source_path, target_path)
+    elif filename.endswith('.ts'):
+        compile_typescript_files(source_path)
+        compiled_source_path = target_path.replace('.ts', '.js')
+        compiled_target_path = target_path.replace('.ts', '.unmin.js')
+        os.path.rename(compiled_source_path, compiled_target_path)
+        minified_target_path = target_path.replace('.ts', '.js')
+        print 'Minifying %s' % compiled_target_path
+        _minify(compiled_target_path, minified_target_path)
     else:
         print 'Copying %s' % source_path
         safe_copy_file(source_path, target_path)
@@ -836,6 +854,10 @@ def generate_delete_tasks_to_remove_deleted_files(
             if not any(
                     target_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 relative_path = os.path.relpath(target_path, staging_directory)
+                # Replace .js with .ts in files since source files are ts files
+                # but files in staging directory are compiled js files.
+                if not relative_path.endswith(FILES_NOT_TO_REPLACE_WITH_TS):
+                    relative_path = relative_path.replace('.js', '.ts')
                 # Remove file found in staging directory but not in source
                 # directory, i.e. file not listed in hash dict.
                 if relative_path not in source_dir_hashes:
@@ -926,6 +948,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             source_dir, staging_dir, filenames_to_always_rebuild, file_hashes)
 
         dev_dir_hashes = get_file_hashes(source_dir)
+
         # Clean up files in staging directory that cannot be found in file
         # hashes dictionary.
         _execute_tasks(generate_delete_tasks_to_remove_deleted_files(
@@ -1101,6 +1124,28 @@ def generate_build_directory():
     print 'Build completed.'
 
 
+def compile_typescript_files(filepath):
+
+    print 'Compiling %s...' % filepath
+
+    out_dir = 'backend_prod_files'
+    allow_js = 'true'
+    lib = 'es2017,dom'
+    no_implicit_use_strict = 'true'
+    root_dir = '.'
+    skip_lib_check = 'true'
+    target = 'es5'
+    type_roots = '../node_modules/@types'
+
+    cmd = (
+        '../node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+        '-lib %s -noImplicitUseStrict %s -rootDir %s -skipLibCheck %s '
+        '-target %s -typeRoots %s %s typings/*') % (
+            out_dir, allow_js, lib, no_implicit_use_strict, root_dir,
+            skip_lib_check, target, type_roots, filepath)
+    subprocess.check_call(cmd, shell=True)
+
+
 def build():
     """The main method of this script.
 
@@ -1114,10 +1159,17 @@ def build():
     parser.add_option(
         '--minify_third_party_libs_only', action='store_true', default=False,
         dest='minify_third_party_libs_only')
+    parser.add_option(
+        '--compile', action='store_true', default=False, dest='compile')
     options = parser.parse_args()[0]
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+
+    if not options.prod_mode or options.compile:
+        print 'Compiling typescript files...'
+        cmd = '../node_modules/typescript/bin/tsc'
+        subprocess.check_call(cmd)
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
