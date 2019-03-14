@@ -29,12 +29,12 @@ module.exports = function(config) {
       'third_party/static/angular-recorder-1.4.1/dist' +
       '/angular-audio-recorder.min.js',
       generatedJs,
-      'core/templates/dev/head/*.js',
+      'core/templates/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
-      'core/templates/dev/head/**/*.js',
-      'core/templates/dev/head/**/*_directive.html',
+      'core/templates/**/*.js',
+      'core/templates/**/*_directive.html',
       'extensions/**/*.js',
       {
         pattern: 'extensions/**/*.png',
@@ -58,7 +58,7 @@ module.exports = function(config) {
       }
     ],
     exclude: [
-      'core/templates/dev/head/**/*-e2e.js',
+      'core/templates/**/*-e2e.js',
       'extensions/**/protractor.js',
       'backend_prod_files/extensions/**'
     ],
@@ -70,14 +70,14 @@ module.exports = function(config) {
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
-      'core/templates/dev/head/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+      'core/templates/!(*Spec).js': ['coverage'],
+      'core/templates/**/!(*Spec).js': ['coverage'],
       'extensions/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
-      'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
+      'core/templates/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures']
     },

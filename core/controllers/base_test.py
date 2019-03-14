@@ -465,7 +465,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         """Tests that keys in HTML files are present in en.json."""
         en_key_list = self._extract_keys_from_json_file('en.json')
         dirs_to_search = [
-            os.path.join('core', 'templates', 'dev', 'head'),
+            os.path.join('core', 'templates'),
             'extensions']
         files_checked = 0
         missing_keys_count = 0

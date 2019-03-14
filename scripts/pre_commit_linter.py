@@ -155,7 +155,7 @@ BAD_PATTERNS_JS_REGEXP = [
         'regexp': r'templateUrl: \'',
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
-            'core/templates/dev/head/pages/exploration_player/'
+            'core/templates/pages/exploration_player/'
             'FeedbackPopupDirective.js'
         ),
         'excluded_dirs': (
@@ -245,13 +245,13 @@ EXCLUDED_PATHS = (
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
     'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/ExpressionParserService.js')
+    'core/templates/expressions/ExpressionParserService.js')
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.js',
-    'core/templates/dev/head/mathjaxConfig.js',
+    'core/templates/mathjaxConfig.js',
     'assets/constants.js',
     'assets/rich_text_components_definitions.js')
 
@@ -752,7 +752,7 @@ def _pre_commit_linter(all_files):
     config_path_for_css_in_html = os.path.join(
         parent_dir, 'oppia', '.stylelintrc')
     config_path_for_oppia_css = os.path.join(
-        parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
+        parent_dir, 'oppia', 'core', 'templates',
         'css', '.stylelintrc')
     if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
         print ''
