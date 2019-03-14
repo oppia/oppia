@@ -24,10 +24,6 @@ oppia.factory('UserService', [
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
     var userInfo = null;
-
-    // TODO(userIsLoggedIn): Find a way to substitute out constants.DEV_MODE
-    // so that we can check ACSID, SACSID cookies.
-    // if DEV_MODE = false, we have to check ACSID and SACSID cookies.
     var currentUrl = $window.location.href;
     var isUserLoggedIn = function() {
       var userIsLoggedIn_ = $cookies.get('dev_appserver_login') !== undefined ||
@@ -39,7 +35,6 @@ oppia.factory('UserService', [
       return userIsLoggedIn_;
     };
     var getUserInfoAsync = function() {
-      // var userIsLoggedIn = window.userIsLoggedIn;
       var userIsLoggedIn = isUserLoggedIn();
       if (userIsLoggedIn) {
         if (userInfo) {
@@ -81,15 +76,13 @@ oppia.factory('UserService', [
           data: newProfileImageDataUrl
         });
       },
-      getLoginAndLogoutUrls: function() {
+      getLoginUrlAsync: function() {
         var urlParameters = {
           current_url: $window.location.href
         };
         return $http.get('/url_handler', {params: urlParameters}).then(
           function(response) {
-            return {
-              login_url: response.data.login_url,
-            };
+            return response.data.login_url;
           }
         );
       },

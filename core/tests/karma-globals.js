@@ -78,8 +78,7 @@ var GLOBALS = {
     id: 'en',
     text: 'English'
   }],
-  GCS_RESOURCE_BUCKET_NAME: null,
-  userIsLoggedIn: true
+  GCS_RESOURCE_BUCKET_NAME: null
 };
 
 /* hashes for UrlInterpolationService tests */
