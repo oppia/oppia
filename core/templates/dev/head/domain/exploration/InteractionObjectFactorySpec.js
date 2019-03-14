@@ -287,5 +287,24 @@ describe('Interaction object factory', function() {
     var otherInteraction = iof.createFromBackendDict(otherInteractionDict);
     testInteraction.copy(otherInteraction);
     expect(testInteraction).toEqual(otherInteraction);
+    changedOtherInteractionDict = {
+      answer_groups: newAnswerGroups,
+      confirmed_unclassified_answers: [],
+      customization_args: [],
+      default_outcome: newDefaultOutcome,
+      hints: newHintDict,
+      id: 'interaction_id_new_changed',
+      solution: newSolutionDict
+    };
+    otherInteraction = iof.createFromBackendDict(changedOtherInteractionDict);
+    expect(testInteraction).toEqual(iof.createFromBackendDict({
+      answer_groups: newAnswerGroups,
+      confirmed_unclassified_answers: [],
+      customization_args: [],
+      default_outcome: newDefaultOutcome,
+      hints: newHintDict,
+      id: 'interaction_id_new',
+      solution: newSolutionDict
+    }));
   });
 });
