@@ -171,7 +171,7 @@ def edit_suggestion(suggestion, change_object):
 
     Args:
         suggestion: obj. The suggestion to be changed.
-        change_object: dict(str, str). Object of change in suugestion.
+        change_object: obj. Object of change in suugestion.
     """
     suggestion.pre_update_validate(change_object)
     suggestion.change = change_object
