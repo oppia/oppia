@@ -1023,15 +1023,15 @@ class QuestionPlayerHandler(base.BaseHandler):
         """Handles GET request."""
         start_cursor = self.request.get('start_cursor')
         skill_ids = self.request.get('skill_ids').split(',')
-        question_count = int(self.request.get('question_count'))
+        question_count = self.request.get('question_count')
 
-        if question_count <= 0:
+        if not question_count.isdigit() or int(question_count) <= 0:
             raise self.InvalidInputException("question count has " +
                                              "to be greater than 0")
 
         questions, _, next_start_cursor = (
             question_services.get_questions_and_skill_descriptions_by_skill_ids(
-                question_count,
+                int(question_count),
                 skill_ids,
                 start_cursor)
         )
