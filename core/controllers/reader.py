@@ -1018,17 +1018,24 @@ class QuestionPlayerHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET request."""
         start_cursor = self.request.get('start_cursor')
         skill_ids = self.request.get('skill_ids').split(',')
         question_count = int(self.request.get('question_count'))
+
+        if question_count <= 0:
+            raise self.InvalidInputException("question count has " +
+                                             "to be greater than 0")
+
         questions, _, next_start_cursor = (
             question_services.get_questions_and_skill_descriptions_by_skill_ids(
                 question_count,
                 skill_ids,
                 start_cursor)
         )
+
         question_dicts = [question.to_dict() for question in questions]
         self.values.update({
             'question_dicts': question_dicts,
