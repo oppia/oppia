@@ -24,13 +24,13 @@ oppia.directive('searchBar', [
         '/pages/library/' +
         'search_bar_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', '$window', '$location',
-        '$translate', 'ConstructTranslationIdsService', 'DebouncerService',
+        '$location', '$rootScope', '$scope', '$timeout', '$translate',
+        '$window', 'ConstructTranslationIdsService', 'DebouncerService',
         'HtmlEscaperService', 'LanguageUtilService', 'NavigationService',
         'SearchService', 'UrlService', 'SEARCH_DROPDOWN_CATEGORIES',
         function(
-            $scope, $rootScope, $timeout, $window, $location,
-            $translate, ConstructTranslationIdsService, DebouncerService,
+            $location, $rootScope, $scope, $timeout, $translate,
+            $window, ConstructTranslationIdsService, DebouncerService,
             HtmlEscaperService, LanguageUtilService, NavigationService,
             SearchService, UrlService, SEARCH_DROPDOWN_CATEGORIES) {
           $scope.isSearchInProgress = SearchService.isSearchInProgress;
