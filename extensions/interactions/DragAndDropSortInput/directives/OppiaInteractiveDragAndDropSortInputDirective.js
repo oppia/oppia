@@ -50,7 +50,7 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
 
           // Make list of dicts from the list of choices.
           for (var i = 0; i < $scope.choices.length; i++) {
-            $scope.list.push({title: $scope.choices[i], items: []});
+            $scope.list.push({title: $scope.choices[i].html, items: []});
           }
 
           $scope.treeOptions = {

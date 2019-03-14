@@ -79,12 +79,12 @@ oppia.filter('parameterizeRuleDescription', [
               for (var j = 0; j < key[i].length; j++) {
                 replacementText += $filter('formatRtePreview')(key[i][j]);
                 if (j < key[i].length - 1) {
-                  replacementText += ',';
+                  replacementText += ', ';
                 }
               }
               replacementText += ']';
               if (i < key.length - 1) {
-                replacementText += ',';
+                replacementText += ', ';
               }
             }
             replacementText += ']';

@@ -29,7 +29,9 @@ class DragAndDropSortInput(base.BaseInteraction):
     narrow_instructions = 'Drag and drop items'
     needs_summary = True
     can_have_solution = True
+    can_have_translations = True
     show_generic_submit_button = True
+    _path_to_customization_args_content_id = ['choices', 'value']
 
     _customization_arg_specs = [{
         'name': 'choices',
@@ -49,18 +51,17 @@ class DragAndDropSortInput(base.BaseInteraction):
                 'min_value': 1
             }],
             'items': {
-                'type': 'html',
-                'ui_config': {
-                    'hide_complex_extensions': True,
-                    'placeholder': 'Enter an option for the learner to drag' +
-                                   ' and drop.',
-                },
+                'type': 'custom',
+                'obj_type': 'TranslatableHtml',
             },
             'ui_config': {
                 'add_element_text': 'Add a new item',
             }
         },
-        'default_value': [''],
+        'default_value': [{
+            'content_id': '',
+            'html': ''
+        }],
     }, {
         'name': 'allowMultipleItemsInSamePosition',
         'description': 'Allow multiple sort items in the same position',
