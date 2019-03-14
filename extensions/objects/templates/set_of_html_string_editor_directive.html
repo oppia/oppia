@@ -12,7 +12,7 @@
   <div ng-repeat="choice in choices track by $index">
     <md-checkbox ng-click="toggleSelection($index)"
                  ng-model="selections[$index]"
-                 style="max-width: 300px;" aria-label="choice">
+                 style="max-width: 300px;" aria-label="choice.val">
       <span>
         <angular-html-bind html-data="choice.id">
         </angular-html-bind>

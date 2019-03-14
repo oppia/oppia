@@ -110,8 +110,8 @@ oppia.factory('StateEditorService', [
             interactionId === 'DragAndDropSortInput') {
           return customizationArgs.choices.value.map(function(val) {
             return {
-              val: val,
-              label: val
+              val: val.html,
+              label: val.html
             };
           });
         } else {

@@ -1464,7 +1464,6 @@ class State(object):
             raise Exception(
                 'Expected interaction_answer_groups to be a list, received %s'
                 % answer_groups_list)
-
         interaction_answer_groups = []
         old_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
@@ -1514,7 +1513,6 @@ class State(object):
                 answer_group.rule_specs.append(rule_spec)
             interaction_answer_groups.append(answer_group)
         self.interaction.answer_groups = interaction_answer_groups
-
         new_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]

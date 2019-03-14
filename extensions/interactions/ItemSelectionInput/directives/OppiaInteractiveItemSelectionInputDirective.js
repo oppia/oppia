@@ -51,7 +51,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
           $scope.userSelections = {};
 
           for (var i = 0; i < $scope.choices.length; i++) {
-            $scope.userSelections[$scope.choices[i]] = false;
+            $scope.userSelections[$scope.choices[i].html] = false;
           }
 
           $scope.displayCheckboxes = ($scope.maxAllowableSelectionCount > 1);
@@ -78,7 +78,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
           };
 
           $scope.submitMultipleChoiceAnswer = function(index) {
-            $scope.userSelections[$scope.choices[index]] = true;
+            $scope.userSelections[$scope.choices[index].html] = true;
             $scope.submitAnswer($scope.userSelections);
           };
 
@@ -88,7 +88,6 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
                 return $scope.userSelections[obj];
               }
             );
-
             CurrentInteractionService.onSubmit(
               answers, itemSelectionInputRulesService);
           };

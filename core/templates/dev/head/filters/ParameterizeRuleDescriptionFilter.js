@@ -43,7 +43,6 @@ oppia.filter('parameterizeRuleDescription', [
 
       var inputs = rule.inputs;
       var finalDescription = description;
-
       var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
       var iter = 0;
       while (true) {
@@ -68,7 +67,7 @@ oppia.filter('parameterizeRuleDescription', [
             for (var i = 0; i < key.length; i++) {
               replacementText += $filter('formatRtePreview')(key[i]);
               if (i < key.length - 1) {
-                replacementText += ',';
+                replacementText += ', ';
               }
             }
             replacementText += ']';

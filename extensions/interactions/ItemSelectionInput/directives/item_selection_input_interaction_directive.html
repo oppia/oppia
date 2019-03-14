@@ -17,10 +17,10 @@
     <div class="item-selection-input-container" ng-repeat="choice in choices track by $index">
       <div ng-if="displayCheckboxes">
         <label class="item-selection-input-item">
-          <md-checkbox class="item-selection-input-checkbox" ng-model="userSelections[choice]" ng-checked="userSelections[choice]"
-                       ng-change="onToggleCheckbox()" ng-disabled="preventAdditionalSelections && !userSelections[choice]" tabindex="0">
+          <md-checkbox class="item-selection-input-checkbox" ng-model="userSelections[choice.html]" ng-checked="userSelections[choice.html]"
+                       ng-change="onToggleCheckbox()" ng-disabled="preventAdditionalSelections && !userSelections[choice.html]" tabindex="0">
             <span>
-              <angular-html-bind html-data="choice">
+              <angular-html-bind html-data="choice.html">
               </angular-html-bind>
             </span>
           </md-checkbox>
@@ -36,7 +36,7 @@
           </div>
           <div class="multiple-choice-content-container">
             <span>
-              <angular-html-bind class="protractor-test-multiple-choice-option" html-data="choice">
+              <angular-html-bind class="protractor-test-multiple-choice-option" html-data="choice.html">
               </angular-html-bind>
             </span>
           </div>

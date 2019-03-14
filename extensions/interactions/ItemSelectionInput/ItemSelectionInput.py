@@ -31,9 +31,11 @@ class ItemSelectionInput(base.BaseInteraction):
     # Radio buttons get unselected when specifying a solution. This needs to be
     # fixed before solution feature can support this interaction.
     can_have_solution = False
+    can_have_translations = True
     # ItemSelectionInput's submit button is dynamic and is handled
     # separately.
     show_generic_submit_button = False
+    _path_to_customization_args_content_id = ['choices', 'value']
 
     _customization_arg_specs = [{
         'name': 'minAllowableSelectionCount',
@@ -63,17 +65,17 @@ class ItemSelectionInput(base.BaseInteraction):
         'schema': {
             'type': 'list',
             'items': {
-                'type': 'html',
-                'ui_config': {
-                    'hide_complex_extensions': True,
-                    'placeholder': 'Sample item answer',
-                },
+                'type': 'custom',
+                'obj_type': 'TranslatableHtml',
             },
             'ui_config': {
                 'add_element_text': 'Add item for selection',
             }
         },
-        'default_value': [''],
+        'default_value': [{
+            'content_id': '',
+            'html': ''
+        }],
     }]
 
     _answer_visualization_specs = [{

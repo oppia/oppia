@@ -12,7 +12,7 @@
 <ul ng-if="answer.length > 1">
   <li ng-repeat="response in answer track by $index">
     <span>
-      <angular-html-bind html-data="response">
+      <angular-html-bind html-data="response.html">
       </angular-html-bind>
     </span>
   </li>

@@ -33,8 +33,8 @@ describe('MultipleChoiceInputValidationService', function() {
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
-        html: '',
-        audio_translations: {}
+        html: 'Feedback',
+        content_id: 'feedback_1'
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -46,7 +46,7 @@ describe('MultipleChoiceInputValidationService', function() {
       dest: currentState,
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: 'feedback_2'
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -60,8 +60,8 @@ describe('MultipleChoiceInputValidationService', function() {
           content_id: 'interaction_123',
           html: 'Option 1'
         }, {
-          content_id: 'interaction_123',
-          html: 'Option 1'
+          content_id: 'interaction_124',
+          html: 'Option 2'
         }]
       }
     };
