@@ -923,7 +923,7 @@ class LintChecksManager(object):
             file_content = FileCache.read(filepath).decode('utf-8')
 
             # Use esprima to parse a JS file.
-            parsed_js_files[filepath] = esprima.parseScript(file_content)
+            parsed_js_files[filepath] = esprima.parseScript(file_content, comment=True)
         return parsed_js_files
 
     def _lint_all_files(self):
@@ -1195,6 +1195,53 @@ class LintChecksManager(object):
 
             print ''
 
+        return summary_messages
+
+    def _check_js_file_overview(self):
+        """This function checks the JS files for the presence of their
+        respective file overviews.
+        """
+        if self.verbose_mode_enabled:
+            print 'Starting JS file overview check'
+            print '----------------------------------------'
+
+        summary_messages = []
+        failed = False
+        files_to_check = [
+            filepath for filepath in self.all_filepaths if (
+                filepath.endswith('.js'))
+            and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                        EXCLUDED_PATHS)]
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            for filepath in files_to_check:
+                parsed_script = self.parsed_js_files[filepath]
+                file_overview_found = False
+                for comment in parsed_script.comments:
+                    if '@fileoverview' in comment.value:
+                        file_overview_found = True
+                        if comment.type != 'Block':
+                            failed = True
+                            print ('%s --> File overview must be in block '
+                                'comments.' % filepath)
+                if not file_overview_found:
+                    failed = True
+                    print '%s --> Missing file overview.' % filepath
+                
+            if failed:
+                summary_message = (
+                    '%s  JS file overview check failed' % (
+                        _MESSAGE_TYPE_FAILED))
+                print summary_message
+            else:
+                summary_message = (
+                    '%s  JS file overview check passed' % (
+                        _MESSAGE_TYPE_SUCCESS))
+                print summary_message
+
+        print ''
+
+        summary_messages.append(summary_message)
         return summary_messages
 
     def _check_sorted_dependencies(self):
@@ -1937,6 +1984,7 @@ class LintChecksManager(object):
 
         linter_messages = self._lint_all_files()
         directive_scope_messages = self._check_directive_scope()
+        file_overview_messages = self._check_js_file_overview()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
         controller_dependency_messages = (
@@ -1958,7 +2006,7 @@ class LintChecksManager(object):
             directive_scope_messages + sorted_dependencies_messages +
             controller_dependency_messages +
             html_directive_name_messages + import_order_messages +
-            docstring_messages + comment_messages +
+            file_overview_messages + docstring_messages + comment_messages +
             html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
             copyright_notice_messages)
