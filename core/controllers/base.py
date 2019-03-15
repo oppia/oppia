@@ -239,8 +239,8 @@ class BaseHandler(webapp2.RequestHandler):
                 csrf_token = self.request.get('csrf_token')
                 if not csrf_token:
                     raise self.UnauthorizedUserException(
-                        'Missing CSRF Token , '
-                        'you are not authorized to view this page.')
+                        'Missing CSRF token. Changes were not saved,'
+                        'Please report this bug.')
 
                 is_csrf_token_valid = CsrfTokenManager.is_csrf_token_valid(
                     self.user_id, csrf_token)
