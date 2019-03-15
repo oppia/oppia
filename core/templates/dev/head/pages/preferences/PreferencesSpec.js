@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for the Preferences page.
+ */
+
 describe('Preferences Controller', function() {
   describe('PreferencesCtrl', function() {
     var scope, ctrl, $httpBackend, mockAlertsService, SUPPORTED_AUDIO_LANGUAGES;

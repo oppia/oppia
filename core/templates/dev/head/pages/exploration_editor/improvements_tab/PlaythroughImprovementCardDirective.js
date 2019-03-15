@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Playthrough Improvement card directive.
+ */
+
 oppia.directive('playthroughImprovementCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
