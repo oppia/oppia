@@ -593,3 +593,5 @@ def check_can_edit_suggestion(user, suggestion_id):
         if rights_manager.check_can_edit_activity(
                 user, collection_rights):
             return True
+
+    return False

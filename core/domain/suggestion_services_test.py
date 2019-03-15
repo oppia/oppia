@@ -475,6 +475,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'new_value': new_value,
             'old_value': 'new suggestion content'
         }
+
         suggestion = suggestion_services.get_suggestion_by_id(self.suggestion_id)
         change_cls = type(suggestion.change)
         change_object = change_cls(new_change_dict)
@@ -483,6 +484,55 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.get_suggestion_by_id(self.suggestion_id)
         suggestion_change_dict = suggestion.change.to_dict()
         self.assertEqual(new_change_dict, suggestion_change_dict)
+
+    def test_can_edit_suggestion(self):
+
+        EXP_ID = 'exp1'
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.login(self.EDITOR_EMAIL)
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                EXP_ID, editor_id, ['State 1', 'State 2', 'State 3'],
+                ['TextInput'], category='Algebra'))
+        editor = user_services.UserActionsInfo(editor_id)
+        rights_manager.publish_exploration(editor, EXP_ID)
+        rights_manager.assign_role_for_exploration(
+            editor, EXP_ID, owner_id,
+            rights_manager.ROLE_EDITOR)
+
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_thread_id):
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change, 'test description',
+                    self.reviewer_id)
+
+        user = user_services.UserActionsInfo(self.author_id)
+        can_edit = suggestion_services.check_can_edit_suggestion(user, self.suggestion_id)
+        self.assertEqual(can_edit, True)
+
+        user = user_services.UserActionsInfo(self.normal_user_id)
+        can_edit = suggestion_services.check_can_edit_suggestion(user, self.suggestion_id)
+        self.assertEqual(can_edit, False)
+
+        user = user_services.UserActionsInfo(owner_id)
+        can_edit = suggestion_services.check_can_edit_suggestion(user, self.suggestion_id)
+        self.assertEqual(can_edit, True)
+
+        user = user_services.UserActionsInfo(editor_id)
+        can_edit = suggestion_services.check_can_edit_suggestion(user, self.suggestion_id)
+        self.assertEqual(can_edit, True)
+
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     score_category = (
