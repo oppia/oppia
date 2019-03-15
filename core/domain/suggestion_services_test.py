@@ -452,6 +452,37 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.suggestion_id, self.normal_user_id))
         self.assertEqual(can_resubmit, False)
 
+    def test_edit_suggestion(self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_thread_id):
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change, 'test description',
+                    self.reviewer_id)
+        new_value = {
+            'html': 'edited suggestion'
+        }
+        new_change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': new_value,
+            'old_value': 'new suggestion content'
+        }
+        suggestion = suggestion_services.get_suggestion_by_id(self.suggestion_id)
+        change_cls = type(suggestion.change)
+        change_object = change_cls(new_change_dict)
+        suggestion_services.edit_suggestion(suggestion, change_object)
+
+        suggestion = suggestion_services.get_suggestion_by_id(self.suggestion_id)
+        suggestion_change_dict = suggestion.change.to_dict()
+        self.assertEqual(new_change_dict, suggestion_change_dict)
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     score_category = (
