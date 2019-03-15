@@ -52,6 +52,11 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
             }]
         }
 
+    def _mock_update_collection_raise_exception(
+            self, unused_committer_id, unused_collection_id, unused_change_list,
+            unused_commit_message):
+        """Mocks collection updates. Always fails by raising a validation error."""
+        raise utils.ValidationError()
 
 class CollectionEditorTests(BaseCollectionEditorControllerTests):
     COLLECTION_ID = '0'
@@ -170,11 +175,18 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
                 self.COLLECTION_ID))
         csrf_token = self.get_csrf_token_from_response(response)
 
-        json_response = self.put_json(
-            '%s/%s' % (
-                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
-                self.COLLECTION_ID),
-            self.json_dict, csrf_token=csrf_token)
+        url = '%s/%s' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID)
+        # Check PUT returns 500 when an exception is raised updating the
+        # colleection.
+        update_collection_swap = self.swap(
+            collection_services, 'update_collection',
+            self._mock_update_collection_raise_exception)
+        with update_collection_swap:
+            self.put_json(
+                url, self.json_dict, csrf_token=csrf_token,
+                expected_status_int=500)
+
+        json_response = self.put_json(url, self.json_dict, csrf_token=csrf_token)
 
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
         self.assertEqual(2, json_response['collection']['version'])
