@@ -1112,8 +1112,9 @@ class LintChecksManager(object):
         """This function checks that all directives have an explicit
         scope: {} and it should not be scope: true.
         """
-        print 'Starting directive scope check'
-        print '----------------------------------------'
+        if self.verbose_mode_enabled:
+            print 'Starting directive scope check'
+            print '----------------------------------------'
         # Select JS files which need to be checked.
         files_to_check = [
             filename for filename in self.all_filepaths if
@@ -1235,8 +1236,9 @@ class LintChecksManager(object):
         one component and and that the name of the component
         matches the filename.
         """
-        print 'Starting js component name and count check'
-        print '----------------------------------------'
+        if self.verbose_mode_enabled:
+            print 'Starting js component name and count check'
+            print '----------------------------------------'
         # Select JS files which need to be checked.
         files_to_check = [
             filename for filename in self.all_filepaths if not
@@ -1322,8 +1324,9 @@ class LintChecksManager(object):
         files are in following pattern: dollar imports, regular
         imports, and constant imports, all in sorted order.
         """
-        print 'Starting sorted dependencies check'
-        print '----------------------------------------'
+        if self.verbose_mode_enabled:
+            print 'Starting sorted dependencies check'
+            print '----------------------------------------'
         files_to_check = [
             filename for filename in self.all_filepaths if
             filename.endswith('.js') and not
