@@ -17,6 +17,7 @@
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -51,6 +52,11 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
                 'new_value': 'A new title'
             }]
         }
+
+    def _mock_get_learner_collection_dict_by_id_raise_exception(
+            self, unused_collection_id):
+        """Mocks get leaner collection. Always fails by raising an exception."""
+        raise Exception()
 
     def _mock_update_collection_raise_exception(
             self, unused_committer_id, unused_collection_id, unused_change_list,
@@ -111,20 +117,25 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         # Check that non-editors cannot access the editor data handler.
         # This is due to them not being whitelisted.
-        self.get_json(
-            '%s/%s' % (
-                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
-                self.COLLECTION_ID), expected_status_int=401)
+        url = '%s/%s' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID)
+        
+        self.get_json(url, expected_status_int=401)
 
         # Check that whitelisted users can access the data
         # from the editable_collection_data_handler.
         self.login(self.EDITOR_EMAIL)
 
-        json_response = self.get_json(
-            '%s/%s' % (
-                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
-                self.COLLECTION_ID))
+        json_response = self.get_json(url)
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
+
+        # Check GET returns when an exceptio is raised in get learner
+        # collection.
+        summary_services_swap = self.swap(
+            summary_services, 'get_learner_collection_dict_by_id',
+            self._mock_get_learner_collection_dict_by_id_raise_exception)
+        with summary_services_swap:
+            self.get_json(url, expected_status_int=404)
+
         self.logout()
 
     def test_editable_collection_handler_put_cannot_access(self):
