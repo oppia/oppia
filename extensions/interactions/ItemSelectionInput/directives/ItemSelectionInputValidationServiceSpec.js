@@ -178,12 +178,9 @@ describe('ItemSelectionInputValidationService', function() {
   });
 
   it(
-    'should expect more that 1 element to be  in the rule input, if the ' +
+    'should expect more that 1 element to be in the rule input, if the ' +
     '"proper subset" rule is used.',
     function() {
-      // Modify values of customization arguments to get warning.
-      customizationArguments.minAllowableSelectionCount.value = 0;
-
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, IsProperSubsetValidOption,
         goodDefaultOutcome);

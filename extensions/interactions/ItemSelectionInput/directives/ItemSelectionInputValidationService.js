@@ -131,6 +131,17 @@ oppia.factory('ItemSelectionInputValidationService', [
                         'please select only one answer choice.')
                     });
                   }
+                } else if (rule.type === 'IsProperSubsetOf') {
+                  handledAnswers[choiceIndex] = true;
+                  if (ruleInputs.length < 2) {
+                    warningsList.push({
+                      type: WARNING_TYPES.ERROR,
+                      message: (
+                        'In answer group ' + (answerIndex + 1) + ', ' +
+                        'rule ' + (ruleIndex + 1) + ', the "proper subset" ' +
+                        'rule must include at least 2 options.')
+                    });
+                  }
                 } else if (rule.type === 'ContainsAtLeastOneOf') {
                   handledAnswers[choiceIndex] = true;
                 } else if (rule.type ===
