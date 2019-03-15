@@ -202,7 +202,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         suggestion_id = suggestion['suggestion_id']
 
         # Change that needs to be done in submitted suggestion.
-        change = {
+        change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'State 3',
