@@ -262,9 +262,18 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         response = self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         csrf_token = self.get_csrf_token_from_response(response)
+
+        url = '/collection_editor_handler/unpublish/%s' % collection_id
+        # Check that a collection cannot be unpublished when the payload has no
+        # version.
+        self.put_json(
+            url, {}, csrf_token=csrf_token, expected_status_int=400)
+        # Check that a collection cannot be unpublished when the payload's version
+        # is different from the collection's version.
+        self.put_json(
+            url, {'version': -1}, csrf_token=csrf_token, expected_status_int=400)
+
         response_dict = self.put_json(
-            '/collection_editor_handler/unpublish/%s' % collection_id,
-            {'version': collection.version},
-            csrf_token=csrf_token)
+            url, {'version': collection.version}, csrf_token=csrf_token)
         self.assertTrue(response_dict['is_private'])
         self.logout()
