@@ -1198,8 +1198,8 @@ class LintChecksManager(object):
         return summary_messages
 
     def _check_js_file_overview(self):
-        """This function checks the JS files for the presence of their
-        respective file overviews.
+        """This function checks that all JS files contain their respective
+        file overview.
         """
         if self.verbose_mode_enabled:
             print 'Starting JS file overview check'
@@ -1226,18 +1226,19 @@ class LintChecksManager(object):
                                 'comments.' % filepath)
                 if not file_overview_found:
                     failed = True
-                    print '%s --> Missing file overview.' % filepath
+                    print ('Please ensure that file %s should contain a file'
+                           'overview i.e. a short description of the file.'
+                           % filepath)
                 
             if failed:
                 summary_message = (
                     '%s  JS file overview check failed' % (
                         _MESSAGE_TYPE_FAILED))
-                print summary_message
             else:
                 summary_message = (
                     '%s  JS file overview check passed' % (
                         _MESSAGE_TYPE_SUCCESS))
-                print summary_message
+            print summary_message
 
         print ''
 
