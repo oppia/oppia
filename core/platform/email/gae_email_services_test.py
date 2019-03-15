@@ -93,10 +93,9 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(messages[0].reply_to, expected_reply_to_address)
 
     def test_sending_email_without_reply_to_id_not_add_reply_to_email(self):
-        """ Tests that email does not have reply_to_email
+        """Tests that email does not have reply_to_email
         if reply_to_id is not passed.
         """
-
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             gae_email_services.send_mail(
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
