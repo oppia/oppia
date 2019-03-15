@@ -170,8 +170,8 @@ def edit_suggestion(suggestion, change_object):
     """Edits the submitted suggestion.
 
     Args:
-        suggestion: obj. The suggestion to be changed.
-        change_object: obj. Object of change in suugestion.
+        suggestion: Suggestion. The suggestion to be updated.
+        change_object: Change. Object of change in suugestion.
     """
     suggestion.change = change_object
     _update_suggestion(suggestion)
@@ -565,8 +565,7 @@ def check_can_edit_suggestion(user, suggestion_id):
         suggestion_id: str. Id of a suggestion.
 
     Returns:
-        users_which_have_rights: dict(str, str). Dict whose key value pairs
-            describes whether a user have permisson or not.
+        bool: Whether the user can resubmit the suggestion.
     """
 
     suggestion = get_suggestion_by_id(suggestion_id)
