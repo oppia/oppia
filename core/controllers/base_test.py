@@ -107,6 +107,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     def test_requests_for_invalid_paths(self):
         """Test that requests for invalid paths result in a 404 error."""
+        user_id = user_services.get_user_id_from_username('learneruser')
+        csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
         self.get_html_response(
             '/library/extra', expected_status_int=404)
@@ -115,10 +117,12 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/library/data/extra', expected_status_int=404)
 
         self.post_json(
-            '/library/extra', payload={}, expected_status_int=404)
+            '/library/extra', payload={}, csrf_token=csrf_token,
+            expected_status_int=404)
 
         self.put_json(
-            '/library/extra', payload={}, expected_status_int=404)
+            '/library/extra', payload={}, csrf_token=csrf_token,
+            expected_status_int=404)
 
     def test_redirect_in_logged_out_states(self):
         """Test for a redirect in logged out state on '/'."""
