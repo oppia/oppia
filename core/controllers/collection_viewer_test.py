@@ -90,6 +90,13 @@ class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
         self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
 
+    def test_invalid_collection_error(self):
+        self.login(self.EDITOR_EMAIL)
+        self.get_html_response(
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, 'none'),
+            expected_status_int=404)
+        self.logout()
+
 
 class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the collection viewer controller using a sample collection."""
@@ -106,6 +113,11 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
 
         # Login as the user who will play the collection.
         self.login(self.VIEWER_EMAIL)
+
+        # Request invalid collection from data handler.
+        response_dict = self.get_json(
+            '%s/1' % feconf.COLLECTION_DATA_URL_PREFIX,
+            expected_status_int=404)
 
         # Request the collection from the data handler.
         response_dict = self.get_json(
