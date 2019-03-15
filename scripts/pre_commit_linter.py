@@ -414,6 +414,54 @@ def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
             or filepath in BAD_PATTERNS[pattern]['excluded_files'])
 
 
+def _get_expression_from_node_if_one_exists(
+        parsed_node, components_to_check):
+    """This function first checks whether the parsed node represents
+    the required angular component that needs to be derived by checking if
+    its in the 'components_to_check' list. If yes, then it  will return the
+    expression part of the node from which the component can be derived.
+    If no, it will return None. It is done by filtering out
+    'AssignmentExpression' (as it represents an assignment) and 'Identifier'
+    (as it represents a static expression).
+
+    Args:
+        parsed_node: dict. Parsed node of the body of a JS file.
+        components_to_check: list(str). List of angular components to check
+            in a JS file. These include directives, factories, controllers,
+            etc.
+
+    Returns:
+        expression: dict or None. Expression part of the node if the node
+            represents a component else None.
+    """
+    if parsed_node.type != 'ExpressionStatement':
+        return
+    # Separate the expression part of the node which is the actual
+    # content of the node.
+    expression = parsed_node.expression
+    # Check whether the expression belongs to a
+    # 'CallExpression' which always contains a call
+    # and not an 'AssignmentExpression'.
+    # For example, func() is a CallExpression.
+    if expression.type != 'CallExpression':
+        return
+    # Check whether the expression belongs to a 'MemberExpression' which
+    # represents a computed expression or an Identifier which represents
+    # a static expression.
+    # For example, 'thing.func' is a MemberExpression where
+    # 'thing' is the object of the MemberExpression and
+    # 'func' is the property of the MemberExpression.
+    # Another example of a MemberExpression within a CallExpression is
+    # 'thing.func()' where 'thing.func' is the callee of the CallExpression.
+    if expression.callee.type != 'MemberExpression':
+        return
+    # Get the component in the JS file.
+    component = expression.callee.property.name
+    if component not in components_to_check:
+        return
+    return expression
+
+
 def _get_changed_filepaths():
     """Returns a list of modified files (both staged and unstaged)
 
@@ -1060,336 +1108,306 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def _get_expression_from_node_if_one_exists(parsed_node, components_to_check):
-	    """This function first checks whether the parsed node represents
-	    the required angular component that needs to be derived by checking if its
-	    in the 'components_to_check' list. If yes, then it  will return the
-	    expression part of the node from which the component can be derived.
-	    If no, it will return None. It is done by filtering out
-	    'AssignmentExpression' (as it represents an assignment) and 'Identifier'
-	    (as it represents a static expression).
+    def _check_directive_scope(self):
+        """This function checks that all directives have an explicit
+        scope: {} and it should not be scope: true.
+        """
+        print 'Starting directive scope check'
+        print '----------------------------------------'
+        # Select JS files which need to be checked.
+        files_to_check = [
+            filename for filename in self.all_filepaths if
+            filename.endswith('.js') and not
+            any(fnmatch.fnmatch(filename, pattern) for pattern in
+                EXCLUDED_PATHS)]
+        failed = False
+        summary_messages = []
+        components_to_check = ['directive']
 
-	    Args:
-	        parsed_node: dict. Parsed node of the body of a JS file.
-	        components_to_check: list(str). List of angular components to check
-	            in a JS file. These include directives, factories, controllers, etc.
+        for filename in files_to_check:
+            parsed_script = self.parsed_js_files[filename]
+            with _redirect_stdout(_TARGET_STDOUT):
+                # Parse the body of the content as nodes.
+                parsed_nodes = parsed_script.body
+                for parsed_node in parsed_nodes:
+                    expression = _get_expression_from_node_if_one_exists(
+                        parsed_node, components_to_check)
+                    if not expression:
+                        continue
+                    # Separate the arguments of the expression.
+                    arguments = expression.arguments
+                    # The first argument of the expression is the
+                    # name of the directive.
+                    if arguments[0].type == 'Literal':
+                        directive_name = str(arguments[0].value)
+                    arguments = arguments[1:]
+                    for argument in arguments:
+                        # Check the type of an argument.
+                        if argument.type != 'ArrayExpression':
+                            continue
+                        # Separate out the elements for the argument.
+                        elements = argument.elements
+                        for element in elements:
+                            # Check the type of an element.
+                            if element.type != 'FunctionExpression':
+                                continue
+                            # Separate out the body of the element.
+                            body = element.body
+                            if body.type != 'BlockStatement':
+                                continue
+                            # Further separate the body elements from the body.
+                            body_elements = body.body
+                            for body_element in body_elements:
+                                # Check if the body element is a return
+                                # statement.
+                                body_element_type_is_not_return = (
+                                    body_element.type != 'ReturnStatement')
+                                body_element_argument_type_is_not_object = (
+                                    body_element.argument.type != (
+                                        'ObjectExpression'))
+                                if (
+                                        body_element_argument_type_is_not_object
+                                        or (
+                                            body_element_type_is_not_return)):
+                                    continue
+                                # Separate the properties of the return node.
+                                return_node_properties = (
+                                    body_element.argument.properties)
+                                # Loop over all the properties of the return
+                                # node to find out the scope key.
+                                for return_node_property in (
+                                        return_node_properties):
+                                    # Check whether the property is scope.
+                                    property_key_is_an_identifier = (
+                                        return_node_property.key.type == (
+                                            'Identifier'))
+                                    property_key_name_is_scope = (
+                                        return_node_property.key.name == (
+                                            'scope'))
+                                    if (
+                                            property_key_is_an_identifier and (
+                                                property_key_name_is_scope)):
+                                        # Separate the scope value and
+                                        # check if it is an Object Expression.
+                                        # If it is not, then check for scope:
+                                        # true and report the error message.
+                                        scope_value = return_node_property.value
+                                        if scope_value.type == 'Literal' and (
+                                                scope_value.value):
+                                            failed = True
+                                            print (
+                                                'Please ensure that %s '
+                                                'directive in %s file '
+                                                'does not have scope set to '
+                                                'true.' %
+                                                (directive_name, filename))
+                                            print ''
+                                        elif scope_value.type != (
+                                                'ObjectExpression'):
+                                            # Check whether the directive has
+                                            # scope: {} else report the error
+                                            # message.
+                                            failed = True
+                                            print (
+                                                'Please ensure that %s '
+                                                'directive in %s file has a '
+                                                'scope: {}.' % (
+                                                    directive_name, filename))
+                                            print ''
 
-	    Returns:
-	        expression: dict or None. Expression part of the node if the node
-	            represents a component else None.
-	    """
-	    if parsed_node.type != 'ExpressionStatement':
-	        return
-	    # Separate the expression part of the node which is the actual
-	    # content of the node.
-	    expression = parsed_node.expression
-	    # Check whether the expression belongs to a
-	    # 'CallExpression' which always contains a call
-	    # and not an 'AssignmentExpression'.
-	    # For example, func() is a CallExpression.
-	    if expression.type != 'CallExpression':
-	        return
-	    # Check whether the expression belongs to a 'MemberExpression' which
-	    # represents a computed expression or an Identifier which represents
-	    # a static expression.
-	    # For example, 'thing.func' is a MemberExpression where
-	    # 'thing' is the object of the MemberExpression and
-	    # 'func' is the property of the MemberExpression.
-	    # Another example of a MemberExpression within a CallExpression is
-	    # 'thing.func()' where 'thing.func' is the callee of the CallExpression.
-	    if expression.callee.type != 'MemberExpression':
-	        return
-	    # Get the component in the JS file.
-	    component = expression.callee.property.name
-	    if component not in components_to_check:
-	        return
-	    return expression
+        with _redirect_stdout(_TARGET_STDOUT):
+            if failed:
+                summary_message = '%s   Directive scope check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+                print summary_message
+                summary_messages.append(summary_message)
+            else:
+                summary_message = '%s  Directive scope check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+                print summary_message
+                summary_messages.append(summary_message)
 
-    def _check_directive_scope(all_files):
-	    """This function checks that all directives have an explicit
-	    scope: {} and it should not be scope: true.
-	    """
-	    print 'Starting directive scope check'
-	    print '----------------------------------------'
-	    # Select JS files which need to be checked.
-	    files_to_check = [
-	        filename for filename in all_files if filename.endswith('.js') and
-	        not any(fnmatch.fnmatch(filename, pattern) for pattern in
-	                EXCLUDED_PATHS)]
-	    failed = False
-	    summary_messages = []
-	    components_to_check = ['directive']
+            print ''
+            return summary_messages
 
-	    for filename in files_to_check:
-	        parsed_script = self.parsed_js_files[filename]
-	        with _redirect_stdout(_TARGET_STDOUT):
-	            # Parse the body of the content as nodes.
-	            parsed_nodes = parsed_script.body
-	            for parsed_node in parsed_nodes:
-	                expression = _get_expression_from_node_if_one_exists(
-	                    parsed_node, components_to_check)
-	                if not expression:
-	                    continue
-	                # Separate the arguments of the expression.
-	                arguments = expression.arguments
-	                # The first argument of the expression is the
-	                # name of the directive.
-	                if arguments[0].type == 'Literal':
-	                    directive_name = str(arguments[0].value)
-	                arguments = arguments[1:]
-	                for argument in arguments:
-	                    # Check the type of an argument.
-	                    if argument.type != 'ArrayExpression':
-	                        continue
-	                    # Separate out the elements for the argument.
-	                    elements = argument.elements
-	                    for element in elements:
-	                        # Check the type of an element.
-	                        if element.type != 'FunctionExpression':
-	                            continue
-	                        # Separate out the body of the element.
-	                        body = element.body
-	                        if body.type != 'BlockStatement':
-	                            continue
-	                        # Further separate the body elements from the body.
-	                        body_elements = body.body
-	                        for body_element in body_elements:
-	                            # Check if the body element is a return statement.
-	                            body_element_type_is_not_return = (
-	                                body_element.type != 'ReturnStatement')
-	                            body_element_argument_type_is_not_object = (
-	                                body_element.argument.type != (
-	                                    'ObjectExpression'))
-	                            if (body_element_type_is_not_return or (
-	                                    body_element_argument_type_is_not_object)):
-	                                continue
-	                            # Separate the properties of the return node.
-	                            return_node_properties = (
-	                                body_element.argument.properties)
-	                            # Loop over all the properties of the return node
-	                            # to find out the scope key.
-	                            for return_node_property in return_node_properties:
-	                                # Check whether the property is scope.
-	                                property_key_is_an_identifier = (
-	                                    return_node_property.key.type == (
-	                                        'Identifier'))
-	                                property_key_name_is_scope = (
-	                                    return_node_property.key.name == (
-	                                        'scope'))
-	                                if (
-	                                        property_key_is_an_identifier and (
-	                                            property_key_name_is_scope)):
-	                                    # Separate the scope value and
-	                                    # check if it is an Object Expression.
-	                                    # If it is not, then check for scope: true
-	                                    # and report the error message.
-	                                    scope_value = return_node_property.value
-	                                    if scope_value.type == 'Literal' and (
-	                                            scope_value.value):
-	                                        failed = True
-	                                        print (
-	                                            'Please ensure that %s '
-	                                            'directive in %s file '
-	                                            'does not have scope set to '
-	                                            'true.' %
-	                                            (directive_name, filename))
-	                                        print ''
-	                                    elif scope_value.type != (
-	                                            'ObjectExpression'):
-	                                        # Check whether the directive has scope:
-	                                        # {} else report the error message.
-	                                        failed = True
-	                                        print (
-	                                            'Please ensure that %s directive '
-	                                            'in %s file has a scope: {}.' % (
-	                                                directive_name, filename))
-	                                        print ''
+    def _check_js_component_name_and_count(self):
+        """This function ensures that all JS files have exactly
+        one component and and that the name of the component
+        matches the filename.
+        """
+        print 'Starting js component name and count check'
+        print '----------------------------------------'
+        # Select JS files which need to be checked.
+        files_to_check = [
+            filename for filename in self.all_filepaths if not
+            any(fnmatch.fnmatch(filename, pattern) for pattern in
+                EXCLUDED_PATHS)
+            and filename.endswith('.js') and not filename.endswith('App.js')]
+        failed = False
+        summary_messages = []
+        component_name = ''
+        components_to_check = ['controller', 'directive', 'factory', 'filter']
+        for filename in files_to_check:
+            component_num = 0
+            # Filename without its path and extension.
+            exact_filename = filename.split('/')[-1][:-3]
+            parsed_script = self.parsed_js_files[filename]
+            with _redirect_stdout(_TARGET_STDOUT):
+                # Parse the body of the content as nodes.
+                parsed_nodes = parsed_script.body
+                for parsed_node in parsed_nodes:
+                    expression = _get_expression_from_node_if_one_exists(
+                        parsed_node, components_to_check)
+                    if not expression:
+                        continue
+                    component_num += 1
+                    # Check if the number of components in each file exceeds
+                    # one.
+                    if component_num > 1:
+                        print (
+                            '%s -> Please ensure that there is exactly one '
+                            'component in the file.' % (filename))
+                        failed = True
+                        break
+                    # Separate the arguments of the expression.
+                    arguments = expression.arguments
+                    # The first argument of the expression is the
+                    # name of the component.
+                    component_name = arguments[0].value
+                    component = expression.callee.property.name
 
-	    with _redirect_stdout(_TARGET_STDOUT):
-	        if failed:
-	            summary_message = '%s   Directive scope check failed' % (
-	                _MESSAGE_TYPE_FAILED)
-	            print summary_message
-	            summary_messages.append(summary_message)
-	        else:
-	            summary_message = '%s  Directive scope check passed' % (
-	                _MESSAGE_TYPE_SUCCESS)
-	            print summary_message
-	            summary_messages.append(summary_message)
+                    # If the component is directive or filter and its name is
+                    # xxx then the filename containing it should be
+                    # XxxDirective.js or XxxFilter.js respectively.
+                    if component == 'directive' or component == 'filter':
+                        if (component_name[0].swapcase() + component_name[1:] +
+                                component.capitalize() != (exact_filename)):
+                            print (
+                                '%s -> Please ensure that the %s name '
+                                'matches the filename'
+                                % (filename, component))
+                            failed = True
+                    # If the component is controller or factory, then the
+                    # component name should exactly match the filename
+                    # containing it. If the component's name is xxx then the
+                    # filename should be xxx.js.
+                    else:
+                        if component_name != exact_filename:
+                            print (
+                                '%s -> Please ensure that the %s name '
+                                'matches the filename'
+                                % (filename, component))
+                            failed = True
 
-	        print ''
+        with _redirect_stdout(_TARGET_STDOUT):
+            if failed:
+                summary_message = (
+                    '%s  Js component name and count check failed' %
+                    (_MESSAGE_TYPE_FAILED))
+                print summary_message
+                summary_messages.append(summary_message)
+            else:
+                summary_message = (
+                    '%s  Js component name and count check passed' %
+                    (_MESSAGE_TYPE_SUCCESS))
+                print summary_message
+                summary_messages.append(summary_message)
 
-    def _check_js_component_name_and_count(all_files):
-	    """This function ensures that all JS files have exactly
-	    one component and and that the name of the component
-	    matches the filename.
-	    """
-	    print 'Starting js component name and count check'
-	    print '----------------------------------------'
-	    # Select JS files which need to be checked.
-	    files_to_check = [
-	        filename for filename in all_files if not
-	        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-	        and filename.endswith('.js') and not filename.endswith('App.js')]
-	    failed = False
-	    summary_messages = []
-	    component_name = ''
-	    components_to_check = ['controller', 'directive', 'factory', 'filter']
-	    for filename in files_to_check:
-	        component_num = 0
-	        # Filename without its path and extension.
-	        exact_filename = filename.split('/')[-1][:-3]
-	        parsed_script = self.parsed_js_files[filename]
-	        with _redirect_stdout(_TARGET_STDOUT):
-	            # Parse the body of the content as nodes.
-	            parsed_nodes = parsed_script.body
-	            for parsed_node in parsed_nodes:
-	                expression = _get_expression_from_node_if_one_exists(
-	                    parsed_node, components_to_check)
-	                if not expression:
-	                    continue
-	                component_num += 1
-	                # Check if the number of components in each file exceeds one.
-	                if component_num > 1:
-	                    print (
-	                        '%s -> Please ensure that there is exactly one '
-	                        'component in the file.' % (filename))
-	                    failed = True
-	                    break
-	                # Separate the arguments of the expression.
-	                arguments = expression.arguments
-	                # The first argument of the expression is the
-	                # name of the component.
-	                component_name = arguments[0].value
-	                component = expression.callee.property.name
+            print ''
+            return summary_messages
 
-	                # If the component is directive or filter and its name is xxx
-	                # then the filename containing it should be XxxDirective.js
-	                # or XxxFilter.js respectively.
-	                if component == 'directive' or component == 'filter':
-	                    if (component_name[0].swapcase() + component_name[1:] +
-	                            component.capitalize() != (exact_filename)):
-	                        print (
-	                            '%s -> Please ensure that the %s name '
-	                            'matches the filename'
-	                            % (filename, component))
-	                        failed = True
-	                # If the component is controller or factory, then the component
-	                # name should exactly match the filename containing it. If the
-	                # component's name is xxx then the filename should be xxx.js.
-	                else:
-	                    if component_name != exact_filename:
-	                        print (
-	                            '%s -> Please ensure that the %s name '
-	                            'matches the filename'
-	                            % (filename, component))
-	                        failed = True
+    def _check_sorted_dependencies(self):
+        """This function checks that the dependencies which are
+        imported in the controllers/directives/factories in JS
+        files are in following pattern: dollar imports, regular
+        imports, and constant imports, all in sorted order.
+        """
+        print 'Starting sorted dependencies check'
+        print '----------------------------------------'
+        files_to_check = [
+            filename for filename in self.all_filepaths if
+            filename.endswith('.js') and not
+            any(fnmatch.fnmatch(filename, pattern) for pattern in
+                EXCLUDED_PATHS)]
+        components_to_check = ['controller', 'directive', 'factory']
+        failed = False
+        summary_messages = []
 
-	    with _redirect_stdout(_TARGET_STDOUT):
-	        if failed:
-	            summary_message = '%s  Js component name and count check failed' % (
-	                _MESSAGE_TYPE_FAILED)
-	            print summary_message
-	            summary_messages.append(summary_message)
-	        else:
-	            summary_message = '%s  Js component name and count check passed' % (
-	                _MESSAGE_TYPE_SUCCESS)
-	            print summary_message
-	            summary_messages.append(summary_message)
+        for filename in files_to_check:
+            parsed_script = self.parsed_js_files[filename]
+            with _redirect_stdout(_TARGET_STDOUT):
+                parsed_nodes = parsed_script.body
+                for parsed_node in parsed_nodes:
+                    expression = _get_expression_from_node_if_one_exists(
+                        parsed_node, components_to_check)
+                    if not expression:
+                        continue
+                    # Separate the arguments of the expression.
+                    arguments = expression.arguments
+                    if arguments[0].type == 'Literal':
+                        property_value = str(arguments[0].value)
+                    arguments = arguments[1:]
+                    for argument in arguments:
+                        if argument.type != 'ArrayExpression':
+                            continue
+                        literal_args = []
+                        function_args = []
+                        dollar_imports = []
+                        regular_imports = []
+                        constant_imports = []
+                        elements = argument.elements
+                        for element in elements:
+                            if element.type == 'Literal':
+                                literal_args.append(str(element.value))
+                            elif element.type == 'FunctionExpression':
+                                func_args = element.params
+                                for func_arg in func_args:
+                                    function_args.append(str(func_arg.name))
+                        for arg in function_args:
+                            if arg.startswith('$'):
+                                dollar_imports.append(arg)
+                            elif re.search('[a-z]', arg):
+                                regular_imports.append(arg)
+                            else:
+                                constant_imports.append(arg)
+                        dollar_imports.sort()
+                        regular_imports.sort()
+                        constant_imports.sort()
+                        sorted_imports = (
+                            dollar_imports + regular_imports + constant_imports)
+                        if sorted_imports != function_args:
+                            failed = True
+                            print (
+                                'Please ensure that in %s in file %s, the '
+                                'injected dependencies should be in the '
+                                'following manner: dollar imports, regular '
+                                'imports and constant imports, all in sorted '
+                                'order.'
+                                % (property_value, filename))
+                        if sorted_imports != literal_args:
+                            failed = True
+                            print (
+           	                    'Please ensure that in %s in file %s, the '
+           	                    'stringfied dependencies should be in the '
+           	                    'following manner: dollar imports, regular '
+           	                    'imports and constant imports, all in sorted '
+           	                    'order.'
+           	                    % (property_value, filename))
 
-	        print ''
-	        return summary_messages
+        with _redirect_stdout(_TARGET_STDOUT):
+            if failed:
+                summary_message = (
+                    '%s  Sorted dependencies check failed' % (
+                        _MESSAGE_TYPE_FAILED))
+            else:
+                summary_message = (
+                    '%s  Sorted dependencies check passed' % (
+                        _MESSAGE_TYPE_SUCCESS))
 
-	def _check_sorted_dependencies(all_files):
-	    """This function checks that the dependencies which are
-	    imported in the controllers/directives/factories in JS
-	    files are in following pattern: dollar imports, regular
-	    imports, and constant imports, all in sorted order.
-	    """
-	    print 'Starting sorted dependencies check'
-	    print '----------------------------------------'
-	    files_to_check = [
-	        filename for filename in all_files if filename.endswith('.js') and
-	        not any(fnmatch.fnmatch(filename, pattern) for pattern in
-	                EXCLUDED_PATHS)]
-	    components_to_check = ['controller', 'directive', 'factory']
-	    failed = False
-	    summary_messages = []
-
-	    for filename in files_to_check:
-	        parsed_script = self.parsed_js_files[filename]
-	        with _redirect_stdout(_TARGET_STDOUT):
-	            parsed_nodes = parsed_script.body
-	            for parsed_node in parsed_nodes:
-	                expression = _get_expression_from_node_if_one_exists(
-	                    parsed_node, components_to_check)
-	                if not expression:
-	                    continue
-	                # Separate the arguments of the expression.
-	                arguments = expression.arguments
-	                if arguments[0].type == 'Literal':
-	                    property_value = str(arguments[0].value)
-	                arguments = arguments[1:]
-	                for argument in arguments:
-	                    if argument.type != 'ArrayExpression':
-	                        continue
-	                    literal_args = []
-	                    function_args = []
-	                    dollar_imports = []
-	                    regular_imports = []
-	                    constant_imports = []
-	                    elements = argument.elements
-	                    for element in elements:
-	                        if element.type == 'Literal':
-	                            literal_args.append(str(element.value))
-	                        elif element.type == 'FunctionExpression':
-	                            func_args = element.params
-	                            for func_arg in func_args:
-	                                function_args.append(str(func_arg.name))
-	                    for arg in function_args:
-	                        if arg.startswith('$'):
-	                            dollar_imports.append(arg)
-	                        elif re.search('[a-z]', arg):
-	                            regular_imports.append(arg)
-	                        else:
-	                            constant_imports.append(arg)
-	                    dollar_imports.sort()
-	                    regular_imports.sort()
-	                    constant_imports.sort()
-	                    sorted_imports = (
-	                        dollar_imports + regular_imports + constant_imports)
-	                    if sorted_imports != function_args:
-	                        failed = True
-	                        print (
-	                            'Please ensure that in %s in file %s, the '
-	                            'injected dependencies should be in the '
-	                            'following manner: dollar imports, regular '
-	                            'imports and constant imports, all in sorted '
-	                            'order.'
-	                            % (property_value, filename))
-	                    if sorted_imports != literal_args:
-	                        failed = True
-	                        print (
-	       	                    'Please ensure that in %s in file %s, the '
-	       	                    'stringfied dependencies should be in the '
-	       	                    'following manner: dollar imports, regular '
-	       	                    'imports and constant imports, all in sorted '
-	       	                    'order.'
-	       	                    % (property_value, filename))
-
-	    with _redirect_stdout(_TARGET_STDOUT):
-	        if failed:
-	            summary_message = (
-	                '%s  Sorted dependencies check failed' % (
-	                    _MESSAGE_TYPE_FAILED))
-	        else:
-	            summary_message = (
-	                '%s  Sorted dependencies check passed' % (
-	                    _MESSAGE_TYPE_SUCCESS))
-
-	        summary_messages.append(summary_message)
-	        print summary_message
-	        print ''
+            summary_messages.append(summary_message)
+            print summary_message
+            print ''
+            return summary_messages
 
     def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
@@ -2027,8 +2045,7 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
-        js_component_messages = self._check_js_component_name_and_count(
-            all_files, parsed_js_files)
+        js_component_messages = self._check_js_component_name_and_count()
         directive_scope_messages = self._check_directive_scope()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
