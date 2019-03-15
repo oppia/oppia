@@ -923,7 +923,8 @@ class LintChecksManager(object):
             file_content = FileCache.read(filepath).decode('utf-8')
 
             # Use esprima to parse a JS file.
-            parsed_js_files[filepath] = esprima.parseScript(file_content, comment=True)
+            parsed_js_files[filepath] = esprima.parseScript(
+                file_content, comment=True)
         return parsed_js_files
 
     def _lint_all_files(self):
@@ -1223,13 +1224,13 @@ class LintChecksManager(object):
                         if comment.type != 'Block':
                             failed = True
                             print ('%s --> File overview must be in block '
-                                'comments.' % filepath)
+                                   'comments.' % filepath)
                 if not file_overview_found:
                     failed = True
                     print ('Please ensure that file %s should contain a file'
                            'overview i.e. a short description of the file.'
                            % filepath)
-                
+
             if failed:
                 summary_message = (
                     '%s  JS file overview check failed' % (
