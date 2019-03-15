@@ -58,6 +58,11 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
         """Mocks collection updates. Always fails by raising a validation error."""
         raise utils.ValidationError()
 
+    def _mock_validate_exps_in_collection_are_public_raise_exception(
+            self, unused_collection):
+        """Mocks collection validates. Always fails by raising a validation error."""
+        raise utils.ValidationError()
+
 class CollectionEditorTests(BaseCollectionEditorControllerTests):
     COLLECTION_ID = '0'
 
@@ -177,7 +182,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         url = '%s/%s' % (feconf.COLLECTION_EDITOR_DATA_URL_PREFIX, self.COLLECTION_ID)
         # Check PUT returns 500 when an exception is raised updating the
-        # colleection.
+        # collection.
         update_collection_swap = self.swap(
             collection_services, 'update_collection',
             self._mock_update_collection_raise_exception)
@@ -262,10 +267,20 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             '%s/%s' % (
                 feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         csrf_token = self.get_csrf_token_from_response(response)
+        url = '/collection_editor_handler/publish/%s' % collection_id
+        
+        # Check PUT returns 500 when an exception is raised validating exps
+        # in collection are public.
+        validate_collection_swap = self.swap(
+            collection_services, 'validate_exps_in_collection_are_public',
+            self._mock_validate_exps_in_collection_are_public_raise_exception)
+        with validate_collection_swap:
+            self.put_json(
+                url, {'version': collection.version}, csrf_token=csrf_token,
+                expected_status_int=500)
+
         response_dict = self.put_json(
-            '/collection_editor_handler/publish/%s' % collection_id,
-            {'version': collection.version},
-            csrf_token=csrf_token)
+            url, {'version': collection.version}, csrf_token=csrf_token)
         self.assertFalse(response_dict['is_private'])
         self.logout()
 
