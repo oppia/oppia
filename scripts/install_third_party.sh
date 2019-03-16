@@ -94,7 +94,10 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
 
     # The Skulpt setup function needs to be tweaked. It fails without certain
     # third party commands. These are only used for unit tests and generating
-    # documentation and are not necessary when building Skulpt.
+    # documentation and are not necessary when building Skulpt. Some machines
+    # also have problems running the dist tests, so the second two lines
+    # disable those checks to fix behaviors for those environments, and because
+    # historically these tests don't seem to fail or catch anything.
     sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
     sed -e "s/  doc()/  pass#doc()/" |\
     sed -e "s/ret = os.system(\"{0}/ret = 0 #os.system(\"{0}/" |\
