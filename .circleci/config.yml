@@ -101,3 +101,8 @@ workflows:
       - backend_tests:
           requires:
             - setup
+notify:
+  webhooks:
+    # A list of hook hashes, containing the url field
+    # gitter hook
+    - url: https://webhooks.gitter.im/e/71ac71505d1d45161035
