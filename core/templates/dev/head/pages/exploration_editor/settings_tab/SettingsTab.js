@@ -387,7 +387,7 @@ oppia.controller('SettingsTab', [
     };
 
     // Meathod to check if title is given
-    $scope.hasTitleNotBeenGiven = function() {
+    $scope.isTitlePresent = function() {
       return ExplorationTitleService.displayed.length === 0;
     };
   }
