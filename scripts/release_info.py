@@ -291,9 +291,9 @@ def main():
         prs = get_prs_from_pr_numbers(pr_numbers, personal_access_token)
         categorized_pr_titles = get_changelog_categories(prs)
     else:
-        print('No personal access token provided, uncategorized changelog'
-              ' will be output. If you would like to have a categorized'
-              ' changelog, setup a personal access token at '
+        print('No personal access token provided, changelog will not be output.'
+              ' If you would like to have the changelog also output by the '
+              'script, set up a personal access token at '
               'https://github.com/settings/tokens and pass it to the script '
               'using --personal_access_token=<token>')
 
