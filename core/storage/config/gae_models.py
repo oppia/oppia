@@ -45,3 +45,31 @@ class ConfigPropertyModel(base_models.VersionedModel):
 
     def commit(self, committer_id, commit_cmds):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
+
+
+class FeatureFlagSnapshotMetadataModel(
+        base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a dynamic feature flag snapshot."""
+    pass
+
+
+class FeatureFlagSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content for a dynamic feature flag snapshot."""
+    pass
+
+
+class FeatureFlagModel(base_models.VersionedModel):
+    """Model that represents a dynamic feature flag, e.g. such as to gate new
+    feature code.
+
+    The id is the name of the feature, generally in lower_snake_case.
+    """
+    SNAPSHOT_METADATA_CLASS = FeatureFlagSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = FeatureFlagSnapshotContentModel
+
+    # The value of the feature flag. This is a JSON structure containing the
+    # typed value corresponding to the flag, and potential additional metadata.
+    flag_value = ndb.JsonProperty(required=True, indexed=False)
+
+    # Indicates the schema version corresponding to the flag_value property.
+    schema_version = ndb.IntegerProperty(required=True, indexed=True)
