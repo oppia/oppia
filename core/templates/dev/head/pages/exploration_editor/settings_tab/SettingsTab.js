@@ -386,7 +386,6 @@ oppia.controller('SettingsTab', [
       $scope.isRolesFormOpen = false;
     };
 
-    // Meathod to check if title is given
     $scope.isTitlePresent = function() {
       return ExplorationTitleService.displayed.length === 0;
     };
