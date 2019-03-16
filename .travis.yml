@@ -19,9 +19,9 @@ branches:
 
 env:
   matrix:
-    - RUN_LINT=true
     # These lines are commented out because these checks are being run on CircleCI
     # here: https://circleci.com/gh/oppia/oppia
+    # - RUN_LINT=true
     # - RUN_FRONTEND_TESTS=true
     # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false EXCLUDE_LOAD_TESTS=true
     # TODO(sll): Reinstate this when we can get it to run in reasonable time.
@@ -84,7 +84,7 @@ notifications:
     urls:
     # This URL can be obtained by going to the Gitter chat room
     # and clicking Settings > Integrations.
-    - https://webhooks.gitter.im/e/f8f782497ec1ffcea2e7
+    - https://webhooks.gitter.im/e/f3865f3ee5e9b40ee871
     on_success: always
     on_failure: always
 
@@ -106,11 +106,11 @@ install:
 - bash scripts/install_third_party.sh
 
 script:
-- if [ "$RUN_LINT" == 'true' ]; then python scripts/third_party_size_check.py; python scripts/pre_commit_linter.py --path=. --verbose; fi
 # These lines are commented out because these checks are being run on CircleCI
 # here: https://circleci.com/gh/oppia/oppia
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
+# - if [ "$RUN_LINT" == 'true' ]; then python scripts/third_party_size_check.py; python scripts/pre_commit_linter.py --path=. --verbose; fi
 # - if [ "$RUN_FRONTEND_TESTS" == 'true' ]; then travis_retry bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
 # - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests; fi
 # - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --exclude_load_tests; fi
