@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,27 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * @fileoverview Directive for the attribution guide.
- */
-
-require('domain/utilities/BrowserCheckerService.js');
-require('domain/utilities/UrlInterpolationService.js');
-
-oppia.directive('attributionGuide', [
+oppia.directive('playthroughImprovementCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        getData: '&data',
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/attribution_guide/' +
-        'attribution_guide_directive.html'),
+        '/pages/exploration_editor/improvements_tab/' +
+        'playthrough_improvement_card_directive.html'),
       controller: [
-        '$scope', 'BrowserCheckerService', 'UrlService', function(
-            $scope, BrowserCheckerService, UrlService) {
-          $scope.isMobileDevice = BrowserCheckerService.isMobileDevice();
-          $scope.iframed = UrlService.isIframed();
+        '$scope', 'PlaythroughIssuesService',
+        function($scope, PlaythroughIssuesService) {
+          $scope.openPlaythroughModal = function(playthroughId, index) {
+            PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
+          };
         }
       ]
     };
-  }]);
+  }
+]);

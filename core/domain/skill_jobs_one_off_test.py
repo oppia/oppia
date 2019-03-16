@@ -139,7 +139,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                 }
             }
         }
-        self.save_new_skill_with_story_and_skill_contents_schema_version(
+        self.save_new_skill_with_defined_schema_versions(
             self.SKILL_ID, self.albert_id, 'A description', 0,
             misconceptions=[], skill_contents=skill_contents)
         skill = (
