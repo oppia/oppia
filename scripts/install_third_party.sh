@@ -132,11 +132,17 @@ if ! type pip > /dev/null 2>&1 ; then
     exit 1
 fi
 
+function pip_install {
+  # Attempt standard pip install, or pass in --system if the local environment requires it.
+  # See https://github.com/pypa/pip/issues/3826 for context on when this situation may occur.
+  pip install "$@" || pip install --system "$@"
+}
+
 echo Checking if pylint is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/pylint-1.9.3" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.9.3 --system --target="$TOOLS_DIR/pylint-1.9.3"
+  pip_install pylint==1.9.3 --target="$TOOLS_DIR/pylint-1.9.3"
   # Add __init__.py file so that pylint dependency backports are resolved
   # correctly.
   touch $TOOLS_DIR/pylint-1.9.3/backports/__init__.py
@@ -196,21 +202,21 @@ echo Checking if browsermob-proxy is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
   echo Installing browsermob-proxy
 
-  pip install browsermob-proxy==0.7.1 --system --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+  pip_install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   echo Installing selenium
 
-  pip install selenium==2.53.2 --system --target="$TOOLS_DIR/selenium-2.53.2"
+  pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
 echo Checking if PIL is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
   echo Installing PIL
 
-  pip install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --system --target="$TOOLS_DIR/PIL-1.1.7"
+  pip_install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
 
   if [[ $? != 0 && ${OS} == "Darwin" ]]; then
     echo "  PIL install failed. See troubleshooting instructions at:"
