@@ -38,6 +38,8 @@ install_node_module gulp-util 3.0.7
 install_node_module htmllint 0.7.2
 install_node_module htmllint-cli 0.0.7
 install_node_module @mapbox/stylelint-processor-arbitrary-tags 0.2.0
+install_node_module postcss-html 0.34.0
+install_node_module postcss-markdown 0.34.0
 install_node_module postcss-syntax 0.34.0
 install_node_module stylelint 9.8.0
 install_node_module stylelint-config-standard 18.2.0
