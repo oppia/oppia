@@ -16,6 +16,11 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
+require('components/StateGraphLayoutService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationWarningsService.js');
+require('pages/exploration_editor/translation_tab/TranslationStatusService.js');
+
 /* eslint-disable angular/directive-restrict */
 oppia.directive('stateGraphViz', [
   'UrlInterpolationService', function(UrlInterpolationService) {

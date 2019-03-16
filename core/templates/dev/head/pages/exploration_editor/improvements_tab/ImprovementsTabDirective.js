@@ -17,6 +17,9 @@
  * exploration editor.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('services/ImprovementCardService.js');
+
 oppia.directive('improvementsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

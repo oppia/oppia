@@ -17,6 +17,19 @@
  * exploration editor.
  */
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.js');
+require('domain/state/StatesObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationDataService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/RouterService.js');
+require('pages/exploration_editor/statistics_tab/StateImprovementSuggestionService.js');
+require('services/AlertsService.js');
+require('services/ComputeGraphService.js');
+require('services/DateTimeFormatService.js');
+require('services/ExplorationFeaturesService.js');
+require('services/StateRulesStatsService.js');
+
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [

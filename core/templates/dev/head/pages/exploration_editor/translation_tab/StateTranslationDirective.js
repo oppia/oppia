@@ -16,6 +16,15 @@
  * @fileoverview Directive containing the exploration material to be translated.
  */
 
+*require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.js');
+require('pages/exploration_editor/ExplorationInitStateNameService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/RouterService.js');
+require('pages/exploration_editor/translation_tab/TranslationStatusService.js');
+require('pages/exploration_editor/translation_tab/TranslationTabActiveContentIdService.js');
+require('pages/state_editor/StateEditorService.js');
+
 oppia.directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

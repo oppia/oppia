@@ -17,6 +17,12 @@
  * feedback tab of the exploration editor.
  */
 
+require('domain/feedback_thread/FeedbackThreadObjectFactory.js');
+require('domain/suggestion/SuggestionObjectFactory.js');
+require('domain/suggestion/SuggestionThreadObjectFactory.js');
+require('pages/exploration_editor/ExplorationDataService.js');
+require('services/AlertsService.js');
+
 oppia.factory('ThreadDataService', [
   '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionObjectFactory',

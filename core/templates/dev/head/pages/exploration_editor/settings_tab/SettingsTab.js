@@ -16,6 +16,28 @@
  * @fileoverview Controllers for the exploration settings tab.
  */
 
+require('domain/exploration/EditableExplorationBackendApiService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ChangeListService.js');
+require('pages/exploration_editor/ExplorationAutomaticTextToSpeechService.js');
+require('pages/exploration_editor/ExplorationCategoryService.js');
+require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.js');
+require('pages/exploration_editor/ExplorationDataService.js');
+require('pages/exploration_editor/ExplorationEditor.js');
+require('pages/exploration_editor/ExplorationInitStateNameService.js');
+require('pages/exploration_editor/ExplorationLanguageCodeService.js');
+require('pages/exploration_editor/ExplorationObjectiveService.js');
+require('pages/exploration_editor/ExplorationParamChangesService.js');
+require('pages/exploration_editor/ExplorationParamSpecsService.js');
+require('pages/exploration_editor/ExplorationRightsService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/ExplorationTagsService.js');
+require('pages/exploration_editor/ExplorationTitleService.js');
+require('pages/exploration_editor/ExplorationWarningsService.js');
+require('pages/exploration_editor/UserEmailPreferencesService.js');
+require('services/AlertsService.js');
+require('services/ExplorationFeaturesService.js');
+
 oppia.controller('SettingsTab', [
   '$http', '$rootScope', '$scope', '$uibModal', '$window', 'AlertsService',
   'ChangeListService', 'EditableExplorationBackendApiService',

@@ -17,6 +17,20 @@
  * the training modal used for unresolved answers.
  */
 
+require('domain/exploration/AnswerGroupObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/AngularNameService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/ExplorationWarningsService.js');
+require('pages/exploration_editor/GraphDataService.js');
+require('pages/exploration_editor/editor_tab/ResponsesService.js');
+require('pages/exploration_editor/editor_tab/TrainingDataService.js');
+require('pages/exploration_player/AnswerClassificationService.js');
+require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/StatePropertyServices.js');
+require('services/AlertsService.js');
+require('services/ContextService.js');
+
 oppia.factory('TrainingModalService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {

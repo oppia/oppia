@@ -16,6 +16,11 @@
  * @fileoverview Directive for visualizing multiple incorrect issue.
  */
 
+
+require('domain/utilities/UrlInterpolationService.js');
+require('services/AlertsService.js');
+require('services/PlaythroughIssuesService.js');
+
 oppia.directive('cyclicTransitionsIssueDirective', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

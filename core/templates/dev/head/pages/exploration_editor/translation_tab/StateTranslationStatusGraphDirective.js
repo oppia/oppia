@@ -16,6 +16,13 @@
  * @fileoverview Directive for the state translation status graph.
  */
 
+*require('domain/utilities/UrlInterpolationService.js');
+*require('pages/exploration_editor/ExplorationStatesService.js');
+*require('pages/exploration_editor/GraphDataService.js');
+*require('pages/exploration_editor/translation_tab/TranslationStatusService.js');
+*require('pages/state_editor/StateEditorService.js');
+*require('pages/state_editor/StatePropertyServices.js');
+
 oppia.directive('stateTranslationStatusGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

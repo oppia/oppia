@@ -15,6 +15,19 @@
 /**
  * @fileoverview Directive for the audio translation bar.
  */
+
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/translation_tab/TranslationLanguageService.js');
+require('pages/exploration_editor/translation_tab/TranslationTabActiveContentIdService.js');
+require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/StatePropertyServices.js');
+require('services/AlertsService.js');
+require('services/AssetsBackendApiService.js');
+require('services/AudioPlayerService.js');
+require('services/ContextService.js');
+require('services/EditabilityService.js');
+require('services/IdGenerationService.js');
+
 // Constant for audio recording time limit.
 oppia.constant('RECORDING_TIME_LIMIT', 300);
 

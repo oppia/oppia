@@ -17,6 +17,10 @@
  * its components.
  */
 
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/translation_tab/TranslationLanguageService.js');
+require('pages/state_editor/StatePropertyServices.js');
+
 oppia.factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateContentIdsToAudioTranslationsService',
   'TranslationLanguageService', 'INTERACTION_SPECS', function(

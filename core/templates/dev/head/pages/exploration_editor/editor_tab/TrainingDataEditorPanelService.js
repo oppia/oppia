@@ -17,6 +17,21 @@
  * the training data editor of an answer group.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/AngularNameService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/editor_tab/ResponsesService.js');
+require('pages/exploration_editor/editor_tab/TrainingDataService.js');
+require('pages/exploration_editor/editor_tab/TrainingModalService.js');
+require('pages/exploration_player/AnswerClassificationService.js');
+require('pages/exploration_player/CurrentInteractionService.js');
+require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/StatePropertyServices.js');
+require('services/AlertsService.js');
+require('services/ContextService.js');
+require('services/ExplorationHtmlFormatterService.js');
+require('services/stateful/FocusManagerService.js');
+
 oppia.factory('TrainingDataEditorPanelService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {

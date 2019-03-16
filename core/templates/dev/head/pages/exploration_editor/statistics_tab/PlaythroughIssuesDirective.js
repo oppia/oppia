@@ -16,6 +16,9 @@
  * @fileoverview Directive for visualizing issues.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('services/PlaythroughIssuesService.js');
+
 oppia.directive('playthroughIssuesDirective', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

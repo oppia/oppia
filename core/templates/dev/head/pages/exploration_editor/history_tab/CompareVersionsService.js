@@ -16,6 +16,13 @@
  * @fileoverview Service to compare versions of explorations.
  */
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.js');
+require('domain/state/StateObjectFactory.js');
+require('domain/state/StatesObjectFactory.js');
+require('pages/exploration_editor/ExplorationDataService.js');
+require('pages/exploration_editor/ExplorationDiffService.js');
+require('pages/exploration_editor/history_tab/VersionTreeService.js');
+
 oppia.factory('CompareVersionsService', [
   '$http', '$q', 'ExplorationDataService', 'ExplorationDiffService',
   'ReadOnlyExplorationBackendApiService', 'StateObjectFactory',

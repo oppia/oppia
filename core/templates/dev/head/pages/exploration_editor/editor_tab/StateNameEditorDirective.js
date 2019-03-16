@@ -16,6 +16,14 @@
  * @fileoverview Directive for the state name editor section of the state
  * editor.
  */
+
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/RouterService.js');
+require('pages/state_editor/StateEditorService.js');
+require('services/EditabilityService.js');
+require('services/stateful/FocusManagerService.js');
+
 oppia.directive('stateNameEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -17,6 +17,25 @@
  * editor page.
  */
 
+require('domain/exploration/EditableExplorationBackendApiService.js');
+require('domain/exploration/ParamChangeObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationCategoryService.js');
+require('pages/exploration_editor/ExplorationDataService.js');
+require('pages/exploration_editor/ExplorationInitStateNameService.js');
+require('pages/exploration_editor/ExplorationParamChangesService.js');
+require('pages/exploration_editor/ExplorationParamSpecsService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/ExplorationTitleService.js');
+require('pages/exploration_editor/ParameterMetadataService.js');
+require('pages/exploration_player/ExplorationEngineService.js');
+require('pages/exploration_player/LearnerParamsService.js');
+require('pages/exploration_player/NumberAttemptsService.js');
+require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.js');
+require('pages/state_editor/StateEditorService.js');
+require('services/ContextService.js');
+require('services/ExplorationFeaturesService.js');
+
 oppia.controller('PreviewTab', [
   '$q', '$scope', '$timeout', '$uibModal', 'ContextService',
   'EditableExplorationBackendApiService', 'ExplorationCategoryService',

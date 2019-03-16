@@ -16,6 +16,18 @@
  * @fileoverview Controller for the exploration editor feedback tab.
  */
 
+require('domain/state/StateObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ChangeListService.js');
+require('pages/exploration_editor/ExplorationDataService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/feedback_tab/ThreadDataService.js');
+require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js');
+require('pages/suggestion_editor/ShowSuggestionModalForEditorViewService.js');
+require('services/AlertsService.js');
+require('services/DateTimeFormatService.js');
+require('services/UserService.js');
+
 oppia.controller('FeedbackTab', [
   '$log', '$q', '$rootScope', '$scope', '$uibModal',
   'AlertsService', 'ChangeListService', 'DateTimeFormatService',

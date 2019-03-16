@@ -15,6 +15,11 @@
 /**
  * @fileoverview Directive for the test interaction panel in the state editor.
  */
+
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_player/CurrentInteractionService.js');
+
 oppia.directive('testInteractionPanel', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -16,6 +16,14 @@
  * @fileoverview Controllers for the exploration graph.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/GraphDataService.js');
+require('pages/exploration_editor/RouterService.js');
+require('pages/state_editor/StateEditorService.js');
+require('services/AlertsService.js');
+require('services/EditabilityService.js');
+
 oppia.controller('ExplorationGraph', [
   '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
   'ExplorationStatesService', 'GraphDataService', 'RouterService',

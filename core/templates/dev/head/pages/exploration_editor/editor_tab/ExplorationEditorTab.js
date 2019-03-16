@@ -16,6 +16,18 @@
  * @fileoverview Controller for the Editor tab in the exploration editor page.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.js');
+require('pages/exploration_editor/ExplorationInitStateNameService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/ExplorationWarningsService.js');
+require('pages/exploration_editor/GraphDataService.js');
+require('pages/exploration_editor/RouterService.js');
+require('pages/state_editor/StateEditorService.js');
+require('services/AlertsService.js');
+require('services/ContextService.js');
+require('services/ExplorationFeaturesService.js');
+
 oppia.controller('ExplorationEditorTab', [
   '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
   'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
