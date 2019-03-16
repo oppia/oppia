@@ -291,7 +291,7 @@
                         ng-show="isRolesFormOpen">
                   Cancel
                 </button>
-                <p ng-show="hasTitleNotBeenGiven()" class="text-danger">*Title is needed in order to invite users</p>
+                <p ng-show="!isTitlePresent()" class="text-danger">Title is needed in order to invite users</p>
               </form>
             </div>
           </div>
