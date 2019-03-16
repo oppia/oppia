@@ -17,20 +17,21 @@
  */
 
 var errorWrapper = function(
-    dubiousFunction, input1, input2, input3, input4, input5, input6) {
+    dubiousFunction, input1 = null, input2 = null, input3 = null,
+    input4 = null, input5 = null, input6 = null) {
   return function() {
     try {
-      if (input1 === undefined) {
+      if (input1 === null) {
         dubiousFunction();
-      } else if (input2 === undefined) {
+      } else if (input2 === null) {
         dubiousFunction(input1);
-      } else if (input3 === undefined) {
+      } else if (input3 === null) {
         dubiousFunction(input1, input2);
-      } else if (input4 === undefined) {
+      } else if (input4 === null) {
         dubiousFunction(input1, input2, input3);
-      } else if (input5 === undefined) {
+      } else if (input5 === null) {
         dubiousFunction(input1, input2, input3, input4);
-      } else if (input6 === undefined) {
+      } else if (input6 === null) {
         dubiousFunction(input1, input2, input3, input4, input5);
       } else {
         dubiousFunction(input1, input2, input3, input4, input5, input6);
@@ -588,7 +589,7 @@ describe('Match line to template', function() {
       logicProofShared.parseLineString(
         lineString, logicProofData.BASE_STUDENT_LANGUAGE.operators,
         logicProofData.BASE_VOCABULARY
-      )[0], template.reader_view, logicProofData.BASE_VOCABULARY);
+      )[0], template.reader_view);
   };
 
   it('should match examples correctly', function() {
