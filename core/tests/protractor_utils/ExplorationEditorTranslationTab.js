@@ -27,21 +27,23 @@ var ExplorationEditorTranslationTab = function() {
   this.saveUploadedAudioButton = element(
     by.css('.protractor-test-save-button'));
 
-  this.wrongFileTypeErrorMessage = element(by.css('div.error-message')).getText();
+  this.wrongFileTypeErrorMessage = function() {
+    return (element(by.css('div.error-message')).getText());
+  };
 
-  this.colorOfInitNode = function() {
+  this.getColorOfInitNode = function() {
     return (element.all(by.css(
       'rect.protractor-test-node-background.init-node')).last().
       getCssValue('fill'));
   };
 
-  this.colorsOfNormalNode = function(index) {
+  this.getColorsOfNormalNode = function() {
     return (element.all(by.css(
       'rect.protractor-test-node-background.normal-node')).
       getCssValue('fill'));
   };
 
-  this.colorOfTerminalNode = function() {
+  this.getColorOfTerminalNode = function() {
     return (element.all(by.css(
       'rect.protractor-test-node-background.terminal-node')).last().
       getCssValue('fill'));
@@ -171,7 +173,7 @@ var ExplorationEditorTranslationTab = function() {
       element(by.cssContainingText('option', language)).click();
   };
 
-  this.audioElem = element(by.className('protractor-test-upload-audio'));
+  this.audioUploadInputElem = element(by.className('protractor-test-upload-audio'));
 
   this.expectContentTabContentToMatch = function(content) {
     waitFor.elementToBeClickable(

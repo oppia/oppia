@@ -166,7 +166,8 @@ describe('Exploration translation', function() {
     var relativePathOfAudioToUpload = '../data/cafe.mp3';
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
+    explorationEditorTranslationTab.audioUploadInputElem.sendKeys(
+      audioAbsolutePath);
     explorationEditorTranslationTab.saveUploadedAudio(true);
     /** To check correct display of numerical status after
     *   the upload of audio translation in exploration.
@@ -176,11 +177,12 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.openUploadAudioModal();
     relativePathOfAudioToUpload = '../data/img.png';
     audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
-    explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
+    explorationEditorTranslationTab.audioUploadInputElem.sendKeys(
+      audioAbsolutePath);
     /** To check behaviour on attempting to
     *   upload an image as audio translation.
     */
-    expect(explorationEditorTranslationTab.wrongFileTypeErrorMessage)
+    expect(explorationEditorTranslationTab.wrongFileTypeErrorMessage())
     .toContain('This file is not recognized as an audio file.');
     expect(explorationEditorTranslationTab.saveUploadedAudioButton
       .getAttribute('disabled')).toBe('true');
@@ -188,7 +190,8 @@ describe('Exploration translation', function() {
       '(1/11)');
     relativePathOfAudioToUpload = '../data/cafe-over-five-minutes.mp3';
     audioAbsolutePath = path.resolve(__dirname, relativePathOfAudioToUpload);
-    explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
+    explorationEditorTranslationTab.audioUploadInputElem.sendKeys(
+      audioAbsolutePath);
     explorationEditorTranslationTab.saveUploadedAudio();
     /** To check behaviour on attempting to upload an 
     *   audio translation with length above 300 seconds.
@@ -224,15 +227,17 @@ describe('Exploration translation', function() {
       explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.exitTutorial();
       explorationEditorTranslationTab.openUploadAudioModal();
-      explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
+      explorationEditorTranslationTab.audioUploadInputElem.sendKeys(
+        audioAbsolutePath);
       explorationEditorTranslationTab.saveUploadedAudio(true);
       explorationEditorPage.navigateToMainTab();
       explorationEditorMainTab.moveToState('final card');
       explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.openUploadAudioModal();
-      explorationEditorTranslationTab.audioElem.sendKeys(audioAbsolutePath);
+      explorationEditorTranslationTab.audioUploadInputElem.sendKeys(
+        audioAbsolutePath);
       explorationEditorTranslationTab.saveUploadedAudio(true);
-      var colorsOfNormalNodes = explorationEditorTranslationTab.colorsOfNormalNode();
+      var colorsOfNormalNodes = explorationEditorTranslationTab.getColorsOfNormalNode();
       /** To check correct status color for 'second', 'third' 
       *   and 'final card' states.
       */
@@ -242,7 +247,7 @@ describe('Exploration translation', function() {
           expect(colorsOfStates[0]).toBe(NO_AUDIO_AVAILABLE_COLOR);
           expect(colorsOfStates[1]).toBe(FEW_AUDIO_AVAILABLE_COLOR);
         });
-      expect(explorationEditorTranslationTab.colorOfTerminalNode()).
+      expect(explorationEditorTranslationTab.getColorOfTerminalNode()).
         toBe(ALL_AUDIO_AVAILABLE_COLOR);
       
       general.checkForConsoleErrors([]);
