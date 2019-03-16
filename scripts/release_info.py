@@ -133,10 +133,10 @@ def _extract_issues(logs):
 
 
 def _extract_pr_numbers(logs):
-    """Extract PR numbers out of a list of Logs
+    """Extract PR numbers out of a list of Logs.
 
     Args:
-        logs: list(Log). List of Logs to parse
+        logs: list(Log). List of Logs to parse.
 
     Returns:
         set(int): Set of PR numbers extracted from the log.
@@ -175,7 +175,7 @@ def get_changelog_categories(pulls):
             labels, and the values are the titles of the PRs that fall under
             that category.
     """
-    result = {}
+    result = collections.defaultdict(list)
     for pull in pulls:
         labels = pull.labels
         added_to_dict = False
@@ -184,17 +184,11 @@ def get_changelog_categories(pulls):
             if 'CHANGELOG:' in label.name:
                 category = label.name[label.name.find(':') + 2:]
                 added_to_dict = True
-                if category in result.keys():
-                    result[category].append(formatted_title)
-                else:
-                    result[category] = [formatted_title]
+                result[category].append(formatted_title)
                 break
         if not added_to_dict:
-            if NO_LABEL_CHANGELOG_CATEGORY in result.keys():
-                result[NO_LABEL_CHANGELOG_CATEGORY].append(formatted_title)
-            else:
-                result[NO_LABEL_CHANGELOG_CATEGORY] = [formatted_title]
-    return result
+            result[NO_LABEL_CHANGELOG_CATEGORY].append(formatted_title)
+    return dict(result)
 
 
 def _check_versions(current_release):
@@ -280,8 +274,8 @@ def main():
     if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
         raise Exception(
             'This script should only be run from the latest release branch.')
+
     parsed_args = _PARSER.parse_args()
-    personal_access_token = parsed_args.personal_access_token
     current_release = _get_current_version_tag()
     base_commit = _get_base_commit_with_develop(current_release)
     new_release_logs = _gather_logs(base_commit)
@@ -291,9 +285,17 @@ def main():
     setup_changes = _check_setup_scripts(current_release)
     storage_changes = _check_storage_models(current_release)
 
-    pr_numbers = _extract_pr_numbers(new_release_logs)
-    prs = get_prs_from_pr_numbers(pr_numbers, personal_access_token)
-    categorized_pr_titles = get_changelog_categories(prs)
+    if parsed_args.personal_access_token:
+        personal_access_token = parsed_args.personal_access_token
+        pr_numbers = _extract_pr_numbers(new_release_logs)
+        prs = get_prs_from_pr_numbers(pr_numbers, personal_access_token)
+        categorized_pr_titles = get_changelog_categories(prs)
+    else:
+        print('No personal access token provided, uncategorized changelog'
+              ' will be output. If you would like to have a categorized'
+              ' changelog, setup a personal access token at '
+              'https://github.com/settings/tokens and pass it to the script '
+              'using --personal_access_token=<token>')
 
     summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
     with open(summary_file, 'w') as out:
@@ -353,12 +355,13 @@ def main():
             '``Thanks to %s, our returning contributors who made this release '
             'possible.``\n' % existing_author_comma_list)
 
-        out.write('\n### Changelog: \n')
-        for category in categorized_pr_titles:
-            out.write('%s\n' % category)
-            for pr_title in categorized_pr_titles[category]:
-                out.write('* %s\n' % pr_title)
-            out.write('\n')
+        if parsed_args.personal_access_token:
+            out.write('\n### Changelog: \n')
+            for category in categorized_pr_titles:
+                out.write('%s\n' % category)
+                for pr_title in categorized_pr_titles[category]:
+                    out.write('* %s\n' % pr_title)
+                out.write('\n')
 
         out.write('\n### Commit History:\n')
         for name, title in [(log.author, log.message.split('\n\n')[0])
