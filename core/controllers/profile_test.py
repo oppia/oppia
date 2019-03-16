@@ -46,7 +46,7 @@ class SignupTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_to_check_url_redirection_in_signup(self):
-        """To validate the redirections from return_url"""
+        """To validate the redirections from return_url."""
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -57,12 +57,12 @@ class SignupTests(test_utils.GenericTestBase):
             {'username': 'abc', 'agreed_to_terms': True},
             csrf_token=csrf_token)
 
-        response = self.get_html_response('/signup?return_url=https://google.com',
-            expected_status_int=302)
-        response = self.get_html_response('/signup?return_url=//google.com',
-            expected_status_int=302)
-        response = self.get_html_response('/signup?return_url=/page',
-            expected_status_int=302)
+        response = self.get_html_response(
+            '/signup?return_url=https://google.com', expected_status_int=302)
+        response = self.get_html_response(
+            '/signup?return_url=//google.com', expected_status_int=302)
+        response = self.get_html_response(
+            '/signup?return_url=/page', expected_status_int=302)
 
         self.assertIn('/', response.headers['location'])
         self.assertIn('/', response.headers['location'])
