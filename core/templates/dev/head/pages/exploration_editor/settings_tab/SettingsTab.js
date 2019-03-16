@@ -387,7 +387,7 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.isTitlePresent = function() {
-      return ExplorationTitleService.displayed.length === 0;
+      return ExplorationTitleService.displayed.length > 0;
     };
   }
 ]);
