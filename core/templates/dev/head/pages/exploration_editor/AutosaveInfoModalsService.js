@@ -17,6 +17,11 @@
  * on the type of response received as a result of the autosaving request.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ChangesInHumanReadableFormService.js');
+require('pages/exploration_editor/ExplorationDataService.js');
+require('services/LocalStorageService.js');
+
 oppia.factory('AutosaveInfoModalsService', [
   '$log', '$timeout', '$uibModal', '$window',
   'ChangesInHumanReadableFormService', 'ExplorationDataService',

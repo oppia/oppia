@@ -18,6 +18,8 @@
  * is opened for the first time for an exploration.
  */
 
+require('services/SiteAnalyticsService.js');
+
 oppia.factory('EditorFirstTimeEventsService', [
   'SiteAnalyticsService',
   function(SiteAnalyticsService) {

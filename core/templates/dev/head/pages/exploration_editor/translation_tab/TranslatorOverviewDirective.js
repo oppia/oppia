@@ -17,6 +17,11 @@
  * translation language.
  */
 
+require('domain/utilities/LanguageUtilService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/translation_tab/TranslationLanguageService.js');
+require('pages/exploration_editor/translation_tab/TranslationStatusService.js');
+
 oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
 
 oppia.directive('translatorOverview', [

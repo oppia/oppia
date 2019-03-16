@@ -17,6 +17,12 @@
  *  with the exploration editor backend.
  */
 
+require('domain/exploration/EditableExplorationBackendApiService.js');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.js');
+require('services/AlertsService.js');
+require('services/LocalStorageService.js');
+require('services/contextual/UrlService.js');
+
 oppia.factory('ExplorationDataService', [
   '$http', '$log', '$q', '$window', 'AlertsService',
   'EditableExplorationBackendApiService', 'LocalStorageService',

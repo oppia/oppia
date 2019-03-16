@@ -17,6 +17,10 @@
  * committed to the server.
  */
 
+require('pages/exploration_editor/AutosaveInfoModalsService.js');
+require('pages/exploration_editor/ExplorationDataService.js');
+require('services/AlertsService.js');
+
 oppia.factory('ChangeListService', [
   '$log', '$rootScope', 'AlertsService', 'AutosaveInfoModalsService',
   'ExplorationDataService',

@@ -17,6 +17,10 @@
  * that it can be displayed and edited in multiple places in the UI.
  */
 
+require('pages/exploration_editor/ExplorationPropertyService.js');
+require('pages/exploration_editor/ExplorationRightsService.js');
+require('services/ValidatorsService.js');
+
 oppia.factory('ExplorationCategoryService', [
   '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
   'ValidatorsService',

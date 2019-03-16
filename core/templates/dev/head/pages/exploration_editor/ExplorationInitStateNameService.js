@@ -19,6 +19,8 @@
  * valid.
  */
 
+require('pages/exploration_editor/ExplorationPropertyService.js');
+
 oppia.factory('ExplorationInitStateNameService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
