@@ -25,10 +25,10 @@ oppia.directive('attributionGuide', [
         '/components/attribution_guide/' +
         'attribution_guide_directive.html'),
       controller: [
-        '$scope', 'BrowserCheckerService', function(
-            $scope, BrowserCheckerService) {
+        '$scope', 'BrowserCheckerService', 'UrlService', function(
+            $scope, BrowserCheckerService, UrlService) {
           $scope.isMobileDevice = BrowserCheckerService.isMobileDevice();
-          $scope.iframed = GLOBALS.iframed;
+          $scope.iframed = UrlService.isIframed();
         }
       ]
     };
