@@ -34,12 +34,12 @@ oppia.directive('storyNodeEditor', [
         '$scope', '$rootScope', '$uibModal', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
-        'AlertsService',
+        'EXPLORATION_AND_SKILL_ID_PATTERN', 'AlertsService',
         function(
             $scope, $rootScope, $uibModal, StoryEditorStateService,
             StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
-            AlertsService) {
+            EXPLORATION_AND_SKILL_ID_PATTERN, AlertsService) {
           var _recalculateAvailableNodes = function() {
             $scope.newNodeId = null;
             $scope.availableNodes = [];
@@ -82,7 +82,13 @@ oppia.directive('storyNodeEditor', [
           $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;
           };
-
+          $scope.canSaveExpId = true;
+          // Regex pattern for exploration id.
+          $scope.explorationIdPattern = /^[a-zA-Z0-9_-]*$/;
+          $scope.checkCanSaveExpId = function()
+          {
+            $scope.canSaveExpId = $scope.explorationIdPattern.test($scope.explorationId);
+          }
           $scope.updateTitle = function(newTitle) {
             if (newTitle === $scope.currentTitle) {
               return;
