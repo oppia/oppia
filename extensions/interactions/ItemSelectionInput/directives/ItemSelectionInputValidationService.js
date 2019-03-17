@@ -151,6 +151,17 @@ oppia.factory('ItemSelectionInputValidationService', [
           return handledAnswer;
         });
 
+        if (!areAllChoicesCovered) {
+          if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
+            warningsList.push({
+              type: WARNING_TYPES.ERROR,
+              message: (
+                'Please add something for Oppia to say in the ' +
+                '\"All other answers\" response.')
+            });
+          }
+        }
+
         answerGroups.forEach(function(answerGroup, answerIndex) {
           var rules = answerGroup.rules;
           rules.forEach(function(rule, ruleIndex) {
@@ -170,17 +181,6 @@ oppia.factory('ItemSelectionInputValidationService', [
             });
           });
         });
-
-        if (!areAllChoicesCovered) {
-          if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
-            warningsList.push({
-              type: WARNING_TYPES.ERROR,
-              message: (
-                'Please add something for Oppia to say in the ' +
-                '\"All other answers\" response.')
-            });
-          }
-        }
 
         return warningsList;
       }
