@@ -84,7 +84,7 @@ notifications:
     urls:
     # This URL can be obtained by going to the Gitter chat room
     # and clicking Settings > Integrations.
-    - https://webhooks.gitter.im/e/f8f782497ec1ffcea2e7
+    - https://webhooks.gitter.im/e/f3865f3ee5e9b40ee871
     on_success: always
     on_failure: always
 
