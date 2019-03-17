@@ -1392,12 +1392,12 @@ class LintChecksManager(object):
                         if sorted_imports != literal_args:
                             failed = True
                             print (
-           	                    'Please ensure that in %s in file %s, the '
-           	                    'stringfied dependencies should be in the '
-           	                    'following manner: dollar imports, regular '
-           	                    'imports and constant imports, all in sorted '
-           	                    'order.'
-           	                    % (property_value, filepath))
+           	                'Please ensure that in %s in file %s, the '
+           	                'stringfied dependencies should be in the '
+           	                'following manner: dollar imports, regular '
+           	                'imports and constant imports, all in sorted '
+           	                'order.'
+           	                % (property_value, filepath))
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
@@ -1409,11 +1409,11 @@ class LintChecksManager(object):
                     '%s  Sorted dependencies check passed' % (
                         _MESSAGE_TYPE_SUCCESS))
 
-            summary_messages.append(summary_message)
-            print ''
-            print summary_message
-            if self.verbose_mode_enabled:
-                print '----------------------------------------'
+        summary_messages.append(summary_message)
+        print ''
+        print summary_message
+        if self.verbose_mode_enabled:
+            print '----------------------------------------'
 
         return summary_messages
 
