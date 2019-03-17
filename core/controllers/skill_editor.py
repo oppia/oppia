@@ -96,8 +96,6 @@ class SkillEditorPage(base.BaseHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'ALLOWED_INTERACTION_CATEGORIES': (
-                feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES)
         })
 
         self.render_template('pages/skill_editor/skill_editor.html')
