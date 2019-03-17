@@ -190,13 +190,13 @@ oppia.directive('stateInteractionEditor', [
                 controller: [
                   '$scope', '$uibModalInstance', '$injector',
                   'StateSolutionService', 'StateInteractionIdService',
-                  'StateCustomizationArgsService',
+                  'StateCustomizationArgsService', 'ALLOWED_INTERACTION_CATEGORIES',
                   'InteractionDetailsCacheService', 'INTERACTION_SPECS',
                   'UrlInterpolationService', 'EditorFirstTimeEventsService',
                   function(
                       $scope, $uibModalInstance, $injector,
                       StateSolutionService, StateInteractionIdService,
-                      StateCustomizationArgsService,
+                      StateCustomizationArgsService, ALLOWED_INTERACTION_CATEGORIES,
                       InteractionDetailsCacheService, INTERACTION_SPECS,
                       UrlInterpolationService, EditorFirstTimeEventsService) {
                     EditorFirstTimeEventsService
@@ -214,7 +214,7 @@ oppia.directive('stateInteractionEditor', [
 
                     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
                     $scope.ALLOWED_INTERACTION_CATEGORIES = (
-                      GLOBALS.ALLOWED_INTERACTION_CATEGORIES);
+                      ALLOWED_INTERACTION_CATEGORIES);
 
                     if (StateInteractionIdService.savedMemento) {
                       $scope.customizationModalReopened = true;
