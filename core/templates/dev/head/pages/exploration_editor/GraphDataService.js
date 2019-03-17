@@ -16,6 +16,10 @@
  * @fileoverview Service for computing graph data.
  */
 
+require('pages/exploration_editor/ExplorationInitStateNameService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('services/ComputeGraphService.js');
+
 oppia.factory('GraphDataService', [
   'ComputeGraphService', 'ExplorationInitStateNameService',
   'ExplorationStatesService',

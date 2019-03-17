@@ -13,11 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-
 /**
  * @fileoverview Controller for the questions list.
  */
+
+require('components/QuestionCreationService.js');
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/question/EditableQuestionBackendApiService.js');
+require('domain/question/QuestionObjectFactory.js');
+require('domain/skill/EditableSkillBackendApiService.js');
+require('domain/skill/MisconceptionObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/topic_editor/TopicEditorStateService.js');
+require('pages/state_editor/StateEditorService.js');
+require('services/AlertsService.js');
+require('services/contextual/UrlService.js');
+
 oppia.directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

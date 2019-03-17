@@ -16,6 +16,15 @@
  * @fileoverview Directive for navigation in the conversation skin.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_player/ExplorationEngineService.js');
+require('pages/exploration_player/ExplorationPlayerStateService.js');
+require('pages/exploration_player/PlayerConstants.js');
+require('pages/exploration_player/PlayerPositionService.js');
+require('pages/exploration_player/PlayerTranscriptService.js');
+require('services/contextual/UrlService.js');
+require('services/contextual/WindowDimensionsService.js');
+
 oppia.directive('progressNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

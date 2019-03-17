@@ -17,6 +17,9 @@
  * used for audio translations.
  */
 
+require('domain/utilities/BrowserCheckerService.js');
+require('domain/utilities/LanguageUtilService.js');
+
 oppia.factory('AudioTranslationLanguageService', [
   'BrowserCheckerService', 'LanguageUtilService',
   function(

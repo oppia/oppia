@@ -17,6 +17,11 @@
  * footer.
  */
 
+require('components/RatingComputationService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/ContextService.js');
+require('services/DateTimeFormatService.js');
+
 oppia.controller('LearnerViewInfo', [
   '$http', '$log', '$scope', '$uibModal', 'ContextService',
   'UrlInterpolationService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',

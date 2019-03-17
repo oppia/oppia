@@ -17,6 +17,23 @@
  *  like engine service.
  */
 
+require('domain/exploration/EditableExplorationBackendApiService.js');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.js');
+require('domain/question/PretestQuestionBackendApiService.js');
+require('pages/exploration_player/ExplorationEngineService.js');
+require('pages/exploration_player/NumberAttemptsService.js');
+require('pages/exploration_player/PlayerPositionService.js');
+require('pages/exploration_player/PlayerTranscriptService.js');
+require('pages/exploration_player/PretestEngineService.js');
+require('pages/exploration_player/StateClassifierMappingService.js');
+require('pages/exploration_player/StatsReportingService.js');
+require('services/ContextService.js');
+require('services/ExplorationFeaturesBackendApiService.js');
+require('services/ExplorationFeaturesService.js');
+require('services/PlaythroughIssuesService.js');
+require('services/PlaythroughService.js');
+require('services/contextual/UrlService.js');
+
 oppia.factory('ExplorationPlayerStateService', [
   '$log', '$q', 'ContextService', 'EditableExplorationBackendApiService',
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',

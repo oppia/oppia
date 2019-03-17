@@ -16,6 +16,15 @@
  * @fileoverview Services for stats reporting.
  */
 
+require('domain/utilities/StopwatchObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_player/AnswerClassificationService.js');
+require('pages/exploration_player/PlayerConstants.js');
+require('services/ContextService.js');
+require('services/MessengerService.js');
+require('services/PlaythroughService.js');
+require('services/SiteAnalyticsService.js');
+
 oppia.constant('STATS_EVENT_TYPES', {
   EVENT_TYPE_START_EXPLORATION: 'start',
   EVENT_TYPE_ACTUAL_START_EXPLORATION: 'actual_start',

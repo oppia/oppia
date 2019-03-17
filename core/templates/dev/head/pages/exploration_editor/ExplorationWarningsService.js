@@ -16,6 +16,15 @@
  * @fileoverview A service that lists all the exploration warnings.
  */
 
+require('expressions/ExpressionInterpolationService.js');
+require('pages/exploration_editor/ExplorationParamChangesService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/GraphDataService.js');
+require('pages/exploration_editor/ParameterMetadataService.js');
+require('pages/exploration_editor/editor_tab/SolutionValidityService.js');
+require('services/ImprovementsService.js');
+require('services/StateTopAnswersStatsService.js');
+
 // When an unresolved answer's frequency exceeds this threshold, an exploration
 // will be blocked from being published until the answer is resolved.
 oppia.constant('UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);

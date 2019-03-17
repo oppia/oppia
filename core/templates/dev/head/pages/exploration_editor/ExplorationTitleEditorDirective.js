@@ -15,6 +15,9 @@
 /**
  * @fileoverview Directive for the exploration title field in forms.
  */
+
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.directive('explorationTitleEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

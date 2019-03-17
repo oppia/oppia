@@ -16,6 +16,27 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
+require('domain/state/StatesObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/AutosaveInfoModalsService.js');
+require('pages/exploration_editor/ChangeListService.js');
+require('pages/exploration_editor/ExplorationCategoryService.js');
+require('pages/exploration_editor/ExplorationDataService.js');
+require('pages/exploration_editor/ExplorationDiffService.js');
+require('pages/exploration_editor/ExplorationInitStateNameService.js');
+require('pages/exploration_editor/ExplorationLanguageCodeService.js');
+require('pages/exploration_editor/ExplorationObjectiveService.js');
+require('pages/exploration_editor/ExplorationRightsService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/ExplorationTagsService.js');
+require('pages/exploration_editor/ExplorationTitleService.js');
+require('pages/exploration_editor/ExplorationWarningsService.js');
+require('pages/exploration_editor/RouterService.js');
+require('services/AlertsService.js');
+require('services/ContextService.js');
+require('services/SiteAnalyticsService.js');
+require('services/stateful/FocusManagerService.js');
+
 oppia.factory('ExplorationSaveService', [
   '$log', '$q', '$rootScope', '$timeout', '$uibModal',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',

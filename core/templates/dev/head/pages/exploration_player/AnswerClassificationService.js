@@ -16,6 +16,11 @@
  * @fileoverview Classification service for answer groups.
  */
 
+require('domain/classifier/AnswerClassificationResultObjectFactory.js');
+require('pages/exploration_player/PredictionAlgorithmRegistryService.js');
+require('pages/exploration_player/StateClassifierMappingService.js');
+require('services/AlertsService.js');
+
 // TODO(bhenning): Find a better place for these constants.
 
 // NOTE TO DEVELOPERS: These constants must be the same (in name and value) as

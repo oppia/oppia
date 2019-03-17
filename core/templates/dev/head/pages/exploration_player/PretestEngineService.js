@@ -16,6 +16,15 @@
  * @fileoverview Utility service for the pretests for an exploration.
  */
 
+require('domain/question/QuestionObjectFactory.js');
+require('domain/state_card/StateCardObjectFactory.js');
+require('expressions/ExpressionInterpolationService.js');
+require('pages/exploration_player/AnswerClassificationService.js');
+require('services/AlertsService.js');
+require('services/ContextService.js');
+require('services/ExplorationHtmlFormatterService.js');
+require('services/stateful/FocusManagerService.js');
+
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 oppia.factory('PretestEngineService', [

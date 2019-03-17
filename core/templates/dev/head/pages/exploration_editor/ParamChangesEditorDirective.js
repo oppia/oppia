@@ -17,6 +17,14 @@
  * both the exploration settings tab and the state editor page).
  */
 
+require('domain/exploration/ParamChangeObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationParamSpecsService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/state_editor/StateEditorService.js');
+require('services/AlertsService.js');
+require('services/EditabilityService.js');
+
 oppia.directive('paramChangesEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

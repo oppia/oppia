@@ -15,6 +15,14 @@
 /**
  * @fileoverview Directive for the exploration save & publish buttons.
  */
+
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ChangeListService.js');
+require('pages/exploration_editor/ExplorationRightsService.js');
+require('pages/exploration_editor/ExplorationSaveService.js');
+require('pages/exploration_editor/ExplorationWarningsService.js');
+require('services/EditabilityService.js');
+
 oppia.directive('explorationSaveAndPublishButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
