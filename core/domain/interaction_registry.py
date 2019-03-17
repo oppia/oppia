@@ -20,8 +20,8 @@ import itertools
 import os
 import pkgutil
 
-import feconf
 from constants import constants
+import feconf
 
 
 class Registry(object):
