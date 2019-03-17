@@ -16,14 +16,17 @@
  * @fileoverview Data and controllers for the Oppia contributors' library page.
  */
 
-// NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
-// be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
-// LIBRARY_PAGE_MODES.GROUP should have the same value as
-// LIBRARY_PAGE_MODE_GROUP in feconf.py.
 oppia.constant('LIBRARY_PAGE_MODES', {
   GROUP: 'group',
   INDEX: 'index',
   SEARCH: 'search'
+});
+
+oppia.constant('LIBRARY_PATHS_TO_MODES', {
+  '/library': 'index',
+  '/library/top_rated': 'group',
+  '/library/recently_published': 'group',
+  '/search/find': 'search'
 });
 
 oppia.controller('Library', [
@@ -34,7 +37,7 @@ oppia.controller('Library', [
   'SearchService',
   'UrlInterpolationService', 'UrlService', 'UserService',
   'WindowDimensionsService', 'ALL_CATEGORIES',
-  'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX',
+  'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
   function(
       $http, $log, $rootScope, $scope, $timeout, $uibModal, $window,
       AlertsService, ConstructTranslationIdsService,
@@ -43,7 +46,7 @@ oppia.controller('Library', [
       SearchService,
       UrlInterpolationService, UrlService, UserService,
       WindowDimensionsService, ALL_CATEGORIES,
-      LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX) {
+      LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES, LIBRARY_TILE_WIDTH_PX) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -55,7 +58,11 @@ oppia.controller('Library', [
 
     $scope.activeGroupIndex = null;
 
-    $scope.pageMode = GLOBALS.PAGE_MODE;
+    var currentPath = $window.location.pathname;
+    if (!LIBRARY_PATHS_TO_MODES.hasOwnProperty(currentPath)) {
+      $log.error('INVALID URL PATH: ' + currentPath);
+    }
+    $scope.pageMode = LIBRARY_PATHS_TO_MODES[currentPath];
     $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
 
     // Keeps track of the index of the left-most visible card of each group.

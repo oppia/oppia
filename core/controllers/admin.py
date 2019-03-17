@@ -266,7 +266,7 @@ class AdminHandler(base.BaseHandler):
             exploration_ids_to_publish = []
             for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
-                category = random.choice(feconf.SEARCH_DROPDOWN_CATEGORIES)
+                category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_services.get_new_exploration_id()
                 exploration = exp_domain.Exploration.create_default_exploration(
                     new_exploration_id, title=title, category=category,
