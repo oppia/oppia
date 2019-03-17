@@ -88,7 +88,7 @@ exports.config = {
     ],
 
     explorationFeedbackTab: [
-      'protractor_desktop/explorationFeedbackTab.js'
+      'protractor_desktop/ExplorationFeedbackTab.js'
     ],
 
     explorationHistoryTab: [
