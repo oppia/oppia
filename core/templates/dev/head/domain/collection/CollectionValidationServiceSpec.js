@@ -20,6 +20,8 @@ describe('Collection validation service', function() {
   var CollectionValidationService = null;
   var CollectionObjectFactory = null;
   var CollectionNodeObjectFactory = null;
+  var sampleCollectionBackendObject = null;
+  var _sampleCollection = null;
 
   var EXISTS = true;
   var DOES_NOT_EXIST = false;
@@ -33,7 +35,7 @@ describe('Collection validation service', function() {
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
 
-    var sampleCollectionBackendObject = {
+    sampleCollectionBackendObject = {
       id: 'sample_collection_id',
       title: 'a title',
       objective: 'an objective',

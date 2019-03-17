@@ -21,6 +21,9 @@ describe('Story editor state service', function() {
   var StoryObjectFactory = null;
   var StoryUpdateService = null;
   var fakeEditableStoryBackendApiService = null;
+  var secondBackendStoryObject = null;
+  var $rootScope = null;
+  var $scope = null;
 
   var FakeEditableStoryBackendApiService = function() {
     var self = {};
@@ -85,7 +88,7 @@ describe('Story editor state service', function() {
         nodes: []
       },
       language_code: 'en',
-      schema_version: '1',
+      story_contents_schema_version: '1',
       version: '1'
     };
 
@@ -100,7 +103,7 @@ describe('Story editor state service', function() {
         nodes: []
       },
       language_code: 'en',
-      schema_version: '1',
+      story_contents_schema_version: '1',
       version: '1'
     };
   }));

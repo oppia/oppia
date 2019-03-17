@@ -248,9 +248,13 @@ DEFAULT_MISCONCEPTION_NAME = ''
 DEFAULT_MISCONCEPTION_NOTES = ''
 # Default feedback for a newly-minted misconception.
 DEFAULT_MISCONCEPTION_FEEDBACK = ''
+# Default content_id for explanation subtitled html.
+DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
 
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
+# Default content id for the subtopic page's content.
+DEFAULT_SUBTOPIC_PAGE_CONTENT_ID = 'content'
 
 # Default ID of VM which is used for training classifier.
 DEFAULT_VM_ID = 'vm_default'
@@ -673,13 +677,15 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
+NOTIFICATIONS_DASHBOARD_URL = '/notifications_dashboard'
+PREFERENCES_URL = '/preferences'
+PRACTICE_SESSION_URL_PREFIX = '/practice_session'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
-SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
