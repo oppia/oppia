@@ -1119,16 +1119,16 @@ class LintChecksManager(object):
             print '----------------------------------------'
         # Select JS files which need to be checked.
         files_to_check = [
-            filename for filename in self.all_filepaths if
-            filename.endswith('.js') and not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in
+            filepath for filepath in self.all_filepaths if
+            filepath.endswith('.js') and not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS)]
         failed = False
         summary_messages = []
         components_to_check = ['directive']
 
-        for filename in files_to_check:
-            parsed_script = self.parsed_js_files[filename]
+        for filepath in files_to_check:
+            parsed_script = self.parsed_js_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
                 parsed_nodes = parsed_script.body
@@ -1203,7 +1203,7 @@ class LintChecksManager(object):
                                                 'directive in %s file '
                                                 'does not have scope set to '
                                                 'true.' %
-                                                (directive_name, filename))
+                                                (directive_name, filepath))
                                             print ''
                                         elif scope_value.type != (
                                                 'ObjectExpression'):
@@ -1215,7 +1215,7 @@ class LintChecksManager(object):
                                                 'Please ensure that %s '
                                                 'directive in %s file has a '
                                                 'scope: {}.' % (
-                                                    directive_name, filename))
+                                                    directive_name, filepath))
                                             print ''
 
         with _redirect_stdout(_TARGET_STDOUT):
@@ -1243,19 +1243,19 @@ class LintChecksManager(object):
             print '----------------------------------------'
         # Select JS files which need to be checked.
         files_to_check = [
-            filename for filename in self.all_filepaths if not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in
+            filepath for filepath in self.all_filepaths if not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS)
-            and filename.endswith('.js') and not filename.endswith('App.js')]
+            and filepath.endswith('.js') and not filepath.endswith('App.js')]
         failed = False
         summary_messages = []
         component_name = ''
         components_to_check = ['controller', 'directive', 'factory', 'filter']
-        for filename in files_to_check:
+        for filepath in files_to_check:
             component_num = 0
             # Filename without its path and extension.
-            exact_filename = filename.split('/')[-1][:-3]
-            parsed_script = self.parsed_js_files[filename]
+            exact_filename = filepath.split('/')[-1][:-3]
+            parsed_script = self.parsed_js_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
                 parsed_nodes = parsed_script.body
@@ -1270,7 +1270,7 @@ class LintChecksManager(object):
                     if component_num > 1:
                         print (
                             '%s -> Please ensure that there is exactly one '
-                            'component in the file.' % (filename))
+                            'component in the file.' % (filepath))
                         failed = True
                         break
                     # Separate the arguments of the expression.
@@ -1289,7 +1289,7 @@ class LintChecksManager(object):
                             print (
                                 '%s -> Please ensure that the %s name '
                                 'matches the filename'
-                                % (filename, component))
+                                % (filepath, component))
                             failed = True
                     # If the component is controller or factory, then the
                     # component name should exactly match the filename
@@ -1300,7 +1300,7 @@ class LintChecksManager(object):
                             print (
                                 '%s -> Please ensure that the %s name '
                                 'matches the filename'
-                                % (filename, component))
+                                % (filepath, component))
                             failed = True
 
         with _redirect_stdout(_TARGET_STDOUT):
@@ -1330,16 +1330,16 @@ class LintChecksManager(object):
             print 'Starting sorted dependencies check'
             print '----------------------------------------'
         files_to_check = [
-            filename for filename in self.all_filepaths if
-            filename.endswith('.js') and not
-            any(fnmatch.fnmatch(filename, pattern) for pattern in
+            filepath for filepath in self.all_filepaths if
+            filepath.endswith('.js') and not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS)]
         components_to_check = ['controller', 'directive', 'factory']
         failed = False
         summary_messages = []
 
-        for filename in files_to_check:
-            parsed_script = self.parsed_js_files[filename]
+        for filepath in files_to_check:
+            parsed_script = self.parsed_js_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 parsed_nodes = parsed_script.body
                 for parsed_node in parsed_nodes:
@@ -1388,7 +1388,7 @@ class LintChecksManager(object):
                                 'following manner: dollar imports, regular '
                                 'imports and constant imports, all in sorted '
                                 'order.'
-                                % (property_value, filename))
+                                % (property_value, filepath))
                         if sorted_imports != literal_args:
                             failed = True
                             print (
@@ -1397,7 +1397,7 @@ class LintChecksManager(object):
            	                    'following manner: dollar imports, regular '
            	                    'imports and constant imports, all in sorted '
            	                    'order.'
-           	                    % (property_value, filename))
+           	                    % (property_value, filepath))
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
@@ -1410,9 +1410,12 @@ class LintChecksManager(object):
                         _MESSAGE_TYPE_SUCCESS))
 
             summary_messages.append(summary_message)
-            print summary_message
             print ''
-            return summary_messages
+            print summary_message
+            if self.verbose_mode_enabled:
+                print '----------------------------------------'
+
+        return summary_messages
 
     def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
