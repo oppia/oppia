@@ -54,7 +54,7 @@ oppia.factory('QuestionUpdateService', [
     };
 
     var _getAllContentIds = function(state) {
-      allContentIdsSet = new Set();
+      var allContentIdsSet = new Set();
       allContentIdsSet.add(state.content.getContentId());
       state.interaction.answerGroups.forEach(function(answerGroup) {
         allContentIdsSet.add(answerGroup.outcome.feedback.getContentId());
@@ -75,15 +75,15 @@ oppia.factory('QuestionUpdateService', [
     };
 
     var _getElementsInFirstSetButNotInSecond = function(setA, setB) {
-      diffList = Array.from(setA).filter(function(element) {
+      var diffList = Array.from(setA).filter(function(element) {
         return !setB.has(element);
       });
       return diffList;
     };
 
     var _updateContentIdsInAssets = function(newState, oldState) {
-      newContentIds = _getAllContentIds(newState);
-      oldContentIds = _getAllContentIds(oldState);
+      var newContentIds = _getAllContentIds(newState);
+      var oldContentIds = _getAllContentIds(oldState);
       var contentIdsToDelete = _getElementsInFirstSetButNotInSecond(
         oldContentIds, newContentIds);
       var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(

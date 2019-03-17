@@ -20,6 +20,7 @@ describe('Question object factory', function() {
   var QuestionObjectFactory = null;
   var _sampleQuestion = null;
   var _sampleQuestionBackendDict = null;
+  var MisconceptionObjectFactory = null;
 
   beforeEach(module('oppia'));
 
@@ -136,11 +137,7 @@ describe('Question object factory', function() {
   });
 
   it('should correctly get backend dict', function() {
-    expect(
-      _sampleQuestion.toBackendDict(true).question_state_schema_version
-    ).toEqual(27);
-
-    expect(_sampleQuestion.toBackendDict(true, 27).id).toEqual(null);
+    expect(_sampleQuestion.toBackendDict(true).id).toEqual(null);
     expect(_sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 

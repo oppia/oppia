@@ -18,7 +18,7 @@
 
 describe('Sidebar state name controller', function() {
   describe('SidebarStateName', function() {
-    var scope, filter, ctrl, ecs, fs, ess;
+    var scope, filter, ctrl, ecs, fs, ess, rootScope, outerScope;
     var $httpBackend;
     var mockExplorationData;
 

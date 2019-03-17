@@ -82,10 +82,7 @@
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         status_code: JSON.parse('{{status_code}}'),
         GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
-        SITE_FEEDBACK_FORM_URL: JSON.parse('{{SITE_FEEDBACK_FORM_URL|js_string}}'),
-        iframed: JSON.parse('{{iframed|js_string}}'),
         isTopicManager: JSON.parse('{{is_topic_manager|js_string}}'),
-        logoutUrl: JSON.parse('{{logout_url|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
     </script>
@@ -185,8 +182,6 @@
     <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
     <script src="/templates/dev/head/services/TranslationFileHashLoaderService.js"></script>
     <script src="/templates/dev/head/services/RteHelperService.js"></script>
-    <script src="/templates/dev/head/services/StateRulesStatsService.js"></script>
-    <script src="/templates/dev/head/services/ConstructTranslationIdsService.js"></script>
     <script src="/templates/dev/head/services/UserService.js"></script>
     <script src="/templates/dev/head/services/PromoBarService.js"></script>
     <script src="/templates/dev/head/services/contextual/DeviceInfoService.js"></script>
@@ -207,11 +202,7 @@
 
     <script src="/templates/dev/head/components/CollectionCreationService.js"></script>
     <script src="/templates/dev/head/components/ExplorationCreationService.js"></script>
-    <script src="/templates/dev/head/components/TopicCreationService.js"></script>
-    <script src="/templates/dev/head/components/SkillCreationService.js"></script>
-    <script src="/templates/dev/head/components/StoryCreationService.js"></script>
 
-    <script src="/templates/dev/head/components/CkEditorRteDirective.js"></script>
     <script src="/templates/dev/head/domain/sidebar/SidebarStatusService.js"></script>
     <script src="/templates/dev/head/domain/user/UserInfoObjectFactory.js"></script>
     <script src="/templates/dev/head/domain/utilities/UrlInterpolationService.js"></script>

@@ -107,6 +107,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     def test_requests_for_invalid_paths(self):
         """Test that requests for invalid paths result in a 404 error."""
+        user_id = user_services.get_user_id_from_username('learneruser')
+        csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
         self.get_html_response(
             '/library/extra', expected_status_int=404)
@@ -115,10 +117,12 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/library/data/extra', expected_status_int=404)
 
         self.post_json(
-            '/library/extra', payload={}, expected_status_int=404)
+            '/library/extra', payload={}, csrf_token=csrf_token,
+            expected_status_int=404)
 
         self.put_json(
-            '/library/extra', payload={}, expected_status_int=404)
+            '/library/extra', payload={}, csrf_token=csrf_token,
+            expected_status_int=404)
 
     def test_redirect_in_logged_out_states(self):
         """Test for a redirect in logged out state on '/'."""
@@ -273,8 +277,8 @@ class EscapingTests(test_utils.GenericTestBase):
         ))
 
     def test_jinja_autoescaping(self):
-        form_url = '<[angular_tag]> x{{51 * 3}}y'
-        with self.swap(feconf, 'SITE_FEEDBACK_FORM_URL', form_url):
+        dangerous_field_contents = '<[angular_tag]> x{{51 * 3}}y'
+        with self.swap(constants, 'DEV_MODE', dangerous_field_contents):
             response = self.get_html_response('/fake')
 
             self.assertIn('&lt;[angular_tag]&gt;', response.body)
@@ -332,9 +336,7 @@ class LogoutPageTests(test_utils.GenericTestBase):
         # cookies have expired after hitting the logout url.
         current_page = '/explore/0'
         response = self.get_html_response(current_page)
-        response = self.get_html_response(
-            current_user_services.create_logout_url(
-                current_page), expected_status_int=302)
+        response = self.get_html_response('/logout', expected_status_int=302)
         expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
         self.assertTrue(

@@ -564,10 +564,6 @@ tags: []
         """Returns the expected login URL."""
         return current_user_services.create_login_url(slug)
 
-    def get_expected_logout_url(self, slug):
-        """Returns the expected logout URL."""
-        return current_user_services.create_logout_url(slug)
-
     def _get_response(
             self, url, expected_content_type, params=None,
             expected_status_int=200):
@@ -1371,7 +1367,7 @@ tags: []
             description=description,
             title=title,
             language_code=language_code,
-            schema_version=1,
+            story_contents_schema_version=1,
             notes=notes,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT
         )
@@ -1547,22 +1543,22 @@ tags: []
             Skill. A newly-created skill.
         """
         skill = skill_domain.Skill.create_default_skill(skill_id, description)
-        if misconceptions:
+        if misconceptions is not None:
             skill.misconceptions = misconceptions
-        if skill_contents:
+            skill.next_misconception_id = len(misconceptions) + 1
+        if skill_contents is not None:
             skill.skill_contents = skill_contents
         skill.language_code = language_code
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
         return skill
 
-    def save_new_skill_with_story_and_skill_contents_schema_version(
-            self, skill_id, owner_id,
-            description, next_misconception_id, misconceptions=None,
-            skill_contents=None, misconceptions_schema_version=1,
-            skill_contents_schema_version=1,
+    def save_new_skill_with_defined_schema_versions(
+            self, skill_id, owner_id, description, next_misconception_id,
+            misconceptions=None, skill_contents=None,
+            misconceptions_schema_version=1, skill_contents_schema_version=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Saves a new default skill with a default version 1 misconceptions
+        """Saves a new default skill with the given versions for misconceptions
         and skill contents.
 
         This function should only be used for creating skills in tests

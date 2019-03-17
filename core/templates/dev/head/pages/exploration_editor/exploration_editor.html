@@ -133,6 +133,7 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
   <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
@@ -324,7 +325,11 @@
   <script src="/templates/dev/head/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
 
+  <script src="/templates/dev/head/domain/statistics/PlaythroughImprovementCardObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/statistics/ImprovementActionButtonObjectFactory.js"></script>
+  <script src="/templates/dev/head/services/ImprovementCardService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/improvements_tab/ImprovementsTabDirective.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/improvements_tab/PlaythroughImprovementCardDirective.js"></script>
 
   <script src="/templates/dev/head/pages/state_editor/StateContentEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StateInteractionEditorDirective.js"></script>
@@ -334,6 +339,9 @@
   <script src="/templates/dev/head/pages/state_editor/StateEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StateEditorService.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StatePropertyServices.js"></script>
+
+  <script src="/templates/dev/head/components/CkEditorRteDirective.js"></script>
+  <script src="/templates/dev/head/components/CkEditorWidgetsInitializer.js"></script>
 
   <script src="/templates/dev/head/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
@@ -362,6 +370,7 @@
   <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
   <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
   <script src="/templates/dev/head/services/SpeechSynthesisChunkerService.js"></script>
+  <script src="/templates/dev/head/services/StateRulesStatsService.js"></script>
   <script src="/templates/dev/head/services/StateTopAnswersStatsBackendApiService.js"></script>
   <script src="/templates/dev/head/services/StateTopAnswersStatsService.js"></script>
   <script src="/templates/dev/head/services/ExplorationFeaturesService.js"></script>
