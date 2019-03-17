@@ -147,6 +147,10 @@ oppia.factory('ItemSelectionInputValidationService', [
             });
           });
         }
+        areAllChoicesCovered = handledAnswers.every(function(handledAnswer) {
+          return handledAnswer;
+        });
+
         answerGroups.forEach(function(answerGroup, answerIndex) {
           var rules = answerGroup.rules;
           rules.forEach(function(rule, ruleIndex) {
@@ -165,10 +169,6 @@ oppia.factory('ItemSelectionInputValidationService', [
               }
             });
           });
-        });
-
-        areAllChoicesCovered = handledAnswers.every(function(handledAnswer) {
-          return handledAnswer;
         });
 
         if (!areAllChoicesCovered) {
