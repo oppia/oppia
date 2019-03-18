@@ -188,16 +188,18 @@ oppia.directive('stateInteractionEditor', [
                 backdrop: true,
                 resolve: {},
                 controller: [
-                  '$scope', '$uibModalInstance', '$injector',
+                  '$scope', '$uibModalInstance', '$injector', '$window',
                   'StateSolutionService', 'StateInteractionIdService',
-                  'StateCustomizationArgsService', 'ALLOWED_INTERACTION_CATEGORIES',
+                  'StateCustomizationArgsService',
                   'InteractionDetailsCacheService', 'INTERACTION_SPECS',
+                  'ALLOWED_INTERACTION_CATEGORIES', 'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
                   'UrlInterpolationService', 'EditorFirstTimeEventsService',
                   function(
-                      $scope, $uibModalInstance, $injector,
+                      $scope, $uibModalInstance, $injector, $window,
                       StateSolutionService, StateInteractionIdService,
-                      StateCustomizationArgsService, ALLOWED_INTERACTION_CATEGORIES,
+                      StateCustomizationArgsService,
                       InteractionDetailsCacheService, INTERACTION_SPECS,
+                      ALLOWED_INTERACTION_CATEGORIES, ALLOWED_QUESTION_INTERACTION_CATEGORIES,
                       UrlInterpolationService, EditorFirstTimeEventsService) {
                     EditorFirstTimeEventsService
                       .registerFirstClickAddInteractionEvent();
@@ -213,8 +215,16 @@ oppia.directive('stateInteractionEditor', [
                       UrlInterpolationService.getInteractionThumbnailImageUrl);
 
                     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
-                    $scope.ALLOWED_INTERACTION_CATEGORIES = (
-                      ALLOWED_INTERACTION_CATEGORIES);
+
+                    // Checks that the modal is invoked by exploration_editor or
+                    // skill_editor, topic_editor. 
+                    if ($window.location.href.indexOf('/questions') == -1) {
+                      $scope.ALLOWED_INTERACTION_CATEGORIES = (
+                        ALLOWED_INTERACTION_CATEGORIES);
+                    } else {
+                      $scope.ALLOWED_INTERACTION_CATEGORIES = (
+                        ALLOWED_QUESTION_INTERACTION_CATEGORIES);
+                    }
 
                     if (StateInteractionIdService.savedMemento) {
                       $scope.customizationModalReopened = true;

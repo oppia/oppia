@@ -438,6 +438,19 @@ var constants = {
     "LIST": "list"
   },
 
+  "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
+    "name": "General",
+    "interaction_ids": [
+        "MultipleChoiceInput",
+        "TextInput"
+    ]
+  }, {
+    "name": "Math",
+    "interaction_ids": [
+        "NumericInput"
+    ]
+  }],
+
   // These categories and interactions are displayed in the order in which they
   // appear in the interaction selector.
   "ALLOWED_INTERACTION_CATEGORIES": [{
