@@ -51,13 +51,4 @@ describe('Hint object factory', function() {
       })
     );
   }));
-
-  it('should create a hint object from a dict correctly', inject(function() {
-    expect(hof.createFromBackendDict({
-      hint_content: {
-        html: '<p>Some Hint</p>',
-        content_id: 'content_id'
-      }
-    })).toEqual(hof.createNew('content_id', '<p>Some Hint</p>'));
-  }));
 });
