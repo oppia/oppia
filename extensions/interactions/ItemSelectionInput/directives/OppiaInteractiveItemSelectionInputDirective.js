@@ -88,6 +88,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
                 return $scope.userSelections[obj];
               }
             );
+
             CurrentInteractionService.onSubmit(
               answers, itemSelectionInputRulesService);
           };

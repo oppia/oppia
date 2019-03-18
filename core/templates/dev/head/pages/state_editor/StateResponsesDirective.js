@@ -503,6 +503,7 @@ oppia.directive('stateResponses', [
             var summary = '';
             var outcome = answerGroup.outcome;
             var hasFeedback = outcome.hasNonemptyFeedback();
+
             if (answerGroup.rules) {
               var firstRule = $filter('convertToPlainText')(
                 $filter('parameterizeRuleDescription')(

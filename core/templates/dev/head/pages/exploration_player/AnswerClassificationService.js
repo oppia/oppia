@@ -95,6 +95,7 @@ oppia.factory('AnswerClassificationService', [
       getMatchingClassificationResult: function(
           stateName, interactionInOldState, answer, interactionRulesService) {
         var answerClassificationResult = null;
+
         var answerGroups = interactionInOldState.answerGroups;
         var defaultOutcome = interactionInOldState.defaultOutcome;
         if (interactionRulesService) {

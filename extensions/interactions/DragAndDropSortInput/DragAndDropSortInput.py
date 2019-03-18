@@ -14,6 +14,7 @@
 """Python configuration for DragAndDropSortInput interaction."""
 
 from extensions.interactions import base
+from extensions.objects.models import objects
 
 
 class DragAndDropSortInput(base.BaseInteraction):
@@ -58,10 +59,7 @@ class DragAndDropSortInput(base.BaseInteraction):
                 'add_element_text': 'Add a new item',
             }
         },
-        'default_value': [{
-            'content_id': '',
-            'html': ''
-        }],
+        'default_value': [objects.TranslatableHtml.default_value]
     }, {
         'name': 'allowMultipleItemsInSamePosition',
         'description': 'Allow multiple sort items in the same position',

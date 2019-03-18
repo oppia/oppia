@@ -410,8 +410,7 @@ describe('Testing filters', function() {
           x: 0
         }
       };
-      var interactionIdMultipleChoice = 'TextInput';
-      // What to do here? TextInput interaction cannot have choices, right?
+      var interactionIdMultipleChoice = 'MultipleChoiceInput';
       var choicesMultipleChoice = [
         {
           label: '$10 should not become $$10',

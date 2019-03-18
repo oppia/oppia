@@ -17,6 +17,7 @@
 """Python configuration for MultipleChoiceInput interaction."""
 
 from extensions.interactions import base
+from extensions.objects.models import objects
 
 
 class MultipleChoiceInput(base.BaseInteraction):
@@ -55,10 +56,7 @@ class MultipleChoiceInput(base.BaseInteraction):
                 'add_element_text': 'Add multiple choice option',
             }
         },
-        'default_value': [{
-            'content_id': '',
-            'html': ''
-        }],
+        'default_value': [objects.TranslatableHtml.default_value]
     }]
 
     _answer_visualization_specs = [{

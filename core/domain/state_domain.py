@@ -1217,19 +1217,15 @@ class State(object):
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
 
-        if allow_null_interaction and self.interaction.id is not None:
-            interaction_can_have_translations = (
-                interaction_registry.Registry.get_interaction_by_id(
-                    self.interaction.id).can_have_translations)
-            if interaction_can_have_translations:
-                for content_id in self._get_customization_args_content_ids():
-                    if content_id in content_id_list:
-                        raise utils.ValidationError(
-                            'Found a duplicate content id %s' % content_id)
-                    content_id_list.append(content_id)
+        for content_id in self._get_customization_args_content_ids():
+            if content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % content_id)
+            content_id_list.append(content_id)
 
         available_content_ids_in_audio_translations = (
             self.content_ids_to_audio_translations.keys())
+
         self.written_translations.validate(content_id_list)
 
         if not set(content_id_list) == set(
@@ -1400,13 +1396,9 @@ class State(object):
             interaction_id: str. The new interaction id to set.
         """
         if interaction_id is None:
-            interaction_can_have_translations = (
-                interaction_registry.Registry.get_interaction_by_id(
-                    self.interaction.id).can_have_translations)
-            if interaction_can_have_translations:
-                unwanted_content_ids = (
-                    self._get_customization_args_content_ids())
-                self._update_content_ids_in_assets(unwanted_content_ids, [])
+            unwanted_content_ids = self._get_customization_args_content_ids()
+            self._update_content_ids_in_assets(unwanted_content_ids, [])
+
         self.interaction.id = interaction_id
         # TODO(sll): This should also clear interaction.answer_groups (except
         # for the default rule). This is somewhat mitigated because the client
@@ -1415,7 +1407,11 @@ class State(object):
 
     def _get_customization_args_content_ids(self):
         """Returns a list of content id present within the customization_args
-        of interaction.
+        of the interaction.
+
+        Returns:
+            list(str). A list of content id present within the
+                customization_args of the interaction.
         """
         interaction_can_have_translations = False
         content_id_list = []
@@ -1463,6 +1459,7 @@ class State(object):
             raise Exception(
                 'Expected interaction_answer_groups to be a list, received %s'
                 % answer_groups_list)
+
         interaction_answer_groups = []
         old_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
@@ -1512,6 +1509,7 @@ class State(object):
                 answer_group.rule_specs.append(rule_spec)
             interaction_answer_groups.append(answer_group)
         self.interaction.answer_groups = interaction_answer_groups
+
         new_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]

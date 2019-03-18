@@ -17,6 +17,7 @@
 """Python configuration for ItemSelectionInput interaction."""
 
 from extensions.interactions import base
+from extensions.objects.models import objects
 
 
 class ItemSelectionInput(base.BaseInteraction):
@@ -72,10 +73,7 @@ class ItemSelectionInput(base.BaseInteraction):
                 'add_element_text': 'Add item for selection',
             }
         },
-        'default_value': [{
-            'content_id': '',
-            'html': ''
-        }],
+        'default_value': [objects.TranslatableHtml.default_value]
     }]
 
     _answer_visualization_specs = [{
