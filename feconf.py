@@ -677,6 +677,9 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
+NOTIFICATIONS_DASHBOARD_URL = '/notifications_dashboard'
+PREFERENCES_URL = '/preferences'
+PRACTICE_SESSION_URL_PREFIX = '/practice_session'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
@@ -798,27 +801,6 @@ USER_QUERY_STATUS_FAILED = 'failed'
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
 
-# These categories are shown in the library navbar.
-SEARCH_DROPDOWN_CATEGORIES = sorted([
-    'Mathematics',
-    'Statistics',
-    'Algorithms',
-    'Programming',
-    'Biology',
-    'Chemistry',
-    'Physics',
-    'Medicine',
-    'English',
-    'Architecture',
-    'Art',
-    'Music',
-    'Reading',
-    'Business',
-    'Economics',
-    'Geography',
-    'History',
-])
-
 # The i18n id for the header of the "Featured Activities" category in the
 # library index page.
 LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
@@ -835,18 +817,6 @@ LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
 # The group name that appears at the end of the url for the top rated page.
 LIBRARY_GROUP_TOP_RATED = 'top_rated'
-
-# NOTE TO DEVELOPERS: The LIBRARY_PAGE_MODE constants defined below should have
-# the same value as the ones defined in LIBRARY_PAGE_MODES in Library.js. For
-# example LIBRARY_PAGE_MODE_GROUP should have the same value as
-# LIBRARY_PAGE_MODES.GROUP.
-# Page mode for the group pages such as top rated and recently published
-# explorations.
-LIBRARY_PAGE_MODE_GROUP = 'group'
-# Page mode for the main library page.
-LIBRARY_PAGE_MODE_INDEX = 'index'
-# Page mode for the search results page.
-LIBRARY_PAGE_MODE_SEARCH = 'search'
 
 # Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5
