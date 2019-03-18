@@ -17,6 +17,7 @@
  * use in Protractor tests.
  */
 
+var until = protractor.ExpectedConditions;
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
@@ -28,8 +29,8 @@ var ExplorationEditorFeedbackTab = function() {
     by.css('.protractor-test-exploration-feedback-subject'));
   var feedbackTabRow = element(
     by.css('.protractor-test-oppia-feedback-tab-row'));
-  var explorationFeedback = element(
-    by.css('.protractor-test-exploration-feedback'));
+  var explorationFeedbackMessage = element(
+    by.css('.protractor-test-exploration-feedback-message'));
   var feedbackBackButton = element(
     by.css('.protractor-test-oppia-feedback-back-button'));
   var feedbackResponseTextArea = element(
@@ -39,6 +40,10 @@ var ExplorationEditorFeedbackTab = function() {
     by.css('.protractor-test-suggestion-commit-message'));
   var suggestionReviewMessageInput = element(
     by.css('.protractor-test-suggestion-review-message'));
+  var threadStatusDropdown = element(
+    by.css('.protractor-test-thread-status-dropdown'));
+  var feedbackMessageStatusBanners = element.all(
+    by.css('.protractor-feedback-message-status-banner'));
   /*
    * Buttons
    */
@@ -105,8 +110,8 @@ var ExplorationEditorFeedbackTab = function() {
       rows.forEach(function(row) {
         row.click();
         waitFor.visibilityOf(
-          explorationFeedback, 'Feedback message text is not visible');
-        explorationFeedback.getText().then(function(message) {
+          explorationFeedbackMessage, 'Feedback message text is not visible');
+        explorationFeedbackMessage.getText().then(function(message) {
           messages.push(message);
         });
         feedbackBackButton.click();
@@ -139,6 +144,23 @@ var ExplorationEditorFeedbackTab = function() {
       first().click();
     feedbackResponseTextArea.sendKeys(feedbackResponse);
     feedbackSendResponseButton.click();
+  };
+
+  this.changeThreadStatusOfLatestFeedback = function(status, feedbackResponse) {
+    element.all(by.css('.protractor-test-oppia-feedback-tab-row')).
+      first().click();
+    var statusOption = threadStatusDropdown.element(
+      by.cssContainingText('option', status));
+    statusOption.click();
+    feedbackResponseTextArea.sendKeys(feedbackResponse);
+    feedbackSendResponseButton.click();
+    browser.wait(
+      until.textToBePresentInElement(
+        element.all(by.css('.protractor-test-exploration-feedback'),
+        feedbackResponse).last()), 50000,
+      'Feedback message takes too long to appear');
+    expect(feedbackMessageStatusBanners.last().getText()).toEqual(
+      feedbackResponse);
   };
 };
 
