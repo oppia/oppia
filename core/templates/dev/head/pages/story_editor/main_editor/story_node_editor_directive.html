@@ -26,8 +26,8 @@
   </div>
   <label style="padding-top: 2em;" class="form-heading"> Exploration ID </label>
   <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
-    <input type="text" ng-model="explorationId">
-    <button type="submit" class="btn btn-success btn-sm">Save</button>
+    <input type="text" ng-model="explorationId" ng-change="checkCanSaveExpId()">
+    <button type="submit" class="btn btn-success btn-sm" ng-disabled="!canSaveExpId">Save</button>
   </form>
   <label style="padding-top: 2em;" class="form-heading"> Prerequisite Skill IDs </label>
   <form class="form-horizontal" role="form" ng-submit="addPrerequisiteSkillId(prerequisiteSkillId)">
