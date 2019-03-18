@@ -34,12 +34,12 @@ oppia.directive('storyNodeEditor', [
         '$scope', '$rootScope', '$uibModal', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
-        'EXPLORATION_AND_SKILL_ID_PATTERN', 'AlertsService',
+        'AlertsService',
         function(
             $scope, $rootScope, $uibModal, StoryEditorStateService,
             StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
-            EXPLORATION_AND_SKILL_ID_PATTERN, AlertsService) {
+            AlertsService) {
           var _recalculateAvailableNodes = function() {
             $scope.newNodeId = null;
             $scope.availableNodes = [];
@@ -82,7 +82,9 @@ oppia.directive('storyNodeEditor', [
           $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;
           };
-          // Regex pattern for exploration id.
+          // Regex pattern for exploration id, EXPLORATION_AND_SKILL_ID_PATTERN
+          // is not being used here, as the chapter of the story can be saved
+          // with empty exploration id.
           $scope.explorationIdPattern = /^[a-zA-Z0-9_-]*$/;
           $scope.canSaveExpId = true;
           $scope.checkCanSaveExpId = function() {
