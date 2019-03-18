@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview unit tests for hint object factory.
+ * @fileoverview Unit tests for hint object factory.
  */
 
 describe('Hint object factory', function() {
@@ -24,7 +24,8 @@ describe('Hint object factory', function() {
     hof = $injector.get('HintObjectFactory');
   }));
 
-  it('should convert to backend dict correctly', inject(function() {
+  it('should create a Hint from dict and convert a Hint Object to' +
+     'backend dict correctly', inject(function() {
     var testHint = hof.createNew('content_id', '<p>Some Hint</p>');
     expect(testHint.toBackendDict()).toEqual({
       hint_content: {
@@ -32,6 +33,12 @@ describe('Hint object factory', function() {
         content_id: 'content_id'
       }
     });
+    expect(hof.createFromBackendDict({
+      hint_content: {
+        html: '<p>Some Hint</p>',
+        content_id: 'content_id'
+      }
+    })).toEqual(hof.createNew('content_id', '<p>Some Hint</p>'));
   }));
 
   it('should be able to create a new hint object', inject(function() {

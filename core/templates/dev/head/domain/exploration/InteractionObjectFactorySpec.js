@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview unit tests for Interaction object factory.
+ * @fileoverview Unit tests for Interaction object factory.
  */
 
 describe('Interaction object factory', function() {
@@ -62,7 +62,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 'tagged_misconception_id'
+      tagged_misconception_id: 1
     }];
     hintsDict = [
       {
@@ -126,7 +126,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 'tagged_misconception_id'
+      tagged_misconception_id: 1
     };
     expect(testInteraction.answerGroups).toEqual([agof.createFromBackendDict({
       rule_specs: [],
@@ -142,7 +142,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data'],
-      tagged_misconception_id: 'tagged_misconception_id'
+      tagged_misconception_id: 1
     })]);
     newAnswerGroup = agof.createFromBackendDict(newAnswerGroup);
     testInteraction.setAnswerGroups([newAnswerGroup]);
@@ -246,7 +246,7 @@ describe('Interaction object factory', function() {
         missing_prerequisite_skill_id: null
       },
       training_data: ['training_data_new'],
-      tagged_misconception_id: 'tagged_misconception_id_new'
+      tagged_misconception_id: 2
     }];
     var newDefaultOutcome = {
       dest: 'dest_default_new',
@@ -287,16 +287,11 @@ describe('Interaction object factory', function() {
     var otherInteraction = iof.createFromBackendDict(otherInteractionDict);
     testInteraction.copy(otherInteraction);
     expect(testInteraction).toEqual(otherInteraction);
-    changedOtherInteractionDict = {
-      answer_groups: newAnswerGroups,
-      confirmed_unclassified_answers: [],
-      customization_args: [],
-      default_outcome: newDefaultOutcome,
-      hints: newHintDict,
-      id: 'interaction_id_new_changed',
-      solution: newSolutionDict
-    };
-    otherInteraction = iof.createFromBackendDict(changedOtherInteractionDict);
+    otherInteraction.setCustomizationArgs({
+      customArgNew: {
+        value: 'custom_value_new'
+      }
+    });
     expect(testInteraction).toEqual(iof.createFromBackendDict({
       answer_groups: newAnswerGroups,
       confirmed_unclassified_answers: [],
