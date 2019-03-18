@@ -2196,17 +2196,29 @@ class Exploration(object):
                 customization_args = state_dict[
                     'interaction']['customization_args']
                 new_values = []
+                content_ids = []
                 for value in customization_args['choices']['value']:
+                    content_id = 'interaction_' + utils.generate_random_string(
+                        5)
+                    content_ids.append(content_id)
                     new_values.append({
                         'html': value,
-                        'content_id': 'interaction_' + (
-                            utils.generate_random_string(5))
+                        'content_id': content_id
                     })
+
                 customization_args.update({
                     'choices': {
                         'value': new_values
                     }
                 })
+
+                citat = state_dict['content_ids_to_audio_translations']
+                written_translations = state_dict['written_translations']
+
+                for content_id in content_ids:
+                    citat[content_id] = {}
+                    written_translations['translations_mapping'][content_id] = (
+                        {})
 
         return states_dict
 
