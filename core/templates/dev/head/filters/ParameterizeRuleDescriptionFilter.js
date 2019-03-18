@@ -96,7 +96,7 @@ oppia.filter('parameterizeRuleDescription', [
             for (var i = 0; i < choices.length; i++) {
               if (choices[i].val === inputs[varName]) {
                 var filteredLabelText =
-                  $filter('formatRtePreview')(choices[i].label.html);
+                  $filter('formatRtePreview')(choices[i].label);
                 replacementText = '\'' + filteredLabelText + '\'';
               }
             }

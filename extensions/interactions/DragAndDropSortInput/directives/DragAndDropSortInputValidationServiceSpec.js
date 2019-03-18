@@ -48,7 +48,16 @@ describe('DragAndDropSortInputValidationService', function() {
 
     customizationArgs = {
       choices: {
-        value: ['Item 1', 'Item 2', 'Item 3']
+        value: [{
+          html: 'Item 1',
+          content_id: 'interaction_123'
+        }, {
+          html: 'Item 2',
+          content_id: 'interaction_456'
+        }, {
+          html: 'Item 3',
+          content_id: 'interaction_789'
+        }]
       },
       allowMultipleItemsInSamePosition: {
         value: false
@@ -129,7 +138,10 @@ describe('DragAndDropSortInputValidationService', function() {
   });
 
   it('should expect at least two choices', function() {
-    customizationArgs.choices.value = ['1'];
+    customizationArgs.choices.value = [{
+      html: '1',
+      content_id: 'interaction_123'
+    }];
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -141,7 +153,10 @@ describe('DragAndDropSortInputValidationService', function() {
 
   it('should expect all choices to be nonempty', function() {
     // Set the first choice to empty.
-    customizationArgs.choices.value[0] = '';
+    customizationArgs.choices.value[0] = {
+      html: '',
+      content_id: 'interaction_123'
+    };
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -153,7 +168,10 @@ describe('DragAndDropSortInputValidationService', function() {
 
   it('should expect all choices to be unique', function() {
     // Repeat the last choice.
-    customizationArgs.choices.value.push('Item 3');
+    customizationArgs.choices.value.push({
+      html: 'Item 3',
+      content_id: 'interaction_123'
+    });
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);

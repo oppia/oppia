@@ -1217,7 +1217,7 @@ class State(object):
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
 
-        if not allow_null_interaction and self.interaction.id is not None:
+        if allow_null_interaction and self.interaction.id is not None:
             interaction_can_have_translations = (
                 interaction_registry.Registry.get_interaction_by_id(
                     self.interaction.id).can_have_translations)
@@ -1417,15 +1417,25 @@ class State(object):
         """Returns a list of content id present within the customization_args
         of interaction.
         """
-        path_to_translatable_html = (
-            interaction_registry.Registry.get_interaction_by_id(
-                self.interaction.id).path_to_customization_args_content_id)
-        translatable_html_list = self.interaction.customization_args
-        for node in path_to_translatable_html:
-            translatable_html_list = translatable_html_list[node]
+        interaction_can_have_translations = False
+        content_id_list = []
+        if self.interaction.id is not None:
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                self.interaction.id)
+            interaction_can_have_translations = (
+                interaction.can_have_translations)
 
-        return [translatable_html['content_id'] for translatable_html in (
-            translatable_html_list)]
+        if interaction_can_have_translations:
+            if any(self.interaction.customization_args):
+                path_to_translatable_html = (
+                    interaction.path_to_customization_args_content_id)
+                translatable_html_list = self.interaction.customization_args
+                for node in path_to_translatable_html:
+                    translatable_html_list = translatable_html_list[node]
+                content_id_list = [translatable_html['content_id'] for (
+                    translatable_html) in translatable_html_list]
+
+        return content_id_list
 
     def update_interaction_customization_args(self, customization_args):
         """Update the customization_args of InteractionInstance domain object.
@@ -1433,25 +1443,14 @@ class State(object):
         Args:
             customization_args: dict. The new customization_args to set.
         """
-        interaction_can_have_translations = False
-        if self.interaction.id is not None:
-            interaction_can_have_translations = (
-                interaction_registry.Registry.get_interaction_by_id(
-                    self.interaction.id).can_have_translations)
-
-        if interaction_can_have_translations:
-            if any(self.interaction.customization_args):
-                old_content_id_list = self._get_customization_args_content_ids()
-            else:
-                old_content_id_list = []
+        old_content_id_list = self._get_customization_args_content_ids()
 
         self.interaction.customization_args = customization_args
 
-        if interaction_can_have_translations:
-            new_content_id_list = self._get_customization_args_content_ids()
+        new_content_id_list = self._get_customization_args_content_ids()
 
-            self._update_content_ids_in_assets(
-                old_content_id_list, new_content_id_list)
+        self._update_content_ids_in_assets(
+            old_content_id_list, new_content_id_list)
 
     def update_interaction_answer_groups(self, answer_groups_list):
         """Update the list of AnswerGroup in IteractioInstancen domain object.

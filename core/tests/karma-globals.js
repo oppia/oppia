@@ -69,6 +69,49 @@ var GLOBALS = {
       },
       is_trainable: true,
       narrow_instructions: null
+    },
+    MultipleChoiceInput: {
+      is_terminal: false,
+      name: 'Multiple Choice',
+      default_outcome_heading: null,
+      rule_descriptions: {
+        Equals: 'is equal to {{x|NonnegativeInt}}'
+      },
+      customization_arg_specs: [{
+        default_value: [''],
+        schema: {
+          items: {
+            type: 'html',
+            ui_config: {
+              hide_complex_extensions: true,
+              placeholder: 'Enter an option for the learner to select'
+            }
+          },
+          type: 'list',
+          ui_config: {
+            add_element_text: 'Add multiple choice option'
+          },
+          validators: [{
+            min_value: 1,
+            id: 'has_length_at_least'
+          }]
+        },
+        name: 'choices',
+        description: 'Multiple Choice options'
+      }],
+      narrow_instructions: null,
+      can_have_solution: false,
+      can_have_translations: true,
+      needs_summary: false,
+      show_generic_submit_button: false,
+      answer_type: 'NonnegativeInt',
+      display_mode: 'inline',
+      is_linear: false,
+      instructions: null,
+      is_trainable: false,
+      id: 'MultipleChoiceInput',
+      description: (
+        'Allows learners to select one of a list of multiple-choice options.')
     }
   },
   SUPPORTED_SITE_LANGUAGES: [{

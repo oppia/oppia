@@ -42,10 +42,13 @@ describe('Editor state service', function() {
     it('should correctly return answer choices for interaction', function() {
       var customizationArgs = {
         choices: {
-          value: [
-            'Choice 1',
-            'Choice 2'
-          ]
+          value: [{
+            html: 'Choice 1',
+            content_id: 'interaction_123'
+          }, {
+            html: 'Choice 2',
+            content_id: 'interaction_456'
+          }]
         }
       };
       expect(
@@ -81,10 +84,13 @@ describe('Editor state service', function() {
 
       customizationArgs = {
         choices: {
-          value: [
-            'Choice 1',
-            'Choice 2'
-          ]
+          value: [{
+            html: 'Choice 1',
+            content_id: 'interaction_123'
+          }, {
+            html: 'Choice 2',
+            content_id: 'interaction_456'
+          }]
         }
       };
       expect(

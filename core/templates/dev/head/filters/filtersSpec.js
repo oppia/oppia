@@ -335,8 +335,7 @@ describe('Testing filters', function() {
           x: 2
         }
       };
-      var interactionIdMath = 'TextInput';
-      // What to do here? TextInput interaction cannot have choices, right?
+      var interactionIdMath = 'MultipleChoiceInput';
       var choicesMath = [
         {
           label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
@@ -366,8 +365,7 @@ describe('Testing filters', function() {
           x: 0
         }
       };
-      var interactionIdMixed = 'TextInput';
-      // What to do here? TextInput interaction cannot have choices, right?
+      var interactionIdMixed = 'MultipleChoiceInput';
       var choicesMixed = [
         {
           label: '<p><oppia-noninteractive-image alt-with-value="&amp;' +

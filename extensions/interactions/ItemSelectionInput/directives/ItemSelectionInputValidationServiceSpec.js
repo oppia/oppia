@@ -38,7 +38,7 @@ describe('ItemSelectionInputValidationService', function() {
       dest: 'Second State',
       feedback: {
         html: 'Feedback',
-        audio_translations: {}
+        content_id: 'feedback_1'
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -48,7 +48,16 @@ describe('ItemSelectionInputValidationService', function() {
 
     customizationArguments = {
       choices: {
-        value: ['Selection 1', 'Selection 2', 'Selection 3']
+        value: [{
+          html: 'Selection 1',
+          content_id: 'interaction_123'
+        }, {
+          html: 'Selection 2',
+          content_id: 'interaction_456'
+        }, {
+          html: 'Selection 3',
+          content_id: 'interaction_789'
+        }]
       },
       maxAllowableSelectionCount: {
         value: 2
@@ -142,7 +151,10 @@ describe('ItemSelectionInputValidationService', function() {
 
   it('should expect all choices to be nonempty', function() {
     // Set the first choice to empty.
-    customizationArguments.choices.value[0] = '';
+    customizationArguments.choices.value[0] = {
+      html: '',
+      content_id: 'interaction_123'
+    };
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -155,7 +167,10 @@ describe('ItemSelectionInputValidationService', function() {
 
   it('should expect all choices to be unique', function() {
     // Repeat the last choice.
-    customizationArguments.choices.value.push('Selection 3');
+    customizationArguments.choices.value.push({
+      html: 'Selection 3',
+      content_id: 'interaction_789'
+    });
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,

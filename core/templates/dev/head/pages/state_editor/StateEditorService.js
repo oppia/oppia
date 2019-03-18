@@ -90,7 +90,7 @@ oppia.factory('StateEditorService', [
             function(val, ind) {
               return {
                 val: ind,
-                label: val
+                label: val.html
               };
             }
           );
