@@ -63,16 +63,6 @@ describe('Library controller', function() {
         preferred_language_codes: ['en']
       });
 
-      GLOBALS.LANGUAGE_CODES_AND_NAMES = [{
-        code: 'en',
-        name: 'English'
-      }, {
-        code: 'es',
-        name: 'español'
-      }, {
-        code: 'hr',
-        name: 'hrvatski'
-      }];
       scope = $rootScope.$new();
       rootScope = $rootScope;
       ctrl = $controller('Library', {
