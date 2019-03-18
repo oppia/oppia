@@ -16,7 +16,9 @@
  * @fileoverview Controllers for the about page.
  */
 
-oppia.controller('About', [
+var aboutPageController = angular.module('aboutPageModule', []);
+
+aboutPageController.controller('About', [
   '$scope', 'UrlInterpolationService',
   function($scope, UrlInterpolationService) {
     // Define constants
