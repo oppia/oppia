@@ -16,6 +16,11 @@
  * @fileoverview Directive for the skill misconceptions editor.
  */
 
+require('domain/skill/MisconceptionObjectFactory.js');
+require('domain/skill/SkillUpdateService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/skill_editor/SkillEditorStateService.js');
+
 oppia.directive('skillMisconceptionsEditor', [
   'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
   function(

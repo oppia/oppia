@@ -15,6 +15,11 @@
 /**
  * @fileoverview Controller for the state editor directive.
  */
+
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/StatePropertyServices.js');
+
 oppia.directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -16,6 +16,11 @@
  * @fileoverview Directive for the navbar of the skill editor.
  */
 
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/skill_editor/SkillEditorStateService.js');
+require('services/AlertsService.js');
+
 oppia.directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

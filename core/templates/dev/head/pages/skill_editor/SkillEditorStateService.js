@@ -17,6 +17,13 @@
 * in the skill editor.
 */
 
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/skill/EditableSkillBackendApiService.js');
+require('domain/skill/SkillObjectFactory.js');
+require('domain/skill/SkillRightsBackendApiService.js');
+require('domain/skill/SkillRightsObjectFactory.js');
+require('services/AlertsService.js');
+
 oppia.constant('EVENT_SKILL_INITIALIZED', 'skillInitialized');
 oppia.constant('EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
 oppia.constant(

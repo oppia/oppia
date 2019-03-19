@@ -16,6 +16,9 @@
  * @fileoverview Controller for the main tab of the skill editor.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/skill_editor/SkillEditorStateService.js');
+
 oppia.directive('skillEditorMainTab', [
   'SkillEditorStateService', 'UrlInterpolationService',
   function(SkillEditorStateService, UrlInterpolationService) {

@@ -16,6 +16,11 @@
  * @fileoverview Directive for the worked example editor.
  */
 
+
+require('domain/skill/SkillUpdateService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/skill_editor/SkillEditorStateService.js');
+
 oppia.directive('workedExampleEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

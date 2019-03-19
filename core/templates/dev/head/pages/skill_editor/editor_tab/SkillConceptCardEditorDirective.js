@@ -16,6 +16,12 @@
  * @fileoverview Directive for the concept card editor.
  */
 
+require('domain/exploration/SubtitledHtmlObjectFactory.js');
+require('domain/skill/SkillUpdateService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/skill_editor/SkillEditorStateService.js');
+require('services/GenerateContentIdService.js');
+
 oppia.directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
