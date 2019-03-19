@@ -60,10 +60,7 @@ oppia.factory('ExplorationDataService', [
       explorationId: explorationId,
       // Note that the changeList is the full changeList since the last
       // committed version (as opposed to the most recent autosave).
-      autosaveChangeList: function(
-          changeList,
-          successCallback = function(response) {},
-          errorCallback = function() {}) {
+      autosaveChangeList: function(changeList, successCallback, errorCallback) {
         // First save locally to be retrieved later if save is unsuccessful.
         LocalStorageService.saveExplorationDraft(
           explorationId, changeList, draftChangeListId);
@@ -75,9 +72,14 @@ oppia.factory('ExplorationDataService', [
           // We can safely remove the locally saved draft copy if it was saved
           // to the backend.
           LocalStorageService.removeExplorationDraft(explorationId);
-          successCallback(response);
-        },
-        errorCallback);
+          if (successCallback) {
+            successCallback(response);
+          }
+        }, function() {
+          if (errorCallback) {
+            errorCallback();
+          }
+        });
       },
       discardDraft: function(successCallback, errorCallback) {
         $http.post(explorationDraftAutosaveUrl, {}).then(function() {
