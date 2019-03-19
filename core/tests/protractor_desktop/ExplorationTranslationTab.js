@@ -198,7 +198,8 @@ describe('Exploration translation', function() {
       explorationEditorTranslationTab.openUploadAudioModal();
       explorationEditorTranslationTab.uploadAudio(relativePathOfAudioToUpload);
       explorationEditorTranslationTab.saveUploadedAudio(true);
-      var colorsOfNormalNodes = explorationEditorTranslationTab.getColorsOfNormalNode();
+      var colorsOfNormalNodes = explorationEditorTranslationTab
+      .getColorsOfNormalNode();
       /**
        * To check correct status color for 'second', 'third' 
        * and 'final card' states.
