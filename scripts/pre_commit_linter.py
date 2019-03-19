@@ -259,8 +259,8 @@ GENERATED_FILE_PATHS = (
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
     'core/tests/protractor.conf.js',
-    'core/tests/karma.conf.js',
-    'core/templates/dev/head/mathjaxConfig.js',
+    'core/tests/karma.conf.ts',
+    'core/templates/dev/head/mathjaxConfig.ts',
     'assets/constants.js',
     'assets/rich_text_components_definitions.js')
 
@@ -2047,4 +2047,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    pass

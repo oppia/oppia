@@ -41,7 +41,7 @@ var logicProofTeacher = (function() {
    *         words that are reserved for the vocabulary.
    */
   var buildQuestion = function(assumptionsString, targetString, vocabulary) {
-    var assumptions;
+    var assumptions = null;
     if (assumptionsString.replace(/ /g, '') === '') {
       assumptions = [];
     } else {
