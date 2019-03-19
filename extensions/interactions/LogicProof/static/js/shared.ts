@@ -134,7 +134,7 @@ var logicProofShared = (function() {
    * @return {string} A string representing the expression.
    */
   var displayExpressionHelper = function(
-      expression, operators, desirabilityOfBrackets) {
+      expression, operators, desirabilityOfBrackets = 0) {
     var desirabilityOfBracketsBelow = (
       expression.top_kind_name === 'binary_connective' ||
       expression.top_kind_name === 'binary_relation' ||
@@ -325,7 +325,7 @@ var logicProofShared = (function() {
    *         what the user intended and did wrong.
    */
   var parseLineString = function(
-      inputString, operators, vocabulary, isTemplate) {
+      inputString, operators, vocabulary, isTemplate = false) {
     var unparsedArray = preParseLineString(inputString, operators, isTemplate);
 
     // We compile all words occurring in the vocabulary, to help us identify
@@ -559,11 +559,11 @@ var logicProofShared = (function() {
    *         largest (in lexicographic ordering) as this is likely to be closest
    *         to what the user intended.
    */
-  var assignTypesToExpression = function(untypedExpression, possibleTopTypes,
-      language, newKindsPermitted, permitDuplicateDummyNames) {
+  var assignTypesToExpression = function(
+      untypedExpression, possibleTopTypes,
+      language, newKindsPermitted = ['constant', 'variable'],
+      permitDuplicateDummyNames = false) {
     var operators = language.operators;
-    newKindsPermitted = newKindsPermitted || ['constant', 'variable'];
-    permitDuplicateDummyNames = permitDuplicateDummyNames || false;
 
     var _attemptTyping = function(topType, typingRule) {
       if (!operatorIsNew &&
@@ -775,11 +775,11 @@ var logicProofShared = (function() {
    *          }
    * @raises: as before
    */
-  var assignTypesToExpressionArray = function(untypedArray, topTypes, language,
-      newKindsPermitted, isTemplate, numDummies) {
-    newKindsPermitted = newKindsPermitted || ['constant', 'variable'];
-    isTemplate = isTemplate || false;
-    numDummies = numDummies || 0;
+
+  var assignTypesToExpressionArray = function(
+      untypedArray, topTypes, language,
+      newKindsPermitted = ['constant', 'variable'], isTemplate = false,
+      numDummies = 0) {
     var partiallyTypedArrays = [[[]]];
     var partiallyUpdatedOperators = [[{}]];
     for (var key in language.operators) {
