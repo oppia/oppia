@@ -82,7 +82,10 @@
 
 
 # Interaction project.
-# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
+# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10 for the
+# following directories:
+# - /core/templates/dev/head/domain/objects/
+# - /extensions/interactions/
 /core/templates/dev/head/domain/objects/ @nithusha21
 /core/templates/dev/head/expressions/ @seanlip
 /extensions/dependencies/ @seanlip
