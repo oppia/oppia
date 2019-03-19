@@ -1017,8 +1017,9 @@ class LintChecksManager(object):
                 config_pylint, config_pycodestyle, py_files_to_lint,
                 py_result, self.verbose_mode_enabled)))
 
-        print 'Starting CSS, Javascript and Python Linting'
-        print '----------------------------------------'
+        if self.verbose_mode_enabled:
+            print 'Starting CSS, Javascript and Python Linting'
+            print '----------------------------------------'
 
         for process in linting_processes:
             process.daemon = False
