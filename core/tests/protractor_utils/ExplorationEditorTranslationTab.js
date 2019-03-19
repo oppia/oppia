@@ -174,7 +174,8 @@ var ExplorationEditorTranslationTab = function() {
       element(by.cssContainingText('option', language)).click();
   };
 
-  this.audioUploadInputElem = element(by.className('protractor-test-upload-audio'));
+  this.audioUploadInputElem = element(by.className(
+    'protractor-test-upload-audio'));
 
   this.uploadAudio = function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
