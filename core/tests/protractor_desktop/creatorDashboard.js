@@ -58,14 +58,14 @@ describe('Creator dashboard functionality', function() {
     // created a creator ID and 2 learner ID.
     var creator1Id = 'creatorName';
     users.createUser('learner1@learnerDashboard.com',
-    'learner1learnerDashboard');
-    users.createUser('learner2@learnerDashboard.com', 
-    'learner2learnerDashboard');
+      'learner1learnerDashboard');
+    users.createUser('learner2@learnerDashboard.com',
+      'learner2learnerDashboard');
     users.createUser(creator1Id + '@creatorDashboard.com', creator1Id);
 
-      // created a new exploration for the creator.
+    // created a new exploration for the creator.
     users.login(creator1Id + '@creatorDashboard.com');
-    creatorDashboardPage.clickCreateExplorationButton();    
+    creatorDashboardPage.clickCreateExplorationButton();
     workflow.createAndPublishExploration(
       'Activations',
       'Chemistry',
@@ -73,7 +73,7 @@ describe('Creator dashboard functionality', function() {
       'English'
     );
     users.logout();
-     
+
     // both the learners will subscribe to the creator.
     users.login('learner1@learnerDashboard.com');
     subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
@@ -84,7 +84,7 @@ describe('Creator dashboard functionality', function() {
     subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
     subscriptionDashboardPage.navigateToSubscriptionButton();
     users.logout();
-     
+
       // exploration created by the creator.
     users.login(creator1Id + '@creatorDashboard.com');
     workflow.createAndPublishExploration(
@@ -93,8 +93,8 @@ describe('Creator dashboard functionality', function() {
       'Learn about different types of chemistry activations.',
       'English'
     );
-    
-      // navigating to creator's subscribed dashboard.
+
+    // navigating to creator's subscribed dashboard.
     creatorDashboardPage.navigateToSubscriptionDashboard();
     users.logout();
   });
@@ -102,7 +102,8 @@ describe('Creator dashboard functionality', function() {
   it('get all feedback messages count & edit exploration', function() {
     var creator1Id = 'creatorName';
     users.createUser(creator1Id + '@learnerDashboard.com', creator1Id);
-    users.createUser('learner1@learnerDashboard.com', 'learner1learnerDashboard');
+    users.createUser('learner1@learnerDashboard.com',
+      'learner1learnerDashboard');
     users.login(creator1Id + '@creatorDashboard.com');
     creatorDashboardPage.clickCreateExplorationButton();    
     workflow.createAndPublishExploration(
@@ -113,7 +114,7 @@ describe('Creator dashboard functionality', function() {
     );
     users.logout();
 
-      // learner gives a feedback to creator exploration.
+    // learner gives a feedback to creator exploration.
     users.login('learner2@learnerDashboard.com');
     var feedback = 'A good exploration. Would love to see a few more questions';
     libraryPage.get();
