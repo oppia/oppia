@@ -16,7 +16,7 @@
  * @fileoverview Directive for visualizing multiple incorrect issue.
  */
 
-oppia.directive('multipleIncorrectIssueDirective', [
+oppia.directive('multipleIncorrectIssue', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

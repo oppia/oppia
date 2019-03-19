@@ -14,7 +14,7 @@
 
 var logicDemo = angular.module('logicDemo', []);
 
-logicDemo.controller('TestCtrl', ['$scope', function($scope) {
+logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
   $scope.buildIndexer = function(n) {
     var output = [];
     for (var i = 0; i < n; i++) {

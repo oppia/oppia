@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the select supporting html
+ * @fileoverview Directive for the selection dropdown with HTML content.
  */
 
 // This directive allows user to put html into select's options.

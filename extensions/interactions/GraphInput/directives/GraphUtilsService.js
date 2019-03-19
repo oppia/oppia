@@ -16,7 +16,7 @@
  * @fileoverview Utils service for the interaction.
  */
 
-oppia.factory('graphUtilsService', [function() {
+oppia.factory('GraphUtilsService', [function() {
   return {
     GRAPH_ADJACENCY_MODE: {
       DIRECTED: 'directed',

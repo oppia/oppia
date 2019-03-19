@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('pencilCodeEditorRulesService', [
+oppia.factory('PencilCodeEditorRulesService', [
   '$filter', 'CodeNormalizerService',
   function($filter, CodeNormalizerService) {
     return {

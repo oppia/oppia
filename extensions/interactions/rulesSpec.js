@@ -26,7 +26,7 @@ describe('Rule spec services', function() {
 
   var getRulesServiceName = function(interactionId) {
     return (
-      interactionId[0].toLowerCase() + interactionId.substr(1) + 'RulesService'
+      interactionId + 'RulesService'
     );
   };
 

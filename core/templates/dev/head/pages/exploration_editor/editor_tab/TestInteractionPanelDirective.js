@@ -15,6 +15,7 @@
 /**
  * @fileoverview Directive for the test interaction panel in the state editor.
  */
+
 oppia.directive('testInteractionPanel', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

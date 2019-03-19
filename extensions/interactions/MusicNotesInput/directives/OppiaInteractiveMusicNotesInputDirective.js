@@ -39,13 +39,13 @@ oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
 
 oppia.directive('oppiaInteractiveMusicNotesInput', [
   'CurrentInteractionService', 'HtmlEscaperService',
+  'MusicNotesInputRulesService', 'MusicPhrasePlayerService',
   'UrlInterpolationService', 'WindowDimensionsService',
-  'musicNotesInputRulesService', 'musicPhrasePlayerService',
   'EVENT_NEW_CARD_AVAILABLE', 'NOTE_NAMES_TO_MIDI_VALUES',
   function(
       CurrentInteractionService, HtmlEscaperService,
+      MusicNotesInputRulesService, MusicPhrasePlayerService,
       UrlInterpolationService, WindowDimensionsService,
-      musicNotesInputRulesService, musicPhrasePlayerService,
       EVENT_NEW_CARD_AVAILABLE, NOTE_NAMES_TO_MIDI_VALUES) {
     return {
       restrict: 'E',
@@ -734,7 +734,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           }
           readableSequence = _makeAllNotesHaveDurationOne(readableSequence);
           CurrentInteractionService.onSubmit(
-            readableSequence, musicNotesInputRulesService);
+            readableSequence, MusicNotesInputRulesService);
         };
 
         CurrentInteractionService.registerCurrentInteraction(
@@ -786,7 +786,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             }
           }
 
-          musicPhrasePlayerService.playMusicPhrase(notes);
+          MusicPhrasePlayerService.playMusicPhrase(notes);
         };
 
         // A MIDI pitch is the baseNoteMidiNumber of the note plus the offset.

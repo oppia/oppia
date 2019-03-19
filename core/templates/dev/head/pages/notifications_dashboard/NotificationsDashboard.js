@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the user's notifications dashboard.
  */
 
-oppia.controller('DashboardNotifications', [
+oppia.controller('NotificationsDashboard', [
   '$http', '$rootScope', '$scope', 'DateTimeFormatService',
   function($http, $rootScope, $scope, DateTimeFormatService) {
     $scope.getItemUrl = function(activityId, notificationType) {

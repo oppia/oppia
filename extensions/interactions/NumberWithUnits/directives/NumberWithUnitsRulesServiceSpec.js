@@ -21,7 +21,7 @@ describe('Number with Units rules service', function() {
 
   var nurs = null;
   beforeEach(inject(function($injector) {
-    nurs = $injector.get('numberWithUnitsRulesService');
+    nurs = $injector.get('NumberWithUnitsRulesService');
   }));
 
   var createFractionDict = function(

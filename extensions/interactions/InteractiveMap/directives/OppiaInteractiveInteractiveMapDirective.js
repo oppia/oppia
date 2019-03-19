@@ -20,10 +20,10 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveInteractiveMap', [
-  'HtmlEscaperService', 'UrlInterpolationService', 'interactiveMapRulesService',
+  'HtmlEscaperService', 'InteractiveMapRulesService', 'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE',
   function(
-      HtmlEscaperService, UrlInterpolationService, interactiveMapRulesService,
+      HtmlEscaperService, InteractiveMapRulesService, UrlInterpolationService,
       EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
@@ -135,7 +135,6 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               $scope.hideOverlay();
             }
           });
-
           $scope.$on('leafletDirectiveMap.interactiveMap.click',
             function(evt, args) {
               if ($scope.interactionIsActive) {
@@ -143,10 +142,9 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
                 var newLng = args.leafletEvent.latlng.lng;
                 changeMarkerPosition(newLat, newLng);
                 CurrentInteractionService.onSubmit(
-                  [newLat, newLng], interactiveMapRulesService);
+                  [newLat, newLng], InteractiveMapRulesService);
               }
             });
-
           refreshMap();
         }
       ]

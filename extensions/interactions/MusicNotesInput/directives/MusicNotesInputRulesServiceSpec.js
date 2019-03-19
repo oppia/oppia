@@ -21,7 +21,7 @@ describe('Music Notes Input rules service', function() {
 
   var mnirs = null;
   beforeEach(inject(function($injector) {
-    mnirs = $injector.get('musicNotesInputRulesService');
+    mnirs = $injector.get('MusicNotesInputRulesService');
   }));
 
   it('should have a correct \'equals\' rule', function() {

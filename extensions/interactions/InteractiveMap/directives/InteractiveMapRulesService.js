@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('interactiveMapRulesService', [
+oppia.factory('InteractiveMapRulesService', [
   function() {
     var RADIUS_OF_EARTH_KM = 6371.0;
     var degreesToRadians = function(angle) {

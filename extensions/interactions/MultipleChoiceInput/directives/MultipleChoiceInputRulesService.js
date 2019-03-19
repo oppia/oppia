@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('multipleChoiceInputRulesService', [function() {
+oppia.factory('MultipleChoiceInputRulesService', [function() {
   return {
     Equals: function(answer, inputs) {
       return answer === inputs.x;
