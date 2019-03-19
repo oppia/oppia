@@ -160,8 +160,9 @@ describe('Exploration translation', function() {
      * To check behaviour on attempting to upload an audio translation with
      * length above 300 seconds.
      */
-    expect(explorationEditorTranslationTab.getAudioOverFiveMinutesErrorMessage())
-    .toContain('The uploaded file is 301.87 seconds long.');
+    expect(
+      explorationEditorTranslationTab.getAudioOverFiveMinutesErrorMessage())
+      .toContain('The uploaded file is 301.87 seconds long.');
     expect(explorationEditorTranslationTab.saveUploadedAudioButton
       .getAttribute('disabled')).toBe('true');
     explorationEditorTranslationTab.expectNumericalStatusToMatch('(1/11)');
