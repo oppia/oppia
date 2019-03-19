@@ -51,7 +51,7 @@ describe('Creator dashboard functionality', function() {
   it('displays creators subscribers', function() {
     // created a creator ID and 2 learner ID.
     var creator1Id = 'creatorName';
-    users.createUser('learner1@learnerDashboard.com', 
+    users.createUser('learner1@learnerDashboard.com',
     'learner1learnerDashboard');
     users.createUser('learner2@learnerDashboard.com', 
     'learner2learnerDashboard');
@@ -79,7 +79,7 @@ describe('Creator dashboard functionality', function() {
     subscriptionDashboardPage.navigateToSubscriptionButton();
     users.logout();
      
-      //exploration created by the creator.
+      // exploration created by the creator.
     users.login(creator1Id + '@creatorDashboard.com');
     workflow.createAndPublishExploration(
       'Activations',
@@ -88,7 +88,7 @@ describe('Creator dashboard functionality', function() {
       'English'
     );
     
-      //navigating to creator's subscribed dashboard.
+      // navigating to creator's subscribed dashboard.
     creatorDashboardPage.navigateToSubscriptionDashboard();
     users.logout();
   });
@@ -107,7 +107,7 @@ describe('Creator dashboard functionality', function() {
     );
     users.logout();
 
-      //learner gives a feedback to creator exploration.
+      // learner gives a feedback to creator exploration.
     users.login('learner2@learnerDashboard.com');
     var feedback = 'A good exploration. Would love to see a few more questions';
     libraryPage.get();
@@ -115,13 +115,13 @@ describe('Creator dashboard functionality', function() {
     explorationPlayerPage.submitFeedback(feedback);
     users.logout();
 
-    //creator checks all his feedback messages.
+    // creator checks all his feedback messages.
     users.login(creator1Id + '@creatorDashboard.com');
     creatorDashboardPage.getNumberOfFeedbackMessages();
     creatorDashboardPage.editExploration('Activations');
     users.logout();
   });
-      
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });
