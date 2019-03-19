@@ -37,7 +37,7 @@ describe('Creator dashboard functionality', function() {
   var explorationPlayerPage = null;
   var libraryPage = null;
   var learnerDashboardPage = null;
-  
+
   beforeAll(function() {
     libraryPage = new LibraryPage.LibraryPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
@@ -47,15 +47,17 @@ describe('Creator dashboard functionality', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
-  
+
   it('displays creators subscribers', function() {
-    //created a creator ID and 2 learner ID.
+    // created a creator ID and 2 learner ID.
     var creator1Id = 'creatorName';
-    users.createUser('learner1@learnerDashboard.com', 'learner1learnerDashboard');
-    users.createUser('learner2@learnerDashboard.com', 'learner2learnerDashboard');
+    users.createUser('learner1@learnerDashboard.com', 
+    'learner1learnerDashboard');
+    users.createUser('learner2@learnerDashboard.com', 
+    'learner2learnerDashboard');
     users.createUser(creator1Id + '@creatorDashboard.com', creator1Id);
 
-      //created a new exploration for the creator.
+      // created a new exploration for the creator.
     users.login(creator1Id + '@creatorDashboard.com');
     creatorDashboardPage.clickCreateExplorationButton();    
     workflow.createAndPublishExploration(
@@ -66,7 +68,7 @@ describe('Creator dashboard functionality', function() {
     );
     users.logout();
      
-    //both the learners will subscribe to the creator.
+    // both the learners will subscribe to the creator.
     users.login('learner1@learnerDashboard.com');
     subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
     subscriptionDashboardPage.navigateToSubscriptionButton();
