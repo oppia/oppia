@@ -226,6 +226,8 @@ oppia.directive('stateInteractionEditor', [
                                $window.location.pathname.match('/topic_editor')) {
                       $scope.ALLOWED_INTERACTION_CATEGORIES = (
                         ALLOWED_QUESTION_INTERACTION_CATEGORIES);
+                    } else {
+                      throw Error('URL does not match');
                     }
 
                     if (StateInteractionIdService.savedMemento) {
