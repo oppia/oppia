@@ -85,7 +85,7 @@ describe('Creator dashboard functionality', function() {
     subscriptionDashboardPage.navigateToSubscriptionButton();
     users.logout();
 
-      // exploration created by the creator.
+    // exploration created by the creator.
     users.login(creator1Id + '@creatorDashboard.com');
     workflow.createAndPublishExploration(
       'Activations',
@@ -105,7 +105,7 @@ describe('Creator dashboard functionality', function() {
     users.createUser('learner1@learnerDashboard.com',
       'learner1learnerDashboard');
     users.login(creator1Id + '@creatorDashboard.com');
-    creatorDashboardPage.clickCreateExplorationButton();    
+    creatorDashboardPage.clickCreateExplorationButton();
     workflow.createAndPublishExploration(
       'Activations',
       'Chemistry',
