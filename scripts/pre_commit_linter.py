@@ -1953,13 +1953,17 @@ class LintChecksManager(object):
             path_patterns = []
             for line_num, line in enumerate(FileCache.readlines(
                     codeowner_file)):
-                if line.strip() != '' and line.strip()[0] != '#':
+                stripped_line = line.strip()
+                if stripped_line != '' and stripped_line[0] != '#':
                     if '@' not in line:
                         print ('%s --> Pattern on line %s doesn\'t have'
                                'codeowner' % (codeowner_file, line_num))
                         failed = True
                     else:
+                        # Extract the file pattern from the line.
                         line_in_concern = line.split('@')[0].strip()
+                        # Adjustments to the dir paths in CODEOWNERS syntax
+                        # for glob-style patterns to match correctly.
                         if line_in_concern.endswith('/'):
                             line_in_concern = line_in_concern[:-1]
                         if not glob.glob(line_in_concern.replace('/', '', 1)):
@@ -1967,6 +1971,8 @@ class LintChecksManager(object):
                                    'any file or directory' % (
                                        codeowner_file, line_num))
                             failed = True
+                        # Checks if the path is the full path relative to the
+                        # root and not relative.
                         if (not line_in_concern.startswith('/') and
                                 not './' +
                                 line_in_concern in CODEOWNER_FILE_PATHS):
@@ -1974,6 +1980,9 @@ class LintChecksManager(object):
                                    'full path relative to the root directory'
                                    % (codeowner_file, line_num))
                             failed = True
+                        # The double asterisk pattern is supported by the
+                        # CODEOWNERS syntax but not the glob in Python 2.
+                        # The following condition checks this.
                         if '**' in line_in_concern:
                             print ('%s --> Pattern on line %s is invalid. '
                                    '\'**\' wildcard not allowed' % (
@@ -1985,12 +1994,16 @@ class LintChecksManager(object):
             # Checks that every dir/file is covered under CODEOWNERS.
             for root, _, filename in os.walk('.'):
                 for file_name in filename:
+                    # This bool checks if the file belongs to the root
+                    # oppia directory.
                     is_root_file = False
                     if os.path.join(root, file_name) in CODEOWNER_FILE_PATHS:
                         is_root_file = True
-                    if any(root.startswith(
-                            x) for x in CODEOWNER_DIR_PATHS) or is_root_file:
+                    if (any(root.startswith(
+                            dir_path) for dir_path in CODEOWNER_DIR_PATHS) or
+                                is_root_file):
                         match = False
+                        # Ignore .pyc and __init__.py files.
                         if file_name.endswith(
                                 '.pyc') or file_name == '__init__.py':
                             match = True
