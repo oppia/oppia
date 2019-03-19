@@ -219,7 +219,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             ('/suggestionactionhandler/edit/' + suggestion_id), {
                 'action': 'edit',
                 'summary_message': 'summary message',
-                'change': change
+                'change': change_dict
                 }, csrf_token=csrf_token)
 
         # Get suggestion after edit.
@@ -228,7 +228,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id_2))['suggestions'][1]
 
-        self.assertEqual(change, suggestion_after_edit['change'])
+        self.assertEqual(change_dict, suggestion_after_edit['change'])
         self.logout()
 
     def test_accept_suggestion(self):
