@@ -23,20 +23,14 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
-var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
-var CollectionEditorPage =
-  require('../protractor_utils/CollectionEditorPage.js');
-var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
-var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
-var LearnerDashboardPage =
-  require('../protractor_utils/LearnerDashboardPage.js');
+var CreatorDashboardPage = require('../protractor_utils/CreatorDashboardPage.js');
+var CollectionEditorPage = require('../protractor_utils/CollectionEditorPage.js');
+var ExplorationEditorPage = require('../protractor_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage = require('../protractor_utils/ExplorationPlayerPage.js');
+var LearnerDashboardPage = require('../protractor_utils/LearnerDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
-var SubscriptionDashboardPage =
-  require('../protractor_utils/SubscriptionDashboardPage.js');
+var SubscriptionDashboardPage = require('../protractor_utils/SubscriptionDashboardPage.js');
 
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
