@@ -17,6 +17,7 @@
  * use in Protractor tests.
  */
 var waitFor = require('../protractor_utils/waitFor.js');
+var path = require('path');
 
 var ExplorationEditorTranslationTab = function() {
   var dismissWelcomeModalButton = element(
@@ -27,7 +28,7 @@ var ExplorationEditorTranslationTab = function() {
   this.saveUploadedAudioButton = element(
     by.css('.protractor-test-save-button'));
 
-  this.wrongFileTypeErrorMessage = function() {
+  this.getWrongFileTypeErrorMessage = function() {
     return (element(by.css('div.error-message')).getText());
   };
 
@@ -175,6 +176,13 @@ var ExplorationEditorTranslationTab = function() {
 
   this.audioUploadInputElem = element(by.className('protractor-test-upload-audio'));
 
+  this.uploadAudio = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    explorationEditorTranslationTab.audioUploadInputElem.sendKeys(
+      audioAbsolutePath);
+  };
+
   this.expectContentTabContentToMatch = function(content) {
     waitFor.elementToBeClickable(
       contentTabButton, 'Content Tab button is not clickable');
@@ -227,7 +235,7 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.audioOverFiveMinutesErrorMessage = function() {
+  this.getAudioOverFiveMinutesErrorMessage = function() {
     waitFor.visibilityOf(
       audioOverFiveMinutesErrorMessageElement,
       'Audio above 300 seconds error is not visible');
