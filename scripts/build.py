@@ -726,7 +726,7 @@ def minify_func(source_path, target_path, file_hashes, filename):
         compile_typescript_files(source_path)
         compiled_source_path = target_path.replace('.ts', '.js')
         compiled_target_path = target_path.replace('.ts', '.unmin.js')
-        os.path.rename(compiled_source_path, compiled_target_path)
+        os.rename(compiled_source_path, compiled_target_path)
         minified_target_path = target_path.replace('.ts', '.js')
         print 'Minifying %s' % compiled_target_path
         _minify(compiled_target_path, minified_target_path)
