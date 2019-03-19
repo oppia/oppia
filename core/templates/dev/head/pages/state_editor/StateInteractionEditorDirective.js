@@ -218,12 +218,13 @@ oppia.directive('stateInteractionEditor', [
 
                     // Checks that the modal is invoked by exploration_editor or
                     // skill_editor, topic_editor. 
-                    if ($window.location.pathname.match('/create') || 
-                        $window.location.pathname.match('/creator_dashboard')) {
+                    var currentUrl = $window.location.pathname.split('/')[1];
+                    if (currentUrl.match('create') || 
+                        currentUrl.match('creator_dashboard')) {
                       $scope.ALLOWED_INTERACTION_CATEGORIES = (
                         ALLOWED_INTERACTION_CATEGORIES);
-                    } else if ($window.location.pathname.match('/skill_editor') ||
-                               $window.location.pathname.match('/topic_editor')) {
+                    } else if (currentUrl.match('skill_editor') ||
+                               currentUrl.match('topic_editor')) {
                       $scope.ALLOWED_INTERACTION_CATEGORIES = (
                         ALLOWED_QUESTION_INTERACTION_CATEGORIES);
                     } else {
