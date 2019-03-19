@@ -1,5 +1,3 @@
-import {browser} from 'protractor'
-
 var ScreenShotReporter = require('protractor-screenshot-reporter');
 
 // A reference configuration file.

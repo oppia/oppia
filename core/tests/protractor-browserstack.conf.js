@@ -16,8 +16,6 @@
  * @fileoverview Protractor configuration to run tests on Browserstack.
  */
 
-import {browser} from 'protractor'
-
 var browserstack = require('browserstack-local');
 var dotenv = require('dotenv');
 
