@@ -105,9 +105,6 @@ echo Starting GAE development server
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
 
-if ! [[ "$FORCE_PROD_MODE" == "True" ]]; then
-  ($NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.dev.config.js --watch)&
-fi
 (python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py $CLEAR_DATASTORE_ARG $ENABLE_CONSOLE_ARG --admin_host 0.0.0.0 --admin_port 8000 --host 0.0.0.0 --port 8181 --skip_sdk_update_check true app.yaml)&
 
 # Wait for the servers to come up.
