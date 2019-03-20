@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the profile page."""
+import re
 
 from constants import constants
 from core.domain import exp_domain
@@ -57,16 +58,25 @@ class SignupTests(test_utils.GenericTestBase):
             {'username': 'abc', 'agreed_to_terms': True},
             csrf_token=csrf_token)
 
+        def strip_domain_from_location_header(url):
+            """To strip the domain form the location url"""
+            splitted_url = re.match(r'(http[s]?:\/\/)?([^\/\s]+\/)(.*)', url)
+            return splitted_url.group(3)
+
         response = self.get_html_response(
             '/signup?return_url=https://google.com', expected_status_int=302)
+        self.assertEqual('', strip_domain_from_location_header(
+            response.headers['location']))
+
         response = self.get_html_response(
             '/signup?return_url=//google.com', expected_status_int=302)
+        self.assertEqual('', strip_domain_from_location_header(
+            response.headers['location']))
+
         response = self.get_html_response(
             '/signup?return_url=/page', expected_status_int=302)
-
-        self.assertIn('/', response.headers['location'])
-        self.assertIn('/', response.headers['location'])
-        self.assertIn('/page', response.headers['location'])
+        self.assertEqual('page', strip_domain_from_location_header(
+            response.headers['location']))
 
         self.logout()
 
