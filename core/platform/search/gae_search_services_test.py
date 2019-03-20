@@ -263,6 +263,11 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         self.assertEqual(add_docs_counter.times_called, 1)
         self.assertEqual(e.exception.original_exception, error)
 
+    def test_raise_error_when_document_type_is_invalid(self):
+        with self.assertRaises(ValueError):
+            doc = {'abc': set('xyz')}
+            gae_search_services.add_documents_to_index([doc], 'my_index')
+
 
 class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
     """Test deleting documents from search indexes."""
@@ -461,6 +466,11 @@ class SearchQueryTests(test_utils.GenericTestBase):
             'id': 'doc3', 'k': 'abc jkl ghi', 'rank': 3, 'language_code': 'en'
         }, result)
 
+    def test_search_when_query_string_is_invalid(self):
+        result = gae_search_services.search('NOT:abc', 'my_index')
+        self.assertEqual(result, ([], None))
+
+
     def test_respect_search_query(self):
         doc1 = search.Document(doc_id='doc1', rank=1, language='en', fields=[
             search.TextField(name='k', value='abc def ghi')])
@@ -584,6 +594,12 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(result[1].get('id'), 'doc1')
         self.assertEqual(result[2].get('id'), 'doc2')
 
+    def test_raise_error_when_sort_starts_with_invalid_character(self):
+        doc = {'id': 'doc1', 'k': 'abc def', 'rank': 3, 'language_code': 'en'}
+        gae_search_services.add_documents_to_index([doc], 'index')
+        with self.assertRaises(ValueError):
+            gae_search_services.search('k:abc', 'index', sort='k')
+
     def test_search_using_multiple_sort_expressions(self):
         doc1 = {'id': 'doc1', 'k1': 2, 'k2': 'abc ghi'}
         doc2 = {'id': 'doc2', 'k1': 1, 'k2': 'abc def'}
@@ -704,3 +720,14 @@ class SearchGetFromIndexTests(test_utils.GenericTestBase):
             'my_doc', 'my_index')
         self.assertEqual(result.get('id'), 'my_doc')
         self.assertEqual(result.get('my_field'), 'value')
+
+
+class ClearIndexTests(test_utils.GenericTestBase):
+    def test_clear_index(self):
+        doc = {'id': 'doc1', 'k': 'abc def', 'rank': 3, 'language_code': 'en'}
+        gae_search_services.add_documents_to_index([doc], 'index')
+        result = gae_search_services.search('k:abc', index='index')[0]
+        self.assertEqual(result, [doc])
+        gae_search_services.clear_index('index')
+        result = gae_search_services.search('k:abc', index='index')[0]
+        self.assertNotEqual(result, [doc])

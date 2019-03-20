@@ -14,6 +14,10 @@
 
 """Tests for the creator dashboard and the notifications dashboard."""
 
+import datetime
+import os
+
+from constants import constants
 from core.controllers import creator_dashboard
 from core.domain import event_services
 from core.domain import exp_services
@@ -23,6 +27,7 @@ from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_jobs_continuous
+from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -152,6 +157,15 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
         self.process_and_flush_pending_tasks()
 
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_jobs_one_off.DashboardStatsOneOffJob.create_new()
+        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
     def test_stats_no_explorations(self):
         self.login(self.OWNER_EMAIL_1)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
@@ -222,6 +236,22 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self._rate_exploration(exp_id, [3])
 
         self._run_user_stats_aggregator_job()
+
+        def _mock_get_date_after_one_week():
+            """Returns the date of the next week."""
+            return (
+                (datetime.datetime.utcnow() + datetime.timedelta(7)).strftime(
+                    feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT))
+
+        with self.swap(
+            user_services,
+            'get_current_date_as_string',
+            _mock_get_date_after_one_week):
+            self._run_one_off_job()
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        self.assertEqual(
+            response['last_week_stats']
+            [_mock_get_date_after_one_week()]['average_ratings'], 3)
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 1)
         self.assertEqual(
@@ -644,6 +674,44 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['subscribers_list']), 0)
 
+    def test_get_response_when_new_structure_players_is_true(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+            self.assertEqual(len(response['topic_summary_dicts']), 0)
+        self.logout()
+
+    def test_can_update_display_preference(self):
+        self.login(self.OWNER_EMAIL)
+        response_display_preference = self.get_json(
+            feconf.CREATOR_DASHBOARD_DATA_URL)['display_preference']
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json(
+            feconf.CREATOR_DASHBOARD_DATA_URL,
+            {'display_preference': response_display_preference},
+            csrf_token=csrf_token)
+        self.logout()
+
+    def test_can_create_new_collection(self):
+        self.set_admins([self.OWNER_USERNAME])
+        self.login(self.OWNER_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json(feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)
+        self.logout()
+
+    def test_collections_list_gets_updated(self):
+        self.set_admins([self.OWNER_USERNAME])
+        self.login(self.OWNER_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json(feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)
+        response_collection_list = self.get_json(
+            feconf.CREATOR_DASHBOARD_DATA_URL)['collections_list']
+        self.assertNotEqual(response_collection_list, [])
+        self.logout()
+
 
 class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
 
@@ -707,12 +775,23 @@ class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
                 response['recent_notifications'][0]['author_username'], '')
             self.assertNotIn('author_id', response['recent_notifications'][0])
 
+    def test_get_unseen_notifications_data(self):
+        with self.swap(
+            user_jobs_continuous.DashboardRecentUpdatesAggregator,
+            'get_recent_notifications',
+            self._get_recent_notifications_mock_by_anonymous_user):
+            self.login(self.VIEWER_EMAIL)
+            response = self.get_json('/notificationshandler')
+            self.assertEqual(response['num_unseen_notifications'], 1)
+            self.logout()
+
 
 class CreationButtonsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CreationButtonsTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
     def test_new_exploration_ids(self):
         """Test generation of exploration ids."""
@@ -724,5 +803,38 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token
         )[creator_dashboard.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
+
+        self.logout()
+
+    def test_can_upload_exploration(self):
+        with self.swap(constants, 'ALLOW_YAML_FILE_UPLOAD', True):
+            self.set_admins([self.ADMIN_USERNAME])
+            self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            yaml_path = os.path.join(
+                feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+            with open(yaml_path, 'r') as yaml_file:
+                yaml_content = yaml_file.read()
+                self.post_json(
+                    feconf.UPLOAD_EXPLORATION_URL, {
+                        'yaml_file': yaml_content}, csrf_token=csrf_token)
+            self.logout()
+
+    def test_can_not_upload_exploration(self):
+        self.set_admins([self.ADMIN_USERNAME])
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        yaml_path = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        with self.assertRaises(Exception) and open(yaml_path, 'r') as yaml_file:
+            yaml_content = yaml_file.read()
+            self.post_json(
+                feconf.UPLOAD_EXPLORATION_URL,
+                {'yaml_file': yaml_content}, csrf_token=csrf_token,
+                expected_status_int=400)
 
         self.logout()

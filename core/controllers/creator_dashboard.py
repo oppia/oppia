@@ -159,20 +159,6 @@ class CreatorDashboardHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
-        def _get_intro_card_color(category):
-            """Returns the intro card color according to the category.
-
-            Args:
-                category: str. The category of the lesson.
-
-            Returns:
-                str. The intro card color according to the category.
-            """
-            return (
-                constants.CATEGORIES_TO_COLORS[category] if
-                category in constants.CATEGORIES_TO_COLORS else
-                constants.DEFAULT_COLOR)
-
         def _round_average_ratings(rating):
             """Returns the rounded average rating to display on the creator
             dashboard.
@@ -264,9 +250,14 @@ class CreatorDashboardHandler(base.BaseHandler):
 
         last_week_stats = (
             user_services.get_last_week_dashboard_stats(self.user_id))
-        if last_week_stats and last_week_stats.get('average_ratings'):
-            last_week_stats['average_ratings'] = (
-                _round_average_ratings(last_week_stats['average_ratings']))
+        if last_week_stats:
+            last_week_stats_average_ratings = (
+                last_week_stats.get(list(
+                    last_week_stats.keys())[0]).get('average_ratings'))
+            if last_week_stats_average_ratings:
+                last_week_stats[
+                    list(last_week_stats.keys())[0]]['average_ratings'] = (
+                        _round_average_ratings(last_week_stats_average_ratings))
 
         subscriber_ids = subscription_services.get_all_subscribers_of_creator(
             self.user_id)
@@ -297,11 +288,12 @@ class CreatorDashboardHandler(base.BaseHandler):
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user(self.user_id))
 
-        for s in suggestions_created_by_user:
-            s.populate_old_value_of_change()
+        suggestions_created_by_user = [s.populate_old_value_of_change() for s
+                                       in suggestions_created_by_user]
 
-        for s in suggestions_which_can_be_reviewed:
-            s.populate_old_value_of_change()
+        suggestions_which_can_be_reviewed = [s.populate_old_value_of_change()
+                                             for s in
+                                             suggestions_which_can_be_reviewed]
 
         suggestion_dicts_created_by_user = (
             [s.to_dict() for s in suggestions_created_by_user])
@@ -346,6 +338,7 @@ class CreatorDashboardHandler(base.BaseHandler):
         creator_dashboard_display_pref = self.payload.get('display_preference')
         user_services.update_user_creator_dashboard_display(
             self.user_id, creator_dashboard_display_pref)
+        self.render_json({})
 
 
 class NotificationsHandler(base.BaseHandler):
@@ -413,7 +406,7 @@ class UploadExplorationHandler(base.BaseHandler):
     @acl_decorators.can_upload_exploration
     def post(self):
         """Handles POST requests."""
-        yaml_content = self.request.get('yaml_file')
+        yaml_content = self.payload.get('yaml_file')
 
         new_exploration_id = exp_services.get_new_exploration_id()
         if constants.ALLOW_YAML_FILE_UPLOAD:
