@@ -264,7 +264,7 @@ oppia.controller('ExplorationEditor', [
     var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
     var _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
 
-    var saveButtonElement = {
+    var saveButtonTutorialElement = {
       type: 'element',
       selector: _ID_TUTORIAL_SAVE_BUTTON,
       heading: 'Save',
@@ -367,7 +367,7 @@ oppia.controller('ExplorationEditor', [
         'At any time, you can click the <b>preview</b> button to play ' +
         'through your exploration.'),
       placement: 'bottom'
-    }, saveButtonElement, {
+    }, saveButtonTutorialElement, {
       type: 'title',
       heading: 'Tutorial Complete',
       text: (
@@ -394,7 +394,7 @@ oppia.controller('ExplorationEditor', [
     // exploration since in that case Save Draft button will not be visible
     // on the create page.
     if (!GLOBALS.can_edit) {
-      var index = $scope.EDITOR_TUTORIAL_OPTIONS.indexOf(saveButtonElement);
+      var index = $scope.EDITOR_TUTORIAL_OPTIONS.indexOf(saveButtonTutorialElement);
       $scope.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
     }
 
