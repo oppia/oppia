@@ -219,7 +219,7 @@ describe('Music phrase player service', function() {
     var mpps = null;
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
     beforeEach(inject(function($injector, $window) {
-      mpps = $injector.get('musicPhrasePlayerService');
+      mpps = $injector.get('MusicPhrasePlayerService');
       // This is here so that, if the test environment is modified
       // to include MIDI in the future, we will remember to swap
       // it out with a dummy MIDI and back again after the test.
