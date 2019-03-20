@@ -121,7 +121,8 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.QUESTION_ID, self.albert_id)
         question = (
             question_services.get_question_by_id(self.QUESTION_ID))
-        self.assertEqual(question.question_state_schema_version,
+        self.assertEqual(
+            question.question_state_schema_version,
             feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # Start migration job.

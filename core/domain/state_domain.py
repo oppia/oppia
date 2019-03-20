@@ -1424,7 +1424,6 @@ class State(object):
                 interaction.can_have_translations)
 
         if interaction_can_have_translations:
-            print(self.interaction.customization_args)
             if any(self.interaction.customization_args):
                 path_to_translatable_html = (
                     interaction.path_to_customization_args_content_id)

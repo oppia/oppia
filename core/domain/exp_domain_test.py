@@ -5033,7 +5033,7 @@ states:
                 'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
                 'new_value': {}
-             }), exp_domain.ExplorationChange({
+            }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': self.exploration.init_state_name,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
@@ -5054,7 +5054,7 @@ states:
                         }]
                     }
                 }
-             })], 'Update interaction.')
+            })], 'Update interaction.')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -5105,7 +5105,7 @@ states:
                         }]
                     }
                 }
-             }), exp_domain.ExplorationChange({
+            }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'extra state',
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
@@ -5154,7 +5154,7 @@ states:
                 'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
                 'new_value': {}
-             }), exp_domain.ExplorationChange({
+            }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'state',
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,

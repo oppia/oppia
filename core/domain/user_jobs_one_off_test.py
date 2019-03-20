@@ -1033,7 +1033,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
                 'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
                 'new_value': {}
-             }), exp_domain.ExplorationChange({
+            }), exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
                 'property_name': 'widget_id',

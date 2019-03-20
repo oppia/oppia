@@ -580,7 +580,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
                 'new_value': {}
-             }), exp_domain.ExplorationChange({
+            }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': init_state_name,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
@@ -601,7 +601,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                         }]
                     }
                 }
-             })], 'commit')
+            })], 'commit')
 
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
@@ -630,7 +630,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
                 'new_value': {}
-             }), exp_domain.ExplorationChange({
+            }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': init_state_name,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
@@ -651,7 +651,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                         }]
                     }
                 }
-             })], '')
+            })], '')
+
         self.assertIsNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
 

@@ -2189,16 +2189,16 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
+        translatble_interactions = [
+            'DragAndDropSortInput', 'ItemSelectionInput', 'MultipleChoiceInput']
         for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'DragAndDropSortInput' or (
-                state_dict['interaction']['id'] == 'ItemSelectionInput') or (
-                state_dict['interaction']['id'] == 'MultipleChoiceInput'):
+            if state_dict['interaction']['id'] in translatble_interactions:
                 customization_args = state_dict[
                     'interaction']['customization_args']
                 new_values = []
                 content_ids = []
                 for index, value in enumerate(
-                    customization_args['choices']['value']):
+                        customization_args['choices']['value']):
                     content_id = 'interaction_' + str(index + 1).zfill(5)
                     content_ids.append(content_id)
                     new_values.append({

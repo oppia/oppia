@@ -1022,20 +1022,22 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         customization_args_dict2 = {
             'choices': {'value': [
                 {
-                    'html': '<p>This is value1 for MultipleChoice'
+                    'html': (
+                        '<p>This is value1 for MultipleChoice'
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&amp;quot;s2Choice1.png&amp;quot;" '
                         'caption-with-value="&amp;quot;&amp;quot;" '
                         'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image></p>',
+                        '</oppia-noninteractive-image></p>'),
                     'content_id': 'interaction_00001'
                 }, {
-                    'html': '<p>This is value2 for MultipleChoice'
+                    'html': (
+                        '<p>This is value2 for MultipleChoice'
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value'
                         '="&amp;quot;&amp;quot;" alt-with-value='
                         '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                        '</p></p>',
+                        '</p></p>'),
                     'content_id': 'interaction_00002'
                 }
             ]}
@@ -1043,28 +1045,31 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         customization_args_dict3 = {
             'choices': {'value': [
                 {
-                    'html': '<p>This is value1 for ItemSelection'
+                    'html': (
+                        '<p>This is value1 for ItemSelection'
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value'
                         '="&amp;quot;&amp;quot;" alt-with-value='
                         '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                        '</p>',
+                        '</p>'),
                     'content_id': 'interaction_00001'
                 }, {
-                    'html': '<p>This is value2 for ItemSelection'
+                    'html': (
+                        '<p>This is value2 for ItemSelection'
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value'
                         '="&amp;quot;&amp;quot;" alt-with-value='
                         '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                        '</p>',
+                        '</p>'),
                     'content_id': 'interaction_00002'
                 }, {
-                    'html': '<p>This is value3 for ItemSelection'
+                    'html': (
+                        '<p>This is value3 for ItemSelection'
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value'
                         '="&amp;quot;&amp;quot;" alt-with-value='
                         '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                        '</p>',
+                        '</p>'),
                     'content_id': 'interaction_00003'
                 },
             ]}
@@ -2042,21 +2047,20 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # We create a second state to use as a rule destination.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exp_services.update_exploration(
-            self.owner_id, self.EXP_ID,
-            [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'State 2',
-            })] + _get_change_list(
-                'State 2',
-                exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'TextInput'),
-            'Add state name')
+            self.owner_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State 2',
+                })] +
+            _get_change_list(
+                'State 2', exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'TextInput'), 'Add state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.interaction_default_outcome['dest'] = 'State 2'
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID,
-             _get_change_list(
+            _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 None) +
             _get_change_list(
@@ -2108,7 +2112,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID,
-                 _get_change_list(
+                _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_ID, None) +
                 _get_change_list(
