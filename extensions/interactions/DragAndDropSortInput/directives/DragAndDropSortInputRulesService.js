@@ -17,7 +17,7 @@
  */
 
 // Rules Service for DragAndDropSortInput interaction.
-oppia.factory('dragAndDropSortInputRulesService', [function() {
+oppia.factory('DragAndDropSortInputRulesService', [function() {
   var checkEquality = function(answer, inputs) {
     for (var i = 0; i < answer.length; i++) {
       if (answer[i].length === inputs.x[i].length) {
