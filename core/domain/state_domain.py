@@ -503,8 +503,10 @@ class InteractionInstance(object):
         if self.id in (
                 'ItemSelectionInput', 'MultipleChoiceInput',
                 'DragAndDropSortInput'):
-            customization_args_html_list = (
+            customization_args_translatable_html_list = (
                 self.customization_args['choices']['value'])
+            customization_args_html_list = [translatable_html['html'] for (
+                translatable_html) in customization_args_translatable_html_list]
             html_list = html_list + customization_args_html_list
 
         return html_list
@@ -1422,6 +1424,7 @@ class State(object):
                 interaction.can_have_translations)
 
         if interaction_can_have_translations:
+            print(self.interaction.customization_args)
             if any(self.interaction.customization_args):
                 path_to_translatable_html = (
                     interaction.path_to_customization_args_content_id)

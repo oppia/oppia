@@ -173,6 +173,46 @@ class Question(object):
             None, is_initial_state=True)
 
     @classmethod
+    def _convert_state_v27_dict_to_v28_dict(cls, state_dict):
+        """Converts from version 27 to 28. Version 28 adds content_id to
+        customization_arg for interactions which can have translations.
+
+        Args:
+            state_dict: dict. A dict representation of State domain object.
+
+        Returns:
+            dict. The converted state_dict.
+        """
+        if state_dict['interaction']['id'] == 'MultipleChoiceInput':
+            customization_args = state_dict['interaction']['customization_args']
+            new_values = []
+            content_ids = []
+            for index, value in enumerate(
+                customization_args['choices']['value']):
+                content_id = 'interaction_' + str(index + 1).zfill(5)
+                content_ids.append(content_id)
+                new_values.append({
+                    'html': value,
+                    'content_id': content_id
+                })
+
+            customization_args.update({
+                'choices': {
+                    'value': new_values
+                }
+            })
+
+            citat = state_dict['content_ids_to_audio_translations']
+            written_translations = state_dict['written_translations']
+
+            for content_id in content_ids:
+                citat[content_id] = {}
+                written_translations['translations_mapping'][content_id] = (
+                    {})
+
+        return state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given

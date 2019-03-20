@@ -1021,45 +1021,52 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         }
         customization_args_dict2 = {
             'choices': {'value': [
-                (
-                    '<p>This is value1 for MultipleChoice'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
-                ),
-                (
-                    '<p>This is value2 for MultipleChoice'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p></p>')
+                {
+                    'html': '<p>This is value1 for MultipleChoice'
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&amp;quot;s2Choice1.png&amp;quot;" '
+                        'caption-with-value="&amp;quot;&amp;quot;" '
+                        'alt-with-value="&amp;quot;&amp;quot;">'
+                        '</oppia-noninteractive-image></p>',
+                    'content_id': 'interaction_00001'
+                }, {
+                    'html': '<p>This is value2 for MultipleChoice'
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value'
+                        '="&amp;quot;&amp;quot;" alt-with-value='
+                        '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                        '</p></p>',
+                    'content_id': 'interaction_00002'
+                }
             ]}
         }
         customization_args_dict3 = {
             'choices': {'value': [
-                (
-                    '<p>This is value1 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
-                (
-                    '<p>This is value2 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
-                (
-                    '<p>This is value3 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                {
+                    'html': '<p>This is value1 for ItemSelection'
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value'
+                        '="&amp;quot;&amp;quot;" alt-with-value='
+                        '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                        '</p>',
+                    'content_id': 'interaction_00001'
+                }, {
+                    'html': '<p>This is value2 for ItemSelection'
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value'
+                        '="&amp;quot;&amp;quot;" alt-with-value='
+                        '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                        '</p>',
+                    'content_id': 'interaction_00002'
+                }, {
+                    'html': '<p>This is value3 for ItemSelection'
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value'
+                        '="&amp;quot;&amp;quot;" alt-with-value='
+                        '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                        '</p>',
+                    'content_id': 'interaction_00003'
+                },
             ]}
         }
         state1.update_interaction_customization_args(customization_args_dict1)
@@ -1923,9 +1930,26 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_interaction_id(self):
         """Test updating of interaction_id."""
         exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, _get_change_list(
+            self.owner_id, self.EXP_ID,
+            _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'MultipleChoiceInput'), '')
+                None) +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {}) +
+            _get_change_list(
+                self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'MultipleChoiceInput') +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {'choices': {'value': [{
+                    'html': 'Option A',
+                    'content_id': 'interaction_00001'
+                }, {
+                    'html': 'Option B',
+                    'content_id': 'interaction_00002'
+                }]}}), '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
@@ -1937,17 +1961,35 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID,
             _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                None) +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {}) +
+            _get_change_list(
+                self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'MultipleChoiceInput') +
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                {'choices': {'value': ['Option A', 'Option B']}}),
+                {'choices': {'value': [{
+                    'html': 'Option A',
+                    'content_id': 'interaction_00001'
+                }, {
+                    'html': 'Option B',
+                    'content_id': 'interaction_00002'
+                }]}}),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exploration.init_state.interaction.customization_args[
-                'choices']['value'], ['Option A', 'Option B'])
+                'choices']['value'], [{
+                    'html': 'Option A',
+                    'content_id': 'interaction_00001'
+                }, {
+                    'html': 'Option B',
+                    'content_id': 'interaction_00002'
+                }])
 
     def test_update_interaction_handlers_fails(self):
         """Test legacy interaction handler updating."""
@@ -1971,8 +2013,24 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.owner_id, self.EXP_ID,
                 _get_change_list(
                     self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_ID, None) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {}) +
+                _get_change_list(
+                    self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'MultipleChoiceInput') +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    {'choices': {'value': [{
+                        'html': 'Option A',
+                        'content_id': 'interaction_00001'
+                    }, {
+                        'html': 'Option B',
+                        'content_id': 'interaction_00002'
+                    }]}}) +
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
@@ -1998,9 +2056,28 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.interaction_default_outcome['dest'] = 'State 2'
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID,
+             _get_change_list(
+                self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                None) +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {}) +
             _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'MultipleChoiceInput') +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>Option 1</p>',
+                            'content_id': 'interaction_123'
+                        }, {
+                            'html': '<p>Option 2</p>',
+                            'content_id': 'interaction_456'
+                        }]
+                    }
+                }) +
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
@@ -2031,10 +2108,29 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID,
+                 _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_ID, None) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {}) +
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'MultipleChoiceInput') +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS, {
+                        'choices': {
+                            'value': [{
+                                'html': '<p>Option 1</p>',
+                                'content_id': 'interaction_123'
+                            }, {
+                                'html': '<p>Option 2</p>',
+                                'content_id': 'interaction_456'
+                            }]
+                        }
+                    }) +
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,

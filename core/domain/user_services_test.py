@@ -1,3 +1,4 @@
+
 # coding: utf-8
 #
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
@@ -569,11 +570,38 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': 'edit_state_property',
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': init_state_name,
-                'property_name': 'widget_id',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': None
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {}
+             }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'MultipleChoiceInput'
-            })], 'commit')
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>Hello</p>',
+                            'content_id': 'interaction_123'
+                        }, {
+                            'html': '<p>Bye</p>',
+                            'content_id': 'interaction_456'
+                        }]
+                    }
+                }
+             })], 'commit')
 
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
@@ -592,11 +620,38 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # contribution time.
         exp_services.update_exploration(
             self.admin_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': 'edit_state_property',
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': init_state_name,
-                'property_name': 'widget_id',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': None
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {}
+             }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'MultipleChoiceInput'
-            })], '')
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>Hello</p>',
+                            'content_id': 'interaction_123'
+                        }, {
+                            'html': '<p>Bye</p>',
+                            'content_id': 'interaction_456'
+                        }]
+                    }
+                }
+             })], '')
         self.assertIsNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
 

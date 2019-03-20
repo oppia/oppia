@@ -2197,9 +2197,9 @@ class Exploration(object):
                     'interaction']['customization_args']
                 new_values = []
                 content_ids = []
-                for value in customization_args['choices']['value']:
-                    content_id = 'interaction_' + utils.generate_random_string(
-                        5)
+                for index, value in enumerate(
+                    customization_args['choices']['value']):
+                    content_id = 'interaction_' + str(index + 1).zfill(5)
                     content_ids.append(content_id)
                     new_values.append({
                         'html': value,

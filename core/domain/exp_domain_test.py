@@ -4280,6 +4280,8 @@ states:
       feedback_2: {}
       hint_1: {}
       hint_2: {}
+      interaction_00001: {}
+      interaction_00002: {}
     interaction:
       answer_groups:
       - outcome:
@@ -4319,8 +4321,10 @@ states:
       customization_args:
         choices:
           value:
-          - <p>This is </p><p>value1 <br>for MultipleChoice</p>
-          - <p>This is value2 for <br>MultipleChoice</p>
+          - content_id: interaction_00001
+            html: <p>This is </p><p>value1 <br>for MultipleChoice</p>
+          - content_id: interaction_00002
+            html: <p>This is value2 for <br>MultipleChoice</p>
       default_outcome:
         dest: state2
         feedback:
@@ -4350,6 +4354,8 @@ states:
         feedback_2: {}
         hint_1: {}
         hint_2: {}
+        interaction_00001: {}
+        interaction_00002: {}
   state3:
     classifier_model_id: null
     content:
@@ -4359,6 +4365,9 @@ states:
       content: {}
       default_outcome: {}
       feedback_1: {}
+      interaction_00001: {}
+      interaction_00002: {}
+      interaction_00003: {}
     interaction:
       answer_groups:
       - outcome:
@@ -4389,9 +4398,12 @@ states:
       customization_args:
         choices:
           value:
-          - <p>This is value1 for ItemSelection</p>
-          - <p>This is value2 for ItemSelection</p>
-          - <p>This is value3 for ItemSelection</p>
+          - content_id: interaction_00001
+            html: <p>This is value1 for ItemSelection</p>
+          - content_id: interaction_00002
+            html: <p>This is value2 for ItemSelection</p>
+          - content_id: interaction_00003
+            html: <p>This is value3 for ItemSelection</p>
         maxAllowableSelectionCount:
           value: 1
         minAllowableSelectionCount:
@@ -4414,6 +4426,9 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        interaction_00001: {}
+        interaction_00002: {}
+        interaction_00003: {}
 states_schema_version: 28
 tags: []
 title: title
@@ -5011,8 +5026,35 @@ states:
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': self.exploration.init_state_name,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': None
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': self.exploration.init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {}
+             }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': self.exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'MultipleChoiceInput'
-            })], 'Update interaction.')
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': self.exploration.init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>Hello</p>',
+                            'content_id': 'interaction_123'
+                        }, {
+                            'html': '<p>Bye</p>',
+                            'content_id': 'interaction_456'
+                        }]
+                    }
+                }
+             })], 'Update interaction.')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -5048,6 +5090,22 @@ states:
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'MultipleChoiceInput'
             }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>Hello</p>',
+                            'content_id': 'interaction_123'
+                        }, {
+                            'html': '<p>Bye</p>',
+                            'content_id': 'interaction_456'
+                        }]
+                    }
+                }
+             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'extra state',
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
@@ -5089,7 +5147,34 @@ states:
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'state',
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': None
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {}
+             }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>Hello</p>',
+                            'content_id': 'interaction_123'
+                        }, {
+                            'html': '<p>Bye</p>',
+                            'content_id': 'interaction_456'
+                        }]
+                    }
+                }
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'extra state'
@@ -5270,17 +5355,29 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'rows': {'value': 1}
         }
         customization_args_dict2 = {
-            'choices': {'value': [
-                '<p>This is value1 for MultipleChoice</p>',
-                '<p>This is value2 for MultipleChoice</p>'
-            ]}
+            'choices': {
+                'value': [{
+                    'html': '<p>This is value1 for MultipleChoice</p>',
+                    'content_id': 'interaction_123'
+                }, {
+                    'html': '<p>This is value2 for MultipleChoice</p>',
+                    'content_id': 'interaction_456'
+                }]
+            }
         }
         customization_args_dict3 = {
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-                '<p>This is value3 for ItemSelection</p>'
-            ]}
+            'choices': {
+                'value': [{
+                    'html': '<p>This is value1 for ItemSelection</p>',
+                    'content_id': 'interaction_123'
+                }, {
+                    'html': '<p>This is value2 for ItemSelection</p>',
+                    'content_id': 'interaction_456'
+                }, {
+                    'html': '<p>This is value3 for ItemSelection</p>',
+                    'content_id': 'interaction_789'
+                }]
+            }
         }
         state1.update_interaction_customization_args(customization_args_dict1)
         state2.update_interaction_customization_args(customization_args_dict2)

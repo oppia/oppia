@@ -1023,10 +1023,37 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             self.admin, self.EXP_ID)
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': None
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {}
+             }), exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'html': '<p>Hello</p>',
+                            'content_id': 'interaction_123'
+                        }, {
+                            'html': '<p>Bye</p>',
+                            'content_id': 'interaction_456'
+                        }]
+                    }
+                }
             })], 'commit')
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())

@@ -1135,6 +1135,17 @@ class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
         end_state = exploration2.states['End']
 
         intro_state.update_interaction_id('ItemSelectionInput')
+        intro_state.update_interaction_customization_args({
+            'choices': {
+                'value': [{
+                    'html': 'Option 1',
+                    'content_id': 'interaction_00001'
+                }, {
+                    'html': 'Option 2',
+                    'content_id': 'interaction_00002'
+                }]
+            }
+        })
         end_state.update_interaction_id('EndExploration')
         end_state.update_interaction_default_outcome(None)
 
@@ -1206,13 +1217,15 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state2 = exploration.states['State2']
 
         state1.update_interaction_id('ItemSelectionInput')
-        state2.update_interaction_id('ItemSelectionInput')
 
         customization_args_dict1 = {
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'interaction_00001'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'interaction_00002'
+            }]}
         }
 
         answer_group_list1 = [{
@@ -1242,16 +1255,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_misconception_id': None
         }]
 
-        content_ids_to_audio_translations_dict = {
-            'content': {},
-            'default_outcome': {},
-            'feedback': {}
-        }
-
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_interaction_answer_groups(answer_group_list1)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1265,11 +1270,16 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         self.assertEqual(actual_output, [])
 
+        state2.update_interaction_id('ItemSelectionInput')
+
         customization_args_dict2 = {
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'interaction_00001'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'interaction_00002'
+            }]}
         }
 
         answer_group_list2 = [{
@@ -1301,8 +1311,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_interaction_answer_groups(answer_group_list2)
-        state2.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1332,17 +1340,14 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state1.update_interaction_id('ItemSelectionInput')
 
-        content_ids_to_audio_translations_dict = {
-            'content': {},
-            'default_outcome': {},
-            'feedback': {}
-        }
-
         customization_args_dict = {
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'interaction_00001'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'interaction_00002'
+            }]}
         }
 
         answer_group_list = [{
@@ -1374,8 +1379,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_interaction_answer_groups(answer_group_list)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 

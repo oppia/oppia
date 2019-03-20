@@ -312,10 +312,12 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if state.interaction.id == 'ItemSelectionInput':
                 choices = (
                     state.interaction.customization_args['choices']['value'])
+                html_list = [translatable_html['html'] for (
+                    translatable_html) in choices]
                 for group in state.interaction.answer_groups:
                     for rule_spec in group.rule_specs:
                         for rule_item in rule_spec.inputs['x']:
-                            if rule_item not in choices:
+                            if rule_item not in html_list:
                                 yield (
                                     item.id,
                                     '%s: %s' % (
