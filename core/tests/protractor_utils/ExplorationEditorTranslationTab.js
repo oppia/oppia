@@ -144,17 +144,8 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   var solutionTabText = element(by.css('.protractor-test-solution-text'));
-  var translationGraph = element(by.css('.protractor-test-translation-graph'));
-  var stateNodes = translationGraph.all(by.css('.protractor-test-node'));
-  var stateBackgroundNodes = translationGraph.all(by.css(
-    '.protractor-test-node-background'));
-  var stateNodeLabel = function(nodeElement) {
-    return nodeElement.element(by.css('.protractor-test-node-label'));
-  };
-  var audioUploadInputElem = element(by.className(
-    'protractor-test-upload-audio'));
 
-  numericalStatus = element(
+  var numericalStatus = element(
     by.css('.protractor-test-translation-numerical-status'));
 
   var _selectLanguage = function(language) {
@@ -162,9 +153,20 @@ var ExplorationEditorTranslationTab = function() {
       element(by.cssContainingText('option', language)).click();
   };
 
+  var audioUploadInputElem = element(by.className(
+    'protractor-test-upload-audio'));
+  var translationGraph = element(by.css('.protractor-test-translation-graph'));
+  var stateBackgroundNodes = translationGraph.all(by.css(
+    '.protractor-test-node-background'));
+  var stateNodes = translationGraph.all(by.css('.protractor-test-node'));
+  var stateNodeLabel = function(nodeElement) {
+    return nodeElement.element(by.css('.protractor-test-node-label'));
+  };
+  
   this.expectSaveUploadedAudioButtonToBeDisabled = function() {
     expect(saveUploadedAudioButton.getAttribute('disabled')).toBe('true');
   };
+
 
   this.uploadAudio = function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
@@ -256,6 +258,7 @@ var ExplorationEditorTranslationTab = function() {
       uploadAudioButton, 'Upload Audio button is not clickable');
     uploadAudioButton.click();
   };
+
 
   // NOTE: if the state is not visible in the state graph this function will
   // fail.
