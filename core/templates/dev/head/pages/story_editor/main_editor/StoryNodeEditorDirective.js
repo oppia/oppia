@@ -82,7 +82,15 @@ oppia.directive('storyNodeEditor', [
           $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;
           };
-
+          // Regex pattern for exploration id, EXPLORATION_AND_SKILL_ID_PATTERN
+          // is not being used here, as the chapter of the story can be saved
+          // with empty exploration id.
+          $scope.explorationIdPattern = /^[a-zA-Z0-9_-]*$/;
+          $scope.canSaveExpId = true;
+          $scope.checkCanSaveExpId = function() {
+            $scope.canSaveExpId = $scope.explorationIdPattern.test(
+              $scope.explorationId);
+          };
           $scope.updateTitle = function(newTitle) {
             if (newTitle === $scope.currentTitle) {
               return;
