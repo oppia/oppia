@@ -17,7 +17,6 @@
  *   editor page.
  */
 
-
 describe('Change list service', function() {
   beforeEach(angular.mock.module('oppia'));
 

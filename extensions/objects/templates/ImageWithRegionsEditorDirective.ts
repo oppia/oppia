@@ -471,6 +471,7 @@ oppia.directive('imageWithRegionsEditor', [
                 ($scope.xDirection === 1 && $scope.xDirectionToggled)) {
                 xDirectionCursor = 'e';
               } else {
+          
                 xDirectionCursor = '';
               }
               if (

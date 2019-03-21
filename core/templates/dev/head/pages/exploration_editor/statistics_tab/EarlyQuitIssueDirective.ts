@@ -16,7 +16,7 @@
  * @fileoverview Directive for visualizing early quit issue.
  */
 
-oppia.directive('earlyQuitIssueDirective', [
+oppia.directive('earlyQuitIssue', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -17,7 +17,7 @@
  */
 
 /* eslint-disable angular/directive-restrict */
-oppia.directive('stateGraphViz', [
+oppia.directive('stateGraphVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       // Note: This directive is used as attribute because pannability does not

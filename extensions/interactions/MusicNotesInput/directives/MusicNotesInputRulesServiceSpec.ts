@@ -22,7 +22,7 @@ describe('Music Notes Input rules service', function() {
 
   var mnirs = null;
   beforeEach(angular.mock.inject(function($injector) {
-    mnirs = $injector.get('musicNotesInputRulesService');
+    mnirs = $injector.get('MusicNotesInputRulesService');
   }));
 
   it('should have a correct \'equals\' rule', function() {

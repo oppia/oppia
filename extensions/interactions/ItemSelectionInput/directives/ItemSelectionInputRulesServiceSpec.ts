@@ -22,7 +22,7 @@ describe('Item Selection rules service', function() {
 
   var isirs = null;
   beforeEach(angular.mock.inject(function($injector) {
-    isirs = $injector.get('itemSelectionInputRulesService');
+    isirs = $injector.get('ItemSelectionInputRulesService');
   }));
 
   it('should have a correct \'equals\' rule', function() {

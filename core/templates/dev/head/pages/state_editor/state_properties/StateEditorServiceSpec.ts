@@ -16,14 +16,13 @@
  * @fileoverview Unit test for the Editor state service.
  */
 
-
 describe('Editor state service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('editor state service', function() {
     var ecs = null;
 
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(inject(function($injector) {
       ecs = $injector.get('StateEditorService');
     }));
 
@@ -50,8 +49,7 @@ describe('Editor state service', function() {
         }
       };
       expect(
-        ecs.getAnswerChoices(
-          'MultipleChoiceInput', customizationArgsForMultipleChoiceInput)
+        ecs.getAnswerChoices('MultipleChoiceInput', customizationArgsForMultipleChoiceInput)
       ).toEqual([{
         val: 0,
         label: 'Choice 1',
@@ -72,8 +70,7 @@ describe('Editor state service', function() {
         }
       };
       expect(
-        ecs.getAnswerChoices(
-          'ImageClickInput', customizationArgsForImageClickInput)
+        ecs.getAnswerChoices('ImageClickInput', customizationArgsForImageClickInput)
       ).toEqual([{
         val: 'Label 1',
         label: 'Label 1',
@@ -82,7 +79,7 @@ describe('Editor state service', function() {
         label: 'Label 2',
       }]);
 
-      var customizationArgsForItemSelectionAndDragAndDropInput = {
+      var customizationArgsForItemSelectionInputAndDragAndDropSortInput = {
         choices: {
           value: [
             'Choice 1',
@@ -93,7 +90,7 @@ describe('Editor state service', function() {
       expect(
         ecs.getAnswerChoices(
           'ItemSelectionInput',
-          customizationArgsForItemSelectionAndDragAndDropInput)
+          customizationArgsForItemSelectionInputAndDragAndDropSortInput)
       ).toEqual([{
         val: 'Choice 1',
         label: 'Choice 1',
@@ -104,7 +101,7 @@ describe('Editor state service', function() {
       expect(
         ecs.getAnswerChoices(
           'DragAndDropSortInput',
-          customizationArgsForItemSelectionAndDragAndDropInput)
+          customizationArgsForItemSelectionInputAndDragAndDropSortInput)
       ).toEqual([{
         val: 'Choice 1',
         label: 'Choice 1',

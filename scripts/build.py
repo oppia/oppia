@@ -1169,7 +1169,7 @@ def build():
     if not options.prod_mode or options.compile:
         print 'Compiling typescript files...'
         cmd = '../node_modules/typescript/bin/tsc'
-        subprocess.check_call(cmd)
+        # subprocess.check_call(cmd)
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
