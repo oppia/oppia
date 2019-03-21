@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.js');
 require('services/PlaythroughIssuesService.js');
 
-oppia.directive('playthroughIssuesDirective', [
+oppia.directive('playthroughIssues', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -22,7 +22,7 @@ require('pages/exploration_editor/ExplorationWarningsService.js');
 require('pages/exploration_editor/translation_tab/TranslationStatusService.js');
 
 /* eslint-disable angular/directive-restrict */
-oppia.directive('stateGraphViz', [
+oppia.directive('stateGraphVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       // Note: This directive is used as attribute because pannability does not

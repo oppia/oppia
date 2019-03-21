@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.js');
 require('pages/collection_editor/CollectionEditorStateService.js');
 require('pages/collection_editor/editor_tab/CollectionLinearizerService.js');
 
-oppia.directive('collectionMainTab', [
+oppia.directive('collectionEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

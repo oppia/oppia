@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.js');
 require('services/AlertsService.js');
 require('services/PlaythroughIssuesService.js');
 
-oppia.directive('multipleIncorrectIssueDirective', [
+oppia.directive('multipleIncorrectIssue', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
