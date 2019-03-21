@@ -23,9 +23,9 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var ExplorationEditorPage = require(
-	'../protractor_utils/ExplorationEditorPage.js');
+  '../protractor_utils/ExplorationEditorPage.js');
 var CreatorDashboardPage = require(
-	'../protractor_utils/CreatorDashboardPage');
+  '../protractor_utils/CreatorDashboardPage');
 
 describe('Exploration translation', function() {
   var creatorDashboardPage = null;
@@ -33,8 +33,6 @@ describe('Exploration translation', function() {
   var explorationEditorPage = null;
   var explorationEditorSettingsTab = null;
   var explorationEditorTranslationTab = null;
-});
-
 
   beforeAll(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -44,8 +42,8 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
 
     // Create a common exploration for testing.
-    users.createUser('user2@translationTab.com', 'user2TranslationTab');
-    users.login('user2@translationTab.com');
+    users.createUser('common@translationTab.com', 'commonUserTranslationTab');
+    users.login('common@translationTab.com');
     workflow.createExploration();
 
     explorationEditorMainTab.setStateName('first');
@@ -82,7 +80,8 @@ describe('Exploration translation', function() {
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle('tests');
     explorationEditorSettingsTab.setCategory('Algorithms');
-    explorationEditorSettingsTab.setObjective('Test');
+    explorationEditorSettingsTab.setObjective('Run tests using same' +
+    'exploration.');
     explorationEditorPage.saveChanges('Done!');
     users.logout();
   });
@@ -103,7 +102,7 @@ describe('Exploration translation', function() {
     });
 
   it('should have all the state contents', function() {
-    users.login('user2@translationTab.com');
+    users.login('common@translationTab.com');
     creatorDashboardPage.get();
     // Test using common exploration.
     creatorDashboardPage.editExploration('tests');
@@ -123,11 +122,11 @@ describe('Exploration translation', function() {
   });
 
   it('should have a correct numerical status', function() {
-    users.login('user2@translationTab.com');
+    users.login('common@translationTab.com');
     creatorDashboardPage.get();
     // Test using common exploration.
     creatorDashboardPage.editExploration('tests');
-    
+
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.exitTutorial();
     // To check the absence of any audio translation in exploration initially.
@@ -135,7 +134,6 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.openUploadAudioModal();
     var relativePathOfAudioToUpload = '../data/cafe.mp3';
     explorationEditorTranslationTab.uploadAudio(relativePathOfAudioToUpload);
-    explorationEditorTranslationTab.saveUploadedAudio(true);
     /**
      * To check correct display of numerical status after the upload of audio
      * translation in exploration.
@@ -143,35 +141,31 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.expectNumericalStatusToMatch('(1/11)');
     explorationEditorTranslationTab.openUploadAudioModal();
     relativePathOfAudioToUpload = '../data/img.png';
-    explorationEditorTranslationTab.uploadAudio(relativePathOfAudioToUpload);
     /**
-     * To check behaviour on attempting to
-     * upload an image as audio translation.
+     * To check behaviotabur on attempting to upload an image as audio
+     * translation.
      */
-    expect(explorationEditorTranslationTab.getWrongFileTypeErrorMessage())
-    .toContain('This file is not recognized as an audio file.');
-    expect(explorationEditorTranslationTab.saveUploadedAudioButton
-      .getAttribute('disabled')).toBe('true');
+    explorationEditorTranslationTab.expectWrongFileType(
+      relativePathOfAudioToUpload);
+    explorationEditorTranslationTab.expectSaveUploadedAudioButtonToBeDisabled(
+    );
     explorationEditorTranslationTab.expectNumericalStatusToMatch('(1/11)');
+
     relativePathOfAudioToUpload = '../data/cafe-over-five-minutes.mp3';
-    explorationEditorTranslationTab.uploadAudio(relativePathOfAudioToUpload);
-    explorationEditorTranslationTab.saveUploadedAudio();
+    explorationEditorTranslationTab.expectAudioOverFiveMinutes(
+      relativePathOfAudioToUpload);
     /**
      * To check behaviour on attempting to upload an audio translation with
      * length above 300 seconds.
      */
-    expect(
-      explorationEditorTranslationTab.getAudioOverFiveMinutesErrorMessage())
-      .toContain('The uploaded file is 301.87 seconds long.');
-    expect(explorationEditorTranslationTab.saveUploadedAudioButton
-      .getAttribute('disabled')).toBe('true');
+    explorationEditorTranslationTab.expectSaveUploadedAudioButtonToBeDisabled();
     explorationEditorTranslationTab.expectNumericalStatusToMatch('(1/11)');
     users.logout();
 
     general.checkForConsoleErrors(
       ['Failed to load resource: the server responded with a status of 400' +
-       '(Bad Request)', {'status_code':400,
-       'error':'Audio files must be under 300 seconds in length.' +
+       '(Bad Request)', {status_code: 400,
+        error: 'Audio files must be under 300 seconds in length.' +
        ' The uploaded file is 301.87 seconds long.'}]);
   });
 
@@ -182,37 +176,28 @@ describe('Exploration translation', function() {
       var NO_AUDIO_AVAILABLE_COLOR = 'rgb(209, 72, 54)';
       var relativePathOfAudioToUpload = '../data/cafe.mp3';
 
-      users.login('user2@translationTab.com');
+      users.login('common@translationTab.com');
       creatorDashboardPage.get();
       // Test using common exploration.
       creatorDashboardPage.editExploration('tests');
-      explorationEditorMainTab.moveToState('second');
       explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.exitTutorial();
+      explorationEditorTranslationTab.moveToState('second');
       explorationEditorTranslationTab.openUploadAudioModal();
       explorationEditorTranslationTab.uploadAudio(relativePathOfAudioToUpload);
-      explorationEditorTranslationTab.saveUploadedAudio(true);
-      explorationEditorPage.navigateToMainTab();
-      explorationEditorMainTab.moveToState('final card');
+      explorationEditorTranslationTab.moveToState('final card');
       explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.openUploadAudioModal();
       explorationEditorTranslationTab.uploadAudio(relativePathOfAudioToUpload);
-      explorationEditorTranslationTab.saveUploadedAudio(true);
-      var colorsOfNormalNodes = explorationEditorTranslationTab
-      .getColorsOfNormalNode();
-      /**
-       * To check correct status color for 'second', 'third' 
-       * and 'final card' states.
-       */
-      colorsOfNormalNodes.then(
-        function(colorsOfStates) {
-          colorsOfStates.sort();
-          expect(colorsOfStates[0]).toBe(NO_AUDIO_AVAILABLE_COLOR);
-          expect(colorsOfStates[1]).toBe(FEW_AUDIO_AVAILABLE_COLOR);
-        });
-      expect(explorationEditorTranslationTab.getColorOfTerminalNode()).
-        toBe(ALL_AUDIO_AVAILABLE_COLOR);
-      
+
+      // To check that the status color is correct for cards.
+      explorationEditorTranslationTab.expectCorrectStatusColor(
+        'second', FEW_AUDIO_AVAILABLE_COLOR);
+      explorationEditorTranslationTab.expectCorrectStatusColor(
+        'third', NO_AUDIO_AVAILABLE_COLOR);
+      explorationEditorTranslationTab.expectCorrectStatusColor(
+        'final card', ALL_AUDIO_AVAILABLE_COLOR);
+
       general.checkForConsoleErrors([]);
     });
 
@@ -287,3 +272,4 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
     general.checkForConsoleErrors([]);
   });
+});

@@ -16,8 +16,9 @@
  * @fileoverview Page object for the exploration editor's translation tab, for
  * use in Protractor tests.
  */
-var waitFor = require('../protractor_utils/waitFor.js');
+var general = require('./general.js');
 var path = require('path');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorTranslationTab = function() {
   var dismissWelcomeModalButton = element(
@@ -25,30 +26,8 @@ var ExplorationEditorTranslationTab = function() {
   var translationWelcomeModal = element(
     by.css('.protractor-test-translation-tab-welcome-modal'));
 
-  this.saveUploadedAudioButton = element(
+  var saveUploadedAudioButton = element(
     by.css('.protractor-test-save-button'));
-
-  this.getWrongFileTypeErrorMessage = function() {
-    return (element(by.css('div.error-message')).getText());
-  };
-
-  this.getColorOfInitNode = function() {
-    return (element.all(by.css(
-      'rect.protractor-test-node-background.init-node')).last().
-      getCssValue('fill'));
-  };
-
-  this.getColorsOfNormalNode = function() {
-    return (element.all(by.css(
-      'rect.protractor-test-node-background.normal-node')).
-      getCssValue('fill'));
-  };
-
-  this.getColorOfTerminalNode = function() {
-    return (element.all(by.css(
-      'rect.protractor-test-node-background.terminal-node')).last().
-      getCssValue('fill'));
-  };
 
   this.exitTutorial = function() {
     // If the translation welcome modal shows up, exit it.
@@ -174,14 +153,39 @@ var ExplorationEditorTranslationTab = function() {
       element(by.cssContainingText('option', language)).click();
   };
 
-  this.audioUploadInputElem = element(by.className(
+  this.expectSaveUploadedAudioButtonToBeDisabled = function() {
+    expect(saveUploadedAudioButton.getAttribute('disabled')).toBe('true');
+  };
+
+  var audioUploadInputElem = element(by.className(
     'protractor-test-upload-audio'));
 
   this.uploadAudio = function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    explorationEditorTranslationTab.audioUploadInputElem.sendKeys(
-      audioAbsolutePath);
+    audioUploadInputElem.sendKeys(audioAbsolutePath);
+    waitFor.elementToBeClickable(
+      saveUploadedAudioButton, 'Save button is not clickable');
+    saveUploadedAudioButton.click();
+    waitFor.invisibilityOf(saveUploadedAudioButton,
+      'Upload Audio modal takes too long to disappear');
+  };
+
+  this.expectWrongFileType = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    audioUploadInputElem.sendKeys(audioAbsolutePath);
+    expect(element(by.css('div.error-message')).getText())
+      .toContain('This file is not recognized as an audio file.');
+  };
+
+  this.expectAudioOverFiveMinutes = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    audioUploadInputElem.sendKeys(audioAbsolutePath);
+    waitFor.elementToBeClickable(
+      saveUploadedAudioButton, 'Save button is not clickable');
+    saveUploadedAudioButton.click();
   };
 
   this.expectContentTabContentToMatch = function(content) {
@@ -236,13 +240,6 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.getAudioOverFiveMinutesErrorMessage = function() {
-    waitFor.visibilityOf(
-      audioOverFiveMinutesErrorMessageElement,
-      'Audio above 300 seconds error is not visible');
-    return audioOverFiveMinutesErrorMessageElement.getText();
-  };
-
   this.expectFeedbackTabToBeActive = function() {
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
     ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
@@ -254,14 +251,55 @@ var ExplorationEditorTranslationTab = function() {
     uploadAudioButton.click();
   };
 
-  this.saveUploadedAudio = function(wait) {
-    waitFor.elementToBeClickable(
-      this.saveUploadedAudioButton, 'Save button is not clickable');
-    this.saveUploadedAudioButton.click();
-    if (wait) {
-      waitFor.invisibilityOf(this.saveUploadedAudioButton,
-        'Upload Audio modal takes too long to disappear');
-    }
+  var translationGraph = element(by.css('.protractor-test-translation-graph'));
+  var stateNodes = translationGraph.all(by.css('.protractor-test-node'));
+  var stateBackgroundNodes = translationGraph.all(by.css(
+    '.protractor-test-node-background'));
+  var stateNodeLabel = function(nodeElement) {
+    return nodeElement.element(by.css('.protractor-test-node-label'));
+  };
+
+  // NOTE: if the state is not visible in the state graph this function will
+  // fail.
+  this.moveToState = function(targetName) {
+    general.scrollToTop();
+    stateNodes.map(function(stateElement) {
+      return stateNodeLabel(stateElement).getText();
+    }).then(function(listOfNames) {
+      var matched = false;
+      for (var i = 0; i < listOfNames.length; i++) {
+        if (listOfNames[i] === targetName) {
+          stateNodes.get(i).click();
+          matched = true;
+          // Wait to re-load the entire state editor.
+        }
+      }
+      if (!matched) {
+        throw Error(
+          'State ' + targetName + ' not found by editorTranslationTab.' +
+          'moveToState.');
+      }
+    });
+  };
+
+  this.expectCorrectStatusColor = function(stateName, expectedColor) {
+    stateNodes.map(function(stateElement) {
+      return stateNodeLabel(stateElement).getText();
+    }).then(function(listOfNames) {
+      var matched = false;
+      for (var i = 0; i < listOfNames.length; i++) {
+        if (listOfNames[i] === stateName) {
+          expect(stateBackgroundNodes.get(i).getCssValue('fill')).toBe(
+            expectedColor);
+          matched = true;
+        }
+      }
+      if (!matched) {
+        throw Error(
+          'State ' + targetName +
+          ' not found by editorTranslationTab.expectCorrectStatusColor.');
+      }
+    });
   };
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;
