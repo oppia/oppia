@@ -27,7 +27,7 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-tab-welcome-modal'));
 
   var saveUploadedAudioButton = element(
-    by.css('.protractor-test-save-button'));
+    by.css('.protractor-test-save-uploaded-audio-button'));
 
   this.exitTutorial = function() {
     // If the translation welcome modal shows up, exit it.
@@ -144,6 +144,15 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   var solutionTabText = element(by.css('.protractor-test-solution-text'));
+  var translationGraph = element(by.css('.protractor-test-translation-graph'));
+  var stateNodes = translationGraph.all(by.css('.protractor-test-node'));
+  var stateBackgroundNodes = translationGraph.all(by.css(
+    '.protractor-test-node-background'));
+  var stateNodeLabel = function(nodeElement) {
+    return nodeElement.element(by.css('.protractor-test-node-label'));
+  };
+  var audioUploadInputElem = element(by.className(
+    'protractor-test-upload-audio'));
 
   numericalStatus = element(
     by.css('.protractor-test-translation-numerical-status'));
@@ -156,9 +165,6 @@ var ExplorationEditorTranslationTab = function() {
   this.expectSaveUploadedAudioButtonToBeDisabled = function() {
     expect(saveUploadedAudioButton.getAttribute('disabled')).toBe('true');
   };
-
-  var audioUploadInputElem = element(by.className(
-    'protractor-test-upload-audio'));
 
   this.uploadAudio = function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
@@ -251,14 +257,6 @@ var ExplorationEditorTranslationTab = function() {
     uploadAudioButton.click();
   };
 
-  var translationGraph = element(by.css('.protractor-test-translation-graph'));
-  var stateNodes = translationGraph.all(by.css('.protractor-test-node'));
-  var stateBackgroundNodes = translationGraph.all(by.css(
-    '.protractor-test-node-background'));
-  var stateNodeLabel = function(nodeElement) {
-    return nodeElement.element(by.css('.protractor-test-node-label'));
-  };
-
   // NOTE: if the state is not visible in the state graph this function will
   // fail.
   this.moveToState = function(targetName) {
@@ -271,7 +269,6 @@ var ExplorationEditorTranslationTab = function() {
         if (listOfNames[i] === targetName) {
           stateNodes.get(i).click();
           matched = true;
-          // Wait to re-load the entire state editor.
         }
       }
       if (!matched) {

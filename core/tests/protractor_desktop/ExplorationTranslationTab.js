@@ -24,8 +24,7 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
-var CreatorDashboardPage = require(
-  '../protractor_utils/CreatorDashboardPage');
+var CreatorDashboardPage = require('../protractor_utils/CreatorDashboardPage');
 
 describe('Exploration translation', function() {
   var creatorDashboardPage = null;
@@ -186,7 +185,6 @@ describe('Exploration translation', function() {
       explorationEditorTranslationTab.openUploadAudioModal();
       explorationEditorTranslationTab.uploadAudio(relativePathOfAudioToUpload);
       explorationEditorTranslationTab.moveToState('final card');
-      explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.openUploadAudioModal();
       explorationEditorTranslationTab.uploadAudio(relativePathOfAudioToUpload);
 
