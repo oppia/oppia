@@ -142,7 +142,7 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.openUploadAudioModal();
     relativePathOfAudioToUpload = '../data/img.png';
     /**
-     * To check behaviotabur on attempting to upload an image as audio
+     * To check behaviour on attempting to upload an image as audio
      * translation.
      */
     explorationEditorTranslationTab.expectWrongFileType(
