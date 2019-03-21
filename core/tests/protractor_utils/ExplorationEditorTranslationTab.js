@@ -194,6 +194,10 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.elementToBeClickable(
       saveUploadedAudioButton, 'Save button is not clickable');
     saveUploadedAudioButton.click();
+    waitFor.visibilityOf(audioOverFiveMinutesErrorMessageElement,
+      'Error element is not visible');
+    expect(audioOverFiveMinutesErrorMessageElement.getText()).toContain(
+      'Audio files must be under 300 seconds in length.');
   };
 
   this.expectContentTabContentToMatch = function(content) {

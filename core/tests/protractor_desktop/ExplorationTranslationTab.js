@@ -80,7 +80,7 @@ describe('Exploration translation', function() {
     explorationEditorSettingsTab.setTitle('tests');
     explorationEditorSettingsTab.setCategory('Algorithms');
     explorationEditorSettingsTab.setObjective('Run tests using same' +
-    'exploration.');
+    ' exploration.');
     explorationEditorPage.saveChanges('Done!');
     users.logout();
   });
