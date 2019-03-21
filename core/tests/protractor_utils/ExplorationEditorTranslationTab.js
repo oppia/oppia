@@ -162,7 +162,7 @@ var ExplorationEditorTranslationTab = function() {
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.element(by.css('.protractor-test-node-label'));
   };
-  
+
   this.expectSaveUploadedAudioButtonToBeDisabled = function() {
     expect(saveUploadedAudioButton.getAttribute('disabled')).toBe('true');
   };
