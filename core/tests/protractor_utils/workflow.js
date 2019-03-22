@@ -128,7 +128,8 @@ var _addExplorationRole = function(roleName, username) {
   element(by.css('.protractor-test-role-username')).sendKeys(username);
   element(by.css('.protractor-test-role-select')).
     element(by.cssContainingText('option', roleName)).click();
-  element(by.css('.protractor-test-save-role')).isEnabled().toBe(false);
+  expect(element(by.css('.protractor-test-save-role')).isEnabled())
+    .toBe(false);
   element(by.model('explorationTitleService.displayed')).sendKeys(
     'Chuck Norris');
   element(by.css('.protractor-test-save-role')).click();
