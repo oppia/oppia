@@ -96,7 +96,12 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
     # third party commands. These are only used for unit tests and generating
     # documentation and are not necessary when building Skulpt.
     sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
-    sed -e "s/  doc()/  pass#doc()/" > $TMP_FILE
+    sed -e "s/  doc()/  pass#doc()/" |\
+    # This and the next command disable unit and compressed unit tests for the
+    # compressed distribution of Skulpt. These tests don't work on some
+    # Ubuntu environments and cause a libreadline dependency issue.
+    sed -e "s/ret = os.system(\"{0}/ret = 0 #os.system(\"{0}/" |\
+    sed -e "s/ret = rununits(opt=True)/ret = 0/" > $TMP_FILE
     mv $TMP_FILE $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py
     $PYTHON_CMD $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
 
@@ -130,11 +135,17 @@ if ! type pip > /dev/null 2>&1 ; then
     exit 1
 fi
 
+function pip_install {
+  # Attempt standard pip install, or pass in --system if the local environment requires it.
+  # See https://github.com/pypa/pip/issues/3826 for context on when this situation may occur.
+  pip install "$@" || pip install --system "$@"
+}
+
 echo Checking if pylint is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/pylint-1.9.3" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.9.3 --target="$TOOLS_DIR/pylint-1.9.3"
+  pip_install pylint==1.9.3 --target="$TOOLS_DIR/pylint-1.9.3"
   # Add __init__.py file so that pylint dependency backports are resolved
   # correctly.
   touch $TOOLS_DIR/pylint-1.9.3/backports/__init__.py
@@ -194,26 +205,33 @@ echo Checking if browsermob-proxy is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
   echo Installing browsermob-proxy
 
-  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+  pip_install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   echo Installing selenium
 
-  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
+  pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
 echo Checking if PIL is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
   echo Installing PIL
 
-  pip install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
+  pip_install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
 
   if [[ $? != 0 && ${OS} == "Darwin" ]]; then
     echo "  PIL install failed. See troubleshooting instructions at:"
     echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
   fi
+fi
+
+echo Checking if PyGithub is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/PyGithub-1.43.5" ]; then
+  echo Installing PyGithub
+
+  pip install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5"
 fi
 
 # install pre-push script
