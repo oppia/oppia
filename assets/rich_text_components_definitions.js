@@ -94,7 +94,7 @@ var richTextComponents = {
         "type": "custom",
         "obj_type": "SanitizedUrl"
       },
-      "default_value": "https://www.example.com"
+      "default_value": ""
     }, {
       "name": "text",
       "description": "The link text. If left blank, the link URL will be used.",

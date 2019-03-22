@@ -7,7 +7,7 @@
          uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
          tooltip-append-to-body="true" tooltip-placement="right">
       </i>
-      <div class="slider-section" ng-if="hasPressedPlayButtonAtLeastOnce">
+      <div class="slider-section" ng-if="progressBarIsShown">
         <div ng-if="audioLoadingIndicatorIsShown">
           <md-progress-linear md-mode="indeterminate"></md-progress-linear>
         </div>
@@ -23,7 +23,7 @@
       <select class="audio-language-select"
               ng-model="selectedLanguage.value"
               ng-options="o.value as o.displayed for o in languagesInExploration"
-              ng-style="hasPressedPlayButtonAtLeastOnce ? {'width': '30%'} : {'width': '60%'}"
+              ng-style="progressBarIsShown ? {'width': '30%'} : {'width': '60%'}"
               ng-change="onNewLanguageSelected()">
       </select>
     </div>

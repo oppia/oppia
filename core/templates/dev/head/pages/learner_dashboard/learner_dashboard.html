@@ -814,7 +814,7 @@
 
     .oppia-learner-dashboard-menu {
       border: 1px solid #d0d0d0;
-      color: #009688;
+      color: black;
       font-family: 'Capriola', 'Roboto', Arial, sans-serif;
       font-size: 1em;
       font-weight: normal;
@@ -824,6 +824,8 @@
 
     .oppia-learner-dashboard-main-menu .oppia-learner-dashboard-sub-section-active {
       color: black;
+      background-color: #aed2e9;
+      border: 1px solid lightgreen;
     }
 
     .oppia-learner-dashboard-submenu {
@@ -1174,7 +1176,9 @@
   {{ super() }}
   <script src="/templates/dev/head/directives/AngularHtmlBindDirective.js"></script>
 
+  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
   <script src="/templates/dev/head/filters/SummarizeNonnegativeNumberFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateFilter.js"></script>
   <script src="/templates/dev/head/filters/TruncateAndCapitalizeFilter.js"></script>
 
   <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>

@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('fractionInputRulesService', [
+oppia.factory('FractionInputRulesService', [
   'FractionObjectFactory',
   function(FractionObjectFactory) {
     var toFloat = function(fractionDict) {

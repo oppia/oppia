@@ -211,7 +211,7 @@ oppia.factory('ExplorationDiffService', [
      * - maxId: the maximum id in states and stateIds.
      */
     var _getAdjMatrix = function(states, stateIds, maxId) {
-      adjMatrix = {};
+      var adjMatrix = {};
       for (var stateId = 1; stateId <= maxId; stateId++) {
         adjMatrix[stateId] = {};
       }
@@ -244,7 +244,7 @@ oppia.factory('ExplorationDiffService', [
      */
     var _compareLinks = function(
         v1States, originalStateIds, v2States, newestStateIds) {
-      links = [];
+      var links = [];
       var adjMatrixV1 = _getAdjMatrix(v1States, originalStateIds, _maxId);
       var adjMatrixV2 = _getAdjMatrix(v2States, newestStateIds, _maxId);
 

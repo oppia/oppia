@@ -30,17 +30,17 @@ oppia.directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
-          if (!scope.showDropArea) {
-            scope.showDropArea = true;
-            scope.$digest();
-          }
+          scope.dropAreaIsAccessible = GLOBALS.can_translate;
+          scope.userIsGuest = !GLOBALS.userIsLoggedIn;
+          scope.$digest();
           return false;
         });
 
         $('.oppia-main-body').on('dragleave', function(evt) {
           evt.preventDefault();
           if (evt.pageX === 0 || evt.pageY === 0) {
-            scope.showDropArea = false;
+            scope.dropAreaIsAccessible = false;
+            scope.userIsGuest = false;
             scope.$digest();
           }
           return false;
@@ -48,11 +48,12 @@ oppia.directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('drop', function(evt) {
           evt.preventDefault();
-          if (evt.target.classList.contains('oppia-drop-area-message')) {
+          if (evt.target.classList.contains('oppia-drop-area-message') &&
+            scope.dropAreaIsAccessible) {
             files = evt.originalEvent.dataTransfer.files;
             scope.openAddAudioTranslationModal(files);
           }
-          scope.showDropArea = false;
+          scope.dropAreaIsAccessible = false;
           scope.$digest();
           return false;
         });
@@ -64,7 +65,8 @@ oppia.directive('audioTranslationBar', [
         '$filter', '$rootScope', '$scope', '$timeout', '$uibModal',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
-        'IdGenerationService', 'StateContentIdsToAudioTranslationsService',
+        'IdGenerationService', 'SiteAnalyticsService',
+        'StateContentIdsToAudioTranslationsService',
         'StateEditorService', 'TranslationLanguageService',
         'recorderService', 'TranslationTabActiveContentIdService',
         'RECORDING_TIME_LIMIT',
@@ -72,7 +74,8 @@ oppia.directive('audioTranslationBar', [
             $filter, $rootScope, $scope, $timeout, $uibModal,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
-            IdGenerationService, StateContentIdsToAudioTranslationsService,
+            IdGenerationService , SiteAnalyticsService,
+            StateContentIdsToAudioTranslationsService,
             StateEditorService, TranslationLanguageService,
             recorderService, TranslationTabActiveContentIdService,
             RECORDING_TIME_LIMIT) {
@@ -167,6 +170,7 @@ oppia.directive('audioTranslationBar', [
               $scope.unsupportedBrowser = true;
               $scope.cannotRecord = true;
             } else {
+              SiteAnalyticsService.registerStartAudioRecordingEvent();
               $scope.unsupportedBrowser = false;
               showPermissionAndStartRecording();
             }
@@ -209,6 +213,7 @@ oppia.directive('audioTranslationBar', [
 
           $scope.saveRecordedAudio = function() {
             $scope.audioIsCurrentlyBeingSaved = true;
+            SiteAnalyticsService.registerSaveRecordedAudioEvent();
             var filename = generateNewFilename();
             var fileType = 'audio/mp3';
             var contentId = $scope.contentId;
@@ -411,6 +416,7 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.openAddAudioTranslationModal = function(audioFile) {
+            SiteAnalyticsService.registerUploadAudioEvent();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/translation_tab/' +

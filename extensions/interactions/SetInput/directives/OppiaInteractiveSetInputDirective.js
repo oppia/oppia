@@ -29,10 +29,10 @@ oppia.directive('oppiaInteractiveSetInput', [
         '/interactions/SetInput/directives/' +
         'set_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', '$translate', 'setInputRulesService',
+        '$scope', '$attrs', '$translate', 'SetInputRulesService',
         'WindowDimensionsService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, $translate, setInputRulesService,
+            $scope, $attrs, $translate, SetInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
           $scope.schema = {
             type: 'list',
@@ -52,7 +52,7 @@ oppia.directive('oppiaInteractiveSetInput', [
           var hasDuplicates = function(answer) {
             for (var i = 0; i < answer.length; i++) {
               for (var j = 0; j < i; j++) {
-                if (angular.equals(answer[i], answer[j], true)) {
+                if (angular.equals(answer[i], answer[j])) {
                   return true;
                 }
               }
@@ -73,7 +73,7 @@ oppia.directive('oppiaInteractiveSetInput', [
             } else {
               $scope.errorMessage = '';
               CurrentInteractionService.onSubmit(
-                answer, setInputRulesService);
+                answer, SetInputRulesService);
             }
           };
 

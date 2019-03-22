@@ -1,5 +1,11 @@
 # Per-directory ownership and automatic assignment for pull requests.
 
+# Note: The e2e test files are owned by both the dev workflow and QA teams.
+# - The QA team will do an initial review to verify the PR's test coverage. They
+#   will then ask the dev workflow team for a final review.
+# - The dev workflow team will review the code quality to see if the e2e tests
+#   can be optimized further.
+
 # Answer classification team.
 /core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08
@@ -14,14 +20,17 @@
 
 
 # Collection project.
-/core/domain/collection*.py @kevinlee12
-/core/storage/collection/ @kevinlee12
-/core/templates/dev/head/domain/collection/ @kevinlee12
-/core/templates/dev/head/pages/collection_editor/ @kevinlee12
-/core/templates/dev/head/pages/collection_player/ @kevinlee12
+# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
+/core/controllers/collection*.py @nithusha21
+/core/domain/collection*.py @nithusha21
+/core/storage/collection/ @nithusha21
+/core/templates/dev/head/domain/collection/ @nithusha21
+/core/templates/dev/head/pages/collection_editor/ @nithusha21
+/core/templates/dev/head/pages/collection_player/ @nithusha21
 
 
 # Dashboard frontend pages.
+/core/controllers/creator_dashboard*.py @nithusha21
 /core/templates/dev/head/domain/creator_dashboard/ @nithusha21
 /core/templates/dev/head/domain/learner_dashboard/ @nithusha21
 /core/templates/dev/head/pages/creator_dashboard/ @nithusha21
@@ -31,7 +40,6 @@
 
 
 # Dev workflow team.
-/core/tests/ @apb7
 /scripts/ @apb7
 
 
@@ -43,12 +51,13 @@
 /core/templates/dev/head/domain/exploration/ @DubeySandeep
 /core/templates/dev/head/domain/state/ @aks681
 /core/templates/dev/head/domain/state_card/ @aks681
-/core/templates/dev/head/pages/exploration_editor/editor_tab @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/history_tab @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/preview_tab @aks681
-/core/templates/dev/head/pages/exploration_editor/settings_tab @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/editor_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/history_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/preview_tab/ @aks681
+/core/templates/dev/head/pages/exploration_editor/settings_tab/ @DubeySandeep
 /core/templates/dev/head/pages/exploration_player/ @aks681
 /core/templates/dev/head/pages/state_editor/ @aks681
+/core/templates/dev/head/components/state/ @aks681
 
 
 # Forms pages.
@@ -73,29 +82,35 @@
 
 
 # Interaction project.
-/core/templates/dev/head/domain/objects/ @kevinlee12
+# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10 for the
+# following directories:
+# - /core/templates/dev/head/domain/objects/
+# - /extensions/interactions/
+/core/templates/dev/head/domain/objects/ @nithusha21
 /core/templates/dev/head/expressions/ @seanlip
 /extensions/dependencies/ @seanlip
-/extensions/interactions/ @kevinlee12
+/extensions/interactions/ @nithusha21
 /extensions/objects/ @seanlip
 /extensions/value_generators/ @seanlip
 
 
 # Lesson Analytics team.
-/core/domain/stats*.py @brianrodri
-/core/storage/statistics/ @brianrodri
-/core/templates/dev/head/domain/statistics/ @brianrodri
-/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @brianrodri
-/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @brianrodri
-/extensions/actions/ @brianrodri
-/extensions/answer_summarizers/ @brianrodri
-/extensions/issues/ @brianrodri
-/extensions/visualizations/ @brianrodri
+# TODO(brianrodri): Revert ownership to @brianrodri after 2019-03-31.
+/core/domain/stats*.py @seanlip
+/core/storage/statistics/ @seanlip
+/core/templates/dev/head/domain/statistics/ @seanlip
+/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @seanlip
+/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @seanlip
+/extensions/actions/ @seanlip
+/extensions/answer_summarizers/ @seanlip
+/extensions/issues/ @seanlip
+/extensions/visualizations/ @seanlip
 
 
 # Library page.
-/core/controllers/library*.py @kevinlee12
-/core/templates/dev/head/pages/library/ @kevinlee12
+# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
+/core/controllers/library*.py @nithusha21
+/core/templates/dev/head/pages/library/ @nithusha21
 
 
 # Navigation bar project.
@@ -145,24 +160,25 @@
 
 
 # Infrastructure.
-/core/storage/ @seanlip
 /core/platform/ @seanlip
 
 
 # Miscellaneous.
-/core/domain/html*.py @seanlip
 /core/templates/dev/head/pages/about/ @seanlip
 /core/templates/dev/head/pages/privacy/ @seanlip
 /core/templates/dev/head/pages/terms/ @seanlip
 /core/templates/dev/head/pages/tests/ @seanlip
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
-/export/ @seanlip
 
 
 # Restricted pages.
+/core/controllers/admin*.py @seanlip
 /core/templates/dev/head/pages/admin/ @seanlip
 /core/templates/dev/head/pages/moderator/ @seanlip
-/.github/CODEOWNERS @seanlip
+
+
+# QA team.
+/core/tests/ @apb7 @nithusha21
 
 
 # Rich text editor team.
@@ -203,8 +219,7 @@
 
 
 # Speed Improvement team.
-app.yaml @vojtechjelinek
-manifest.json @vojtechjelinek
+/app.yaml @vojtechjelinek
 /core/templates/dev/head/pages/base.html @vojtechjelinek
 /core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
@@ -212,5 +227,22 @@ manifest.json @vojtechjelinek
 
 
 # User’s profile page.
-/core/templates/dev/head/domain/user/ @kevinlee12
-/core/templates/dev/head/pages/profile/ @kevinlee12
+# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
+/core/templates/dev/head/domain/user/ @nithusha21
+/core/templates/dev/head/pages/profile/ @nithusha21
+
+
+# Critical files.
+#
+# IMPORTANT NOTE: Please ensure that these files are always located at the end
+# of the CODEOWNERS file, since later rows override earlier ones. For details,
+# see the example at the bottom of this page:
+#
+#     https://help.github.com/en/articles/about-code-owners
+#
+/manifest.json @seanlip @vojtechjelinek
+/scripts/install_third_party.sh @seanlip @vojtechjelinek
+/core/storage/ @seanlip
+/core/domain/html*.py @seanlip
+/export/ @seanlip
+/.github/CODEOWNERS @seanlip

@@ -73,7 +73,7 @@ oppia.factory('StoryContentsObjectFactory', [
       if (Object.keys(nodeTitles).length !== nodeIds.length) {
         for (var i = 0; i < nodeIds.length; i++) {
           if (!nodeTitles.hasOwnProperty(nodeIds[i])) {
-            throw Error('The node with id ' + nodesIds[i] + ' is invalid');
+            throw Error('The node with id ' + nodeIds[i] + ' is invalid');
           }
         }
       }
@@ -157,7 +157,7 @@ oppia.factory('StoryContentsObjectFactory', [
         // The user is assumed to have all the prerequisite skills of the
         // starting node before starting the story. Also, this list models the
         // skill IDs acquired by a learner as they progress through the story.
-        simulatedSkillIds = new Set(startingNode.getPrerequisiteSkillIds());
+        var simulatedSkillIds = new Set(startingNode.getPrerequisiteSkillIds());
 
         // The following loop employs a Breadth First Search from the given
         // starting node and makes sure that the user has acquired all the
@@ -274,13 +274,15 @@ oppia.factory('StoryContentsObjectFactory', [
       var index = this.getNodeIndex(nodeId);
       if (index === -1) {
         throw Error('The node with given id doesn\'t exist');
-      }
-      for (var i = 0; i < this._nodes.length; i++) {
-        if (this._nodes[i].getExplorationId() === explorationId) {
-          throw Error('The given exploration already exists in the story.');
+      } else if (explorationId !== null || explorationId !== '') {
+        for (var i = 0; i < this._nodes.length; i++) {
+          if ((this._nodes[i].getExplorationId() === explorationId) && (
+            i !== index)) {
+            throw Error('The given exploration already exists in the story.');
+          }
         }
+        this._nodes[index].setExplorationId(explorationId);
       }
-      this._nodes[index].setExplorationId(explorationId);
     };
 
     StoryContents.prototype.markNodeOutlineAsFinalized = function(nodeId) {
