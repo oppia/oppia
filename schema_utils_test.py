@@ -443,7 +443,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 
     def test_is_nonempty_validator(self):
         """Tests if static method is_nonempty returns true iff obj
-        is not empty str.
+        is not an empty str.
         """
         is_nonempty = schema_utils.get_validator('is_nonempty')
         self.assertTrue(is_nonempty('non-empty string'))
@@ -470,7 +470,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(has_len_at_least(['elem'], 2))
 
     def test_get_raises_invalid_validator_id(self):
-        """Test if class method get in _Validator raises exception
+        """Tests if class method 'get' in _Validator raises exception
         for invalid validator id.
         """
         with self.assertRaises(Exception):
@@ -670,13 +670,12 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.assertEqual('dog cat', normalize_spaces('dog     cat'))
         self.assertEqual('dog cat', normalize_spaces('  dog cat'))
         self.assertEqual('dog cat', normalize_spaces(' dog   cat   '))
+        self.assertNotEqual('dog cat', normalize_spaces('dogcat'))
 
     def test_normalizer_get(self):
-        """Tests the class method get of Normalizers, should return the
+        """Tests the class method 'get' of Normalizers, should return the
         normalizer method corresponding to the given normalizer id.
         """
-
-        # Will test .get on the normalize_spaces method.
         normalize_spaces = schema_utils.Normalizers.get('normalize_spaces')
         self.assertEqual('normalize_spaces', normalize_spaces.__name__)
 

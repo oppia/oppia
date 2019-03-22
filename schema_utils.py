@@ -164,10 +164,15 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
 
 
 def get_validator(validator_id):
-    """Returns a validator function.
+    """Get the validator method corresponding to the given validator_id.
 
-    This is a necessary abstraction for backend testing. Simply returns
-    the validator function associated with the given validator_id.
+    Args:
+        validator_id: str. The name of the validator method that should
+            be retrieved.
+
+    Returns:
+        function. The validator method corresponding to the given
+            validator_id.
     """
     return _Validators.get(validator_id)
 
@@ -215,8 +220,8 @@ class Normalizers(object):
             obj: a string.
 
         Returns:
-            a string that is the same as `obj`, except that each block of
-            whitespace is collapsed into a single space character. if the
+            A string that is the same as `obj`, except that each block of
+            whitespace is collapsed into a single space character. If the
             block of whitespace is at the front or end of obj, then it
             is simply removed.
         """
