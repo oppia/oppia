@@ -97,6 +97,8 @@ var publishExploration = function() {
 };
 
 // Creates and publishes a minimal exploration
+
+
 var createAndPublishExploration = function(
     title, category, objective, language) {
   createExploration();
@@ -119,14 +121,16 @@ var createAndPublishExploration = function(
 
 // Role management (state editor settings tab)
 
+// Make sure you can not add users without giving a title to the exploration
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = function(roleName, username) {
-  element(by.model('explorationTitleService.displayed')).sendKeys(
-    'Chuck Norris');
   element(by.css('.protractor-test-edit-roles')).click();
   element(by.css('.protractor-test-role-username')).sendKeys(username);
   element(by.css('.protractor-test-role-select')).
     element(by.cssContainingText('option', roleName)).click();
+  element(by.css('.protractor-test-save-role')).isEnabled().toBe(false);
+  element(by.model('explorationTitleService.displayed')).sendKeys(
+    'Chuck Norris');
   element(by.css('.protractor-test-save-role')).click();
 };
 
