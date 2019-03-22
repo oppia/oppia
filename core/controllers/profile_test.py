@@ -59,7 +59,7 @@ class SignupTests(test_utils.GenericTestBase):
             csrf_token=csrf_token)
 
         def strip_domain_from_location_header(url):
-            """To strip the domain form the location url"""
+            """To strip the domain form the location url."""
             splitted_url = re.match(r'(http[s]?:\/\/)?([^\/\s]+\/)(.*)', url)
             return splitted_url.group(3)
 
@@ -74,9 +74,20 @@ class SignupTests(test_utils.GenericTestBase):
             response.headers['location']))
 
         response = self.get_html_response(
-            '/signup?return_url=/page', expected_status_int=302)
+            '/signup?return_url=/page#hello', expected_status_int=302)
         self.assertEqual('page', strip_domain_from_location_header(
             response.headers['location']))
+
+        response = self.get_html_response(
+            '/signup?return_url=/page/hello', expected_status_int=302)
+        self.assertEqual('page/hello', strip_domain_from_location_header(
+            response.headers['location']))
+
+        response = self.get_html_response(
+            '/signup?return_url=/page/hello?id=test', expected_status_int=302)
+        self.assertEqual(
+            'page/hello?id=test', strip_domain_from_location_header(
+                response.headers['location']))
 
         self.logout()
 
