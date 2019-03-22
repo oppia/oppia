@@ -97,8 +97,6 @@ var publishExploration = function() {
 };
 
 // Creates and publishes a minimal exploration
-
-
 var createAndPublishExploration = function(
     title, category, objective, language) {
   createExploration();
