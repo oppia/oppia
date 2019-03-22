@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('MathExpressionInputRulesService', [function() {
+oppia.factory('mathExpressionInputRulesService', [function() {
   return {
     IsMathematicallyEquivalentTo: function(answer, inputs) {
       return (

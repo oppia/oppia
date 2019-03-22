@@ -21,7 +21,7 @@ describe('Pencil Code Editor rules service', function() {
 
   var pcers = null;
   beforeEach(inject(function($injector) {
-    pcers = $injector.get('PencilCodeEditorRulesService');
+    pcers = $injector.get('pencilCodeEditorRulesService');
   }));
 
   describe('\'equals\' rule', function() {

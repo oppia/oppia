@@ -21,7 +21,7 @@ describe('Multiple choice input rules service', function() {
 
   var mcirs = null;
   beforeEach(inject(function($injector) {
-    mcirs = $injector.get('MultipleChoiceInputRulesService');
+    mcirs = $injector.get('multipleChoiceInputRulesService');
   }));
 
   it('should have a correct \'equals\' rule', function() {

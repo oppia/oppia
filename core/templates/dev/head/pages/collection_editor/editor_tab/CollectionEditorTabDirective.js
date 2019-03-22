@@ -16,7 +16,7 @@
  * @fileoverview Controller for the main tab of the collection editor.
  */
 
-oppia.directive('collectionEditorTab', [
+oppia.directive('collectionMainTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -21,7 +21,7 @@ describe('Image Click Input rules service', function() {
 
   var icirs = null;
   beforeEach(inject(function($injector) {
-    icirs = $injector.get('ImageClickInputRulesService');
+    icirs = $injector.get('imageClickInputRulesService');
   }));
 
   it('should have a correct \'is in region\' rule', function() {

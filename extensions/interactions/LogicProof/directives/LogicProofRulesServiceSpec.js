@@ -21,7 +21,7 @@ describe('Logic Proof rules service', function() {
 
   var lprs = null;
   beforeEach(inject(function($injector) {
-    lprs = $injector.get('LogicProofRulesService');
+    lprs = $injector.get('logicProofRulesService');
   }));
 
   var CORRECT_EXAMPLE = {

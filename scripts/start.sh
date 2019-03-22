@@ -68,7 +68,6 @@ ENABLE_CONSOLE_ARG=""
 
 # Argument passed to feconf.py to help choose production templates folder.
 FORCE_PROD_MODE=False
-START_BROWSER=True
 for arg in "$@"; do
   if [ "$arg" == "--save_datastore" ]; then
     CLEAR_DATASTORE_ARG=""
@@ -79,9 +78,6 @@ for arg in "$@"; do
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
     FORCE_PROD_MODE=True
-  fi
-  if [ "$arg" == "--no-browser" ]; then
-    START_BROWSER=False
   fi
 done
 
@@ -114,7 +110,7 @@ fi
 while ! nc -vz localhost 8181 >/dev/null 2>&1; do sleep 1; done
 
 # Launch a browser window.
-if [ ${OS} == "Linux" ] && [ "$START_BROWSER" == "True" ]; then
+if [ ${OS} == "Linux" ]; then
   detect_virtualbox="$(ls -1 /dev/disk/by-id/)"
   if [[ $detect_virtualbox = *"VBOX"* ]]; then
     echo ""
@@ -130,7 +126,7 @@ if [ ${OS} == "Linux" ] && [ "$START_BROWSER" == "True" ]; then
     echo ""
     (sleep 5; xdg-open http://localhost:8181/ )&
   fi
-elif [ ${OS} == "Darwin" ] && [ "$START_BROWSER" == "True" ]; then
+elif [ ${OS} == "Darwin" ]; then
   echo ""
   echo "  INFORMATION"
   echo "  Setting up a local development server at localhost:8181. Opening a"

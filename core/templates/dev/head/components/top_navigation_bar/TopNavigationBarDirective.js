@@ -30,12 +30,12 @@ oppia.directive('topNavigationBar', [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
-        'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
+        'DebouncerService', 'DeviceInfoService',
         function(
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
-            DebouncerService, DeviceInfoService, LOGOUT_URL) {
+            DebouncerService, DeviceInfoService) {
           $scope.isModerator = null;
           $scope.isAdmin = null;
           $scope.isTopicManager = null;
@@ -86,18 +86,18 @@ oppia.directive('topNavigationBar', [
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURE_EDITORS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-          $scope.logoutUrl = LOGOUT_URL;
+          $scope.logoutUrl = GLOBALS.logoutUrl;
           $scope.userMenuIsShown = ($scope.currentUrl !== NAV_MODE_SIGNUP);
           $scope.standardNavIsShown = (
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.currentUrl) === -1);
 
           $scope.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
-            UserService.getLoginUrlAsync().then(
-              function(loginUrl) {
-                if (loginUrl) {
+            UserService.getLoginAndLogoutUrls().then(
+              function(urlObject) {
+                if (urlObject.login_url) {
                   $timeout(function() {
-                    $window.location = loginUrl;
+                    $window.location = urlObject.login_url;
                   }, 150);
                 } else {
                   throw Error('Login url not found.');

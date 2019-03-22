@@ -21,7 +21,7 @@ oppia.factory('AngularNameService', [function() {
 
   return {
     getNameOfInteractionRulesService: function(interactionId) {
-      angularName = interactionId.charAt(0) +
+      angularName = interactionId.charAt(0).toLowerCase() +
         interactionId.slice(1) + 'RulesService';
       return angularName;
     }

@@ -21,7 +21,7 @@ describe('Fraction Input rules service', function() {
 
   var firs = null;
   beforeEach(inject(function($injector) {
-    firs = $injector.get('FractionInputRulesService');
+    firs = $injector.get('fractionInputRulesService');
   }));
 
   var createNegativeFractionDict = function(

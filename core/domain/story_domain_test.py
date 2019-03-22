@@ -85,8 +85,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 'initial_node_id': None,
                 'next_node_id': self.NODE_ID_1
             },
-            'story_contents_schema_version': (
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            'schema_version': feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
@@ -130,16 +129,15 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Invalid language code')
 
     def test_schema_version_validation(self):
-        self.story.story_contents_schema_version = 'schema_version'
+        self.story.schema_version = 'schema_version'
         self._assert_validation_error(
-            'Expected story contents schema version to be an integer, received '
-            'schema_version')
+            'Expected schema version to be an integer, received schema_version')
 
-        self.story.story_contents_schema_version = 100
+        self.story.schema_version = 100
         self._assert_validation_error(
-            'Expected story contents schema version to be %s, received %s' % (
+            'Expected schema version to be %s, received %s' % (
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
-                self.story.story_contents_schema_version)
+                self.story.schema_version)
         )
 
     def test_add_node_validation(self):

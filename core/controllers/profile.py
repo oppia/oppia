@@ -107,8 +107,11 @@ class PreferencesPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
+            'LANGUAGE_CODES_AND_NAMES': (
+                utils.get_all_language_codes_and_names()),
         })
-        self.render_template('pages/preferences/preferences.html')
+        self.render_template(
+            'pages/preferences/preferences.html', redirect_url_on_logout='/')
 
 
 class PreferencesHandler(base.BaseHandler):

@@ -17,7 +17,7 @@
  */
 
 // Rules service for number with units interaction.
-oppia.factory('NumberWithUnitsRulesService', [
+oppia.factory('numberWithUnitsRulesService', [
   'FractionObjectFactory', 'NumberWithUnitsObjectFactory',
   function(FractionObjectFactory, NumberWithUnitsObjectFactory) {
     try {

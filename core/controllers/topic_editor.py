@@ -175,7 +175,8 @@ class TopicEditorPage(base.BaseHandler):
                 feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES)
         })
 
-        self.render_template('pages/topic_editor/topic_editor.html')
+        self.render_template(
+            'pages/topic_editor/topic_editor.html', redirect_url_on_logout='/')
 
 
 class EditableSubtopicPageDataHandler(base.BaseHandler):

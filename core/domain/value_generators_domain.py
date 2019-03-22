@@ -72,7 +72,7 @@ class BaseValueGenerator(object):
         # customizationArgs and objType.
         return utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
-            '%sDirective.js' % cls.__name__))
+            '%s.js' % cls.__name__))
 
     def generate_value(self, *args, **kwargs):
         """Generates a new value, using the given customization args.

@@ -29,10 +29,10 @@ oppia.directive('oppiaInteractiveSetInput', [
         '/interactions/SetInput/directives/' +
         'set_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', '$translate', 'SetInputRulesService',
+        '$scope', '$attrs', '$translate', 'setInputRulesService',
         'WindowDimensionsService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, $translate, SetInputRulesService,
+            $scope, $attrs, $translate, setInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
           $scope.schema = {
             type: 'list',
@@ -73,7 +73,7 @@ oppia.directive('oppiaInteractiveSetInput', [
             } else {
               $scope.errorMessage = '';
               CurrentInteractionService.onSubmit(
-                answer, SetInputRulesService);
+                answer, setInputRulesService);
             }
           };
 

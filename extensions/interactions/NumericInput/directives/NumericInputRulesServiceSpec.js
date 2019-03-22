@@ -21,7 +21,7 @@ describe('Numeric Input service', function() {
 
   var nirs = null;
   beforeEach(inject(function($injector) {
-    nirs = $injector.get('NumericInputRulesService');
+    nirs = $injector.get('numericInputRulesService');
   }));
 
   it('should have a correct equals rule', function() {

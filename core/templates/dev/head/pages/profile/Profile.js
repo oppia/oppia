@@ -88,10 +88,10 @@ oppia.controller('Profile', [
 
       $scope.changeSubscriptionStatus = function() {
         if ($scope.userNotLoggedIn) {
-          UserService.getLoginUrlAsync().then(
-            function(loginUrl) {
-              if (loginUrl) {
-                window.location.href = loginUrl;
+          UserService.getLoginAndLogoutUrls().then(
+            function(urlObject) {
+              if (urlObject.login_url) {
+                window.location.href = urlObject.login_url;
               } else {
                 throw Error('Login url not found.');
               }

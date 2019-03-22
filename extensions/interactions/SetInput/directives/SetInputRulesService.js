@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('SetInputRulesService', [function() {
+oppia.factory('setInputRulesService', [function() {
   return {
     Equals: function(answer, inputs) {
       return answer.length === inputs.x.length && inputs.x.every(function(val) {

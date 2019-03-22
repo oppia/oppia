@@ -77,7 +77,7 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
             }
 
             CurrentInteractionService.onSubmit(
-              answers, DragAndDropSortInputRulesService);
+              answers, dragAndDropSortInputRulesService);
           };
 
           CurrentInteractionService.registerCurrentInteraction(

@@ -21,13 +21,13 @@ describe('Graph Input service', function() {
 
   var girs = null;
   beforeEach(inject(function($injector) {
-    girs = $injector.get('GraphInputRulesService');
+    girs = $injector.get('graphInputRulesService');
   }));
 
   describe('graph utilities', function() {
     var utils = null;
     beforeEach(inject(function($injector) {
-      utils = $injector.get('GraphUtilsService');
+      utils = $injector.get('graphUtilsService');
     }));
 
     it('should construct an adjacency matrix from a graph', function() {

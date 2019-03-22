@@ -264,16 +264,6 @@ oppia.controller('ExplorationEditor', [
     var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
     var _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
 
-    var saveButtonTutorialElement = {
-      type: 'element',
-      selector: _ID_TUTORIAL_SAVE_BUTTON,
-      heading: 'Save',
-      text: (
-        'When you\'re done making changes, ' +
-        'be sure to save your work.<br><br>'),
-      placement: 'bottom'
-    };
-
     $scope.EDITOR_TUTORIAL_OPTIONS = [{
       type: 'title',
       heading: 'Creating in Oppia',
@@ -367,7 +357,15 @@ oppia.controller('ExplorationEditor', [
         'At any time, you can click the <b>preview</b> button to play ' +
         'through your exploration.'),
       placement: 'bottom'
-    }, saveButtonTutorialElement, {
+    }, {
+      type: 'element',
+      selector: _ID_TUTORIAL_SAVE_BUTTON,
+      heading: 'Save',
+      text: (
+        'When you\'re done making changes, ' +
+        'be sure to save your work.<br><br>'),
+      placement: 'bottom'
+    }, {
       type: 'title',
       heading: 'Tutorial Complete',
       text: (
@@ -389,14 +387,6 @@ oppia.controller('ExplorationEditor', [
         '  </li>' +
         '</ul>')
     }];
-
-    // Remove save from tutorial if user does not has edit rights for
-    // exploration since in that case Save Draft button will not be visible
-    // on the create page.
-    if (!GLOBALS.can_edit) {
-      var index = $scope.EDITOR_TUTORIAL_OPTIONS.indexOf(saveButtonTutorialElement);
-      $scope.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
-    }
 
     // Replace the ng-joyride template with one that uses <[...]> interpolators
     // instead of/ {{...}} interpolators.

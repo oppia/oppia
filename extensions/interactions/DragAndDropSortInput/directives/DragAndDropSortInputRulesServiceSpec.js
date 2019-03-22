@@ -21,7 +21,7 @@ describe('Drag and Drop Sort Input rules service', function() {
 
   var ddsrs = null;
   beforeEach(inject(function($injector) {
-    ddsrs = $injector.get('DragAndDropSortInputRulesService');
+    ddsrs = $injector.get('dragAndDropSortInputRulesService');
   }));
 
   it('should have a correct \'is equal to ordering\' rule', function() {

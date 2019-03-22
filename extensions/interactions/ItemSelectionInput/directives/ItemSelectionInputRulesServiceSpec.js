@@ -21,7 +21,7 @@ describe('Item Selection rules service', function() {
 
   var isirs = null;
   beforeEach(inject(function($injector) {
-    isirs = $injector.get('ItemSelectionInputRulesService');
+    isirs = $injector.get('itemSelectionInputRulesService');
   }));
 
   it('should have a correct \'equals\' rule', function() {

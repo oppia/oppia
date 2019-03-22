@@ -21,10 +21,10 @@
  */
 
 oppia.directive('oppiaInteractiveCodeRepl', [
-  'CodeReplRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
+  'HtmlEscaperService', 'UrlInterpolationService', 'codeReplRulesService',
   'EVENT_NEW_CARD_AVAILABLE',
   function(
-      CodeReplRulesService, HtmlEscaperService, UrlInterpolationService,
+      HtmlEscaperService, UrlInterpolationService, codeReplRulesService,
       EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
@@ -242,7 +242,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
               output: $scope.output,
               evaluation: $scope.evaluation,
               error: (err || '')
-            }, CodeReplRulesService);
+            }, codeReplRulesService);
 
             // Without this, the error message displayed in the user-facing
             // console will sometimes not update.

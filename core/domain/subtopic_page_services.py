@@ -90,29 +90,23 @@ def get_subtopic_pages_with_ids(topic_id, subtopic_ids):
         subtopic_page_ids)
     subtopic_pages = []
     for subtopic_page_model in subtopic_page_models:
-        if subtopic_page_model is None:
-            subtopic_pages.append(subtopic_page_model)
-        else:
-            subtopic_pages.append(
-                get_subtopic_page_from_model(subtopic_page_model))
+        subtopic_pages.append(
+            get_subtopic_page_from_model(subtopic_page_model))
     return subtopic_pages
 
 
-def get_subtopic_page_contents_by_id(topic_id, subtopic_id, strict=True):
+def get_subtopic_page_contents_by_id(topic_id, subtopic_id):
     """Returns the page contents of a subtopic
 
     Args:
         topic_id: str. ID of the topic that the subtopic belong to.
         subtopic_id: int. The id of the subtopic.
-        strict: bool. Whether to fail noisily if no subtopic page with the given
-            id exists in the datastore.
 
     Returns:
         SubtopicPageContents or None: The page contents for a subtopic page,
             or None if subtopic page does not exist.
     """
-    subtopic_page = get_subtopic_page_by_id(
-        topic_id, subtopic_id, strict=strict)
+    subtopic_page = get_subtopic_page_by_id(topic_id, subtopic_id)
     if subtopic_page is not None:
         return subtopic_page.page_contents
     else:

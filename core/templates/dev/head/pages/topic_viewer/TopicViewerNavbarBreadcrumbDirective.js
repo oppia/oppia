@@ -15,7 +15,7 @@
 /**
  * @fileoverview Directive for the navbar breadcrumb of the topic viewer.
  */
-oppia.directive('topicViewerNavbarBreadcrumb', [
+oppia.directive('topicsViewerNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

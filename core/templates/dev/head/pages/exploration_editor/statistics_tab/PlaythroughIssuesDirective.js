@@ -16,7 +16,7 @@
  * @fileoverview Directive for visualizing issues.
  */
 
-oppia.directive('playthroughIssues', [
+oppia.directive('playthroughIssuesDirective', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

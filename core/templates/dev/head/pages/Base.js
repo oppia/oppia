@@ -18,15 +18,13 @@
 
 oppia.controller('Base', [
   '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService', 'UrlService', 'DEV_MODE', 'SITE_FEEDBACK_FORM_URL',
-  'SITE_NAME',
+  'SidebarStatusService', 'DEV_MODE', 'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function($document, $rootScope, $scope, AlertsService, BackgroundMaskService,
-      SidebarStatusService, UrlService, DEV_MODE, SITE_FEEDBACK_FORM_URL,
-      SITE_NAME) {
+      SidebarStatusService, DEV_MODE, SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
-    $scope.iframed = UrlService.isIframed();
+    $scope.iframed = GLOBALS.iframed;
     $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
 
     $rootScope.DEV_MODE = DEV_MODE;

@@ -26,11 +26,11 @@ oppia.directive('oppiaInteractiveFractionInput', [
         '/interactions/FractionInput/directives/' +
         'fraction_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'FocusManagerService', 'FractionInputRulesService',
+        '$scope', '$attrs', 'FocusManagerService', 'fractionInputRulesService',
         'FractionObjectFactory', 'FRACTION_PARSING_ERRORS',
         'WindowDimensionsService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, FocusManagerService, FractionInputRulesService,
+            $scope, $attrs, FocusManagerService, fractionInputRulesService,
             FractionObjectFactory, FRACTION_PARSING_ERRORS,
             WindowDimensionsService, CurrentInteractionService) {
           $scope.answer = '';
@@ -121,7 +121,7 @@ oppia.directive('oppiaInteractiveFractionInput', [
                   FORM_ERROR_TYPE, false);
               } else {
                 CurrentInteractionService.onSubmit(
-                  fraction, FractionInputRulesService);
+                  fraction, fractionInputRulesService);
               }
             } catch (parsingError) {
               errorMessage = parsingError.message;

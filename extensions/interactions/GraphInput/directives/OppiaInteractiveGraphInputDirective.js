@@ -23,11 +23,11 @@
 oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 oppia.directive('oppiaInteractiveGraphInput', [
-  'GraphInputRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
-  'UrlService', 'EVENT_NEW_CARD_AVAILABLE',
+  'HtmlEscaperService', 'UrlInterpolationService', 'UrlService',
+  'graphInputRulesService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
-      GraphInputRulesService, HtmlEscaperService, UrlInterpolationService,
-      UrlService, EVENT_NEW_CARD_AVAILABLE) {
+      HtmlEscaperService, UrlInterpolationService, UrlService,
+      graphInputRulesService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
@@ -53,7 +53,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
           $scope.submitGraph = function() {
             // Here, angular.copy is needed to strip $$hashkey from the graph.
             CurrentInteractionService.onSubmit(
-              angular.copy($scope.graph), GraphInputRulesService);
+              angular.copy($scope.graph), graphInputRulesService);
           };
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {

@@ -16,8 +16,8 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('GraphInputRulesService', [
-  'GraphUtilsService', function(GraphUtilsService) {
+oppia.factory('graphInputRulesService', [
+  'graphUtilsService', function(graphUtilsService) {
     /**
      * @param {object} graph - A graph object.
      * @return {boolean} Whether the graph is strongly connected.
@@ -29,15 +29,15 @@ oppia.factory('GraphInputRulesService', [
         return true;
       }
 
-      var adjacencyLists = GraphUtilsService.constructAdjacencyLists(
-        graph, GraphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
-      var invertedAdjacencyLists = GraphUtilsService.constructAdjacencyLists(
-        graph, GraphUtilsService.GRAPH_ADJACENCY_MODE.INVERTED);
+      var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+        graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+      var invertedAdjacencyLists = graphUtilsService.constructAdjacencyLists(
+        graph, graphUtilsService.GRAPH_ADJACENCY_MODE.INVERTED);
 
       var isVisited = graph.vertices.map(function() {
         return false;
       });
-      GraphUtilsService.markAccessible(0, adjacencyLists, isVisited);
+      graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
       var isAnyVertexUnreachable = isVisited.some(function(visited) {
         return visited === false;
       });
@@ -45,7 +45,7 @@ oppia.factory('GraphInputRulesService', [
       var isVisitedInReverse = graph.vertices.map(function() {
         return false;
       });
-      GraphUtilsService.markAccessible(
+      graphUtilsService.markAccessible(
         0, invertedAdjacencyLists, isVisitedInReverse);
       var isAnyVertexUnreachableInReverse =
         isVisitedInReverse.some(function(visited) {
@@ -66,12 +66,12 @@ oppia.factory('GraphInputRulesService', [
         return true;
       }
 
-      var adjacencyLists = GraphUtilsService.constructAdjacencyLists(
-        graph, GraphUtilsService.GRAPH_ADJACENCY_MODE.UNDIRECTED);
+      var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+        graph, graphUtilsService.GRAPH_ADJACENCY_MODE.UNDIRECTED);
       var isVisited = graph.vertices.map(function() {
         return false;
       });
-      GraphUtilsService.markAccessible(0, adjacencyLists, isVisited);
+      graphUtilsService.markAccessible(0, adjacencyLists, isVisited);
       return isVisited.every(function(visited) {
         return visited === true;
       });
@@ -86,15 +86,15 @@ oppia.factory('GraphInputRulesService', [
       // ancestor in the search tree.
 
       var isVisited = graph.vertices.map(function() {
-        return GraphUtilsService.DFS_STATUS.UNVISITED;
+        return graphUtilsService.DFS_STATUS.UNVISITED;
       });
-      var adjacencyLists = GraphUtilsService.constructAdjacencyLists(
-        graph, GraphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+      var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+        graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
       for (var startVertex = 0;
         startVertex < graph.vertices.length;
         startVertex++) {
-        if (isVisited[startVertex] === GraphUtilsService.DFS_STATUS.UNVISITED) {
-          if (GraphUtilsService.findCycle(
+        if (isVisited[startVertex] === graphUtilsService.DFS_STATUS.UNVISITED) {
+          if (graphUtilsService.findCycle(
             startVertex, -1, adjacencyLists, isVisited, graph.isDirected)) {
             return false;
           }
@@ -113,8 +113,8 @@ oppia.factory('GraphInputRulesService', [
         return true;
       }
 
-      var adjacencyLists = GraphUtilsService.constructAdjacencyLists(
-        graph, GraphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
+      var adjacencyLists = graphUtilsService.constructAdjacencyLists(
+        graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
       var outdegreeCounts = adjacencyLists.map(function(list) {
         return list.length;
       });
@@ -141,8 +141,8 @@ oppia.factory('GraphInputRulesService', [
         return false;
       }
 
-      var adj1 = GraphUtilsService.constructAdjacencyMatrix(graph1);
-      var adj2 = GraphUtilsService.constructAdjacencyMatrix(graph2);
+      var adj1 = graphUtilsService.constructAdjacencyMatrix(graph1);
+      var adj2 = graphUtilsService.constructAdjacencyMatrix(graph2);
 
       // Check that for every vertex from the first graph there is a vertex in
       // the second graph with the same sum of weights of outgoing edges
@@ -174,11 +174,11 @@ oppia.factory('GraphInputRulesService', [
             return vertex.label === graph1.vertices[permutation[index]].label;
           });
         if (doLabelsMatch &&
-            GraphUtilsService.areAdjacencyMatricesEqualWithPermutation(
+            graphUtilsService.areAdjacencyMatricesEqualWithPermutation(
               adj1, adj2, permutation)) {
           return true;
         }
-        permutation = GraphUtilsService.nextPermutation(permutation);
+        permutation = graphUtilsService.nextPermutation(permutation);
       }
       return false;
     };

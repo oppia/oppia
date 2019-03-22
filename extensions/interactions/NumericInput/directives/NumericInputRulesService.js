@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('NumericInputRulesService', [function() {
+oppia.factory('numericInputRulesService', [function() {
   return {
     Equals: function(answer, inputs) {
       return answer === inputs.x;

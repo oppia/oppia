@@ -21,7 +21,7 @@ describe('Numeric Input service', function() {
 
   var imrs = null;
   beforeEach(inject(function($injector) {
-    imrs = $injector.get('InteractiveMapRulesService');
+    imrs = $injector.get('interactiveMapRulesService');
   }));
 
   var RADIUS_OF_EARTH_KM = 6371.0;

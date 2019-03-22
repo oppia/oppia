@@ -34,9 +34,6 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
       $http, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
       UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
       RESOLVE_ISSUE_URL) {
-    /** @type {PlaythroughIssue[]} */
-    var cachedIssues = null;
-
     var getFullIssuesUrl = function(explorationId) {
       return UrlInterpolationService.interpolateUrl(
         FETCH_ISSUES_URL, {
@@ -60,45 +57,28 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
     };
     return {
       fetchIssues: function(explorationId, explorationVersion) {
-        if (cachedIssues !== null) {
-          return Promise.resolve(cachedIssues);
-        } else {
-          return $http.get(getFullIssuesUrl(explorationId), {
-            params: {
-              exp_version: explorationVersion
-            }
-          }).then(function(response) {
-            var unresolvedIssueBackendDicts = response.data;
-            cachedIssues = unresolvedIssueBackendDicts.map(
-              PlaythroughIssueObjectFactory.createFromBackendDict);
-            return cachedIssues;
-          });
-        }
+        return $http.get(getFullIssuesUrl(explorationId), {
+          params: {
+            exp_version: explorationVersion
+          }
+        }).then(function(response) {
+          var unresolvedIssuesDicts = response.data;
+          return unresolvedIssuesDicts.map(
+            PlaythroughIssueObjectFactory.createFromBackendDict);
+        });
       },
       fetchPlaythrough: function(expId, playthroughId) {
         return $http.get(getFullPlaythroughUrl(expId, playthroughId)).then(
           function(response) {
-            var playthroughBackendDict = response.data;
+            var playthroughDict = response.data;
             return PlaythroughObjectFactory.createFromBackendDict(
-              playthroughBackendDict);
+              playthroughDict);
           });
       },
-      resolveIssue: function(issueToResolve, expId, expVersion) {
-        return $http.post(getFullResolveIssueUrl(expId), {
-          exp_issue_dict: issueToResolve.toBackendDict(),
+      resolveIssue: function(issue, expId, expVersion) {
+        $http.post(getFullResolveIssueUrl(expId), {
+          exp_issue_dict: issue.toBackendDict(),
           exp_version: expVersion
-        }).then(function() {
-          var issueIndex = cachedIssues.findIndex(function(issue) {
-            return angular.equals(issue, issueToResolve);
-          });
-          if (issueIndex === -1) {
-            var invalidIssueError = new Error(
-              'An issue which was not fetched from the backend has been ' +
-              'resolved');
-            return Promise.reject(invalidIssueError);
-          } else {
-            cachedIssues.splice(issueIndex, 1);
-          }
         });
       },
     };

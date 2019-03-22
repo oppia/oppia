@@ -15,7 +15,7 @@
 /**
  * @fileoverview Controller for the main topic editor.
  */
-oppia.directive('topicEditorTab', [
+oppia.directive('topicMainEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

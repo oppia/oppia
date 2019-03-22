@@ -274,15 +274,13 @@ oppia.factory('StoryContentsObjectFactory', [
       var index = this.getNodeIndex(nodeId);
       if (index === -1) {
         throw Error('The node with given id doesn\'t exist');
-      } else if (explorationId !== null || explorationId !== '') {
-        for (var i = 0; i < this._nodes.length; i++) {
-          if ((this._nodes[i].getExplorationId() === explorationId) && (
-            i !== index)) {
-            throw Error('The given exploration already exists in the story.');
-          }
-        }
-        this._nodes[index].setExplorationId(explorationId);
       }
+      for (var i = 0; i < this._nodes.length; i++) {
+        if (this._nodes[i].getExplorationId() === explorationId) {
+          throw Error('The given exploration already exists in the story.');
+        }
+      }
+      this._nodes[index].setExplorationId(explorationId);
     };
 
     StoryContents.prototype.markNodeOutlineAsFinalized = function(nodeId) {

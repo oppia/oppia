@@ -189,7 +189,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               clickedRegions: $scope.currentlyHoveredRegions
             };
             CurrentInteractionService.onSubmit(
-              answer, ImageClickInputRulesService);
+              answer, imageClickInputRulesService);
           };
 
           CurrentInteractionService.registerCurrentInteraction(null, null);

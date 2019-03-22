@@ -27,8 +27,8 @@
  */
 
 oppia.factory('SVMPredictionService', [
-  '$log', 'PredictionResultObjectFactory',
-  function($log, PredictionResultObjectFactory) {
+  '$log', 'PredictionResultOjectFactory',
+  function($log, PredictionResultOjectFactory) {
     return {
       kernel: function(kernelParams, supportVectors, input) {
         var kernel = kernelParams.kernel;
@@ -240,7 +240,7 @@ oppia.factory('SVMPredictionService', [
         }
 
         var predictedLabel = classes[maxProbIdx];
-        var prediction = PredictionResultObjectFactory.createNew(
+        var prediction = PredictionResultOjectFactory.createNew(
           predictedLabel, probabilities[maxProbIdx]);
         return prediction;
       }

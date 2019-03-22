@@ -90,7 +90,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
             );
 
             CurrentInteractionService.onSubmit(
-              answers, ItemSelectionInputRulesService);
+              answers, itemSelectionInputRulesService);
           };
 
           var validityCheckFn = function() {

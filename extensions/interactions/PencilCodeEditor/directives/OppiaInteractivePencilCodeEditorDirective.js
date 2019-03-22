@@ -34,10 +34,10 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
         'pencil_code_editor_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$element', '$timeout', '$uibModal',
-        'FocusManagerService', 'PencilCodeEditorRulesService',
+        'FocusManagerService', 'pencilCodeEditorRulesService',
         'CurrentInteractionService',
         function($scope, $attrs, $element, $timeout, $uibModal,
-            FocusManagerService, PencilCodeEditorRulesService,
+            FocusManagerService, pencilCodeEditorRulesService,
             CurrentInteractionService) {
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
 
@@ -147,7 +147,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
                 output: output || '',
                 evaluation: '',
                 error: ''
-              }, PencilCodeEditorRulesService);
+              }, pencilCodeEditorRulesService);
             }, true);
           });
 
@@ -166,7 +166,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
               output: '',
               evaluation: '',
               error: error.message
-            }, PencilCodeEditorRulesService);
+            }, pencilCodeEditorRulesService);
 
             $timeout(function() {
               errorIsHappening = false;

@@ -1,10 +1,6 @@
-<div  class="oppia-drop-area" ng-if="dropAreaIsAccessible">
+<div  class="oppia-drop-area" ng-if="showDropArea">
   <div class="oppia-blur-background"></div>
-  <div class="oppia-drop-area-message" >Drop your file here!</div>
-</div>
-<div  class="oppia-drop-area" ng-if="userIsGuest">
-  <div class="oppia-blur-background"></div>
-  <div class="oppia-drop-area-message-for-guest-users" >Please log in to upload audio files.</div>
+  <div class="oppia-drop-area-message">Drop your file here!</div>
 </div>
 <div class="oppia-audio-recording-bar" ng-show="(!isAudioAvailable || audioIsUpdating) && !selectedRecording">
   <div class="oppia-content-wrapper">
@@ -201,15 +197,6 @@
     width: 100%;
   }
   .oppia-drop-area-message {
-    font-size: 36px;
-    height: 100%;
-    padding: 20%;
-    position: absolute;
-    text-align: center;
-    width: 100%;
-  }
-  .oppia-drop-area-message-for-guest-users {
-    color: #aaa;
     font-size: 36px;
     height: 100%;
     padding: 20%;

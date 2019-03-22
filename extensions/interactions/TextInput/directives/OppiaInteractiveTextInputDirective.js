@@ -29,10 +29,10 @@ oppia.directive('oppiaInteractiveTextInput', [
         '/interactions/TextInput/directives/' +
         'text_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'FocusManagerService', 'TextInputRulesService',
+        '$scope', '$attrs', 'FocusManagerService', 'textInputRulesService',
         'WindowDimensionsService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, FocusManagerService, TextInputRulesService,
+            $scope, $attrs, FocusManagerService, textInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
           $scope.placeholder = HtmlEscaperService.escapedJsonToObj(
             $attrs.placeholderWithValue);
@@ -57,7 +57,7 @@ oppia.directive('oppiaInteractiveTextInput', [
               return;
             }
 
-            CurrentInteractionService.onSubmit(answer, TextInputRulesService);
+            CurrentInteractionService.onSubmit(answer, textInputRulesService);
           };
 
           var submitAnswerFn = function() {

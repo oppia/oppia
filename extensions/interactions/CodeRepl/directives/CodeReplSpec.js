@@ -19,7 +19,7 @@
 describe('CodeRepl interaction', function() {
   describe('CodeRepl tests', function() {
     var $httpBackend, $templateCache;
-    var elt, scope;
+    var elt, scope, ctrlScope;
 
     beforeEach(module('directiveTemplates'));
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -41,6 +41,7 @@ describe('CodeRepl interaction', function() {
       elt = angular.element('<' + TAG_NAME + '></' + TAG_NAME + '>');
       $compile(elt)(scope);
       scope.$digest();
+      ctrlScope = elt.isolateScope();
     }));
 
     afterEach(function() {

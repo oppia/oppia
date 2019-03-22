@@ -24,18 +24,18 @@ oppia.directive('searchBar', [
         '/pages/library/' +
         'search_bar_directive.html'),
       controller: [
-        '$location', '$rootScope', '$scope', '$timeout', '$translate',
-        '$window', 'ConstructTranslationIdsService', 'DebouncerService',
-        'HtmlEscaperService', 'LanguageUtilService', 'NavigationService',
-        'SearchService', 'UrlService', 'SEARCH_DROPDOWN_CATEGORIES',
+        '$scope', '$rootScope', '$timeout', '$window', '$location',
+        '$translate', 'SearchService', 'NavigationService',
+        'DebouncerService', 'HtmlEscaperService',
+        'UrlService', 'ConstructTranslationIdsService',
         function(
-            $location, $rootScope, $scope, $timeout, $translate,
-            $window, ConstructTranslationIdsService, DebouncerService,
-            HtmlEscaperService, LanguageUtilService, NavigationService,
-            SearchService, UrlService, SEARCH_DROPDOWN_CATEGORIES) {
+            $scope, $rootScope, $timeout, $window, $location,
+            $translate, SearchService, NavigationService,
+            DebouncerService, HtmlEscaperService,
+            UrlService, ConstructTranslationIdsService) {
           $scope.isSearchInProgress = SearchService.isSearchInProgress;
           $scope.SEARCH_DROPDOWN_CATEGORIES = (
-            SEARCH_DROPDOWN_CATEGORIES.map(
+            GLOBALS.SEARCH_DROPDOWN_CATEGORIES.map(
               function(categoryName) {
                 return {
                   id: categoryName,
@@ -74,8 +74,13 @@ oppia.directive('searchBar', [
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
             $scope.activeMenuName = NavigationService.activeMenuName;
           };
-          $scope.ALL_LANGUAGE_CODES = (
-            LanguageUtilService.getLanguageIdsAndTexts());
+          $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
+            function(languageItem) {
+              return {
+                id: languageItem.code,
+                text: languageItem.name
+              };
+            });
 
           $scope.searchQuery = '';
           $scope.selectionDetails = {

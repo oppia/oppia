@@ -21,7 +21,7 @@ describe('Math expression input rules service', function() {
 
   var meirs = null;
   beforeEach(inject(function($injector) {
-    meirs = $injector.get('MathExpressionInputRulesService');
+    meirs = $injector.get('mathExpressionInputRulesService');
   }));
 
   it('should have a correct equivalence rule', function() {
