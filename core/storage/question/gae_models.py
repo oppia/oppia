@@ -194,7 +194,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             id=question_skill_link_id,
             question_id=question_id,
             skill_id=skill_id,
-            skill_difficulty = skill_difficulty
+            skill_difficulty=skill_difficulty
         )
         return question_skill_link_model_instance
 
