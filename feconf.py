@@ -64,17 +64,17 @@ DEPENDENCIES_TEMPLATES_DIR = (
 
 if not constants.DEV_MODE:
     VALUE_GENERATORS_DIR_FOR_JS = os.path.join(
-        'local_compiled_js', 'extensions', 'value_generators')
+        'extensions', 'value_generators')
 else:
     VALUE_GENERATORS_DIR_FOR_JS = os.path.join(
-        'extensions', 'value_generators')
+        'local_compiled_js', 'extensions', 'value_generators')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 
 if not constants.DEV_MODE:
+    VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
+else:
     VISUALIZATIONS_DIR = os.path.join(
         'local_compiled_js', 'extensions', 'visualizations')
-else:
-    VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'objects', 'object_defaults.json')
