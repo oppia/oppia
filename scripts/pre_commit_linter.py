@@ -1379,7 +1379,7 @@ class LintChecksManager(object):
                 filepath.endswith(('.js', '.ts')))
             and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                         EXCLUDED_PATHS)]
-        properties_to_check = ['controller', 'directive', 'factory']
+        components_to_check = ['controller', 'directive', 'factory']
         failed = False
         summary_messages = []
 
@@ -2163,4 +2163,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    pass
