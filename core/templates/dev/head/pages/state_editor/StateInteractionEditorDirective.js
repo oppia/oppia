@@ -191,16 +191,18 @@ oppia.directive('stateInteractionEditor', [
                   '$scope', '$uibModalInstance', '$injector',
                   'StateSolutionService', 'StateInteractionIdService',
                   'StateCustomizationArgsService', 'StateEditorService',
-                  'InteractionDetailsCacheService', 'INTERACTION_SPECS',
-                  'ALLOWED_INTERACTION_CATEGORIES', 'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
+                  'InteractionDetailsCacheService', 
                   'UrlInterpolationService', 'EditorFirstTimeEventsService',
+                  'INTERACTION_SPECS', 'ALLOWED_INTERACTION_CATEGORIES',
+                  'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
                   function(
                       $scope, $uibModalInstance, $injector,
                       StateSolutionService, StateInteractionIdService,
                       StateCustomizationArgsService, StateEditorService,
-                      InteractionDetailsCacheService, INTERACTION_SPECS,
-                      ALLOWED_INTERACTION_CATEGORIES, ALLOWED_QUESTION_INTERACTION_CATEGORIES,
-                      UrlInterpolationService, EditorFirstTimeEventsService) {
+                      InteractionDetailsCacheService,
+                      UrlInterpolationService, EditorFirstTimeEventsService,
+                      INTERACTION_SPECS, ALLOWED_INTERACTION_CATEGORIES,
+                      ALLOWED_QUESTION_INTERACTION_CATEGORIES) {
                     EditorFirstTimeEventsService
                       .registerFirstClickAddInteractionEvent();
 
