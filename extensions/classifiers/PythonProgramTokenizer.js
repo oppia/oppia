@@ -42,16 +42,16 @@ oppia.constant('PythonProgramTokenType', {
 
 oppia.factory('PythonProgramTokenizer', [
   '$log', 'PythonProgramTokenType', function($log, PythonProgramTokenType) {
-    var groupOfRegEx = function(...params) {
-      return '(' + Array.prototype.join.call(params, '|') + ')';
+    var groupOfRegEx = function() {
+      return '(' + Array.prototype.join.call(arguments, '|') + ')';
     };
 
-    var regExMayBePresent = function(params) {
-      return groupOfRegEx(params) + '?';
+    var regExMayBePresent = function() {
+      return groupOfRegEx(arguments) + '?';
     };
 
-    var repeatedRegEx = function(params) {
-      return groupOfRegEx(params) + '*';
+    var repeatedRegEx = function() {
+      return groupOfRegEx(arguments) + '*';
     };
 
     var whitespace = '[ \\f\\t]*';

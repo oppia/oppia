@@ -14,7 +14,7 @@
 /**
  * @fileoverview Unit tests for QuestionPlayerBackendApiService.
  */
-describe('Question backend Api service', function() {
+describe('Question Player backend Api service', function() {
   var QuestionPlayerBackendApiService = null;
   var sampleDataResults = null;
   var $httpBackend = null;
