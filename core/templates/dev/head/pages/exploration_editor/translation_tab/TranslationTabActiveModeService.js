@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to change and validate active mode in translation tab.
+ * @fileoverview Service to change and validate active mode in the translation
+ * tab.
  */
 
 oppia.constant('VOICEOVER_MODE', 'voiceoverMode');
@@ -22,7 +23,7 @@ oppia.constant('VOICEOVER_MODE', 'voiceoverMode');
 oppia.factory('TranslationTabActiveModeService', [
   '$rootScope', 'TRANSLATION_MODE', 'VOICEOVER_MODE',
   function($rootScope, TRANSLATION_MODE, VOICEOVER_MODE) {
-    var activeMode = VOICEOVER_MODE;
+    var activeMode = null;
     return {
       activateVoiceoverMode: function() {
         activeMode = VOICEOVER_MODE;

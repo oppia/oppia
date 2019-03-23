@@ -50,6 +50,7 @@ oppia.directive('translatorOverview', [
           $scope.VOICEOVER_MODE = 'Record';
           $scope.TRANSLATION_MODE = 'Translate';
 
+          TranslationTabActiveModeService.activateVoiceoverMode();
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.languageCode =
             allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
@@ -58,7 +59,6 @@ oppia.directive('translatorOverview', [
             $scope.languageCode);
           $scope.inTranslationMode = false;
           $scope.inVoiceoverMode = true;
-          TranslationTabActiveModeService.activateVoiceoverMode();
           $scope.showTabModeSwitcher = function() {
             return ($scope.languageCode !== (
               ExplorationLanguageCodeService.displayed));
