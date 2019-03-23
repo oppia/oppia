@@ -67,7 +67,7 @@ oppia.factory('TopicRightsBackendApiService', [
 
     var _sendMail = function(topicId, topicName, successCallback, errorCallback) {
       var sendMailUrl = UrlInterpolationService.interpolateUrl(
-        '/rightshandler/send_mail/<topic_id>', {
+        '/rightshandler/send_topic_publish_mail/<topic_id>', {
           topic_id: topicId
         });
 
@@ -76,9 +76,8 @@ oppia.factory('TopicRightsBackendApiService', [
       };
 
       $http.put(sendMailUrl, putParams).then(function(response) {
-        console.log(response);
         if (successCallback) {
-          successCallback(response.status);
+          successCallback();
         }
       }, function(errorResponse) {
         if (errorCallback) {
