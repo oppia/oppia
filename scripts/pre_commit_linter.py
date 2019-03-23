@@ -992,7 +992,7 @@ class LintChecksManager(object):
                     file_content)
 
         print 'Removing compiled js used in parsing'
-        dirpath = 'compiled_js_for_parsing'
+        dirpath = os.path.join(os.getcwd(), 'compiled_js_for_parsing')
         if os.path.exists(dirpath):
             shutil.rmtree(dirpath)
 
@@ -1002,7 +1002,9 @@ class LintChecksManager(object):
         """Compiles a typescript file and returns the path for compiled
         js file.
         """
-        out_dir = 'compiled_js_for_parsing'
+        out_dir = os.path.join(os.getcwd(), 'compiled_js_for_parsing')
+        if not os.path.exists(out_dir):
+            os.mkdir(out_dir)
         allow_js = 'true'
         lib = 'es2017,dom'
         no_implicit_use_strict = 'true'
