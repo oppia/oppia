@@ -24,6 +24,7 @@ describe('Compare versions service', function() {
     var vts = null;
     var treeParents = null;
     var $httpBackend = null;
+    var mockExplorationData = null;
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
     beforeEach(function() {

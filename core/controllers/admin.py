@@ -266,7 +266,7 @@ class AdminHandler(base.BaseHandler):
             exploration_ids_to_publish = []
             for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
-                category = random.choice(feconf.SEARCH_DROPDOWN_CATEGORIES)
+                category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_services.get_new_exploration_id()
                 exploration = exp_domain.Exploration.create_default_exploration(
                     new_exploration_id, title=title, category=category,
@@ -326,6 +326,13 @@ class AdminRoleHandler(base.BaseHandler):
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
+
+        if (
+                user_services.get_user_role_from_id(user_id) ==
+                feconf.ROLE_ID_TOPIC_MANAGER):
+            topic_services.deassign_user_from_all_topics(
+                user_services.get_system_user(), user_id)
+
         user_services.update_user_role(user_id, role)
         role_services.log_role_query(
             self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,

@@ -1598,6 +1598,10 @@ pre.oppia-pre-wrapped-text {
 .oppia-editable-section:hover .oppia-interaction-preview {
   background: rgba(5, 140, 166, 0.5);
   border-radius: 4px;
+  /* The z-index value of leaflet map zoom control is 1000, to make it go lower
+     in stack we have used 1001.
+  */
+  z-index: 1001;
 }
 
 .oppia-editor-edit-icon {
@@ -3849,16 +3853,19 @@ span.oppia-issues-learner-action {
   width: 200px;
   height: 115.47px;
   background-color: #009A8B;
-  margin: 20px 0;
+  margin: 15px 0;
   border-left: solid 2px #009A8B;
   border-right: solid 2px #009A8B;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
 }
 
 .oppia-hexagon:before,
 .oppia-hexagon:after {
   content: "";
   position: absolute;
-  z-index: 1;
+  z-index: -1;
   width: 141.42px;
   height: 141.42px;
   -webkit-transform: scaleY(0.5774) rotate(-45deg);

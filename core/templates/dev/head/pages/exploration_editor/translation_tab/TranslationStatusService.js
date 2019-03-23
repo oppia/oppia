@@ -201,7 +201,7 @@ oppia.factory('TranslationStatusService', [
       var contentIdList = _getContentIdListRelatedToComponent(componentName);
       var contentId = null;
       if (contentIdList) {
-        for (index in contentIdList) {
+        for (var index in contentIdList) {
           contentId = contentIdList[index];
           var availabilityStatus = _getActiveStateContentAvailabilityStatus(
             contentId);

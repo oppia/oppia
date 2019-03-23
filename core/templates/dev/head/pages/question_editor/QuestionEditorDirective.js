@@ -32,13 +32,15 @@ oppia.directive('questionEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_editor/question_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'AlertsService', 'QuestionCreationService',
+        '$scope', '$rootScope', '$uibModal',
+        'AlertsService', 'QuestionCreationService',
         'EditabilityService', 'EditableQuestionBackendApiService',
         'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
         'INTERACTION_SPECS', 'StateEditorService', 'ResponsesService',
         'SolutionValidityService', 'QuestionUpdateService',
         function(
-            $scope, $rootScope, AlertsService, QuestionCreationService,
+            $scope, $rootScope, $uibModal,
+            AlertsService, QuestionCreationService,
             EditabilityService, EditableQuestionBackendApiService,
             QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
             INTERACTION_SPECS, StateEditorService, ResponsesService,

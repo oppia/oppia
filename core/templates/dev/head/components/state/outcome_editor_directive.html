@@ -163,6 +163,6 @@
 
   <div ng-if="isEditable()">
     <strong>The answers in this group are correct</strong>
-    <input type="checkbox" ng-model="outcome.labelledAsCorrect" ng-change="onChangeCorrectnessLabel()">
+    <input class="protractor-test-editor-correctness-toggle" type="checkbox" ng-model="outcome.labelledAsCorrect" ng-change="onChangeCorrectnessLabel()">
   </div>
 </div>

@@ -21,8 +21,13 @@ describe('Question update service', function() {
   var QuestionObjectFactory = null;
   var QuestionUndoRedoService = null;
   var StateObjectFactory = null;
+  var SubtitledHtmlObjectFactory = null;
   var sampleQuestion = null;
   var sampleStateTwo = null;
+  var sampleStateDict = null;
+  var expectedOutputStateDict = null;
+  var expectedOutputState = null;
+  var sampleQuestionBackendObject = null;
 
   beforeEach(module('oppia'));
 
@@ -33,7 +38,7 @@ describe('Question update service', function() {
     StateObjectFactory = $injector.get('StateObjectFactory');
     SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
-    var sampleStateDict = {
+    sampleStateDict = {
       name: 'question',
       classifier_model_id: 0,
       content: {
@@ -76,7 +81,7 @@ describe('Question update service', function() {
       }
     };
 
-    var expectedOutputStateDict = {
+    expectedOutputStateDict = {
       name: 'question',
       classifier_model_id: 0,
       content: {
@@ -122,7 +127,7 @@ describe('Question update service', function() {
     expectedOutputState = StateObjectFactory.createFromBackendDict(
       'question', expectedOutputStateDict);
 
-    var sampleQuestionBackendObject = {
+    sampleQuestionBackendObject = {
       id: '0',
       question_state_data: sampleStateDict,
       language_code: 'en',

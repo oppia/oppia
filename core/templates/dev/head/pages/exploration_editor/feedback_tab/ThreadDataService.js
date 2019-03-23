@@ -48,7 +48,7 @@ oppia.factory('ThreadDataService', [
 
     var _fetchThreads = function(successCallback) {
       var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
-      params = {
+      var params = {
         target_type: 'exploration',
         target_id: _expId
       };

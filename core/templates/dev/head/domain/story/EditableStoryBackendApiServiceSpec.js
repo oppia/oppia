@@ -124,6 +124,7 @@ describe('Editable story backend API service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
+      var story = null;
 
       // Loading a story the first time should fetch it from the backend.
       $httpBackend.expect(

@@ -635,12 +635,12 @@ var logicProofShared = (function() {
         throw err;
       }
       var updatedOperators = {};
-      for (key in operators) {
+      for (var key in operators) {
         updatedOperators[key] = operators[key];
       }
       if (operatorIsNew) {
         var _decorateTypes = function(types) {
-          decoratedTypes = [];
+          var decoratedTypes = [];
           for (var k = 0; k < types.length; k++) {
             decoratedTypes.push({
               type: types[k],
@@ -779,7 +779,6 @@ var logicProofShared = (function() {
     newKindsPermitted = newKindsPermitted || ['constant', 'variable'];
     isTemplate = isTemplate || false;
     numDummies = numDummies || 0;
-
     var partiallyTypedArrays = [[[]]];
     var partiallyUpdatedOperators = [[{}]];
     for (var key in language.operators) {
@@ -937,7 +936,7 @@ var logicProofShared = (function() {
       } catch (err) {}
     }
     throw UserError('unknown_typing_error', {
-      expression: expression
+      array: array
     });
   };
 
