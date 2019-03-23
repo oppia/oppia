@@ -376,17 +376,20 @@ class QuestionSkillLink(object):
         skill_description: str. The description of the corresponding skill.
     """
 
-    def __init__(self, question_id, skill_id, skill_description):
+    def __init__(
+            self, question_id, skill_id, skill_description, skill_difficulty):
         """Constructs a Question Skill Link domain object.
 
         Args:
             question_id: str. The ID of the question.
             skill_id: str. The ID of the skill to which the question is linked.
             skill_description: str. The description of the corresponding skill.
+            skill_difficulty: float. The difficulty between [0, 1] of the skill.
         """
         self.question_id = question_id
         self.skill_id = skill_id
         self.skill_description = skill_description
+        self.skill_difficulty = skill_difficulty
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
@@ -397,7 +400,8 @@ class QuestionSkillLink(object):
         return {
             'question_id': self.question_id,
             'skill_id': self.skill_id,
-            'skill_description': self.skill_description
+            'skill_description': self.skill_description,
+            'skill_difficulty': self.skill_difficulty,
         }
 
 
