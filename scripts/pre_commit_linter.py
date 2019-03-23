@@ -1233,13 +1233,13 @@ class LintChecksManager(object):
             print ''
             return summary_messages
 
-    def _check_js_component_name_and_count(self):
+    def _check_js_component_count(self):
         """This function ensures that all JS files have exactly
         one component and and that the name of the component
         matches the filename.
         """
         if self.verbose_mode_enabled:
-            print 'Starting js component name and count check'
+            print 'Starting js component count check'
             print '----------------------------------------'
         # Select JS files which need to be checked.
         files_to_check = [
@@ -1280,39 +1280,16 @@ class LintChecksManager(object):
                     component_name = arguments[0].value
                     component = expression.callee.property.name
 
-                    # If the component is directive or filter and its name is
-                    # xxx then the filename containing it should be
-                    # XxxDirective.js or XxxFilter.js respectively.
-                    if component == 'directive' or component == 'filter':
-                        if (component_name[0].swapcase() + component_name[1:] +
-                                component.capitalize() != (exact_filename)):
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
-                    # If the component is controller or factory, then the
-                    # component name should exactly match the filename
-                    # containing it. If the component's name is xxx then the
-                    # filename should be xxx.js.
-                    else:
-                        if component_name != exact_filename:
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
-
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
                 summary_message = (
-                    '%s  Js component name and count check failed' %
+                    '%s  Js component count check failed' %
                     (_MESSAGE_TYPE_FAILED))
                 print summary_message
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
-                    '%s  Js component name and count check passed' %
+                    '%s  Js component check passed' %
                     (_MESSAGE_TYPE_SUCCESS))
                 print summary_message
                 summary_messages.append(summary_message)
@@ -2053,7 +2030,7 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
-        js_component_messages = self._check_js_component_name_and_count()
+        js_component_messages = self._check_js_component_count()
         directive_scope_messages = self._check_directive_scope()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
