@@ -61,86 +61,86 @@ exports.config = {
     // them. Therefore, we mention the complete directory
     // in 'full'.
     full: [
-      'local_compiled_js/core/tests/../../protractor/*.js',
-      'local_compiled_js/core/tests/../../protractor_desktop/*.js'
+      'protractor/*.js',
+      'protractor_desktop/*.js'
     ],
 
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
     accessibility: [
-      '../../local_compiled_js/core/tests/protractor/accessibility.js'
+      'protractor/accessibility.js'
     ],
 
     additionalEditorAndPlayerFeatures: [
-      '../../local_compiled_js/core/tests/protractor_desktop/additionalEditorAndPlayerFeatures.js'
+      'protractor_desktop/additionalEditorAndPlayerFeatures.js'
     ],
 
     collections: [
-      '../../local_compiled_js/core/tests/protractor_desktop/collections.js'
+      'protractor_desktop/collections.js'
     ],
 
     coreEditorAndPlayerFeatures: [
-      '../../local_compiled_js/core/tests/protractor_desktop/coreEditorAndPlayerFeatures.js'
+      'protractor_desktop/coreEditorAndPlayerFeatures.js'
     ],
 
     embedding: [
-      '../../local_compiled_js/core/tests/protractor_desktop/embedding.js'
+      'protractor_desktop/embedding.js'
     ],
 
     explorationFeedbackTab: [
-      '../../local_compiled_js/core/tests/protractor_desktop/explorationFeedbackTab.js'
+      'protractor_desktop/explorationFeedbackTab.js'
     ],
 
     explorationHistoryTab: [
-      '../../local_compiled_js/core/tests/protractor_desktop/explorationHistoryTab.js'
+      'protractor_desktop/explorationHistoryTab.js'
     ],
 
     explorationStatisticsTab: [
-      '../../local_compiled_js/core/tests/protractor_desktop/explorationStatisticsTab.js'
+      'protractor_desktop/explorationStatisticsTab.js'
     ],
 
     explorationTranslationTab: [
-      '../../local_compiled_js/core/tests/protractor_desktop/explorationTranslationTab.js'
+      'protractor_desktop/explorationTranslationTab.js'
     ],
 
     extensions: [
-      '../../local_compiled_js/core/tests/protractor_desktop/extensions.js'
+      'protractor_desktop/extensions.js'
     ],
 
     learnerDashboard: [
-      '../../local_compiled_js/core/tests/protractor_desktop/learnerDashboard.js'
+      'protractor_desktop/learnerDashboard.js'
     ],
 
     learner: [
-      '../../local_compiled_js/core/tests/protractor/learnerFlow.js'
+      'protractor/learnerFlow.js'
     ],
 
     library: [
-      '../../local_compiled_js/core/tests/protractor/libraryFlow.js'
+      'protractor/libraryFlow.js'
     ],
 
     navigation: [
-      '../../local_compiled_js/core/tests/protractor_desktop/navigation.js'
+      'protractor_desktop/navigation.js'
     ],
 
     preferences: [
-      'local_compiled_js/core/tests/../../protractor_desktop/preferences.js'
+      'protractor_desktop/preferences.js'
     ],
 
     profileFeatures: [
-      '../../local_compiled_js/core/tests/protractor_desktop/profileFeatures.js'
+      'protractor_desktop/profileFeatures.js'
     ],
 
     profileMenu: [
-      '../../local_compiled_js/core/tests/protractor/profileMenuFlow.js'
+      'protractor/profileMenuFlow.js'
     ],
 
     publication: [
-      '../../local_compiled_js/core/tests/protractor_desktop/publicationAndLibrary.js'
+      'protractor_desktop/publicationAndLibrary.js'
     ],
 
     subscriptions: [
-      '../../local_compiled_js/core/tests/protractor/subscriptionsFlow.js'
+      'protractor/subscriptionsFlow.js'
     ],
 
     topicAndStoryEditor: [
@@ -148,7 +148,7 @@ exports.config = {
     ],
 
     topicsAndSkillsDashboard: [
-      '../../local_compiled_js/core/tests/protractor_desktop/topicsAndSkillsDashboard.js'
+      'protractor_desktop/topicsAndSkillsDashboard.js'
     ],
 
     skillEditorPage: [
@@ -156,7 +156,7 @@ exports.config = {
     ],
 
     users: [
-      '../../local_compiled_js/core/tests/protractor_desktop/userJourneys.js',
+      'protractor_desktop/userJourneys.js',
     ],
   },
 

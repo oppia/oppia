@@ -132,7 +132,7 @@ done
 if [[ "$FORCE_PROD_MODE" == "True" ]]; then
   constants_env_variable="\"DEV_MODE\": false"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
-  $PYTHON_CMD scripts/build.py --compile --prod_env
+  $PYTHON_CMD scripts/build.py --prod_env
 else
   constants_env_variable="\"DEV_MODE\": true"
   sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
