@@ -130,6 +130,13 @@ class AboutRedirectPageTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 302)
         self.assertIn('about', response.headers['location'])
 
+    def test_loading_about_page_loads_correctly(self):
+        response = self.testapp.get('/about')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
+        response.mustcontain(
+            'I18N_ABOUT_PAGE_CREDITS_TAB_HEADING')
+
 
 class FoundationRedirectPageTest(test_utils.GenericTestBase):
     """Test for foundation redirect page."""
@@ -148,6 +155,12 @@ class TeachRedirectPageTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 302)
         self.assertIn('teach', response.headers['location'])
 
+    def test_loading_teach_page_loads_correctly(self):
+        response = self.testapp.get('/teach')
+        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.content_type, 'text/html')
+        response.mustcontain('I18N_TEACH_PAGE_HEADING')
+
 
 class ConsoleErrorPageTest(test_utils.GenericTestBase):
     """Test for console error page."""
@@ -160,14 +173,12 @@ class ConsoleErrorPageTest(test_utils.GenericTestBase):
 class MaintenancePageTest(test_utils.GenericTestBase):
     """Test for maintenance page."""
 
-    def test_loading_maintenance_page_loads_correctly(self):
+    def test_redirect_to_maintenance_page_loads_correctly(self):
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True):
-            response = self.testapp.get('/admin')
+            response = self.testapp.get('/')
             self.assertEqual(response.status_int, 302)
-            self.assertIn('admin', response.headers['location'])
 
-    def test_redirect_login_page_loads_correctly(self):
+    def test_loading_a_page_with_disabled_maintance_mode_does_not_redirects_to_maintanence_page(self):
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
-            response = self.testapp.get('/admin')
+            response = self.testapp.get('/')
             self.assertEqual(response.status_int, 302)
-            self.assertIn('Login', response.headers['location'])
