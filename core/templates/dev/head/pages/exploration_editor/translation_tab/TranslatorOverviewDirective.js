@@ -30,23 +30,69 @@ oppia.directive('translatorOverview', [
         '/pages/exploration_editor/translation_tab/' +
         'translator_overview_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$window', 'SUPPORTED_AUDIO_LANGUAGES',
-        'LanguageUtilService', 'TranslationLanguageService',
-        'TranslationStatusService', 'DEFAULT_AUDIO_LANGUAGE', function(
-            $scope, $rootScope, $window, SUPPORTED_AUDIO_LANGUAGES,
-            LanguageUtilService, TranslationLanguageService,
-            TranslationStatusService, DEFAULT_AUDIO_LANGUAGE) {
+        '$rootScope', '$scope', '$timeout', '$window',
+        'ExplorationLanguageCodeService', 'LanguageUtilService',
+        'TranslationLanguageService', 'TranslationStatusService',
+        'TranslationTabActiveModeService', 'DEFAULT_AUDIO_LANGUAGE',
+        'SUPPORTED_AUDIO_LANGUAGES', function(
+            $rootScope, $scope, $timeout, $window,
+            ExplorationLanguageCodeService, LanguageUtilService,
+            TranslationLanguageService, TranslationStatusService,
+            TranslationTabActiveModeService, DEFAULT_AUDIO_LANGUAGE,
+            SUPPORTED_AUDIO_LANGUAGES) {
           var LAST_SELECTED_TRANSLATION_LANGUAGE = (
             'last_selected_translation_lang');
           var prevLanguageCode = $window.localStorage.getItem(
             LAST_SELECTED_TRANSLATION_LANGUAGE);
           var allAudioLanguageCodes = LanguageUtilService
             .getAllAudioLanguageCodes();
+
+          $scope.VOICEOVER_MODE = 'Record';
+          $scope.TRANSLATION_MODE = 'Translate';
+
+          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.languageCode =
             allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
               prevLanguageCode : DEFAULT_AUDIO_LANGUAGE;
           TranslationLanguageService.setActiveLanguageCode(
             $scope.languageCode);
+          $scope.inTranslationMode = false;
+          $scope.inVoiceoverMode = true;
+          TranslationTabActiveModeService.activateVoiceoverMode();
+          $scope.showTabModeSwitcher = function() {
+            return ($scope.languageCode !== (
+              ExplorationLanguageCodeService.displayed));
+          };
+
+          $scope.showModeSwitchHelperImage = function() {
+            var alreadyShown = $window.localStorage.getItem(
+              'mode_switch_helper_image_shown');
+            if (alreadyShown !== 'true') {
+              $timeout(function() {
+                $window.localStorage.setItem(
+                  'mode_switch_helper_image_shown', true);
+              }, 15000);
+              return true;
+            } else {
+              return false;
+            }
+          };
+
+          var updateMode = function() {
+            $scope.inTranslationMode = (
+              TranslationTabActiveModeService.isTranslationModeActive());
+            $scope.inVoiceoverMode = (
+              TranslationTabActiveModeService.isVoiceoverModeActive());
+          };
+
+          $scope.changeActiveMode = function(modeName) {
+            if (modeName === $scope.VOICEOVER_MODE) {
+              TranslationTabActiveModeService.activateVoiceoverMode();
+            } else if (modeName === $scope.TRANSLATION_MODE) {
+              TranslationTabActiveModeService.activatetTranslationMode();
+            }
+            updateMode();
+          };
           $scope.languageCodesAndDescriptions = (
             allAudioLanguageCodes.map(function(languageCode) {
               return {
@@ -58,9 +104,9 @@ oppia.directive('translatorOverview', [
             }));
           $scope.getTranslationProgressStyle = function() {
             $scope.numberOfRequiredAudio = TranslationStatusService
-              .getExplorationAudioRequiredCount();
+              .getExplorationContentRequiredCount();
             $scope.numberOfAudioNotAvailable = TranslationStatusService
-              .getExplorationAudioNotAvailableCount();
+              .getExplorationContentNotAvailableCount();
             var progressPercent = (
               100 - ($scope.numberOfAudioNotAvailable /
                 $scope.numberOfRequiredAudio) * 100);
@@ -76,6 +122,12 @@ oppia.directive('translatorOverview', [
             }
             TranslationLanguageService.setActiveLanguageCode(
               $scope.languageCode);
+
+            if ($scope.languageCode === (
+              ExplorationLanguageCodeService.displayed)) {
+              TranslationTabActiveModeService.activateVoiceoverMode();
+              updateMode();
+            }
             $window.localStorage.setItem(
               LAST_SELECTED_TRANSLATION_LANGUAGE, $scope.languageCode);
           };

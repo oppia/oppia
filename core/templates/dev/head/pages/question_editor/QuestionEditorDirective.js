@@ -169,11 +169,17 @@ oppia.directive('questionEditor', [
                   '/components/forms/' +
                   'mark_all_audio_as_needing_update_modal_directive.html'),
                 backdrop: true,
-                resolve: {},
+                resolve: {
+                  considerTranslation: function() {
+                    return true;
+                  }
+                },
                 controller: 'MarkAllAudioAsNeedingUpdateController'
               }).result.then(function() {
                 updateQuestion(function() {
                   contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
+                    contentId);
+                  writtenTranslations.markAllTranslationsAsNeedingUpdate(
                     contentId);
                 });
               });

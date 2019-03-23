@@ -35,11 +35,17 @@
     </ul>
   </div>
 
+  <div ng-if="!isVoiceoverModeActive()" class="oppia-state-content-header">Original content</div>
   <div class="translation-state-contents">
     <div ng-if="isActive(TAB_ID_CONTENT)" class="translation-state-content protractor-test-content-text">
       <span>
-        <angular-html-bind html-data="getRequieredHtml(stateContent)" class="oppia-rte-editor">
-        </angular-html-bind>
+        <span ng-show="!getRequieredHtml(stateContent)" class="oppia-placeholder">
+          <[getEmptyContentMessage()]>
+        </span>
+        <span>
+          <angular-html-bind html-data="getRequieredHtml(stateContent)" class="oppia-rte-editor">
+          </angular-html-bind>
+        </span>
       </span>
     </div>
     <div ng-if="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
@@ -68,8 +74,13 @@
             <div ng-if="activeAnswerGroupIndex === $index">
               <div class="oppia-editor-card-section protractor-test-feedback-<[$index]>-text">
                 <div class="oppia-rule-body-container">
-                  <angular-html-bind html-data="getRequieredHtml(answerGroup.outcome.feedback)" class="oppia-rte-editor">
-                  </angular-html-bind>
+                  <span ng-show="!getRequieredHtml(answerGroup.outcome.feedback)" class="oppia-placeholder">
+                    <[getEmptyContentMessage()]>
+                  </span>
+                  <span>
+                    <angular-html-bind html-data="getRequieredHtml(answerGroup.outcome.feedback)" class="oppia-rte-editor">
+                    </angular-html-bind>
+                  </span>
                 </div>
               </div>
             </div>
@@ -144,13 +155,23 @@
       </span>
     </div>
   </div>
-  <div id="tutorialTranslationAudioBar" class="oppia-audio-translation-bar">
+  <div ng-if="isVoiceoverModeActive()" id="tutorialTranslationAudioBar" class="oppia-audio-translation-bar">
     <audio-translation-bar is-translation-tab-busy="isTranslationTabBusy"></audio-translation-bar>
+  </div>
+  <div ng-if="!isVoiceoverModeActive()">
+    <state-translation-editor></state-translation-editor>
   </div>
 </div>
 
 
 <style>
+  .oppia-state-content-header {
+    background: #ccc;
+    height: 16px;
+    text-align: center;
+    font-size: 12px;
+    font-style: italic;
+  }
   .oppia-translation-page-statename {
     margin-left: 80px;
     margin-top: 35px;
@@ -161,7 +182,6 @@
     flex-direction: column;
     margin-left: 80px;
     margin-top: 20px;
-    min-height: 500px;
     padding: 0px;
     width: 80%;
   }

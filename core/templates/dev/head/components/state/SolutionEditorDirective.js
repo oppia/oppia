@@ -34,7 +34,6 @@ oppia.directive('solutionEditor', [
         onSaveSolution: '=',
         correctAnswerEditorHtml: '=',
         onOpenSolutionEditor: '&',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/solution_editor_directive.html'),

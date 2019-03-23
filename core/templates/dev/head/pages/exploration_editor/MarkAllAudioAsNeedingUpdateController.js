@@ -17,8 +17,9 @@
  */
 
 oppia.controller('MarkAllAudioAsNeedingUpdateController', [
-  '$scope', '$uibModalInstance',
-  function($scope, $uibModalInstance) {
+  '$scope', '$uibModalInstance', 'considerTranslation',
+  function($scope, $uibModalInstance, considerTranslation) {
+    $scope.considerTranslation = considerTranslation;
     $scope.flagAll = function() {
       $uibModalInstance.close();
     };

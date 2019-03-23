@@ -157,6 +157,7 @@ oppia.controller('ExplorationEditorTab', [
       var stateName = StateEditorService.getActiveStateName();
       var state = ExplorationStatesService.getState(stateName);
       var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
+      var writtenTranslations = state.writtenTranslations;
       if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
         contentId)) {
         $uibModal.open({
@@ -164,12 +165,19 @@ oppia.controller('ExplorationEditorTab', [
             '/components/forms/' +
             'mark_all_audio_as_needing_update_modal_directive.html'),
           backdrop: true,
-          resolve: {},
+          resolve: {
+            considerTranslation: function() {
+              return true;
+            }
+          },
           controller: 'MarkAllAudioAsNeedingUpdateController'
         }).result.then(function() {
           contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(contentId);
           ExplorationStatesService.saveContentIdsToAudioTranslations(
             stateName, contentIdsToAudioTranslations);
+          writtenTranslations.markAllTranslationsAsNeedingUpdate(contentId);
+          ExplorationStatesService.saveWrittenTranslations(
+            stateName, writtenTranslations);
         });
       }
     };

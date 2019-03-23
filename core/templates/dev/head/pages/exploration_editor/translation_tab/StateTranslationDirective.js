@@ -70,30 +70,42 @@ oppia.directive('stateTranslation', [
           $scope.stateSolution = null;
           $scope.needsUpdateTooltipMessage = 'Audio needs update to match ' +
             'text. Please record new audio.';
+          $scope.isVoiceoverModeActive = (
+            TranslationTabActiveModeService.isVoiceoverModeActive);
           var isTranslatedTextRequiered = function() {
-            return (TranslationTabActiveModeService.isVoiceoverModeActive &&
-              TranslationLanguageService.getActiveLanguageCode() != (
-                ExplorationLanguageCodeService.displayed))
-          }
+            return (TranslationTabActiveModeService.isVoiceoverModeActive() &&
+              TranslationLanguageService.getActiveLanguageCode() !== (
+                ExplorationLanguageCodeService.displayed));
+          };
           $scope.getRequieredHtml = function(subtitledHtml) {
-            if(isTranslatedTextRequiered()) {
+            var html = null;
+            if (isTranslatedTextRequiered()) {
               var contentId = subtitledHtml.getContentId();
               var activeLanguageCode = (
                 TranslationLanguageService.getActiveLanguageCode());
               var writtenTranslations = (
                 ExplorationStatesService.getWrittenTranslationsMemento(
                   $scope.stateName));
-              if(writtenTranslations.hasWrittenTranslation(
+              if (writtenTranslations.hasWrittenTranslation(
                 contentId, activeLanguageCode)) {
-                return writtenTranslations.getWrittenTranslation(
-                  contentId, activeLanguageCode);
-              } else {
-                return "<h1>No translation Found</h1>";
+                var writtenTranslation = (
+                  writtenTranslations.getWrittenTranslation(
+                    contentId, activeLanguageCode));
+                html = writtenTranslation.getHtml();
               }
             } else {
-              return subtitledHtml.getHtml();
+              html = subtitledHtml.getHtml();
             }
-          }
+            return html;
+          };
+
+          $scope.getEmptyContentMessage = function() {
+            if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
+              return 'There is no text to record.';
+            } else {
+              return 'There is no text to translate.';
+            }
+          };
 
           $scope.isActive = function(tabId) {
             return ($scope.activatedTabId === tabId);

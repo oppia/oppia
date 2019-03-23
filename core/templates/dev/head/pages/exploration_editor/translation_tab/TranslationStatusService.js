@@ -19,10 +19,13 @@
 
 oppia.factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateContentIdsToAudioTranslationsService',
-  'TranslationLanguageService', 'INTERACTION_SPECS', function(
+  'StateWrittenTranslationsService', 'TranslationLanguageService',
+  'TranslationTabActiveModeService', 'INTERACTION_SPECS', function(
       ExplorationStatesService, StateContentIdsToAudioTranslationsService,
-      TranslationLanguageService, INTERACTION_SPECS) {
-    var NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
+      StateWrittenTranslationsService, TranslationLanguageService,
+      TranslationTabActiveModeService, INTERACTION_SPECS) {
+    var AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
+    var TRANSLATION_NEEDS_UPDATE_MESSAGE = ['Translation needs update!'];
     var ALL_AUDIO_AVAILABLE_COLOR = '#16A765';
     var FEW_AUDIO_AVAILABLE_COLOR = '#E9B330';
     var NO_AUDIO_AVAILABLE_COLOR = '#D14836';
@@ -30,24 +33,85 @@ oppia.factory('TranslationStatusService', [
     var langCode = TranslationLanguageService.getActiveLanguageCode();
     var stateNeedsUpdateWarnings = {};
     var stateWiseStatusColor = {};
-    var explorationAudioRequiredCount = 0;
-    var explorationAudioNotAvailableCount = 0;
+    var explorationContentRequiredCount = 0;
+    var explorationContentNotAvailableCount = 0;
     var contentIdsToAudioTranslations =
         StateContentIdsToAudioTranslationsService.displayed;
-    var _computeAllStatesStatus = function() {
+    var writtenTranslations = StateWrittenTranslationsService.dsiplayed;
+
+    var _getVoiceOverStatus = function(
+        contentIdsToAudioTranslations, contentId) {
+      // The first value of availabilityStatus shows whether a audio is
+      // available for a contentId in a given language, whereas the last value
+      // represent whether the available audio needs update.
+      var availabilityStatus = [false, false];
+      var availableLanguage = (
+        contentIdsToAudioTranslations.getAudioLanguageCodes(contentId));
+      if (availableLanguage.indexOf(langCode) !== -1) {
+        availabilityStatus[0] = true;
+        var audioTranslation = (
+          contentIdsToAudioTranslations.getAudioTranslation(
+            contentId, langCode));
+        availabilityStatus[1] = audioTranslation.needsUpdate;
+      }
+      return availabilityStatus;
+    };
+
+    var _getTranslationStatus = function(writtenTranslations, contentId) {
+      // The first value of availabilityStatus shows whether a translation is
+      // available for a contentId in a given language, whereas the last value
+      // represent whether the available translation needs update.
+      var availabilityStatus = [false, false];
+      var availableLanguage = (
+        writtenTranslations.getTranslationsLanguageCodes(contentId));
+      if (availableLanguage.indexOf(langCode) !== -1) {
+        var writtenTranslation = (
+          writtenTranslations.getWrittenTranslation(contentId, langCode));
+        if (writtenTranslation.getHtml() !== '') {
+          availabilityStatus[0] = true;
+          availabilityStatus[1] = writtenTranslation.needsUpdate;
+        }
+      }
+      return availabilityStatus;
+    };
+    var _getContentAvailabilityStatus = function(stateName, contentId) {
       langCode = TranslationLanguageService.getActiveLanguageCode();
+      if (TranslationTabActiveModeService.isTranslationModeActive()) {
+        var writtenTranslations = (
+          ExplorationStatesService.getWrittenTranslationsMemento(stateName));
+        return _getTranslationStatus(writtenTranslations, contentId);
+      } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
+        var contentIdsToAudioTranslations = (
+          ExplorationStatesService.getContentIdsToAudioTranslationsMemento(
+            stateName));
+        return _getVoiceOverStatus(contentIdsToAudioTranslations, contentId);
+      }
+    };
+
+    var _getActiveStateContentAvailabilityStatus = function(contentId) {
+      if (TranslationTabActiveModeService.isTranslationModeActive()) {
+        var writtenTranslations = StateWrittenTranslationsService.displayed;
+        return _getTranslationStatus(writtenTranslations, contentId);
+      } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
+        var contentIdsToAudioTranslations = (
+          StateContentIdsToAudioTranslationsService.displayed);
+        return _getVoiceOverStatus(contentIdsToAudioTranslations, contentId);
+      }
+    };
+    var _computeAllStatesStatus = function() {
       stateNeedsUpdateWarnings = {};
       stateWiseStatusColor = {};
-      explorationAudioRequiredCount = 0;
-      explorationAudioNotAvailableCount = 0;
+      explorationContentRequiredCount = 0;
+      explorationContentNotAvailableCount = 0;
+
       if (ExplorationStatesService.isInitialized()) {
         ExplorationStatesService.getStateNames().forEach(function(stateName) {
           var noTranslationCount = 0;
           var contentIdsToAudioTranslations = ExplorationStatesService
             .getContentIdsToAudioTranslationsMemento(stateName);
           var allContentId = contentIdsToAudioTranslations.getAllContentId();
-          var interactionId = ExplorationStatesService
-            .getInteractionIdMemento(stateName);
+          var interactionId = ExplorationStatesService.getInteractionIdMemento(
+            stateName);
           // This is used to prevent users from adding unwanted hints audio, as
           // of now we do not delete interaction.hints when a user deletes
           // interaction, so these hints audio are not counted in checking
@@ -57,21 +121,24 @@ oppia.factory('TranslationStatusService', [
             INTERACTION_SPECS[interactionId].is_terminal) {
             allContentId = ['content'];
           }
-          explorationAudioRequiredCount += allContentId.length;
+          explorationContentRequiredCount += allContentId.length;
           allContentId.forEach(function(contentId) {
-            availableTranslationLanguageCodes = contentIdsToAudioTranslations
-              .getAudioLanguageCodes(contentId);
-            if (availableTranslationLanguageCodes.indexOf(langCode) > -1) {
-              var audioTranslation = contentIdsToAudioTranslations
-                .getAudioTranslation(contentId, langCode);
-              if (audioTranslation.needsUpdate) {
-                stateNeedsUpdateWarnings[stateName] = NEEDS_UPDATE_MESSAGE;
-              }
-            } else {
+            var availabilityStatus = _getContentAvailabilityStatus(
+              stateName, contentId);
+            if (!availabilityStatus[0]) {
               noTranslationCount++;
             }
+            if (availabilityStatus[1]) {
+              if (TranslationTabActiveModeService.isTranslationModeActive()) {
+                stateNeedsUpdateWarnings[stateName] = (
+                  TRANSLATION_NEEDS_UPDATE_MESSAGE);
+              } else {
+                stateNeedsUpdateWarnings[stateName] = (
+                  AUDIO_NEEDS_UPDATE_MESSAGE);
+              }
+            }
           });
-          explorationAudioNotAvailableCount += noTranslationCount;
+          explorationContentNotAvailableCount += noTranslationCount;
           if (noTranslationCount === 0) {
             stateWiseStatusColor[stateName] = ALL_AUDIO_AVAILABLE_COLOR;
           } else if (noTranslationCount === allContentId.length) {
@@ -114,8 +181,9 @@ oppia.factory('TranslationStatusService', [
       var availableAudioCount = 0;
       if (contentIdList) {
         contentIdList.forEach(function(contentId) {
-          if (contentIdsToAudioTranslations
-            .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
+          var availabilityStatus = _getActiveStateContentAvailabilityStatus(
+            contentId);
+          if (availabilityStatus[0]) {
             availableAudioCount++;
           }
         });
@@ -135,13 +203,10 @@ oppia.factory('TranslationStatusService', [
       if (contentIdList) {
         for (index in contentIdList) {
           contentId = contentIdList[index];
-          if (contentIdsToAudioTranslations
-            .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
-            var audioTranslation = contentIdsToAudioTranslations
-              .getAudioTranslation(contentId, langCode);
-            if (audioTranslation.needsUpdate) {
-              return true;
-            }
+          var availabilityStatus = _getActiveStateContentAvailabilityStatus(
+            contentId);
+          if (availabilityStatus[1]) {
+            return true;
           }
         }
       }
@@ -149,44 +214,30 @@ oppia.factory('TranslationStatusService', [
     };
 
     var _getActiveStateContentIdStatusColor = function(contentId) {
-      contentIdsToAudioTranslations =
-        StateContentIdsToAudioTranslationsService.displayed;
-      if (contentIdsToAudioTranslations) {
-        if (contentIdsToAudioTranslations
-          .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
-          return ALL_AUDIO_AVAILABLE_COLOR;
-        } else {
-          return NO_AUDIO_AVAILABLE_COLOR;
-        }
+      var availabilityStatus = _getActiveStateContentAvailabilityStatus(
+        contentId);
+      if (availabilityStatus[0]) {
+        return ALL_AUDIO_AVAILABLE_COLOR;
+      } else {
+        return NO_AUDIO_AVAILABLE_COLOR;
       }
     };
 
     var _getActiveStateContentIdNeedsUpdateStatus = function(contentId) {
-      contentIdsToAudioTranslations =
-        StateContentIdsToAudioTranslationsService.displayed;
-      if (contentIdsToAudioTranslations) {
-        if (contentIdsToAudioTranslations
-          .getAudioLanguageCodes(contentId).indexOf(langCode) > -1) {
-          var audioTranslation = contentIdsToAudioTranslations
-            .getAudioTranslation(contentId, langCode);
-          if (audioTranslation.needsUpdate) {
-            return true;
-          } else {
-            return false;
-          }
-        }
-      }
+      var availabilityStatus = _getActiveStateContentAvailabilityStatus(
+        contentId);
+      return availabilityStatus[1];
     };
 
     return {
       getAllStatesNeedUpdatewarning: function() {
         return stateNeedsUpdateWarnings;
       },
-      getExplorationAudioRequiredCount: function() {
-        return explorationAudioRequiredCount;
+      getExplorationContentRequiredCount: function() {
+        return explorationContentRequiredCount;
       },
-      getExplorationAudioNotAvailableCount: function() {
-        return explorationAudioNotAvailableCount;
+      getExplorationContentNotAvailableCount: function() {
+        return explorationContentNotAvailableCount;
       },
       getAllStateStatusColors: function() {
         _computeAllStatesStatus();

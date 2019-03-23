@@ -29,7 +29,7 @@ oppia.factory('WrittenTranslationsObjectFactory', [
 
     WrittenTranslations.prototype.getWrittenTranslation = function(
         contentId, langCode) {
-      return this.translationsMapping[contentId][langCode].getHtml();
+      return this.translationsMapping[contentId][langCode];
     };
 
     WrittenTranslations.prototype.markAllTranslationsAsNeedingUpdate = (
@@ -48,6 +48,9 @@ oppia.factory('WrittenTranslationsObjectFactory', [
 
     WrittenTranslations.prototype.hasWrittenTranslation = function(
         contentId, langaugeCode) {
+      if (!this.translationsMapping.hasOwnProperty(contentId)) {
+        return false;
+      }
       return this.getTranslationsLanguageCodes(
         contentId).indexOf(langaugeCode) !== -1;
     };
@@ -80,9 +83,6 @@ oppia.factory('WrittenTranslationsObjectFactory', [
     WrittenTranslations.prototype.addWrittenTranslation = function(
         contentId, languageCode, html) {
       var writtenTranslations = this.translationsMapping[contentId];
-      if (writtenTranslations.hasOwnProperty(languageCode)) {
-        throw Error('Trying to add duplicate language code.');
-      }
       writtenTranslations[languageCode] = (
         WrittenTranslationObjectFactory.createNew(html));
     };

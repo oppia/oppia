@@ -65,7 +65,7 @@ oppia.directive('stateContentEditor', [
             $scope.cardHeightLimitWarningIsShown = false;
           };
 
-          var saveTranslation = function() {
+          var saveContent = function() {
             StateContentService.saveDisplayedValue();
             $scope.onSaveStateContent(StateContentService.displayed);
             $scope.contentEditorIsOpen = false;
