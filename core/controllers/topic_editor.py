@@ -20,6 +20,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import dependency_registry
+from core.domain import email_manager
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import question_services
@@ -361,6 +362,26 @@ class TopicRightsHandler(base.BaseHandler):
             'published': topic_rights.topic_is_published,
             'can_publish_topic': can_publish_topic
         })
+
+        self.render_json(self.values)
+
+class TopicPublishSendMailHandler(base.BaseHandler):
+    """A handler for sending mail to admins to review and publish topic."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_view_any_topic_editor
+    def put(self, topic_id):
+        """Returns the TopicRights object of a topic."""
+        topic_domain.Topic.require_valid_topic_id(topic_id)
+
+        topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_mail_to_admin(
+                'Request to review and publish a topic',
+                '%s wants to publish topic: %s at URL %s, please review'
+                ' and publish if it looks good.'
+                % (self.username, self.payload.get('topic_name'), topic_url))
 
         self.render_json(self.values)
 
