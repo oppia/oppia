@@ -228,5 +228,4 @@ class MaintenancePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
-        ENABLE_MAINTENANCE_MODE = True
         self.render_template('pages/maintenance/maintenance.html')
