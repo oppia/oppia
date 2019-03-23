@@ -53,7 +53,7 @@ oppia.factory('QuestionPlayerBackendApiService', [
      * Does basic validation on input.
      */
     var validateRequestParameters = function(
-      skillIds, questionCount, errorCallback) {
+        skillIds, questionCount, errorCallback) {
       if (!isListOfStrings(skillIds)) {
         errorCallback('Skill ids should be a list of strings');
         return false;
