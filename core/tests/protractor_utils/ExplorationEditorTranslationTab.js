@@ -161,7 +161,7 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-accessibility-test-translation-play-recorded-audio'));
 
   var _selectLanguage = function(language) {
-    element(by.css('protractor-test-translation-language-selector')).
+    element(by.css('.protractor-test-translation-language-selector')).
       element(by.cssContainingText('option', language)).click();
   };
 
@@ -205,8 +205,7 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectNumericalStatusAccessibilityToMatch = function(content) {
-    expect(numericalStatus.getAttribute(
-      'aria-label')).toMatch(content);
+    expect(numericalStatus.getAttribute('aria-label')).toMatch(content);
   };
 
   this.expectContentAccessibilityToMatch = function(content) {
