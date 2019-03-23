@@ -250,7 +250,7 @@ class SignupPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         return_url = str(self.request.get('return_url', self.request.uri))
-        # Validating return_url for no external redirection.
+        # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
         if user_services.has_fully_registered(self.user_id):

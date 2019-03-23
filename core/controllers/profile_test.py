@@ -84,9 +84,9 @@ class SignupTests(test_utils.GenericTestBase):
             response.headers['location']))
 
         response = self.get_html_response(
-            '/signup?return_url=/page/hello?id=test', expected_status_int=302)
+            '/signup?return_url=/page/hello?id=tests', expected_status_int=302)
         self.assertEqual(
-            'page/hello?id=test', strip_domain_from_location_header(
+            'page/hello?id=tests', strip_domain_from_location_header(
                 response.headers['location']))
 
         self.logout()
