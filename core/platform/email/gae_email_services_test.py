@@ -26,10 +26,6 @@ class EmailTests(test_utils.GenericTestBase):
     RECIPIENT_EMAIL = 'user@example.com'
     RECIPIENT_USERNAME = 'user'
 
-    def setUp(self):
-        super(EmailTests, self).setUp()
-        self.signup(self.RECIPIENT_EMAIL, self.RECIPIENT_USERNAME)
-
     def test_sending_email(self):
         # Emails are not sent if the CAN_SEND_EMAILS setting is not turned on.
         email_exception = self.assertRaisesRegexp(
@@ -50,17 +46,14 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(0, len(messages))
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             gae_email_services.send_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS,
-                feconf.ADMIN_EMAIL_ADDRESS,
+                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
         messages = self.mail_stub.get_sent_messages(
             to=feconf.ADMIN_EMAIL_ADDRESS)
         self.assertEqual(1, len(messages))
 
     def test_email_bcc_is_sent_if_bcc_admin_is_true(self):
-        """Tests that the email has ADMIN_EMAIL_ADDRESS as bcc
-        if bcc_admin is True.
-        """
+        # Tests that email has ADMIN_EMAIL_ADDRESS as bcc if bcc_admin is True.
         messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(0, len(messages))
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
@@ -84,7 +77,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertFalse(hasattr(messages[0], 'bcc'))
 
     def test_sending_email_with_reply_to_id_adds_reply_to_email(self):
-        # Tests that email reply_to if passed.
+        # Tests that email has reply_to_address if reply_to_id is passed.
         messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(0, len(messages))
 
@@ -99,8 +92,8 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(messages[0].reply_to, expected_reply_to_address)
 
     def test_sending_email_without_reply_to_id_not_add_reply_to_email(self):
-        """Tests that email does not have reply_to_email
-        if reply_to_id is not passed.
+        """Tests that email does not have reply_to_address if reply_to_id is
+        not passed.
         """
         messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(0, len(messages))
@@ -148,11 +141,6 @@ class BulkEmailsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(BulkEmailsTests, self).setUp()
-        # SENDER is authorised sender.
-        # A and B are recipients.
-        self.signup(self.SENDER_EMAIL, self.SENDER_USERNAME)
-        self.signup(self.RECIPIENT_A_EMAIL, self.RECIPIENT_A_USERNAME)
-        self.signup(self.RECIPIENT_B_EMAIL, self.RECIPIENT_B_USERNAME)
         self.recipient_emails = [self.RECIPIENT_A_EMAIL, self.RECIPIENT_B_EMAIL]
 
     def test_correct_bulk_emails_sent(self):
