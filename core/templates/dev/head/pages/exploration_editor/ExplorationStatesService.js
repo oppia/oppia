@@ -200,7 +200,6 @@ oppia.factory('ExplorationStatesService', [
             newStateData.contentIdsToAudioTranslations.addContentId(contentId);
             newStateData.writtenTranslations.addContentId(contentId);
           });
-          console.log(newStateData.writtenTranslations);
         }
         var propertyRef = newStateData;
         for (var i = 0; i < accessorList.length - 1; i++) {
