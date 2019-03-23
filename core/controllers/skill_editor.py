@@ -95,7 +95,7 @@ class SkillEditorPage(base.BaseHandler):
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
-            'dependencies_html': jinja2.utils.Markup(dependencies_html),
+            'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
 
         self.render_template('pages/skill_editor/skill_editor.html')
