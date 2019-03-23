@@ -290,19 +290,19 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, 'user', 'Description')
 
-        question_id = question_services.get_new_question_id()
+        self.question_id = question_services.get_new_question_id()
         self.save_new_question(
-            question_id, 'user',
+            self.question_id, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            question_id, self.skill_id)
+            self.question_id, self.skill_id)
 
-        question_id_2 = question_services.get_new_question_id()
+        self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
-            question_id_2, 'user',
+            self.question_id_2, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            question_id_2, self.skill_id)
+            self.question_id_2, self.skill_id)
 
     def test_questions_are_returned_successfully(self):
         # Call the handler.
@@ -327,6 +327,24 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 2)
 
+    def test_multiple_skill_id_returns_questions(self):
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_2, 'user', 'Description')
+
+        question_id_3 = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id_3, 'user',
+            self._create_valid_question_data('ABC'))
+        question_services.create_new_question_skill_link(
+            question_id_3, skill_id_2)
+        url = '%s?question_count=%s&skill_ids=%s,%s&start_cursor=' % (
+            feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2)
+        json_response = self.get_json(url)
+        self.assertEqual(len(json_response['question_dicts']), 3)
+        question_ids = [data['id'] for data in json_response['question_dicts']]
+        self.assertItemsEqual([self.question_id, self.question_id_2,
+                               question_id_3], question_ids)
+
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
         url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
@@ -338,8 +356,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         # Call the handler.
         url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
             feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id)
-        json_response = self.get_json(url, expected_status_int = 400)
-
+        self.get_json(url, expected_status_int = 400)
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
     """Test methods relating to exploration parameters."""

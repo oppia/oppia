@@ -87,7 +87,7 @@ describe('Question backend Api service', function() {
       'start_cursor=').respond(
       sampleDataResults);
     QuestionPlayerBackendApiService.fetchQuestions(
-      '1', '1').then(successHandler, failHandler);
+      ['1'], 1).then(successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(
@@ -108,7 +108,7 @@ describe('Question backend Api service', function() {
         'start_cursor=').respond(
         sampleDataResultsWithCursor);
       QuestionPlayerBackendApiService.fetchQuestions(
-        '1', '1').then(successHandler, failHandler);
+        ['1'], 1).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
@@ -121,7 +121,7 @@ describe('Question backend Api service', function() {
         sampleDataResults);
 
       QuestionPlayerBackendApiService.fetchQuestions(
-        '1', '1').then(successHandler, failHandler);
+        ['1'], 1).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
@@ -139,7 +139,7 @@ describe('Question backend Api service', function() {
         'start_cursor=').respond(
         500, 'Error loading questions.');
       QuestionPlayerBackendApiService.fetchQuestions(
-        '1', '1').then(successHandler, failHandler);
+        ['1'], 1).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
@@ -153,11 +153,11 @@ describe('Question backend Api service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
       QuestionPlayerBackendApiService.fetchQuestions(
-        '1', 'abc').then(successHandler, failHandler);
+        ['1'], 'abc').then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Question count has to be ' +
-        'a number');
+      expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
+        'positive integer');
     }
   );
 
@@ -166,21 +166,76 @@ describe('Question backend Api service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
       QuestionPlayerBackendApiService.fetchQuestions(
-        '1', '-1').then(successHandler, failHandler);
+        ['1'], -1).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Question count has to be ' +
-        'positive');
+      expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
+        'positive integer');
     }
   );
-  it('should use the fail handler if skill ids is missing', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    QuestionPlayerBackendApiService.fetchQuestions(
-      '', '1').then(successHandler, failHandler);
-    $rootScope.$digest();
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Skill ids value is expected' +
-      ' but is missing');
-  });
+
+  it('should use the fail handler if question count is not an integer',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+      QuestionPlayerBackendApiService.fetchQuestions(
+        ['1'], 1.5).then(successHandler, failHandler);
+      $rootScope.$digest();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
+        'positive integer');
+    }
+  );
+
+  it('should use the fail handler if skill ids is not a list',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+      QuestionPlayerBackendApiService.fetchQuestions(
+        'x', 1).then(successHandler, failHandler);
+      $rootScope.$digest();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      ' strings');
+    }
+  );
+
+  it('should use the fail handler if skill ids is not a list of strings',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+      QuestionPlayerBackendApiService.fetchQuestions(
+        [1, 2], 1).then(successHandler, failHandler);
+      $rootScope.$digest();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      ' strings');
+    }
+  );
+
+  it('should use the fail handler if skill ids is sent as null',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+      QuestionPlayerBackendApiService.fetchQuestions(
+        null, 1).then(successHandler, failHandler);
+      $rootScope.$digest();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      ' strings');
+    }
+  );
+
+  it('should use the fail handler if question count is sent as null',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+      QuestionPlayerBackendApiService.fetchQuestions(
+        ['1'], null).then(successHandler, failHandler);
+      $rootScope.$digest();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
+        'positive integer');
+    }
+  );
 });

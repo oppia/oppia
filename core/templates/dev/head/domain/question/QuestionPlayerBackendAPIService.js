@@ -26,13 +26,13 @@ oppia.factory('QuestionPlayerBackendApiService', [
     var _startCursor = '';
     var _fetchQuestions = function(
         skillIds, questionCount, successCallback, errorCallback) {
-      if (!_inputValidation(skillIds, questionCount, errorCallback)) {
+      if (!validateRequestParameters(skillIds, questionCount, errorCallback)) {
         return;
       }
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_PLAYER_URL_TEMPLATE, {
-          skill_ids: skillIds,
-          question_count: questionCount,
+          skill_ids: skillIds.toString(),
+          question_count: questionCount.toString(),
           start_cursor: _startCursor
         });
 
@@ -50,25 +50,45 @@ oppia.factory('QuestionPlayerBackendApiService', [
     };
 
     /**
-     * Does basic validation on input
+     * Does basic validation on input.
      */
-    var _inputValidation = function(skillIds, questionCount, errorCallback) {
-      if (!skillIds) {
-        errorCallback('Skill ids value is expected but is missing');
+    var validateRequestParameters = function(
+      skillIds, questionCount, errorCallback) {
+      if (!isListOfStrings(skillIds)) {
+        errorCallback('Skill ids should be a list of strings');
         return false;
       }
 
-      if (isNaN(questionCount)) {
-        errorCallback('Question count has to be a number');
-        return false;
-      }
-
-      if (parseInt(questionCount) < 0) {
-        errorCallback('Question count has to be positive');
+      if (!isInt(questionCount) || questionCount <= 0) {
+        errorCallback('Question count has to be a positive integer');
         return false;
       }
 
       return true;
+    };
+
+    /**
+     * Checks if given input is a list and has all strings
+     */
+    var isListOfStrings = function(list) {
+      if (!angular.isArray(list)) {
+        return false;
+      }
+      isValid = true;
+      for (var i = 0; i < list.length; i++) {
+        if (!angular.isString(list[i])) {
+          isValid = false;
+          break;
+        }
+      }
+      return isValid;
+    };
+
+    /**
+     * Checks if given input is an integer
+     */
+    var isInt = function(n) {
+      return angular.isNumber(n) && n % 1 === 0;
     };
 
     /**

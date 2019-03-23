@@ -1022,12 +1022,15 @@ class QuestionPlayerHandler(base.BaseHandler):
     def get(self):
         """Handles GET request."""
         start_cursor = self.request.get('start_cursor')
+        """Skill ids are given as a comma separated list because this is
+        a GET request
+        """
         skill_ids = self.request.get('skill_ids').split(',')
         question_count = self.request.get('question_count')
 
         if not question_count.isdigit() or int(question_count) <= 0:
-            raise self.InvalidInputException("question count has " +
-                                             "to be greater than 0")
+            raise self.InvalidInputException(
+                'Question count has to be greater than 0')
 
         questions, _, next_start_cursor = (
             question_services.get_questions_and_skill_descriptions_by_skill_ids(
