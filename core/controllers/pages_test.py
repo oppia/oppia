@@ -178,7 +178,7 @@ class MaintenancePageTest(test_utils.GenericTestBase):
             response = self.testapp.get('/')
             self.assertEqual(response.status_int, 302)
 
-    def test_loading_a_page_with_disabled_maintance_mode_does_not_redirects_to_maintanence_page(self):
+    def test_loading_not_redirects_to_maintanence_page_correctly(self):
         with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
             response = self.testapp.get('/')
             self.assertEqual(response.status_int, 302)
