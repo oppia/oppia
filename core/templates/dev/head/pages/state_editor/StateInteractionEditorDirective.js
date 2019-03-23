@@ -188,16 +188,16 @@ oppia.directive('stateInteractionEditor', [
                 backdrop: true,
                 resolve: {},
                 controller: [
-                  '$scope', '$uibModalInstance', '$injector', '$window',
+                  '$scope', '$uibModalInstance', '$injector',
                   'StateSolutionService', 'StateInteractionIdService',
-                  'StateCustomizationArgsService',
+                  'StateCustomizationArgsService', 'StateEditorService',
                   'InteractionDetailsCacheService', 'INTERACTION_SPECS',
                   'ALLOWED_INTERACTION_CATEGORIES', 'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
                   'UrlInterpolationService', 'EditorFirstTimeEventsService',
                   function(
-                      $scope, $uibModalInstance, $injector, $window,
+                      $scope, $uibModalInstance, $injector,
                       StateSolutionService, StateInteractionIdService,
-                      StateCustomizationArgsService,
+                      StateCustomizationArgsService, StateEditorService,
                       InteractionDetailsCacheService, INTERACTION_SPECS,
                       ALLOWED_INTERACTION_CATEGORIES, ALLOWED_QUESTION_INTERACTION_CATEGORIES,
                       UrlInterpolationService, EditorFirstTimeEventsService) {
@@ -216,19 +216,12 @@ oppia.directive('stateInteractionEditor', [
 
                     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
 
-                    // Checks that the modal is invoked by exploration_editor or
-                    // skill_editor, topic_editor. 
-                    var currentPage = $window.location.pathname.split('/')[1];
-                    if (currentPage === 'create' || 
-                        currentPage === 'creator_dashboard') {
-                      $scope.ALLOWED_INTERACTION_CATEGORIES = (
-                        ALLOWED_INTERACTION_CATEGORIES);
-                    } else if (currentPage === 'skill_editor' ||
-                               currentPage === 'topic_editor') {
+                    if (StateEditorService.isInQuestionMode()) {
                       $scope.ALLOWED_INTERACTION_CATEGORIES = (
                         ALLOWED_QUESTION_INTERACTION_CATEGORIES);
                     } else {
-                      throw Error('URL does not match');
+                      $scope.ALLOWED_INTERACTION_CATEGORIES = (
+                        ALLOWED_INTERACTION_CATEGORIES);
                     }
 
                     if (StateInteractionIdService.savedMemento) {
