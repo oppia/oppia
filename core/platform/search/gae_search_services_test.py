@@ -264,8 +264,8 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         self.assertEqual(e.exception.original_exception, error)
 
     def test_raise_error_when_document_type_is_invalid(self):
+        doc = {'abc': set('xyz')}
         with self.assertRaises(ValueError):
-            doc = {'abc': set('xyz')}
             gae_search_services.add_documents_to_index([doc], 'my_index')
 
 
@@ -467,9 +467,10 @@ class SearchQueryTests(test_utils.GenericTestBase):
         }, result)
 
     def test_search_when_query_string_is_invalid(self):
+        doc = {'id': 'doc1', 'NOT': 'abc', 'rank': 3, 'language_code': 'en'}
+        gae_search_services.add_documents_to_index([doc], 'index')
         result = gae_search_services.search('NOT:abc', 'my_index')
         self.assertEqual(result, ([], None))
-
 
     def test_respect_search_query(self):
         doc1 = search.Document(doc_id='doc1', rank=1, language='en', fields=[
@@ -597,6 +598,9 @@ class SearchQueryTests(test_utils.GenericTestBase):
     def test_raise_error_when_sort_starts_with_invalid_character(self):
         doc = {'id': 'doc1', 'k': 'abc def', 'rank': 3, 'language_code': 'en'}
         gae_search_services.add_documents_to_index([doc], 'index')
+        # Fields in the sort expression need to start with '+' or '-'
+        # to indicate sort direction. If no such indicator is there, it will
+        # raise ValueError.
         with self.assertRaises(ValueError):
             gae_search_services.search('k:abc', 'index', sort='k')
 
@@ -730,4 +734,4 @@ class ClearIndexTests(test_utils.GenericTestBase):
         self.assertEqual(result, [doc])
         gae_search_services.clear_index('index')
         result = gae_search_services.search('k:abc', index='index')[0]
-        self.assertNotEqual(result, [doc])
+        self.assertEqual(result, [])

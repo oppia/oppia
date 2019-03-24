@@ -679,18 +679,29 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
             self.assertEqual(len(response['topic_summary_dicts']), 0)
+            self.save_new_topic(
+                'topic_id', self.owner_id, 'Name', 'Description',
+                ['story_id_1', 'story_id_2'], ['story_id_3'],
+                ['skill_id_1', 'skill_id_2'], [], 1)
+            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+            self.assertEqual(len(response['topic_summary_dicts']), 1)
+            self.assertTrue(isinstance(response['topic_summary_dicts'], list))
         self.logout()
 
     def test_can_update_display_preference(self):
         self.login(self.OWNER_EMAIL)
         response_display_preference = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['display_preference']
+        self.assertEqual(response_display_preference, 'card')
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             feconf.CREATOR_DASHBOARD_DATA_URL,
-            {'display_preference': response_display_preference},
+            {'display_preference': 'list'},
             csrf_token=csrf_token)
+        response_display_preference = self.get_json(
+            feconf.CREATOR_DASHBOARD_DATA_URL)['display_preference']
+        self.assertEqual(response_display_preference, 'list')
         self.logout()
 
     def test_can_create_new_collection(self):
@@ -698,7 +709,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)
+        collection_id = self.post_json(
+            feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[creator_dashboard.COLLECTION_ID_KEY]
+        self.assertEqual(len(collection_id), 12)
         self.logout()
 
     def test_collections_list_gets_updated(self):
@@ -706,10 +719,12 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)
+        collection_id = self.post_json(
+            feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[creator_dashboard.COLLECTION_ID_KEY]
         response_collection_list = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['collections_list']
         self.assertNotEqual(response_collection_list, [])
+        self.assertEqual(response_collection_list[-1]['id'], collection_id)
         self.logout()
 
 

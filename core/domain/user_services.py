@@ -1565,9 +1565,9 @@ def get_last_week_dashboard_stats(user_id):
         user_id: str. The unique ID of the user.
 
     Returns:
-        dict: The dict denotes last week dashboard stats of the user, keyed by a
-        datetime string. If the user doesn't exist, then this function returns
-        None.
+        dict or None: The dict denotes last week dashboard stats of the user,
+        keyed by a datetime string. If the user doesn't exist, then this
+        function returns None.
     """
     weekly_dashboard_stats = get_weekly_dashboard_stats(user_id)
     if weekly_dashboard_stats:
