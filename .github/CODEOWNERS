@@ -65,7 +65,7 @@
 
 
 # Global components.
-/core/templates/dev/head/components/alerts/ @ankita240796
+/core/templates/dev/head/components/alert-message/ @ankita240796
 /core/templates/dev/head/components/attribution_guide/ @ankita240796
 /core/templates/dev/head/components/background/ @ankita240796
 /core/templates/dev/head/components/embed_modal/ @ankita240796
