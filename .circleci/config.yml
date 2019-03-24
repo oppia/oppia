@@ -120,7 +120,7 @@ workflows:
             - setup
       - install_chrome:
           requires:
-            -setup
+            - setup
 notify:
   webhooks:
     # A list of hook hashes, containing the url field
