@@ -330,13 +330,13 @@ def can_edit_suggestion(handler):
             UnauthorizedUserException: The user does not have
                 credentials to edit a suggestion.
         """
-
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        user_have_right = suggestion_services.check_can_edit_suggestion(
-            self.user, suggestion_id)
-        if user_have_right:
+        user_can_edit_suggestion = (
+            suggestion_services.check_can_edit_suggestion(
+                self.user, suggestion_id))
+        if user_can_edit_suggestion:
             return handler(self, suggestion_id)
 
         raise base.UserFacingExceptions.UnauthorizedUserException(

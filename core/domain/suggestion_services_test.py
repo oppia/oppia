@@ -443,13 +443,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description',
                     self.reviewer_id)
-        can_resubmit = (
-            suggestion_services.check_can_resubmit_suggestion(
-                self.suggestion_id, self.author_id))
+        can_resubmit = (suggestion_services.check_can_resubmit_suggestion(
+            self.suggestion_id, self.author_id))
         self.assertEqual(can_resubmit, True)
-        can_resubmit = (
-            suggestion_services.check_can_resubmit_suggestion(
-                self.suggestion_id, self.normal_user_id))
+        can_resubmit = (suggestion_services.check_can_resubmit_suggestion(
+            self.suggestion_id, self.normal_user_id))
         self.assertEqual(can_resubmit, False)
 
     def test_edit_suggestion(self):
@@ -476,17 +474,18 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'old_value': 'new suggestion content'
         }
 
-        suggestion = suggestion_services.get_suggestion_by_id(self.suggestion_id)
+        suggestion = (suggestion_services.get_suggestion_by_id(
+            self.suggestion_id))
         change_cls = type(suggestion.change)
         change_object = change_cls(new_change_dict)
         suggestion_services.edit_suggestion(suggestion, change_object)
 
-        suggestion = suggestion_services.get_suggestion_by_id(self.suggestion_id)
+        suggestion = (suggestion_services.get_suggestion_by_id(
+            self.suggestion_id))
         suggestion_change_dict = suggestion.change.to_dict()
         self.assertEqual(new_change_dict, suggestion_change_dict)
 
     def test_can_edit_suggestion(self):
-
         EXP_ID = 'exp1'
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)

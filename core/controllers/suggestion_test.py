@@ -195,13 +195,13 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id_2))['suggestions'][1]
 
-        # Create new content for exploration after edit.
+        # Create new suggestion content.
         new_content_after_edit = state_domain.SubtitledHtml(
             'content', 'new edit content html').to_dict()
 
         suggestion_id = suggestion['suggestion_id']
 
-        # Change that needs to be done in submitted suggestion.
+        # New change dict for the suggestion.
         change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,

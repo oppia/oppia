@@ -177,16 +177,17 @@ class SuggestionListHandler(base.BaseHandler):
 
 
 class EditSuggestionHandler(base.BaseHandler):
-    """Handler for editing the submitted suggestion by reviwer before
-    accepting.
+    """Handler for editing an existing suggestion.
+    This action can be performed by the reviewer, or by the author of the
+    suggestion.
     """
 
     @acl_decorators.can_edit_suggestion
     def put(self, suggestion_id):
-        """Edits the submitted suggestion by author or reviewer.
+        """Edits an existing suggestion.
 
         Args:
-            suggestion_id: str. Id of suggestion to be edit.
+            suggestion_id: str. ID of suggestion to be edited.
         """
         new_change_dict = self.payload.get('change')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
