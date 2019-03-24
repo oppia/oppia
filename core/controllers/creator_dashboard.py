@@ -287,12 +287,11 @@ class CreatorDashboardHandler(base.BaseHandler):
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user(self.user_id))
 
-        suggestions_created_by_user = [s.populate_old_value_of_change() for s
-                                       in suggestions_created_by_user]
+        for s in suggestions_created_by_user:
+            s.populate_old_value_of_change()
 
-        suggestions_which_can_be_reviewed = [s.populate_old_value_of_change()
-                                             for s in
-                                             suggestions_which_can_be_reviewed]
+        for s in suggestions_which_can_be_reviewed:
+            s.populate_old_value_of_change()
 
         suggestion_dicts_created_by_user = (
             [s.to_dict() for s in suggestions_created_by_user])
@@ -405,7 +404,7 @@ class UploadExplorationHandler(base.BaseHandler):
     @acl_decorators.can_upload_exploration
     def post(self):
         """Handles POST requests."""
-        yaml_content = self.payload.get('yaml_file')
+        yaml_content = self.request.get('yaml_file')
 
         new_exploration_id = exp_services.get_new_exploration_id()
         if constants.ALLOW_YAML_FILE_UPLOAD:

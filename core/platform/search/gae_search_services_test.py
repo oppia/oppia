@@ -467,6 +467,8 @@ class SearchQueryTests(test_utils.GenericTestBase):
         }, result)
 
     def test_search_when_query_string_is_invalid(self):
+        # The search result would be ([], None) if query strings contain "NOT"
+        # or a string with backslashes.
         doc = {'id': 'doc1', 'NOT': 'abc', 'rank': 3, 'language_code': 'en'}
         gae_search_services.add_documents_to_index([doc], 'index')
         result = gae_search_services.search('NOT:abc', 'my_index')
@@ -601,7 +603,8 @@ class SearchQueryTests(test_utils.GenericTestBase):
         # Fields in the sort expression need to start with '+' or '-'
         # to indicate sort direction. If no such indicator is there, it will
         # raise ValueError.
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(
+            ValueError, 'Fields in the sort expression'):
             gae_search_services.search('k:abc', 'index', sort='k')
 
     def test_search_using_multiple_sort_expressions(self):
