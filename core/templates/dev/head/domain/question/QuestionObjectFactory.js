@@ -99,7 +99,11 @@ oppia.factory('QuestionObjectFactory', [
         pendingMisconceptionNamesToTag.forEach(function(misconceptionName) {
           returnString = returnString + ' ' + misconceptionName + ',';
         });
-        return returnString.slice(0, -1);
+        returnString = returnString.slice(0, -1);
+        returnString = returnString + '. \nClick on (or create) an outcome ' +
+          'that is neither marked correct nor is the default outcome to tag ' +
+          'a misconception to that answer group';
+        return returnString;
       }
       return false;
     };
