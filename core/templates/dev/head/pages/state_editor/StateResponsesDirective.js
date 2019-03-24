@@ -289,18 +289,31 @@ oppia.directive('stateResponses', [
                 '$scope', '$uibModalInstance', 'ResponsesService',
                 'EditorFirstTimeEventsService', 'StateEditorService',
                 'RuleObjectFactory', 'OutcomeObjectFactory',
-                'COMPONENT_NAME_FEEDBACK', 'GenerateContentIdService',
+                'COMPONENT_NAME_FEEDBACK', 'INTERACTION_SPECS',
+                'GenerateContentIdService', 'StateInteractionIdService',
                 function(
                     $scope, $uibModalInstance, ResponsesService,
                     EditorFirstTimeEventsService, StateEditorService,
                     RuleObjectFactory, OutcomeObjectFactory,
-                    COMPONENT_NAME_FEEDBACK, GenerateContentIdService) {
+                    COMPONENT_NAME_FEEDBACK, INTERACTION_SPECS,
+                    GenerateContentIdService, StateInteractionIdService) {
                   $scope.feedbackEditorIsOpen = false;
                   $scope.addState = addState;
                   $scope.questionModeEnabled =
                     StateEditorService.isInQuestionMode();
                   $scope.openFeedbackEditor = function() {
                     $scope.feedbackEditorIsOpen = true;
+                  };
+                  $scope.isCorrectnessFeedbackEnabled = function() {
+                    return StateEditorService.getCorrectnessFeedbackEnabled();
+                  };
+                  $scope.getCurrentInteractionId = function() {
+                    return StateInteractionIdService.savedMemento;
+                  };
+                  // This returns false if the current interaction ID is null.
+                  $scope.isCurrentInteractionLinear = function() {
+                    var interactionId = $scope.getCurrentInteractionId();
+                    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
                   };
                   $scope.tmpRule = RuleObjectFactory.createNew(null, {});
                   var feedbackContentId = GenerateContentIdService.getNextId(

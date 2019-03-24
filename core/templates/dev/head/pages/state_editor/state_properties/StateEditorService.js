@@ -78,7 +78,7 @@ oppia.factory('StateEditorService', [
         interaction.setHints(hints);
       },
       getInteraction: function() {
-        return interaction;
+        return angular.copy(interaction);
       },
       getAnswerChoices: function(interactionId, customizationArgs) {
         if (!interactionId) {
