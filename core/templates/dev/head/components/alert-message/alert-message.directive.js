@@ -51,4 +51,3 @@ angular.module('alertMessageModule').directive('alertMessage', [function() {
     }
   };
 }]);
-    
