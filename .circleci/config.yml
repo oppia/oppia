@@ -11,6 +11,16 @@ anchor_for_installing_dependencies: &install_dependencies
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
 
+anchor_for_installing_chrome: &install_chrome
+  name: Install Chrome
+  commad: |
+    sudo apt-get update
+    sudo apt-get install lsb-release libappindicator3-1
+    curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_67.0.3396.99-1_amd64.deb
+    sudo dpkg -i google-chrome.deb
+    sudo sed -i 's|HERE/chrome"|HERE/chrome" --no-sandbox|g' /opt/google/chrome/google-chrome
+    rm google-chrome.deb
+
 anchor_for_restoring_cache: &restore_cache
   keys:
     - setup-files-cache-{{ checksum "date" }}
@@ -27,27 +37,12 @@ jobs:
           <<: *restore_cache
       - run:
           <<: *install_dependencies
+          <<: *install_chrome
       - save_cache:
           key: setup-files-cache-{{ checksum "date" }}
           paths:
             - ../node_modules/
             - ../oppia_tools/
-  install_chrome:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
-      - run:
-          name: Install Chromedriver latest version
-          command: |
-            sudo apt-get update
-            sudo apt-get install lsb-release libappindicator3-1
-            curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_67.0.3396.99-1_amd64.deb
-            sudo dpkg -i google-chrome.deb
-            sudo sed -i 's|HERE/chrome"|HERE/chrome" --no-sandbox|g' /opt/google/chrome/google-chrome
-            rm google-chrome.deb
 
   lint_tests:
     <<: *job_defaults
@@ -120,7 +115,6 @@ workflows:
   circleci_tests:
     jobs:
       - setup
-      - install_chrome
       - lint_tests:
           requires:
             - setup
@@ -133,7 +127,6 @@ workflows:
       - e2e_test_accessibility:
           requires:
             - setup
-            - install_chrome
 notify:
   webhooks:
     # A list of hook hashes, containing the url field
