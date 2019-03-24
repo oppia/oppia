@@ -57,6 +57,16 @@ oppia.directive('stateSolutionEditor', [
           $scope.StateInteractionIdService = StateInteractionIdService;
           $scope.StateSolutionService = StateSolutionService;
 
+          $scope.getTooltip = function() {
+            if (StateEditorService.isInQuestionMode()) {
+              return 'There is no correct response that corresponds to ' +
+                'this solution. Check that there\'s a response with this ' +
+                'solution answer, and that response is marked as correct';
+            }
+            return 'This solution does not lead to another card. Verify the ' +
+              'responses specified or change the solution.';
+          };
+
 
           $scope.refreshWarnings()();
 
