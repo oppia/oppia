@@ -524,16 +524,16 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler),
     get_redirect_route(
+        r'%s/edit/<suggestion_id>' %
+        feconf.SUGGESTION_ACTION_URL_PREFIX,
+        suggestion.EditSuggestionHandler),
+    get_redirect_route(
         r'%s/exploration/<target_id>/<suggestion_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToExplorationActionHandler),
     get_redirect_route(
         r'%s/resubmit/<suggestion_id>' % feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.ResubmitSuggestionHandler),
-    get_redirect_route(
-        r'%s/edit/<suggestion_id>' %
-        feconf.SUGGESTION_ACTION_URL_PREFIX,
-        suggestion.EditSuggestionHandler),
     get_redirect_route(
         r'%s/topic/<target_id>/<suggestion_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,

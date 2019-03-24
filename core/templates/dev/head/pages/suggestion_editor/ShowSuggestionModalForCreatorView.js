@@ -54,9 +54,9 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     // the scope (the property cannot sit directly on the scope)
     // Reference https://stackoverflow.com/q/12618342
     $scope.suggestionData = {newSuggestionHtml: newContent.html};
-    $scope.beforeEditSuggestionContent = $scope.suggestionData;
+    $scope.suggestionDataBeforeEdit = $scope.suggestionData;
     $scope.suggestionEditorIsShown = false;
-    $scope.editButtonShown = true;
+    $scope.editButtonIsShown = true;
     $scope.acceptSuggestion = function() {
       SuggestionModalService.acceptSuggestion(
         $uibModalInstance,
@@ -78,24 +78,20 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     };
     $scope.editSuggestion = function() {
       $scope.suggestionEditorIsShown = true;
-      $scope.editButtonShown = false;
+      $scope.editButtonIsShown = false;
     };
     $scope.cancel = function() {
       SuggestionModalService.cancelSuggestion($uibModalInstance);
     };
     $scope.isEditButtonShown = function() {
-      return (
-        $scope.isNotHandled &&
-        $scope.editButtonShown);
+      return ($scope.isNotHandled && $scope.editButtonIsShown);
     };
     $scope.isSaveButtonShown = function() {
-      return (
-        $scope.isNotHandled &&
-        !$scope.editButtonShown);
+      return ($scope.isNotHandled && !$scope.editButtonIsShown);
     };
     $scope.isSaveButtonDisabled = function() {
       return (
-        $scope.beforeEditSuggestionContent.newSuggestionHtml ===
+        $scope.suggestionDataBeforeEdit.newSuggestionHtml ===
         $scope.newContent.html || $scope.summaryMessage === '');
     };
     $scope.isResubmitButtonShown = function() {

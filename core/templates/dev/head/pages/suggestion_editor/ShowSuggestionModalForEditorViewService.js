@@ -90,7 +90,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
               }
             }
           };
-          // Amkaing ajax request for update suggestion
+          // Ajax request for update suggestion
           $http.put(url, data);
 
           if (response) {
