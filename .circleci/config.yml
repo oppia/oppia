@@ -104,6 +104,18 @@ jobs:
             sudo sed -i 's|HERE/chrome"|HERE/chrome" --no-sandbox|g' /opt/google/chrome/google-chrome
             rm google-chrome.deb
 
+  e2e_test_accessibility:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run:
+        name: E2E Test Accessibilty
+        command: |
+          bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env
+
 workflows:
   version: 2
   circleci_tests:
