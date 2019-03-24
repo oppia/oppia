@@ -23,23 +23,23 @@
     </div>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-accessibility-test-translation-start-record"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-accessibility-translation-start-record"
             uib-tooltip="Record"
             tooltip-placement="above"
             ng-click="checkAndStartRecording()"
             ng-disabled="!canTranslate || cannotRecord"
-            aria-label="Start Recording"
+            aria-label="Start recording"
             for="Recording">
       <i class="material-icons">&#xE029;</i>
     </button>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-accessibility-test-translation-upload-audio"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-accessibility-translation-upload-audio"
             uib-tooltip="Upload"
             tooltip-placement="above"
             ng-click="openAddAudioTranslationModal()"
             ng-disabled="!canTranslate"
-            aria-label="Upload Translated file">
+            aria-label="Upload translated file">
       <i class="material-icons">&#xE2C6;</i>
     </button>
   </div>
@@ -51,7 +51,7 @@
                      audio-model="audioBlob"
                      time-limit="recordingTimeLimit">
     <div class="oppia-content-wrapper">
-      <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-accessibility-test-translation-play-recorded-audio"
+      <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-accessibility-translation-play-recorded-audio"
               ng-click="recorder.status.isPlaying ? recorder.playbackPause() : recorder.playbackResume()"
               ng-disabled="recorder.status.isRecording || !recorder.audioModel"
               aria-label="Play recorded audio">

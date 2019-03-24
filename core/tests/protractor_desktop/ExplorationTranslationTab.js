@@ -170,19 +170,19 @@ describe('Exploration translation', function() {
 
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
-      '0 items translated out of 8 items');
+      '0 item translated out of 8 items');
     explorationEditorTranslationTab.expectContentAccessibilityToMatch(
       'Content of the card');
     explorationEditorTranslationTab.expectFeedbackAccessibilityToMatch(
-      'Feedbacks');
+      'Feedback responses for answer groups');
     explorationEditorTranslationTab.expectHintAccessibilityToMatch(
-      'Hints for the lesson');
+      'Hints for the state');
     explorationEditorTranslationTab.expectSolutionAccessibilityToMatch(
-      'Solutions of the lesson');
+      'Solutions for the state');
     explorationEditorTranslationTab.expectStartRecordingAccessibilityToMatch(
-      'Start Recording');
+      'Start recording');
     explorationEditorTranslationTab.expectUploadRecordingAccessibilityToMatch(
-      'Upload Translated file');
+      'Upload translated file');
     explorationEditorTranslationTab.expectPlayRecordingAccessibilityToMatch(
       'Play recorded audio');
     users.logout();

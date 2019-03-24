@@ -143,22 +143,22 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-accessibility-test-translation-content'));
 
   var translationTabFeedbackAccessibility = element(
-    by.css('.protractor-accessibility-test-translation-feedback'));
+    by.css('.protractor-test-accessibility-translation-feedback'));
 
   var translationTabHintAccessibility = element(
-    by.css('.protractor-accessibility-test-translation-hint'));
+    by.css('.protractor-test-accessibility-translation-hint'));
 
   var translationTabSolutionAccessibility = element(
-    by.css('.protractor-accessibility-test-translation-solution'));
+    by.css('.protractor-test-accessibility-translation-solution'));
 
   var translationTabStartRecordingAccessibility = element(
-    by.css('.protractor-accessibility-test-translation-start-record'));
+    by.css('.protractor-test-accessibility-translation-start-record'));
 
   var translationTabUploadRecordingAccessibility = element(
-    by.css('.protractor-accessibility-test-translation-upload-audio'));
+    by.css('.protractor-test-accessibility-translation-upload-audio'));
 
   var translationTabPlayRecordingAccessibility = element(
-    by.css('.protractor-accessibility-test-translation-play-recorded-audio'));
+    by.css('.protractor-test-accessibility-translation-play-recorded-audio'));
 
   var _selectLanguage = function(language) {
     element(by.css('.protractor-test-translation-language-selector')).
