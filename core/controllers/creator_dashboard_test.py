@@ -710,7 +710,8 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         collection_id = self.post_json(
-            feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[creator_dashboard.COLLECTION_ID_KEY]
+            feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[
+                creator_dashboard.COLLECTION_ID_KEY]
         self.assertEqual(len(collection_id), 12)
         self.logout()
 
@@ -720,7 +721,8 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         collection_id = self.post_json(
-            feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[creator_dashboard.COLLECTION_ID_KEY]
+            feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[
+                creator_dashboard.COLLECTION_ID_KEY]
         response_collection_list = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['collections_list']
         self.assertNotEqual(response_collection_list, [])
