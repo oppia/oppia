@@ -25,6 +25,7 @@ class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
     RECIPIENT_EMAIL = 'user@example.com'
     RECIPIENT_USERNAME = 'user'
+    SENDER_EMAIL = 'Sender <sender@example.com>'
 
     def test_sending_email(self):
         # Emails are not sent if the CAN_SEND_EMAILS setting is not turned on.
@@ -35,7 +36,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(0, len(messages))
         with self.swap(feconf, 'CAN_SEND_EMAILS', False), email_exception:
             gae_email_services.send_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                self.SENDER_EMAIL, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
         messages = self.mail_stub.get_sent_messages(
             to=feconf.ADMIN_EMAIL_ADDRESS)
@@ -46,7 +47,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(0, len(messages))
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             gae_email_services.send_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                self.SENDER_EMAIL, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
         messages = self.mail_stub.get_sent_messages(
             to=feconf.ADMIN_EMAIL_ADDRESS)
@@ -58,7 +59,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(0, len(messages))
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             gae_email_services.send_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, self.RECIPIENT_EMAIL,
+                self.SENDER_EMAIL, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html', bcc_admin=True)
         messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(1, len(messages))
@@ -70,7 +71,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(0, len(messages))
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             gae_email_services.send_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, self.RECIPIENT_EMAIL,
+                self.SENDER_EMAIL, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html', bcc_admin=False)
         messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(1, len(messages))
@@ -84,7 +85,7 @@ class EmailTests(test_utils.GenericTestBase):
         reply_to_id = 'reply_to_id'
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             gae_email_services.send_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, self.RECIPIENT_EMAIL,
+                self.SENDER_EMAIL, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html', reply_to_id=reply_to_id)
         messages = self.mail_stub.get_sent_messages(
             to=self.RECIPIENT_EMAIL)
@@ -99,7 +100,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(0, len(messages))
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             gae_email_services.send_mail(
-                feconf.SYSTEM_EMAIL_ADDRESS, self.RECIPIENT_EMAIL,
+                self.SENDER_EMAIL, self.RECIPIENT_EMAIL,
                 'subject', 'body', 'html')
         messages = self.mail_stub.get_sent_messages(
             to=self.RECIPIENT_EMAIL)
@@ -119,6 +120,32 @@ class EmailTests(test_utils.GenericTestBase):
         messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(0, len(messages))
 
+        messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
+        self.assertEqual(0, len(messages))
+        malformed_sender_email = 'malformed_sender_email@example.com'
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed sender email address: %s'
+            % malformed_sender_email)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            gae_email_services.send_mail(
+                malformed_sender_email, self.RECIPIENT_EMAIL,
+                'subject', 'body', 'html')
+        messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
+        self.assertEqual(0, len(messages))
+
+        messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
+        self.assertEqual(0, len(messages))
+        malformed_sender_email = 'MalfomedSender'
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed sender email address: %s'
+            % malformed_sender_email)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            gae_email_services.send_mail(
+                malformed_sender_email, self.RECIPIENT_EMAIL,
+                'subject', 'body', 'html')
+        messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
+        self.assertEqual(0, len(messages))
+
     def test_email_not_sent_if_recipient_address_is_malformed(self):
         malformed_recipient_email = ''
         email_exception = self.assertRaisesRegexp(
@@ -126,22 +153,18 @@ class EmailTests(test_utils.GenericTestBase):
             % malformed_recipient_email)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
             gae_email_services.send_mail(
-                feconf.ADMIN_EMAIL_ADDRESS, malformed_recipient_email,
+                self.SENDER_EMAIL, malformed_recipient_email,
                 'subject', 'body', 'html')
 
 
 class BulkEmailsTests(test_utils.GenericTestBase):
-    SENDER_EMAIL = 'sender@example.com'
+    SENDER_EMAIL = 'Sender <sender@example.com>'
     SENDER_USERNAME = 'sender'
     RECIPIENT_A_EMAIL = 'a@example.com'
     RECIPIENT_A_USERNAME = 'usera'
     RECIPIENT_B_EMAIL = 'b@example.com'
     RECIPIENT_B_USERNAME = 'userb'
     RECIPIENT_EMAILS = [RECIPIENT_A_EMAIL, RECIPIENT_B_EMAIL]
-
-    def setUp(self):
-        super(BulkEmailsTests, self).setUp()
-        self.recipient_emails = [self.RECIPIENT_A_EMAIL, self.RECIPIENT_B_EMAIL]
 
     def test_correct_bulk_emails_sent(self):
         message_a = self.mail_stub.get_sent_messages(
@@ -173,7 +196,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
             Exception, 'This app cannot send emails.')
         with email_exception:
             gae_email_services.send_bulk_mail(
-                self.SENDER_EMAIL, self.recipient_emails,
+                self.SENDER_EMAIL, self.RECIPIENT_EMAILS,
                 'subject', 'body', 'html')
         message_a = self.mail_stub.get_sent_messages(
             to=self.RECIPIENT_EMAILS[0])
@@ -195,7 +218,49 @@ class BulkEmailsTests(test_utils.GenericTestBase):
             % malformed_sender_email)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
             gae_email_services.send_bulk_mail(
-                malformed_sender_email, self.recipient_emails,
+                malformed_sender_email, self.RECIPIENT_EMAILS,
+                'subject', 'body', 'html')
+        message_a = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[0])
+        self.assertEqual(0, len(message_a))
+        message_b = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[1])
+        self.assertEqual(0, len(message_b))
+
+        message_a = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[0])
+        self.assertEqual(0, len(message_a))
+        message_b = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[1])
+        self.assertEqual(0, len(message_b))
+        malformed_sender_email = 'malformed_sender_email@example.com'
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed sender email address: %s'
+            % malformed_sender_email)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            gae_email_services.send_bulk_mail(
+                malformed_sender_email, self.RECIPIENT_EMAILS,
+                'subject', 'body', 'html')
+        message_a = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[0])
+        self.assertEqual(0, len(message_a))
+        message_b = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[1])
+        self.assertEqual(0, len(message_b))
+
+        message_a = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[0])
+        self.assertEqual(0, len(message_a))
+        message_b = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[1])
+        self.assertEqual(0, len(message_b))
+        malformed_sender_email = 'MalformedSender'
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed sender email address: %s'
+            % malformed_sender_email)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            gae_email_services.send_bulk_mail(
+                malformed_sender_email, self.RECIPIENT_EMAILS,
                 'subject', 'body', 'html')
         message_a = self.mail_stub.get_sent_messages(
             to=self.RECIPIENT_EMAILS[0])

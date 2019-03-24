@@ -34,6 +34,27 @@ def get_incoming_email_address(reply_to_id):
     return 'reply+%s@%s' % (reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
 
 
+def is_sender_email_valid(sender_email):
+    """Gets the sender_email address and validates it is of the form
+    'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
+
+    Args:
+        sender_email: str. The email address of the sender.
+
+    Returns:
+        False if sender_email is not valid.
+        True if sender_email is valid.
+    """
+    splitted_sender_email = sender_email.split(' ')
+    if len(splitted_sender_email) < 2:
+        return False
+
+    if not mail.is_email_valid(sender_email):
+        return False
+
+    return True
+
+
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body, html_body,
         bcc_admin=False, reply_to_id=None):
@@ -63,7 +84,7 @@ def send_mail(
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails.')
 
-    if not mail.is_email_valid(sender_email):
+    if not is_sender_email_valid(sender_email):
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
     if not mail.is_email_valid(recipient_email):
@@ -107,7 +128,7 @@ def send_bulk_mail(
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails.')
 
-    if not mail.is_email_valid(sender_email):
+    if not is_sender_email_valid(sender_email):
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
 
