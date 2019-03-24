@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('logicProofRulesService', [function() {
+oppia.factory('LogicProofRulesService', [function() {
   return {
     Correct: function(answer) {
       return answer.correct;

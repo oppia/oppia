@@ -218,8 +218,8 @@ class BuildTests(test_utils.GenericTestBase):
         minified_html_file_stream = StringIO.StringIO()
         # Obtain actual file hashes of /templates to add hash to all filepaths
         # within the HTML file. The end result will look like:
-        # E.g <script ... app.js></script>
-        # --> <script ... app.[hash].js></script>.
+        # E.g <script ... App.js></script>
+        # --> <script ... App.[hash].js></script>.
         # Only need to hash Base.js.
         with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
             file_hashes = build.get_file_hashes(MOCK_TEMPLATES_DEV_DIR)
