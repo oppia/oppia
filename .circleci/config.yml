@@ -13,7 +13,7 @@ anchor_for_installing_dependencies: &install_dependencies
 
 anchor_for_installing_chrome: &install_chrome
   name: Install Chrome
-  commad: |
+  command: |
     sudo apt-get update
     sudo apt-get install lsb-release libappindicator3-1
     curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_67.0.3396.99-1_amd64.deb
