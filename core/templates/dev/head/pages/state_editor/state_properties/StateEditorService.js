@@ -54,7 +54,7 @@ oppia.factory('StateEditorService', [
         misconceptions = newMisconceptions;
       },
       getMisconceptions: function() {
-        return misconceptions;
+        return angular.copy(misconceptions);
       },
       setInteraction: function(newInteraction) {
         interaction = newInteraction;
