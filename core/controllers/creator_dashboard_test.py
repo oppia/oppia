@@ -15,7 +15,6 @@
 """Tests for the creator dashboard and the notifications dashboard."""
 
 import datetime
-import os
 
 from constants import constants
 from core.controllers import creator_dashboard
@@ -856,22 +855,25 @@ class CreationButtonsTests(test_utils.GenericTestBase):
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
             self.assertEqual(explorations_list, [])
             exp_a_id = self.post_json(
-                '%s?yaml_file=%s' % (feconf.UPLOAD_EXPLORATION_URL,
+                '%s?yaml_file=%s' % (
+                    feconf.UPLOAD_EXPLORATION_URL,
                     self.SAMPLE_YAML_CONTENT), {},
-                    csrf_token=csrf_token)[creator_dashboard.EXPLORATION_ID_KEY]
+                csrf_token=csrf_token)[creator_dashboard.EXPLORATION_ID_KEY]
             explorations_list = self.get_json(
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
             self.assertEqual(explorations_list[0]['id'], exp_a_id)
             self.logout()
 
-    def test_can_not_upload_exploration_when_server_does_not_allow_file_upload(self):
+    def test_can_not_upload_exploration_when_server_does_not_allow_file_upload(
+            self):
         self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
-            '%s?yaml_file=%s' % (feconf.UPLOAD_EXPLORATION_URL,
-                self.SAMPLE_YAML_CONTENT), {},csrf_token=csrf_token,
+            '%s?yaml_file=%s' % (
+                feconf.UPLOAD_EXPLORATION_URL,
+                self.SAMPLE_YAML_CONTENT), {}, csrf_token=csrf_token,
             expected_status_int=400)
 
         self.logout()
