@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Undo Redo Service.
+ */
+
 oppia.factory('UndoRedoService', [
   'BaseUndoRedoService', function(BaseUndoRedoService) {
     var child = Object.create(BaseUndoRedoService);
