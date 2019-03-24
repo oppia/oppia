@@ -29,11 +29,11 @@ oppia.directive('oppiaInteractiveLogicProof', [
         '/interactions/LogicProof/directives/' +
         'logic_proof_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', '$uibModal', 'logicProofRulesService',
+        '$scope', '$attrs', '$uibModal', 'LogicProofRulesService',
         'WindowDimensionsService', 'UrlService',
         'CurrentInteractionService',
         function(
-            $scope, $attrs, $uibModal, logicProofRulesService,
+            $scope, $attrs, $uibModal, LogicProofRulesService,
             WindowDimensionsService, UrlService,
             CurrentInteractionService) {
           $scope.localQuestionData = HtmlEscaperService.escapedJsonToObj(
@@ -256,7 +256,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
                 $scope.proofString);
             }
             CurrentInteractionService.onSubmit(
-              submission, logicProofRulesService);
+              submission, LogicProofRulesService);
           };
 
           CurrentInteractionService.registerCurrentInteraction(

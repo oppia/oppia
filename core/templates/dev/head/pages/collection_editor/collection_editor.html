@@ -29,7 +29,7 @@
 {% block content %}
   <div ng-controller="CollectionEditor">
     <div ng-if="getActiveTabName() === 'main'">
-      <collection-main-tab></collection-main-tab>
+      <collection-editor-tab></collection-editor-tab>
     </div>
 
     <div ng-show="getActiveTabName() === 'settings'">
@@ -86,11 +86,14 @@
   <script src="/templates/dev/head/domain/collection/SearchExplorationsBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/QuestionUndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/BaseUndoRedoService.js"></script>
   <script src="/templates/dev/head/domain/exploration/AudioTranslationObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/state/StateObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/NumberWithUnitsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/objects/UnitsObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/AnswerGroupObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/ContentIdsToAudioTranslationsObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/exploration/WrittenTranslationObjectFactory.js"></script>
@@ -121,7 +124,16 @@
 
   <script src="/templates/dev/head/components/loading/LoadingDotsDirective.js"></script>
 
-  <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertUnicodeWithParamsToHtmlFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertHtmlToUnicodeFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertUnicodeToHtmlFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsAtLeastFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsAtMostFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsFloatFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsIntegerFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsNonemptyFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
   <script src="/templates/dev/head/components/forms/Select2DropdownDirective.js"></script>
 
   {# TODO(bhenning): Remove these once RouterServices is decoupled from the exploration editor #}
@@ -149,11 +161,13 @@
   <script src="/templates/dev/head/services/ExplorationHtmlFormatterService.js"></script>
   <script src="/templates/dev/head/services/ExtensionTagAssemblerService.js"></script>
   <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>
+  <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
+  <script src="/templates/dev/head/services/IdGenerationService.js"></script>
   <script src="/templates/dev/head/services/LocalStorageService.js"></script>
   <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
   <script src="/templates/dev/head/services/ValidatorsService.js"></script>
 
-  <script src="/templates/dev/head/pages/state_editor/StateEditorService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateEditorService.js"></script>
 
   <script src="/templates/dev/head/pages/exploration_editor/editor_tab/SolutionVerificationService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/editor_tab/SolutionValidityService.js"></script>
