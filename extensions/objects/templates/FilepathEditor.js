@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for filepath editor.
+ */
+
 // This directive can only be used in the context of an exploration.
 
 oppia.directive('filepathEditor', [

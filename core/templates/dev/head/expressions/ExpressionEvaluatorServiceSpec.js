@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for Expression Evaluator Service.
+ */
+
 describe('Expression evaluator service', function() {
   beforeEach(module('oppia'));
 

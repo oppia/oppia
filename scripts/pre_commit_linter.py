@@ -1212,7 +1212,9 @@ class LintChecksManager(object):
             filepath for filepath in self.all_filepaths if (
                 filepath.endswith('.js'))
             and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                        EXCLUDED_PATHS)]
+                        EXCLUDED_PATHS)
+            and not filepath.split('/')[-1].startswith('generated')
+            and not filepath.split('/')[-1] == 'ExpressionParserService.js']
 
         with _redirect_stdout(_TARGET_STDOUT):
             for filepath in files_to_check:

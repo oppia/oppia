@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the PencilCodeEditor response.
+ * @fileoverview Directive for the PencilCodeEditor response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',

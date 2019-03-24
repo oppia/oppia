@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for list of sets of html strings editor.
+ */
 
 oppia.directive('listOfSetsOfHtmlStringsEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',

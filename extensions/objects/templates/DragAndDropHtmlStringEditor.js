@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for drag and drop HTML string editor.
+ */
 
 oppia.directive('dragAndDropHtmlStringEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
