@@ -120,6 +120,7 @@ workflows:
   circleci_tests:
     jobs:
       - setup
+      - install_chrome
       - lint_tests:
           requires:
             - setup
