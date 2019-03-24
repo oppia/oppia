@@ -87,6 +87,23 @@ jobs:
             codecov
           when: on_success
 
+  install_chrome:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      -run:
+        name: Install Chromedriver latest version
+        command: |
+          sudo apt-get update
+          sudo apt-get install lsb-release libappindicator3-1
+          curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome.deb
+          sudo sed -i 's|HERE/chrome"|HERE/chrome" --no-sandbox|g' /opt/google/chrome/google-chrome
+          rm google-chrome.deb
+
 workflows:
   version: 2
   circleci_tests:
@@ -101,6 +118,9 @@ workflows:
       - backend_tests:
           requires:
             - setup
+      - install_chrome:
+          requires:
+            -setup
 notify:
   webhooks:
     # A list of hook hashes, containing the url field
