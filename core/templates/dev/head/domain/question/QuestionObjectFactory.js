@@ -100,9 +100,10 @@ oppia.factory('QuestionObjectFactory', [
           returnString = returnString + ' ' + misconceptionName + ',';
         });
         returnString = returnString.slice(0, -1);
-        returnString = returnString + '. \nClick on (or create) an outcome ' +
-          'that is neither marked correct nor is the default outcome to tag ' +
-          'a misconception to that answer group';
+        returnString = returnString + '. \nClick on (or create) an answer ' +
+          'that is neither marked correct nor is a default answer (marked ' +
+          'above as [All other answers]) to tag a misconception to that ' +
+          'answer group.';
         return returnString;
       }
       return false;

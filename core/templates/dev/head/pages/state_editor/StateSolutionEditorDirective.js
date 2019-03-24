@@ -57,11 +57,11 @@ oppia.directive('stateSolutionEditor', [
           $scope.StateInteractionIdService = StateInteractionIdService;
           $scope.StateSolutionService = StateSolutionService;
 
-          $scope.getTooltip = function() {
+          $scope.getInvalidSolutionTooltip = function() {
             if (StateEditorService.isInQuestionMode()) {
-              return 'There is no correct response that corresponds to ' +
-                'this solution. Check that there\'s a response with this ' +
-                'solution answer, and that response is marked as correct';
+              return 'This solution doesn\'t correspond to an answer ' +
+                'marked as correct. Verify the rules specified for the ' +
+                'answers or change the solution.';
             }
             return 'This solution does not lead to another card. Verify the ' +
               'responses specified or change the solution.';

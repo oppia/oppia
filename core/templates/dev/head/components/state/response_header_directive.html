@@ -80,10 +80,10 @@
     <em ng-if="getOutcome().newStateName">(<[getOutcome().newStateName]>)</em>
     <em ng-if="!getOutcome().newStateName">Nowhere yet...</em>
   </span>
-  <span ng-if="getOutcome() && isOutcomeLooping() && !isInQuestionMode()">
+  <span ng-if="getOutcome() && !isInQuestionMode() && isOutcomeLooping()">
     <em>(try again)</em>
   </span>
-  <span ng-if="isInQuestionMode() && getOutcome() && !isCorrect() && !getOutcome().dest">
+  <span ng-if="getOutcome() && isInQuestionMode() && !isCorrect()">
     <em>Wrong<br> (try again)</em>
   </span>
 </div>

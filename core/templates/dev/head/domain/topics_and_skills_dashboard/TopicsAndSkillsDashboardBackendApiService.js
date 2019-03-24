@@ -25,10 +25,10 @@ oppia.factory('TopicsAndSkillsDashboardBackendApiService', [
       return $http.get('/topics_and_skills_dashboard/data');
     };
 
-    var _mergeSkills = function(old_skill_id, new_skill_id) {
+    var _mergeSkills = function(oldSkillId, newSkillId) {
       var mergeSkillData = {
-        old_skill_id: old_skill_id,
-        new_skill_id: new_skill_id
+        old_skill_id: oldSkillId,
+        new_skill_id: newSkillId
       };
       return $http.post(MERGE_SKILL_URL, mergeSkillData);
     };
