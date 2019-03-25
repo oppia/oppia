@@ -287,11 +287,13 @@ describe('Interaction object factory', function() {
     var otherInteraction = iof.createFromBackendDict(otherInteractionDict);
     testInteraction.copy(otherInteraction);
     expect(testInteraction).toEqual(otherInteraction);
-    otherInteraction.setCustomizationArgs({
+    otherInteractionDict = otherInteraction.toBackendDict();
+    var customizationArgsNewDict = otherInteractionDict.customization_args;
+    customizationArgsNewDict = {
       customArgNew: {
         value: 'custom_value_new'
       }
-    });
+    };
     expect(testInteraction).toEqual(iof.createFromBackendDict({
       answer_groups: newAnswerGroups,
       confirmed_unclassified_answers: [],
