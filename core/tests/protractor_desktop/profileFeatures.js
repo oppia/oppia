@@ -79,16 +79,20 @@ describe('Creator dashboard functionality', function() {
 
   it('subscribe to another user', function() {
     users.login('learner1@learnerDashboard.com');
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id + '@creatorDashboard.com');
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id
+      + '@creatorDashboard.com');
     subscriptionDashboardPage.navigateToSubscriptionButton();
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id + '@creatorDashboard.com');
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id
+      + '@creatorDashboard.com');
     subscriptionDashboardPage.navigateToSubscriptionButton();
     users.logout();
 
     users.login('learner2@learnerDashboard.com');
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id + '@creatorDashboard.com');
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id 
+      + '@creatorDashboard.com');
     subscriptionDashboardPage.navigateToSubscriptionButton();
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id + '@creatorDashboard.com');
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id 
+      + '@creatorDashboard.com');
     subscriptionDashboardPage.navigateToSubscriptionButton();
     users.logout();
   });
@@ -101,6 +105,7 @@ describe('Creator dashboard functionality', function() {
       'Learn about different types of chemistry activations.',
       'English'
     );
+    
     creatorDashboardPage.getNumberofExplorations();
     users.logout();
   });
