@@ -85,15 +85,14 @@ oppia.directive('translatorOverview', [
               $scope.numberOfAudioNotAvailable < 1) {
               return (
                 $scope.numberOfRequiredAudio -
-                  $scope.numberOfAudioNotAvailable +
-                  ' item translated out of ' +
+                $scope.numberOfAudioNotAvailable + ' item translated out of ' +
                 $scope.numberOfRequiredAudio + ' items');
             } else {
               return (
                 $scope.numberOfRequiredAudio -
-                  $scope.numberOfAudioNotAvailable +
-                    ' items translated out of ' +
-                    $scope.numberOfRequiredAudio + ' items');
+                $scope.numberOfAudioNotAvailable +
+                ' items translated out of ' +
+                $scope.numberOfRequiredAudio + ' items');
             }
           };
         }
