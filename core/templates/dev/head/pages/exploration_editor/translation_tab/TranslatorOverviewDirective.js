@@ -80,16 +80,20 @@ oppia.directive('translatorOverview', [
               LAST_SELECTED_TRANSLATION_LANGUAGE, $scope.languageCode);
           };
 
-          $scope.label = function() {
+          $scope.getTranslationProgressAriaLabel = function() {
             if ($scope.numberOfRequiredAudio -
               $scope.numberOfAudioNotAvailable < 1) {
-              return $scope.numberOfRequiredAudio -
-                $scope.numberOfAudioNotAvailable + ' item translated out of ' +
-                $scope.numberOfRequiredAudio + ' items';
+              return (
+                $scope.numberOfRequiredAudio -
+                  $scope.numberOfAudioNotAvailable +
+                  ' item translated out of ' +
+                $scope.numberOfRequiredAudio + ' items');
             } else {
-              return $scope.numberOfRequiredAudio -
-                $scope.numberOfAudioNotAvailable + ' items translated out of' +
-                ' ' + $scope.numberOfRequiredAudio + ' items';
+              return (
+                $scope.numberOfRequiredAudio -
+                  $scope.numberOfAudioNotAvailable +
+                    ' items translated out of ' +
+                    $scope.numberOfRequiredAudio + ' items');
             }
           };
         }

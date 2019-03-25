@@ -188,7 +188,7 @@
     <strong>Warning: </strong>Don't navigate to other tabs of this page before saving recorded audio, otherwise the recorded audio will be lost.
   </span>
 </div>
-<div class="oppia-translation-bottom-right-container" ng-if="!showRecorderWarning && !audioBlob ">
+<div class="oppia-translation-bottom-proTip" ng-if="!showRecorderWarning && !audioBlob ">
   <span>
     <strong>ProTip: </strong>Use key "R" to start/stop recording
   </span>
@@ -319,6 +319,14 @@
   }
   .oppia-translation-bottom-right-container {
     color: #ce133b;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    position: relative;
+    text-align: center;
+    top: 10px;
+  }
+  .oppia-translation-bottom-proTip  {
+    color: #000000;
     font-size: 12px;
     letter-spacing: 0.5px;
     position: relative;
