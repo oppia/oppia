@@ -43,8 +43,8 @@ describe('Creator dashboard functionality', function() {
   var libraryPage = null;
   var learnerDashboardPage = null;
 
-  const creator1Id = 'creatorName';
-  const creator2Id = 'creatorName2';
+  var creator1Id = 'creatorName';
+  var creator2Id = 'creatorName2';
   users.createUser('learner1@learnerDashboard.com',
     'learner1learnerDashboard');
   users.createUser('learner2@learnerDashboard.com',
