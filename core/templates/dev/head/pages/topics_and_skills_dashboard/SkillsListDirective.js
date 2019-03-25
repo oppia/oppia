@@ -16,11 +16,9 @@
  * @fileoverview Controller for the skills list viewer.
  */
 oppia.directive('skillsList', [
-  '$http', 'AlertsService', 'TopicsAndSkillsDashboardBackendApiService',
-  'UrlInterpolationService',
+  '$http', 'AlertsService', 'UrlInterpolationService',
   function(
-      $http, AlertsService, TopicsAndSkillsDashboardBackendApiService,
-      UrlInterpolationService) {
+      $http, AlertsService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -38,10 +36,12 @@ oppia.directive('skillsList', [
       controller: [
         '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
         'EditableSkillBackendApiService',
+        'TopicsAndSkillsDashboardBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
             EditableSkillBackendApiService,
+            TopicsAndSkillsDashboardBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           $scope.SKILL_HEADINGS = [
             'description', 'worked_examples_count', 'misconception_count'
@@ -175,8 +175,11 @@ oppia.directive('skillsList', [
             modalInstance.result.then(function(result) {
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;
+              // Transfer questions from the old skill to the new skill.
               TopicsAndSkillsDashboardBackendApiService.mergeSkills(
-                  skill.id, supersedingSkillId).then(function(data) {
+                  skill.id, supersedingSkillId).then(function() {
+                // Broadcast will update the skills list in the dashboard so
+                // that the merged skills are not shown anymore.
                 $rootScope.$broadcast(
                   EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
               });

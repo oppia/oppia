@@ -279,6 +279,7 @@ oppia.directive('stateResponses', [
             var stateName = StateEditorService.getActiveStateName();
             var addState = $scope.addState;
             var existingContentIds = _getExistingFeedbackContentIds();
+            var currentInteractionId = $scope.getCurrentInteractionId();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
@@ -286,17 +287,15 @@ oppia.directive('stateResponses', [
               // Clicking outside this modal should not dismiss it.
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance', 'ResponsesService',
-                'EditorFirstTimeEventsService', 'StateEditorService',
-                'RuleObjectFactory', 'OutcomeObjectFactory',
+                '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
+                'GenerateContentIdService', 'OutcomeObjectFactory',
+                'ResponsesService', 'RuleObjectFactory', 'StateEditorService',
                 'COMPONENT_NAME_FEEDBACK', 'INTERACTION_SPECS',
-                'GenerateContentIdService', 'StateInteractionIdService',
                 function(
-                    $scope, $uibModalInstance, ResponsesService,
-                    EditorFirstTimeEventsService, StateEditorService,
-                    RuleObjectFactory, OutcomeObjectFactory,
-                    COMPONENT_NAME_FEEDBACK, INTERACTION_SPECS,
-                    GenerateContentIdService, StateInteractionIdService) {
+                    $scope, $uibModalInstance, EditorFirstTimeEventsService,
+                    GenerateContentIdService, OutcomeObjectFactory,
+                    ResponsesService, RuleObjectFactory, StateEditorService,
+                    COMPONENT_NAME_FEEDBACK, INTERACTION_SPECS) {
                   $scope.feedbackEditorIsOpen = false;
                   $scope.addState = addState;
                   $scope.questionModeEnabled =
@@ -307,13 +306,11 @@ oppia.directive('stateResponses', [
                   $scope.isCorrectnessFeedbackEnabled = function() {
                     return StateEditorService.getCorrectnessFeedbackEnabled();
                   };
-                  $scope.getCurrentInteractionId = function() {
-                    return StateInteractionIdService.savedMemento;
-                  };
                   // This returns false if the current interaction ID is null.
                   $scope.isCurrentInteractionLinear = function() {
-                    var interactionId = $scope.getCurrentInteractionId();
-                    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+                    return (
+                      currentInteractionId &&
+                      INTERACTION_SPECS[currentInteractionId].is_linear);
                   };
                   $scope.tmpRule = RuleObjectFactory.createNew(null, {});
                   var feedbackContentId = GenerateContentIdService.getNextId(

@@ -12,10 +12,6 @@
               &#xE161;
             </i>
             <span class="oppia-save-publish-button-label">Save Draft</span>
-            <span class="hidden-sm hidden-xs" style="opacity:0.5"
-                  ng-if="getChangeListCount() > 0">
-              (<[getChangeListCount()]>)
-            </span>
           </span>
           <span ng-if="skillRights.isPublic()" title="Publish Changes">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
@@ -23,10 +19,10 @@
               &#xE2C3;
             </i>
             <span class="oppia-save-publish-button-label">Publish Changes</span>
-            <span class="hidden-sm hidden-xs" style="opacity:0.5"
-                  ng-if="getChangeListCount() > 0">
-              (<[getChangeListCount()]>)
-            </span>
+          </span>
+          <span class="hidden-sm hidden-xs" style="opacity:0.5"
+                ng-if="getChangeListCount() > 0">
+            (<[getChangeListCount()]>)
           </span>
         </span>
 
