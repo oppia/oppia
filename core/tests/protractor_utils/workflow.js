@@ -119,6 +119,12 @@ var createAndPublishExploration = function(
 
 // Role management (state editor settings tab)
 
+// Add a title to the exploration
+var addTitle = function(){
+    element(by.model('explorationTitleService.displayed')).sendKeys(
+    'Chuck Norris');
+}
+
 // Make sure you can not add users without giving a title to the exploration
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = function(roleName, username) {
@@ -127,9 +133,8 @@ var _addExplorationRole = function(roleName, username) {
   element(by.css('.protractor-test-role-select')).
     element(by.cssContainingText('option', roleName)).click();
   expect(element(by.css('.protractor-test-save-role')).isEnabled())
-    .toBe(false);
-  element(by.model('explorationTitleService.displayed')).sendKeys(
-    'Chuck Norris');
+    .toBe(true);
+// Make sure title is given
   element(by.css('.protractor-test-save-role')).click();
 };
 
@@ -182,6 +187,7 @@ exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
 exports.createCollectionAsAdmin = createCollectionAsAdmin;
 exports.createExplorationAsAdmin = createExplorationAsAdmin;
+exports.addTitle = addTitle;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
