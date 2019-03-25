@@ -78,6 +78,27 @@ oppia.directive('translatorOverview', [
             }
           };
 
+          var updateLangaugeList = function() {
+            allAudioLanguageCodes = (
+              LanguageUtilService.getAllAudioLanguageCodes());
+            if($scope.inTranslationMode) {
+              var index = allAudioLanguageCodes.indexOf(
+                ExplorationLanguageCodeService.displayed);
+              if (index !== -1) {
+                allAudioLanguageCodes.splice(index, 1);
+              }
+            }
+            $scope.languageCodesAndDescriptions = (
+            allAudioLanguageCodes.map(function(languageCode) {
+              return {
+                id: languageCode,
+                description: (
+                  LanguageUtilService.getAudioLanguageDescription(
+                    languageCode))
+              };
+            }));
+          };
+
           var updateMode = function() {
             $scope.inTranslationMode = (
               TranslationTabActiveModeService.isTranslationModeActive());
@@ -92,16 +113,9 @@ oppia.directive('translatorOverview', [
               TranslationTabActiveModeService.activatetTranslationMode();
             }
             updateMode();
+            updateLangaugeList();
           };
-          $scope.languageCodesAndDescriptions = (
-            allAudioLanguageCodes.map(function(languageCode) {
-              return {
-                id: languageCode,
-                description: (
-                  LanguageUtilService.getAudioLanguageDescription(
-                    languageCode))
-              };
-            }));
+
           $scope.getTranslationProgressStyle = function() {
             $scope.numberOfRequiredAudio = TranslationStatusService
               .getExplorationContentRequiredCount();
@@ -131,6 +145,9 @@ oppia.directive('translatorOverview', [
             $window.localStorage.setItem(
               LAST_SELECTED_TRANSLATION_LANGUAGE, $scope.languageCode);
           };
+
+          updateLangaugeList();
+          updateMode();
         }
       ]
     };

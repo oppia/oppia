@@ -68,8 +68,7 @@ oppia.directive('stateTranslation', [
           $scope.stateDefaultOutcome = null;
           $scope.stateHints = [];
           $scope.stateSolution = null;
-          $scope.needsUpdateTooltipMessage = 'Audio needs update to match ' +
-            'text. Please record new audio.';
+
           $scope.isVoiceoverModeActive = (
             TranslationTabActiveModeService.isVoiceoverModeActive);
           var isTranslatedTextRequiered = function() {
@@ -101,9 +100,9 @@ oppia.directive('stateTranslation', [
 
           $scope.getEmptyContentMessage = function() {
             if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
-              return 'There is no text to record.';
+              return 'There is no text available to voice-over.';
             } else {
-              return 'There is no text to translate.';
+              return 'There is no text available to translate.';
             }
           };
 
@@ -328,6 +327,13 @@ oppia.directive('stateTranslation', [
             $scope.answerChoices = StateEditorService.getAnswerChoices(
               $scope.stateInteractionId, currentCustomizationArgs);
 
+            if(TranslationTabActiveModeService.isVoiceoverModeActive()) {
+              $scope.needsUpdateTooltipMessage = 'Audio needs update to ' +
+                'match text. Please record new audio.';
+            } else {
+              $scope.needsUpdateTooltipMessage = 'Translation needs update ' +
+                'to match text. Please re-translate the content.';
+            }
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
           $scope.initStateTranslation();

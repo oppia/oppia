@@ -18,7 +18,7 @@
  */
 
 oppia.constant('VOICEOVER_MODE', 'voiceoverMode');
- oppia.constant('TRANSLATION_MODE', 'translationMode');
+oppia.constant('TRANSLATION_MODE', 'translationMode');
 
 oppia.factory('TranslationTabActiveModeService', [
   '$rootScope', 'TRANSLATION_MODE', 'VOICEOVER_MODE',
