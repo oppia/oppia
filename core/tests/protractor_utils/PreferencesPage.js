@@ -34,6 +34,13 @@ var PreferencesPage = function() {
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
   var systemLanguageSelector = element.all(
     by.css('.protractor-test-system-language-selector')).first();
+  var bioLink = element(by.css('.protractor-test-preferences-editBio'));
+
+  this.addBio = function(bio) {
+    bioLink.click();
+    bioLink.sendKeys(bio);
+    pageHeader.click();
+  };
 
   this.get = function() {
     browser.get(USER_PREFERENCES_URL);
@@ -81,6 +88,10 @@ var PreferencesPage = function() {
   // This function only compares the text displayed on the subscription (which
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
+  this.expectBioToBe = function(bio) {
+    expect(bioLink.getAttribute('value')).toMatch(bio);
+  };
+
   this.expectDisplayedFirstSubscriptionToBe = function(name) {
     expect(subscriptions.first().getText()).toMatch(name);
   };

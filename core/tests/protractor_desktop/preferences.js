@@ -48,6 +48,17 @@ describe('Preferences', function() {
     expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
   });
 
+  it('should add bio to profile', function() {
+    users.createUser('lisa@preferences.com', 'lisaPreferences');
+    users.login('lisa@preferences.com');
+    preferencesPage.get();
+    preferencesPage.addBio("abc;");
+    browser.refresh();
+    preferencesPage.expectBioToBe("abc;");
+  });
+
+
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
     users.logout();
