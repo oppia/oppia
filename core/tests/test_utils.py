@@ -1451,6 +1451,11 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
         """
+        topic_rights_model = topic_models.TopicRightsModel(
+            id=topic_id,
+            manager_ids=[],
+            topic_is_published=True
+        )
         topic_model = topic_models.TopicModel(
             id=topic_id,
             name=name,
@@ -1466,6 +1471,11 @@ tags: []
         )
         commit_message = (
             'New topic created with name \'%s\'.' % name)
+        topic_rights_model.commit(
+            committer_id=owner_id,
+            commit_message='Created new topic rights',
+            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}]
+        )
         topic_model.commit(
             owner_id, commit_message, [{
                 'cmd': topic_domain.CMD_CREATE_NEW,
@@ -1520,7 +1530,7 @@ tags: []
             question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_schema_version=27
+            question_state_data_schema_version=27
         )
         question_model.commit(
             owner_id, 'New question created',

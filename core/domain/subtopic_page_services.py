@@ -16,6 +16,7 @@
 
 """Commands for operations on subtopic pages, and related models."""
 
+import copy
 from core.domain import subtopic_page_domain
 from core.platform import models
 import feconf
@@ -23,6 +24,36 @@ import feconf
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
+
+
+def _migrate_page_contents_to_latest_schema(versioned_page_contents):
+    """Holds the responsibility of performing a step-by-step, sequential update
+    of the page contents structure based on the schema version of the input
+    page contents dictionary. If the current page_contents schema changes, a
+    new conversion function must be added and some code appended to this
+    function to account for that new version.
+
+    Args:
+        versioned_page_contents: A dict with two keys:
+          - schema_version: int. The schema version for the page_contents dict.
+          - page_contents: dict. The dict comprising the page contents.
+
+    Raises:
+        Exception: The schema version of the page_contents is outside of what
+            is supported at present.
+    """
+    page_contents_schema_version = versioned_page_contents['schema_version']
+    if not (1 <= page_contents_schema_version
+            <= feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d page schemas at '
+            'present.' % feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION)
+
+    while (page_contents_schema_version <
+           feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+        subtopic_page_domain.SubtopicPage.update_page_contents_from_model(
+            versioned_page_contents, page_contents_schema_version)
+        page_contents_schema_version += 1
 
 
 def get_subtopic_page_from_model(subtopic_page_model):
@@ -34,12 +65,19 @@ def get_subtopic_page_from_model(subtopic_page_model):
     Returns:
         SubtopicPage.
     """
-
+    versioned_page_contents = {
+        'schema_version': subtopic_page_model.page_contents_schema_version,
+        'page_contents': copy.deepcopy(subtopic_page_model.page_contents)
+    }
+    if (subtopic_page_model.page_contents_schema_version !=
+            feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+        _migrate_page_contents_to_latest_schema(versioned_page_contents)
     return subtopic_page_domain.SubtopicPage(
         subtopic_page_model.id,
         subtopic_page_model.topic_id,
         subtopic_page_domain.SubtopicPageContents.from_dict(
-            subtopic_page_model.page_contents),
+            versioned_page_contents['page_contents']),
+        versioned_page_contents['schema_version'],
         subtopic_page_model.language_code,
         subtopic_page_model.version
     )
@@ -158,6 +196,8 @@ def save_subtopic_page(
     subtopic_page_model.topic_id = subtopic_page.topic_id
     subtopic_page_model.page_contents = subtopic_page.page_contents.to_dict()
     subtopic_page_model.language_code = subtopic_page.language_code
+    subtopic_page_model.page_contents_schema_version = (
+        subtopic_page.page_contents_schema_version)
     change_dicts = [change.to_dict() for change in change_list]
     subtopic_page_model.commit(committer_id, commit_message, change_dicts)
     subtopic_page.version += 1
