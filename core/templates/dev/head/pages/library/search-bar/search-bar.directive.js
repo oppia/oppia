@@ -3,8 +3,8 @@ angular.module('searchBarModule').directive('searchBar', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/library/' +
-        'search_bar_directive.html'),
+        '/pages/library/search-bar/' +
+        'search-bar.directive.html'),
       controller: [
         '$location', '$rootScope', '$scope', '$timeout', '$translate',
         '$window', 'ConstructTranslationIdsService', 'DebouncerService',

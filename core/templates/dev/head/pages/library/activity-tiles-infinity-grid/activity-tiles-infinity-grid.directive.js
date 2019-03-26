@@ -3,8 +3,8 @@ angular.module('activityTilesInfinityGridModule').directive('activityTilesInfini
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/library/' +
-        'activity_tiles_infinity_grid_directive.html'),
+        '/pages/library/activity-tiles-infinity-grid/' +
+        'activity-tiles-infinity-grid.directive.html'),
       controller: [
         '$scope', '$rootScope', 'SearchService', 'WindowDimensionsService',
         function($scope, $rootScope, SearchService, WindowDimensionsService) {
