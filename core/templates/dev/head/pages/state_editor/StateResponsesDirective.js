@@ -279,6 +279,7 @@ oppia.directive('stateResponses', [
             var stateName = StateEditorService.getActiveStateName();
             var addState = $scope.addState;
             var existingContentIds = _getExistingFeedbackContentIds();
+            var currentInteractionId = $scope.getCurrentInteractionId();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
@@ -286,21 +287,30 @@ oppia.directive('stateResponses', [
               // Clicking outside this modal should not dismiss it.
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance', 'ResponsesService',
-                'EditorFirstTimeEventsService', 'StateEditorService',
-                'RuleObjectFactory', 'OutcomeObjectFactory',
-                'COMPONENT_NAME_FEEDBACK', 'GenerateContentIdService',
+                '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
+                'GenerateContentIdService', 'OutcomeObjectFactory',
+                'ResponsesService', 'RuleObjectFactory', 'StateEditorService',
+                'COMPONENT_NAME_FEEDBACK', 'INTERACTION_SPECS',
                 function(
-                    $scope, $uibModalInstance, ResponsesService,
-                    EditorFirstTimeEventsService, StateEditorService,
-                    RuleObjectFactory, OutcomeObjectFactory,
-                    COMPONENT_NAME_FEEDBACK, GenerateContentIdService) {
+                    $scope, $uibModalInstance, EditorFirstTimeEventsService,
+                    GenerateContentIdService, OutcomeObjectFactory,
+                    ResponsesService, RuleObjectFactory, StateEditorService,
+                    COMPONENT_NAME_FEEDBACK, INTERACTION_SPECS) {
                   $scope.feedbackEditorIsOpen = false;
                   $scope.addState = addState;
                   $scope.questionModeEnabled =
                     StateEditorService.isInQuestionMode();
                   $scope.openFeedbackEditor = function() {
                     $scope.feedbackEditorIsOpen = true;
+                  };
+                  $scope.isCorrectnessFeedbackEnabled = function() {
+                    return StateEditorService.getCorrectnessFeedbackEnabled();
+                  };
+                  // This returns false if the current interaction ID is null.
+                  $scope.isCurrentInteractionLinear = function() {
+                    return (
+                      currentInteractionId &&
+                      INTERACTION_SPECS[currentInteractionId].is_linear);
                   };
                   $scope.tmpRule = RuleObjectFactory.createNew(null, {});
                   var feedbackContentId = GenerateContentIdService.getNextId(

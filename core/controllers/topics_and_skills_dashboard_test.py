@@ -253,7 +253,7 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):
         super(MergeSkillHandlerTests, self).setUp()
-        self.url = feconf.MERGE_SKILL_URL
+        self.url = feconf.MERGE_SKILLS_URL
 
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(

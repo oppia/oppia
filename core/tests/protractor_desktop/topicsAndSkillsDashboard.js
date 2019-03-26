@@ -23,8 +23,10 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
-var TopicsAndSkillsDashboardPage =
-  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js');
+var TopicsAndSkillsDashboardPage = require(
+  '../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
@@ -32,6 +34,8 @@ describe('Topics and skills dashboard functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
   var topicEditorPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
 
   beforeAll(function() {
     topicsAndSkillsDashboardPage =
@@ -40,6 +44,8 @@ describe('Topics and skills dashboard functionality', function() {
       new SkillEditorPage.SkillEditorPage();
     topicEditorPage =
       new TopicEditorPage.TopicEditorPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAdmin('creator@topicsAndSkillsDashboard.com',
       'creatorTopicsAndSkillsDashboard');
   });
@@ -85,6 +91,34 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
     topicEditorPage.moveToSubtopicsTab();
     topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
+  });
+
+  it('should merge an outside skill with one in a topic', function() {
+    topicsAndSkillsDashboardPage.createSkillWithDescription(
+      'Skill to be merged');
+    skillEditorPage.editConceptCard('Concept card explanation');
+    skillEditorPage.saveOrPublishSkill('Added review material.');
+    skillEditorPage.moveToQuestionsTab();
+    skillEditorPage.clickCreateQuestionButton();
+    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
+    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', 'correct');
+    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
+    explorationEditorMainTab.addHint('Hint 1');
+    explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
+    });
+    skillEditorPage.saveQuestion();
+    skillEditorPage.firstTimePublishSkill();
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
+    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    topicEditorPage.moveToQuestionsTab();
+    topicEditorPage.expectNumberOfQuestionsToBe(1);
   });
 
   it('should remove a skill from list once deleted', function() {

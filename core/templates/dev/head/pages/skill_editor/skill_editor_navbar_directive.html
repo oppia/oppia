@@ -4,7 +4,7 @@
       <button class="btn btn-default oppia-save-draft-button protractor-test-save-or-publish-skill"
               ng-class="{'btn-success': isSkillSaveable(), 'save-draft-button-padding': getChangeListCount()}"
               ng-click="saveChanges()"
-              style="float: left;"
+              style="float: left; width: 10em;"
               ng-disabled="!isSkillSaveable()">
         <span ng-if="!isSaveInProgress()">
           <span ng-if="skillRights.isPrivate()">
@@ -12,10 +12,6 @@
               &#xE161;
             </i>
             <span class="oppia-save-publish-button-label">Save Draft</span>
-            <span class="hidden-sm hidden-xs" style="opacity:0.5"
-                  ng-if="getChangeListCount() > 0">
-              (<[getChangeListCount()]>)
-            </span>
           </span>
           <span ng-if="skillRights.isPublic()" title="Publish Changes">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
@@ -23,6 +19,10 @@
               &#xE2C3;
             </i>
             <span class="oppia-save-publish-button-label">Publish Changes</span>
+          </span>
+          <span class="hidden-sm hidden-xs" style="opacity:0.5"
+                ng-if="getChangeListCount() > 0">
+            (<[getChangeListCount()]>)
           </span>
         </span>
 

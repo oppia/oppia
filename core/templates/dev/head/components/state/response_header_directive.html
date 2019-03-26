@@ -70,7 +70,7 @@
   <br class="break-in-mobile">
   <span ng-if="getOutcome()">→</span>
   <span ng-if="isCorrect() && isInQuestionMode()">
-    Continue
+    Correct
   </span>
   <span ng-if="getOutcome() && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
         ng-click="navigateToState(getOutcome().dest)" class="oppia-nested-link">
@@ -80,8 +80,11 @@
     <em ng-if="getOutcome().newStateName">(<[getOutcome().newStateName]>)</em>
     <em ng-if="!getOutcome().newStateName">Nowhere yet...</em>
   </span>
-  <span ng-if="getOutcome() && (isOutcomeLooping() || (!isCorrect() && !getOutcome().dest && isInQuestionMode()))">
+  <span ng-if="getOutcome() && !isInQuestionMode() && isOutcomeLooping()">
     <em>(try again)</em>
+  </span>
+  <span ng-if="getOutcome() && isInQuestionMode() && !isCorrect()">
+    <em>Wrong<br> (try again)</em>
   </span>
 </div>
 
