@@ -49,8 +49,8 @@
     </div>
 
     {% include 'pages/footer_js_libs.html' %}
-    <script src="/templates/app.js"></script>
-    <script src="/templates/i18n.js"></script>
+    <script src="/templates/App.js"></script>
+    <script src="/templates/I18nFooter.js"></script>
 
     <script src="/templates/filters/UnderscoresToCamelCaseFilter.js"></script>
 
@@ -62,11 +62,19 @@
     <script src="/templates/services/HtmlEscaperService.js"></script>
     <script src="/templates/services/RteHelperService.js"></script>
     <script src="/templates/services/contextual/UrlService.js"></script>
-    <script src="/templates/components/forms/FormBuilder.js"></script>
+    <script src="/templates/components/forms/ConvertUnicodeWithParamsToHtmlFilter.js"></script>
+    <script src="/templates/components/forms/ConvertHtmlToUnicodeFilter.js"></script>
+    <script src="/templates/components/forms/ConvertUnicodeToHtmlFilter.js"></script>
+    <script src="/templates/components/forms/validators/IsAtLeastFilter.js"></script>
+    <script src="/templates/components/forms/validators/IsAtMostFilter.js"></script>
+    <script src="/templates/components/forms/validators/IsFloatFilter.js"></script>
+    <script src="/templates/components/forms/validators/IsIntegerFilter.js"></script>
+    <script src="/templates/components/forms/validators/IsNonemptyFilter.js"></script>
+    <script src="/templates/components/forms/ApplyValidationDirective.js"></script>
+    <script src="/templates/components/forms/RequireIsFloatDirective.js"></script>
     <script src="/templates/components/forms/ObjectEditorDirective.js"></script>
     <script src="/templates/domain/utilities/UrlInterpolationService.js"></script>
     <script src="/templates/pages/maintenance/Maintenance.js"></script>
-
     <!-- These three files need to be loaded here only because they are dependencies for $provide, and Angular will not load without them. -->
     <script src="/templates/services/contextual/DeviceInfoService.js"></script>
     <script src="/templates/services/stateful/FocusManagerService.js"></script>
