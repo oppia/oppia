@@ -194,4 +194,3 @@ class EditSuggestionHandler(base.BaseHandler):
         change_cls = type(suggestion.change)
         change_object = change_cls(new_change_dict)
         suggestion_services.edit_suggestion(suggestion, change_object)
-        self.render_json(new_change_dict)
