@@ -126,14 +126,15 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
         }
 
         $http.put(url, data).then(function(response) {
+
+          // Updates suggestion on Client Side.
+          activeThread.suggestion.newValue = response.data.new_value;
+
           for (var i = 0; i < suggestionsToReviewList.length; i++) {
             if (suggestionsToReviewList[i] === activeThread) {
               suggestionsToReviewList.splice(i, 1);
               break;
             }
-          }
-          if (response) {
-            activeThread.suggestion.newValue = response.data.new_value;
           }
           clearActiveThread();
         }, function() {
