@@ -12,7 +12,7 @@ anchor_for_installing_dependencies: &install_dependencies
     source scripts/setup_gae.sh || exit 1
     sudo apt-get update
     sudo apt-get install lsb-release libappindicator3-1
-    curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_67.0.3396.99-1_amd64.deb
     sudo dpkg -i google-chrome.deb
     sudo sed -i 's|HERE/chrome"|HERE/chrome" --no-sandbox|g' /opt/google/chrome/google-chrome
     rm google-chrome.deb
@@ -93,6 +93,18 @@ jobs:
             codecov
           when: on_success
 
+  e2e_test_accessibility:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run:
+          name: E2E Test Accessibilty
+          command: |
+            bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env
+
 workflows:
   version: 2
   circleci_tests:
@@ -105,6 +117,9 @@ workflows:
           requires:
             - setup
       - backend_tests:
+          requires:
+            - setup
+      - e2e_test_accessibility:
           requires:
             - setup
 notify:
