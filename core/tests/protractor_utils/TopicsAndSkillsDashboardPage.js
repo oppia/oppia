@@ -65,8 +65,8 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-confirm-move-button'));
   var mergeSkillsButtons = element.all(
     by.css('.protractor-test-merge-skills-button'));
-  var confirmSkillMergeButton = element(
-    by.css('.protractor-test-confirm-skill-merge-button'));
+  var confirmSkillsMergeButton = element(
+    by.css('.protractor-test-confirm-skills-merge-button'));
 
   this.get = function() {
     browser.get(DASHBOARD_URL);
@@ -78,7 +78,7 @@ var TopicsAndSkillsDashboardPage = function() {
       elems[oldSkillIndex].click();
       skillsListItems.then(function(skills) {
         skills[newSkillIndex].click();
-        confirmSkillMergeButton.click();
+        confirmSkillsMergeButton.click();
       });
     });
   };

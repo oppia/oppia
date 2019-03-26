@@ -16,7 +16,7 @@
  * @fileoverview Service to retrieve information of topics and skills dashboard
   from the backend and to merge skills from the dashboard.
  */
-oppia.constant('MERGE_SKILLS_URL', '/merge_skill');
+oppia.constant('MERGE_SKILLS_URL', '/merge_skills_handler');
 
 oppia.factory('TopicsAndSkillsDashboardBackendApiService', [
   '$http', 'MERGE_SKILLS_URL', function($http, MERGE_SKILLS_URL) {
