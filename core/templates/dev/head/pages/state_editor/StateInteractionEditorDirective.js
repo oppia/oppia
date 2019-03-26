@@ -188,21 +188,19 @@ oppia.directive('stateInteractionEditor', [
                 backdrop: true,
                 resolve: {},
                 controller: [
-                  '$scope', '$uibModalInstance', '$injector',
-                  'StateSolutionService', 'StateInteractionIdService',
+                  '$injector', '$scope', '$uibModalInstance',
+                  'EditorFirstTimeEventsService', 'InteractionDetailsCacheService',
                   'StateCustomizationArgsService', 'StateEditorService',
-                  'InteractionDetailsCacheService', 
-                  'UrlInterpolationService', 'EditorFirstTimeEventsService',
-                  'INTERACTION_SPECS', 'ALLOWED_INTERACTION_CATEGORIES',
-                  'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
+                  'StateInteractionIdService', 'StateSolutionService',
+                  'UrlInterpolationService', 'ALLOWED_INTERACTION_CATEGORIES',
+                  'ALLOWED_QUESTION_INTERACTION_CATEGORIES', 'INTERACTION_SPECS',
                   function(
-                      $scope, $uibModalInstance, $injector,
-                      StateSolutionService, StateInteractionIdService,
-                      StateCustomizationArgsService, StateEditorService,
-                      InteractionDetailsCacheService,
-                      UrlInterpolationService, EditorFirstTimeEventsService,
-                      INTERACTION_SPECS, ALLOWED_INTERACTION_CATEGORIES,
-                      ALLOWED_QUESTION_INTERACTION_CATEGORIES) {
+                    $injector, $scope, $uibModalInstance,
+                    EditorFirstTimeEventsService, InteractionDetailsCacheService,
+                    StateCustomizationArgsService, StateEditorService,
+                    StateInteractionIdService, StateSolutionService,
+                    UrlInterpolationService, ALLOWED_INTERACTION_CATEGORIES,
+                    ALLOWED_QUESTION_INTERACTION_CATEGORIES, INTERACTION_SPECS) {
                     EditorFirstTimeEventsService
                       .registerFirstClickAddInteractionEvent();
 
