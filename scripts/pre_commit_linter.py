@@ -1477,7 +1477,7 @@ class LintChecksManager(object):
                     matched_pattern = matched_pattern.split()
                     directive_filepath = ''.join(matched_pattern).replace(
                         '\'', '').replace('+', '')
-                    if not directive_filepath.endswith('_directive.html'):
+                    if not directive_filepath.endswith('.directive.html'):
                         failed = True
                         total_error_count += 1
                         print (
