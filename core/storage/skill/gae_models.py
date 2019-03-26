@@ -107,10 +107,18 @@ class SkillModel(base_models.VersionedModel):
             committer_user_settings_model.username
             if committer_user_settings_model else '')
 
+        skill_rights = SkillRightsModel.get_by_id(self.id)
+
+        status = ''
+        if skill_rights.skill_is_private:
+            status = constants.ACTIVITY_STATUS_PRIVATE
+        else:
+            status = constants.ACTIVITY_STATUS_PUBLIC
+
         skill_commit_log_entry = SkillCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            status, False
         )
         skill_commit_log_entry.skill_id = self.id
         skill_commit_log_entry.put()
@@ -199,6 +207,55 @@ class SkillRightsModel(base_models.VersionedModel):
     # Whether the skill is private.
     skill_is_private = ndb.BooleanProperty(
         indexed=True, required=True, default=True)
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        super(SkillRightsModel, self)._trusted_commit(
+            committer_id, commit_type, commit_message, commit_cmds)
+
+        committer_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(committer_id))
+        committer_username = (
+            committer_user_settings_model.username
+            if committer_user_settings_model else '')
+
+        skill_rights = SkillRightsModel.get_by_id(self.id)
+
+        status = ''
+        if skill_rights.skill_is_private:
+            status = constants.ACTIVITY_STATUS_PRIVATE
+        else:
+            status = constants.ACTIVITY_STATUS_PUBLIC
+
+        SkillCommitLogEntryModel(
+            id=('rights-%s-%s' % (self.id, self.version)),
+            user_id=committer_id,
+            username=committer_username,
+            skill_id=self.id,
+            commit_type=commit_type,
+            commit_message=commit_message,
+            commit_cmds=commit_cmds,
+            version=None,
+            post_commit_status=status,
+            post_commit_community_owned=False,
+            post_commit_is_private=skill_rights.skill_is_private
+        ).put()
 
     @classmethod
     def get_unpublished_by_creator_id(cls, user_id):
