@@ -43,6 +43,11 @@
                                 add-state="addState">
     </outcome-destination-editor>
   </form>
+
+  <div class="oppia-correctness-label-editor" ng-if="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
+    <strong>The answers in this group are correct</strong>
+    <input class="protractor-test-editor-correctness-toggle" type="checkbox" ng-model="tmpOutcome.labelledAsCorrect">
+  </div>
 </div>
 
 <div class="modal-footer">
