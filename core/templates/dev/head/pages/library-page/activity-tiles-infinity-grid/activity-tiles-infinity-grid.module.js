@@ -12,4 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for an infinitely-scrollable view of activity tiles.
+ */
+
 angular.module('activityTilesInfinityGridModule', []);
