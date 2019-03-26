@@ -110,7 +110,7 @@
 # Library page.
 # TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
 /core/controllers/library*.py @nithusha21
-/core/templates/dev/head/pages/library/ @nithusha21
+/core/templates/dev/head/pages/library-page/ @nithusha21
 
 
 # Navigation bar project.

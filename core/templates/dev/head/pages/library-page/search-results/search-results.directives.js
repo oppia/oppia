@@ -3,7 +3,7 @@ angular.module('searchResultsModule').directive('searchResults', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/library/search-results/' +
+        '/pages/library-page/search-results/' +
         'search-results.directive.html'),
       controller: [
         '$location', '$rootScope', '$scope', '$timeout', '$translate',
