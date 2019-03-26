@@ -14,6 +14,7 @@
 
 """Tests for Oppia story models."""
 import datetime
+import feconf
 
 from core.platform import models
 from core.tests import test_utils
@@ -36,6 +37,8 @@ class StoryModelTest(test_utils.GenericTestBase):
             title='title',
             description='description',
             notes='notes',
+            story_contents_schema_version=(
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             language_code='language_code')
         story_instance.commit(committer_id, commit_message, commit_cmds)
         story_by_id = story_models.StoryModel.get_by_id('id')
