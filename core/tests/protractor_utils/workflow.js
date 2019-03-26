@@ -22,6 +22,7 @@ var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
+var ExplorationEditorSettingsTab = require('./ExplorationEditorSettingsTab.js');
 
 // Creates an exploration, opens its editor and skips the tutorial.
 var createExploration = function() {
@@ -119,12 +120,6 @@ var createAndPublishExploration = function(
 
 // Role management (state editor settings tab)
 
-// Add a title to the exploration
-var addTitle = function(){
-    element(by.model('explorationTitleService.displayed')).sendKeys(
-    'Chuck Norris');
-}
-
 // Make sure you can not add users without giving a title to the exploration
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = function(roleName, username) {
@@ -132,9 +127,10 @@ var _addExplorationRole = function(roleName, username) {
   element(by.css('.protractor-test-role-username')).sendKeys(username);
   element(by.css('.protractor-test-role-select')).
     element(by.cssContainingText('option', roleName)).click();
-  expect(element(by.css('.protractor-test-save-role')).isEnabled())
-    .toBe(true);
-// Make sure title is given
+  if (!element(by.css('.protractor-test-save-role')).isEnabled()) {
+    ExplorationEditorSettingsTab.setTitle('Chuck Norris');
+  }
+  // Check and add title, if title does is not present
   element(by.css('.protractor-test-save-role')).click();
 };
 
@@ -187,7 +183,6 @@ exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
 exports.createCollectionAsAdmin = createCollectionAsAdmin;
 exports.createExplorationAsAdmin = createExplorationAsAdmin;
-exports.addTitle = addTitle;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
