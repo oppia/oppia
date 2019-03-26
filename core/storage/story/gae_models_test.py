@@ -14,10 +14,10 @@
 
 """Tests for Oppia story models."""
 import datetime
-import feconf
 
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (story_models, base_models, ) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.base_model])

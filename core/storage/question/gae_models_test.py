@@ -47,15 +47,15 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
             id='question_1',
             creator_id='user',
             question_content='Question 1',
-            question_model_created_on=datetime.datetime.now(),
-            question_model_last_updated=datetime.datetime.now()
+            question_model_created_on=datetime.datetime.utcnow(),
+            question_model_last_updated=datetime.datetime.utcnow()
         )
         question_summary_model_2 = question_models.QuestionSummaryModel(
             id='question_2',
             creator_id='user',
             question_content='Question 2',
-            question_model_created_on=datetime.datetime.now(),
-            question_model_last_updated=datetime.datetime.now()
+            question_model_created_on=datetime.datetime.utcnow(),
+            question_model_last_updated=datetime.datetime.utcnow()
         )
         question_summary_model_1.put()
         question_summary_model_2.put()
