@@ -221,6 +221,9 @@ class SubtopicPageModel(base_models.VersionedModel):
     # The json data of the subtopic consisting of subtitled_html,
     # content_ids_to_audio_translations and written_translations fields.
     page_contents = ndb.JsonProperty(required=True)
+    # The schema version for the page_contents field.
+    page_contents_schema_version = ndb.IntegerProperty(
+        required=True, indexed=True)
     # The ISO 639-1 code for the language this subtopic page is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
