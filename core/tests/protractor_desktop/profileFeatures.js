@@ -15,3 +15,98 @@
 /**
 * @fileoverview End-to-end tests for user profile features.
 */
+
+var forms = require('../protractor_utils/forms.js');
+var general = require('../protractor_utils/general.js');
+var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
+var workflow = require('../protractor_utils/workflow.js');
+
+
+var AdminPage =
+require('../protractor_utils/AdminPage.js');
+var CreatorDashboardPage =
+require('../protractor_utils/CreatorDashboardPage.js');
+var CollectionEditorPage =
+require('../protractor_utils/CollectionEditorPage.js');
+var ExplorationEditorPage =
+require('../protractor_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage =
+require('../protractor_utils/ExplorationPlayerPage.js');
+var LibraryPage =
+require('../protractor_utils/LibraryPage.js');
+
+describe('Creator dashboard functionality', function() {
+  var creatorDashboardPage = null;
+  var explorationEditorPage = null;
+  var explorationPlayerPage = null;
+  var libraryPage = null;
+  var learnerDashboardPage = null;
+
+  var creator1Id = 'creatorName';
+  var creator2Id = 'creatorName2';
+  users.createUser('learner1@learnerDashboard.com',
+    'learner1learnerDashboard');
+  users.createUser('learner2@learnerDashboard.com',
+    'learner2learnerDashboard');
+  users.createUser(creator1Id + '@creatorDashboard.com', creator1Id);
+  users.createUser(creator2Id + '@creatorDashboard.com', creator2Id);
+
+  beforeAll(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
+  it('view exploration created by another user', function() {
+    users.login('learner1@learnerDashboard.com');
+    workflow.createAndPublishExploration(
+      'Activations',
+      'Chemistry',
+      'Learn about different types of chemistry activations.',
+      'English'
+    );
+    users.logout();
+
+    users.login('learner2@learnerDashboard.com');
+    libraryPage.findExploration('Activations');
+    users.logout();
+  });
+
+  it('subscribe to another user', function() {
+    users.login('learner1@learnerDashboard.com');
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id +
+      '@creatorDashboard.com');
+    subscriptionDashboardPage.navigateToSubscriptionButton();
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id +
+      '@creatorDashboard.com');
+    subscriptionDashboardPage.navigateToSubscriptionButton();
+    users.logout();
+
+    users.login('learner2@learnerDashboard.com');
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id +
+      '@creatorDashboard.com');
+    subscriptionDashboardPage.navigateToSubscriptionButton();
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id +
+      '@creatorDashboard.com');
+    subscriptionDashboardPage.navigateToSubscriptionButton();
+    users.logout();
+  });
+
+  it('get number of explorations of a user', function() {
+    users.login(creator1Id + 'creatorDashboard.com');
+    workflow.createAndPublishExploration(
+      'Activations',
+      'Chemistry',
+      'Learn about different types of chemistry activations.',
+      'English'
+    );
+
+    creatorDashboardPage.getNumberofExplorations();
+    users.logout();
+  });
+});

@@ -51,6 +51,12 @@ var CreatorDashboardPage = function() {
     });
   };
 
+  var getNumberofExplorations = function() {
+    var allExplorationDashboardCard = element.all(
+      by.css('.protractor-test-exploration-dashboard-card'));
+      return allExplorationDashboardCard.length;
+  }
+
   this.get = function() {
     browser.get(CREATOR_DASHBOARD_URL);
     return waitFor.pageToFullyLoad();
