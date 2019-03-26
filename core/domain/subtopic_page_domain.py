@@ -245,7 +245,7 @@ class SubtopicPage(object):
 
     def __init__(
             self, subtopic_page_id, topic_id, page_contents,
-            language_code, version):
+            page_contents_schema_version, language_code, version):
         """Constructs a SubtopicPage domain object.
 
         Args:
@@ -253,6 +253,8 @@ class SubtopicPage(object):
             topic_id: str. The ID of the topic that this subtopic is a part of.
             page_contents: SubtopicPageContents. The html and audio
                 translations to be surfaced to the learner.
+            page_contents_schema_version: int. The schema version for the page
+                contents object.
             language_code: str. The ISO 639-1 code for the language this
                 subtopic page is written in.
             version: int. The current version of the subtopic.
@@ -260,6 +262,7 @@ class SubtopicPage(object):
         self.id = subtopic_page_id
         self.topic_id = topic_id
         self.page_contents = page_contents
+        self.page_contents_schema_version = page_contents_schema_version
         self.language_code = language_code
         self.version = version
 
@@ -273,6 +276,7 @@ class SubtopicPage(object):
             'id': self.id,
             'topic_id': self.topic_id,
             'page_contents': self.page_contents.to_dict(),
+            'page_contents_schema_version': self.page_contents_schema_version,
             'language_code': self.language_code,
             'version': self.version
         }
@@ -307,7 +311,32 @@ class SubtopicPage(object):
         return cls(
             subtopic_page_id, topic_id,
             SubtopicPageContents.create_default_subtopic_page_contents(),
+            feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
+
+    @classmethod
+    def update_page_contents_from_model(
+            cls, versioned_page_contents, current_version):
+        """Converts the page_contents blob contained in the given
+        versioned_skill_contents dict from current_version to
+        current_version + 1. Note that the versioned_skill_contents being
+        passed in is modified in-place.
+
+        Args:
+            versioned_page_contents: dict. A dict with two keys:
+                - schema_version: str. The schema version for the
+                    page_contents dict.
+                - page_contents: dict. The dict comprising the subtopic page
+                    contents.
+            current_version: int. The current schema version of page_contents.
+        """
+        versioned_page_contents['schema_version'] = current_version + 1
+
+        conversion_fn = getattr(
+            cls, '_convert_page_contents_v%s_dict_to_v%s_dict' % (
+                current_version, current_version + 1))
+        versioned_page_contents['skill_contents'] = conversion_fn(
+            versioned_page_contents['skill_contents'])
 
     def get_subtopic_id_from_subtopic_page_id(self):
         """Returns the id from the subtopic page id of the object.
@@ -372,6 +401,20 @@ class SubtopicPage(object):
                 'Expected version number to be an int, received %s' %
                 self.version)
         self.page_contents.validate()
+
+        if not isinstance(self.page_contents_schema_version, int):
+            raise utils.ValidationError(
+                'Expected page contents schema version to be an integer, '
+                'received %s' % self.page_contents_schema_version)
+        if (
+                self.page_contents_schema_version !=
+                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+            raise utils.ValidationError(
+                'Expected page contents schema version to be %s, received %s'
+                % (
+                    feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION,
+                    self.page_contents_schema_version)
+            )
 
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(

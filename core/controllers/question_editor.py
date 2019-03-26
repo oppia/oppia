@@ -49,7 +49,7 @@ class QuestionCreationHandler(base.BaseHandler):
                 (question_dict['version'] != 1)):
             raise self.InvalidInputException
 
-        question_dict['question_state_schema_version'] = (
+        question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATES_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
         try:

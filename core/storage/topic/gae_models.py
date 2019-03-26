@@ -96,10 +96,17 @@ class TopicModel(base_models.VersionedModel):
             committer_user_settings_model.username
             if committer_user_settings_model else '')
 
+        topic_rights = TopicRightsModel.get_by_id(self.id)
+        status = ''
+        if topic_rights.topic_is_published:
+            status = constants.ACTIVITY_STATUS_PUBLIC
+        else:
+            status = constants.ACTIVITY_STATUS_PRIVATE
+
         topic_commit_log_entry = TopicCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            status, False
         )
         topic_commit_log_entry.topic_id = self.id
         topic_commit_log_entry.put()
@@ -211,8 +218,12 @@ class SubtopicPageModel(base_models.VersionedModel):
 
     # The topic id that this subtopic is a part of.
     topic_id = ndb.StringProperty(required=True, indexed=True)
-    # The html data of the subtopic.
+    # The json data of the subtopic consisting of subtitled_html,
+    # content_ids_to_audio_translations and written_translations fields.
     page_contents = ndb.JsonProperty(required=True)
+    # The schema version for the page_contents field.
+    page_contents_schema_version = ndb.IntegerProperty(
+        required=True, indexed=True)
     # The ISO 639-1 code for the language this subtopic page is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
@@ -320,3 +331,51 @@ class TopicRightsModel(base_models.VersionedModel):
             cls.manager_ids == user_id
         )
         return topic_rights_models
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        super(TopicRightsModel, self)._trusted_commit(
+            committer_id, commit_type, commit_message, commit_cmds)
+
+        committer_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(committer_id))
+        committer_username = (
+            committer_user_settings_model.username
+            if committer_user_settings_model else '')
+
+        topic_rights = TopicRightsModel.get_by_id(self.id)
+        status = ''
+        if topic_rights.topic_is_published:
+            status = constants.ACTIVITY_STATUS_PUBLIC
+        else:
+            status = constants.ACTIVITY_STATUS_PRIVATE
+
+        TopicCommitLogEntryModel(
+            id=('rights-%s-%s' % (self.id, self.version)),
+            user_id=committer_id,
+            username=committer_username,
+            topic_id=self.id,
+            commit_type=commit_type,
+            commit_message=commit_message,
+            commit_cmds=commit_cmds,
+            version=None,
+            post_commit_status=status,
+            post_commit_community_owned=False,
+            post_commit_is_private=not topic_rights.topic_is_published
+        ).put()

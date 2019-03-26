@@ -35,6 +35,11 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
 
+        topic_rights = topic_models.TopicRightsModel(
+            id=self.TOPIC_ID,
+            manager_ids=[],
+            topic_is_published=True
+        )
         # Topic is created but not committed/saved.
         topic = topic_models.TopicModel(
             id=self.TOPIC_ID,
@@ -48,6 +53,11 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(topic_models.TopicModel.get_by_name(self.TOPIC_NAME))
         # We call commit() expecting that _trusted_commit works fine
         # and saves topic to datastore.
+        topic_rights.commit(
+            committer_id=feconf.SYSTEM_COMMITTER_ID,
+            commit_message='Created new topic rights',
+            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}]
+        )
         topic.commit(
             committer_id=feconf.SYSTEM_COMMITTER_ID,
             commit_message='Created new topic',
@@ -112,6 +122,8 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
             id=self.SUBTOPIC_PAGE_ID,
             topic_id='topic_id',
             page_contents={},
+            page_contents_schema_version=(
+                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
             language_code='en'
         )
         # We check that subtopic page has not been saved before calling

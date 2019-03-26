@@ -20,6 +20,7 @@ from constants import constants
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.tests import test_utils
+import feconf
 import utils
 
 
@@ -52,6 +53,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
             },
+            'page_contents_schema_version': (
+                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
@@ -81,6 +84,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
             },
+            'page_contents_schema_version': (
+                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
@@ -138,6 +143,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
             },
+            'page_contents_schema_version': (
+                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
@@ -164,6 +171,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     }
                 }
             },
+            'page_contents_schema_version': (
+                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
@@ -198,6 +207,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'written_translations': written_translations_dict
             },
+            'page_contents_schema_version': (
+                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }

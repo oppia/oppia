@@ -120,7 +120,7 @@ class Question(object):
 
     def __init__(
             self, question_id, question_state_data,
-            question_state_schema_version, language_code, version,
+            question_state_data_schema_version, language_code, version,
             created_on=None, last_updated=None):
         """Constructs a Question domain object.
 
@@ -128,7 +128,7 @@ class Question(object):
             question_id: str. The unique ID of the question.
             question_state_data: State. An object representing the question
                 state data.
-            question_state_schema_version: int. The schema version of the
+            question_state_data_schema_version: int. The schema version of the
                 question states (equivalent to the states schema version of
                 explorations).
             language_code: str. The ISO 639-1 code for the language this
@@ -142,7 +142,8 @@ class Question(object):
         self.id = question_id
         self.question_state_data = question_state_data
         self.language_code = language_code
-        self.question_state_schema_version = question_state_schema_version
+        self.question_state_data_schema_version = (
+            question_state_data_schema_version)
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
@@ -156,7 +157,8 @@ class Question(object):
         return {
             'id': self.id,
             'question_state_data': self.question_state_data.to_dict(),
-            'question_state_schema_version': self.question_state_schema_version,
+            'question_state_data_schema_version': (
+                self.question_state_data_schema_version),
             'language_code': self.language_code,
             'version': self.version
         }
@@ -209,10 +211,10 @@ class Question(object):
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
 
-        if not isinstance(self.question_state_schema_version, int):
+        if not isinstance(self.question_state_data_schema_version, int):
             raise utils.ValidationError(
                 'Expected schema version to be an integer, received %s' %
-                self.question_state_schema_version)
+                self.question_state_data_schema_version)
 
         if not isinstance(self.question_state_data, state_domain.State):
             raise utils.ValidationError(
@@ -286,7 +288,7 @@ class Question(object):
         question = cls(
             question_dict['id'],
             state_domain.State.from_dict(question_dict['question_state_data']),
-            question_dict['question_state_schema_version'],
+            question_dict['question_state_data_schema_version'],
             question_dict['language_code'], question_dict['version'])
 
         return question

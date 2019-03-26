@@ -57,7 +57,7 @@ class StoryModel(base_models.VersionedModel):
     story_contents = ndb.JsonProperty(default={}, indexed=False)
     # The schema version for the story_contents.
     story_contents_schema_version = (
-        ndb.IntegerProperty(required=True, default=1, indexed=True))
+        ndb.IntegerProperty(required=True, indexed=True))
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
