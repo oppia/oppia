@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,6 +49,12 @@ var CreatorDashboardPage = function() {
           return (tileTitle === explorationTitle);
         });
     });
+  };
+
+  var getNumberofExplorations = function() {
+    var allExplorationDashboardCard = element.all(
+      by.css('.protractor-test-exploration-dashboard-card'));
+    return allExplorationDashboardCard.length;
   };
 
   this.get = function() {
