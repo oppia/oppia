@@ -19,6 +19,7 @@ describe('ItemSelectionInputValidationService', function() {
   var goodAnswerGroups, goodDefaultOutcome;
   var customizationArguments;
   var oof, agof, rof;
+  var badAnswerGroup;
 
   beforeEach(function() {
     module('oppia');
@@ -68,6 +69,39 @@ describe('ItemSelectionInputValidationService', function() {
       false,
       null)
     ];
+    ThreeInputsAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: ['Selection 1', 'Selection 2', 'Selection 3']
+        }
+      })],
+      goodDefaultOutcome,
+      false,
+      null)
+    ];
+    OneInputAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: ['Selection 1']
+        }
+      })],
+      goodDefaultOutcome,
+      false,
+      null)
+    ];
+    NoInputAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'ContainsAtLeastOneOf',
+        inputs: {
+          x: []
+        }
+      })],
+      goodDefaultOutcome,
+      false,
+      null)
+    ];
     IsProperSubsetValidOption = [agof.createNew(
       [rof.createFromBackendDict({
         rule_type: 'IsProperSubsetOf',
@@ -102,7 +136,7 @@ describe('ItemSelectionInputValidationService', function() {
       customizationArguments.minAllowableSelectionCount.value = 3;
 
       var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups,
+        currentState, customizationArguments, ThreeInputsAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
@@ -142,7 +176,7 @@ describe('ItemSelectionInputValidationService', function() {
       customizationArguments.maxAllowableSelectionCount.value = 3;
 
       var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups,
+        currentState, customizationArguments, ThreeInputsAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
@@ -189,6 +223,44 @@ describe('ItemSelectionInputValidationService', function() {
         message: (
           'In answer group 1, ' +
           'rule 1, the "proper subset" rule must include at least 2 options.')
+      }]);
+    });
+
+  it(
+    'should expect min possible selections to be less than or equal to ' +
+    'number of correct options when "Equals" rule is used.',
+    function() {
+      // Make min allowed selections greater than correct answers
+      customizationArguments.minAllowableSelectionCount.value = 2;
+
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, OneInputAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'In answer group 1, ' +
+          'rule 1, the "Equals" rule should not have more correct options ' +
+          'than minimum allowed selection count.')
+      }]);
+    });
+
+  it(
+    'should expect at lease one option when  ' +
+    '"ContainsAtLeastOneOf" rule is used.',
+    function() {
+      // Make min allowed selections greater than correct answers
+      customizationArguments.minAllowableSelectionCount.value = 2;
+
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, NoInputAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'In answer group 1, rule 1, the "ContainsAtLeastOneOf" rule ' +
+          'should not have more correct options than minimum allowed ' +
+          'selection count.')
       }]);
     });
 });

@@ -104,6 +104,9 @@ oppia.factory('ItemSelectionInputValidationService', [
         var handledAnswers = seenChoices.map(function(item) {
           return false;
         });
+
+        var minAllowedCount =
+          customizationArgs.minAllowableSelectionCount.value;
         var maxAllowedCount =
           customizationArgs.maxAllowableSelectionCount.value;
 
@@ -177,8 +180,31 @@ oppia.factory('ItemSelectionInputValidationService', [
                       'rule must include at least 2 options.')
                   });
                 }
+              } else if (rule.type === 'Equals') {
+                if (minAllowedCount > ruleInputs.length) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'In answer group ' + (answerIndex + 1) + ', ' +
+                      'rule ' + (ruleIndex + 1) + ', the "Equals" rule ' +
+                      'should not have more correct options than minimum ' +
+                      'allowed selection count.')
+                  });
+                }
               }
             });
+            if (ruleInputs.length === 0) {
+              if (rule.type === 'ContainsAtLeastOneOf') {
+                warningsList.push({
+                  type: WARNING_TYPES.ERROR,
+                  message: (
+                    'In answer group ' + (answerIndex + 1) + ', ' +
+                    'rule ' + (ruleIndex + 1) + ', the ' +
+                    '"ContainsAtLeastOneOf" rule should not have more ' +
+                    'correct options than minimum allowed selection count.')
+                });
+              }
+            }
           });
         });
 
