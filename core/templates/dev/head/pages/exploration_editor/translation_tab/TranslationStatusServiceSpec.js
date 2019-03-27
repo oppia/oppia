@@ -260,7 +260,7 @@ describe('Translation status service', function() {
       };
       ess.init(statesWithAudioDict);
 
-      // To call the function "_computeAllStatesStatus()" of
+      // To call the function _computeAllStatesStatus() of
       // TranslationStatusService, so that the status of all states is
       // computed for the other dependent functions to work.
       tss.getAllStateStatusColors();
@@ -278,7 +278,7 @@ describe('Translation status service', function() {
       scitats.saveDisplayedValue();
       ess.saveContentIdsToAudioTranslations(STATES[0], value);
 
-      // To call the function "_computeAllStatesStatus()" of
+      // To call the function _computeAllStatesStatus() of
       // TranslationStatusService, so that the status of all states is
       // computed for the dependent function "getAllStatesNeedUpdatewarning"
       // to work.
