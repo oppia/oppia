@@ -21,7 +21,6 @@ from core.domain import exp_services
 from core.domain import search_services
 from core.domain import stats_domain
 from core.domain import stats_services
-from core.platform import models
 from core.tests import test_utils
 import feconf
 
