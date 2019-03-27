@@ -343,8 +343,8 @@ describe('Translation status service', function() {
       'active state component need(s) update', function() {
       var activeStateComponentNeedsUpdateStatus = tss
         .getActiveStateComponentNeedsUpdateStatus('feedback');
-      // To check that initially the state component "feedback" contains no audio
-      // that needs update.
+      // To check that initially the state component "feedback" does not
+      // contain audio that needs update.
       expect(activeStateComponentNeedsUpdateStatus).toBe(false);
       scitats.init(STATES[0], ess.getContentIdsToAudioTranslationsMemento(
         STATES[0]));
@@ -393,8 +393,8 @@ describe('Translation status service', function() {
         STATES[0]));
       var activeStateContentIdNeedsUpdateStatus = tss
         .getActiveStateContentIdNeedsUpdateStatus('feedback_2');
-      // To check that initially the state content id "feedback" contains no
-      // audio that needs update.
+      // To check that initially the state content id "feedback" does not
+      // contain audio that needs update.
       expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
       var value = scitats.displayed;
       value.toggleNeedsUpdateAttribute('feedback_2', 'en');
