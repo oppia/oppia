@@ -86,7 +86,7 @@ def _create_new_question(committer_id, question, commit_message):
     create_question_summary(question.id, committer_id)
 
 
-def create_new_question_skill_link(question_id, skill_id, skill_difficulty=0.0):
+def create_new_question_skill_link(question_id, skill_id, skill_difficulty):
     """Creates a new QuestionSkillLink model.
 
     Args:
