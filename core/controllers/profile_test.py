@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the profile page."""
+import re
 
 from constants import constants
 from core.domain import exp_domain
@@ -42,6 +43,51 @@ class SignupTests(test_utils.GenericTestBase):
         response = self.get_html_response('/create/0', expected_status_int=302)
         self.assertIn('Logout', response.headers['location'])
         self.assertIn('create', response.headers['location'])
+
+        self.logout()
+
+    def test_to_check_url_redirection_in_signup(self):
+        """To validate the redirections from return_url."""
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Registering this user fully.
+        self.post_json(
+            feconf.SIGNUP_DATA_URL,
+            {'username': 'abc', 'agreed_to_terms': True},
+            csrf_token=csrf_token)
+
+        def strip_domain_from_location_header(url):
+            """To strip the domain form the location url."""
+            splitted_url = re.match(r'(http[s]?:\/\/)?([^\/\s]+\/)(.*)', url)
+            return splitted_url.group(3)
+
+        response = self.get_html_response(
+            '/signup?return_url=https://google.com', expected_status_int=302)
+        self.assertEqual('', strip_domain_from_location_header(
+            response.headers['location']))
+
+        response = self.get_html_response(
+            '/signup?return_url=//google.com', expected_status_int=302)
+        self.assertEqual('', strip_domain_from_location_header(
+            response.headers['location']))
+
+        response = self.get_html_response(
+            '/signup?return_url=/page#hello', expected_status_int=302)
+        self.assertEqual('page', strip_domain_from_location_header(
+            response.headers['location']))
+
+        response = self.get_html_response(
+            '/signup?return_url=/page/hello', expected_status_int=302)
+        self.assertEqual('page/hello', strip_domain_from_location_header(
+            response.headers['location']))
+
+        response = self.get_html_response(
+            '/signup?return_url=/page/hello?id=tests', expected_status_int=302)
+        self.assertEqual(
+            'page/hello?id=tests', strip_domain_from_location_header(
+                response.headers['location']))
 
         self.logout()
 
