@@ -463,6 +463,8 @@ var constants = {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
+  "DEFAULT_SKILL_DIFFICULTY": 0.3,
+
   "ENABLE_NEW_STRUCTURE_EDITORS": true,
 
   "ENABLE_PREREQUISITE_SKILLS": false,

@@ -307,10 +307,11 @@ class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
         expected_object_dict = {
             'question_id': 'testquestion',
             'skill_id': 'testskill',
-            'skill_description': 'testskilldescription'
+            'skill_description': 'testskilldescription',
+            'skill_difficulty': 0.5,
         }
         observed_object = question_domain.QuestionSkillLink(
-            'testquestion', 'testskill', 'testskilldescription')
+            'testquestion', 'testskill', 'testskilldescription', 0.5)
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
 
