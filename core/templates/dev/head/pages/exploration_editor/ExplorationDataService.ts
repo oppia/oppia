@@ -76,9 +76,14 @@ oppia.factory('ExplorationDataService', [
           // We can safely remove the locally saved draft copy if it was saved
           // to the backend.
           LocalStorageService.removeExplorationDraft(explorationId);
-          successCallback(response);
-        },
-        errorCallback);
+          if (successCallback) {
+            successCallback(response);
+          }
+        }, function() {
+          if (errorCallback) {
+            errorCallback();
+          }
+        });
       },
       discardDraft: function(successCallback, errorCallback) {
         $http.post(explorationDraftAutosaveUrl, {}).then(function() {

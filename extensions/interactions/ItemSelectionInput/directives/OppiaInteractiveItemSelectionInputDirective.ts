@@ -22,10 +22,10 @@
 
 oppia.directive('oppiaInteractiveItemSelectionInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
-  'itemSelectionInputRulesService',
+  'ItemSelectionInputRulesService',
   function(
       HtmlEscaperService, UrlInterpolationService,
-      itemSelectionInputRulesService) {
+      ItemSelectionInputRulesService) {
     return {
       restrict: 'E',
       scope: {},
@@ -90,7 +90,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
             );
 
             CurrentInteractionService.onSubmit(
-              answers, itemSelectionInputRulesService);
+              answers, ItemSelectionInputRulesService);
           };
 
           var validityCheckFn = function() {

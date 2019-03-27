@@ -22,7 +22,7 @@ describe('Pencil Code Editor rules service', function() {
 
   var pcers = null;
   beforeEach(angular.mock.inject(function($injector) {
-    pcers = $injector.get('pencilCodeEditorRulesService');
+    pcers = $injector.get('PencilCodeEditorRulesService');
   }));
 
   describe('\'equals\' rule', function() {

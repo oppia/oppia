@@ -20,7 +20,7 @@ interface ICustomScope extends ng.IScope {
     // ImageUploaderDirective.ts
     fileInputClassName?: string;
 
-    // FormBuilder.ts
+    // ApplyValidationDirective.ts
     validators?: any;
 
     // ObjectEditorDirective.ts, ValueGeneratorEditorDirective.ts
@@ -34,7 +34,7 @@ interface ICustomScope extends ng.IScope {
     getAlwaysEditable?: (() => boolean);
     getIsEditable?: (() => boolean);
 
-    // ValueGeneratorEditorDirective.ts, Copier.ts, RandomSelector.ts
+    // ValueGeneratorEditorDirective.ts, CopierDirective.ts, RandomSelectorDirective.ts
     generatorId?: string;
 
     // ValueGeneratorEditorDirective.ts
@@ -51,7 +51,7 @@ interface ICustomScope extends ng.IScope {
     // ConversationSkinDirective.ts
     directiveTemplate?: string;
 
-    // Copier.ts, RandomSelector.ts
+    // CopierDirective.ts, RandomSelectorDirective.ts
     getTemplateUrl?: (() => string);
 
     // OppiaInteractiveMusicNotesInputDirective.ts

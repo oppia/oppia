@@ -22,7 +22,7 @@ describe('Logic Proof rules service', function() {
 
   var lprs = null;
   beforeEach(angular.mock.inject(function($injector) {
-    lprs = $injector.get('logicProofRulesService');
+    lprs = $injector.get('LogicProofRulesService');
   }));
 
   var CORRECT_EXAMPLE = {

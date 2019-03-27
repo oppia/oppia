@@ -22,7 +22,7 @@ describe('Image Click Input rules service', function() {
 
   var icirs = null;
   beforeEach(angular.mock.inject(function($injector) {
-    icirs = $injector.get('imageClickInputRulesService');
+    icirs = $injector.get('ImageClickInputRulesService');
   }));
 
   it('should have a correct \'is in region\' rule', function() {

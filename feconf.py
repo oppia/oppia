@@ -64,17 +64,17 @@ DEPENDENCIES_TEMPLATES_DIR = (
 
 if not constants.DEV_MODE:
     VALUE_GENERATORS_DIR_FOR_JS = os.path.join(
-        'local_compiled_js', 'extensions', 'value_generators')
+        'extensions', 'value_generators')
 else:
     VALUE_GENERATORS_DIR_FOR_JS = os.path.join(
-        'extensions', 'value_generators')
+        'local_compiled_js', 'extensions', 'value_generators')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 
 if not constants.DEV_MODE:
+    VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
+else:
     VISUALIZATIONS_DIR = os.path.join(
         'local_compiled_js', 'extensions', 'visualizations')
-else:
-    VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'objects', 'object_defaults.json')
@@ -773,7 +773,7 @@ SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with app.js.
+# NOTE TO DEVELOPERS: This should be synchronized with App.js.
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
@@ -814,27 +814,6 @@ USER_QUERY_STATUS_FAILED = 'failed'
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
 
-# These categories are shown in the library navbar.
-SEARCH_DROPDOWN_CATEGORIES = sorted([
-    'Mathematics',
-    'Statistics',
-    'Algorithms',
-    'Programming',
-    'Biology',
-    'Chemistry',
-    'Physics',
-    'Medicine',
-    'English',
-    'Architecture',
-    'Art',
-    'Music',
-    'Reading',
-    'Business',
-    'Economics',
-    'Geography',
-    'History',
-])
-
 # The i18n id for the header of the "Featured Activities" category in the
 # library index page.
 LIBRARY_CATEGORY_FEATURED_ACTIVITIES = 'I18N_LIBRARY_GROUPS_FEATURED_ACTIVITIES'
@@ -851,18 +830,6 @@ LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
 # The group name that appears at the end of the url for the top rated page.
 LIBRARY_GROUP_TOP_RATED = 'top_rated'
-
-# NOTE TO DEVELOPERS: The LIBRARY_PAGE_MODE constants defined below should have
-# the same value as the ones defined in LIBRARY_PAGE_MODES in Library.js. For
-# example LIBRARY_PAGE_MODE_GROUP should have the same value as
-# LIBRARY_PAGE_MODES.GROUP.
-# Page mode for the group pages such as top rated and recently published
-# explorations.
-LIBRARY_PAGE_MODE_GROUP = 'group'
-# Page mode for the main library page.
-LIBRARY_PAGE_MODE_INDEX = 'index'
-# Page mode for the search results page.
-LIBRARY_PAGE_MODE_SEARCH = 'search'
 
 # Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5

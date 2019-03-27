@@ -22,13 +22,13 @@ describe('Graph Input service', function() {
 
   var girs = null;
   beforeEach(angular.mock.inject(function($injector) {
-    girs = $injector.get('graphInputRulesService');
+    girs = $injector.get('GraphInputRulesService');
   }));
 
   describe('graph utilities', function() {
     var utils = null;
     beforeEach(angular.mock.inject(function($injector) {
-      utils = $injector.get('graphUtilsService');
+      utils = $injector.get('GraphUtilsService');
     }));
 
     it('should construct an adjacency matrix from a graph', function() {

@@ -775,6 +775,7 @@ var logicProofShared = (function() {
    *          }
    * @raises: as before
    */
+
   var assignTypesToExpressionArray = function(
       untypedArray, topTypes, language,
       newKindsPermitted = ['constant', 'variable'], isTemplate = false,

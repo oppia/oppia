@@ -22,7 +22,7 @@ describe('Fraction Input rules service', function() {
 
   var firs = null;
   beforeEach(angular.mock.inject(function($injector) {
-    firs = $injector.get('fractionInputRulesService');
+    firs = $injector.get('FractionInputRulesService');
   }));
 
   var createNegativeFractionDict = function(
