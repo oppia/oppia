@@ -130,7 +130,7 @@ oppia.factory('StateEditorService', [
         misconceptions = newMisconceptions;
       },
       getMisconceptions: function() {
-        return misconceptions;
+        return angular.copy(misconceptions);
       },
       setInteraction: function(newInteraction) {
         interaction = newInteraction;
@@ -154,7 +154,7 @@ oppia.factory('StateEditorService', [
         interaction.setHints(hints);
       },
       getInteraction: function() {
-        return interaction;
+        return angular.copy(interaction);
       },
       getAnswerChoices: function(interactionId, customizationArgs) {
         if (!interactionId) {
