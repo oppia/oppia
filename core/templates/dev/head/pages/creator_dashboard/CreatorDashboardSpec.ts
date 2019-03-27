@@ -20,8 +20,8 @@
 
 describe('Creator dashboard controller', function() {
   describe('CreatorDashboard', function() {
-    var scope, ctrl;
-    var mockDashboardBackendApiService;
+    var scope, ctrl, $httpBackend;
+    var CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data';
     var dashboardData = {
       explorations_list: [{
         category: 'Featured category',
@@ -57,34 +57,27 @@ describe('Creator dashboard controller', function() {
 
     beforeEach(function() {
       angular.mock.module('oppia');
-      angular.mock.module(function($provide) {
-        $provide.factory(
-          'CreatorDashboardBackendApiService', ['$q', function($q) {
-            var fetchDashboardData = function() {
-              return $q.resolve(dashboardData);
-            };
-            return {
-              fetchDashboardData: fetchDashboardData
-            };
-          }]);
-      });
     });
+
+    beforeEach(angular.mock.inject(function($injector) {
+      $httpBackend = $injector.get('$httpBackend');
+    }));
 
     beforeEach(angular.mock.inject(
       function($controller, $rootScope, CreatorDashboardBackendApiService) {
-        mockDashboardBackendApiService = CreatorDashboardBackendApiService;
-        spyOn(mockDashboardBackendApiService, 'fetchDashboardData')
-          .and.callThrough();
+        $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
+          dashboardData);
         scope = $rootScope.$new();
         ctrl = $controller('CreatorDashboard', {
           $scope: scope,
           AlertsService: null,
-          CreatorDashboardBackendApiService: mockDashboardBackendApiService
+          CreatorDashboardBackendApiService: CreatorDashboardBackendApiService
         });
       }
     ));
 
     it('should have the correct data for creator dashboard', function() {
+      $httpBackend.flush();
       expect(scope.explorationsList).toEqual(dashboardData.explorations_list);
       expect(scope.collectionsList).toEqual(dashboardData.collections_list);
       expect(scope.dashboardStats).toEqual(dashboardData.dashboard_stats);
