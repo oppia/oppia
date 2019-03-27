@@ -28,7 +28,6 @@ import feconf
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
-gae_search_services = models.Registry.import_search_services()
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
