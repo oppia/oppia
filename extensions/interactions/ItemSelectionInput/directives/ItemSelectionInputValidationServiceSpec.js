@@ -68,6 +68,17 @@ describe('ItemSelectionInputValidationService', function() {
       false,
       null)
     ];
+    IsProperSubsetValidOption = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'IsProperSubsetOf',
+        inputs: {
+          x: ['Selection 1']
+        }
+      })],
+      goodDefaultOutcome,
+      false,
+      null)
+    ];
   }));
 
   it('should be able to perform basic validation', function() {
@@ -165,4 +176,19 @@ describe('ItemSelectionInputValidationService', function() {
       message: 'Please ensure the choices are unique.'
     }]);
   });
+
+  it(
+    'should expect more that 1 element to be in the rule input, if the ' +
+    '"proper subset" rule is used.',
+    function() {
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, IsProperSubsetValidOption,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'In answer group 1, ' +
+          'rule 1, the "proper subset" rule must include at least 2 options.')
+      }]);
+    });
 });

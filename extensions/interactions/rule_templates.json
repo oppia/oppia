@@ -97,6 +97,9 @@
     },
     "DoesNotContainAtLeastOneOf": {
       "description": "omits at least one of {{x|SetOfHtmlString}}"
+    },
+    "IsProperSubsetOf": {
+      "description": "is a proper subset of {{x|SetOfHtmlString}}"
     }
   },
   "LogicProof": {
