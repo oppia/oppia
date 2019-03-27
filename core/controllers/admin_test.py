@@ -23,6 +23,7 @@ from core.domain import stats_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+
 from google.appengine.api import search
 
 
@@ -308,13 +309,21 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
     def test_clear_search_index(self):
         doc1 = search.Document(doc_id='doc1', language='en', rank=1, fields=[
             search.TextField(name='k', value='abc def ghi')])
-        index = search.Index(search_services.SEARCH_INDEX_EXPLORATIONS)
-        index.put([doc1])
-        result = gae_search_services.search(
+        doc2 = search.Document(doc_id='doc1', language='en', rank=2, fields=[
+            search.TextField(name='k', value='abc def ghi')])
+        index_explorations = search.Index(
+            search_services.SEARCH_INDEX_EXPLORATIONS)
+        index_explorations.put([doc1])
+        index_collections = search.Index(
+            search_services.SEARCH_INDEX_COLLECTIONS)
+        index_collections.put([doc2])
+        result_explorations = gae_search_services.search(
             'k:abc', search_services.SEARCH_INDEX_EXPLORATIONS)[0]
         self.assertIn({
             'id': 'doc1', 'k': 'abc def ghi', 'rank': 1, 'language_code': 'en'
-            }, result)
+            }, result_explorations)
+        result_collections = gae_search_services.search(
+            'k:abc', search_services.SEARCH_INDEX_COLLECTIONS)[0]
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_html_response('/admin')
@@ -325,6 +334,9 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token)
         self.assertEqual(generated_exps_response, {})
-        result = gae_search_services.search(
+        result_explorations = gae_search_services.search(
             'k:abc', search_services.SEARCH_INDEX_EXPLORATIONS)[0]
-        self.assertEqual(result, [])
+        self.assertEqual(result_explorations, [])
+        result_collections = gae_search_services.search(
+            'k:abc', search_services.SEARCH_INDEX_COLLECTIONS)[0]
+        self.assertEqual(result_collections, [])
