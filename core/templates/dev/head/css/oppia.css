@@ -498,6 +498,11 @@ textarea {
   -webkit-transition: -webkit-transform 0.5s;
 }
 
+.oppia-correctness-label-editor {
+  margin-left: 4px;
+  margin-top: 18px;
+}
+
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
   height: 110vh;
