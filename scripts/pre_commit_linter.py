@@ -64,6 +64,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 
@@ -951,6 +952,7 @@ class LintChecksManager(object):
             all_filepaths: list(str). The list of filepaths to be linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
+        self.compiled_js_dir = tempfile.mkdtemp()
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
@@ -991,20 +993,12 @@ class LintChecksManager(object):
                 parsed_js_and_ts_files[filepath] = esprima.parseScript(
                     file_content)
 
-        print 'Removing compiled js used in parsing'
-        dirpath = os.path.join(os.getcwd(), 'compiled_js_for_parsing')
-        if os.path.exists(dirpath):
-            shutil.rmtree(dirpath)
-
         return parsed_js_and_ts_files
 
     def _compile_ts_file(self, filepath):
         """Compiles a typescript file and returns the path for compiled
         js file.
         """
-        out_dir = os.path.join(os.getcwd(), 'compiled_js_for_parsing')
-        if not os.path.exists(out_dir):
-            os.mkdir(out_dir)
         allow_js = 'true'
         lib = 'es2017,dom'
         no_implicit_use_strict = 'true'
@@ -1015,12 +1009,13 @@ class LintChecksManager(object):
             '../node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
             '-lib %s -noImplicitUseStrict %s -skipLibCheck '
             '%s -target %s -typeRoots %s %s typings/*') % (
-                out_dir, allow_js, lib, no_implicit_use_strict,
+                self.compiled_js_dir, allow_js, lib, no_implicit_use_strict,
                 skip_lib_check, target, type_roots, filepath)
         subprocess.call(cmd, shell=True)
-        filename = os.path.basename(filepath)
-        compiled_js_filename = filename.replace('.ts', '.js')
-        compiled_js_filepath = os.path.join(out_dir, compiled_js_filename)
+
+        compiled_js_filepath = os.path.join(
+            self.compiled_js_dir, os.path.basename(filepath).replace(
+                '.ts', '.js'))
         return compiled_js_filepath
 
     def _lint_all_files(self):
