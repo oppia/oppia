@@ -24,7 +24,6 @@ from core.domain import stats_services
 from core.tests import test_utils
 import feconf
 
-
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
