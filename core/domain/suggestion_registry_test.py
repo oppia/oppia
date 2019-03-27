@@ -144,7 +144,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'question_state_data': self._create_valid_question_data(
                         'default_state').to_dict(),
                     'language_code': 'en',
-                    'question_state_schema_version': (
+                    'question_state_data_schema_version': (
                         feconf.CURRENT_STATES_SCHEMA_VERSION)
                 },
                 'skill_id': 'skill_1'

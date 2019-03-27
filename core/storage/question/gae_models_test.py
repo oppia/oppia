@@ -14,6 +14,8 @@
 
 """Tests for core.storage.question.gae_models."""
 
+import datetime
+
 from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
@@ -44,12 +46,16 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
         question_summary_model_1 = question_models.QuestionSummaryModel(
             id='question_1',
             creator_id='user',
-            question_content='Question 1'
+            question_content='Question 1',
+            question_model_created_on=datetime.datetime.utcnow(),
+            question_model_last_updated=datetime.datetime.utcnow()
         )
         question_summary_model_2 = question_models.QuestionSummaryModel(
             id='question_2',
             creator_id='user',
-            question_content='Question 2'
+            question_content='Question 2',
+            question_model_created_on=datetime.datetime.utcnow(),
+            question_model_last_updated=datetime.datetime.utcnow()
         )
         question_summary_model_1.put()
         question_summary_model_2.put()
