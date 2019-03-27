@@ -69,7 +69,7 @@ if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
   echo ""
   echo "  Running test in production environment"
   echo ""
-  $PYTHON_CMD scripts/build.py --compile --prod_env --minify_third_party_libs_only
+  $PYTHON_CMD scripts/build.py --prod_env --minify_third_party_libs_only
   $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.ts --prod_env=True
 fi
 

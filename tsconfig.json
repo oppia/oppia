@@ -9,5 +9,5 @@
     "target": "es5",
     "typeRoots": ["../node_modules/@types"],
   },
-  "exclude": ["third_party", "assets/scripts/*.js", "gulpfile.js", "local_compiled_js", "backend_prod_files", "build"]
+  "exclude": ["third_party", "assets/scripts/*.js", "assets/hashes.js", "gulpfile.js", "local_compiled_js", "backend_prod_files", "build", "core/tests"]
 }

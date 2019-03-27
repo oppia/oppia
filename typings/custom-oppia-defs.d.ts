@@ -1,6 +1,7 @@
 // These declarations are required to avoid compile errors while compiling
 // single files.
 declare var constants: any;
+declare var hashes: any;
 declare var GLOBALS: any;
 declare var oppia: any;
 declare var richTextComponents: any;

@@ -252,8 +252,8 @@ EXCLUDED_PATHS = (
     'compiled_js_for_parsing/*')
 
 GENERATED_FILE_PATHS = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
-    'extensions/interactions/LogicProof/static/js/generatedParser.ts',
+    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
+    'extensions/interactions/LogicProof/static/js/generatedParser.js',
     'core/templates/dev/head/expressions/ExpressionParserService.ts')
 
 CONFIG_FILE_PATHS = (

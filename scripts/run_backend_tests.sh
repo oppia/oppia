@@ -87,7 +87,7 @@ done
 
 # Compile typescript files
 echo "Compiling typescript..."
-$NODE_MODULE_DIR/typescript/bin/tsc
+$NODE_MODULE_DIR/typescript/bin/tsc --project .
 
 $PYTHON_CMD scripts/backend_tests.py $@
 

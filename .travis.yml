@@ -160,6 +160,7 @@ cache:
     - build/templates/head/
     - backend_prod_files/extensions/
     - build/extensions/
+    - local_compiled_js
 
 before_cache:
   # Delete python bytecode to prevent cache rebuild.
