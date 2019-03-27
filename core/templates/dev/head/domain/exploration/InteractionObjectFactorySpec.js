@@ -278,7 +278,11 @@ describe('Interaction object factory', function() {
     var otherInteractionDict = {
       answer_groups: newAnswerGroups,
       confirmed_unclassified_answers: [],
-      customization_args: [],
+      customization_args: {
+        customArg: {
+          value: 'custom_arg'
+        }
+      },
       default_outcome: newDefaultOutcome,
       hints: newHintDict,
       id: 'interaction_id_new',
@@ -287,17 +291,15 @@ describe('Interaction object factory', function() {
     var otherInteraction = iof.createFromBackendDict(otherInteractionDict);
     testInteraction.copy(otherInteraction);
     expect(testInteraction).toEqual(otherInteraction);
-    otherInteractionDict = otherInteraction.toBackendDict();
-    var customizationArgsNewDict = otherInteractionDict.customization_args;
-    customizationArgsNewDict = {
-      customArgNew: {
-        value: 'custom_value_new'
-      }
-    };
+    otherInteraction.customizationArgs.customArg.value = 'custom_arg_new';
     expect(testInteraction).toEqual(iof.createFromBackendDict({
       answer_groups: newAnswerGroups,
       confirmed_unclassified_answers: [],
-      customization_args: [],
+      customization_args: {
+        customArg: {
+          value: 'custom_arg'
+        }
+      },
       default_outcome: newDefaultOutcome,
       hints: newHintDict,
       id: 'interaction_id_new',
