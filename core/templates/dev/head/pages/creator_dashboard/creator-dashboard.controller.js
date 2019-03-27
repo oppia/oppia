@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,37 +16,7 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
-oppia.constant('EXPLORATION_DROPDOWN_STATS', {
-  OPEN_FEEDBACK: 'open_feedback'
-});
-
-oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
-  TITLE: 'title',
-  RATING: 'ratings',
-  NUM_VIEWS: 'num_views',
-  OPEN_FEEDBACK: 'num_open_threads',
-  LAST_UPDATED: 'last_updated_msec'
-});
-
-oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
-  TITLE: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE ',
-  RATING: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING',
-  NUM_VIEWS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TOTAL_PLAYS',
-  OPEN_FEEDBACK: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_OPEN_FEEDBACK',
-  LAST_UPDATED: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
-});
-
-oppia.constant('SUBSCRIPTION_SORT_BY_KEYS', {
-  USERNAME: 'subscriber_username',
-  IMPACT: 'subscriber_impact'
-});
-
-oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
-  USERNAME: 'Username',
-  IMPACT: 'Impact'
-});
-
-oppia.controller('CreatorDashboard', [
+angular.module('creatorDashboardModule').controller('CreatorDashboard', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$uibModal', '$window',
   'AlertsService', 'CreatorDashboardBackendApiService', 'DateTimeFormatService',
   'ExplorationCreationService', 'QuestionObjectFactory',
@@ -359,7 +329,7 @@ oppia.controller('CreatorDashboard', [
       var topicSummaries = $scope.topicSummaries;
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/creator_dashboard/create_question_modal_directive.html'),
+          '/pages/creator_dashboard/create-question-modal.directive.html'),
         backdrop: 'static',
         keyboard: false,
         size: 'lg',
