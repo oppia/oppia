@@ -86,15 +86,16 @@ def _create_new_question(committer_id, question, commit_message):
     create_question_summary(question.id, committer_id)
 
 
-def create_new_question_skill_link(question_id, skill_id):
+def create_new_question_skill_link(question_id, skill_id, skill_difficulty):
     """Creates a new QuestionSkillLink model.
 
     Args:
         question_id: str. ID of the question linked to the skill.
         skill_id: str. ID of the skill to which the question is linked.
+        skill_difficulty: float. The difficulty between [0, 1] of the skill.
     """
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
-        question_id, skill_id)
+        question_id, skill_id, skill_difficulty)
     question_skill_link_model.put()
 
 
@@ -229,7 +230,8 @@ def get_question_skill_link_from_model(
 
     return question_domain.QuestionSkillLink(
         question_skill_link_model.question_id,
-        question_skill_link_model.skill_id, skill_description)
+        question_skill_link_model.skill_id, skill_description,
+        question_skill_link_model.skill_difficulty)
 
 
 def get_question_by_id(question_id, strict=True):
@@ -311,7 +313,8 @@ def update_skill_ids_of_questions(
     for question_skill_link in old_question_skill_links:
         new_question_skill_link_models.append(
             question_models.QuestionSkillLinkModel.create(
-                question_skill_link.question_id, new_skill_id)
+                question_skill_link.question_id, new_skill_id,
+                question_skill_link.skill_difficulty)
             )
     question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
         old_question_skill_link_models)

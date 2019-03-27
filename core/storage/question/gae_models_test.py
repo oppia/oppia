@@ -73,24 +73,27 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_create_question_skill_link(self):
         question_id = 'A Test Question Id'
         skill_id = 'A Test Skill Id'
+        skill_difficulty = 0.4
         questionskilllink_model = question_models.QuestionSkillLinkModel.create(
-            question_id, skill_id)
+            question_id, skill_id, skill_difficulty)
 
         self.assertEqual(questionskilllink_model.question_id, question_id)
         self.assertEqual(questionskilllink_model.skill_id, skill_id)
+        self.assertEqual(
+            questionskilllink_model.skill_difficulty, skill_difficulty)
 
     def test_put_multi_question_skill_link(self):
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id1', 'skill_id1')
+                'question_id1', 'skill_id1', 0.1)
             )
         questionskilllink_model2 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id2', 'skill_id1')
+                'question_id2', 'skill_id1', 0.5)
             )
         questionskilllink_model3 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id3', 'skill_id3')
+                'question_id3', 'skill_id3', 0.8)
             )
 
         question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
@@ -109,15 +112,15 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_delete_multi_question_skill_link(self):
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id1', 'skill_id1')
+                'question_id1', 'skill_id1', 0.1)
             )
         questionskilllink_model2 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id2', 'skill_id1')
+                'question_id2', 'skill_id1', 0.5)
             )
         questionskilllink_model3 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id3', 'skill_id3')
+                'question_id3', 'skill_id3', 0.8)
             )
 
         question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
@@ -150,15 +153,15 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_get_models_by_question_id(self):
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id1', 'skill_id1')
+                'question_id1', 'skill_id1', 0.1)
             )
         questionskilllink_model2 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id2', 'skill_id1')
+                'question_id2', 'skill_id1', 0.5)
             )
         questionskilllink_model3 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id2', 'skill_id3')
+                'question_id2', 'skill_id3', 0.8)
             )
 
         question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
