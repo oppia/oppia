@@ -209,7 +209,7 @@
 /core/templates/dev/head/pages/donate/ @vojtechjelinek
 /core/templates/dev/head/pages/error/ @vojtechjelinek
 /core/templates/dev/head/pages/get_started/ @vojtechjelinek
-/core/templates/dev/head/pages/landing/ @vojtechjelinek
+/core/templates/dev/head/pages/landing-page/ @vojtechjelinek
 /core/templates/dev/head/pages/maintenance/ @vojtechjelinek
 /core/templates/dev/head/pages/preferences/ @vojtechjelinek
 /core/templates/dev/head/pages/signup/ @vojtechjelinek
