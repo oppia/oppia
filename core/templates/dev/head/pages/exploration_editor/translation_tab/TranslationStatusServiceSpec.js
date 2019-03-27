@@ -24,60 +24,7 @@ describe('Translation status service', function() {
       },
       availableTranslationLanguageCodes: ['en']
     });
-    $provide.value('ExplorationStatesService', {
-      isInitialized: function() {
-        return true;
-      },
-      getStateNames: function() {
-        return ['First', 'Second', 'Third'];
-      },
-      getContentIdsToAudioTranslationsMemento: function(stateName) {
-        var citatDict = {
-          First: {
-            content: {
-              en: {
-                filename: 'filename1.mp3',
-                file_size_bytes: 100000,
-                needs_update: true
-              }
-            },
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {
-              en: {
-                filename: 'filename2.mp3',
-                file_size_bytes: 100000,
-                needs_update: false
-              }
-            }
-          },
-          Second: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {}
-          },
-          Third: {
-            content: {
-              en: {
-                filename: 'filename3.mp3',
-                file_size_bytes: 100000,
-                needs_update: false
-              }
-            }
-          }
-        };
-        return ContentIdsToAudioTranslationsObjectFactory
-          .createFromBackendDict(citatDict[stateName]);
-      },
-      getInteractionIdMemento: function(stateName) {
-        var interactionIds = {
-          First: 'MultipleChoiceInput',
-          Second: 'MultipleChoiceInput',
-          Third: 'EndExploration'};
-        return interactionIds[stateName];
-      }
-    });
+
     $provide.constant('INTERACTION_SPECS', {
       MultipleChoiceInput: {
         is_linear: false,
@@ -90,26 +37,228 @@ describe('Translation status service', function() {
     });
   }));
 
-  beforeEach(inject(function($injector) {
-    var ContentIdsToAudioTranslationsObjectFactory = $injector.get(
-      'ContentIdsToAudioTranslationsObjectFactory');
-  }));
-
   describe('Translation status service', function() {
     var ess = null;
-    var StateContentIdsToAudioTranslationsService = null;
+    var scitats = null;
     var tss = null;
     var ALL_AUDIO_AVAILABLE_COLOR = '#16A765';
     var FEW_AUDIO_AVAILABLE_COLOR = '#E9B330';
     var NO_AUDIO_AVAILABLE_COLOR = '#D14836';
     var STATES = ['First', 'Second', 'Third'];
+    var statesWithAudioDict = null;
+    var mockExplorationData;
+
+    beforeEach(function() {
+      mockExplorationData = {
+        explorationId: 0,
+        autosaveChangeList: function() {},
+        discardDraft: function() {}
+      };
+      module(function($provide) {
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
+      });
+      spyOn(mockExplorationData, 'autosaveChangeList');
+    });
+
     beforeEach(inject(function($injector) {
       tss = $injector.get('TranslationStatusService');
       ess = $injector.get('ExplorationStatesService');
-      StateContentIdsToAudioTranslationsService = $injector.get(
+      scitats = $injector.get(
         'StateContentIdsToAudioTranslationsService');
-      ContentIdsToAudioTranslationsObjectFactory = $injector.get(
-        'ContentIdsToAudioTranslationsObjectFactory');
+
+      statesWithAudioDict = {
+        First: {
+          content: {
+            html: '<p>This is first card.</p>',
+            content_id: 'content'
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_2: {},
+              feedback_1: {}
+            }
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_2: {
+              en: {
+                needs_update: false,
+                filename: 'filename1.mp3',
+                file_size_bytes: 43467
+              }
+            },
+            feedback_1: {}
+          },
+          interaction: {
+            answer_groups: [{
+              tagged_misconception_id: null,
+              outcome: {
+                refresher_exploration_id: null,
+                param_changes: [],
+                labelled_as_correct: false,
+                feedback: {
+                  html: '<p>This is feedback1</p>',
+                  content_id: 'feedback_1'
+                },
+                missing_prerequisite_skill_id: null,
+                dest: 'Second'
+              },
+              rule_specs: [{
+                inputs: {
+                  x: 0
+                },
+                rule_type: 'Equals'
+              }],
+              training_data: []
+            },
+            {
+              tagged_misconception_id: null,
+              outcome: {
+                refresher_exploration_id: null,
+                param_changes: [],
+                labelled_as_correct: false,
+                feedback: {
+                  html: '<p>This is feedback2</p>',
+                  content_id: 'feedback_2'
+                },
+                missing_prerequisite_skill_id: null,
+                dest: 'First'
+              },
+              rule_specs: [{
+                inputs: {
+                  x: 1
+                },
+                rule_type: 'Equals'
+              }],
+              training_data: []
+            }],
+            solution: null,
+            hints: [],
+            id: 'MultipleChoiceInput',
+            customization_args: {
+              choices: {
+                value: ['<p>1</p>', '<p>2</p>']
+              }
+            },
+            default_outcome: {
+              refresher_exploration_id: null,
+              param_changes: [],
+              labelled_as_correct: false,
+              feedback: {
+                html: '',
+                content_id: 'default_outcome'
+              },
+              missing_prerequisite_skill_id: null,
+              dest: 'First'
+            },
+            confirmed_unclassified_answers: []
+          },
+          classifier_model_id: null,
+          param_changes: []
+        },
+        Second: {
+          content: {
+            html: '<p>This is second card</p>',
+            content_id: 'content'
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          },
+          interaction: {
+            answer_groups: [{
+              tagged_misconception_id: null,
+              outcome: {
+                refresher_exploration_id: null,
+                param_changes: [],
+                labelled_as_correct: false,
+                feedback: {
+                  html: '',
+                  content_id: 'feedback_1'
+                },
+                missing_prerequisite_skill_id: null,
+                dest: 'Third'
+              },
+              rule_specs: [{
+                inputs: {
+                  x: 0
+                },
+                rule_type: 'Equals'
+              }],
+              training_data: []
+            }],
+            solution: null,
+            hints: [],
+            id: 'MultipleChoiceInput',
+            customization_args: {
+              choices: {
+                value: ['<p>1</p>']
+              }
+            },
+            default_outcome: {
+              refresher_exploration_id: null,
+              param_changes: [],
+              labelled_as_correct: false,
+              feedback: {
+                html: '',
+                content_id: 'default_outcome'
+              },
+              missing_prerequisite_skill_id: null,
+              dest: 'Second'
+            },
+            confirmed_unclassified_answers: []
+          },
+          classifier_model_id: null,
+          param_changes: []
+        },
+        Third: {
+          content: {
+            html: 'Congratulations, you have finished!',
+            content_id: 'content'
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {}
+            }
+          },
+          content_ids_to_audio_translations: {
+            content: {
+              en: {
+                needs_update: false,
+                filename: 'content-en-s86jb5zajs.mp3',
+                file_size_bytes: 38870
+              }
+            }
+          },
+          interaction: {
+            answer_groups: [],
+            solution: null,
+            hints: [],
+            id: 'EndExploration',
+            customization_args: {
+              recommendedExplorationIds: {
+                value: []
+              }
+            },
+            default_outcome: null,
+            confirmed_unclassified_answers: []
+          },
+          classifier_model_id: null,
+          param_changes: []
+        }
+      };
+      ess.init(statesWithAudioDict);
 
       // To call _computeAllStatesStatus() function of
       // TranslationStatusService, so that the status of all states is
@@ -120,6 +269,22 @@ describe('Translation status service', function() {
     it('should return a correct list of state names for which ' +
       'audio needs update', function() {
       var statesNeedingAudioUpdate = tss.getAllStatesNeedUpdatewarning();
+      // To check that initially no state contains audio that needs update.
+      expect(Object.keys(statesNeedingAudioUpdate).length).toBe(0);
+      scitats.init(STATES[0], ess.getContentIdsToAudioTranslationsMemento(
+        STATES[0]));
+      var value = scitats.displayed;
+      value.toggleNeedsUpdateAttribute('feedback_2', 'en');
+      scitats.saveDisplayedValue();
+      ess.saveContentIdsToAudioTranslations(STATES[0], value);
+
+      // To call _computeAllStatesStatus() function of
+      // TranslationStatusService, so that the status of all states is
+      // computed for the dependent function "getAllStatesNeedUpdatewarning"
+      // to work.
+      tss.getAllStateStatusColors();
+      statesNeedingAudioUpdate = tss.getAllStatesNeedUpdatewarning();
+      // To check that "First" state contains audio that needs update.
       expect(Object.keys(statesNeedingAudioUpdate).length).toBe(1);
       expect(statesNeedingAudioUpdate.First.indexOf(
         'Audio needs update!')).toBe(0);
@@ -129,7 +294,7 @@ describe('Translation status service', function() {
       'in an exploration', function() {
       var explorationAudioRequiredCount = tss
         .getExplorationAudioRequiredCount();
-      expect(explorationAudioRequiredCount).toBe(9);
+      expect(explorationAudioRequiredCount).toBe(8);
     });
 
     it('should return a correct count of audio translations not available ' +
@@ -140,8 +305,7 @@ describe('Translation status service', function() {
     });
 
     it('should correctly return an object contaning status colors of all ' +
-      'states in exploration', function() {
-      
+      'states in the exploration', function() {
       var stateWiseStatusColor = tss.getAllStateStatusColors();
       expect(stateWiseStatusColor[STATES[0]]).toBe(
         FEW_AUDIO_AVAILABLE_COLOR);
@@ -152,24 +316,24 @@ describe('Translation status service', function() {
     });
 
     it('should return correct status color for active state', function() {
-      StateContentIdsToAudioTranslationsService.init(
-        STATES[0], ess.getContentIdsToAudioTranslationsMemento(STATES[0]));
+      scitats.init(STATES[0], ess.getContentIdsToAudioTranslationsMemento(
+        STATES[0]));
       var activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('content');
-      expect(activeStateComponentStatus).toBe(ALL_AUDIO_AVAILABLE_COLOR);
+      expect(activeStateComponentStatus).toBe(NO_AUDIO_AVAILABLE_COLOR);
       activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('feedback');
       expect(activeStateComponentStatus).toBe(FEW_AUDIO_AVAILABLE_COLOR);
-      StateContentIdsToAudioTranslationsService.init(
-        STATES[1], ess.getContentIdsToAudioTranslationsMemento(STATES[1]));
+      scitats.init(STATES[1], ess.getContentIdsToAudioTranslationsMemento(
+        STATES[1]));
       activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('content');
       expect(activeStateComponentStatus).toBe(NO_AUDIO_AVAILABLE_COLOR);
       activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('feedback');
       expect(activeStateComponentStatus).toBe(NO_AUDIO_AVAILABLE_COLOR);
-      StateContentIdsToAudioTranslationsService.init(
-        STATES[2], ess.getContentIdsToAudioTranslationsMemento(STATES[2]));
+      scitats.init(STATES[2], ess.getContentIdsToAudioTranslationsMemento(
+        STATES[2]));
       activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('content');
       expect(activeStateComponentStatus).toBe(ALL_AUDIO_AVAILABLE_COLOR);
@@ -177,42 +341,70 @@ describe('Translation status service', function() {
 
     it('should correctly return whether audio translation(s) of ' +
       'active state component need(s) update', function() {
-      StateContentIdsToAudioTranslationsService.init(
-        STATES[0], ess.getContentIdsToAudioTranslationsMemento(STATES[0]));
       var activeStateComponentNeedsUpdateStatus = tss
-        .getActiveStateComponentNeedsUpdateStatus('content');
-      expect(activeStateComponentNeedsUpdateStatus).toBe(true);
+        .getActiveStateComponentNeedsUpdateStatus('feedback');
+      // To check that initially state component "feedback" contains no audio
+      // that needs update.
+      expect(activeStateComponentNeedsUpdateStatus).toBe(false);
+      scitats.init(STATES[0], ess.getContentIdsToAudioTranslationsMemento(
+        STATES[0]));
+      var value = scitats.displayed;
+      value.toggleNeedsUpdateAttribute('feedback_2', 'en');
+      scitats.saveDisplayedValue();
+      ess.saveContentIdsToAudioTranslations(STATES[0], value);
       activeStateComponentNeedsUpdateStatus = tss
         .getActiveStateComponentNeedsUpdateStatus('feedback');
-      expect(activeStateComponentNeedsUpdateStatus).toBe(false);
+      // To check that state component "feedback" contains audio that
+      // needs update.
+      expect(activeStateComponentNeedsUpdateStatus).toBe(true);
     });
 
     it('should return correct status color of a contentId of active state',
       function() {
-        StateContentIdsToAudioTranslationsService.init(
-          STATES[0], ess.getContentIdsToAudioTranslationsMemento(STATES[0]));
+        scitats.init(STATES[0], ess.getContentIdsToAudioTranslationsMemento(
+          STATES[0]));
         var activeStateContentIdStatusColor = tss
           .getActiveStateContentIdStatusColor('content');
+        expect(activeStateContentIdStatusColor).toBe(NO_AUDIO_AVAILABLE_COLOR);
+        activeStateContentIdStatusColor = tss
+          .getActiveStateContentIdStatusColor('feedback_1');
+        expect(activeStateContentIdStatusColor).toBe(NO_AUDIO_AVAILABLE_COLOR);
+        activeStateContentIdStatusColor = tss
+          .getActiveStateContentIdStatusColor('feedback_2');
         expect(activeStateContentIdStatusColor).toBe(ALL_AUDIO_AVAILABLE_COLOR);
-        StateContentIdsToAudioTranslationsService.init(
-          STATES[1], ess.getContentIdsToAudioTranslationsMemento(STATES[1]));
+        scitats.init(STATES[1], ess.getContentIdsToAudioTranslationsMemento(
+          STATES[1]));
         activeStateContentIdStatusColor = tss
           .getActiveStateContentIdStatusColor('content');
         expect(activeStateContentIdStatusColor).toBe(NO_AUDIO_AVAILABLE_COLOR);
+        activeStateContentIdStatusColor = tss
+          .getActiveStateContentIdStatusColor('feedback_1');
+        expect(activeStateContentIdStatusColor).toBe(NO_AUDIO_AVAILABLE_COLOR);
+        scitats.init(STATES[2], ess.getContentIdsToAudioTranslationsMemento(
+          STATES[2]));
+        activeStateContentIdStatusColor = tss
+          .getActiveStateContentIdStatusColor('content');
+        expect(activeStateContentIdStatusColor).toBe(ALL_AUDIO_AVAILABLE_COLOR);
       });
 
     it('should return whether audio translation(s) of active ' +
       'state contentId needs update status', function() {
-      StateContentIdsToAudioTranslationsService.init(
-        STATES[0], ess.getContentIdsToAudioTranslationsMemento(STATES[0]));
+      scitats.init(STATES[0], ess.getContentIdsToAudioTranslationsMemento(
+        STATES[0]));
       var activeStateContentIdNeedsUpdateStatus = tss
-        .getActiveStateContentIdNeedsUpdateStatus('content');
-      expect(activeStateContentIdNeedsUpdateStatus).toBe(true);
-      StateContentIdsToAudioTranslationsService.init(
-        STATES[2], ess.getContentIdsToAudioTranslationsMemento(STATES[2]));
-      activeStateContentIdNeedsUpdateStatus = tss
-        .getActiveStateContentIdNeedsUpdateStatus('content');
+        .getActiveStateContentIdNeedsUpdateStatus('feedback_2');
+      // To check that initially state content id "feedback" contains no audio
+      // that needs update.
       expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
+      var value = scitats.displayed;
+      value.toggleNeedsUpdateAttribute('feedback_2', 'en');
+      scitats.saveDisplayedValue();
+      ess.saveContentIdsToAudioTranslations(STATES[0], value);
+      activeStateContentIdNeedsUpdateStatus = tss
+        .getActiveStateContentIdNeedsUpdateStatus('feedback_2');
+      // To check that state content id "feedback" contains audio that needs
+      // update.
+      expect(activeStateContentIdNeedsUpdateStatus).toBe(true);
     });
   });
 });
