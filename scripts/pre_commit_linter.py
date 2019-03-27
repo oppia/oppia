@@ -15,38 +15,27 @@
 # limitations under the License.
 
 """Pre-commit script for Oppia.
-
 This script lints Python and JavaScript code, and prints a
 list of lint errors to the terminal. If the directory path is passed,
 it will lint all Python and JavaScript files in that directory; otherwise,
 it will only lint files that have been touched in this commit.
-
 This script ignores all filepaths contained within .eslintignore.
-
 IMPORTANT NOTES:
-
 1.  Before running this script, you must install third-party dependencies by
     running
-
         bash scripts/start.sh
-
     at least once.
-
 =====================
 CUSTOMIZATION OPTIONS
 =====================
 1.  To lint only files that have been touched in this commit
         python scripts/pre_commit_linter.py
-
 2.  To lint all files in the folder or to lint just a specific file
         python scripts/pre_commit_linter.py --path filepath
-
 3.  To lint a specific list of files (*.js/*.py only). Separate files by spaces
         python scripts/pre_commit_linter.py --files file_1 file_2 ... file_n
-
 4.  To lint files in verbose mode
         python scripts/pre_commit_linter.py --verbose
-
 Note that the root folder MUST be named 'oppia'.
  """
 
@@ -334,11 +323,9 @@ class FileCache(object):
     @classmethod
     def read(cls, filepath, mode='r'):
         """Returns the data read from the file.
-
         Args:
             filepath: str. The file path from which data is to be read.
             mode: str. The mode in which the file is to be opened.
-
         Returns:
             str. The data read from the file.
         """
@@ -348,11 +335,9 @@ class FileCache(object):
     def readlines(cls, filepath, mode='r'):
         """Returns the tuple containing data line by line as read from the
         file.
-
         Args:
             filepath: str. The file path from which data is to be read.
             mode: str. The mode in which the file is to be opened.
-
         Returns:
             tuple(str). The tuple containing data line by line as read from the
                 file.
@@ -362,11 +347,9 @@ class FileCache(object):
     @classmethod
     def _get_cache_lock(cls, key):
         """Returns the cache lock corresponding to the given key.
-
         Args:
             key: str. The key corresponding to which the cache lock is to be
                 found.
-
         Returns:
             str. The cache lock corresponding to the given key.
         """
@@ -380,11 +363,9 @@ class FileCache(object):
     def _get_data(cls, filepath, mode):
         """Returns the collected data from the file corresponding to the given
         filepath.
-
         Args:
             filepath: str. The file path from which data is to be read.
             mode: str. The mode in which the file is to be opened.
-
         Returns:
             tuple(str, tuple(str)). The tuple containing data read from the file
                 as first element and tuple containing the text line by line as
@@ -402,11 +383,9 @@ class FileCache(object):
 
 def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
     """Checks if file is excluded from the bad patterns check.
-
     Args:
         pattern: str. The pattern to be checked against.
         filepath: str. Path of the file.
-
     Returns:
         bool: Whether to exclude the given file from this
         particular pattern check.
@@ -425,13 +404,11 @@ def _get_expression_from_node_if_one_exists(
     If no, it will return None. It is done by filtering out
     'AssignmentExpression' (as it represents an assignment) and 'Identifier'
     (as it represents a static expression).
-
     Args:
         parsed_node: dict. Parsed node of the body of a JS file.
         components_to_check: list(str). List of angular components to check
             in a JS file. These include directives, factories, controllers,
             etc.
-
     Returns:
         expression: dict or None. Expression part of the node if the node
             represents a component else None.
@@ -466,7 +443,6 @@ def _get_expression_from_node_if_one_exists(
 
 def _get_changed_filepaths():
     """Returns a list of modified files (both staged and unstaged)
-
     Returns:
         a list of filepaths of modified files.
     """
@@ -482,12 +458,10 @@ def _get_changed_filepaths():
 def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     """Recursively collects all files in directory and
     subdirectories of specified path.
-
     Args:
         dir_path: str. Path to the folder to be linted.
         excluded_glob_patterns: set(str). Set of all glob patterns
             to be excluded.
-
     Returns:
         a list of files in directory and subdirectories without excluded files.
     """
@@ -505,10 +479,8 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
 @contextlib.contextmanager
 def _redirect_stdout(new_target):
     """Redirect stdout to the new target.
-
     Args:
         new_target: TextIOWrapper. The new target to which stdout is redirected.
-
     Yields:
         TextIOWrapper. The new target.
     """
@@ -523,12 +495,10 @@ def _redirect_stdout(new_target):
 def _get_all_filepaths(input_path, input_filenames):
     """This function is used to return the filepaths which needs to be linted
     and checked.
-
     Args:
         input_path: str. The path of the directory to be linted and checked.
         input_filenames: list(str). The list of filenames to be linted and
             checked, ignored if input_path is specified.
-
     Returns:
         all_filepaths: list(str). The list of filepaths to be linted and
             checked.
@@ -569,7 +539,6 @@ def _get_all_filepaths(input_path, input_filenames):
 
 def _check_bad_pattern_in_file(filepath, file_content, pattern):
     """Detects whether the given pattern is present in the file.
-
     Args:
         filepath: str. Path of the file.
         file_content: str. Contents of the file.
@@ -579,7 +548,6 @@ def _check_bad_pattern_in_file(filepath, file_content, pattern):
             excluded_dirs(tuple(str)) : directories to be excluded from
                 matching).
             Object containing details for the pattern to be checked.
-
     Returns:
         bool. True if there is bad pattern else false.
     """
@@ -754,7 +722,6 @@ def _lint_css_files(
         node_path, stylelint_path, config_path, files_to_lint, stdout, result,
         verbose_mode_enabled):
     """Prints a list of lint errors in the given list of CSS files.
-
     Args:
         node_path: str. Path to the node binary.
         stylelint_path: str. Path to the Stylelint binary.
@@ -814,7 +781,6 @@ def _lint_js_files(
         node_path, eslint_path, files_to_lint, stdout, result,
         verbose_mode_enabled):
     """Prints a list of lint errors in the given list of JavaScript files.
-
     Args:
         node_path: str. Path to the node binary.
         eslint_path: str. Path to the ESLint binary.
@@ -870,7 +836,6 @@ def _lint_py_files(
         config_pylint, config_pycodestyle, files_to_lint, result,
         verbose_mode_enabled):
     """Prints a list of lint errors in the given list of Python files.
-
     Args:
         config_pylint: str. Path to the .pylintrc file.
         config_pycodestyle: str. Path to the tox.ini file.
@@ -932,7 +897,6 @@ def _lint_py_files(
 
 class LintChecksManager(object):
     """Manages all the linting functions.
-
     Attributes:
         all_filepaths: list(str). The list of filepaths to be linted.
         parsed_js_files: dict. Contains the content of JS files, after
@@ -942,7 +906,6 @@ class LintChecksManager(object):
 
     def __init__(self, all_filepaths, verbose_mode_enabled=False):
         """Constructs a LintChecksManager object.
-
         Args:
             all_filepaths: list(str). The list of filepaths to be linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
@@ -1273,35 +1236,6 @@ class LintChecksManager(object):
                             'component in the file.' % (filepath))
                         failed = True
                         break
-                    # Separate the arguments of the expression.
-                    arguments = expression.arguments
-                    # The first argument of the expression is the
-                    # name of the component.
-                    component_name = arguments[0].value
-                    component = expression.callee.property.name
-
-                    # If the component is directive or filter and its name is
-                    # xxx then the filename containing it should be
-                    # XxxDirective.js or XxxFilter.js respectively.
-                    if component == 'directive' or component == 'filter':
-                        if (component_name[0].swapcase() + component_name[1:] +
-                                component.capitalize() != (exact_filename)):
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
-                    # If the component is controller or factory, then the
-                    # component name should exactly match the filename
-                    # containing it. If the component's name is xxx then the
-                    # filename should be xxx.js.
-                    else:
-                        if component_name != exact_filename:
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
@@ -1506,7 +1440,7 @@ class LintChecksManager(object):
                     matched_pattern = matched_pattern.split()
                     directive_filepath = ''.join(matched_pattern).replace(
                         '\'', '').replace('+', '')
-                    if not directive_filepath.endswith('_directive.html'):
+                    if not directive_filepath.endswith('.directive.html'):
                         failed = True
                         total_error_count += 1
                         print (
@@ -1576,7 +1510,6 @@ class LintChecksManager(object):
     def _check_docstrings(self):
         """This function ensures that docstrings end in a period and the arg
         order in the function definition matches the order in the doc string.
-
         Returns:
             summary_messages: list(str). Summary of messages generated by the
             check.
@@ -2047,7 +1980,6 @@ class LintChecksManager(object):
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
-
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
