@@ -260,7 +260,7 @@ describe('Translation status service', function() {
       };
       ess.init(statesWithAudioDict);
 
-      // To call _computeAllStatesStatus() function of
+      // To call the function "_computeAllStatesStatus()" of
       // TranslationStatusService, so that the status of all states is
       // computed for the other dependent functions to work.
       tss.getAllStateStatusColors();
@@ -278,7 +278,7 @@ describe('Translation status service', function() {
       scitats.saveDisplayedValue();
       ess.saveContentIdsToAudioTranslations(STATES[0], value);
 
-      // To call _computeAllStatesStatus() function of
+      // To call the function "_computeAllStatesStatus()" of
       // TranslationStatusService, so that the status of all states is
       // computed for the dependent function "getAllStatesNeedUpdatewarning"
       // to work.
@@ -343,7 +343,7 @@ describe('Translation status service', function() {
       'active state component need(s) update', function() {
       var activeStateComponentNeedsUpdateStatus = tss
         .getActiveStateComponentNeedsUpdateStatus('feedback');
-      // To check that initially state component "feedback" contains no audio
+      // To check that initially the state component "feedback" contains no audio
       // that needs update.
       expect(activeStateComponentNeedsUpdateStatus).toBe(false);
       scitats.init(STATES[0], ess.getContentIdsToAudioTranslationsMemento(
@@ -354,7 +354,7 @@ describe('Translation status service', function() {
       ess.saveContentIdsToAudioTranslations(STATES[0], value);
       activeStateComponentNeedsUpdateStatus = tss
         .getActiveStateComponentNeedsUpdateStatus('feedback');
-      // To check that state component "feedback" contains audio that
+      // To check that the state component "feedback" contains audio that
       // needs update.
       expect(activeStateComponentNeedsUpdateStatus).toBe(true);
     });
@@ -393,8 +393,8 @@ describe('Translation status service', function() {
         STATES[0]));
       var activeStateContentIdNeedsUpdateStatus = tss
         .getActiveStateContentIdNeedsUpdateStatus('feedback_2');
-      // To check that initially state content id "feedback" contains no audio
-      // that needs update.
+      // To check that initially the state content id "feedback" contains no
+      // audio that needs update.
       expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
       var value = scitats.displayed;
       value.toggleNeedsUpdateAttribute('feedback_2', 'en');
@@ -402,8 +402,8 @@ describe('Translation status service', function() {
       ess.saveContentIdsToAudioTranslations(STATES[0], value);
       activeStateContentIdNeedsUpdateStatus = tss
         .getActiveStateContentIdNeedsUpdateStatus('feedback_2');
-      // To check that state content id "feedback" contains audio that needs
-      // update.
+      // To check that the state content id "feedback" contains audio that
+      // needs update.
       expect(activeStateContentIdNeedsUpdateStatus).toBe(true);
     });
   });
