@@ -316,4 +316,3 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         search_services.clear_collection_search_index()
         result= search_services.search_collections('Welcome', 2)[0]
         self.assertEqual(result, [])
-
