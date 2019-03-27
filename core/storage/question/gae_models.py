@@ -154,7 +154,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     # The ID of the skill to which the question is linked.
     skill_id = ndb.StringProperty(required=True, indexed=True)
     # The difficulty of the skill.
-    skill_difficulty = ndb.FloatProperty(required=False)
+    skill_difficulty = ndb.FloatProperty(required=True, indexed=True)
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
