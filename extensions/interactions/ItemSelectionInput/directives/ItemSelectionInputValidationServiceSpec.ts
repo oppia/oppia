@@ -19,6 +19,7 @@ describe('ItemSelectionInputValidationService', function() {
   var currentState;
   var goodAnswerGroups, goodDefaultOutcome;
   var customizationArguments;
+  var IsProperSubsetValidOption;
   var oof, agof, rof;
 
   beforeEach(function() {
