@@ -31,6 +31,7 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import search_services
 from core.domain import stats_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -155,7 +156,8 @@ class AdminHandler(base.BaseHandler):
                     self._generate_dummy_explorations(
                         num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif self.payload.get('action') == 'clear_search_index':
-                exp_services.clear_search_index()
+                search_services.clear_collection_search_index()
+                search_services.clear_exploration_search_index()
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
@@ -326,13 +328,6 @@ class AdminRoleHandler(base.BaseHandler):
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
-
-        if (
-                user_services.get_user_role_from_id(user_id) ==
-                feconf.ROLE_ID_TOPIC_MANAGER):
-            topic_services.deassign_user_from_all_topics(
-                user_services.get_system_user(), user_id)
-
         user_services.update_user_role(user_id, role)
         role_services.log_role_query(
             self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
