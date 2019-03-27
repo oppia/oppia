@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('itemSelectionInputRulesService', ['$filter', function($filter) {
+oppia.factory('ItemSelectionInputRulesService', ['$filter', function($filter) {
   return {
     Equals: function(answer, inputs) {
       var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
@@ -41,6 +41,16 @@ oppia.factory('itemSelectionInputRulesService', ['$filter', function($filter) {
       return normalizedInput.some(function(val) {
         return normalizedAnswer.indexOf(val) === -1;
       });
+    },
+    // This function checks if the answer
+    // given by the user is a subset of the correct answers.
+    IsProperSubsetOf: function(answer, inputs) {
+      var normalizedAnswer = $filter('removeDuplicatesInArray')(answer);
+      var normalizedInput = $filter('removeDuplicatesInArray')(inputs.x);
+      return normalizedAnswer.length < normalizedInput.length &&
+          normalizedAnswer.every(function(val) {
+            return normalizedInput.indexOf(val) !== -1;
+          });
     }
   };
 }]);

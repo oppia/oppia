@@ -16,40 +16,7 @@
  * @fileoverview Controllers for the form builder test page.
  */
 
-oppia.directive('formOverlay', [
-  'NestedDirectivesRecursionTimeoutPreventionService',
-  'UrlInterpolationService',
-  function(
-      NestedDirectivesRecursionTimeoutPreventionService,
-      UrlInterpolationService) {
-    return {
-      scope: {
-        definition: '=',
-        isDisabled: '&',
-        savedValue: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/tests/form_entry_point_modal_directive.html'),
-      restrict: 'E',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: ['$scope', function($scope) {
-        $scope.$watch('savedValue', function() {
-          $scope.localValue = angular.copy($scope.savedValue);
-        });
-
-        $scope.submitValue = function() {
-          $scope.savedValue = angular.copy($scope.localValue);
-          alert($scope.savedValue);
-        };
-        $scope.cancelEdit = function() {
-          $scope.localValue = angular.copy($scope.savedValue);
-        };
-      }]
-    };
-  }
-]);
-
-oppia.controller('FormBuilderTests', [
+oppia.controller('FormBuilderTestPage', [
   '$scope', function($scope) {
     $scope.testText = 'abc{{paramUnicode1}}';
 
