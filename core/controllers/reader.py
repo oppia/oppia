@@ -1022,9 +1022,9 @@ class QuestionPlayerHandler(base.BaseHandler):
     def get(self):
         """Handles GET request."""
         start_cursor = self.request.get('start_cursor')
-        """Skill ids are given as a comma separated list because this is
-        a GET request
-        """
+        # Skill ids are given as a comma separated list because this is
+        # a GET request.
+
         skill_ids = self.request.get('skill_ids').split(',')
         question_count = self.request.get('question_count')
 

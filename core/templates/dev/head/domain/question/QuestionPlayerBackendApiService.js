@@ -31,7 +31,7 @@ oppia.factory('QuestionPlayerBackendApiService', [
       }
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_PLAYER_URL_TEMPLATE, {
-          skill_ids: skillIds.toString(),
+          skill_ids: skillIds.join(','),
           question_count: questionCount.toString(),
           start_cursor: _startCursor
         });
@@ -74,14 +74,9 @@ oppia.factory('QuestionPlayerBackendApiService', [
       if (!angular.isArray(list)) {
         return false;
       }
-      isValid = true;
-      for (var i = 0; i < list.length; i++) {
-        if (!angular.isString(list[i])) {
-          isValid = false;
-          break;
-        }
-      }
-      return isValid;
+      return list.every(function(obj) {
+        return angular.isString(obj);
+      });
     };
 
     /**
