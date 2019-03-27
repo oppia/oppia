@@ -15,6 +15,14 @@
 /**
  * @fileoverview Controller for the stories list viewer.
  */
+
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/topic/EditableTopicBackendApiService.js');
+require('domain/topic/TopicUpdateService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/topic_editor/TopicEditorStateService.js');
+require('services/contextual/UrlService.js');
+
 oppia.directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

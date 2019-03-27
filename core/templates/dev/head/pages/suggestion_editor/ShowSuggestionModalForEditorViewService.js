@@ -16,6 +16,13 @@
  * @fileoverview Service to display suggestion modal in editor view.
  */
 
+require('domain/state/StateObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationDataService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/feedback_tab/ThreadDataService.js');
+require('pages/suggestion_editor/SuggestionModalService.js');
+
 oppia.factory('ShowSuggestionModalForEditorViewService', [
   '$log', '$rootScope', '$uibModal',
   'ExplorationDataService', 'ExplorationStatesService',

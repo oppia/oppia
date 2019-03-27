@@ -15,6 +15,13 @@
 /**
  * @fileoverview Controller for the main topic editor.
  */
+
+require('components/StoryCreationService.js');
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/topic/TopicUpdateService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/topic_editor/TopicEditorStateService.js');
+
 oppia.directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

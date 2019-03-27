@@ -16,6 +16,24 @@
  * @fileoverview Directive for the solution viewer and editor section in the
  * state editor.
  */
+
+require('domain/exploration/SolutionObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/editor_tab/ResponsesService.js');
+require('pages/exploration_editor/editor_tab/SolutionValidityService.js');
+require('pages/exploration_editor/editor_tab/SolutionVerificationService.js');
+require('pages/exploration_player/CurrentInteractionService.js');
+require('pages/state_editor/state_properties/StateCustomizationArgsService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
+require('pages/state_editor/state_properties/StateHintsService.js');
+require('pages/state_editor/state_properties/StateInteractionIdService.js');
+require('pages/state_editor/state_properties/StateSolutionService.js');
+require('services/AlertsService.js');
+require('services/ContextService.js');
+require('services/EditabilityService.js');
+require('services/ExplorationHtmlFormatterService.js');
+require('services/GenerateContentIdService.js');
+
 oppia.directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

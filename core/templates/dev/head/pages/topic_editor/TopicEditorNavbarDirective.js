@@ -16,6 +16,13 @@
  * @fileoverview Directive for the navbar of the topic editor.
  */
 
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/topic/TopicRightsBackendApiService.js');
+require('pages/topic_editor/TopicEditorRoutingService.js');
+require('pages/topic_editor/TopicEditorStateService.js');
+require('services/AlertsService.js');
+require('services/contextual/UrlService.js');
+
 oppia.directive('topicEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -15,6 +15,30 @@
 /**
  * @fileoverview Directive for managing the state responses in the state editor.
  */
+
+require('domain/exploration/AnswerGroupObjectFactory.js');
+require('domain/exploration/HintObjectFactory.js');
+require('domain/exploration/OutcomeObjectFactory.js');
+require('domain/exploration/RuleObjectFactory.js');
+require('domain/exploration/SubtitledHtmlObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('filters/CamelCaseToHyphensFilter.js');
+require('pages/exploration_editor/EditorFirstTimeEventsService.js');
+require('pages/exploration_editor/editor_tab/InteractionDetailsCacheService.js');
+require('pages/exploration_editor/editor_tab/ResponsesService.js');
+require('pages/state_editor/state_properties/StateContentService.js');
+require('pages/state_editor/state_properties/StateCustomizationArgsService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
+require('pages/state_editor/state_properties/StateHintsService.js');
+require('pages/state_editor/state_properties/StateInteractionIdService.js');
+require('pages/state_editor/state_properties/StateSolutionService.js');
+require('services/AlertsService.js');
+require('services/ContextService.js');
+require('services/EditabilityService.js');
+require('services/ExplorationHtmlFormatterService.js');
+require('services/GenerateContentIdService.js');
+require('services/HtmlEscaperService.js');
+
 oppia.directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

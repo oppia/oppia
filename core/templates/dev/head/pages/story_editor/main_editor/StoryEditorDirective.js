@@ -15,6 +15,12 @@
 /**
  * @fileoverview Controller for the main story editor.
  */
+
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/story/StoryUpdateService.js');
+require('pages/story_editor/StoryEditorStateService.js');
+require('services/AlertsService.js');
+
 oppia.constant('EVENT_VIEW_STORY_NODE_EDITOR', 'viewStoryNodeEditor');
 
 oppia.directive('storyEditor', [

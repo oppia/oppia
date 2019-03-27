@@ -16,11 +16,11 @@
  * @fileoverview Service to display suggestion modal in learner view.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.factory('ShowSuggestionModalForLearnerViewService', [
-  '$rootScope', '$uibModal',
-  'UrlInterpolationService',
-  function($rootScope, $uibModal,
-      UrlInterpolationService) {
+  '$rootScope', '$uibModal', 'UrlInterpolationService',
+  function($rootScope, $uibModal, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
       'learner_view_suggestion_modal_directive.html'

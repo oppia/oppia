@@ -16,6 +16,12 @@
  * @fileoverview Directive for the navbar of the story editor.
  */
 
+require('domain/editor/undo_redo/BaseUndoRedoService.js');
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('pages/story_editor/StoryEditorStateService.js');
+require('services/AlertsService.js');
+require('services/contextual/UrlService.js');
+
 oppia.directive('storyEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

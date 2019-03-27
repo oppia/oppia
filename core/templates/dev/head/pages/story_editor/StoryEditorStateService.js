@@ -18,6 +18,11 @@
  * retrieving the story, saving it, and listening for changes.
  */
 
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/story/EditableStoryBackendApiService.js');
+require('domain/story/StoryObjectFactory.js');
+require('services/AlertsService.js');
+
 oppia.constant('EVENT_STORY_INITIALIZED', 'storyInitialized');
 oppia.constant('EVENT_STORY_REINITIALIZED', 'storyReinitialized');
 

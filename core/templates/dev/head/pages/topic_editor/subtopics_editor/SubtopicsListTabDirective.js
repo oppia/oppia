@@ -16,6 +16,12 @@
  * @fileoverview Controller for the subtopics list editor.
  */
 
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/topic/SubtopicPageObjectFactory.js');
+require('domain/topic/TopicUpdateService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/topic_editor/TopicEditorStateService.js');
+
 oppia.directive('subtopicsListTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

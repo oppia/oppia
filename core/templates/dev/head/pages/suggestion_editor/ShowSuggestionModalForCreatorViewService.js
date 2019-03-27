@@ -16,6 +16,8 @@
  * @fileoverview Service to display suggestion modal in creator view.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.factory('ShowSuggestionModalForCreatorViewService', [
   '$http', '$log', '$rootScope',
   '$uibModal', 'UrlInterpolationService',

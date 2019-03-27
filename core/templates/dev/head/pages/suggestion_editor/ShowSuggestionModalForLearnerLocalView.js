@@ -16,6 +16,12 @@
  * @fileoverview Controller to show suggestion modal in learner local view.
  */
 
+
+require('pages/exploration_player/ExplorationEngineService.js');
+require('pages/exploration_player/PlayerPositionService.js');
+require('pages/exploration_player/PlayerTranscriptService.js');
+require('pages/suggestion_editor/SuggestionModalService.js');
+
 oppia.controller('ShowSuggestionModalForLearnerLocalView', [
   '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
   'PlayerPositionService', 'PlayerTranscriptService',

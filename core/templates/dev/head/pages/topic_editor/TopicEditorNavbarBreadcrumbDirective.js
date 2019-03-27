@@ -15,6 +15,11 @@
 /**
  * @fileoverview Controller for the navbar breadcrumb of the topic editor.
  */
+
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/topic_editor/TopicEditorStateService.js');
+require('services/stateful/FocusManagerService.js');
+
 oppia.directive('topicEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

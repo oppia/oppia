@@ -15,6 +15,12 @@
 /**
  * @fileoverview Controller for the skills list viewer.
  */
+
+require('domain/skill/EditableSkillBackendApiService.js');
+require('domain/topic/EditableTopicBackendApiService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/AlertsService.js');
+
 oppia.constant(
   'MERGE_SKILL_URL', '/merge_skill');
 

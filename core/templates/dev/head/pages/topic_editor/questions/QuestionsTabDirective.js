@@ -15,6 +15,22 @@
 /**
  * @fileoverview Controller for the questions tab.
  */
+
+require('components/QuestionCreationService.js');
+require('domain/editor/undo_redo/QuestionUndoRedoService.js');
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/question/EditableQuestionBackendApiService.js');
+require('domain/question/QuestionObjectFactory.js');
+require('domain/skill/EditableSkillBackendApiService.js');
+require('domain/skill/MisconceptionObjectFactory.js');
+require('domain/suggestion/QuestionSuggestionObjectFactory.js');
+require('domain/suggestion/SuggestionThreadObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
+require('pages/topic_editor/TopicEditorStateService.js');
+require('services/AlertsService.js');
+require('services/contextual/UrlService.js');
+
 oppia.directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

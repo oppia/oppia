@@ -16,6 +16,8 @@
  * @fileoverview Controller to show suggestion modal in learner view.
  */
 
+require('pages/suggestion_editor/SuggestionModalService.js');
+
 oppia.controller('ShowSuggestionModalForLearnerView', [
   '$scope', '$uibModalInstance', 'SuggestionModalService', 'description',
   'newContent', 'oldContent',

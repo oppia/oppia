@@ -15,6 +15,12 @@
 /**
  * @fileoverview Controller for the story node editor.
  */
+
+require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/story/StoryUpdateService.js');
+require('pages/story_editor/StoryEditorStateService.js');
+require('services/AlertsService.js');
+
 oppia.directive('storyNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
