@@ -77,7 +77,8 @@ def _create_new_question(committer_id, question, commit_message):
         question_state_data=question.question_state_data.to_dict(),
         language_code=question.language_code,
         version=question.version,
-        question_state_schema_version=question.question_state_schema_version
+        question_state_data_schema_version=(
+            question.question_state_data_schema_version)
     )
     model.commit(
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
@@ -193,13 +194,14 @@ def get_question_from_model(question_model):
 
     # Ensure the original question model does not get altered.
     versioned_question_state = {
-        'state_schema_version': question_model.question_state_schema_version,
+        'state_schema_version': (
+            question_model.question_state_data_schema_version),
         'state': copy.deepcopy(
             question_model.question_state_data)
     }
 
     # Migrate the question if it is not using the latest schema version.
-    if (question_model.question_state_schema_version !=
+    if (question_model.question_state_data_schema_version !=
             feconf.CURRENT_STATES_SCHEMA_VERSION):
         _migrate_state_schema(versioned_question_state)
 
@@ -459,8 +461,8 @@ def _save_question(committer_id, question, change_list, commit_message):
     question_model = question_models.QuestionModel.get(question.id)
     question_model.question_state_data = question.question_state_data.to_dict()
     question_model.language_code = question.language_code
-    question_model.question_state_schema_version = (
-        question.question_state_schema_version)
+    question_model.question_state_data_schema_version = (
+        question.question_state_data_schema_version)
     change_dicts = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_dicts)
     question.version += 1

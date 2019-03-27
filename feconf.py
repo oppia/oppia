@@ -170,6 +170,9 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
 
+# The current version of page_contents dict in the subtopic page schema.
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
+
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
 CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
@@ -669,7 +672,7 @@ LIBRARY_RECENTLY_PUBLISHED_URL = '/library/recently_published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
-MERGE_SKILL_URL = '/merge_skill'
+MERGE_SKILLS_URL = '/merge_skills_handler'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'

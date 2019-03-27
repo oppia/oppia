@@ -50,7 +50,7 @@ class QuestionModel(base_models.VersionedModel):
     # An object representing the question state data.
     question_state_data = ndb.JsonProperty(indexed=False, required=True)
     # The schema version for the question state data.
-    question_state_schema_version = ndb.IntegerProperty(
+    question_state_data_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
@@ -357,11 +357,13 @@ class QuestionSummaryModel(base_models.BaseModel):
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
-    question_model_last_updated = ndb.DateTimeProperty(indexed=True)
+    question_model_last_updated = ndb.DateTimeProperty(
+        indexed=True, required=True)
     # Time when the question model was created (not to be confused
     # with created_on, which is the time when the question *summary*
     # model was created).
-    question_model_created_on = ndb.DateTimeProperty(indexed=True)
+    question_model_created_on = ndb.DateTimeProperty(
+        indexed=True, required=True)
     # The html content for the question.
     question_content = ndb.TextProperty(indexed=False, required=True)
 
