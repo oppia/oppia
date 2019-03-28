@@ -296,11 +296,13 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
+    os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
-    os.path.join('third_party', 'beautifulsoup4-4.6.0'),
+    os.path.join('third_party', 'beautifulsoup4-4.7.1'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
     os.path.join('third_party', 'mutagen-1.38'),
+    os.path.join('third_party', 'soupsieve-1.8'),
     os.path.join('third_party', 'gae-cloud-storage-1.9.15.0'),
 ]
 for path in _PATHS_TO_INSERT:
@@ -412,6 +414,54 @@ def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
     return (any(filepath.startswith(bad_pattern)
                 for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
             or filepath in BAD_PATTERNS[pattern]['excluded_files'])
+
+
+def _get_expression_from_node_if_one_exists(
+        parsed_node, components_to_check):
+    """This function first checks whether the parsed node represents
+    the required angular component that needs to be derived by checking if
+    its in the 'components_to_check' list. If yes, then it  will return the
+    expression part of the node from which the component can be derived.
+    If no, it will return None. It is done by filtering out
+    'AssignmentExpression' (as it represents an assignment) and 'Identifier'
+    (as it represents a static expression).
+
+    Args:
+        parsed_node: dict. Parsed node of the body of a JS file.
+        components_to_check: list(str). List of angular components to check
+            in a JS file. These include directives, factories, controllers,
+            etc.
+
+    Returns:
+        expression: dict or None. Expression part of the node if the node
+            represents a component else None.
+    """
+    if parsed_node.type != 'ExpressionStatement':
+        return
+    # Separate the expression part of the node which is the actual
+    # content of the node.
+    expression = parsed_node.expression
+    # Check whether the expression belongs to a
+    # 'CallExpression' which always contains a call
+    # and not an 'AssignmentExpression'.
+    # For example, func() is a CallExpression.
+    if expression.type != 'CallExpression':
+        return
+    # Check whether the expression belongs to a 'MemberExpression' which
+    # represents a computed expression or an Identifier which represents
+    # a static expression.
+    # For example, 'thing.func' is a MemberExpression where
+    # 'thing' is the object of the MemberExpression and
+    # 'func' is the property of the MemberExpression.
+    # Another example of a MemberExpression within a CallExpression is
+    # 'thing.func()' where 'thing.func' is the callee of the CallExpression.
+    if expression.callee.type != 'MemberExpression':
+        return
+    # Get the component in the JS file.
+    component = expression.callee.property.name
+    if component not in components_to_check:
+        return
+    return expression
 
 
 def _get_changed_filepaths():
@@ -1069,12 +1119,13 @@ class LintChecksManager(object):
             print '----------------------------------------'
         # Select JS files which need to be checked.
         files_to_check = [
-            filepath for filepath in self.all_filepaths if (
-                filepath.endswith('.js'))
-            and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                        EXCLUDED_PATHS)]
+            filepath for filepath in self.all_filepaths if
+            filepath.endswith('.js') and not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                EXCLUDED_PATHS)]
         failed = False
         summary_messages = []
+        components_to_check = ['directive']
 
         for filepath in files_to_check:
             parsed_script = self.parsed_js_files[filepath]
@@ -1082,23 +1133,9 @@ class LintChecksManager(object):
                 # Parse the body of the content as nodes.
                 parsed_nodes = parsed_script.body
                 for parsed_node in parsed_nodes:
-                    # Check the type of the node.
-                    if parsed_node.type != 'ExpressionStatement':
-                        continue
-                    # Separate the expression part of the node.
-                    expression = parsed_node.expression
-                    # Check whether the expression belongs to a directive.
-                    expression_type_is_not_call = (
-                        expression.type != 'CallExpression')
-                    if expression_type_is_not_call:
-                        continue
-                    expression_callee_type_is_not_member = (
-                        expression.callee.type != 'MemberExpression')
-                    if expression_callee_type_is_not_member:
-                        continue
-                    expression_callee_property_name_is_not_directive = (
-                        expression.callee.property.name != 'directive')
-                    if expression_callee_property_name_is_not_directive:
+                    expression = _get_expression_from_node_if_one_exists(
+                        parsed_node, components_to_check)
+                    if not expression:
                         continue
                     # Separate the arguments of the expression.
                     arguments = expression.arguments
@@ -1128,11 +1165,13 @@ class LintChecksManager(object):
                                 # statement.
                                 body_element_type_is_not_return = (
                                     body_element.type != 'ReturnStatement')
-                                body_element_arg_type_is_not_object = (
+                                body_element_argument_type_is_not_object = (
                                     body_element.argument.type != (
                                         'ObjectExpression'))
-                                if (body_element_type_is_not_return or (
-                                        body_element_arg_type_is_not_object)):
+                                if (
+                                        body_element_argument_type_is_not_object
+                                        or (
+                                            body_element_type_is_not_return)):
                                     continue
                                 # Separate the properties of the return node.
                                 return_node_properties = (
@@ -1155,11 +1194,9 @@ class LintChecksManager(object):
                                         # check if it is an Object Expression.
                                         # If it is not, then check for scope:
                                         # true and report the error message.
-                                        scope_value = (
-                                            return_node_property.value)
-                                        if scope_value.type == (
-                                                'Literal') and (
-                                                    scope_value.value):
+                                        scope_value = return_node_property.value
+                                        if scope_value.type == 'Literal' and (
+                                                scope_value.value):
                                             failed = True
                                             print (
                                                 'Please ensure that %s '
@@ -1176,8 +1213,8 @@ class LintChecksManager(object):
                                             failed = True
                                             print (
                                                 'Please ensure that %s '
-                                                'directive in %s file '
-                                                'has a scope: {}.' % (
+                                                'directive in %s file has a '
+                                                'scope: {}.' % (
                                                     directive_name, filepath))
                                             print ''
 
@@ -1194,8 +1231,94 @@ class LintChecksManager(object):
                 summary_messages.append(summary_message)
 
             print ''
+            return summary_messages
 
-        return summary_messages
+    def _check_js_component_name_and_count(self):
+        """This function ensures that all JS files have exactly
+        one component and and that the name of the component
+        matches the filename.
+        """
+        if self.verbose_mode_enabled:
+            print 'Starting js component name and count check'
+            print '----------------------------------------'
+        # Select JS files which need to be checked.
+        files_to_check = [
+            filepath for filepath in self.all_filepaths if not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                EXCLUDED_PATHS)
+            and filepath.endswith('.js') and not filepath.endswith('App.js')]
+        failed = False
+        summary_messages = []
+        component_name = ''
+        components_to_check = ['controller', 'directive', 'factory', 'filter']
+        for filepath in files_to_check:
+            component_num = 0
+            # Filename without its path and extension.
+            exact_filename = filepath.split('/')[-1][:-3]
+            parsed_script = self.parsed_js_files[filepath]
+            with _redirect_stdout(_TARGET_STDOUT):
+                # Parse the body of the content as nodes.
+                parsed_nodes = parsed_script.body
+                for parsed_node in parsed_nodes:
+                    expression = _get_expression_from_node_if_one_exists(
+                        parsed_node, components_to_check)
+                    if not expression:
+                        continue
+                    component_num += 1
+                    # Check if the number of components in each file exceeds
+                    # one.
+                    if component_num > 1:
+                        print (
+                            '%s -> Please ensure that there is exactly one '
+                            'component in the file.' % (filepath))
+                        failed = True
+                        break
+                    # Separate the arguments of the expression.
+                    arguments = expression.arguments
+                    # The first argument of the expression is the
+                    # name of the component.
+                    component_name = arguments[0].value
+                    component = expression.callee.property.name
+
+                    # If the component is directive or filter and its name is
+                    # xxx then the filename containing it should be
+                    # XxxDirective.js or XxxFilter.js respectively.
+                    if component == 'directive' or component == 'filter':
+                        if (component_name[0].swapcase() + component_name[1:] +
+                                component.capitalize() != (exact_filename)):
+                            print (
+                                '%s -> Please ensure that the %s name '
+                                'matches the filename'
+                                % (filepath, component))
+                            failed = True
+                    # If the component is controller or factory, then the
+                    # component name should exactly match the filename
+                    # containing it. If the component's name is xxx then the
+                    # filename should be xxx.js.
+                    else:
+                        if component_name != exact_filename:
+                            print (
+                                '%s -> Please ensure that the %s name '
+                                'matches the filename'
+                                % (filepath, component))
+                            failed = True
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            if failed:
+                summary_message = (
+                    '%s  Js component name and count check failed' %
+                    (_MESSAGE_TYPE_FAILED))
+                print summary_message
+                summary_messages.append(summary_message)
+            else:
+                summary_message = (
+                    '%s  Js component name and count check passed' %
+                    (_MESSAGE_TYPE_SUCCESS))
+                print summary_message
+                summary_messages.append(summary_message)
+
+            print ''
+            return summary_messages
 
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
@@ -1206,13 +1329,12 @@ class LintChecksManager(object):
         if self.verbose_mode_enabled:
             print 'Starting sorted dependencies check'
             print '----------------------------------------'
-
         files_to_check = [
-            filepath for filepath in self.all_filepaths if (
-                filepath.endswith('.js'))
-            and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                        EXCLUDED_PATHS)]
-        properties_to_check = ['controller', 'directive', 'factory']
+            filepath for filepath in self.all_filepaths if
+            filepath.endswith('.js') and not
+            any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                EXCLUDED_PATHS)]
+        components_to_check = ['controller', 'directive', 'factory']
         failed = False
         summary_messages = []
 
@@ -1221,16 +1343,11 @@ class LintChecksManager(object):
             with _redirect_stdout(_TARGET_STDOUT):
                 parsed_nodes = parsed_script.body
                 for parsed_node in parsed_nodes:
-                    if parsed_node.type != 'ExpressionStatement':
+                    expression = _get_expression_from_node_if_one_exists(
+                        parsed_node, components_to_check)
+                    if not expression:
                         continue
-                    expression = parsed_node.expression
-                    if expression.type != 'CallExpression':
-                        continue
-                    if expression.callee.type != 'MemberExpression':
-                        continue
-                    property_name = expression.callee.property.name
-                    if property_name not in properties_to_check:
-                        continue
+                    # Separate the arguments of the expression.
                     arguments = expression.arguments
                     if arguments[0].type == 'Literal':
                         property_value = str(arguments[0].value)
@@ -1936,6 +2053,7 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
+        js_component_messages = self._check_js_component_name_and_count()
         directive_scope_messages = self._check_directive_scope()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
@@ -1955,8 +2073,8 @@ class LintChecksManager(object):
         copyright_notice_messages = (
             self._check_for_copyright_notice())
         all_messages = (
-            directive_scope_messages + sorted_dependencies_messages +
-            controller_dependency_messages +
+            js_component_messages + directive_scope_messages +
+            sorted_dependencies_messages + controller_dependency_messages +
             html_directive_name_messages + import_order_messages +
             docstring_messages + comment_messages +
             html_tag_and_attribute_messages +
