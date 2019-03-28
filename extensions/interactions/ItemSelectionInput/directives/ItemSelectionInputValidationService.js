@@ -181,14 +181,15 @@ oppia.factory('ItemSelectionInputValidationService', [
                   });
                 }
               } else if (rule.type === 'Equals') {
-                if (minAllowedCount > ruleInputs.length) {
+                if (minAllowedCount > ruleInputs.length ||
+                  maxAllowedCount < ruleInputs.length) {
                   warningsList.push({
                     type: WARNING_TYPES.ERROR,
                     message: (
                       'In answer group ' + (answerIndex + 1) + ', ' +
-                      'rule ' + (ruleIndex + 1) + ', the "Equals" rule ' +
-                      'should not have more correct options than minimum ' +
-                      'allowed selection count.')
+                      'rule ' + (ruleIndex + 1) + ', the "Equals" rule\'s ' +
+                      'correct options should be between the minimum and ' +
+                      'maximum allowed selection count.')
                   });
                 }
               }

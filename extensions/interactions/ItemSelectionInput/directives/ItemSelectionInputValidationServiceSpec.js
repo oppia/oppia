@@ -138,12 +138,12 @@ describe('ItemSelectionInputValidationService', function() {
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, ThreeInputsAnswerGroups,
         goodDefaultOutcome);
-      expect(warnings).toEqual([{
+      expect(warnings).toContain({
         type: WARNING_TYPES.CRITICAL,
         message: (
           'Please ensure that the max allowed count is not less than the ' +
           'min count.')
-      }]);
+      });
     });
 
   it(
@@ -227,10 +227,10 @@ describe('ItemSelectionInputValidationService', function() {
     });
 
   it(
-    'should expect min possible selections to be less than or equal to ' +
-    'number of correct options when "Equals" rule is used.',
+    'should expect number of correct options to be in between the maximum ' +
+    'and minimum allowed selections when the "Equals" rule is used.',
     function() {
-      // Make min allowed selections greater than correct answers
+      // Make min allowed selections greater than correct answers.
       customizationArguments.minAllowableSelectionCount.value = 2;
 
       var warnings = validatorService.getAllWarnings(
@@ -240,13 +240,13 @@ describe('ItemSelectionInputValidationService', function() {
         type: WARNING_TYPES.ERROR,
         message: (
           'In answer group 1, ' +
-          'rule 1, the "Equals" rule should not have more correct options ' +
-          'than minimum allowed selection count.')
+          'rule 1, the "Equals" rule\'s correct options should be between ' +
+          'the minimum and maximum allowed selection count.')
       }]);
     });
 
   it(
-    'should expect at lease one option when  ' +
+    'should expect at least one option when  ' +
     '"ContainsAtLeastOneOf" rule is used.',
     function() {
       // Make min allowed selections greater than correct answers
