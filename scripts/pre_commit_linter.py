@@ -1008,17 +1008,16 @@ class LintChecksManager(object):
         target = 'es5'
         type_roots = '../node_modules/@types'
         cmd = (
-            '../node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+            '../node_modules/typescript/bin/tsc -listEmittedFiles true -outDir %s -allowJS %s '
             '-lib %s -noImplicitUseStrict %s -skipLibCheck '
             '%s -target %s -typeRoots %s %s typings/*') % (
                 self.compiled_js_dir, allow_js, lib, no_implicit_use_strict,
                 skip_lib_check, target, type_roots, filepath)
-        subprocess.call(cmd, shell=True)
-
+        output = subprocess.check_output(cmd, shell=True)
+        print output
         compiled_js_filepath = os.path.join(
             self.compiled_js_dir, os.path.basename(filepath).replace(
                 '.ts', '.js'))
-        print os.listdir(self.compiled_js_dir)
         return compiled_js_filepath
 
     def _lint_all_files(self):
