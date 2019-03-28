@@ -1152,7 +1152,6 @@ def compile_typescript_files(project_dir):
     """
     print 'Compiling ts files...'
     cmd = '../node_modules/typescript/bin/tsc --project %s' % project_dir
-    print os.environ
     subprocess.check_call(cmd, shell=True)
 
 def build():
