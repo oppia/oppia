@@ -955,6 +955,7 @@ class LintChecksManager(object):
         node_path = os.path.join(os.pardir, 'oppia_tools/node-6.9.1')
         cmd = 'export PATH=$%s/bin:$PATH' % node_path
         subprocess.check_call(cmd, shell=True)
+        print os.environ['PATH']
 
         self.compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
         self.all_filepaths = all_filepaths
