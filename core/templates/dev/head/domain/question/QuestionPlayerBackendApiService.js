@@ -25,9 +25,12 @@ oppia.factory('QuestionPlayerBackendApiService', [
   function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE) {
     var _startCursor = '';
     var _fetchQuestions = function(
-        skillIds, questionCount, successCallback, errorCallback) {
+        skillIds, questionCount, resetHistory, successCallback, errorCallback) {
       if (!validateRequestParameters(skillIds, questionCount, errorCallback)) {
         return;
+      }
+      if (resetHistory) {
+        _startCursor = '';
       }
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_PLAYER_URL_TEMPLATE, {
@@ -91,9 +94,9 @@ oppia.factory('QuestionPlayerBackendApiService', [
      * of questions requested.
      */
     return {
-      fetchQuestions: function(skillIds, questionCount) {
+      fetchQuestions: function(skillIds, questionCount, resetHistory) {
         return $q(function(resolve, reject) {
-          _fetchQuestions(skillIds, questionCount, resolve, reject);
+          _fetchQuestions(skillIds, questionCount, resetHistory, resolve, reject);
         });
       }
     };
