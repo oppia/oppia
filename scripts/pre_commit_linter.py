@@ -953,7 +953,7 @@ class LintChecksManager(object):
         """
         # Set path for node.
         node_path = os.path.join(os.pardir, 'oppia_tools/node-6.9.1')
-        cmd = 'export PATH=$%s/bin:$PATH' % node_path
+        cmd = 'export PATH=%s/bin:$PATH' % node_path
         subprocess.check_call(cmd, shell=True)
         print os.environ['PATH']
 
