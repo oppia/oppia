@@ -4,7 +4,10 @@ The code is contained in the following files:
  to static/js/tools/input_to_PEG.txt and then paste the contents of this file
  into http://pegjs.majda.cz/online. Call the parser variable 'logicProofParser'
  and check "use results cache". Then download the code and paste it into the
- generatedParser.ts file. Add 'SyntaxError: null' to the result variable.
+ generatedParser.ts file.
+ Add 'SyntaxError: null' property to the result variable. This should be removed
+ once we migrate to Angular2 by using ts-pegjs plugin for the parser.
+ (TODO (ankita240796))
  - shared.ts: this contains code used by both the teacher and student parts of
  the website. The most important functions are parseLine() and
  assignTypesToExpression().
