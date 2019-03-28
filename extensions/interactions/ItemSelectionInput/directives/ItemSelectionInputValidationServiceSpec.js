@@ -246,12 +246,9 @@ describe('ItemSelectionInputValidationService', function() {
     });
 
   it(
-    'should expect at least one option when  ' +
+    'should expect at least one option when ' +
     '"ContainsAtLeastOneOf" rule is used.',
     function() {
-      // Make min allowed selections greater than correct answers
-      customizationArguments.minAllowableSelectionCount.value = 2;
-
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, NoInputAnswerGroups,
         goodDefaultOutcome);
@@ -259,8 +256,7 @@ describe('ItemSelectionInputValidationService', function() {
         type: WARNING_TYPES.ERROR,
         message: (
           'In answer group 1, rule 1, the "ContainsAtLeastOneOf" rule ' +
-          'should not have more correct options than minimum allowed ' +
-          'selection count.')
+          'should have at least one option.')
       }]);
     });
 });

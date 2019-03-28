@@ -199,10 +199,9 @@ oppia.factory('ItemSelectionInputValidationService', [
                 warningsList.push({
                   type: WARNING_TYPES.ERROR,
                   message: (
-                    'In answer group ' + (answerIndex + 1) + ', ' +
-                    'rule ' + (ruleIndex + 1) + ', the ' +
-                    '"ContainsAtLeastOneOf" rule should not have more ' +
-                    'correct options than minimum allowed selection count.')
+                    'In answer group ' + (answerIndex + 1) + ', rule ' +
+                    (ruleIndex + 1) + ', the "ContainsAtLeastOneOf" rule ' +
+                    'should have at least one option.')
                 });
               }
             }
