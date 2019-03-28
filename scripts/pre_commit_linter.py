@@ -987,7 +987,6 @@ class LintChecksManager(object):
                 # file.
                 if filepath.endswith('.js'):
                     raise Exception(e)
-                print os.path.exists(self.compiled_js_dir)
                 compiled_js_filepath = self._compile_ts_file(filepath)
                 file_content = FileCache.read(compiled_js_filepath).decode(
                     'utf-8')
@@ -1019,6 +1018,7 @@ class LintChecksManager(object):
         compiled_js_filepath = os.path.join(
             self.compiled_js_dir, os.path.basename(filepath).replace(
                 '.ts', '.js'))
+        print os.path.exists(compiled_js_filepath)
         return compiled_js_filepath
 
     def _lint_all_files(self):
