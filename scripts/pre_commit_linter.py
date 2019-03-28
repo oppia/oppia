@@ -1015,7 +1015,7 @@ class LintChecksManager(object):
                 skip_lib_check, target, type_roots, filepath)
         subprocess.call(cmd, shell=True, env=dict(
             os.environ, PATH=os.path.join(
-                os.pardir, '/oppia_tools/node-6.9.1/bin:/usr/local/bin:'))
+                os.pardir, '/oppia_tools/node-6.9.1/bin:')))
         
         compiled_js_filepath = os.path.join(
             self.compiled_js_dir, os.path.basename(filepath).replace(
