@@ -26,7 +26,7 @@ describe('Translation tab active mode service', function() {
 
   it('should correctly activate translation mode', function() {
     expect(ttams.isTranslationModeActive()).toBeFalsy();
-    ttams.activatetTranslationMode();
+    ttams.activateTranslationMode();
     expect(ttams.isTranslationModeActive()).toBeTruthy();
   });
 
@@ -45,7 +45,7 @@ describe('Translation tab active mode service', function() {
     expect(ttams.isVoiceoverModeActive()).toBeTruthy();
     expect(ttams.isTranslationModeActive()).toBeFalsy();
 
-    ttams.activatetTranslationMode();
+    ttams.activateTranslationMode();
 
     expect(ttams.isVoiceoverModeActive()).toBeFalsy();
     expect(ttams.isTranslationModeActive()).toBeTruthy();

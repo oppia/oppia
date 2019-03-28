@@ -162,15 +162,10 @@ oppia.controller('ExplorationEditorTab', [
         contentId)) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/forms/' +
-            'mark_all_audio_as_needing_update_modal_directive.html'),
+            '/components/forms/mark_all_audio_and_translations_as_needing_' +
+            'update_modal_directive.html'),
           backdrop: true,
-          resolve: {
-            considerTranslation: function() {
-              return true;
-            }
-          },
-          controller: 'MarkAllAudioAsNeedingUpdateController'
+          controller: 'MarkAllAudioAndTranslationsAsNeedingUpdateController'
         }).result.then(function() {
           contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(contentId);
           ExplorationStatesService.saveContentIdsToAudioTranslations(

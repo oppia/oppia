@@ -71,14 +71,14 @@ oppia.directive('stateTranslation', [
 
           $scope.isVoiceoverModeActive = (
             TranslationTabActiveModeService.isVoiceoverModeActive);
-          var isTranslatedTextRequiered = function() {
+          var isTranslatedTextRequired = function() {
             return (TranslationTabActiveModeService.isVoiceoverModeActive() &&
               TranslationLanguageService.getActiveLanguageCode() !== (
                 ExplorationLanguageCodeService.displayed));
           };
-          $scope.getRequieredHtml = function(subtitledHtml) {
+          $scope.getRequiredHtml = function(subtitledHtml) {
             var html = null;
-            if (isTranslatedTextRequiered()) {
+            if (isTranslatedTextRequired()) {
               var contentId = subtitledHtml.getContentId();
               var activeLanguageCode = (
                 TranslationLanguageService.getActiveLanguageCode());
@@ -100,7 +100,9 @@ oppia.directive('stateTranslation', [
 
           $scope.getEmptyContentMessage = function() {
             if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
-              return 'There is no text available to voice-over.';
+              return (
+                'There is no text available to voice-over, add a text ' +
+                'translation through translation mode.');
             } else {
               return 'There is no text available to translate.';
             }

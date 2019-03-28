@@ -37,22 +37,24 @@ oppia.factory('TranslationStatusService', [
     var explorationContentNotAvailableCount = 0;
     var contentIdsToAudioTranslations =
         StateContentIdsToAudioTranslationsService.displayed;
-    var writtenTranslations = StateWrittenTranslationsService.dsiplayed;
 
     var _getVoiceOverStatus = function(
         contentIdsToAudioTranslations, contentId) {
-      // The first value of availabilityStatus shows whether a audio is
+      // The first value of availabilityStatus shows whether an audio is
       // available for a contentId in a given language, whereas the last value
       // represent whether the available audio needs update.
-      var availabilityStatus = [false, false];
-      var availableLanguage = (
+      var availabilityStatus = {
+        available: false,
+        needsUpdate: false,
+      };
+      var availableLanguages = (
         contentIdsToAudioTranslations.getAudioLanguageCodes(contentId));
-      if (availableLanguage.indexOf(langCode) !== -1) {
-        availabilityStatus[0] = true;
+      if (availableLanguages.indexOf(langCode) !== -1) {
+        availabilityStatus.available = true;
         var audioTranslation = (
           contentIdsToAudioTranslations.getAudioTranslation(
             contentId, langCode));
-        availabilityStatus[1] = audioTranslation.needsUpdate;
+        availabilityStatus.needsUpdate = audioTranslation.needsUpdate;
       }
       return availabilityStatus;
     };
@@ -61,15 +63,18 @@ oppia.factory('TranslationStatusService', [
       // The first value of availabilityStatus shows whether a translation is
       // available for a contentId in a given language, whereas the last value
       // represent whether the available translation needs update.
-      var availabilityStatus = [false, false];
-      var availableLanguage = (
+      var availabilityStatus = {
+        available: false,
+        needsUpdate: false,
+      };
+      var availableLanguages = (
         writtenTranslations.getTranslationsLanguageCodes(contentId));
-      if (availableLanguage.indexOf(langCode) !== -1) {
+      if (availableLanguages.indexOf(langCode) !== -1) {
         var writtenTranslation = (
           writtenTranslations.getWrittenTranslation(contentId, langCode));
         if (writtenTranslation.getHtml() !== '') {
-          availabilityStatus[0] = true;
-          availabilityStatus[1] = writtenTranslation.needsUpdate;
+          availabilityStatus.available = true;
+          availabilityStatus.needsUpdate = writtenTranslation.needsUpdate;
         }
       }
       return availabilityStatus;
@@ -98,6 +103,7 @@ oppia.factory('TranslationStatusService', [
         return _getVoiceOverStatus(contentIdsToAudioTranslations, contentId);
       }
     };
+
     var _computeAllStatesStatus = function() {
       stateNeedsUpdateWarnings = {};
       stateWiseStatusColor = {};
@@ -125,10 +131,10 @@ oppia.factory('TranslationStatusService', [
           allContentId.forEach(function(contentId) {
             var availabilityStatus = _getContentAvailabilityStatus(
               stateName, contentId);
-            if (!availabilityStatus[0]) {
+            if (!availabilityStatus.available) {
               noTranslationCount++;
             }
-            if (availabilityStatus[1]) {
+            if (availabilityStatus.needsUpdate) {
               if (TranslationTabActiveModeService.isTranslationModeActive()) {
                 stateNeedsUpdateWarnings[stateName] = (
                   TRANSLATION_NEEDS_UPDATE_MESSAGE);
@@ -153,8 +159,8 @@ oppia.factory('TranslationStatusService', [
     var _getContentIdListRelatedToComponent = function(componentName) {
       contentIdsToAudioTranslations =
         StateContentIdsToAudioTranslationsService.displayed;
+      var contentIdList = [];
       if (contentIdsToAudioTranslations) {
-        var contentIdList = [];
         if (componentName === 'solution' || componentName === 'content') {
           contentIdList.push(componentName);
         } else {
@@ -170,10 +176,8 @@ oppia.factory('TranslationStatusService', [
             contentIdList.push('default_outcome');
           }
         }
-        return contentIdList;
-      } else {
-        return null;
       }
+      return contentIdList;
     };
 
     var _getActiveStateComponentStatus = function(componentName) {
@@ -183,7 +187,7 @@ oppia.factory('TranslationStatusService', [
         contentIdList.forEach(function(contentId) {
           var availabilityStatus = _getActiveStateContentAvailabilityStatus(
             contentId);
-          if (availabilityStatus[0]) {
+          if (availabilityStatus.available) {
             availableAudioCount++;
           }
         });
@@ -205,7 +209,7 @@ oppia.factory('TranslationStatusService', [
           contentId = contentIdList[index];
           var availabilityStatus = _getActiveStateContentAvailabilityStatus(
             contentId);
-          if (availabilityStatus[1]) {
+          if (availabilityStatus.needsUpdate) {
             return true;
           }
         }
@@ -216,7 +220,7 @@ oppia.factory('TranslationStatusService', [
     var _getActiveStateContentIdStatusColor = function(contentId) {
       var availabilityStatus = _getActiveStateContentAvailabilityStatus(
         contentId);
-      if (availabilityStatus[0]) {
+      if (availabilityStatus.available) {
         return ALL_AUDIO_AVAILABLE_COLOR;
       } else {
         return NO_AUDIO_AVAILABLE_COLOR;
@@ -226,7 +230,7 @@ oppia.factory('TranslationStatusService', [
     var _getActiveStateContentIdNeedsUpdateStatus = function(contentId) {
       var availabilityStatus = _getActiveStateContentAvailabilityStatus(
         contentId);
-      return availabilityStatus[1];
+      return availabilityStatus.needsUpdate;
     };
 
     return {

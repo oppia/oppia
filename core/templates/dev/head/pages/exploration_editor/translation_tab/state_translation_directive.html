@@ -39,11 +39,11 @@
   <div class="translation-state-contents">
     <div ng-if="isActive(TAB_ID_CONTENT)" class="translation-state-content protractor-test-content-text">
       <span>
-        <span ng-show="!getRequieredHtml(stateContent)" class="oppia-placeholder">
+        <span ng-show="!getRequiredHtml(stateContent)" class="oppia-placeholder">
           <[getEmptyContentMessage()]>
         </span>
         <span>
-          <angular-html-bind html-data="getRequieredHtml(stateContent)" class="oppia-rte-editor">
+          <angular-html-bind html-data="getRequiredHtml(stateContent)" class="oppia-rte-editor">
           </angular-html-bind>
         </span>
       </span>
@@ -74,11 +74,11 @@
             <div ng-if="activeAnswerGroupIndex === $index">
               <div class="oppia-editor-card-section protractor-test-feedback-<[$index]>-text">
                 <div class="oppia-rule-body-container">
-                  <span ng-show="!getRequieredHtml(answerGroup.outcome.feedback)" class="oppia-placeholder">
+                  <span ng-show="!getRequiredHtml(answerGroup.outcome.feedback)" class="oppia-placeholder">
                     <[getEmptyContentMessage()]>
                   </span>
                   <span>
-                    <angular-html-bind html-data="getRequieredHtml(answerGroup.outcome.feedback)" class="oppia-rte-editor">
+                    <angular-html-bind html-data="getRequiredHtml(answerGroup.outcome.feedback)" class="oppia-rte-editor">
                     </angular-html-bind>
                   </span>
                 </div>
@@ -111,7 +111,7 @@
             <div ng-if="activeAnswerGroupIndex === stateAnswerGroups.length">
               <div class="oppia-editor-card-section protractor-test-feedback-<[stateAnswerGroups.length]>-text">
                 <div class="oppia-rule-body-container">
-                  <angular-html-bind html-data="getRequieredHtml(stateDefaultOutcome.feedback)" class="oppia-rte-editor">
+                  <angular-html-bind html-data="getRequiredHtml(stateDefaultOutcome.feedback)" class="oppia-rte-editor">
                   </angular-html-bind>
                 </div>
               </div>
@@ -140,7 +140,7 @@
           </a>
           <div ng-if="activeHintIndex === $index">
             <div class="oppia-editor-card-section protractor-test-hint-<[$index]>-text">
-              <angular-html-bind html-data="getRequieredHtml(hint.hintContent)" class="oppia-rte-editor">
+              <angular-html-bind html-data="getRequiredHtml(hint.hintContent)" class="oppia-rte-editor">
               </angular-html-bind>
             </div>
           </div>
@@ -150,7 +150,7 @@
 
     <div ng-if="isActive(TAB_ID_SOLUTION)" class="translation-state-content protractor-test-solution-text">
       <span>
-        <angular-html-bind html-data="getRequieredHtml(stateSolution.explanation)" class="oppia-rte-editor">
+        <angular-html-bind html-data="getRequiredHtml(stateSolution.explanation)" class="oppia-rte-editor">
         </angular-html-bind>
       </span>
     </div>

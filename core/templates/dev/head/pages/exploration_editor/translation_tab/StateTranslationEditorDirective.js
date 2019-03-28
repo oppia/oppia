@@ -39,28 +39,39 @@ oppia.directive('stateTranslationEditor', [
               hide_complex_extensions: 'true'
             }
           };
-          var showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
-              contentId) {
+          var showMarkAudioAsNeedingUpdateModalIfRequired = function(
+              contentId, langaugeCode) {
             var stateName = StateEditorService.getActiveStateName();
             var state = ExplorationStatesService.getState(stateName);
             var contentIdsToAudioTranslations = (
               state.contentIdsToAudioTranslations);
-            if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
-              contentId)) {
+            var availableAudioLanguages = (
+              contentIdsToAudioTranslations.getAudioLanguageCodes(contentId));
+            if (availableAudioLanguages.indexOf(langaugeCode) != -1) {
+              var audioTranslation = (
+                contentIdsToAudioTranslations.getAudioTranslation(
+                  contentId, langaugeCode));
+              if (audioTranslation.needsUpdate) {
+                return;
+              }
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/components/forms/' +
-                  'mark_all_audio_as_needing_update_modal_directive.html'),
+                  'mark_audio_as_needing_update_modal_directive.html'),
                 backdrop: true,
-                resolve: {
-                  considerTranslation: function() {
-                    return false;
-                  }
-                },
-                controller: 'MarkAllAudioAsNeedingUpdateController'
+                controller: ['$scope', '$uibModalInstance', function(
+                    $scope, $uibModalInstance) {
+                  $scope.markNeedsUpdate = function() {
+                    $uibModalInstance.close();
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }]
               }).result.then(function() {
-                contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
-                  contentId);
+                contentIdsToAudioTranslations.toggleNeedsUpdateAttribute(
+                  contentId, langaugeCode);
                 ExplorationStatesService.saveContentIdsToAudioTranslations(
                   stateName, contentIdsToAudioTranslations);
               });
@@ -93,24 +104,27 @@ oppia.directive('stateTranslationEditor', [
           };
           initEditor();
           var saveTranslation = function() {
-            var oldTranslation = '';
-            var newTranslation = '';
+            var oldTranslationHtml = '';
+            var newTranslationHtml = '';
             contentId = (
               TranslationTabActiveContentIdService.getActiveContentId());
             langaugeCode = TranslationLanguageService.getActiveLanguageCode();
             if (StateWrittenTranslationsService
               .savedMemento.hasWrittenTranslation(contentId, langaugeCode)) {
-              oldTranslation = (StateWrittenTranslationsService
+              var writtenTranslation = (StateWrittenTranslationsService
                 .savedMemento.getWrittenTranslation(contentId, langaugeCode));
+              oldTranslation = writtenTranslation.getHtml();
             }
-            newTranslation = (StateWrittenTranslationsService
+            var writtenTranslation = (StateWrittenTranslationsService
               .displayed.getWrittenTranslation(contentId, langaugeCode));
+            newTranslation = writtenTranslation.getHtml();
             if (oldTranslation !== newTranslation) {
               var stateName = StateEditorService.getActiveStateName();
-              showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
-              StateWrittenTranslationsService.saveDisplayedValue();
+              showMarkAudioAsNeedingUpdateModalIfRequired(
+                contentId, langaugeCode);
               ExplorationStatesService.saveWrittenTranslations(
-                stateName, StateWrittenTranslationsService.savedMemento);
+                stateName, StateWrittenTranslationsService.displayed);
+              StateWrittenTranslationsService.saveDisplayedValue();
             }
             $scope.translationEditorIsOpen = false;
           };
@@ -132,9 +146,19 @@ oppia.directive('stateTranslationEditor', [
           };
 
           $scope.onSaveTranslationButtonClicked = function() {
-            StateWrittenTranslationsService.displayed.addWrittenTranslation(
-              contentId, langaugeCode,
-              $scope.activeWrittenTranslation.getHtml());
+            var displayedWrittenTranslations = (
+              StateWrittenTranslationsService.displayed);
+            if (displayedWrittenTranslations.hasWrittenTranslation(
+              contentId, langaugeCode)) {
+              displayedWrittenTranslations.updateWrittenTranslationHtml(
+                contentId, langaugeCode,
+                $scope.activeWrittenTranslation.getHtml());
+            } else {
+              displayedWrittenTranslations.addWrittenTranslation(
+                contentId, langaugeCode,
+                $scope.activeWrittenTranslation.getHtml());
+            }
+
             saveTranslation();
           };
 

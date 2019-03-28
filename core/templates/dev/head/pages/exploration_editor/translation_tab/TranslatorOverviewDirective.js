@@ -50,7 +50,6 @@ oppia.directive('translatorOverview', [
           $scope.VOICEOVER_MODE = 'Record';
           $scope.TRANSLATION_MODE = 'Translate';
 
-          TranslationTabActiveModeService.activateVoiceoverMode();
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.languageCode =
             allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
@@ -58,7 +57,7 @@ oppia.directive('translatorOverview', [
           TranslationLanguageService.setActiveLanguageCode(
             $scope.languageCode);
           $scope.inTranslationMode = false;
-          $scope.inVoiceoverMode = true;
+          $scope.inVoiceoverMode = false;
           $scope.showTabModeSwitcher = function() {
             return ($scope.languageCode !== (
               ExplorationLanguageCodeService.displayed));
@@ -78,7 +77,11 @@ oppia.directive('translatorOverview', [
             }
           };
 
-          var updateLangaugeList = function() {
+          var refreshDirectiveScope = function() {
+            $scope.inTranslationMode = (
+              TranslationTabActiveModeService.isTranslationModeActive());
+            $scope.inVoiceoverMode = (
+              TranslationTabActiveModeService.isVoiceoverModeActive());
             allAudioLanguageCodes = (
               LanguageUtilService.getAllAudioLanguageCodes());
             if($scope.inTranslationMode) {
@@ -89,31 +92,23 @@ oppia.directive('translatorOverview', [
               }
             }
             $scope.languageCodesAndDescriptions = (
-            allAudioLanguageCodes.map(function(languageCode) {
-              return {
-                id: languageCode,
-                description: (
-                  LanguageUtilService.getAudioLanguageDescription(
-                    languageCode))
-              };
-            }));
-          };
-
-          var updateMode = function() {
-            $scope.inTranslationMode = (
-              TranslationTabActiveModeService.isTranslationModeActive());
-            $scope.inVoiceoverMode = (
-              TranslationTabActiveModeService.isVoiceoverModeActive());
+              allAudioLanguageCodes.map(function(languageCode) {
+                return {
+                  id: languageCode,
+                  description: (
+                    LanguageUtilService.getAudioLanguageDescription(
+                      languageCode))
+                };
+              }));
           };
 
           $scope.changeActiveMode = function(modeName) {
             if (modeName === $scope.VOICEOVER_MODE) {
               TranslationTabActiveModeService.activateVoiceoverMode();
             } else if (modeName === $scope.TRANSLATION_MODE) {
-              TranslationTabActiveModeService.activatetTranslationMode();
+              TranslationTabActiveModeService.activateTranslationMode();
             }
-            updateMode();
-            updateLangaugeList();
+            refreshDirectiveScope();
           };
 
           $scope.getTranslationProgressStyle = function() {
@@ -137,17 +132,10 @@ oppia.directive('translatorOverview', [
             TranslationLanguageService.setActiveLanguageCode(
               $scope.languageCode);
 
-            if ($scope.languageCode === (
-              ExplorationLanguageCodeService.displayed)) {
-              TranslationTabActiveModeService.activateVoiceoverMode();
-              updateMode();
-            }
             $window.localStorage.setItem(
               LAST_SELECTED_TRANSLATION_LANGUAGE, $scope.languageCode);
           };
-
-          updateLangaugeList();
-          updateMode();
+          refreshDirectiveScope();
         }
       ]
     };

@@ -83,8 +83,20 @@ oppia.factory('WrittenTranslationsObjectFactory', [
     WrittenTranslations.prototype.addWrittenTranslation = function(
         contentId, languageCode, html) {
       var writtenTranslations = this.translationsMapping[contentId];
+      if (writtenTranslations.hasOwnProperty(languageCode)) {
+        throw Error('Trying to add duplicate language code.');
+      }
       writtenTranslations[languageCode] = (
         WrittenTranslationObjectFactory.createNew(html));
+    };
+
+    WrittenTranslations.prototype.updateWrittenTranslationHtml = function(
+        contentId, languageCode, html) {
+      var writtenTranslations = this.translationsMapping[contentId];
+      if (!writtenTranslations.hasOwnProperty(languageCode)) {
+        throw Error('Unable to find the given language code.');
+      }
+      writtenTranslations[languageCode].setHtml(html);
     };
 
     WrittenTranslations.prototype.toggleNeedsUpdateAttribute = (

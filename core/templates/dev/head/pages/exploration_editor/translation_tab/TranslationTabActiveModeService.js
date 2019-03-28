@@ -29,7 +29,7 @@ oppia.factory('TranslationTabActiveModeService', [
         activeMode = VOICEOVER_MODE;
         $rootScope.$broadcast('translationTabModeChange');
       },
-      activatetTranslationMode: function() {
+      activateTranslationMode: function() {
         activeMode = TRANSLATION_MODE;
         $rootScope.$broadcast('translationTabModeChange');
       },
