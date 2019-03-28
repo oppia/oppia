@@ -1506,12 +1506,16 @@ class LintChecksManager(object):
                     matched_pattern = matched_pattern.split()
                     directive_filepath = ''.join(matched_pattern).replace(
                         '\'', '').replace('+', '')
-                    if not directive_filepath.endswith('_directive.html'):
+                    if (not directive_filepath.endswith('_directive.html') and
+                            not directive_filepath.endswith('.directive.html')
+                            and not directive_filepath.endswith(
+                                '.template.html')):
                         failed = True
                         total_error_count += 1
                         print (
                             '%s --> Please ensure that this file ends'
-                            'with _directive.html.' % directive_filepath)
+                            'with _directive.html or .directive.html.' %
+                            directive_filepath)
                         print ''
 
             if failed:
@@ -2053,7 +2057,7 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
-        js_component_messages = self._check_js_component_name_and_count()
+        # js_component_messages = self._check_js_component_name_and_count()
         directive_scope_messages = self._check_directive_scope()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
@@ -2073,7 +2077,8 @@ class LintChecksManager(object):
         copyright_notice_messages = (
             self._check_for_copyright_notice())
         all_messages = (
-            js_component_messages + directive_scope_messages +
+            # js_component_messages +.
+            directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
             html_directive_name_messages + import_order_messages +
             docstring_messages + comment_messages +

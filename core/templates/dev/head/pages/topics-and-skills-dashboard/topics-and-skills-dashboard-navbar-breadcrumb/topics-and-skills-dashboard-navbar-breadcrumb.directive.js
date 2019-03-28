@@ -13,16 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the navbar breadcrumb of the collection editor.
+ * @fileoverview Directive for the navbar breadcrumb of the topics and
+ * skills dashboard.
  */
-oppia.directive('topicsAndSkillsDashboardNavbarBreadcrumb', [
+angular.module('topicsAndSkillsDashboardNavbarBreadcrumbModule').directive(
+  'topicsAndSkillsDashboardNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics_and_skills_dashboard/' +
-        'topics_and_skills_dashboard_navbar_breadcrumb_directive.html'),
+        '/pages/topics-and-skills-dashboard/' +
+        'topics-and-skills-dashboard-navbar-breadcrumb/' +
+        'topics-and-skills-dashboard-navbar-breadcrumb.directive.html'),
       controller: [
         function() {}
       ]

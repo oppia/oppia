@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the skills list viewer.
+ * @fileoverview Directive for the skills list viewer.
  */
-oppia.directive('skillsList', [
+
+ angular.module('skillsListModule').directive('skillsList', [
   '$http', 'AlertsService', 'UrlInterpolationService',
   function(
       $http, AlertsService, UrlInterpolationService) {
@@ -32,7 +33,8 @@ oppia.directive('skillsList', [
         isUnpublishedSkill: '&unpublishedSkill'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics_and_skills_dashboard/skills_list_directive.html'),
+        '/pages/topics-and-skills-dashboard/skills-list/' +
+        'skills-list.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
         'EditableSkillBackendApiService',
@@ -63,8 +65,9 @@ oppia.directive('skillsList', [
           $scope.deleteSkill = function(skillId) {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics_and_skills_dashboard/' +
-                'delete_skill_modal_directive.html'),
+                '/pages/topics-and-skills-dashboard/' +
+                'topics-and-skills-dashboard-shared-templates/' +
+                'delete-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -96,8 +99,8 @@ oppia.directive('skillsList', [
             var topicSummaries = $scope.getEditableTopicSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics_and_skills_dashboard/' +
-                'assign_skill_to_topic_modal_directive.html'),
+                '/pages/topics-and-skills-dashboard/topics-and-skills-dashboard-shared-templates/' +
+                'assign-skill-to-topic-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -151,8 +154,8 @@ oppia.directive('skillsList', [
             var skillSummaries = $scope.getMergeableSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics_and_skills_dashboard/' +
-                'merge_skill_modal_directive.html'),
+                '/pages/topics-and-skills-dashboard/topics-and-skills-dashboard-shared-templates/' +
+                'merge-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

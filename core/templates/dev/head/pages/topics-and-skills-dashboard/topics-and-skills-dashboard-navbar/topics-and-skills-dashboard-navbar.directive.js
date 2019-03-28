@@ -16,13 +16,15 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
-oppia.directive('topicsAndSkillsDashboardNavbar', [
+angular.module('topicsAndSkillsDashboardNavbarModule').directive(
+  'topicsAndSkillsDashboardNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics_and_skills_dashboard/' +
-        'topics_and_skills_dashboard_navbar_directive.html'),
+        '/pages/topics-and-skills-dashboard/' +
+        'topics-and-skills-dashboard-navbar/' +
+        'topics-and-skills-dashboard-navbar.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
         'SkillCreationService', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
@@ -39,8 +41,9 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
           $scope.createSkill = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics_and_skills_dashboard/' +
-                'create_new_skill_modal_directive.html'),
+                '/pages/topics-and-skills-dashboard/' +
+                'topics-and-skills-dashboard-shared-templates/' +
+                'create-new-skill-modal.template.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
@@ -74,4 +77,4 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
         }
       ]
     };
-  }]);
+  }]);  

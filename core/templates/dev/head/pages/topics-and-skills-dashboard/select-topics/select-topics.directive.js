@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the select topics viewer.
+ * @fileoverview Directive for the select topics viewer.
  */
-oppia.directive('selectTopics', [
+
+ angular.module('selectTopicsModule').directive('selectTopics', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -24,7 +25,8 @@ oppia.directive('selectTopics', [
         selectedTopicIds: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics_and_skills_dashboard/select_topics_directive.html'),
+        '/pages/topics-and-skills-dashboard/select-topics/' +
+        'select-topic.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope',
         function(

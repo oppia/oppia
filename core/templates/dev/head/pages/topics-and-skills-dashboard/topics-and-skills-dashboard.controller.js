@@ -13,21 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the topics and skills dashboard.
+ * @fileoverview Controller for the topics and skills dashboard.
  */
-oppia.constant(
-  'EDITABLE_TOPIC_DATA_URL_TEMPLATE', '/topic_editor_handler/data/<topic_id>');
-oppia.constant(
-  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
-  '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
 
-oppia.constant('EVENT_TYPE_TOPIC_CREATION_ENABLED', 'topicCreationEnabled');
-oppia.constant('EVENT_TYPE_SKILL_CREATION_ENABLED', 'skillCreationEnabled');
-oppia.constant(
-  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-  'topicsAndSkillsDashboardReinitialized');
-
-oppia.controller('TopicsAndSkillsDashboard', [
+angular.module('topicsAndSkillsDashboardModule').controller('TopicsAndSkillsDashboard', [
   '$http', '$rootScope', '$scope', '$uibModal', '$window',
   'AlertsService', 'SkillCreationService',
   'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
@@ -113,8 +102,8 @@ oppia.controller('TopicsAndSkillsDashboard', [
     $scope.createSkill = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/topics_and_skills_dashboard/' +
-          'create_new_skill_modal_directive.html'),
+          '/pages/topics-and-skills-dashboard/topics-and-skills-dashboard-shared-templates/' +
+          'create-new-skill-modal.template.html'),
         backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance',
