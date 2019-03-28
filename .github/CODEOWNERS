@@ -170,6 +170,7 @@
 /core/templates/pages/tests/ @seanlip
 /core/templates/domain/utilities/ @DubeySandeep
 
+
 # Restricted pages.
 /core/controllers/admin*.py @seanlip
 /core/templates/pages/admin/ @seanlip
@@ -208,7 +209,7 @@
 /core/templates/pages/donate/ @vojtechjelinek
 /core/templates/pages/error/ @vojtechjelinek
 /core/templates/pages/get_started/ @vojtechjelinek
-/core/templates/pages/landing/ @vojtechjelinek
+/core/templates/pages/landing-page/ @vojtechjelinek
 /core/templates/pages/maintenance/ @vojtechjelinek
 /core/templates/pages/preferences/ @vojtechjelinek
 /core/templates/pages/signup/ @vojtechjelinek
@@ -219,7 +220,6 @@
 
 # Speed Improvement team.
 /app.yaml @vojtechjelinek
-
 /core/templates/pages/base.html @vojtechjelinek
 /core/templates/pages/footer_js_libs.html @vojtechjelinek
 /core/templates/pages/header_css_libs.html @vojtechjelinek

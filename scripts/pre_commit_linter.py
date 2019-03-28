@@ -1001,8 +1001,7 @@ class LintChecksManager(object):
         config_path_for_css_in_html = os.path.join(
             parent_dir, 'oppia', '.stylelintrc')
         config_path_for_oppia_css = os.path.join(
-            parent_dir, 'oppia', 'core', 'templates',
-            'css', '.stylelintrc')
+            parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
         if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
             print ''
             print 'ERROR    Please run start.sh first to install node-eslint '

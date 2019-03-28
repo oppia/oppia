@@ -16,7 +16,7 @@
  * @fileoverview Controller for the stewards landing page.
  */
 
-oppia.controller('Stewards', [
+angular.module('topicLandingPageStewardsModule').controller('Stewards', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'UrlService', 'WindowDimensionsService',
   function(

@@ -77,7 +77,8 @@ def _create_new_question(committer_id, question, commit_message):
         question_state_data=question.question_state_data.to_dict(),
         language_code=question.language_code,
         version=question.version,
-        question_state_schema_version=question.question_state_schema_version
+        question_state_data_schema_version=(
+            question.question_state_data_schema_version)
     )
     model.commit(
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
@@ -85,15 +86,16 @@ def _create_new_question(committer_id, question, commit_message):
     create_question_summary(question.id, committer_id)
 
 
-def create_new_question_skill_link(question_id, skill_id):
+def create_new_question_skill_link(question_id, skill_id, skill_difficulty):
     """Creates a new QuestionSkillLink model.
 
     Args:
         question_id: str. ID of the question linked to the skill.
         skill_id: str. ID of the skill to which the question is linked.
+        skill_difficulty: float. The difficulty between [0, 1] of the skill.
     """
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
-        question_id, skill_id)
+        question_id, skill_id, skill_difficulty)
     question_skill_link_model.put()
 
 
@@ -193,13 +195,14 @@ def get_question_from_model(question_model):
 
     # Ensure the original question model does not get altered.
     versioned_question_state = {
-        'state_schema_version': question_model.question_state_schema_version,
+        'state_schema_version': (
+            question_model.question_state_data_schema_version),
         'state': copy.deepcopy(
             question_model.question_state_data)
     }
 
     # Migrate the question if it is not using the latest schema version.
-    if (question_model.question_state_schema_version !=
+    if (question_model.question_state_data_schema_version !=
             feconf.CURRENT_STATES_SCHEMA_VERSION):
         _migrate_state_schema(versioned_question_state)
 
@@ -227,7 +230,8 @@ def get_question_skill_link_from_model(
 
     return question_domain.QuestionSkillLink(
         question_skill_link_model.question_id,
-        question_skill_link_model.skill_id, skill_description)
+        question_skill_link_model.skill_id, skill_description,
+        question_skill_link_model.skill_difficulty)
 
 
 def get_question_by_id(question_id, strict=True):
@@ -309,7 +313,8 @@ def update_skill_ids_of_questions(
     for question_skill_link in old_question_skill_links:
         new_question_skill_link_models.append(
             question_models.QuestionSkillLinkModel.create(
-                question_skill_link.question_id, new_skill_id)
+                question_skill_link.question_id, new_skill_id,
+                question_skill_link.skill_difficulty)
             )
     question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
         old_question_skill_link_models)
@@ -459,8 +464,8 @@ def _save_question(committer_id, question, change_list, commit_message):
     question_model = question_models.QuestionModel.get(question.id)
     question_model.question_state_data = question.question_state_data.to_dict()
     question_model.language_code = question.language_code
-    question_model.question_state_schema_version = (
-        question.question_state_schema_version)
+    question_model.question_state_data_schema_version = (
+        question.question_state_data_schema_version)
     change_dicts = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_dicts)
     question.version += 1
