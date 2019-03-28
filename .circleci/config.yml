@@ -103,6 +103,18 @@ jobs:
           name: E2E Test Accessibilty
           command: |
             bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env
+  
+  chrome_version:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run: date + %F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run:
+          name: Chrome Version
+          command: |
+            google-chrome --version
 
 workflows:
   version: 2
@@ -116,6 +128,9 @@ workflows:
           requires:
             - setup
       - backend_tests:
+          requires:
+            - setup
+      - chrome_version:
           requires:
             - setup
       - e2e_test_accessibility:
