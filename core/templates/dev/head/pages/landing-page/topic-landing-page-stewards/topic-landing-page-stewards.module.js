@@ -16,5 +16,4 @@
  * @fileoverview Module for the stewards landing page.
  */
 
- angular.module('topicLandingPageStewardsModule', []);
- 
+angular.module('topicLandingPageStewardsModule', []);
