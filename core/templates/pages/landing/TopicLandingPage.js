@@ -16,7 +16,30 @@
  * @fileoverview Controller for landing page.
  */
 
-angular.module('topicLandingPageModule').controller('TopicLandingPage', [
+// Note: This oppia constant needs to be keep in sync with
+// AVAILABLE_LANDING_PAGES constant defined in feconf.py file.
+oppia.constant('TOPIC_LANDING_PAGE_DATA', {
+  maths: {
+    fractions: {
+      collection_id: '4UgTQUc1tala',
+      page_data: {
+        image_1: 'matthew_paper.png',
+        image_2: 'matthew_fractions.png',
+        video: 'fractions_video.mp4',
+      }
+    },
+    ratios: {
+      collection_id: '53gXGLIR044l',
+      page_data: {
+        image_1: 'ratios_James.png',
+        image_2: 'ratios_question.png',
+        video: 'ratios_video.mp4',
+      }
+    }
+  }
+});
+
+oppia.controller('TopicLandingPage', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'TOPIC_LANDING_PAGE_DATA', function(
       $scope, $timeout, $window, SiteAnalyticsService,
