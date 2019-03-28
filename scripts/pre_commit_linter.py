@@ -855,7 +855,7 @@ def _lint_js_and_ts_files(
             num_files_with_errors += 1
             result_list.append(linter_stdout)
             stdout.put(linter_stdout)
-
+    print result_list
     if num_files_with_errors:
         for error in result_list:
             result.put(error)
@@ -1137,6 +1137,7 @@ class LintChecksManager(object):
         js_and_ts_messages = []
         while not js_and_ts_stdout.empty():
             js_and_ts_messages.append(js_and_ts_stdout.get())
+            print js_and_ts_messages
 
         print ''
         print '\n'.join(js_and_ts_messages)
@@ -2043,7 +2044,7 @@ class LintChecksManager(object):
         if self.verbose_mode_enabled:
             print 'Starting copyright notice check'
             print '----------------------------------------'
-        js_files_to_check = [
+        js_and_ts_files_to_check = [
             filepath for filepath in self.all_filepaths if filepath.endswith((
                 '.js', '.ts')) and (not filepath.endswith(GENERATED_FILE_PATHS)) and (
                     not filepath.endswith(CONFIG_FILE_PATHS))]
@@ -2054,7 +2055,7 @@ class LintChecksManager(object):
             filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.sh')]
         all_files_to_check = (
-            js_files_to_check + py_files_to_check + sh_files_to_check)
+            js_and_ts_files_to_check + py_files_to_check + sh_files_to_check)
         regexp_to_check = (
             r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.')
 
@@ -2165,4 +2166,4 @@ def main():
 
 
 if __name__ == '__main__':
-    pass
+    main()
