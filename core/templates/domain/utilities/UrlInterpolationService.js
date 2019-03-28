@@ -203,7 +203,7 @@ oppia.factory('UrlInterpolationService', [
       getDirectiveTemplateUrl: function(path) {
         validateResourcePath(path);
         if (DEV_MODE) {
-          return '/templates/dev/head' + getUrlWithSlug(path);
+          return '/templates' + getUrlWithSlug(path);
         } else {
           return '/build/templates/head' + getUrlWithSlug(path);
         }
