@@ -16,12 +16,12 @@
  * @fileoverview Module for the landing page.
  */
 
-angular.module('landingPageModule', ['landingPageStewards']);
+angular.module('topicLandingPageModule', ['landingPageStewardsModule']);
 
 // Note: This oppia constant needs to be keep in sync with
 // AVAILABLE_LANDING_PAGES constant defined in feconf.py file.
 
-angular.module.constant('TOPIC_LANDING_PAGE_DATA', {
+angular.module('topicLandingPageModule').constant('TOPIC_LANDING_PAGE_DATA', {
   maths: {
     fractions: {
       collection_id: '4UgTQUc1tala',

@@ -16,7 +16,7 @@
  * @fileoverview Controller for landing page.
  */
 
-angular.module('landingPageModule').controller('TopicLandingPage', [
+angular.module('topicLandingPageModule').controller('TopicLandingPage', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'TOPIC_LANDING_PAGE_DATA', function(
       $scope, $timeout, $window, SiteAnalyticsService,

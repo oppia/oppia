@@ -16,7 +16,7 @@
  * @fileoverview Controller for the stewards landing page.
  */
 
-angular.module('landingPageStewards').controller('Stewards', [
+angular.module('landingPageStewardsModule').controller('Stewards', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'UrlService', 'WindowDimensionsService',
   function(
