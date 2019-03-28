@@ -295,14 +295,14 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             self.question_id, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id)
+            self.question_id, self.skill_id, 0.5)
 
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            self.question_id_2, self.skill_id)
+            self.question_id_2, self.skill_id, 0.5)
 
     def test_questions_are_returned_successfully(self):
         # Call the handler.
@@ -336,7 +336,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             question_id_3, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            question_id_3, skill_id_2)
+            question_id_3, skill_id_2, 0.5)
         url = '%s?question_count=%s&skill_ids=%s,%s&start_cursor=' % (
             feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2)
         json_response = self.get_json(url)
