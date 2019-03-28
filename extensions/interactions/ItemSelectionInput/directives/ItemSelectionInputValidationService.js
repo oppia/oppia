@@ -131,6 +131,8 @@ oppia.factory('ItemSelectionInputValidationService', [
                         'please select only one answer choice.')
                     });
                   }
+                } else if (rule.type === 'IsProperSubsetOf') {
+                  handledAnswers[choiceIndex] = true;
                 } else if (rule.type === 'ContainsAtLeastOneOf') {
                   handledAnswers[choiceIndex] = true;
                 } else if (rule.type ===
@@ -159,6 +161,26 @@ oppia.factory('ItemSelectionInputValidationService', [
             });
           }
         }
+
+        answerGroups.forEach(function(answerGroup, answerIndex) {
+          var rules = answerGroup.rules;
+          rules.forEach(function(rule, ruleIndex) {
+            var ruleInputs = rule.inputs.x;
+            ruleInputs.forEach(function(ruleInput) {
+              if (rule.type === 'IsProperSubsetOf') {
+                if (ruleInputs.length < 2) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'In answer group ' + (answerIndex + 1) + ', ' +
+                      'rule ' + (ruleIndex + 1) + ', the "proper subset" ' +
+                      'rule must include at least 2 options.')
+                  });
+                }
+              }
+            });
+          });
+        });
 
         return warningsList;
       }
