@@ -1012,8 +1012,8 @@ class LintChecksManager(object):
             '-lib %s -noImplicitUseStrict %s -skipLibCheck '
             '%s -target %s -typeRoots %s %s typings/*') % (
                 self.compiled_js_dir, allow_js, lib, no_implicit_use_strict,
-                skip_lib_check, target, type_roots, filepath)
-        subprocess.check_call(cmd, shell=True)
+                skip_lib_check, target, type_roots, os.path.join(os.getcwd, filepath))
+        subprocess.call(cmd, shell=True)
        
         compiled_js_filepath = os.path.join(
             self.compiled_js_dir, os.path.basename(filepath).replace(
