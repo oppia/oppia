@@ -1018,7 +1018,7 @@ class LintChecksManager(object):
         compiled_js_filepath = os.path.join(
             self.compiled_js_dir, os.path.basename(filepath).replace(
                 '.ts', '.js'))
-        print os.path.exists(compiled_js_filepath)
+        print os.listdir(self.compiled_js_dir)
         return compiled_js_filepath
 
     def _lint_all_files(self):
