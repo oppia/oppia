@@ -951,6 +951,11 @@ class LintChecksManager(object):
             all_filepaths: list(str). The list of filepaths to be linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
+        # Set path for node.
+        node_path = os.path.join(os.pardir, 'oppia_tools/node-6.9.1')
+        cmd = 'export PATH=$%s/bin:$PATH' % node_path
+        subprocess.check_call(cmd, shell=True)
+
         self.compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
@@ -1012,10 +1017,6 @@ class LintChecksManager(object):
             '%s -target %s -typeRoots %s %s typings/*') % (
                 self.compiled_js_dir, allow_js, lib, no_implicit_use_strict,
                 skip_lib_check, target, type_roots, filepath)
-        os.environ['PATH'] = os.path.join(
-            os.pardir,
-            'oppia_tools/node-6.9.1/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-        )
         subprocess.call(cmd, shell=True)
         compiled_js_filepath = os.path.join(
             self.compiled_js_dir, os.path.basename(filepath).replace(
