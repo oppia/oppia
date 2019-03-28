@@ -952,7 +952,7 @@ class LintChecksManager(object):
             all_filepaths: list(str). The list of filepaths to be linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
-        self.compiled_js_dir = tempfile.mkdtemp(dir='.')
+        self.compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
