@@ -1,10 +1,10 @@
 The code is contained in the following files:
- - generatedParser.js: this is a parser automatically generated using PEG.js,
+ - generatedParser.ts: this is a parser automatically generated using PEG.js,
  that is responsible for parsing logical expressions. To change it, make updates
  to static/js/tools/input_to_PEG.txt and then paste the contents of this file
  into http://pegjs.majda.cz/online. Call the parser variable 'logicProofParser'
  and check "use results cache". Then download the code and paste it into the
- generatedParser.js file.
+ generatedParser.ts file. Add 'SyntaxError: null' to the result variable.
  - shared.ts: this contains code used by both the teacher and student parts of
  the website. The most important functions are parseLine() and
  assignTypesToExpression().
@@ -23,11 +23,11 @@ The code is contained in the following files:
   - conversion.ts. Used to convert symbols into unicode logic symbols as users
  type.
 
-In order to update generatedDefaultData.js:
+In order to update generatedDefaultData.ts:
 1. Make the desired changes in tools/strings.ts.
 2. Open tools/demonstration.html and check everything has succeeded.
 3. Click "Request javascript" at the bottom of the page.
-4. Paste the result into generatedDefaultData.js.
+4. Paste the result into generatedDefaultData.ts.
 5. Run karma tests.
 
  More information about the program flow, together with specifications for all the
