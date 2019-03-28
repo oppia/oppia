@@ -987,6 +987,7 @@ class LintChecksManager(object):
                 # file.
                 if filepath.endswith('.js'):
                     raise Exception(e)
+                print os.path.exists(self.compiled_js_dir)
                 compiled_js_filepath = self._compile_ts_file(filepath)
                 file_content = FileCache.read(compiled_js_filepath).decode(
                     'utf-8')
