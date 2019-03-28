@@ -359,7 +359,7 @@ oppia.controller('CreatorDashboard', [
       var topicSummaries = $scope.topicSummaries;
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/creator_dashboard/create_question_modal_directive.html'),
+          '/pages/creator_dashboard/create-question-modal.directive.html'),
         backdrop: 'static',
         keyboard: false,
         size: 'lg',
