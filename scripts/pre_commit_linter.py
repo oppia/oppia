@@ -1013,7 +1013,9 @@ class LintChecksManager(object):
             '%s -target %s -typeRoots %s %s typings/*') % (
                 self.compiled_js_dir, allow_js, lib, no_implicit_use_strict,
                 skip_lib_check, target, type_roots, filepath)
-        subprocess.call(cmd, shell=True)
+        my_env = os.environ.copy()
+        my_env["PATH"] = "/usr/bin/env" + my_env["PATH"]
+        subprocess.call(cmd, shell=True, env=my_env)
        
         compiled_js_filepath = os.path.join(
             self.compiled_js_dir, os.path.basename(filepath).replace(
