@@ -37,8 +37,8 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 
 
-EXPRESSION_PARSER_DEFINITION=core/templates/dev/head/expressions/parser.pegjs
-EXPRESSION_PARSER_JS=core/templates/dev/head/expressions/ExpressionParserService.js
+EXPRESSION_PARSER_DEFINITION=core/templates/expressions/parser.pegjs
+EXPRESSION_PARSER_JS=core/templates/expressions/ExpressionParserService.js
 
 # Install the basic environment, e.g. nodejs.
 bash scripts/install_third_party.sh
