@@ -1353,13 +1353,13 @@ class LintChecksManager(object):
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
                 summary_message = (
-                    '%s  Component name and count check failed' %
+                    '%s  JS and TS Component name and count check failed' %
                     (_MESSAGE_TYPE_FAILED))
                 print summary_message
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
-                    '%s  Component name and count check passed' %
+                    '%s  JS and TS Component name and count check passed' %
                     (_MESSAGE_TYPE_SUCCESS))
                 print summary_message
                 summary_messages.append(summary_message)
@@ -2101,7 +2101,7 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
-        js_component_messages = self._check_js_component_name_and_count()
+        js_and_ts_component_messages = self._check_js_and_ts_component_name_and_count()
         directive_scope_messages = self._check_directive_scope()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
@@ -2121,7 +2121,7 @@ class LintChecksManager(object):
         copyright_notice_messages = (
             self._check_for_copyright_notice())
         all_messages = (
-            js_component_messages + directive_scope_messages +
+            js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
             html_directive_name_messages + import_order_messages +
             docstring_messages + comment_messages +
