@@ -335,19 +335,23 @@ class SignupHandler(base.BaseHandler):
 
         self.render_json({})
 
+
 class UserLogInHandler(base.BaseHandler):
     """Checks whether a user is already logged in or not."""
-    REDIRECT_UNFINISHED_SIGNUPS = False
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         if self.user_id:
             self.render_json({
-                'user_is_logged_in':True
+                'user_is_logged_in': True
             })
         else:
             self.render_json({
-                'user_is_logged_in':False
+                'user_is_logged_in': False
             })
+
 
 class UsernameCheckHandler(base.BaseHandler):
     """Checks whether a username has already been taken."""
