@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the user's notifications dashboard.
  */
 
-oppia.controller('NotificationsDashboard', [
+angular.module('notificationsDashboardPageModule').controller('NotificationsDashboard', [
   '$http', '$rootScope', '$scope', 'DateTimeFormatService',
   function($http, $rootScope, $scope, DateTimeFormatService) {
     $scope.getItemUrl = function(activityId, notificationType) {

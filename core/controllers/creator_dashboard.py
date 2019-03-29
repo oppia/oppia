@@ -67,7 +67,8 @@ class NotificationsDashboardPage(base.BaseHandler):
             'meta_description': feconf.CREATOR_DASHBOARD_PAGE_DESCRIPTION,
         })
         self.render_template(
-            'pages/notifications_dashboard/notifications_dashboard.html')
+            'pages/notifications-dashboard-page/' +
+            'notifications-dashboard-page.mainpage.html')
 
 
 class NotificationsDashboardHandler(base.BaseHandler):
