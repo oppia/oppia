@@ -1123,7 +1123,7 @@ class LintChecksManager(object):
         number_of_files_to_lint = sum(
             len(file_group) for file_group in file_groups_to_lint)
 
-        timeout_multiplier = 5000
+        timeout_multiplier = 2000
         for file_group, process in zip(file_groups_to_lint, linting_processes):
             # try..except block is needed to catch ZeroDivisionError
             # when there are no CSS, HTML, JavaScript and Python files to lint.
