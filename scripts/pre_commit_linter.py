@@ -250,7 +250,9 @@ EXCLUDED_PATHS = (
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
     '*.mp3', '*.mp4', 'typings/*', 'local_compiled_js/*',
-    'core/templates/dev/head/expressions/ExpressionParserService.ts')
+    'core/templates/dev/head/expressions/ExpressionParserService.ts',
+    'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
+    'extensions/interactions/LogicProof/static/js/generatedParser.ts')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
