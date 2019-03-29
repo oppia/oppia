@@ -35,7 +35,6 @@ oppia.directive('audioTranslationBar', [
           UserService.isUserLoggedIn().then(function(response){
             scope.userIsGuest = !response;
           });
-          // scope.userIsGuest = !UserService.isUserLoggedIn();
           scope.$digest();
           return false;
         });

@@ -19,21 +19,11 @@
 describe('User Service', function() {
   var UserService, $httpBackend, UrlInterpolationService;
   beforeEach(module('oppia'));
-  // beforeEach(function() {
-  //   module(function($provide) {
-  //     $provide.value('UserService', {
-  //       isUserLoggedIn: function() {
-  //         return Promise.resolve(true);
-  //       }
-  //     });
-  //   });
-  // });
   beforeEach(inject(function($injector) {
     UserService = $injector.get('UserService');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
-    // spyOn(UserService, "isUserLoggedIn").and.returnValue(Promise.resolve(false));
   }));
 
   it('should return image data', function() {
