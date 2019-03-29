@@ -32,7 +32,10 @@ oppia.directive('audioTranslationBar', [
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
           scope.dropAreaIsAccessible = GLOBALS.can_translate;
-          scope.userIsGuest = !UserService.isUserLoggedIn();
+          UserService.isUserLoggedIn().then(function(response){
+            scope.userIsGuest = !response;
+          });
+          // scope.userIsGuest = !UserService.isUserLoggedIn();
           scope.$digest();
           return false;
         });

@@ -18,38 +18,43 @@
 
 describe('User Service', function() {
   var UserService, $httpBackend, UrlInterpolationService;
-  var $cookies;
   beforeEach(module('oppia'));
-  module('ngCookies');
-
-  module({$cookies: {
-    store: {},
-    put: function(key, value) {
-      this.store[key] = value;
-    },
-    get: function(key) {
-      return this.store[key];
-    }
-  }});
+  // beforeEach(function() {
+  //   module(function($provide) {
+  //     $provide.value('UserService', {
+  //       isUserLoggedIn: function() {
+  //         return Promise.resolve(true);
+  //       }
+  //     });
+  //   });
+  // });
   beforeEach(inject(function($injector) {
     UserService = $injector.get('UserService');
-    $cookies = $injector.get('$cookies');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
+    // spyOn(UserService, "isUserLoggedIn").and.returnValue(Promise.resolve(false));
   }));
 
   it('should return image data', function() {
     var requestUrl = '/preferenceshandler/profile_picture';
+
+    $httpBackend.expect('GET','/userisloggedinhandler').respond(200,{
+      user_is_logged_in : true
+    });
+
     $httpBackend.expect('GET', requestUrl).respond(200, {
       profile_picture_data_url: 'image data'
     });
-    $cookies.put('dev_appserver_login', 'temp');
+
     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
       expect(dataUrl).toBe('image data');
     });
     $httpBackend.flush();
 
+    $httpBackend.expect('GET','/userisloggedinhandler').respond(200,{
+      user_is_logged_in : true
+    });
     $httpBackend.expect('GET', requestUrl).respond(404);
 
     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
