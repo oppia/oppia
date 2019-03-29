@@ -26,7 +26,7 @@
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics-and-skills-dashboard/select-topics/' +
-        'select-topic.directive.html'),
+        'select-topics.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope',
         function(

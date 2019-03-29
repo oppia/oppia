@@ -30,7 +30,7 @@ var TopicsAndSkillsDashboardPage = require(
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
-describe('Topics and skills dashboard functionality', function() {
+fdescribe('Topics and skills dashboard functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
   var topicEditorPage = null;
@@ -55,7 +55,7 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.get();
   });
 
-  it('should add a new topic to list', function() {
+  fit('should add a new topic to list', function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     topicsAndSkillsDashboardPage.createTopicWithTitle('Topic 1');
 
