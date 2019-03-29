@@ -60,8 +60,7 @@ oppia.factory('LearnerPlaylistService', [
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/learner-dashboard-page/' +
-          'remove-activity-from-learner-dashboard-modal/' +
-          'remove-activity-from-learner-dashboard-modal.directive.html'),
+          'remove-activity-from-learner-dashboard-modal.template.html'),
         backdrop: true,
         resolve: {
           activityId: function() {
