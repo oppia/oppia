@@ -1123,7 +1123,7 @@ class LintChecksManager(object):
         number_of_files_to_lint = sum(
             len(file_group) for file_group in file_groups_to_lint)
 
-        timeout_multiplier = 2000
+        timeout_multiplier = 5000
         for file_group, process in zip(file_groups_to_lint, linting_processes):
             # try..except block is needed to catch ZeroDivisionError
             # when there are no CSS, HTML, JavaScript and Python files to lint.
@@ -1139,7 +1139,6 @@ class LintChecksManager(object):
         js_and_ts_messages = []
         while not js_and_ts_stdout.empty():
             js_and_ts_messages.append(js_and_ts_stdout.get())
-            print js_and_ts_messages
 
         print ''
         print '\n'.join(js_and_ts_messages)
@@ -1296,7 +1295,8 @@ class LintChecksManager(object):
             filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS)
-            and filepath.endswith('.js') and not filepath.endswith('App.js')]
+            and filepath.endswith(('.js', '.ts')) and (
+                not filepath.endswith('App.ts'))]
         failed = False
         summary_messages = []
         component_name = ''
@@ -1540,7 +1540,7 @@ class LintChecksManager(object):
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS) and filepath.endswith('.js')]
+                EXCLUDED_PATHS) and filepath.endswith(('.js', '.ts'))]
         failed = False
         summary_messages = []
         # For RegExp explanation, please see https://regex101.com/r/gU7oT6/37.
@@ -2169,4 +2169,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    pass
