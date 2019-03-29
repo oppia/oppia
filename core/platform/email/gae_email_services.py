@@ -34,7 +34,7 @@ def get_incoming_email_address(reply_to_id):
     return 'reply+%s@%s' % (reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
 
 
-def is_sender_email_valid(sender_email):
+def _is_sender_email_valid(sender_email):
     """Gets the sender_email address and validates it is of the form
     'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
 
@@ -42,14 +42,14 @@ def is_sender_email_valid(sender_email):
         sender_email: str. The email address of the sender.
 
     Returns:
-        False if sender_email is not valid.
-        True if sender_email is valid.
+        bool. Whether the sender_email is valid.
     """
     splitted_sender_email = sender_email.split(' ')
     if len(splitted_sender_email) < 2:
         return False
 
-    if not mail.is_email_valid(sender_email):
+    email_address = splitted_sender_email[len(splitted_sender_email) - 1]
+    if not email_address.startswith('<') or not email_address.endswith('>'):
         return False
 
     return True
@@ -84,12 +84,13 @@ def send_mail(
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails.')
 
-    if not is_sender_email_valid(sender_email):
-        raise ValueError(
-            'Malformed sender email address: %s' % sender_email)
     if not mail.is_email_valid(recipient_email):
         raise ValueError(
             'Malformed recipient email address: %s' % recipient_email)
+
+    if not _is_sender_email_valid(sender_email):
+        raise ValueError(
+            'Malformed sender email address: %s' % sender_email)
 
     msg = mail.EmailMessage(
         sender=sender_email, to=recipient_email,
@@ -128,14 +129,14 @@ def send_bulk_mail(
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails.')
 
-    if not is_sender_email_valid(sender_email):
-        raise ValueError(
-            'Malformed sender email address: %s' % sender_email)
-
     for recipient_email in recipient_emails:
         if not mail.is_email_valid(recipient_email):
             raise ValueError(
                 'Malformed recipient email address: %s' % recipient_email)
+
+    if not _is_sender_email_valid(sender_email):
+        raise ValueError(
+            'Malformed sender email address: %s' % sender_email)
 
     for recipient_email in recipient_emails:
         mail.send_mail(

@@ -146,6 +146,19 @@ class EmailTests(test_utils.GenericTestBase):
         messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(0, len(messages))
 
+        messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
+        self.assertEqual(0, len(messages))
+        malformed_sender_email = 'MalfomedSender malformed_sender@gmail.com'
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed sender email address: %s'
+            % malformed_sender_email)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            gae_email_services.send_mail(
+                malformed_sender_email, self.RECIPIENT_EMAIL,
+                'subject', 'body', 'html')
+        messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
+        self.assertEqual(0, len(messages))
+
     def test_email_not_sent_if_recipient_address_is_malformed(self):
         malformed_recipient_email = ''
         email_exception = self.assertRaisesRegexp(
@@ -255,6 +268,27 @@ class BulkEmailsTests(test_utils.GenericTestBase):
             to=self.RECIPIENT_EMAILS[1])
         self.assertEqual(0, len(message_b))
         malformed_sender_email = 'MalformedSender'
+        email_exception = self.assertRaisesRegexp(
+            ValueError, 'Malformed sender email address: %s'
+            % malformed_sender_email)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True), email_exception:
+            gae_email_services.send_bulk_mail(
+                malformed_sender_email, self.RECIPIENT_EMAILS,
+                'subject', 'body', 'html')
+        message_a = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[0])
+        self.assertEqual(0, len(message_a))
+        message_b = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[1])
+        self.assertEqual(0, len(message_b))
+
+        message_a = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[0])
+        self.assertEqual(0, len(message_a))
+        message_b = self.mail_stub.get_sent_messages(
+            to=self.RECIPIENT_EMAILS[1])
+        self.assertEqual(0, len(message_b))
+        malformed_sender_email = 'Malformed Sender malformed_sender@example.com'
         email_exception = self.assertRaisesRegexp(
             ValueError, 'Malformed sender email address: %s'
             % malformed_sender_email)
