@@ -1139,6 +1139,7 @@ class LintChecksManager(object):
         js_and_ts_messages = []
         while not js_and_ts_stdout.empty():
             js_and_ts_messages.append(js_and_ts_stdout.get())
+            print js_and_ts_messages
 
         print ''
         print '\n'.join(js_and_ts_messages)
@@ -2168,4 +2169,4 @@ def main():
 
 
 if __name__ == '__main__':
-    pass
+    main()
