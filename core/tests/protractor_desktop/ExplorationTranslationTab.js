@@ -22,7 +22,8 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var CreatorDashboardPage = require('../protractor_utils/CreatorDashboardPage.js');
+var CreatorDashboardPage = require(
+  '../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 
