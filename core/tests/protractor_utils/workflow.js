@@ -22,7 +22,6 @@ var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
-var ExplorationEditorSettingsTab = require('./ExplorationEditorSettingsTab.js');
 
 // Creates an exploration, opens its editor and skips the tutorial.
 var createExploration = function() {
@@ -30,6 +29,10 @@ var createExploration = function() {
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   explorationEditorMainTab.exitTutorial();
+};
+
+var setTitleForExploration = function(name) {
+  element(by.model('explorationTitleService.displayed')).sendKeys(name);
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
@@ -128,7 +131,7 @@ var _addExplorationRole = function(roleName, username) {
   element(by.css('.protractor-test-role-select')).
     element(by.cssContainingText('option', roleName)).click();
   if (!element(by.css('.protractor-test-save-role')).isEnabled()) {
-    ExplorationEditorSettingsTab.setTitle('Chuck Norris');
+    setTitleForExploration('Chuck Norris');
   }
   // Check and add title, if title does is not present
   element(by.css('.protractor-test-save-role')).click();
