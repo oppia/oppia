@@ -26,7 +26,6 @@ oppia.factory('UserService', [
     var userInfo = null;
     var isUserLoggedIn = function (){
       var currentUrl = $window.location.href;
-      console.log(currentUrl);
       if(currentUrl.includes('signup')){
         return Promise.resolve(false);
       }
