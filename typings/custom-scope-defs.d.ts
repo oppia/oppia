@@ -1,3 +1,5 @@
+// Any property defined on scope used in link function needs to be specified
+// in this typing file and the scope needs to be typed as ICustomScope.
 interface ICustomScope extends ng.IScope {
     // CkEditorRteDirective.ts
     uiConfig?: any;
@@ -20,7 +22,7 @@ interface ICustomScope extends ng.IScope {
     // ImageUploaderDirective.ts
     fileInputClassName?: string;
 
-    // ApplyValidationDirective.ts
+    // FormBuilder.ts
     validators?: any;
 
     // ObjectEditorDirective.ts, ValueGeneratorEditorDirective.ts
@@ -34,7 +36,7 @@ interface ICustomScope extends ng.IScope {
     getAlwaysEditable?: (() => boolean);
     getIsEditable?: (() => boolean);
 
-    // ValueGeneratorEditorDirective.ts, CopierDirective.ts, RandomSelectorDirective.ts
+    // ValueGeneratorEditorDirective.ts, Copier.ts, RandomSelector.ts
     generatorId?: string;
 
     // ValueGeneratorEditorDirective.ts
@@ -51,7 +53,7 @@ interface ICustomScope extends ng.IScope {
     // ConversationSkinDirective.ts
     directiveTemplate?: string;
 
-    // CopierDirective.ts, RandomSelectorDirective.ts
+    // Copier.ts, RandomSelector.ts
     getTemplateUrl?: (() => string);
 
     // OppiaInteractiveMusicNotesInputDirective.ts
