@@ -34,7 +34,8 @@ describe('Context service', function() {
       });
     });
 
-    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(
+      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(angular.mock.inject(function($injector) {
       ecs = $injector.get('ContextService');

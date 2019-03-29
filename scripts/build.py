@@ -1131,7 +1131,8 @@ def generate_build_directory():
     SOURCE_DIRS = [
         ASSETS_DEV_DIR, [
             EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS['compiled_js_dir']], [
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS['compiled_js_dir']
+        ], [
             TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
             TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir']
         ],
@@ -1153,6 +1154,7 @@ def compile_typescript_files(project_dir):
     print 'Compiling ts files...'
     cmd = '../node_modules/typescript/bin/tsc --project %s' % project_dir
     subprocess.check_call(cmd, shell=True)
+
 
 def build():
     """The main method of this script.

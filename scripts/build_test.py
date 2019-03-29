@@ -189,7 +189,7 @@ class BuildTests(test_utils.GenericTestBase):
             MOCK_EXTENSIONS_DEV_DIR, MOCK_EXTENSIONS_COMPILED_JS_DIR]
         source_dir_file_count = build.get_file_count(
             MOCK_EXTENSIONS_DEV_DIR) + build.get_file_count(
-            MOCK_EXTENSIONS_COMPILED_JS_DIR)
+                MOCK_EXTENSIONS_COMPILED_JS_DIR)
 
         # Ensure that MOCK_EXTENSIONS_DIR has at least 1 file.
         assert source_dir_file_count > 0
@@ -545,7 +545,7 @@ class BuildTests(test_utils.GenericTestBase):
             'out_dir': os.path.join(TEST_DIR, 'build', 'extensions', '')
         }
         file_hashes = build.get_file_hashes(MOCK_EXTENSIONS_DEV_DIR)
-        compiled_js_file_hashes= build.get_file_hashes(
+        compiled_js_file_hashes = build.get_file_hashes(
             MOCK_EXTENSIONS_COMPILED_JS_DIR)
         build_dir_tasks = collections.deque()
         build_all_files_tasks = (

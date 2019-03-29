@@ -45,8 +45,8 @@ oppia.factory('PlaythroughService', [
     var isLearnerInSamplePopulation = null;
 
     var multipleIncorrectStateName = {
-        state_name: null,
-        num_times_incorrect: null
+      state_name: null,
+      num_times_incorrect: null
     };
 
     var cycleIdentifier = {

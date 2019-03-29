@@ -1279,8 +1279,8 @@ class LintChecksManager(object):
             print ''
             return summary_messages
 
-    def _check_js_component_name_and_count(self):
-        """This function ensures that all JS files have exactly
+    def _check_js_and_ts_component_name_and_count(self):
+        """This function ensures that all JS/TS files have exactly
         one component and and that the name of the component
         matches the filename.
         """
@@ -1352,13 +1352,13 @@ class LintChecksManager(object):
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
                 summary_message = (
-                    '%s  Js component name and count check failed' %
+                    '%s  Component name and count check failed' %
                     (_MESSAGE_TYPE_FAILED))
                 print summary_message
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
-                    '%s  Js component name and count check passed' %
+                    '%s  Component name and count check passed' %
                     (_MESSAGE_TYPE_SUCCESS))
                 print summary_message
                 summary_messages.append(summary_message)
@@ -2044,8 +2044,9 @@ class LintChecksManager(object):
             print '----------------------------------------'
         js_and_ts_files_to_check = [
             filepath for filepath in self.all_filepaths if filepath.endswith((
-                '.js', '.ts')) and (not filepath.endswith(GENERATED_FILE_PATHS)) and (
-                    not filepath.endswith(CONFIG_FILE_PATHS))]
+                '.js', '.ts')) and (
+                    not filepath.endswith(GENERATED_FILE_PATHS)) and (
+                        not filepath.endswith(CONFIG_FILE_PATHS))]
         py_files_to_check = [
             filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.py') and (not filepath.endswith('__init__.py'))]

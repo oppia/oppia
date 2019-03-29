@@ -37,7 +37,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
       Math: '',
       Tabs: '',
       Video: ''
-    }
+    };
 
     Object.keys(RTE_COMPONENT_SPECS).forEach(function(componentSpec) {
       RTE_COMPONENT_NAMES[componentSpec] =
@@ -120,10 +120,10 @@ oppia.factory('SpeechSynthesisChunkerService', [
       // Convert links into speakable text by extracting the readable value.
       elt.find('oppia-noninteractive-' + RTE_COMPONENT_NAMES.Link)
         .replaceWith(function() {
-          if ((<HTMLElement><any>this).attributes[
+          if ((<HTMLElement><any> this).attributes[
             'text-with-value'] !== undefined) {
-            return (<HTMLElement><any>this).attributes[
-          'text-with-value'].textContent.replace(/&quot;/g, '');
+            return (<HTMLElement><any> this).attributes[
+              'text-with-value'].textContent.replace(/&quot;/g, '');
           }
         });
 
@@ -131,10 +131,10 @@ oppia.factory('SpeechSynthesisChunkerService', [
       elt.find('oppia-noninteractive-' + RTE_COMPONENT_NAMES.Math)
         .replaceWith(function() {
           if (
-            (<HTMLElement><any>this).attributes[
+            (<HTMLElement><any> this).attributes[
               'raw_latex-with-value'] !== undefined) {
             return _formatLatexToSpeakableText(
-              (<HTMLElement><any>this).attributes[
+              (<HTMLElement><any> this).attributes[
                 'raw_latex-with-value'].textContent);
           }
         });
