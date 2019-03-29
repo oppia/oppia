@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the practice session.
  */
 
-oppia.controller('PracticeSession', [
+angular.module("practiceSessionPageModule").controller('PracticeSession', [
   '$rootScope', '$scope', '$window', 'AlertsService',
   'UrlService', 'FATAL_ERROR_CODES',
   function(
