@@ -249,7 +249,8 @@ EXCLUDED_PATHS = (
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'typings/*', 'local_compiled_js/*')
+    '*.mp3', '*.mp4', 'typings/*', 'local_compiled_js/*',
+    'core/templates/dev/head/expressions/ExpressionParserService.ts')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
@@ -2165,4 +2166,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    pass
