@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the topic viewer.
  */
 
-oppia.controller('TopicViewer', [
+angular.module('topicViewerPageModule').controller('TopicViewer', [
   '$rootScope', '$scope', '$window', 'AlertsService',
   'TopicViewerBackendApiService',
   'UrlService', 'FATAL_ERROR_CODES',

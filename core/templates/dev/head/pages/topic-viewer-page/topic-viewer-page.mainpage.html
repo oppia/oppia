@@ -28,7 +28,7 @@
       </div>
     </div>
     <div ng-if="activeTab === 'story'" class="oppia-story-tab">
-      <stories-list topic-id="topicId" canonical-stories-list="canonicalStoriesList"></stories-list>
+      <topic-viewer-stories-list topic-id="topicId" canonical-stories-list="canonicalStoriesList"></topic-viewer-stories-list>
     </div>
   </div>
   <style>
@@ -128,7 +128,4 @@
 
   <script src="/templates/dev/head/domain/topic_viewer/TopicViewerBackendApiService.js"></script>
 
-  <script src="/templates/dev/head/pages/topic_viewer/TopicViewerNavbarBreadcrumbDirective.js"></script>
-  <script src="/templates/dev/head/pages/topic_viewer/StoriesListDirective.js"></script>
-  <script src="/templates/dev/head/pages/topic_viewer/TopicViewer.js"></script>
 {% endblock footer_js %}
