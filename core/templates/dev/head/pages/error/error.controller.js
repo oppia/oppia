@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the error page.
  */
 
-oppia.controller('Error', [
+angular.module('errorModule').controller('Error', [
   '$scope', 'UrlInterpolationService',
   function(
       $scope, UrlInterpolationService) {
