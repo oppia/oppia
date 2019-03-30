@@ -278,22 +278,41 @@ def _compare_file_count(first_dir_path, second_dir_path):
     """Ensure that two dir's file counts match.
 
     Args:
-       first_dir_path: str/list. First directory to compare.
+       first_dir_path: str. First directory to compare.
        second_dir_path: str. Second directory to compare.
 
     Raises:
         ValueError: The source directory does not have the same file count as
             the target directory.
     """
-    first_dir_file_count = 0
-    if isinstance(first_dir_path, list):
-        for dir_path in first_dir_path:
-            first_dir_file_count += get_file_count(dir_path)
-    else:
-        first_dir_file_count = get_file_count(first_dir_path)
+    first_dir_file_count = get_file_count(first_dir_path)
     second_dir_file_count = get_file_count(second_dir_path)
     if first_dir_file_count != second_dir_file_count:
         print 'Comparing %s vs %s' % (first_dir_path, second_dir_path)
+        raise ValueError(
+            '%s files in first dir != %s files in second dir' % (
+                first_dir_file_count, second_dir_file_count))
+
+
+def _compare_file_count_for_multiple_dirs(
+        first_dir_list, second_dir_path):
+    """Ensure that two dir's file counts match.
+
+    Args:
+       first_dir_list: list(str). List of directories to compare.
+       second_dir_path: str. Second directory to compare.
+
+    Raises:
+        ValueError: The source directory list does not have the same file
+            count as the target directory.
+    """
+
+    first_dir_file_count = 0
+    for first_dir_path in first_dir_list:
+        first_dir_file_count += get_file_count(first_dir_path)
+    second_dir_file_count = get_file_count(second_dir_path)
+    if first_dir_file_count != second_dir_file_count:
+        print 'Comparing %s vs %s' % (first_dir_list, second_dir_path)
         raise ValueError(
             '%s files in first dir != %s files in second dir' % (
                 first_dir_file_count, second_dir_file_count))
@@ -1030,7 +1049,8 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
             relative_filepath)
 
 
-def _verify_build(input_dirnames, output_dirnames, file_hashes):
+def _verify_build(
+        input_dirnames, output_dirnames, input_dirnames_type, file_hashes):
     """Verify a few metrics after build process finishes:
         1) Number of files between source directory and final directory
         matches.
@@ -1039,17 +1059,23 @@ def _verify_build(input_dirnames, output_dirnames, file_hashes):
         hashes are inserted.
 
         Args:
-            input_dirnames: list(str). List of directory paths that contain
-                source files.
+            input_dirnames: list(str|list(str)). List of directory paths that
+                contain source files.
             output_dirnames: list(str). List of directory paths that contain
                 built files.
+            input_dirnames_type: Type of input_dirnames - whether it is a single
+                directory or list of directories.
             file_hashes: dict(str, str). Dictionary with filepaths as keys and
                 hashes of file content as values.
     """
     for i in xrange(len(input_dirnames)):
         # Make sure that all files in source directory and staging directory are
         # accounted for.
-        _compare_file_count(input_dirnames[i], output_dirnames[i])
+        if input_dirnames_type[i] == 'single_dir':
+            _compare_file_count(input_dirnames[i], output_dirnames[i])
+        else:
+            _compare_file_count_for_multiple_dirs(
+                input_dirnames[i], output_dirnames[i])
 
     # Make sure that hashed file name matches with current hash dict.
     for built_dir in output_dirnames:
@@ -1150,7 +1176,11 @@ def generate_build_directory():
             TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir']
         ],
         THIRD_PARTY_GENERATED_DEV_DIR]
-    _verify_build(SOURCE_DIRS, COPY_OUTPUT_DIRS, hashes)
+    # This is required since we need to compare build/extensions and
+    # build/templates against both the compiled js dir and dev dir.
+    SOURCE_DIRS_TYPE = [
+        'single_dir', 'list_of_dirs', 'list_of_dirs', 'single_dir']
+    _verify_build(SOURCE_DIRS, COPY_OUTPUT_DIRS, SOURCE_DIRS_TYPE, hashes)
     # Clean up un-hashed hashes.js.
     safe_delete_file(HASHES_JS_FILEPATH)
     print 'Build completed.'

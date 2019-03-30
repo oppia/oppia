@@ -196,7 +196,8 @@ class BuildTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             ValueError, ('%s files in first dir != %s files in second dir') %
             (source_dir_file_count, target_dir_file_count)):
-            build._compare_file_count(MOCK_EXTENSIONS_DIR_LIST, EMPTY_DIR)
+            build._compare_file_count_for_multiple_dirs(
+                MOCK_EXTENSIONS_DIR_LIST, EMPTY_DIR)
 
         # Reset EMPTY_DIRECTORY to clean state.
         build.safe_delete_directory_tree(EMPTY_DIR)
@@ -289,6 +290,11 @@ class BuildTests(test_utils.GenericTestBase):
         """
         service_js_filepath = os.path.join(
             'local_compiled_js', 'core', 'pages', 'AudioService.js')
+        generated_parser_js_filepath = os.path.join(
+            'core', 'expressions', 'ExpressionParserService.js')
+        compiled_generated_parser_js_filepath = os.path.join(
+            'local_compiled_js', 'core', 'expressions',
+            'ExpressionParserService.js')
         service_ts_filepath = os.path.join('core', 'pages', 'AudioService.ts')
         spec_js_filepath = os.path.join('core', 'pages', 'AudioServiceSpec.js')
         protractor_filepath = os.path.join('extensions', 'protractor.js')
@@ -315,6 +321,15 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)):
             self.assertFalse(build.should_file_be_built(service_js_filepath))
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
+
+        with self.swap(
+            build, 'JS_FILEPATHS_NOT_TO_BUILD', (
+                'core/expressions/ExpressionParserService.js',)):
+            self.assertFalse(
+                build.should_file_be_built(generated_parser_js_filepath))
+            self.assertTrue(
+                build.should_file_be_built(
+                    compiled_generated_parser_js_filepath))
 
     def test_hash_should_be_inserted(self):
         """Test hash_should_be_inserted returns the correct boolean value
