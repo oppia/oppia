@@ -151,9 +151,6 @@ workflows:
       - backend_tests:
           requires:
             - setup
-      - chrome_version:
-          requires:
-            - setup
       - e2e_tests:
           requires:
             - setup
