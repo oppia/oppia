@@ -82,7 +82,7 @@ oppia.directive('translatorOverview', [
 
           $scope.getTranslationProgressAriaLabel = function() {
             if ($scope.numberOfRequiredAudio -
-              $scope.numberOfAudioNotAvailable < 1) {
+              $scope.numberOfAudioNotAvailable === 1) {
               return (
                 $scope.numberOfRequiredAudio -
                 $scope.numberOfAudioNotAvailable + ' item translated out of ' +

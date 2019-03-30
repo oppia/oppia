@@ -170,7 +170,7 @@ describe('Exploration translation', function() {
 
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
-      '0 item translated out of 8 items');
+      '0 items translated out of 8 items');
     explorationEditorTranslationTab.expectContentAccessibilityToMatch(
       'Content of the card');
     explorationEditorTranslationTab.expectFeedbackAccessibilityToMatch(
