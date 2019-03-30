@@ -8,8 +8,8 @@
   }
   .oppia-stay-anonymous-checkbox {
     font-size: 0.9em;
-    margin: 12px 0 4px 0;
     line-height: 1.75;
+    margin: 12px 0 4px 0;
   }
 </style>
 <div style="min-width: 200px;">
@@ -32,7 +32,7 @@
                ng-disabled="!feedbackText"
                translate="I18N_PLAYER_SUBMIT_BUTTON">
     </md-button>
-    <div class="checkbox oppia-stay-anonymous-checkbox" style="font-size: 0.9em; margin: 12px 0 4px 0;" ng-show="isLoggedIn">
+    <div class="checkbox oppia-stay-anonymous-checkbox" ng-show="isLoggedIn">
       <label>
         <input type="checkbox" ng-model="isSubmitterAnonymized">
         <span translate="I18N_PLAYER_STAY_ANONYMOUS"></span>
