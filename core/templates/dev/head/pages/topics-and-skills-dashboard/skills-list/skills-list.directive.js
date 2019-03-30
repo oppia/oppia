@@ -66,7 +66,7 @@
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard/' +
-                'topics-and-skills-dashboard-shared-templates/' +
+                'topics-and-skills-dashboard-templates/' +
                 'delete-skill-modal.template.html'),
               backdrop: true,
               controller: [
@@ -99,7 +99,7 @@
             var topicSummaries = $scope.getEditableTopicSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard/topics-and-skills-dashboard-shared-templates/' +
+                '/pages/topics-and-skills-dashboard/topics-and-skills-dashboard-templates/' +
                 'assign-skill-to-topic-modal.template.html'),
               backdrop: true,
               controller: [
@@ -154,7 +154,7 @@
             var skillSummaries = $scope.getMergeableSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard/topics-and-skills-dashboard-shared-templates/' +
+                '/pages/topics-and-skills-dashboard/topics-and-skills-dashboard-templates/' +
                 'merge-skill-modal.template.html'),
               backdrop: true,
               controller: [
