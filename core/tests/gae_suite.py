@@ -42,6 +42,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'selenium-2.53.2'),
     os.path.join(OPPIA_TOOLS_DIR, 'PIL-1.1.7'),
     CURR_DIR,
+    os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
     os.path.join(THIRD_PARTY_DIR, 'bleach-1.2.2'),
     os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.15.0'),
     os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.17.0'),
@@ -50,8 +51,9 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(THIRD_PARTY_DIR, 'html5lib-python-0.95'),
     os.path.join(THIRD_PARTY_DIR, 'requests-2.10.0'),
     os.path.join(THIRD_PARTY_DIR, 'simplejson-3.7.1'),
-    os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.6.0'),
+    os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
     os.path.join(THIRD_PARTY_DIR, 'mutagen-1.38'),
+    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.8'),
 ]
 
 _PARSER = argparse.ArgumentParser()

@@ -20,11 +20,11 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveMultipleChoiceInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  'multipleChoiceInputRulesService',
+  'HtmlEscaperService', 'MultipleChoiceInputRulesService',
+  'UrlInterpolationService',
   function(
-      HtmlEscaperService, UrlInterpolationService,
-      multipleChoiceInputRulesService) {
+      HtmlEscaperService, MultipleChoiceInputRulesService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -44,7 +44,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
             }
             answer = parseInt(answer, 10);
             CurrentInteractionService.onSubmit(
-              answer, multipleChoiceInputRulesService);
+              answer, MultipleChoiceInputRulesService);
           };
           CurrentInteractionService.registerCurrentInteraction(null, null);
         }

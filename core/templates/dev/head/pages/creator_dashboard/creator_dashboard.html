@@ -895,7 +895,16 @@
   <script src="/templates/dev/head/filters/WrapTextWithEllipsisFilter.js"></script>
 
   <script src="/templates/dev/head/components/RatingComputationService.js"></script>
-  <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertUnicodeWithParamsToHtmlFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertHtmlToUnicodeFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertUnicodeToHtmlFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsAtLeastFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsAtMostFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsFloatFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsIntegerFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsNonemptyFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
@@ -918,38 +927,39 @@
   <script src="/templates/dev/head/components/forms/ImageUploaderDirective.js"></script>
   <script src="/templates/dev/head/components/forms/AudioFileUploaderDirective.js"></script>
 
-  <script src="/extensions/objects/templates/BooleanEditor.js"></script>
-  <script src="/extensions/objects/templates/CodeStringEditor.js"></script>
-  <script src="/extensions/objects/templates/CoordTwoDimEditor.js"></script>
-  <script src="/extensions/objects/templates/DragAndDropHtmlStringEditor.js"></script>
-  <script src="/extensions/objects/templates/DragAndDropPositiveIntEditor.js"></script>
-  <script src="/extensions/objects/templates/FilepathEditor.js"></script>
-  <script src="/extensions/objects/templates/FractionEditor.js"></script>
-  <script src="/extensions/objects/templates/GraphEditor.js"></script>
-  <script src="/extensions/objects/templates/GraphPropertyEditor.js"></script>
-  <script src="/extensions/objects/templates/HtmlEditor.js"></script>
-  <script src="/extensions/objects/templates/ImageWithRegionsEditor.js"></script>
-  <script src="/extensions/objects/templates/IntEditor.js"></script>
-  <script src="/extensions/objects/templates/ListOfSetsOfHtmlStringsEditor.js"></script>
-  <script src="/extensions/objects/templates/ListOfUnicodeStringEditor.js"></script>
-  <script src="/extensions/objects/templates/LogicErrorCategoryEditor.js"></script>
-  <script src="/extensions/objects/templates/LogicQuestionEditor.js"></script>
-  <script src="/extensions/objects/templates/MathLatexStringEditor.js"></script>
-  <script src="/extensions/objects/templates/MusicPhraseEditor.js"></script>
-  <script src="/extensions/objects/templates/NonnegativeIntEditor.js"></script>
-  <script src="/extensions/objects/templates/NormalizedStringEditor.js"></script>
-  <script src="/extensions/objects/templates/NumberWithUnitsEditor.js"></script>
-  <script src="/extensions/objects/templates/ParameterNameEditor.js"></script>
-  <script src="/extensions/objects/templates/RealEditor.js"></script>
-  <script src="/extensions/objects/templates/SanitizedUrlEditor.js"></script>
-  <script src="/extensions/objects/templates/SetOfHtmlStringEditor.js"></script>
-  <script src="/extensions/objects/templates/SetOfUnicodeStringEditor.js"></script>
-  <script src="/extensions/objects/templates/UnicodeStringEditor.js"></script>
+  <script src="/extensions/objects/templates/BooleanEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/CodeStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/CoordTwoDimEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/DragAndDropHtmlStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/DragAndDropPositiveIntEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/FilepathEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/FractionEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/GraphEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/GraphPropertyEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/HtmlEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ImageWithRegionsEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/IntEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ListOfSetsOfHtmlStringsEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ListOfUnicodeStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/LogicErrorCategoryEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/LogicQuestionEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/MusicPhraseEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/NonnegativeIntEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/NormalizedStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/NumberWithUnitsEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ParameterNameEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/RealEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/SetOfHtmlStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/SetOfUnicodeStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/UnicodeStringEditorDirective.js"></script>
   <script src="/templates/dev/head/services/ExplorationHtmlFormatterService.js"></script>
   <script src="/templates/dev/head/services/ExtensionTagAssemblerService.js"></script>
   <script src="/templates/dev/head/services/MessengerService.js"></script>
   <script src="/templates/dev/head/services/AudioPlayerService.js"></script>
   <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
+  <script src="/templates/dev/head/services/IdGenerationService.js"></script>
   <script src="/templates/dev/head/services/AutogeneratedAudioPlayerService.js"></script>
   <script src="/templates/dev/head/services/SpeechSynthesisChunkerService.js"></script>
   <script src="/templates/dev/head/services/CodeNormalizerService.js"></script>
@@ -977,6 +987,8 @@
 
   <script src="/templates/dev/head/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/QuestionUndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/BaseUndoRedoService.js"></script>
 
   <script src="/templates/dev/head/services/AssetsBackendApiService.js"></script>
   <script src="/templates/dev/head/services/StateTopAnswersStatsBackendApiService.js"></script>
@@ -1009,6 +1021,7 @@
   <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/state/StateObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/NumberWithUnitsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/objects/UnitsObjectFactory.js"></script>
 
   <script src="/templates/dev/head/domain/question/EditableQuestionBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/question/QuestionObjectFactory.js"></script>
@@ -1053,8 +1066,15 @@
   <script src="/templates/dev/head/pages/state_editor/StateSolutionEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StateResponsesDirective.js"></script>
   <script src="/templates/dev/head/pages/state_editor/StateEditorDirective.js"></script>
-  <script src="/templates/dev/head/pages/state_editor/StateEditorService.js"></script>
-  <script src="/templates/dev/head/pages/state_editor/StatePropertyServices.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateEditorService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StatePropertyService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateContentService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateParamChangesService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateInteractionIdService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateCustomizationArgsService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateHintsService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateSolutionService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateContentIdsToAudioTranslationsService.js"></script>
 
   <script src="/templates/dev/head/components/state/AnswerGroupEditorDirective.js"></script>
   <script src="/templates/dev/head/components/state/HintEditorDirective.js"></script>
@@ -1093,7 +1113,7 @@
   <script src="/templates/dev/head/expressions/ExpressionParserService.js"></script>
   <script src="/templates/dev/head/expressions/ExpressionInterpolationService.js"></script>
 
-  <script src="/extensions/interactions/baseValidator.js"></script>
+  <script src="/extensions/interactions/baseInteractionValidationService.js"></script>
   <script src="/templates/dev/head/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="/templates/dev/head/domain/suggestion/SuggestionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/suggestion/SuggestionThreadObjectFactory.js"></script>

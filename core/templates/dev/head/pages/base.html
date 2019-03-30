@@ -82,7 +82,6 @@
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         status_code: JSON.parse('{{status_code}}'),
         GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
-        iframed: JSON.parse('{{iframed|js_string}}'),
         isTopicManager: JSON.parse('{{is_topic_manager|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
@@ -166,8 +165,8 @@
 
     {% include 'pages/footer_js_libs.html' %}
 
-    <script src="/templates/dev/head/app.js"></script>
-    <script src="/templates/dev/head/i18n.js"></script>
+    <script src="/templates/dev/head/App.js"></script>
+    <script src="/templates/dev/head/I18nFooter.js"></script>
 
     <script src="/templates/dev/head/directives/FocusOnDirective.js"></script>
 
@@ -179,10 +178,7 @@
     <script src="/templates/dev/head/services/UtilsService.js"></script>
     <script src="/templates/dev/head/services/DebouncerService.js"></script>
     <script src="/templates/dev/head/services/DateTimeFormatService.js"></script>
-    <script src="/templates/dev/head/services/IdGenerationService.js"></script>
-    <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
     <script src="/templates/dev/head/services/TranslationFileHashLoaderService.js"></script>
-    <script src="/templates/dev/head/services/RteHelperService.js"></script>
     <script src="/templates/dev/head/services/UserService.js"></script>
     <script src="/templates/dev/head/services/PromoBarService.js"></script>
     <script src="/templates/dev/head/services/contextual/DeviceInfoService.js"></script>

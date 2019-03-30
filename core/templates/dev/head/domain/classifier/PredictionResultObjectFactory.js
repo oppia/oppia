@@ -17,7 +17,7 @@
  *     result domain objects.
  */
 
-oppia.factory('PredictionResultOjectFactory', [function() {
+oppia.factory('PredictionResultObjectFactory', [function() {
   /**
    * Stores the prediction result for an answer as returned by the
    * various prediction services used in Oppia for Machine Learning based

@@ -63,11 +63,26 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-assign-skill-to-topic-button'));
   var confirmMoveButton = element(
     by.css('.protractor-test-confirm-move-button'));
+  var mergeSkillsButtons = element.all(
+    by.css('.protractor-test-merge-skills-button'));
+  var confirmSkillsMergeButton = element(
+    by.css('.protractor-test-confirm-skills-merge-button'));
 
   this.get = function() {
     browser.get(DASHBOARD_URL);
     waitFor.pageToFullyLoad();
   };
+
+  this.mergeSkillWithIndexToSkillWithIndex = (
+    function(oldSkillIndex, newSkillIndex) {
+      mergeSkillsButtons.then(function(elems) {
+        elems[oldSkillIndex].click();
+        skillsListItems.then(function(skills) {
+          skills[newSkillIndex].click();
+          confirmSkillsMergeButton.click();
+        });
+      });
+    });
 
   this.navigateToTopicWithIndex = function(index) {
     topicsListItems.then(function(elems) {

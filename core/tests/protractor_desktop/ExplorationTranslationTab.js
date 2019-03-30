@@ -120,6 +120,33 @@ describe('Exploration translation', function() {
     users.logout();
     general.checkForConsoleErrors([]);
   });
+  
+  it('should contain accessibility elements', function() {
+    users.login('common@translationTab.com');
+    creatorDashboardPage.get();
+    // Test using common exploration.
+    creatorDashboardPage.editExploration('tests');
+
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
+      '0 items translated out of 11 items');
+    explorationEditorTranslationTab.expectContentAccessibilityToMatch(
+      'Content of the card');
+    explorationEditorTranslationTab.expectFeedbackAccessibilityToMatch(
+      'Feedback responses for answer groups');
+    explorationEditorTranslationTab.expectHintAccessibilityToMatch(
+      'Hints for the state');
+    explorationEditorTranslationTab.expectSolutionAccessibilityToMatch(
+      'Solutions for the state');
+    explorationEditorTranslationTab.expectStartRecordingAccessibilityToMatch(
+      'Start recording');
+    explorationEditorTranslationTab.expectUploadRecordingAccessibilityToMatch(
+      'Upload translated file');
+    explorationEditorTranslationTab.expectPlayRecordingAccessibilityToMatch(
+      'Play recorded audio');
+    users.logout();
+    general.checkForConsoleErrors([]);
+  });
 
   it('should have a correct numerical status', function() {
     users.login('common@translationTab.com');
@@ -169,6 +196,7 @@ describe('Exploration translation', function() {
        ' The uploaded file is 301.87 seconds long.'}]);
   });
 
+
   it('should provide correct status color for each state in the graph view',
     function() {
       var ALL_AUDIO_AVAILABLE_COLOR = 'rgb(22, 167, 101)';
@@ -199,6 +227,7 @@ describe('Exploration translation', function() {
 
       general.checkForConsoleErrors([]);
     });
+
 
   it(
     'should maintain its active sub-tab on saving draft and publishing changes',

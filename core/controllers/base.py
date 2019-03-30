@@ -238,7 +238,7 @@ class BaseHandler(webapp2.RequestHandler):
                         'Registration session expired.')
                 csrf_token = self.request.get('csrf_token')
                 if not csrf_token:
-                    raise Exception(
+                    raise self.UnauthorizedUserException(
                         'Missing CSRF token. Changes were not saved. '
                         'Please report this bug.')
 
@@ -487,7 +487,7 @@ class BaseHandler(webapp2.RequestHandler):
 class Error404Handler(BaseHandler):
     """Handles 404 errors."""
 
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
+    pass
 
 
 class CsrfTokenManager(object):
