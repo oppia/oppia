@@ -57,6 +57,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('pages/library-page/library-page.module.ts');
 require('pages/signup-page/signup-page.module.ts');
+require('pages/topic-viewer-page/topic-viewer-page.module.ts');
+
 require('pages/landing-page/topic-landing-page.module.ts');
 
 require('components/summary-tile-directives/summary-tile-directives.module.ts');

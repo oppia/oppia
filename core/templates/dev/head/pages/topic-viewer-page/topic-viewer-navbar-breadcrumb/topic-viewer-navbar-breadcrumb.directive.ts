@@ -19,13 +19,14 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.directive('topicViewerNavbarBreadcrumb', [
+angular.module('topicViewerNavbarBreadcrumbModule').directive('topicViewerNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_viewer/topic_viewer_navbar_breadcrumb_directive.html'),
+        '/pages/topic-viewer-page/topic-viewer-navbar-breadcrumb/' +
+        'topic-viewer-navbar-breadcrumb.directive.html'),
       controller: ['$scope', 'TopicViewerBackendApiService', 'UrlService',
         function($scope, TopicViewerBackendApiService, UrlService) {
           TopicViewerBackendApiService.fetchTopicData(

@@ -17,15 +17,15 @@
  */
 
 require('components/background/BackgroundBannerDirective.ts');
-require('pages/topic_viewer/StoriesListDirective.ts');
-require('pages/topic_viewer/TopicViewerNavbarBreadcrumbDirective.ts');
+require('pages/topic-viewer-page/stories-list/stories-list.directive.ts');
+require('pages/topic-viewer-page/topic-viewer-navbar-breadcrumb/topic-viewer-navbar-breadcrumb.directive.ts');
 
 require('domain/topic_viewer/TopicViewerBackendApiService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.controller('TopicViewer', [
+angular.module('topicViewerPageModule').controller('TopicViewer', [
   '$rootScope', '$scope', '$window', 'AlertsService',
   'PageTitleService', 'TopicViewerBackendApiService',
   'UrlService', 'FATAL_ERROR_CODES',

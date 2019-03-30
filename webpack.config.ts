@@ -73,7 +73,7 @@ module.exports = {
       '/pages/topics_and_skills_dashboard/' +
       'TopicsAndSkillsDashboard.ts'
     ),
-    topic_viewer: commonPrefix + '/pages/topic_viewer/TopicViewer.ts',
+    topic_viewer: commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.controller.ts',
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -348,8 +348,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['topic_viewer'],
-      filename: 'topic_viewer.html',
-      template: commonPrefix + '/pages/topic_viewer/topic_viewer.html',
+      filename: 'topic-viewer-page.mainpage.html',
+      template: commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
