@@ -136,6 +136,58 @@ describe('Exploration translation', function() {
     users.logout();
   });
 
+  it('should contain accessibility elements', function() {
+    users.createUser('user2@translationTab.com', 'user2TranslationTab');
+    users.login('user2@translationTab.com');
+    workflow.createExploration();
+
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'This is first card.'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('This is feedback1.'),
+      'second', true, 'Equals', 6);
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('This is default_outcome.'));
+    explorationEditorMainTab.addHint('This is hint1.');
+    explorationEditorMainTab.addHint('This is hint2.');
+    explorationEditorMainTab.addSolution('NumericInput', {
+      correctAnswer: 6,
+      explanation: 'This is solution.'
+    });
+    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('This is second card.'));
+    explorationEditorMainTab.setInteraction('Continue');
+    responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setDestination('final card', true, null);
+    // Setup a terminating state.
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorMainTab.moveToState('first');
+    explorationEditorPage.saveChanges();
+
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
+      '0 items translated out of 8 items');
+    explorationEditorTranslationTab.expectContentAccessibilityToMatch(
+      'Content of the card');
+    explorationEditorTranslationTab.expectFeedbackAccessibilityToMatch(
+      'Feedback responses for answer groups');
+    explorationEditorTranslationTab.expectHintAccessibilityToMatch(
+      'Hints for the state');
+    explorationEditorTranslationTab.expectSolutionAccessibilityToMatch(
+      'Solutions for the state');
+    explorationEditorTranslationTab.expectStartRecordingAccessibilityToMatch(
+      'Start recording');
+    explorationEditorTranslationTab.expectUploadRecordingAccessibilityToMatch(
+      'Upload translated file');
+    explorationEditorTranslationTab.expectPlayRecordingAccessibilityToMatch(
+      'Play recorded audio');
+    users.logout();
+  });
+
   it(
     'should maintain its active sub-tab on saving draft and publishing changes',
     function() {

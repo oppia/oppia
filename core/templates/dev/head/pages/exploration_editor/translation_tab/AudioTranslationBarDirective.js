@@ -96,6 +96,13 @@ oppia.directive('audioTranslationBar', [
           $scope.checkingMicrophonePermission = false;
           $scope.audioTimerIsShown = true;
           $scope.audioIsCurrentlyBeingSaved = false;
+          document.body.onkeyup = function(e) {
+            if (e.keyCode === 82) {
+              // 82 belongs to the keycode for 'R'
+              // Used as shortcut key for recording
+              toggleStartAndStopRecording();
+            }
+          };
 
           var saveContentIdsToAudioTranslationChanges = function() {
             StateContentIdsToAudioTranslationsService.saveDisplayedValue();
@@ -242,6 +249,13 @@ oppia.directive('audioTranslationBar', [
               AlertsService.addWarning(errorResponse.error);
               $scope.initAudioBar();
             });
+          };
+          var toggleStartAndStopRecording = function() {
+            if (!$scope.recorder.status.isRecording && !$scope.audioBlob) {
+              $scope.checkAndStartRecording();
+            } else {
+              $scope.recorder.stopRecord();
+            }
           };
 
           $scope.$on('externalSave', function() {
