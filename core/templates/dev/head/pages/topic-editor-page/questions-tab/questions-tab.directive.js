@@ -15,6 +15,7 @@
 /**
  * @fileoverview Controller for the questions tab.
  */
+
 angular.module('questionsTabModule').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

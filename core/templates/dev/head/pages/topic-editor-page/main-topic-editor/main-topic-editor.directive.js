@@ -15,6 +15,7 @@
 /**
  * @fileoverview Controller for the main topic editor.
  */
+
 angular.module('mainTopicEditorModule').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

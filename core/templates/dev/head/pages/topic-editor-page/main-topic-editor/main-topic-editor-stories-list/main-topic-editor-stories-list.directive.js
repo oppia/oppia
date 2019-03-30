@@ -15,6 +15,7 @@
 /**
  * @fileoverview Controller for the stories list viewer.
  */
+
 angular.module('mainTopicEditorStoriesListModule').directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
