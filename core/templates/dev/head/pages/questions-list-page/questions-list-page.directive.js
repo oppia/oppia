@@ -1,5 +1,4 @@
-
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +15,8 @@
 /**
  * @fileoverview Controller for the questions list.
  */
-oppia.directive('questionsList', [
+
+angular.module('questionListPageModule').directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -31,7 +31,7 @@ oppia.directive('questionsList', [
         getQuestionSuggestionThreads: '&questionSuggestionThreads'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/questions_list/questions_list_directive.html'),
+        '/pages/questions-list-page/questions-list-page.directive.html'),
       controller: [
         '$scope', '$filter', '$http', '$q', '$uibModal', '$window',
         'AlertsService', 'QuestionCreationService', 'UrlService',

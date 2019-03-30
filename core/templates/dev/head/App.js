@@ -28,7 +28,8 @@ var oppia = angular.module(
     'learnerDashboardPageModule', 'maintenancePageModule',
     'moderatorPageModule', 'notificationsDashboardPageModule',
     'practiceSessionPageModule', 'profilePageModule',
-    'questionEditorPageModule', 'topicLandingPageModule'
+    'questionEditorPageModule', 'questionListPageModule',
+    'topicLandingPageModule'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 

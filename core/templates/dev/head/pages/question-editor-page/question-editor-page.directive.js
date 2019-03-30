@@ -30,7 +30,7 @@ angular.module('questionEditorPageModule').directive('questionEditor', [
         questionChanged: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/question_editor/question_editor_directive.html'),
+        '/pages/question-editor-page/question-editor-page.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal',
         'AlertsService', 'QuestionCreationService',
