@@ -252,9 +252,9 @@ EXCLUDED_PATHS = (
     '*.mp3', '*.mp4', 'typings/*', 'local_compiled_js/*')
 
 GENERATED_FILE_PATHS = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
-    'extensions/interactions/LogicProof/static/js/generatedParser.ts',
-    'core/templates/dev/head/expressions/ExpressionParserService.ts')
+    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
+    'extensions/interactions/LogicProof/static/js/generatedParser.js',
+    'core/templates/dev/head/expressions/ExpressionParserService.js')
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',

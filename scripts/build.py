@@ -79,6 +79,17 @@ FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
 # /extensions.)
 JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
+
+# These files are present in both extensions and local_compiled_js/extensions.
+# They are required in local_compiled_js since they contain code used in
+# other ts files and excluding them from compilation will create compile
+# errors due to missing variables. So, the files should be built only from
+# one location instead of both the locations.
+JS_FILEPATHS_NOT_TO_BUILD = (
+    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
+    'extensions/interactions/LogicProof/static/js/generatedParser.js',
+    'core/templates/dev/head/expressions/ExpressionParserService.js')
+
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
 # This is because these files don't need cache invalidation, are referenced
@@ -253,10 +264,11 @@ def get_file_count(directory_path):
         int. Total number of files minus ignored files.
     """
     total_file_count = 0
-    for _, _, filenames in os.walk(directory_path):
+    for root, _, filenames in os.walk(directory_path):
         for filename in filenames:
             # Ignore files with certain extensions.
-            if should_file_be_built(filename) and not any(
+            filepath = os.path.join(root, filename)
+            if should_file_be_built(filepath) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 total_file_count += 1
     return total_file_count
@@ -529,7 +541,7 @@ def should_file_be_built(filepath):
         bool. True if filepath should be built, else False.
     """
     if filepath.endswith('.js'):
-        return not any(
+        return not filepath in JS_FILEPATHS_NOT_TO_BUILD and not any(
             filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
     elif filepath.endswith('_test.py'):
         return False
@@ -632,7 +644,7 @@ def get_filepaths_by_extensions(source_dir, file_extensions):
         for filename in filenames:
             filepath = os.path.join(root, filename)
             relative_filepath = os.path.relpath(filepath, source_dir)
-            if should_file_be_built(filename) and any(
+            if should_file_be_built(filepath) and any(
                     filename.endswith(p) for p in file_extensions):
                 filepaths.append(relative_filepath)
     return filepaths
@@ -660,7 +672,8 @@ def get_file_hashes(directory_path):
             print('Computing hashes for files in %s'
                   % os.path.join(root, directory))
         for filename in filenames:
-            if should_file_be_built(filename) and not any(
+            filepath = os.path.join(root, filename)
+            if should_file_be_built(filepath) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 complete_filepath = os.path.join(root, filename)
                 relative_filepath = os.path.relpath(
@@ -809,7 +822,7 @@ def generate_build_tasks_to_build_files_from_filepaths(
         source_file_path = os.path.join(source_path, filepath)
         target_file_path = os.path.join(target_path, filepath)
         ensure_directory_exists(target_file_path)
-        if should_file_be_built(source_path):
+        if should_file_be_built(source_file_path):
             task = threading.Thread(
                 target=minify_func,
                 args=(
