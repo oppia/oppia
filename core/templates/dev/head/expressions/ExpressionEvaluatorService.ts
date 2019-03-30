@@ -100,54 +100,9 @@ oppia.factory('ExpressionEvaluatorService', [
       return parsed;
     };
 
-    var validateExpression = function(expression, envs) {
-      try {
-        return validate(ExpressionParserService.parse(expression),
-          envs.concat(system));
-      } catch (err) {
-        return false;
-      }
-    };
-
-    /**
-     * @param {*} parsed Parse output from the parser. See parser.pegjs for
-     *     the data structure.
-     * @param {!Array.<!Object>} envs Represents a nested name space
-     *     environment to look up the name in. The first element is looked
-     *     up first (i.e. has higher precedence).
-     * @return {boolean} True when validation succeeds.
-     */
-    var validate = function(parsed, envs) {
-      if (!(parsed instanceof Array)) {
-        return true;
-      }
-
-      if (parsed.length === 0) {
-        // This should not happen.
-        return false;
-      }
-
-      // Make sure we can find the operator.
-      ExpressionSyntaxTreeService.lookupEnvs(parsed[0], envs);
-
-      // Evaluate rest of the elements, i.e. the arguments.
-      var args = parsed.slice(1).map(function(item) {
-        return validate(item, envs);
-      });
-
-      // If it is a name look up, make sure the name exists.
-      // TODO: Validate args for other operators.
-      if (parsed[0] === '#') {
-        ExpressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
-      }
-      return true;
-    };
-
     return {
       evaluate: evaluate,
       evaluateExpression: evaluateExpression,
-      validate: validate,
-      validateExpression: validateExpression
     };
   }
 ]);
