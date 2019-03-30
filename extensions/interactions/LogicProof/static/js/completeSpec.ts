@@ -17,33 +17,6 @@
  */
 
 describe('Full system', function() {
-  var errorWrapper = function(
-      dubiousFunction, input1 = null, input2 = null, input3 = null,
-      input4 = null, input5 = null, input6 = null) {
-    return function() {
-      try {
-        if (input1 === null) {
-          dubiousFunction();
-        } else if (input2 === null) {
-          dubiousFunction(input1);
-        } else if (input3 === null) {
-          dubiousFunction(input1, input2);
-        } else if (input4 === null) {
-          dubiousFunction(input1, input2, input3);
-        } else if (input5 === null) {
-          dubiousFunction(input1, input2, input3, input4);
-        } else if (input6 === null) {
-          dubiousFunction(input1, input2, input3, input4, input5);
-        } else {
-          dubiousFunction(input1, input2, input3, input4, input5, input6);
-        }
-      } catch (err) {
-        throw new Error(logicProofShared.renderError(
-          err, logicProofData.BASE_GENERAL_MESSAGES,
-          logicProofData.BASE_STUDENT_LANGUAGE));
-      }
-    };
-  };
   var sharedErrorWrapper = function(message, line, code, category) {
     return {
       message: message,

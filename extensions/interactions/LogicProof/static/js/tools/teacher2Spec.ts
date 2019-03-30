@@ -18,23 +18,10 @@
 
 describe('Build line templates', function() {
   var errorWrapper2 = function(
-      dubiousFunction, input1 = null, input2 = null, input3 = null,
-      input4 = null, input5 = null, input6 = null) {
+      dubiousFunction, ...input) {
     return function() {
       try {
-        if (input2 === null) {
-          dubiousFunction(input1);
-        } else if (input3 === null) {
-          dubiousFunction(input1, input2);
-        } else if (input4 === null) {
-          dubiousFunction(input1, input2, input3);
-        } else if (input5 === null) {
-          dubiousFunction(input1, input2, input3, input4);
-        } else if (input6 === null) {
-          dubiousFunction(input1, input2, input3, input4, input5);
-        } else {
-          dubiousFunction(input1, input2, input3, input4, input5, input6);
-        }
+          dubiousFunction(...input);
       } catch (err) {
         throw new Error(logicProofShared.renderError(
           err, logicProofTeacher.TEACHER_ERROR_MESSAGES,
