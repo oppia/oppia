@@ -20,7 +20,7 @@ require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('domain/topic/TopicUpdateService.ts');
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/topic-editor-services/topic-editor-state/topic-editor-state.service.ts');
 
 describe('Topic editor state service', function() {
   var TopicEditorStateService = null;

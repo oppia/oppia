@@ -29,17 +29,17 @@ require('domain/suggestion/QuestionSuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/topic-editor-services/topic-editor-state/topic-editor-state.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.directive('questionsTab', [
+angular.module('questionsTabModule').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/questions/questions_tab_directive.html'),
+        '/pages/topic-editor-page/questions-tab/questions-tab.directive.html'),
       controller: [
         '$scope', '$http', '$log', '$q', '$uibModal', '$window',
         'AlertsService', 'TopicEditorStateService', 'QuestionCreationService',

@@ -20,17 +20,18 @@ require('components/loading/LoadingDotsDirective.ts');
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/topic/TopicRightsBackendApiService.ts');
-require('pages/topic_editor/TopicEditorRoutingService.ts');
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/topic-editor-services/topic-editor-routing/topic-editor-routing.service.ts');
+require('pages/topic-editor-page/topic-editor-services/topic-editor-state/topic-editor-state.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.directive('topicEditorNavbar', [
+angular.module('topicEditorNavbarModule').directive('topicEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/topic_editor_navbar_directive.html'),
+        '/pages/topic-editor-page/topic-editor-navbar/' +
+        'topic-editor-navbar.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$window', 'AlertsService',
         'UndoRedoService', 'TopicEditorStateService', 'UrlService',
@@ -63,8 +64,7 @@ oppia.directive('topicEditorNavbar', [
             if (!$scope.topicRights.canPublishTopic()) {
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic_editor/' +
-                  'topic_editor_send_mail_modal_directive.html'),
+                  '/pages/topic-editor-page/topic-editor-templates/topic-editor-send-mail-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',
@@ -131,7 +131,7 @@ oppia.directive('topicEditorNavbar', [
             var topicIsPublished = $scope.topicRights.isPublished();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/topic_editor_save_modal_directive.html'),
+                '/pages/topic-editor-page/topic-editor-templates/topic-editor-save-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

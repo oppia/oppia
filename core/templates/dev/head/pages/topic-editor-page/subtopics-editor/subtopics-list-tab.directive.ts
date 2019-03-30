@@ -20,16 +20,15 @@ require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/topic-editor-services/topic-editor-state/topic-editor-state.service.ts');
 
-oppia.directive('subtopicsListTab', [
+angular.module('subtopicsListTabModule').directive('subtopicsListTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/subtopics_editor/' +
-        'subtopics_list_tab_directive.html'),
+        '/pages/topic-editor-page/subtopics-editor/subtopics-list-tab.directive.html'),
       controller: [
         '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
         'UndoRedoService', 'SubtopicPageObjectFactory',
@@ -60,8 +59,7 @@ oppia.directive('subtopicsListTab', [
             var subtopicTitles = $scope.subtopicTitles;
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/subtopics_editor/' +
-                'subtopic_editor_modal_directive.html'),
+                '/pages/topic-editor-page/topic-editor-templates/subtopic-editor-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -207,8 +205,7 @@ oppia.directive('subtopicsListTab', [
             var subtopicTitles = $scope.subtopicTitles;
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/subtopics_editor/' +
-                'new_subtopic_title_modal_directive.html'),
+                '/pages/topic-editor-page/topic-editor-templates/new-subtopic-title-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

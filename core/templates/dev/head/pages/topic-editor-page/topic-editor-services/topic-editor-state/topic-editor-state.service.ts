@@ -27,15 +27,7 @@ require('domain/topic/TopicRightsBackendApiService.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 
-oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
-oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
-oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
-oppia.constant(
-  'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
-oppia.constant(
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
-
-oppia.factory('TopicEditorStateService', [
+angular.module('topicEditorPageModule').factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
   'SubtopicPageObjectFactory',

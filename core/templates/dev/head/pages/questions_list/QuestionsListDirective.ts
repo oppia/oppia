@@ -28,7 +28,7 @@ require('domain/skill/EditableSkillBackendApiService.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/TruncateFilter.ts');
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/topic-editor-services/topic-editor-state/topic-editor-state.service.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
@@ -165,8 +165,8 @@ oppia.directive('questionsList', [
             var allSkillSummaries = $scope.getAllSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/questions/' +
-                'select_skill_modal_directive.html'),
+                '/pages/topic-editor-page/topic-editor-templates/' +
+                'select-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -343,8 +343,8 @@ oppia.directive('questionsList', [
             var allSkillSummaries = $scope.getAllSkillSummaries();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/questions/' +
-                'select_skill_modal_directive.html'),
+                '/pages/topic-editor-page/topic-editor-templates/' +
+                'select-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

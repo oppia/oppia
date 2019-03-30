@@ -68,22 +68,17 @@ require('filters/NormalizeWhitespaceFilter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.ts');
-require('pages/topic_editor/TopicEditorNavbarDirective.ts');
-require('pages/topic_editor/main_editor/TopicEditorTabDirective.ts');
-require('pages/topic_editor/questions/QuestionsTabDirective.ts');
-require('pages/topic_editor/subtopics_editor/SubtopicsListTabDirective.ts');
+require('pages/topic-editor-page/topic-editor-navbar-breadcrumb/topic-editor-navbar-breadcrumb.directive.ts');
+require('pages/topic-editor-page/topic-editor-navbar/topic-editor-navbar.directive.ts');
+require('pages/topic-editor-page/main-topic-editor/main-topic-editor.directive.ts');
+require('pages/topic-editor-page/questions-tab/questions-tab.directive.ts');
+require('pages/topic-editor-page/subtopics-editor/subtopics-list-tab.directive.ts');
 
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/topic-editor-services/topic-editor-state/topic-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-
-oppia.constant(
-  'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
-
-oppia.controller('TopicEditor', [
+angular.module('topicEditorPageModule').controller('TopicEditor', [
   '$scope', 'PageTitleService', 'TopicEditorStateService', 'UrlService',
   'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
   function($scope, PageTitleService, TopicEditorStateService, UrlService,
