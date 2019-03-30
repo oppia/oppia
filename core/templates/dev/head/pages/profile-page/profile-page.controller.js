@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia profile page.
  */
 
-oppia.controller('Profile', [
+angular.module("profilePageModule").controller('Profile', [
   '$http', '$log', '$rootScope', '$scope', '$window', 'DateTimeFormatService',
   'UrlInterpolationService', 'UserService',
   function($http, $log, $rootScope, $scope, $window, DateTimeFormatService,
