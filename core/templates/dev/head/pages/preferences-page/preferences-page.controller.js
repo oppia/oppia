@@ -176,8 +176,7 @@ angular.module("preferencesPageModule").controller('Preferences', [
     $scope.showEditProfilePictureModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/preferences-page' +
-          '/edit-profile-picture-modal-directive.template.html'),
+          '/pages/preferences-page/edit-profile-picture-modal.directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
