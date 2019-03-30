@@ -1,3 +1,5 @@
+// This file should contain declaration for third parties for which
+// type definitions are not present.
 declare var BlobBuilder: any;
 declare var MIDI: any;
 declare var Guppy: any;
