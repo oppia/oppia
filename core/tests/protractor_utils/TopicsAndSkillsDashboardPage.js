@@ -73,7 +73,9 @@ var TopicsAndSkillsDashboardPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.mergeSkillWithIndexToSkillWithIndex = function(oldSkillIndex, newSkillIndex) {
+  this.mergeSkillWithIndexToSkillWithIndex = function(
+      oldSkillIndex, newSkillIndex
+  ) {
     mergeSkillsButtons.then(function(elems) {
       elems[oldSkillIndex].click();
       skillsListItems.then(function(skills) {
