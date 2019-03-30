@@ -10,11 +10,6 @@ anchor_for_installing_dependencies: &install_dependencies
   command: |
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
-    sudo apt-get install lsb-release libappindicator3-1
-    curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    sudo dpkg -i google-chrome.deb
-    sudo sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
-    rm google-chrome.deb
 
 anchor_for_restoring_cache: &restore_cache
   keys:
@@ -102,6 +97,11 @@ jobs:
       - run:
           name: E2E Test Accessibilty
           command: |
+            sudo apt-get install lsb-release libappindicator3-1
+            curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+            sudo dpkg -i google-chrome.deb
+            sudo sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
+            rm google-chrome.deb
             bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env
   
   chrome_version:
