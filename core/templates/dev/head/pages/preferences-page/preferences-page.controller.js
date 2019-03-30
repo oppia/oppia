@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
  */
 
-oppia.controller('Preferences', [
+angular.module("preferencesPageModule").controller('Preferences', [
   '$http', '$q', '$rootScope', '$scope', '$timeout', '$translate', '$uibModal',
   'AlertsService', 'LanguageUtilService', 'UrlInterpolationService',
   'UserService', 'UtilsService', 'DASHBOARD_TYPE_CREATOR',
@@ -176,7 +176,8 @@ oppia.controller('Preferences', [
     $scope.showEditProfilePictureModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/preferences/edit_profile_picture_modal_directive.html'),
+          '/pages/preferences-page' +
+          '/edit-profile-picture-modal-directive.template.html'),
         backdrop: true,
         controller: [
           '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
