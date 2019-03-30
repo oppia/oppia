@@ -58,12 +58,12 @@ oppia.directive('translatorOverview', [
             $scope.languageCode);
           $scope.inTranslationMode = false;
           $scope.inVoiceoverMode = false;
-          $scope.showTabModeSwitcher = function() {
+          $scope.canShowTabModeSwitcher = function() {
             return ($scope.languageCode !== (
               ExplorationLanguageCodeService.displayed));
           };
 
-          $scope.showModeSwitchHelperImage = function() {
+          $scope.canShowModeSwitchHelperImage = function() {
             var alreadyShown = $window.localStorage.getItem(
               'mode_switch_helper_image_shown');
             if (alreadyShown !== 'true') {

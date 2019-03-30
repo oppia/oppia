@@ -11,7 +11,7 @@
               ng-options="language.id as language.description for language in languageCodesAndDescriptions">
       </select>
     </div>
-    <div ng-if="showTabModeSwitcher()" class="oppia-mode-change-section">
+    <div ng-if="canShowTabModeSwitcher()" class="oppia-mode-change-section">
       <i class="oppia-new-mode-feature-text">New!</i>
       <label class="oppia-mode-change-label">Mode: </label>
       <button class="oppia-translation-tab-mode-changer oppia-translation-mode"
@@ -26,7 +26,7 @@
               ng-click="changeActiveMode(VOICEOVER_MODE)">
         <i class="material-icons md-18">record_voice_over</i>
       </button>
-      <img ng-if="showModeSwitchHelperImage()" class="oppia-mode-switcher-guide" ng-src="<[getStaticImageUrl('/icons/translation_tab_mode_switch.png')]>" alt="">
+      <img ng-if="canShowModeSwitchHelperImage()" class="oppia-mode-switcher-guide" ng-src="<[getStaticImageUrl('/icons/translation_tab_mode_switch.png')]>" alt="">
     </div>
   </div>
   <div class="oppia-translation-progress">
