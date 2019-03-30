@@ -16,33 +16,32 @@
  * @fileoverview Unit tests for LogicProof interaction teacher2 components.
  */
 
-var errorWrapper2 = function(
-    dubiousFunction, input1 = null, input2 = null, input3 = null,
-    input4 = null, input5 = null, input6 = null) {
-  return function() {
-    try {
-      if (input2 === null) {
-        dubiousFunction(input1);
-      } else if (input3 === null) {
-        dubiousFunction(input1, input2);
-      } else if (input4 === null) {
-        dubiousFunction(input1, input2, input3);
-      } else if (input5 === null) {
-        dubiousFunction(input1, input2, input3, input4);
-      } else if (input6 === null) {
-        dubiousFunction(input1, input2, input3, input4, input5);
-      } else {
-        dubiousFunction(input1, input2, input3, input4, input5, input6);
-      }
-    } catch (err) {
-      throw new Error(logicProofShared.renderError(
-        err, logicProofTeacher.TEACHER_ERROR_MESSAGES,
-        logicProofData.BASE_STUDENT_LANGUAGE));
-    }
-  };
-};
-
 describe('Build line templates', function() {
+  var errorWrapper2 = function(
+      dubiousFunction, input1 = null, input2 = null, input3 = null,
+      input4 = null, input5 = null, input6 = null) {
+    return function() {
+      try {
+        if (input2 === null) {
+          dubiousFunction(input1);
+        } else if (input3 === null) {
+          dubiousFunction(input1, input2);
+        } else if (input4 === null) {
+          dubiousFunction(input1, input2, input3);
+        } else if (input5 === null) {
+          dubiousFunction(input1, input2, input3, input4);
+        } else if (input6 === null) {
+          dubiousFunction(input1, input2, input3, input4, input5);
+        } else {
+          dubiousFunction(input1, input2, input3, input4, input5, input6);
+        }
+      } catch (err) {
+        throw new Error(logicProofShared.renderError(
+          err, logicProofTeacher.TEACHER_ERROR_MESSAGES,
+          logicProofData.BASE_STUDENT_LANGUAGE));
+      }
+    };
+  };
   var buildThenDisplay = function(nameString, readerViewString,
       antecedentsString, resultsString, variablesString, errorStrings) {
     return logicProofTeacher2.displayLineTemplate(
@@ -124,6 +123,252 @@ describe('Build line templates', function() {
     ).toThrowError(
       'p yields a boolean but you are trying to use it to give a element.');
   });
+  describe('Build mistake entry', function() {
+    var buildThenDisplay = function(nameString, occursString, messageStrings) {
+      return logicProofTeacher2.displayMistakeEntry(
+        logicProofTeacher2.buildMistakeEntry(
+          nameString, occursString, messageStrings,
+          logicProofData.BASE_CONTROL_LANGUAGE
+        ), logicProofData.BASE_CONTROL_LANGUAGE.operators
+      );
+    };
+
+    it('should build entries correctly', function() {
+      expect(
+        logicProofTeacher2.buildMistakeEntry(
+          'name', '~target()\u2208results(n)', ['{{num_lines()-1}}'],
+          logicProofData.BASE_CONTROL_LANGUAGE)).toEqual({
+        name: 'name',
+        occurs: {
+          top_operator_name: 'not',
+          top_kind_name: 'unary_connective',
+          arguments: [{
+            top_operator_name: 'is_in',
+            top_kind_name: 'binary_relation',
+            arguments: [{
+              top_operator_name: 'target',
+              top_kind_name: 'prefix_function',
+              arguments: [],
+              dummies: [],
+              type: 'formula'
+            }, {
+              top_operator_name: 'results',
+              top_kind_name: 'prefix_function',
+              arguments: [{
+                top_operator_name: 'n',
+                top_kind_name: 'variable',
+                arguments: [],
+                dummies: [],
+                type: 'integer'
+              }],
+              dummies: [],
+              type: 'set_of_formulas'
+            }],
+            dummies: [],
+            type: 'boolean'
+          }],
+          dummies: [],
+          type: 'boolean'
+        },
+        message: [[{
+          format: 'expression',
+          content: {
+            top_operator_name: 'subtraction',
+            top_kind_name: 'binary_function',
+            arguments: [{
+              top_operator_name: 'num_lines',
+              top_kind_name: 'prefix_function',
+              arguments: [],
+              dummies: [],
+              type: 'integer'
+            }, {
+              top_operator_name: 1,
+              top_kind_name: 'constant',
+              arguments: [],
+              dummies: [],
+              type: 'integer'
+            }],
+            dummies: [],
+            type: 'integer'
+          }
+        }]]
+      });
+    });
+
+    it('should build then display entries correctly', function() {
+      expect(
+        buildThenDisplay(
+          'name', 'n=1 \u2227 indentation(n)>0', [
+            'The first line of a proof should not be indented',
+            'Don\'t indent the first line of your proof'
+          ])
+      ).toEqual({
+        name: 'name',
+        occurs: '(n=1)\u2227(indentation(n)>0)',
+        message: [
+          'The first line of a proof should not be indented',
+          'Don\'t indent the first line of your proof'
+        ]
+      });
+    });
+
+    it('should reject mis-typed combinations of expressions', function() {
+      expect(
+        errorWrapper2(
+          buildThenDisplay, 'name', 'template(n) = \'given\'',
+          ['examine {{antecedents(n-1)+1}}'])
+      ).toThrowError(
+        'antecedents yields a set_of_formulas but you are trying to use ' +
+        'it to give a integer.'
+      );
+    });
+  });
+  describe('Build control function', function() {
+    var buildThenDisplay = function(LHSstring, RHSstring, descriptionString) {
+      return logicProofTeacher2.displayControlFunction(
+        logicProofTeacher2.buildControlFunction(
+          LHSstring, RHSstring, descriptionString,
+          logicProofData.BASE_CONTROL_LANGUAGE),
+        logicProofData.BASE_CONTROL_LANGUAGE.operators);
+    };
+
+    it('should build examples correctly', function() {
+      expect(
+        logicProofTeacher2.buildControlFunction(
+          'f(x)', 'x+2', 'a description', logicProofData.BASE_CONTROL_LANGUAGE)
+      ).toEqual({
+        name: 'f',
+        variables: [{
+          top_kind_name: 'variable',
+          top_operator_name: 'x',
+          arguments: [],
+          dummies: []
+        }],
+        typing: [{
+          arguments: [{
+            type: 'integer',
+            arbitrarily_many: false
+          }],
+          dummies: [],
+          output: 'integer'
+        }],
+        definition: {
+          top_operator_name: 'addition',
+          top_kind_name: 'binary_function',
+          arguments: [{
+            top_operator_name: 'x',
+            top_kind_name: 'variable',
+            arguments: [],
+            dummies: [],
+            type: 'integer'
+          }, {
+            top_operator_name: 2,
+            top_kind_name: 'constant',
+            arguments: [],
+            dummies: [],
+            type: 'integer'
+          }],
+          dummies: [],
+          type: 'integer'
+        },
+        description: 'a description'
+      });
+    });
+
+    it('should build then display examples correctly', function() {
+      expect(buildThenDisplay('f(n)', 'n+2', 'a')).toEqual({
+        LHS: 'f(n)',
+        RHS: 'n+2',
+        description: 'a'
+      });
+
+      expect(
+        buildThenDisplay('is_scope_creator(n)',
+          'template(n)=\'given\' \u2228 template(n)=\'assumption\'', '')
+      ).toEqual({
+        LHS: 'is_scope_creator(n)',
+        RHS: '(template(n)=\'given\')\u2228(template(n)=\'assumption\')',
+        description: ''
+      });
+    });
+
+    it('should reject undefined functions', function() {
+      expect(
+        errorWrapper2(
+          buildThenDisplay, 'bad_function(x,y)', 'missing_function(x-y, x+y)',
+          '')
+      ).toThrowError('The operator missing_function could not be identified.');
+    });
+
+    it('should forbid type mismatches', function() {
+      expect(
+        errorWrapper2(
+          buildThenDisplay, 'f(n)', 'template(n) + 3', '')
+      ).toThrowError(
+        'template yields a string but you are trying to use it to give a ' +
+        'integer.');
+    });
+
+    it('should forbid ambiguous typings', function() {
+      expect(
+        errorWrapper2(
+          buildThenDisplay, 'f(n)', 'n', '')
+      ).toThrowError(
+        'Unfortunately this cannot be accepted as it has multiple possible ' +
+        'typings.');
+    });
+
+    it('should not allow n as a function name', function() {
+      expect(
+        errorWrapper2(
+          buildThenDisplay, 'n(x,y)', 'x-y', '')
+      ).toThrowError(
+        'You cannot use n as a function name; it is reserved to refer to ' +
+        'line numbers');
+    });
+  });
+  describe('Parse messages describing student mistakes', function() {
+    it('should parse then display control-language messages correctly',
+      function() {
+        expect(logicProofTeacher2.displayControlMessage(
+          logicProofTeacher2.parseMessage(
+            'stuff {{p\u2227q}} thingies', 'control'),
+          logicProofData.BASE_CONTROL_LANGUAGE.operators)
+        ).toEqual('stuff {{p\u2227q}} thingies');
+      });
+
+    it('should parse general messages correctly', function() {
+      expect(
+        logicProofTeacher2.parseMessage(
+          'Your use of {{item}} is wrong.', 'general')
+      ).toEqual([{
+        isFixed: true,
+        content: 'Your use of '
+      }, {
+        isFixed: false,
+        content: 'item'
+      }, {
+        isFixed: true,
+        content: ' is wrong.'
+      }]);
+    });
+
+    it('should forbid unparseable expression templates', function() {
+      expect(
+        errorWrapper2(
+          logicProofTeacher2.parseMessage,
+          'By lack of arbitraryness this fails for {{p[[x->a]}}.', 'line')
+      ).toThrowError('It was not possible to parse {{p[[x->a]}}.');
+    });
+
+    it('should forbid unmatched {{', function() {
+      expect(
+        errorWrapper2(
+          logicProofTeacher2.parseMessage,
+          'of {{result(scoper(n))}}.{{d)', 'control')
+      ).toThrowError('This has an unmatched {{.');
+    });
+  });
 });
 
 describe('Build line template table', function() {
@@ -192,107 +437,6 @@ describe('Build line template table', function() {
   });
 });
 
-describe('Build mistake entry', function() {
-  var buildThenDisplay = function(nameString, occursString, messageStrings) {
-    return logicProofTeacher2.displayMistakeEntry(
-      logicProofTeacher2.buildMistakeEntry(
-        nameString, occursString, messageStrings,
-        logicProofData.BASE_CONTROL_LANGUAGE
-      ), logicProofData.BASE_CONTROL_LANGUAGE.operators
-    );
-  };
-
-  it('should build entries correctly', function() {
-    expect(
-      logicProofTeacher2.buildMistakeEntry(
-        'name', '~target()\u2208results(n)', ['{{num_lines()-1}}'],
-        logicProofData.BASE_CONTROL_LANGUAGE)).toEqual({
-      name: 'name',
-      occurs: {
-        top_operator_name: 'not',
-        top_kind_name: 'unary_connective',
-        arguments: [{
-          top_operator_name: 'is_in',
-          top_kind_name: 'binary_relation',
-          arguments: [{
-            top_operator_name: 'target',
-            top_kind_name: 'prefix_function',
-            arguments: [],
-            dummies: [],
-            type: 'formula'
-          }, {
-            top_operator_name: 'results',
-            top_kind_name: 'prefix_function',
-            arguments: [{
-              top_operator_name: 'n',
-              top_kind_name: 'variable',
-              arguments: [],
-              dummies: [],
-              type: 'integer'
-            }],
-            dummies: [],
-            type: 'set_of_formulas'
-          }],
-          dummies: [],
-          type: 'boolean'
-        }],
-        dummies: [],
-        type: 'boolean'
-      },
-      message: [[{
-        format: 'expression',
-        content: {
-          top_operator_name: 'subtraction',
-          top_kind_name: 'binary_function',
-          arguments: [{
-            top_operator_name: 'num_lines',
-            top_kind_name: 'prefix_function',
-            arguments: [],
-            dummies: [],
-            type: 'integer'
-          }, {
-            top_operator_name: 1,
-            top_kind_name: 'constant',
-            arguments: [],
-            dummies: [],
-            type: 'integer'
-          }],
-          dummies: [],
-          type: 'integer'
-        }
-      }]]
-    });
-  });
-
-  it('should build then display entries correctly', function() {
-    expect(
-      buildThenDisplay(
-        'name', 'n=1 \u2227 indentation(n)>0', [
-          'The first line of a proof should not be indented',
-          'Don\'t indent the first line of your proof'
-        ])
-    ).toEqual({
-      name: 'name',
-      occurs: '(n=1)\u2227(indentation(n)>0)',
-      message: [
-        'The first line of a proof should not be indented',
-        'Don\'t indent the first line of your proof'
-      ]
-    });
-  });
-
-  it('should reject mis-typed combinations of expressions', function() {
-    expect(
-      errorWrapper2(
-        buildThenDisplay, 'name', 'template(n) = \'given\'',
-        ['examine {{antecedents(n-1)+1}}'])
-    ).toThrowError(
-      'antecedents yields a set_of_formulas but you are trying to use it to ' +
-      'give a integer.'
-    );
-  });
-});
-
 describe('Build mistake section', function() {
   it('should build then display sections correctly', function() {
     expect(
@@ -335,111 +479,6 @@ describe('Build mistake section', function() {
         return err;
       }
     })()[0]).toEqual('The operator operator could not be identified.');
-  });
-});
-
-describe('Build control function', function() {
-  var buildThenDisplay = function(LHSstring, RHSstring, descriptionString) {
-    return logicProofTeacher2.displayControlFunction(
-      logicProofTeacher2.buildControlFunction(
-        LHSstring, RHSstring, descriptionString,
-        logicProofData.BASE_CONTROL_LANGUAGE),
-      logicProofData.BASE_CONTROL_LANGUAGE.operators);
-  };
-
-  it('should build examples correctly', function() {
-    expect(
-      logicProofTeacher2.buildControlFunction(
-        'f(x)', 'x+2', 'a description', logicProofData.BASE_CONTROL_LANGUAGE)
-    ).toEqual({
-      name: 'f',
-      variables: [{
-        top_kind_name: 'variable',
-        top_operator_name: 'x',
-        arguments: [],
-        dummies: []
-      }],
-      typing: [{
-        arguments: [{
-          type: 'integer',
-          arbitrarily_many: false
-        }],
-        dummies: [],
-        output: 'integer'
-      }],
-      definition: {
-        top_operator_name: 'addition',
-        top_kind_name: 'binary_function',
-        arguments: [{
-          top_operator_name: 'x',
-          top_kind_name: 'variable',
-          arguments: [],
-          dummies: [],
-          type: 'integer'
-        }, {
-          top_operator_name: 2,
-          top_kind_name: 'constant',
-          arguments: [],
-          dummies: [],
-          type: 'integer'
-        }],
-        dummies: [],
-        type: 'integer'
-      },
-      description: 'a description'
-    });
-  });
-
-  it('should build then display examples correctly', function() {
-    expect(buildThenDisplay('f(n)', 'n+2', 'a')).toEqual({
-      LHS: 'f(n)',
-      RHS: 'n+2',
-      description: 'a'
-    });
-
-    expect(
-      buildThenDisplay('is_scope_creator(n)',
-        'template(n)=\'given\' \u2228 template(n)=\'assumption\'', '')
-    ).toEqual({
-      LHS: 'is_scope_creator(n)',
-      RHS: '(template(n)=\'given\')\u2228(template(n)=\'assumption\')',
-      description: ''
-    });
-  });
-
-  it('should reject undefined functions', function() {
-    expect(
-      errorWrapper2(
-        buildThenDisplay, 'bad_function(x,y)', 'missing_function(x-y, x+y)',
-        '')
-    ).toThrowError('The operator missing_function could not be identified.');
-  });
-
-  it('should forbid type mismatches', function() {
-    expect(
-      errorWrapper2(
-        buildThenDisplay, 'f(n)', 'template(n) + 3', '')
-    ).toThrowError(
-      'template yields a string but you are trying to use it to give a ' +
-      'integer.');
-  });
-
-  it('should forbid ambiguous typings', function() {
-    expect(
-      errorWrapper2(
-        buildThenDisplay, 'f(n)', 'n', '')
-    ).toThrowError(
-      'Unfortunately this cannot be accepted as it has multiple possible ' +
-      'typings.');
-  });
-
-  it('should not allow n as a function name', function() {
-    expect(
-      errorWrapper2(
-        buildThenDisplay, 'n(x,y)', 'x-y', '')
-    ).toThrowError(
-      'You cannot use n as a function name; it is reserved to refer to line ' +
-      'numbers');
   });
 });
 
@@ -493,48 +532,5 @@ describe('Build control function table', function() {
         return err.message;
       }
     })()).toEqual('The function f has already been defined.');
-  });
-});
-
-describe('Parse messages describing student mistakes', function() {
-  it('should parse then display control-language messages correctly',
-    function() {
-      expect(logicProofTeacher2.displayControlMessage(
-        logicProofTeacher2.parseMessage(
-          'stuff {{p\u2227q}} thingies', 'control'),
-        logicProofData.BASE_CONTROL_LANGUAGE.operators)
-      ).toEqual('stuff {{p\u2227q}} thingies');
-    });
-
-  it('should parse general messages correctly', function() {
-    expect(
-      logicProofTeacher2.parseMessage(
-        'Your use of {{item}} is wrong.', 'general')
-    ).toEqual([{
-      isFixed: true,
-      content: 'Your use of '
-    }, {
-      isFixed: false,
-      content: 'item'
-    }, {
-      isFixed: true,
-      content: ' is wrong.'
-    }]);
-  });
-
-  it('should forbid unparseable expression templates', function() {
-    expect(
-      errorWrapper2(
-        logicProofTeacher2.parseMessage,
-        'By lack of arbitraryness this fails for {{p[[x->a]}}.', 'line')
-    ).toThrowError('It was not possible to parse {{p[[x->a]}}.');
-  });
-
-  it('should forbid unmatched {{', function() {
-    expect(
-      errorWrapper2(
-        logicProofTeacher2.parseMessage,
-        'of {{result(scoper(n))}}.{{d)', 'control')
-    ).toThrowError('This has an unmatched {{.');
   });
 });
