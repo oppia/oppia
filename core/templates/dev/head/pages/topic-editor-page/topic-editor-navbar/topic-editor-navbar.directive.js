@@ -16,12 +16,13 @@
  * @fileoverview Directive for the navbar of the topic editor.
  */
 
-oppia.directive('topicEditorNavbar', [
+angular.module('topicEditorNavbarModule').directive('topicEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/topic_editor_navbar_directive.html'),
+        '/pages/topic-editor-page/topic-editor-navbar/' +
+        'topic-editor-navbar.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$window', 'AlertsService',
         'UndoRedoService', 'TopicEditorStateService', 'UrlService',
@@ -96,7 +97,8 @@ oppia.directive('topicEditorNavbar', [
             var topicIsPublished = $scope.topicRights.isPublished();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/topic_editor_save_modal_directive.html'),
+                '/pages/topic-editor-page/topic-editor-templates/' +
+                'topic-editor-save-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

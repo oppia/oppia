@@ -15,7 +15,7 @@
 /**
  * @fileoverview Controller for the stories list viewer.
  */
-oppia.directive('storiesList', [
+angular.module('mainTopicEditorStoriesListModule').directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -24,7 +24,9 @@ oppia.directive('storiesList', [
         getTopic: '&topic'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/main_editor/stories_list_directive.html'),
+        '/pages/topic-editor-page/main-topic-editor/' +
+        'main-topic-editor-stories-list/' +
+        'main-topic-editor-stories-list.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$window',
         'EditableTopicBackendApiService', 'UrlService', 'UndoRedoService',
@@ -42,8 +44,8 @@ oppia.directive('storiesList', [
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic_editor/main_editor/' +
-                  'save_pending_changes_modal_directive.html'),
+                  '/pages/topic-editor-page/topic-editor-templates/' +
+                  'save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',
@@ -67,8 +69,8 @@ oppia.directive('storiesList', [
           $scope.deleteCanonicalStory = function(storyId) {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/main_editor/' +
-                'delete_story_modal_directive.html'),
+                '/pages/topic-editor-page/topic-editor-templates/' +
+                'delete-story-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

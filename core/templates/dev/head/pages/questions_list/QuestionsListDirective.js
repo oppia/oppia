@@ -148,8 +148,8 @@ oppia.directive('questionsList', [
             var allSkillSummaries = $scope.getAllSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/questions/' +
-                'select_skill_modal_directive.html'),
+                '/pages/topic-editor-page/topic-editor-templates/' +
+                'select-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -326,8 +326,8 @@ oppia.directive('questionsList', [
             var allSkillSummaries = $scope.getAllSkillSummaries();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/questions/' +
-                'select_skill_modal_directive.html'),
+                '/pages/topic-editor-page/topic-editor-templates/' +
+                'select-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

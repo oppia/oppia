@@ -15,13 +15,14 @@
 /**
  * @fileoverview Controller for the main topic editor.
  */
-oppia.directive('topicEditorTab', [
+angular.module('mainTopicEditorModule').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/main_editor/topic_editor_tab_directive.html'),
+        '/pages/topic-editor-page/main-topic-editor/' +
+        'main-topic-editor.directive.html'),
       controller: [
         '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
         'UndoRedoService', 'UrlInterpolationService', 'StoryCreationService',
@@ -52,8 +53,8 @@ oppia.directive('topicEditorTab', [
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic_editor/main_editor/' +
-                  'save_pending_changes_modal_directive.html'),
+                  '/pages/topic-editor-page/topic-editor-templates/' +
+                  'save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',

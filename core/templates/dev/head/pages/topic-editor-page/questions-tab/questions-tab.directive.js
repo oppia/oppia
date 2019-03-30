@@ -15,13 +15,13 @@
 /**
  * @fileoverview Controller for the questions tab.
  */
-oppia.directive('questionsTab', [
+angular.module('questionsTabModule').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/questions/questions_tab_directive.html'),
+        '/pages/topic-editor-page/questions-tab/questions-tab.directive.html'),
       controller: [
         '$scope', '$http', '$log', '$q', '$uibModal', '$window',
         'AlertsService', 'TopicEditorStateService', 'QuestionCreationService',

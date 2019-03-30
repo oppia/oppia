@@ -15,13 +15,15 @@
 /**
  * @fileoverview Controller for the navbar breadcrumb of the topic editor.
  */
-oppia.directive('topicEditorNavbarBreadcrumb', [
+
+angular.module('topicEditorNavbarBreadcrumbModule').directive('topicEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/topic_editor_navbar_breadcrumb_directive.html'),
+        '/pages/topic-editor-page/topic-editor-navbar-breadcrumb/' +
+        'topic-editor-navbar-breadcrumb.directive.html'),
       controller: [
         '$scope', 'TopicEditorStateService',
         'FocusManagerService', 'TOPIC_NAME_INPUT_FOCUS_LABEL',
