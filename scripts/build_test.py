@@ -194,9 +194,6 @@ class BuildTests(test_utils.GenericTestBase):
         # Reset EMPTY_DIRECTORY to clean state.
         build.safe_delete_directory_tree(EMPTY_DIR)
 
-        # Reset EMPTY_DIRECTORY to clean state.
-        build.safe_delete_directory_tree(EMPTY_DIR)
-
 
     def test_verify_filepath_hash(self):
         """Test _verify_filepath_hash raises exception:
