@@ -48,16 +48,17 @@ describe('Preferences', function() {
     expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
   });
 
-  it('should add bio to profile', function() {
+  fit('should add bio to profile', function() {
     users.createUser('lisa@preferences.com', 'lisaPreferences');
     users.login('lisa@preferences.com');
     preferencesPage.get();
-    preferencesPage.addBio("abc;");
+    preferencesPage.setUserBio("abc;");
     browser.refresh();
-    preferencesPage.expectBioToBe("abc;");
+    preferencesPage.expectUserBioToBe("abc;");
+    preferencesPage.setUserBio("3d year CS student");
+    browser.refresh();
+    preferencesPage.expectUserBioToBe("3d year CS student");
   });
-
-
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
