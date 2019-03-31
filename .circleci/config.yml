@@ -111,7 +111,7 @@ jobs:
             bash scripts/run_e2e_tests.sh --suite="explorationHistoryTab" --prod_env
             #  bash scripts/run_e2e_tests.sh --suite="explorationStatisticsTab" --prod_env
             bash scripts/run_e2e_tests.sh --suite="explorationTranslationTab" --prod_env
-            # bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="learnerDashboard" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="learner" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="library" --prod_env
