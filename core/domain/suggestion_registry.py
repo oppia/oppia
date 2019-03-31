@@ -450,14 +450,14 @@ class SuggestionAddQuestion(BaseSuggestion):
         question = question_domain.Question(
             None, state_domain.State.from_dict(
                 self.change.question_dict['question_state_data']),
-            self.change.question_dict['question_state_schema_version'],
+            self.change.question_dict['question_state_data_schema_version'],
             self.change.question_dict['language_code'], None)
         question.partial_validate()
-        question_state_schema_version = (
-            self.change.question_dict['question_state_schema_version'])
+        question_state_data_schema_version = (
+            self.change.question_dict['question_state_data_schema_version'])
         if not (
-                question_state_schema_version >= 1 and
-                question_state_schema_version <=
+                question_state_data_schema_version >= 1 and
+                question_state_data_schema_version <=
                 feconf.CURRENT_STATES_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Expected question state schema version to be between 1 and '
@@ -473,7 +473,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_dict = self.change.question_dict
         self.validate()
         if (
-                question_dict['question_state_schema_version'] !=
+                question_dict['question_state_data_schema_version'] !=
                 feconf.CURRENT_STATES_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Question state schema version is not up to date.')
@@ -509,7 +509,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
         question_services.create_new_question_skill_link(
-            question_dict['id'], self.change.skill_id)
+            question_dict['id'], self.change.skill_id,
+            constants.DEFAULT_SKILL_DIFFICULTY)
 
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
