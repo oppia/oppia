@@ -176,13 +176,14 @@ class BuildTests(test_utils.GenericTestBase):
         # Reset EMPTY_DIRECTORY to clean state.
         build.safe_delete_directory_tree(EMPTY_DIR)
 
-    def test_compare_file_count_with_multiple_dirs(self):
+    def test_compare_file_count_for_multiple_dirs(self):
         """Test _compare_file_count raises exception when there is a
         mismatched file count between the source and target with the source
         being a list of dirs.
         """
         build.ensure_directory_exists(EMPTY_DIR)
         target_dir_file_count = build.get_file_count(EMPTY_DIR)
+        TARGET_DIR_LIST = [EMPTY_DIR]
         assert target_dir_file_count == 0
 
         MOCK_EXTENSIONS_DIR_LIST = [
@@ -194,10 +195,11 @@ class BuildTests(test_utils.GenericTestBase):
         # Ensure that MOCK_EXTENSIONS_DIR has at least 1 file.
         assert source_dir_file_count > 0
         with self.assertRaisesRegexp(
-            ValueError, ('%s files in first dir != %s files in second dir') %
+            ValueError, (
+                '%s files in first dir list != %s files in second dir list') %
             (source_dir_file_count, target_dir_file_count)):
             build._compare_file_count_for_multiple_dirs(
-                MOCK_EXTENSIONS_DIR_LIST, EMPTY_DIR)
+                MOCK_EXTENSIONS_DIR_LIST, TARGET_DIR_LIST)
 
         # Reset EMPTY_DIRECTORY to clean state.
         build.safe_delete_directory_tree(EMPTY_DIR)
