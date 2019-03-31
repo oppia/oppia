@@ -20,8 +20,9 @@ describe('Question Player backend Api service', function() {
   var $httpBackend = null;
   var $rootScope = null;
 
-  beforeEach(module('oppia'));
-  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(
+    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(inject(function($injector) {
     QuestionPlayerBackendApiService = $injector.get(

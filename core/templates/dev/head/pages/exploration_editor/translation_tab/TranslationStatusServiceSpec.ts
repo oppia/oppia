@@ -17,7 +17,7 @@
  */
 
 describe('Translation status service', function() {
-  beforeEach(module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('TranslationLanguageService', {
       getActiveLanguageCode: function() {
         return 'en';
@@ -53,7 +53,7 @@ describe('Translation status service', function() {
         autosaveChangeList: function() {},
         discardDraft: function() {}
       };
-      module(function($provide) {
+      angular.mock.module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
