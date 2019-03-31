@@ -346,7 +346,7 @@ class StateIdMappingModelUnitTest(test_utils.GenericTestBase):
         observed_model = (
             exploration_models.StateIdMappingModel.
             get_state_id_mapping_model('id_0', 0))
-        
+
         self.assertEqual(observed_model.state_names_to_ids, {})
         self.assertEqual(observed_model.largest_state_id_used, 0)
 
