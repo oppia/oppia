@@ -2063,19 +2063,19 @@ class LintChecksManager(object):
             print '----------------------------------------'
 
         with _redirect_stdout(_TARGET_STDOUT):
-            codeowner_file = '.github/CODEOWNERS'
+            codeowner_filepath = '.github/CODEOWNERS'
             failed = False
             summary_messages = []
             # Checks whether every pattern in the CODEOWNERS file matches at
             # least one dir/file.
             path_patterns = []
             for line_num, line in enumerate(FileCache.readlines(
-                    codeowner_file)):
+                    codeowner_filepath)):
                 stripped_line = line.strip()
-                if stripped_line != '' and stripped_line[0] != '#':
+                if stripped_line and stripped_line[0] != '#':
                     if '@' not in line:
                         print ('%s --> Pattern on line %s doesn\'t have'
-                               'codeowner' % (codeowner_file, line_num))
+                               'codeowner' % (codeowner_filepath, line_num + 1))
                         failed = True
                     else:
                         # Extract the file pattern from the line.
@@ -2094,7 +2094,7 @@ class LintChecksManager(object):
                         if not glob.glob(line_in_concern.replace('/', '', 1)):
                             print ('%s --> Pattern on line %s doesn\'t match '
                                    'any file or directory' % (
-                                       codeowner_file, line_num))
+                                       codeowner_filepath, line_num + 1))
                             failed = True
                         # Checks if the path is the full path relative to the
                         # root oppia directory. Patterns starting with '/' are
@@ -2105,7 +2105,7 @@ class LintChecksManager(object):
                                 line_in_concern in CODEOWNER_FILE_PATHS):
                             print ('%s --> Pattern on line %s is invalid. Use '
                                    'full path relative to the root directory'
-                                   % (codeowner_file, line_num))
+                                   % (codeowner_filepath, line_num + 1))
                             failed = True
                         # The double asterisks pattern is supported by the
                         # CODEOWNERS syntax but not the glob in Python 2.
@@ -2113,7 +2113,7 @@ class LintChecksManager(object):
                         if '**' in line_in_concern:
                             print ('%s --> Pattern on line %s is invalid. '
                                    '\'**\' wildcard not allowed' % (
-                                       codeowner_file, line_num))
+                                       codeowner_filepath, line_num + 1))
                             failed = True
                         # The following list is being populated with the
                         # paths in the CODEOWNERS file with the removal of the
@@ -2124,8 +2124,8 @@ class LintChecksManager(object):
                             '/', '', 1))
 
             # Checks that every dir/file is covered under CODEOWNERS.
-            for root, _, filename in os.walk('.'):
-                for file_name in filename:
+            for root, _, file_names in os.walk('.'):
+                for file_name in file_names:
                     # This bool checks if the file belongs to the root
                     # oppia directory.
                     is_root_file = False
