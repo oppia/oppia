@@ -8,8 +8,8 @@
   </button>
   <ul uib-dropdown-menu style="max-width: 80%; overflow: auto; width: auto;">
     <li ng-repeat="choice in options" style="float: left;">
-      <a>
-        <angular-html-bind class="oppia-html-select-option protractor-test-html-select-option" html-data="choice.val" ng-click="select(choice.id)">
+      <a ng-click="select(choice.id)">
+        <angular-html-bind class="oppia-html-select-option protractor-test-html-select-option" html-data="choice.val">
         </angular-html-bind>
       </a>
     </li>
@@ -48,7 +48,7 @@
   }
   .oppia-html-select .oppia-html-select-option:hover {
     background: #1485E6;
-    color: white;
+    color: black;
   }
   .oppia-html-select .oppia-html-select-option oppia-noninteractive-image {
     display: inline-block;
