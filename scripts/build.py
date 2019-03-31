@@ -274,27 +274,7 @@ def get_file_count(directory_path):
     return total_file_count
 
 
-def _compare_file_count(first_dir_path, second_dir_path):
-    """Ensure that two dir's file counts match.
-
-    Args:
-       first_dir_path: str. First directory to compare.
-       second_dir_path: str. Second directory to compare.
-
-    Raises:
-        ValueError: The source directory does not have the same file count as
-            the target directory.
-    """
-    first_dir_file_count = get_file_count(first_dir_path)
-    second_dir_file_count = get_file_count(second_dir_path)
-    if first_dir_file_count != second_dir_file_count:
-        print 'Comparing %s vs %s' % (first_dir_path, second_dir_path)
-        raise ValueError(
-            '%s files in first dir != %s files in second dir' % (
-                first_dir_file_count, second_dir_file_count))
-
-
-def _compare_file_count_for_multiple_dirs(
+def _compare_file_count(
         first_dir_list, second_dir_list):
     """Ensure that the total count of files in all directories in the first
     list matches the count of files in all the directories in the second list.
@@ -308,17 +288,16 @@ def _compare_file_count_for_multiple_dirs(
             count as the target directory list.
     """
 
-    first_dir_file_count = 0
+    file_counts = [0, 0]
     for first_dir_path in first_dir_list:
-        first_dir_file_count += get_file_count(first_dir_path)
-    second_dir_file_count = 0
+        file_counts[0] += get_file_count(first_dir_path)
     for second_dir_path in second_dir_list:
-        second_dir_file_count += get_file_count(second_dir_path)
-    if first_dir_file_count != second_dir_file_count:
+        file_counts[1] += get_file_count(second_dir_path)
+    if file_counts[0] != file_counts[1]:
         print 'Comparing %s vs %s' % (first_dir_list, second_dir_list)
         raise ValueError(
             '%s files in first dir list != %s files in second dir list' % (
-                first_dir_file_count, second_dir_file_count))
+                file_counts[0], file_counts[1]))
 
 
 def process_html(source_file_stream, target_file_stream, file_hashes):
@@ -1059,11 +1038,11 @@ def _verify_hashes(output_dirnames, file_hashes):
         2) hashes.js, third_party.min.css and third_party.min.js are built and
         hashes are inserted.
 
-        Args:
-            output_dirnames: list(str). List of directory paths that contain
-                built files.
-            file_hashes: dict(str, str). Dictionary with filepaths as keys and
-                hashes of file content as values.
+    Args:
+        output_dirnames: list(str). List of directory paths that contain
+            built files.
+        file_hashes: dict(str, str). Dictionary with filepaths as keys and
+            hashes of file content as values.
     """
 
     # Make sure that hashed file name matches with current hash dict.
@@ -1096,42 +1075,6 @@ def _verify_hashes(output_dirnames, file_hashes):
             THIRD_PARTY_GENERATED_OUT_DIR, third_party_js_final_filename),
         os.path.join(
             THIRD_PARTY_GENERATED_OUT_DIR, third_party_css_final_filename)])
-
-
-def _verify_file_count(
-        input_dirnames, output_dirnames):
-    """Verify number of files between source directory and final directory
-        matches after build process finishes.
-
-        Args:
-            input_dirnames: list(str). List of directory paths that contain
-                source files.
-            output_dirnames: list(str). List of directory paths that contain
-                built files.
-    """
-    for i in xrange(len(input_dirnames)):
-        # Make sure that all files in source directory and staging directory are
-        # accounted for.
-        _compare_file_count(input_dirnames[i], output_dirnames[i])
-
-
-def _verify_file_count_for_multiple_dirs(
-        input_dirnames_list, output_dirnames_list):
-    """Verify number of files between all directories in source directory
-    list and all directories in final directory list matches after build
-    process finishes.
-
-        Args:
-            input_dirnames_list: list(list(str)). List of list of directory
-                paths that contain source files.
-            output_dirnames_list: list(list(str)). List of list of directory
-                paths that contain built files.
-    """
-    for i in xrange(len(input_dirnames_list)):
-        # Make sure that all files in source directory and staging directory are
-        # accounted for.
-        _compare_file_count_for_multiple_dirs(
-            input_dirnames_list[i], output_dirnames_list[i])
 
 
 def generate_build_directory():
@@ -1194,21 +1137,27 @@ def generate_build_directory():
 
     _verify_hashes(COPY_OUTPUT_DIRS, hashes)
 
-    SOURCE_DIRS = [ASSETS_DEV_DIR, THIRD_PARTY_GENERATED_DEV_DIR]
-    OUTPUT_DIRS = [ASSETS_OUT_DIR, THIRD_PARTY_GENERATED_OUT_DIR]
-    _verify_file_count(SOURCE_DIRS, OUTPUT_DIRS)
+    SOURCE_DIRS_FOR_ASSETS = [ASSETS_DEV_DIR, THIRD_PARTY_GENERATED_DEV_DIR]
+    OUTPUT_DIRS_FOR_ASSETS = [ASSETS_OUT_DIR, THIRD_PARTY_GENERATED_OUT_DIR]
+    _compare_file_count(SOURCE_DIRS_FOR_ASSETS, OUTPUT_DIRS_FOR_ASSETS)
 
-    SOURCE_DIRS_LIST = [[
+    SOURCE_DIRS_FOR_THIRD_PARTY = [THIRD_PARTY_GENERATED_DEV_DIR]
+    OUTPUT_DIRS_FOR_THIRD_PARTY = [THIRD_PARTY_GENERATED_OUT_DIR]
+    _compare_file_count(
+        SOURCE_DIRS_FOR_THIRD_PARTY, OUTPUT_DIRS_FOR_THIRD_PARTY)
+
+    SOURCE_DIRS_FOR_EXTENSIONS = [
         EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
-        EXTENSIONS_DIRNAMES_TO_DIRPATHS['compiled_js_dir']
-    ], [
+        EXTENSIONS_DIRNAMES_TO_DIRPATHS['compiled_js_dir']]
+    OUTPUT_DIRS_FOR_EXTENSIONS = [EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']]
+    _compare_file_count(SOURCE_DIRS_FOR_EXTENSIONS, OUTPUT_DIRS_FOR_EXTENSIONS)
+
+    SOURCE_DIRS_FOR_TEMPLATES = [
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir']]]
-    OUTPUT_DIRS_LIST = [[
-        EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']
-    ], [
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]]
-    _verify_file_count_for_multiple_dirs(SOURCE_DIRS_LIST, OUTPUT_DIRS_LIST)
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir']]
+    OUTPUT_DIRS_FOR_TEMPLATES = [
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
+    _compare_file_count(SOURCE_DIRS_FOR_TEMPLATES, OUTPUT_DIRS_FOR_TEMPLATES)
 
     # Clean up un-hashed hashes.js.
     safe_delete_file(HASHES_JS_FILEPATH)
