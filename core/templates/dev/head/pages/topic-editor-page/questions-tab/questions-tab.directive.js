@@ -16,7 +16,7 @@
  * @fileoverview Controller for the questions tab.
  */
 
-angular.module('questionsTabModule').directive('questionsTab', [
+angular.module('questionsTabModule').directive('topicEditorQuestionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
