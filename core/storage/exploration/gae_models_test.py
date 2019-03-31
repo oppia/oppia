@@ -95,8 +95,8 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
-        with self.assertRaisesRegexp(
-            Exception, 'max_age must be a datetime.timedelta instance or None.'):
+        with self.assertRaisesRegexp(Exception,
+            'max_age must be a datetime.timedelta instance or None.'):
             results, _, more = (
                 exploration_models.ExplorationCommitLogEntryModel
                 .get_all_non_private_commits(2, None, 1))
@@ -358,9 +358,9 @@ class StateIdMappingModelUnitTest(test_utils.GenericTestBase):
             largest_state_id_used=1,
             overwrite=False)
 
-        with self.assertRaisesRegexp(
-            Exception, 'State id mapping model already exists for exploration id_1,'
-                       ' version 0'):
+        with self.assertRaisesRegexp(Exception,
+            'State id mapping model already exists for exploration id_1,'
+            ' version 0'):
             exploration_models.StateIdMappingModel.create(
                 exp_id='id_1',
                 exp_version=0,
@@ -396,7 +396,8 @@ class StateIdMappingModelUnitTest(test_utils.GenericTestBase):
             largest_state_id_used=1,
             overwrite=True)
 
-        exploration_models.StateIdMappingModel.delete_state_id_mapping_models('id_3', [0])
+        exploration_models.StateIdMappingModel.delete_state_id_mapping_models(
+            'id_3', [0])
 
         with self.assertRaises(Exception):
             observed_model = (
