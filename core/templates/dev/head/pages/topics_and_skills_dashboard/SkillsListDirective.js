@@ -97,7 +97,7 @@ oppia.directive('skillsList', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics_and_skills_dashboard/' +
-                'assign_skill_to_topic_modal_directive.html'),
+              'assign_skill_to_topic_modal_directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
