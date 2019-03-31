@@ -22,8 +22,8 @@ angular.module('subtopicsListTabModule').directive('subtopicsListTab', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/subtopics_editor/' +
-        'subtopics_list_tab_directive.html'),
+        '/pages/topic-editor-page/subtopics_editor/' +
+        'subtopics-list-tab.directive.html'),
       controller: [
         '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
         'UndoRedoService', 'SubtopicPageObjectFactory',

@@ -98,7 +98,7 @@ class TeachPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.TEACH_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/teach/teach.html')
+        self.render_template('/pages/teach-page/teach-page.mainpage.html')
 
 
 class ContactPage(base.BaseHandler):

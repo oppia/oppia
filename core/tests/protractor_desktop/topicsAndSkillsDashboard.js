@@ -30,7 +30,7 @@ var TopicsAndSkillsDashboardPage = require(
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
-describe('Topics and skills dashboard functionality', function() {
+fdescribe('Topics and skills dashboard functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
   var topicEditorPage = null;
@@ -84,7 +84,7 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
   });
 
-  it('should move skill to a topic', function() {
+  fit('should move skill to a topic', function() {
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
     topicsAndSkillsDashboardPage.get();

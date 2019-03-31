@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the teach page.
  */
 
-oppia.controller('Teach', [
+angular.module('teachPageModule').controller('Teach', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService',
   function(
