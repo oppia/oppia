@@ -296,7 +296,8 @@ def _compare_file_count(first_dir_path, second_dir_path):
 
 def _compare_file_count_for_multiple_dirs(
         first_dir_list, second_dir_list):
-    """Ensure that two dir's file counts match.
+    """Ensure that the total count of files in all directories in the first
+    list matches the count of files in all the directories in the second list.
 
     Args:
        first_dir_list: list(str). List of directories to compare.
@@ -1117,8 +1118,9 @@ def _verify_file_count(
 
 def _verify_file_count_for_multiple_dirs(
         input_dirnames_list, output_dirnames_list):
-    """Verify number of files between source directory list and
-        final directory matches after build process finishes.
+    """Verify number of files between all directories in source directory
+    list and all directories in final directory list matches after build
+    process finishes.
 
         Args:
             input_dirnames_list: list(list(str)). List of list of directory
