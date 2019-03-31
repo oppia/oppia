@@ -333,11 +333,12 @@ def _compare_file_count_for_multiple_dirs(
                         files2.append(filepath)
     if first_dir_file_count != second_dir_file_count:
         print 'Comparing %s vs %s' % (first_dir_list, second_dir_list)
+        print files1
+        print files2
         raise ValueError(
             '%s files in first dir list != %s files in second dir list' % (
                 first_dir_file_count, second_dir_file_count))
-        print files1
-        print files2
+
 
 
 def process_html(source_file_stream, target_file_stream, file_hashes):
