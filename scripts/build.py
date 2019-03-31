@@ -309,36 +309,16 @@ def _compare_file_count_for_multiple_dirs(
     """
 
     first_dir_file_count = 0
-    files1 = []
     for first_dir_path in first_dir_list:
         first_dir_file_count += get_file_count(first_dir_path)
-        for root, _, filenames in os.walk(first_dir_path):
-            for filename in filenames:
-                # Ignore files with certain extensions.
-                filepath = os.path.join(root, filename)
-                if should_file_be_built(filepath) and not any(
-                    filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                        files1.append(filepath)
-
     second_dir_file_count = 0
-    files2 = []
     for second_dir_path in second_dir_list:
         second_dir_file_count += get_file_count(second_dir_path)
-        for root, _, filenames in os.walk(second_dir_path):
-            for filename in filenames:
-                # Ignore files with certain extensions.
-                filepath = os.path.join(root, filename)
-                if should_file_be_built(filepath) and not any(
-                    filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                        files2.append(filepath)
     if first_dir_file_count != second_dir_file_count:
         print 'Comparing %s vs %s' % (first_dir_list, second_dir_list)
-        print files1
-        print files2
         raise ValueError(
             '%s files in first dir list != %s files in second dir list' % (
                 first_dir_file_count, second_dir_file_count))
-
 
 
 def process_html(source_file_stream, target_file_stream, file_hashes):
