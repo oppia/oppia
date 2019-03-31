@@ -84,7 +84,7 @@ fdescribe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
   });
 
-  fit('should move skill to a topic', function() {
+  it('should move skill to a topic', function() {
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
     topicsAndSkillsDashboardPage.get();
