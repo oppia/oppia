@@ -40,9 +40,9 @@ oppia.constant('TOPIC_LANDING_PAGE_DATA', {
 });
 
 oppia.controller('TopicLandingPage', [
-  '$scope', '$timeout', '$window', 'SiteAnalyticsService',
+  '$scope', '$timeout', '$window', 'PageTitleService', 'SiteAnalyticsService',
   'UrlInterpolationService', 'TOPIC_LANDING_PAGE_DATA', function(
-      $scope, $timeout, $window, SiteAnalyticsService,
+      $scope, $timeout, $window, PageTitleService, SiteAnalyticsService,
       UrlInterpolationService, TOPIC_LANDING_PAGE_DATA) {
     var pathArray = $window.location.pathname.split('/');
     $scope.subject = pathArray[2];
@@ -50,6 +50,11 @@ oppia.controller('TopicLandingPage', [
     var landingPageData = (
       TOPIC_LANDING_PAGE_DATA[$scope.subject][$scope.topic].page_data);
     var assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
+
+    var capitalizedTopic = (
+      $scope.topic.charAt(0).toUpperCase() + $scope.topic.slice(1));
+    var pageTitle = 'Learn ' + capitalizedTopic + ' - Oppia';
+    PageTitleService.setPageTitle(pageTitle);
 
     $scope.getRowImageUrl = function(index) {
       var imageKey = 'image_' + index;
