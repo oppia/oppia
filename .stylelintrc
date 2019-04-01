@@ -16,5 +16,7 @@
     "block-opening-brace-newline-after": "always-multi-line",
     "block-opening-brace-space-after": "always-single-line",
     "block-opening-brace-space-before": "always",
+    "declaration-colon-space-after": "always",
+    "declaration-colon-space-before": "never",
   }
 }
