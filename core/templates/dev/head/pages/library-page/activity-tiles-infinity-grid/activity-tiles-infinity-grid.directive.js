@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for an infinitely-scrollable view of activity tiles
+ * @fileoverview Directive for the infinitely-scrollable view of activity tiles.
  */
 
-oppia.directive('activityTilesInfinityGrid', [
+angular.module('activityTilesInfinityGridModule').directive('activityTilesInfinityGrid', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/library/' +
-        'activity_tiles_infinity_grid_directive.html'),
+        '/pages/library-page/activity-tiles-infinity-grid/' +
+        'activity-tiles-infinity-grid.directive.html'),
       controller: [
         '$scope', '$rootScope', 'SearchService', 'WindowDimensionsService',
         function($scope, $rootScope, SearchService, WindowDimensionsService) {
@@ -65,4 +65,5 @@ oppia.directive('activityTilesInfinityGrid', [
         }
       ]
     };
-  }]);
+  }
+]);

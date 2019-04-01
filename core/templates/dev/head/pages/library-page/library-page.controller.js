@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,20 +16,7 @@
  * @fileoverview Data and controllers for the Oppia contributors' library page.
  */
 
-oppia.constant('LIBRARY_PAGE_MODES', {
-  GROUP: 'group',
-  INDEX: 'index',
-  SEARCH: 'search'
-});
-
-oppia.constant('LIBRARY_PATHS_TO_MODES', {
-  '/library': 'index',
-  '/library/top_rated': 'group',
-  '/library/recently_published': 'group',
-  '/search/find': 'search'
-});
-
-oppia.controller('Library', [
+angular.module('libraryPageModule').controller('Library', [
   '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'ConstructTranslationIdsService',
   'LearnerDashboardActivityIdsObjectFactory',

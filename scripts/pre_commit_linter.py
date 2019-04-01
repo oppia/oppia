@@ -1273,35 +1273,6 @@ class LintChecksManager(object):
                             'component in the file.' % (filepath))
                         failed = True
                         break
-                    # Separate the arguments of the expression.
-                    arguments = expression.arguments
-                    # The first argument of the expression is the
-                    # name of the component.
-                    component_name = arguments[0].value
-                    component = expression.callee.property.name
-
-                    # If the component is directive or filter and its name is
-                    # xxx then the filename containing it should be
-                    # XxxDirective.js or XxxFilter.js respectively.
-                    if component == 'directive' or component == 'filter':
-                        if (component_name[0].swapcase() + component_name[1:] +
-                                component.capitalize() != (exact_filename)):
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
-                    # If the component is controller or factory, then the
-                    # component name should exactly match the filename
-                    # containing it. If the component's name is xxx then the
-                    # filename should be xxx.js.
-                    else:
-                        if component_name != exact_filename:
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
