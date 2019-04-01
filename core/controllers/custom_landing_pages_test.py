@@ -58,6 +58,15 @@ class TopicLandingPageTest(test_utils.GenericTestBase):
         response = self.get_html_response('/learn/maths/fractions')
         response.mustcontain('students and kids')
 
+    def test_landing_page_loads_with_correct_title(self):
+        for subject, topics in feconf.AVAILABLE_LANDING_PAGES.iteritems():
+            for topic in topics:
+                response = self.get_html_response('/learn/%s/%s' % (
+                    subject, topic))
+                expected_title = 'Learn %s - Oppia' % topic.title()
+                self.assertEqual(
+                    response.html.title.string.strip(), expected_title)
+
 
 class StewardsLandingPageTest(test_utils.GenericTestBase):
     """Test for showing the landing page for stewards (parents, teachers,
