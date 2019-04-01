@@ -153,7 +153,7 @@
         </md-card>
       </div>
 
-      <div  class="col-md-8 oppia-learner-dashboard-main-content"
+      <div class="col-md-8 oppia-learner-dashboard-main-content"
            ng-class="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
         <div>
           <span class="oppia-learner-dashboard-main-content-title">
@@ -218,7 +218,7 @@
             </span>
           </span>
         </div>
-        <div  class="oppia-learner-dashboard-main-content-container">
+        <div class="oppia-learner-dashboard-main-content-container">
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
                   ng-if="numberNonexistentIncompleteExplorations !== 0">
@@ -354,7 +354,7 @@
               </div>
             </md-card>
 
-            <div  ui-sortable="explorationPlaylistSortableOptions" ng-model="explorationPlaylist">
+            <div ui-sortable="explorationPlaylistSortableOptions" ng-model="explorationPlaylist">
               <div class="oppia-learner-playlist-tiles"
                    ng-repeat="tile in explorationPlaylist track by $index"
                    ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false"
