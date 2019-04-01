@@ -16,7 +16,8 @@
  * @fileoverview Controller to show suggestion modal in learner local view.
  */
 
-oppia.controller('ShowSuggestionModalForLearnerLocalView', [
+angular.module('showSuggestionModalForLocalViewModule').controller(
+  'ShowSuggestionModalForLearnerLocalView', [
   '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
   'PlayerPositionService', 'PlayerTranscriptService',
   'SuggestionModalService',

@@ -17,7 +17,8 @@
  */
 
 // TODO(Allan): Implement ability to edit suggestions before applying.
-oppia.controller('ShowSuggestionModalForEditorView', [
+angular.module('showSuggestionModalForEditorViewModule').controller(
+  'ShowSuggestionModalForEditorView', [
   '$log', '$scope', '$uibModalInstance', 'EditabilityService',
   'SuggestionModalService', 'currentContent', 'description',
   'newContent', 'suggestionIsHandled', 'suggestionIsValid', 'suggestionStatus',

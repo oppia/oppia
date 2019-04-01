@@ -16,7 +16,8 @@
  * @fileoverview Controller to show suggestion modal in creator view.
  */
 
-oppia.controller('ShowSuggestionModalForCreatorView', [
+angular.module('showSuggestionModalForCreatorViewModule').controller(
+  'ShowSuggestionModalForCreatorView', [
   '$log', '$scope', '$uibModalInstance', 'SuggestionModalService',
   'canReviewActiveThread', 'description', 'newContent',
   'oldContent', 'stateName', 'suggestionIsHandled', 'suggestionStatus',
