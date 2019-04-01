@@ -56,8 +56,8 @@ oppia.directive('skillEditorNavbar', [
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/skill_editor/editor_tab/' +
-                  'save_pending_changes_modal_directive.html'),
+                  '/pages/story-editor/story-editor-templates/' +
+                  'save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',

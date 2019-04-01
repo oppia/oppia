@@ -16,7 +16,8 @@
  * @fileoverview Module for the Oppia contributors' library page.
  */
 
-angular.module('libraryPageModule', ['activityTilesInfinityGridModule', 'libraryFooterModule', 'searchBarModule', 'searchResultsModule']);
+angular.module('libraryPageModule', ['activityTilesInfinityGridModule',
+  'libraryFooterModule', 'searchBarModule', 'searchResultsModule']);
 
 angular.module('libraryPageModule').constant('LIBRARY_PAGE_MODES', {
     GROUP: 'group',

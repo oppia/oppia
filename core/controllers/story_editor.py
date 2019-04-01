@@ -51,7 +51,7 @@ class StoryEditorPage(base.BaseHandler):
             'story_title': story.title,
         })
 
-        self.render_template('pages/story_editor/story_editor.html')
+        self.render_template('/pages/story-editor/story-editor.mainpage.html')
 
 
 class EditableStoryDataHandler(base.BaseHandler):

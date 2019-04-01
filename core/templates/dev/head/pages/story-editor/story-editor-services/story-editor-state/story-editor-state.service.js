@@ -18,10 +18,7 @@
  * retrieving the story, saving it, and listening for changes.
  */
 
-oppia.constant('EVENT_STORY_INITIALIZED', 'storyInitialized');
-oppia.constant('EVENT_STORY_REINITIALIZED', 'storyReinitialized');
-
-oppia.factory('StoryEditorStateService', [
+angular.module('storyEditorModule').factory('StoryEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableStoryBackendApiService',
   'StoryObjectFactory', 'UndoRedoService',
   'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',

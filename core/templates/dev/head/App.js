@@ -24,13 +24,13 @@ var oppia = angular.module(
     'angularAudioRecorder', 'dndLists', 'headroom', 'infinite-scroll',
     'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
     'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
-    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate', 'teachPageModule',
-    'thanksPageModule', 'topicsAndSkillsDashboardModule', 'topicEditorPageModule',
-    'topicViewerPageModule', 'libraryPageModule',
+    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate', 'libraryPageModule',
     'showSuggestionModalForCreatorViewModule',
     'showSuggestionModalForEditorViewModule',
-    'showSuggestionModalForLocalViewModule',
-    'showSuggestionModalForLearnerViewModule'
+    'showSuggestionModalForLearnerViewModule',
+    'showSuggestionModalForLocalViewModule', ,'storyEditorModule',
+    'teachPageModule', 'thanksPageModule', 'topicsAndSkillsDashboardModule',
+    'topicEditorPageModule', 'topicViewerPageModule',
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 

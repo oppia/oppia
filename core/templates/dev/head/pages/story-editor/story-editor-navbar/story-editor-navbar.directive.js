@@ -16,12 +16,13 @@
  * @fileoverview Directive for the navbar of the story editor.
  */
 
-oppia.directive('storyEditorNavbar', [
+angular.module('storyEditorNavbarModule').directive('storyEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/story_editor/story_editor_navbar_directive.html'),
+        '/pages/story-editor/story-editor-navbar/' +
+        'story-editor-navbar.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'StoryEditorStateService', 'UrlService',
@@ -63,7 +64,8 @@ oppia.directive('storyEditorNavbar', [
           $scope.saveChanges = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story_editor/story_editor_save_modal_directive.html'),
+                '/pages/story-editor/story-editor-templates/' +
+                'story-editor-save-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

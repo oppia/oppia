@@ -15,7 +15,8 @@
 /**
  * @fileoverview Controller for the story node editor.
  */
-oppia.directive('storyNodeEditor', [
+
+angular.module('storyNodeEditorModule').directive('storyNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -29,7 +30,8 @@ oppia.directive('storyNodeEditor', [
         getAcquiredSkillIds: '&acquiredSkillIds'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/story_editor/main_editor/story_node_editor_directive.html'),
+        '/pages/story-editor/main-story-editor/story-node-editor/' +
+        'story-node-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
@@ -164,8 +166,8 @@ oppia.directive('storyNodeEditor', [
               });
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story_editor/main_editor/' +
-                'new_chapter_title_modal_directive.html'),
+                '/pages/story-editor/story-editor-templates/' +
+                'new-chapter-title-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

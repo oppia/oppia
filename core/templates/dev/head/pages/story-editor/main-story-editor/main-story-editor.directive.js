@@ -15,15 +15,15 @@
 /**
  * @fileoverview Controller for the main story editor.
  */
-oppia.constant('EVENT_VIEW_STORY_NODE_EDITOR', 'viewStoryNodeEditor');
 
-oppia.directive('storyEditor', [
+angular.module('mainStoryEditorModule').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/story_editor/main_editor/story_editor_directive.html'),
+        '/pages/story-editor/main-story-editor/' +
+        'main-story-editor.directive.html'),
       controller: [
         '$scope', 'StoryEditorStateService', 'StoryUpdateService',
         'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
@@ -93,8 +93,8 @@ oppia.directive('storyEditor', [
             }
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story_editor/main_editor/' +
-                'delete_chapter_modal_directive.html'),
+                '/pages/story-editor/story-editor-templates/' +
+                'delete-chapter-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -120,8 +120,8 @@ oppia.directive('storyEditor', [
             });
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story_editor/main_editor/' +
-                'new_chapter_title_modal_directive.html'),
+                '/pages/story-editor/story-editor-templates/' +
+                'new-chapter-title-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

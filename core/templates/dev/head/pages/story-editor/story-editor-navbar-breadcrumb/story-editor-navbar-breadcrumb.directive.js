@@ -15,13 +15,16 @@
 /**
  * @fileoverview Controller for the navbar breadcrumb of the story editor.
  */
-oppia.directive('storyEditorNavbarBreadcrumb', [
+
+ angular.module('storyEditorNavbarBreadcrumbModule').directive(
+  'storyEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/story_editor/story_editor_navbar_breadcrumb_directive.html'),
+        '/pages/story-editor/story-editor-navbar-breadcrumb/' +
+        'story-editor-navbar-breadcrumb.directive.html'),
       controller: [
         '$scope', '$uibModal', '$window', 'UrlService',
         'UrlInterpolationService', 'UndoRedoService', 'StoryEditorStateService',
@@ -41,8 +44,8 @@ oppia.directive('storyEditorNavbarBreadcrumb', [
             if (UndoRedoService.getChangeCount() > 0) {
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/story_editor/' +
-                  'save_pending_changes_modal_directive.html'),
+                  '/pages/story-editor/story-editor-templates/' +
+                  'save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',

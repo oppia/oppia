@@ -15,9 +15,8 @@
 /**
  * @fileoverview Primary controller for the story editor page.
  */
-oppia.constant('NODE_ID_PREFIX', 'node_');
 
-oppia.controller('StoryEditor', [
+angular.module('storyEditorModule').controller('StoryEditor', [
   '$scope', '$uibModal', '$window', 'StoryEditorStateService',
   'UndoRedoService',
   'UrlInterpolationService', 'UrlService',
@@ -34,7 +33,8 @@ oppia.controller('StoryEditor', [
       if (UndoRedoService.getChangeCount() > 0) {
         var modalInstance = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/story_editor/save_pending_changes_modal_directive.html'),
+            '/pages/story-editor/story-editor-templates/' +
+            'save-pending-changes-modal.template.html'),
           backdrop: true,
           controller: [
             '$scope', '$uibModalInstance',
