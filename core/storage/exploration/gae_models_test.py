@@ -351,7 +351,7 @@ class StateIdMappingModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(observed_model.state_names_to_ids, {})
         self.assertEqual(observed_model.largest_state_id_used, 0)
 
-    def test_create_failed(self):
+    def test_create_failed_if_id_exists_and_no_overwrite(self):
         exploration_models.StateIdMappingModel.create(
             exp_id='id_1',
             exp_version=0,
@@ -398,10 +398,18 @@ class StateIdMappingModelUnitTest(test_utils.GenericTestBase):
             largest_state_id_used=1,
             overwrite=True)
 
+        observed_model = (
+            exploration_models.StateIdMappingModel.
+            get_state_id_mapping_model('id_3', 0))
+        self.assertEqual(observed_model.state_names_to_ids, {})
+        self.assertEqual(observed_model.largest_state_id_used, 1)
+
         exploration_models.StateIdMappingModel.delete_state_id_mapping_models(
             'id_3', [0])
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class StateIdMappingModel with id id_3.0 not found'):
             observed_model = (
                 exploration_models.StateIdMappingModel.
                 get_state_id_mapping_model('id_3', 0))
