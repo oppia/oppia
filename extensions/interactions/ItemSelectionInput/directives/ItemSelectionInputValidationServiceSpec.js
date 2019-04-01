@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -239,9 +239,9 @@ describe('ItemSelectionInputValidationService', function() {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'In answer group 1, ' +
-          'rule 1, the "Equals" rule\'s correct options should be between ' +
-          'the minimum and maximum allowed selection count.')
+          'In answer group 1, rule 1, the number of correct options in ' +
+          'the "Equals" rule should be between 2 and 2 (' +
+          'the minimum and maximum allowed selection count).')
       }]);
     });
 

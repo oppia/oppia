@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -187,9 +187,10 @@ oppia.factory('ItemSelectionInputValidationService', [
                     type: WARNING_TYPES.ERROR,
                     message: (
                       'In answer group ' + (answerIndex + 1) + ', ' +
-                      'rule ' + (ruleIndex + 1) + ', the "Equals" rule\'s ' +
-                      'correct options should be between the minimum and ' +
-                      'maximum allowed selection count.')
+                      'rule ' + (ruleIndex + 1) + ', the number of correct ' +
+                      'options in the "Equals" rule should be between ' +
+                        minAllowedCount + ' and ' + maxAllowedCount +
+                      ' (the minimum and maximum allowed selection count).')
                   });
                 }
               }
