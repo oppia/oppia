@@ -16,6 +16,8 @@
 
 """Tests for Exploration models."""
 
+import datetime
+
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -90,6 +92,20 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         results, _, more = (
             exploration_models.ExplorationCommitLogEntryModel
             .get_all_non_private_commits(2, None, None))
+        self.assertFalse(more)
+        self.assertEqual(len(results), 1)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'max_age must be a datetime.timedelta instance or None.'):
+            results, _, more = (
+                exploration_models.ExplorationCommitLogEntryModel
+                .get_all_non_private_commits(2, None, 1))
+
+        max_age = datetime.timedelta(hours=1)
+        results, _, more = (
+            exploration_models.ExplorationCommitLogEntryModel
+            .get_all_non_private_commits(2, None, max_age))
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
@@ -316,3 +332,119 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             exploration_models.ExpSummaryModel
             .get_at_least_editable('nonexistent_id'))
         self.assertEqual(0, len(exploration_summary_models))
+
+
+class StateIdMappingModelUnitTest(test_utils.GenericTestBase):
+    """Tests for the StateIdMappingModel."""
+
+    def test_create_successfully_with_new_id(self):
+        exploration_models.StateIdMappingModel.create(
+            exp_id='id_0',
+            exp_version=0,
+            state_names_to_ids={},
+            largest_state_id_used=0)
+
+        observed_model = (
+            exploration_models.StateIdMappingModel.
+            get_state_id_mapping_model('id_0', 0))
+
+        self.assertEqual(observed_model.state_names_to_ids, {})
+        self.assertEqual(observed_model.largest_state_id_used, 0)
+
+    def test_create_successfully_if_id_exists_and_overwrite(self):
+        exploration_models.StateIdMappingModel.create(
+            exp_id='id_1',
+            exp_version=0,
+            state_names_to_ids={},
+            largest_state_id_used=1,
+            overwrite=True)
+
+        observed_model = (
+            exploration_models.StateIdMappingModel.
+            get_state_id_mapping_model('id_1', 0))
+
+        self.assertEqual(observed_model.state_names_to_ids, {})
+        self.assertEqual(observed_model.largest_state_id_used, 1)
+
+        exploration_models.StateIdMappingModel.create(
+            exp_id='id_1',
+            exp_version=0,
+            state_names_to_ids={},
+            largest_state_id_used=0,
+            overwrite=True)
+
+        observed_model = (
+            exploration_models.StateIdMappingModel.
+            get_state_id_mapping_model('id_1', 0))
+
+        self.assertEqual(observed_model.state_names_to_ids, {})
+        self.assertEqual(observed_model.largest_state_id_used, 0)
+
+    def test_create_failed_if_id_exists_and_no_overwrite(self):
+        exploration_models.StateIdMappingModel.create(
+            exp_id='id_1',
+            exp_version=0,
+            state_names_to_ids={},
+            largest_state_id_used=1,
+            overwrite=False)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'State id mapping model already exists for exploration id_1,'
+            ' version 0'):
+            exploration_models.StateIdMappingModel.create(
+                exp_id='id_1',
+                exp_version=0,
+                state_names_to_ids={},
+                largest_state_id_used=0)
+
+    def test_get_state_id_mapping_model(self):
+        exploration_models.StateIdMappingModel.create(
+            exp_id='id_2',
+            exp_version=0,
+            state_names_to_ids={},
+            largest_state_id_used=1,
+            overwrite=False)
+
+        observed_model = (
+            exploration_models.StateIdMappingModel.
+            get_state_id_mapping_model('id_2', 0))
+        self.assertEqual(observed_model.state_names_to_ids, {})
+        self.assertEqual(observed_model.largest_state_id_used, 1)
+
+    def test_delete_state_id_mapping_models(self):
+        exploration_models.StateIdMappingModel.create(
+            exp_id='id_3',
+            exp_version=0,
+            state_names_to_ids={},
+            largest_state_id_used=1,
+            overwrite=True)
+
+        exploration_models.StateIdMappingModel.create(
+            exp_id='id_3',
+            exp_version=1,
+            state_names_to_ids={},
+            largest_state_id_used=1,
+            overwrite=True)
+
+        observed_model = (
+            exploration_models.StateIdMappingModel.
+            get_state_id_mapping_model('id_3', 0))
+        self.assertEqual(observed_model.state_names_to_ids, {})
+        self.assertEqual(observed_model.largest_state_id_used, 1)
+
+        exploration_models.StateIdMappingModel.delete_state_id_mapping_models(
+            'id_3', [0])
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class StateIdMappingModel with id id_3.0 not found'):
+            observed_model = (
+                exploration_models.StateIdMappingModel.
+                get_state_id_mapping_model('id_3', 0))
+
+        observed_model = (
+            exploration_models.StateIdMappingModel.
+            get_state_id_mapping_model('id_3', 1))
+        self.assertEqual(observed_model.state_names_to_ids, {})
+        self.assertEqual(observed_model.largest_state_id_used, 1)
