@@ -337,7 +337,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
 class StateIdMappingModelUnitTest(test_utils.GenericTestBase):
     """Tests for the StateIdMappingModel."""
 
-    def test_create_successfully(self):
+    def test_create_successfully_with_new_id(self):
         exploration_models.StateIdMappingModel.create(
             exp_id='id_0',
             exp_version=0,
@@ -347,6 +347,35 @@ class StateIdMappingModelUnitTest(test_utils.GenericTestBase):
         observed_model = (
             exploration_models.StateIdMappingModel.
             get_state_id_mapping_model('id_0', 0))
+
+        self.assertEqual(observed_model.state_names_to_ids, {})
+        self.assertEqual(observed_model.largest_state_id_used, 0)
+
+    def test_create_successfully_if_id_exists_and_overwrite(self):
+        exploration_models.StateIdMappingModel.create(
+            exp_id='id_1',
+            exp_version=0,
+            state_names_to_ids={},
+            largest_state_id_used=1,
+            overwrite=True)
+
+        exploration_models.StateIdMappingModel.create(
+            exp_id='id_1',
+            exp_version=1,
+            state_names_to_ids={},
+            largest_state_id_used=0,
+            overwrite=True)
+
+        observed_model = (
+            exploration_models.StateIdMappingModel.
+            get_state_id_mapping_model('id_1', 0))
+
+        self.assertEqual(observed_model.state_names_to_ids, {})
+        self.assertEqual(observed_model.largest_state_id_used, 1)
+
+        observed_model = (
+            exploration_models.StateIdMappingModel.
+            get_state_id_mapping_model('id_1', 1))
 
         self.assertEqual(observed_model.state_names_to_ids, {})
         self.assertEqual(observed_model.largest_state_id_used, 0)
