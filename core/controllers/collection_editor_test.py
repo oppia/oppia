@@ -178,6 +178,13 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
         self.assertEqual(2, json_response['collection']['version'])
+
+        # Check that title is changed.
+        response = self.get_html_response(
+            '%s/%s' % (
+                feconf.COLLECTION_EDITOR_URL_PREFIX,
+                self.COLLECTION_ID))
+        response.mustcontain(self.json_dict['change_list'][0]['new_value'])
         self.logout()
 
     def test_collection_rights_handler(self):

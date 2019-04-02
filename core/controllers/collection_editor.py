@@ -66,6 +66,7 @@ class CollectionEditorPage(CollectionEditorHandler):
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
             'TAG_REGEX': feconf.TAG_REGEX,
+            'title': collection.title,
         })
 
         self.render_template('pages/collection_editor/collection_editor.html')
