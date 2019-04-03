@@ -564,16 +564,16 @@ class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
                 '%s/%s' % (
                     feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
                 {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            expected_email_html_body = (
-                'wants to publish topic: Topic Name at URL %s, please review'
-                ' and publish if it looks good.'
-                % (feconf.TOPIC_EDITOR_URL_PREFIX + '/' + self.topic_id))
-            self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
+        messages = self.mail_stub.get_sent_messages(
+            to=feconf.ADMIN_EMAIL_ADDRESS)
+        expected_email_html_body = (
+            'wants to publish topic: Topic Name at URL %s, please review'
+            ' and publish if it looks good.'
+            % (feconf.TOPIC_EDITOR_URL_PREFIX + '/' + self.topic_id))
+        self.assertEqual(len(messages), 1)
+        self.assertIn(
+            expected_email_html_body,
+            messages[0].html.decode())
 
 
 class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
