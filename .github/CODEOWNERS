@@ -1,5 +1,10 @@
 # Per-directory ownership and automatic assignment for pull requests.
 
+# The paths to the directory/files must be relative to the location of this
+# file. Wildcards such as '**', '!' are not allowed. Only glob style patterns
+# are allowed. For information about supported glob patterns please refer
+# https://docs.python.org/2/library/glob.html.
+
 # Note: The e2e test files are owned by both the dev workflow and QA teams.
 # - The QA team will do an initial review to verify the PR's test coverage. They
 #   will then ask the dev workflow team for a final review.
