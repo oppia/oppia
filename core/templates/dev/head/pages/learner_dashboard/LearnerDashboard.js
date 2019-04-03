@@ -370,9 +370,9 @@ oppia.controller('LearnerDashboard', [
         },
         sort: function(e, ui) {
           /* eslint-disable quote-props */
-          // position and elements in sync.
+          // Making top : 0px to avoid irregular change in position.
           ui.helper.css(
-            {'top':'0 px'});
+            {'top': '0 px'});
           /* eslint-enable quote-props */
         },
         update: function(e, ui) {
