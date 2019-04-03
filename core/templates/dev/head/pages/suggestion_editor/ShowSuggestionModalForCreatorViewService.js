@@ -110,6 +110,12 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
               }
             }
           };
+
+          // Updates suggestion.
+          newEditedSuggestion = {
+            html: result.newSuggestionHtml
+          };
+          activeThread.suggestion.newValue = newEditedSuggestion;
         } else {
           url = UrlInterpolationService.interpolateUrl(
             HANDLE_SUGGESTION_URL_TEMPLATE, {
@@ -126,10 +132,6 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
         }
 
         $http.put(url, data).then(function(response) {
-
-          // Updates suggestion.
-          activeThread.suggestion.newValue = response.data.new_value;
-
           for (var i = 0; i < suggestionsToReviewList.length; i++) {
             if (suggestionsToReviewList[i] === activeThread) {
               suggestionsToReviewList.splice(i, 1);

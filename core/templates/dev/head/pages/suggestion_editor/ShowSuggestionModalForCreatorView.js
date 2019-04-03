@@ -54,7 +54,6 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     // the scope (the property cannot sit directly on the scope)
     // Reference https://stackoverflow.com/q/12618342
     $scope.suggestionData = {newSuggestionHtml: newContent.html};
-    $scope.suggestionDataBeforeEdit = $scope.suggestionData;
     $scope.suggestionEditorIsShown = false;
     $scope.editButtonIsShown = true;
     $scope.acceptSuggestion = function() {
@@ -91,8 +90,9 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     };
     $scope.isSaveButtonDisabled = function() {
       return (
-        $scope.suggestionDataBeforeEdit.newSuggestionHtml ===
-        $scope.newContent.html || $scope.summaryMessage === '');
+        $scope.oldContent.html === $scope.suggestionData.newSuggestionHtml ||
+        $scope.summaryMessage === null ||
+        $scope.summaryMessage === '');
     };
     $scope.isResubmitButtonShown = function() {
       return (

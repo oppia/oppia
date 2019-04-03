@@ -572,6 +572,7 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
 
     suggestion = get_suggestion_by_id(suggestion_id)
     user_id = user.user_id
+    target_types = ['exploration', 'collection', 'question']
 
     if suggestion.author_id == user_id:
         return True
@@ -606,5 +607,8 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
                 role_services.ACTION_EDIT_ANY_QUESTION in user.actions or
                 question_rights.is_creator(user.user_id)):
             return True
+
+    elif suggestion.target_type not in target_types:
+        raise Exception('Invalid suggestion target type')
 
     return False
