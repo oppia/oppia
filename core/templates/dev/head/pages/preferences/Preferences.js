@@ -17,15 +17,17 @@
  */
 
 oppia.controller('Preferences', [
-  '$scope', '$http', '$q', '$rootScope', '$uibModal', '$timeout', '$translate',
-  'AlertsService', 'UrlInterpolationService', 'UserService', 'UtilsService',
-  'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
-  'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
+  '$http', '$q', '$rootScope', '$scope', '$timeout', '$translate', '$uibModal',
+  'AlertsService', 'LanguageUtilService', 'UrlInterpolationService',
+  'UserService', 'UtilsService', 'DASHBOARD_TYPE_CREATOR',
+  'DASHBOARD_TYPE_LEARNER', 'SUPPORTED_AUDIO_LANGUAGES',
+  'SUPPORTED_SITE_LANGUAGES',
   function(
-      $scope, $http, $q, $rootScope, $uibModal, $timeout, $translate,
-      AlertsService, UrlInterpolationService, UserService, UtilsService,
-      DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
-      SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
+      $http, $q, $rootScope, $scope, $timeout, $translate, $uibModal,
+      AlertsService, LanguageUtilService, UrlInterpolationService,
+      UserService, UtilsService, DASHBOARD_TYPE_CREATOR,
+      DASHBOARD_TYPE_LEARNER, SUPPORTED_AUDIO_LANGUAGES,
+      SUPPORTED_SITE_LANGUAGES) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $scope.profilePictureDataUrl = '';
     $scope.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
@@ -230,15 +232,7 @@ oppia.controller('Preferences', [
       });
     };
 
-    $scope.LANGUAGE_CHOICES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
-      function(languageItem) {
-        return {
-          id: languageItem.code,
-          text: languageItem.name
-        };
-      }
-    );
-
+    $scope.LANGUAGE_CHOICES = LanguageUtilService.getLanguageIdsAndTexts();
     $scope.SITE_LANGUAGE_CHOICES = SUPPORTED_SITE_LANGUAGES;
     $scope.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(
       function(languageItem) {

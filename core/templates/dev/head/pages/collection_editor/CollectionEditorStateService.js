@@ -24,12 +24,12 @@ oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
 oppia.factory('CollectionEditorStateService', [
   '$rootScope', 'AlertsService', 'CollectionObjectFactory',
   'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
-  'UndoRedoService', 'EditableCollectionBackendApiService',
+  'EditableCollectionBackendApiService', 'UndoRedoService',
   'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
   function(
       $rootScope, AlertsService, CollectionObjectFactory,
       CollectionRightsBackendApiService, CollectionRightsObjectFactory,
-      UndoRedoService, EditableCollectionBackendApiService,
+      EditableCollectionBackendApiService, UndoRedoService,
       EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED) {
     var _collection = CollectionObjectFactory.createEmptyCollection();
     var _collectionRights = (

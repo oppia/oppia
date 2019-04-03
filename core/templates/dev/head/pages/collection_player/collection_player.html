@@ -379,6 +379,11 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
+  <script src="/templates/dev/head/filters/SummarizeNonnegativeNumberFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAndCapitalizeFilter.js"></script>
+
   <script src="/templates/dev/head/pages/collection_player/CollectionPlayer.js"></script>
   <script src="/templates/dev/head/pages/collection_player/CollectionNodeListDirective.js"></script>
   <script src="/templates/dev/head/pages/collection_player/CollectionLocalNav.js"></script>
@@ -393,7 +398,8 @@
 
   <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/objects/NumberWithUnitsObjectFactory.js"></script>
-  <script src="/templates/dev/head/pages/collection_player/collectionFooterDirective.js"></script>
+  <script src="/templates/dev/head/domain/objects/UnitsObjectFactory.js"></script>
+  <script src="/templates/dev/head/pages/collection_player/CollectionFooterDirective.js"></script>
   <script src="/templates/dev/head/components/share/SharingLinksDirective.js"></script>
   <script src="/templates/dev/head/components/HintAndSolutionButtonsDirective.js"></script>
   <script src="/templates/dev/head/components/attribution_guide/AttributionGuideDirective.js"></script>
@@ -403,5 +409,6 @@
 
   <script src="/templates/dev/head/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
   <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
+  <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
   <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
 {% endblock footer_js %}

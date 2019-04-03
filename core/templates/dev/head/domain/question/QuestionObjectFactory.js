@@ -99,7 +99,12 @@ oppia.factory('QuestionObjectFactory', [
         pendingMisconceptionNamesToTag.forEach(function(misconceptionName) {
           returnString = returnString + ' ' + misconceptionName + ',';
         });
-        return returnString.slice(0, -1);
+        returnString = returnString.slice(0, -1);
+        returnString = returnString + '. Click on (or create) an answer ' +
+          'that is neither marked correct nor is a default answer (marked ' +
+          'above as [All other answers]) to tag a misconception to that ' +
+          'answer group.';
+        return returnString;
       }
       return false;
     };
@@ -113,12 +118,11 @@ oppia.factory('QuestionObjectFactory', [
       );
     };
 
-    Question.prototype.toBackendDict = function(isNewQuestion, schemaVersion) {
+    Question.prototype.toBackendDict = function(isNewQuestion) {
       var questionBackendDict = {
         id: null,
         question_state_data: this._stateData.toBackendDict(),
         language_code: this._languageCode,
-        question_state_schema_version: constants.CURRENT_STATES_SCHEMA_VERSION,
         version: 1
       };
       if (!isNewQuestion) {

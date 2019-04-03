@@ -18,21 +18,23 @@
  */
 
 oppia.factory('ResponsesService', [
-  '$rootScope', 'StateInteractionIdService', 'INTERACTION_SPECS',
-  'AnswerGroupsCacheService', 'StateEditorService',
-  'OutcomeObjectFactory', 'COMPONENT_NAME_DEFAULT_OUTCOME',
-  'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
-  'ContextService', 'SolutionValidityService', 'INFO_MESSAGE_SOLUTION_IS_VALID',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
+  '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
+  'ContextService', 'OutcomeObjectFactory',
+  'SolutionValidityService', 'SolutionVerificationService',
+  'StateEditorService', 'StateInteractionIdService',
+  'StateSolutionService', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
+  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INTERACTION_SPECS',
   function(
-      $rootScope, StateInteractionIdService, INTERACTION_SPECS,
-      AnswerGroupsCacheService, StateEditorService,
-      OutcomeObjectFactory, COMPONENT_NAME_DEFAULT_OUTCOME,
-      StateSolutionService, SolutionVerificationService, AlertsService,
-      ContextService, SolutionValidityService, INFO_MESSAGE_SOLUTION_IS_VALID,
+      $rootScope, AlertsService, AnswerGroupsCacheService,
+      ContextService, OutcomeObjectFactory,
+      SolutionValidityService, SolutionVerificationService,
+      StateEditorService, StateInteractionIdService,
+      StateSolutionService, COMPONENT_NAME_DEFAULT_OUTCOME,
+      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
-      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
+      INFO_MESSAGE_SOLUTION_IS_VALID, INTERACTION_SPECS) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
     var _confirmedUnclassifiedAnswersMemento = null;
@@ -318,11 +320,12 @@ oppia.factory('ResponsesService', [
             return choice.val;
           });
 
+          var key, newInputValue;
           _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
             var newRules = angular.copy(answerGroup.rules);
             newRules.forEach(function(rule) {
-              for (var key in rule.inputs) {
-                var newInputValue = [];
+              for (key in rule.inputs) {
+                newInputValue = [];
                 rule.inputs[key].forEach(function(item) {
                   var newIndex = newChoiceStrings.indexOf(item);
                   if (newIndex !== -1) {
@@ -381,21 +384,21 @@ oppia.factory('ResponsesService', [
               var newRules = angular.copy(answerGroup.rules);
               newRules.forEach(function(rule) {
                 if (rule.type === 'HasElementXAtPositionY') {
-                  for (var key in rule.inputs) {
-                    var newInputValue = '';
+                  for (key in rule.inputs) {
+                    newInputValue = '';
                     if (key === 'y') {
                       newInputValue = 1;
                     }
                     rule.inputs[key] = newInputValue;
                   }
                 } else if (rule.type === 'HasElementXBeforeElementY') {
-                  for (var key in rule.inputs) {
-                    var newInputValue = '';
+                  for (key in rule.inputs) {
+                    newInputValue = '';
                     rule.inputs[key] = newInputValue;
                   }
                 } else {
-                  for (var key in rule.inputs) {
-                    var newInputValue = [];
+                  for (key in rule.inputs) {
+                    newInputValue = [];
                     rule.inputs[key] = newInputValue;
                   }
                 }

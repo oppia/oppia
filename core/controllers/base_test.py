@@ -74,13 +74,15 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         with self.swap(constants, 'DEV_MODE', True):
             response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
-                          response.body)
+            self.assertIn(
+                '<div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>',
+                response.body)
 
         with self.swap(constants, 'DEV_MODE', False):
             response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
-                          response.body)
+            self.assertIn(
+                '<div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>',
+                response.body)
 
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
@@ -103,8 +105,19 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         #     POST, PUT and DELETE. Something needs to regulate what
         #     the fields in the payload should be.
 
+    def test_requests_for_missing_csrf_token(self):
+        """Tests request without csrf_token results in 401 error."""
+
+        self.post_json(
+            '/library/any', payload={}, expected_status_int=401)
+
+        self.put_json(
+            '/library/any', payload={}, expected_status_int=401)
+
     def test_requests_for_invalid_paths(self):
         """Test that requests for invalid paths result in a 404 error."""
+        user_id = user_services.get_user_id_from_username('learneruser')
+        csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
         self.get_html_response(
             '/library/extra', expected_status_int=404)
@@ -113,10 +126,12 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/library/data/extra', expected_status_int=404)
 
         self.post_json(
-            '/library/extra', payload={}, expected_status_int=404)
+            '/library/extra', payload={}, csrf_token=csrf_token,
+            expected_status_int=404)
 
         self.put_json(
-            '/library/extra', payload={}, expected_status_int=404)
+            '/library/extra', payload={}, csrf_token=csrf_token,
+            expected_status_int=404)
 
     def test_redirect_in_logged_out_states(self):
         """Test for a redirect in logged out state on '/'."""
@@ -271,8 +286,8 @@ class EscapingTests(test_utils.GenericTestBase):
         ))
 
     def test_jinja_autoescaping(self):
-        form_url = '<[angular_tag]> x{{51 * 3}}y'
-        with self.swap(feconf, 'SITE_FEEDBACK_FORM_URL', form_url):
+        dangerous_field_contents = '<[angular_tag]> x{{51 * 3}}y'
+        with self.swap(constants, 'DEV_MODE', dangerous_field_contents):
             response = self.get_html_response('/fake')
 
             self.assertIn('&lt;[angular_tag]&gt;', response.body)
@@ -330,9 +345,7 @@ class LogoutPageTests(test_utils.GenericTestBase):
         # cookies have expired after hitting the logout url.
         current_page = '/explore/0'
         response = self.get_html_response(current_page)
-        response = self.get_html_response(
-            current_user_services.create_logout_url(
-                current_page), expected_status_int=302)
+        response = self.get_html_response('/logout', expected_status_int=302)
         expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
         self.assertTrue(
@@ -697,3 +710,44 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                                         msg=error_message)
 
         self.assertGreater(num_handlers_checked, 150)
+
+
+class SignUpTests(test_utils.GenericTestBase):
+
+    def test_error_is_raised_on_opening_new_tab_during_signup(self):
+        """Test that error is raised if user opens a new tab
+        during signup.
+        """
+        self.login('abc@example.com')
+        response = self.get_html_response(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        response = self.get_html_response('/about', expected_status_int=302)
+        self.assertIn('Logout', response.location)
+        self.logout()
+
+        response = self.post_json(
+            feconf.SIGNUP_DATA_URL, {
+                'username': 'abc',
+                'agreed_to_terms': True
+            }, csrf_token=csrf_token, expected_status_int=401,
+        )
+
+        self.assertEqual(response['error'], 'Registration session expired.')
+
+    def test_no_error_is_raised_on_opening_new_tab_after_signup(self):
+        """Test that no error is raised if user opens a new tab
+        after signup.
+        """
+        self.login('abc@example.com')
+        response = self.get_html_response(feconf.SIGNUP_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        self.post_json(
+            feconf.SIGNUP_DATA_URL, {
+                'username': 'abc',
+                'agreed_to_terms': True
+            }, csrf_token=csrf_token,
+        )
+
+        self.get_html_response('/about')

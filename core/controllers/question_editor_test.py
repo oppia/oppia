@@ -124,6 +124,19 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
                 }, csrf_token=csrf_token, expected_status_int=400)
             self.logout()
 
+    def test_post_with_incorrect_question_schema_returns_400(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            question_dict = self.question.to_dict()
+            del question_dict['question_state_data']['content']
+            self.post_json(
+                '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id), {
+                    'question_dict': question_dict
+                }, csrf_token=csrf_token, expected_status_int=400)
+            self.logout()
+
     def test_post_with_admin_email_allows_question_creation(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.ADMIN_EMAIL)
@@ -273,9 +286,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_delete_with_admin_email_allows_question_deletion(self):
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id)
+            self.question_id, self.skill_id, 0.3)
         question_services.create_new_question_skill_link(
-            self.question_id_2, self.skill_id)
+            self.question_id_2, self.skill_id, 0.3)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.ADMIN_EMAIL)
             self.delete_json(
@@ -295,9 +308,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_delete_with_topic_manager_email_allows_question_deletion(self):
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id)
+            self.question_id, self.skill_id, 0.5)
         question_services.create_new_question_skill_link(
-            self.question_id_2, self.skill_id)
+            self.question_id_2, self.skill_id, 0.5)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.TOPIC_MANAGER_EMAIL)
             self.delete_json(
@@ -326,7 +339,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.save_new_skill(
             self.skill_id, self.admin_id, 'Skill Description')
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id)
+            self.question_id, self.skill_id, 0.7)
 
     def test_get_with_new_structures_disabled_returns_404_status(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):

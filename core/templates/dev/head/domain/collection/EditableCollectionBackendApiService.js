@@ -29,12 +29,12 @@
 // after deciding and acting upon the decision (which would mean implementing
 // it if it's agreed upon).
 oppia.factory('EditableCollectionBackendApiService', [
-  '$http', '$q', 'COLLECTION_DATA_URL_TEMPLATE',
-  'EDITABLE_COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-  'ReadOnlyCollectionBackendApiService',
-  function($http, $q, COLLECTION_DATA_URL_TEMPLATE,
-      EDITABLE_COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService,
-      ReadOnlyCollectionBackendApiService) {
+  '$http', '$q', 'ReadOnlyCollectionBackendApiService',
+  'UrlInterpolationService', 'COLLECTION_DATA_URL_TEMPLATE',
+  'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
+  function($http, $q, ReadOnlyCollectionBackendApiService,
+      UrlInterpolationService, COLLECTION_DATA_URL_TEMPLATE,
+      EDITABLE_COLLECTION_DATA_URL_TEMPLATE) {
     var _fetchCollection = function(
         collectionId, successCallback, errorCallback) {
       var collectionDataUrl = UrlInterpolationService.interpolateUrl(

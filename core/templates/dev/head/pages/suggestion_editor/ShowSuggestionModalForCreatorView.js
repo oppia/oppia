@@ -17,15 +17,15 @@
  */
 
 oppia.controller('ShowSuggestionModalForCreatorView', [
-  '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
-  'suggestionStatus', 'description', 'oldContent',
-  'newContent', 'canReviewActiveThread', 'stateName', 'suggestionType',
-  'SuggestionModalService',
+  '$log', '$scope', '$uibModalInstance', 'SuggestionModalService',
+  'canReviewActiveThread', 'description', 'newContent',
+  'oldContent', 'stateName', 'suggestionIsHandled', 'suggestionStatus',
+  'suggestionType',
   function(
-      $scope, $log, $uibModalInstance, suggestionIsHandled,
-      suggestionStatus, description, oldContent,
-      newContent, canReviewActiveThread, stateName, suggestionType,
-      SuggestionModalService
+      $log, $scope, $uibModalInstance, SuggestionModalService,
+      canReviewActiveThread, description, newContent,
+      oldContent, stateName, suggestionIsHandled, suggestionStatus,
+      suggestionType
   ) {
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canReject = $scope.isNotHandled;

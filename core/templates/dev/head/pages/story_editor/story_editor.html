@@ -16,7 +16,8 @@
 
 {% block content %}
   <div ng-controller="StoryEditor" class="story-editor">
-    <button class="btn btn-primary back-to-topic-button" ng-click="returnToTopicEditorPage()">
+    <button class="btn btn-primary back-to-topic-button protractor-test-return-to-topic-button"
+            ng-click="returnToTopicEditorPage()">
       <i class="fa fa-arrow-left"></i> &nbsp;Return to topic
     </button>
     <story-editor></story-editor>
@@ -32,10 +33,27 @@
 
 {% block footer_js %}
   {{ super() }}
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
-  <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertUnicodeWithParamsToHtmlFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertHtmlToUnicodeFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertUnicodeToHtmlFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsAtLeastFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsAtMostFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsFloatFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsIntegerFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsNonemptyFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
+  <script src="/templates/dev/head/directives/AngularHtmlBindDirective.js"></script>
+  <script src="/templates/dev/head/directives/MathjaxBindDirective.js"></script>
+
+  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
+
+  <script src="/templates/dev/head/components/CkEditorRteDirective.js"></script>
+  <script src="/templates/dev/head/components/CkEditorWidgetsInitializer.js"></script>
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
@@ -53,10 +71,13 @@
   <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
 
-  <script src="/extensions/objects/templates/MathLatexStringEditor.js"></script>
-  <script src="/extensions/objects/templates/SanitizedUrlEditor.js"></script>
-  <script src="/extensions/objects/templates/ListOfTabsEditor.js"></script>
+  <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ListOfTabsEditorDirective.js"></script>
 
+  <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
+  <script src="/templates/dev/head/services/IdGenerationService.js"></script>
+  <script src="/templates/dev/head/services/RteHelperService.js"></script>
   <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
   <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
   <script src="/templates/dev/head/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
@@ -65,6 +86,8 @@
 
   <script src="/templates/dev/head/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/QuestionUndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/BaseUndoRedoService.js"></script>
   <script src="/templates/dev/head/domain/story/EditableStoryBackendApiService.js"></script>
   <script src="/templates/dev/head/domain/story/StoryObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/story/StoryContentsObjectFactory.js"></script>

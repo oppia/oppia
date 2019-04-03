@@ -18,11 +18,11 @@
  */
 
 oppia.factory('ThreadDataService', [
-  '$http', '$log', '$q', 'ExplorationDataService', 'AlertsService',
+  '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionObjectFactory',
   'SuggestionThreadObjectFactory', 'ACTION_ACCEPT_SUGGESTION',
   function(
-      $http, $log, $q, ExplorationDataService, AlertsService,
+      $http, $log, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionObjectFactory,
       SuggestionThreadObjectFactory, ACTION_ACCEPT_SUGGESTION) {
     var _expId = ExplorationDataService.explorationId;
@@ -48,7 +48,7 @@ oppia.factory('ThreadDataService', [
 
     var _fetchThreads = function(successCallback) {
       var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
-      params = {
+      var params = {
         target_type: 'exploration',
         target_id: _expId
       };

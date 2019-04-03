@@ -80,7 +80,11 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         from core.domain import obj_services  # pylint: disable=relative-import
         obj_class = obj_services.Registry.get_object_class_by_type(
             schema[SCHEMA_KEY_OBJ_TYPE])
-        normalized_obj = obj_class.normalize(obj)
+        if not apply_custom_validators:
+            normalized_obj = normalize_against_schema(
+                obj, obj_class.SCHEMA, apply_custom_validators=False)
+        else:
+            normalized_obj = obj_class.normalize(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [
@@ -151,12 +155,26 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             for validator in schema[SCHEMA_KEY_VALIDATORS]:
                 kwargs = dict(validator)
                 del kwargs['id']
-                assert _Validators.get(
+                assert get_validator(
                     validator['id'])(normalized_obj, **kwargs), (
                         'Validation failed: %s (%s) for object %s' % (
                             validator['id'], kwargs, normalized_obj))
 
     return normalized_obj
+
+
+def get_validator(validator_id):
+    """Get the validator method corresponding to the given validator_id.
+
+    Args:
+        validator_id: str. The name of the validator method that should
+            be retrieved.
+
+    Returns:
+        function. The validator method corresponding to the given
+            validator_id.
+    """
+    return _Validators.get(validator_id)
 
 
 class Normalizers(object):
@@ -199,11 +217,13 @@ class Normalizers(object):
         """Collapses multiple spaces into single spaces.
 
         Args:
-          obj: a string.
+            obj: a string.
 
         Returns:
-          a string that is the same as `obj`, except that each block of
-          whitespace is collapsed into a single space character.
+            A string that is the same as `obj`, except that each block of
+            whitespace is collapsed into a single space character. If the
+            block of whitespace is at the front or end of obj, then it
+            is simply removed.
         """
         return ' '.join(obj.split())
 
@@ -212,12 +232,19 @@ class Normalizers(object):
         """Takes a string representing a URL and sanitizes it.
 
         Args:
-          obj: a string representing a URL.
+            obj: a string representing a URL.
 
         Returns:
-          An empty string if the URL does not start with http:// or https://.
-          Otherwise, returns the original URL.
+            An empty string if the URL does not start with http:// or https://
+            except when the string is empty. Otherwise, returns the original
+            URL.
+
+        Raises:
+            AssertionError: The string is non-empty and does not start with
+            http:// or https://
         """
+        if obj == '':
+            return obj
         url_components = urlparse.urlsplit(obj)
         quoted_url_components = (
             urllib.quote(component) for component in url_components)
@@ -336,31 +363,6 @@ class _Validators(object):
             bool. Whether the given object is at most `max_value`.
         """
         return obj <= max_value
-
-    @staticmethod
-    def is_regex(obj):
-        """Ensures that `obj` (a string) defines a valid regex.
-
-        Args:
-            obj: str. A string.
-
-        Raises:
-            NotImplementedError: The method is not implemented.
-        """
-        raise NotImplementedError
-
-    @staticmethod
-    def matches_regex(obj, regex):
-        """Ensures that `obj` (a string) matches the given regex.
-
-        Args:
-            obj: str. A string.
-            regex: str. A regular expression to match the given object with.
-
-        Raises:
-            NotImplementedError: The method is not implemented.
-        """
-        raise NotImplementedError
 
     @staticmethod
     def is_valid_email(obj):

@@ -20,6 +20,7 @@ describe('Question object factory', function() {
   var QuestionObjectFactory = null;
   var _sampleQuestion = null;
   var _sampleQuestionBackendDict = null;
+  var MisconceptionObjectFactory = null;
 
   beforeEach(module('oppia'));
 
@@ -99,6 +100,15 @@ describe('Question object factory', function() {
           content_3: {},
           content_4: {},
           content_5: {}
+        },
+        written_translations: {
+          translations_mapping: {
+            content_1: {},
+            content_2: {},
+            content_3: {},
+            content_4: {},
+            content_5: {}
+          }
         }
       },
       language_code: 'en',
@@ -127,11 +137,7 @@ describe('Question object factory', function() {
   });
 
   it('should correctly get backend dict', function() {
-    expect(
-      _sampleQuestion.toBackendDict(true).question_state_schema_version
-    ).toEqual(27);
-
-    expect(_sampleQuestion.toBackendDict(true, 27).id).toEqual(null);
+    expect(_sampleQuestion.toBackendDict(true).id).toEqual(null);
     expect(_sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 
@@ -141,8 +147,12 @@ describe('Question object factory', function() {
       'id', 'name', 'notes', 'feedback');
     var misconception2 = MisconceptionObjectFactory.create(
       'id_2', 'name_2', 'notes', 'feedback');
-    expect(_sampleQuestion.validate([misconception1, misconception2])).toEqual(
-      'The following misconceptions should also be caught: name, name_2');
+    expect(
+      _sampleQuestion.validate([misconception1, misconception2])).toEqual(
+        'The following misconceptions should also be caught: name, name_2.' +
+        ' Click on (or create) an answer that is neither marked correct nor ' +
+        'is a default answer (marked above as [All other answers]) to tag a ' +
+        'misconception to that answer group.');
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
     expect(_sampleQuestion.validate([])).toEqual(

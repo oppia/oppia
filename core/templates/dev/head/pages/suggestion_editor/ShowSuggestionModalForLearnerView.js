@@ -17,10 +17,10 @@
  */
 
 oppia.controller('ShowSuggestionModalForLearnerView', [
-  '$scope', '$uibModalInstance', 'newContent', 'oldContent',
-  'description', 'SuggestionModalService',
-  function($scope, $uibModalInstance, newContent, oldContent,
-      description, SuggestionModalService) {
+  '$scope', '$uibModalInstance', 'SuggestionModalService', 'description',
+  'newContent', 'oldContent',
+  function($scope, $uibModalInstance, SuggestionModalService, description,
+      newContent, oldContent) {
     $scope.newContent = newContent;
     $scope.oldContent = oldContent;
     $scope.description = description;

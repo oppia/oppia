@@ -17,8 +17,8 @@
  */
 
 oppia.factory('ImageClickInputValidationService', [
-  '$filter', 'WARNING_TYPES', 'baseInteractionValidationService',
-  function($filter, WARNING_TYPES, baseInteractionValidationService) {
+  '$filter', 'baseInteractionValidationService', 'WARNING_TYPES',
+  function($filter, baseInteractionValidationService, WARNING_TYPES) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         baseInteractionValidationService.requireCustomizationArguments(

@@ -17,11 +17,11 @@
  */
 
 oppia.directive('oppiaInteractiveDragAndDropSortInput', [
-  'dragAndDropSortInputRulesService', 'HtmlEscaperService',
-  'UrlInterpolationService',
+  'HtmlEscaperService', 'UrlInterpolationService',
+  'dragAndDropSortInputRulesService',
   function(
-      dragAndDropSortInputRulesService, HtmlEscaperService,
-      UrlInterpolationService) {
+      HtmlEscaperService, UrlInterpolationService,
+      dragAndDropSortInputRulesService) {
     return {
       restrict: 'E',
       scope: {},
@@ -77,7 +77,7 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
             }
 
             CurrentInteractionService.onSubmit(
-              answers, dragAndDropSortInputRulesService);
+              answers, DragAndDropSortInputRulesService);
           };
 
           CurrentInteractionService.registerCurrentInteraction(

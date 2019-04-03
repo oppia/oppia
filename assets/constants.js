@@ -30,6 +30,13 @@ var constants = {
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
 
+  // These categories are shown in the library navbar. The categories should
+  // be in sorted order.
+  "SEARCH_DROPDOWN_CATEGORIES": ["Algorithms", "Architecture", "Art",
+    "Biology", "Business", "Chemistry", "Economics", "English", "Geography",
+    "History", "Mathematics", "Medicine", "Music", "Physics", "Programming",
+    "Reading", "Statistics"],
+
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
@@ -438,6 +445,8 @@ var constants = {
   "ACTIVITY_STATUS_PRIVATE": "private",
   "ACTIVITY_STATUS_PUBLIC": "public",
 
+  "SITE_FEEDBACK_FORM_URL": "",
+
   "SYSTEM_USER_IDS": ["admin", "OppiaMigrationBot"],
 
   // A string containing the disallowed characters in state or exploration
@@ -454,7 +463,11 @@ var constants = {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
+  "DEFAULT_SKILL_DIFFICULTY": 0.3,
+
   "ENABLE_NEW_STRUCTURE_EDITORS": true,
+
+  "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_NEW_STRUCTURE_PLAYERS": false,
 
@@ -499,8 +512,6 @@ var constants = {
   },
 
   "ALLOW_YAML_FILE_UPLOAD": false,
-
-  "CURRENT_STATES_SCHEMA_VERSION": 27,
 
   "DEV_MODE": true
 };

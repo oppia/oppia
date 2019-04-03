@@ -17,9 +17,9 @@
  */
 
 // Rules service for number with units interaction.
-oppia.factory('numberWithUnitsRulesService', [
-  'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
-  function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
+oppia.factory('NumberWithUnitsRulesService', [
+  'FractionObjectFactory', 'NumberWithUnitsObjectFactory',
+  function(FractionObjectFactory, NumberWithUnitsObjectFactory) {
     try {
       NumberWithUnitsObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}
@@ -30,12 +30,12 @@ oppia.factory('numberWithUnitsRulesService', [
         answer = NumberWithUnitsObjectFactory.fromDict(answer);
         inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
 
-        answerString = answer.toMathjsCompatibleString();
-        inputsString = inputs.toMathjsCompatibleString();
+        var answerString = answer.toMathjsCompatibleString();
+        var inputsString = inputs.toMathjsCompatibleString();
 
-        answerList = NumberWithUnitsObjectFactory.fromRawInputString(
+        var answerList = NumberWithUnitsObjectFactory.fromRawInputString(
           answerString).toDict();
-        inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
+        var inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
           inputsString).toDict();
         return angular.equals(answerList, inputsList);
       },
@@ -50,8 +50,8 @@ oppia.factory('numberWithUnitsRulesService', [
           inputs.type = 'real';
           inputs.real = inputs.fraction.toFloat();
         }
-        answerString = answer.toMathjsCompatibleString();
-        inputsString = inputs.toMathjsCompatibleString();
+        var answerString = answer.toMathjsCompatibleString();
+        var inputsString = inputs.toMathjsCompatibleString();
         return math.unit(answerString).equals(math.unit(inputsString));
       }
     };

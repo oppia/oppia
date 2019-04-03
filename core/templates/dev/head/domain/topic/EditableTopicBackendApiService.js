@@ -23,12 +23,12 @@ oppia.constant(
   '/topic_editor_question_handler/<topic_id>?cursor=<cursor>');
 
 oppia.factory('EditableTopicBackendApiService', [
-  '$http', '$q', 'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
-  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-  'TOPIC_EDITOR_STORY_URL_TEMPLATE', 'TOPIC_EDITOR_QUESTION_URL_TEMPLATE',
-  function($http, $q, EDITABLE_TOPIC_DATA_URL_TEMPLATE,
-      SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, UrlInterpolationService,
-      TOPIC_EDITOR_STORY_URL_TEMPLATE, TOPIC_EDITOR_QUESTION_URL_TEMPLATE) {
+  '$http', '$q', 'UrlInterpolationService',
+  'EDITABLE_TOPIC_DATA_URL_TEMPLATE', 'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
+  'TOPIC_EDITOR_QUESTION_URL_TEMPLATE', 'TOPIC_EDITOR_STORY_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService,
+      EDITABLE_TOPIC_DATA_URL_TEMPLATE, SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE,
+      TOPIC_EDITOR_QUESTION_URL_TEMPLATE, TOPIC_EDITOR_STORY_URL_TEMPLATE) {
     var _fetchTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(

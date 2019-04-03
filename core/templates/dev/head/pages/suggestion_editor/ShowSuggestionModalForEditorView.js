@@ -18,17 +18,19 @@
 
 // TODO(Allan): Implement ability to edit suggestions before applying.
 oppia.controller('ShowSuggestionModalForEditorView', [
-  '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
-  'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
-  'description', 'currentContent', 'newContent', 'EditabilityService',
-  'SuggestionModalService',
+  '$log', '$scope', '$uibModalInstance', 'EditabilityService',
+  'SuggestionModalService', 'currentContent', 'description',
+  'newContent', 'suggestionIsHandled', 'suggestionIsValid', 'suggestionStatus',
+  'unsavedChangesExist',
   function(
-      $scope, $log, $uibModalInstance, suggestionIsHandled,
-      suggestionIsValid, unsavedChangesExist, suggestionStatus,
-      description, currentContent, newContent, EditabilityService,
-      SuggestionModalService) {
+      $log, $scope, $uibModalInstance, EditabilityService,
+      SuggestionModalService, currentContent, description,
+      newContent, suggestionIsHandled, suggestionIsValid, suggestionStatus,
+      unsavedChangesExist) {
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canEdit = EditabilityService.isEditable();
+    $scope.commitMessage = '';
+    $scope.reviewMessage = '';
     $scope.canReject = $scope.canEdit && $scope.isNotHandled;
     $scope.canAccept = $scope.canEdit && $scope.isNotHandled &&
       suggestionIsValid && !unsavedChangesExist;
@@ -50,8 +52,6 @@ oppia.controller('ShowSuggestionModalForEditorView', [
 
     $scope.currentContent = currentContent;
     $scope.newContent = newContent;
-    $scope.commitMessage = description;
-    $scope.reviewMessage = null;
 
     $scope.acceptSuggestion = function() {
       SuggestionModalService.acceptSuggestion(

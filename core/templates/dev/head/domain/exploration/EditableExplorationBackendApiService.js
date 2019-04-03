@@ -17,18 +17,18 @@
  */
 
 oppia.factory('EditableExplorationBackendApiService', [
-  '$http', '$q', 'EXPLORATION_DATA_URL_TEMPLATE',
-  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
-  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
-  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
+  '$http', '$q', 'ReadOnlyExplorationBackendApiService',
   'UrlInterpolationService',
-  'ReadOnlyExplorationBackendApiService',
-  function($http, $q, EXPLORATION_DATA_URL_TEMPLATE,
-      EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
-      EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
-      TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE,
+  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
+  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
+  'EXPLORATION_DATA_URL_TEMPLATE',
+  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
+  function($http, $q, ReadOnlyExplorationBackendApiService,
       UrlInterpolationService,
-      ReadOnlyExplorationBackendApiService) {
+      EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
+      EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
+      EXPLORATION_DATA_URL_TEMPLATE,
+      TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE) {
     var _fetchExploration = function(
         explorationId, applyDraft, successCallback, errorCallback) {
       var editableExplorationDataUrl = _getExplorationUrl(

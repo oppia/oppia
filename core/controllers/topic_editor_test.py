@@ -91,7 +91,7 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
                 question_id, self.admin_id,
                 self._create_valid_question_data('ABC'))
             question_services.create_new_question_skill_link(
-                question_id, self.skill_id)
+                question_id, self.skill_id, 0.5)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.ADMIN_EMAIL)
@@ -174,6 +174,11 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -195,6 +200,11 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                },
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -212,6 +222,11 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -357,6 +372,11 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             json_response = self.get_json(
                 '%s/%s/%s' % (
@@ -376,6 +396,11 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                         }
                     }
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 

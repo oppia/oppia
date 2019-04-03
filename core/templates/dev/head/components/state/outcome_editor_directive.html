@@ -1,0 +1,168 @@
+<style>
+  outcome-editor .oppia-confusing-outcome-warning-text {
+    color: rgb(200, 0, 0);
+    font-style: italic;
+  }
+</style>
+<div ng-if="!feedbackEditorIsOpen && displayFeedback"
+     title="<[isEditable() ? 'Edit feedback' : '']>"
+     style="height: 100%;">
+  <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-feedback-button"
+       ng-class="{'oppia-editable-section': isEditable()}">
+    <div class="oppia-rule-preview oppia-transition-200">
+      <div class="oppia-click-to-start-editing protractor-test-open-outcome-feedback-editor"
+           ng-if="isEditable()" ng-click="openFeedbackEditor()">
+        <i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon pull-right"
+           title="Edit Feedback">&#xE254;
+        </i>
+      </div>
+
+      <strong>Oppia tells the learner...</strong>
+      <div style="position: relative;">
+        <span ng-if="isSelfLoopWithNoFeedback(outcome) && !areWarningsSuppressed()">
+          <span class="oppia-confusing-outcome-warning-text">
+            <i class="material-icons">&#xE002;</i>
+            Please give Oppia something useful to say here.
+          </span>
+        </span>
+        <span ng-if="(!isSelfLoopWithNoFeedback(outcome) && !outcome.hasNonemptyFeedback()) || (isSelfLoopWithNoFeedback(outcome) && areWarningsSuppressed())"
+              style="color: #888">
+          <em>Nothing</em>
+        </span>
+        <span ng-if="outcome.hasNonemptyFeedback()" style="word-wrap: break-word;">
+          <angular-html-bind class="oppia-rte-editor" html-data="outcome.feedback.getHtml()">
+          </angular-html-bind>
+        </span>
+      </div>
+    </div>
+    <!-- This is a dummy div created to mask the contents when hovored above outcome editor contents -->
+    <div class="oppia-rule-preview-section-mask"></div>
+  </div>
+</div>
+
+<div ng-if="isEditable() && feedbackEditorIsOpen">
+  <form role="form"
+        class="form-inline protractor-test-edit-outcome-feedback"
+        name="editOutcomeForm.editFeedbackForm">
+    <outcome-feedback-editor outcome="outcome">
+    </outcome-feedback-editor>
+  </form>
+
+  <div class="oppia-rule-save-cancel-buttons">
+    <div class="pull-right">
+      <button type="button"
+              class="btn btn-default"
+              ng-click="cancelThisFeedbackEdit()">
+        Cancel
+      </button>
+      <button type="button"
+              class="btn btn-success protractor-test-save-outcome-feedback"
+              ng-disabled="invalidStateAfterFeedbackSave() || editOutcomeForm.editFeedbackForm.$invalid"
+              ng-click="saveThisFeedback(true)">
+        Save Feedback
+      </button>
+    </div>
+
+    <div style="clear: both;"></div>
+  </div>
+</div>
+
+<br ng-if="displayFeedback">
+
+<div ng-if="!destinationEditorIsOpen && !isInQuestionMode()"
+     style="height: 100%;"
+     title="<[isEditable() ? 'Change the destination card' : '']>">
+  <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-button"
+       ng-class="{'oppia-editable-section': isEditable()}">
+    <div class="oppia-rule-preview oppia-transition-200">
+      <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-editor"
+           ng-if="isEditable()" ng-click="openDestinationEditor()">
+        <i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon pull-right"
+           title="Edit Destination">&#xE254;
+        </i>
+      </div>
+
+      <div ng-if="outcome.dest !== getActiveStateName()">
+        <strong ng-if="displayFeedback">And afterwards, directs the learner
+        to...</strong>
+        <strong ng-if="!displayFeedback">Oppia directs the learner to...</strong>
+        <span ng-if="!isSelfLoop(outcome)" style="position: relative;">
+          <[outcome.dest]>
+        </span>
+        <span ng-if="isSelfLoop(outcome)" style="position: relative;">
+          <span ng-if="!outcome.refresherExplorationId">(try again)</span>
+          <span ng-if="outcome.refresherExplorationId">
+            (try again, with refresher exploration "<[outcome.refresherExplorationId]>")
+          </span>
+        </span>
+        <div style="margin-top: 1em;" ng-if="outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
+          <strong> Attached prerequisite skill for the current state: </strong>
+          <[outcome.missingPrerequisiteSkillId]>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div ng-if="isEditable() && destinationEditorIsOpen && !isInQuestionMode()">
+  <form role="form"
+        class="form-inline protractor-test-edit-outcome-dest"
+        name="editOutcomeForm.editDestForm"
+        ng-submit="saveThisDestination()">
+    <outcome-destination-editor outcome="outcome"
+                                outcome-has-feedback="displayFeedback"
+                                add-state="addState">
+    </outcome-destination-editor>
+  </form>
+
+  <div class="oppia-rule-save-cancel-buttons">
+    <div class="pull-right">
+      <button type="button"
+              class="btn btn-default protractor-test-cancel-outcome-dest"
+              ng-click="cancelThisDestinationEdit()">
+        Cancel
+      </button>
+      <button type="button"
+              class="btn btn-success protractor-test-save-outcome-dest"
+              ng-disabled="invalidStateAfterDestinationSave() || editOutcomeForm.editDestForm.$invalid"
+              ng-click="saveThisDestination()">
+        Save Destination
+      </button>
+    </div>
+
+    <div style="clear: both;"></div>
+  </div>
+</div>
+
+
+<div class="oppia-correctness-label-editor" ng-if="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
+  <div ng-if="!isEditable()"
+       title="<[isEditable() ? 'Edit correctness setting' : '']>"
+       style="height: 100%;">
+    <div class="oppia-readonly-rule-tile"
+         ng-class="{'oppia-editable-section': isEditable()}">
+      <div class="oppia-rule-details-header">
+        <div class="oppia-click-to-start-editing"
+             ng-if="isEditable()" ng-click="openCorrectnessLabelEditor()">
+          <i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon pull-right"
+             title="Edit Correctness setting">&#xE254;
+          </i>
+        </div>
+
+        <strong>The answers falling under this group are
+          <span ng-if="outcome.labelledAsCorrect" style="color: rgb(20, 180, 15)">
+            correct
+          </span>
+          <span ng-if="!outcome.labelledAsCorrect" style="color: rgb(243, 13, 13)">
+            incorrect
+          </span>
+        </strong>
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="isEditable()">
+    <strong>The answers in this group are correct</strong>
+    <input class="protractor-test-editor-correctness-toggle" type="checkbox" ng-model="outcome.labelledAsCorrect" ng-change="onChangeCorrectnessLabel()">
+  </div>
+</div>

@@ -18,11 +18,11 @@
  */
 
 oppia.factory('ExplorationSummaryBackendApiService', [
-  '$http', '$q', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-  'ValidatorsService', 'AlertsService',
+  '$http', '$q', 'AlertsService',
+  'ValidatorsService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
   function(
-      $http, $q, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
-      ValidatorsService, AlertsService) {
+      $http, $q, AlertsService,
+      ValidatorsService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
     var _fetchExpSummaries = function(
         explorationIds, includePrivateExplorations, successCallback,
         errorCallback) {

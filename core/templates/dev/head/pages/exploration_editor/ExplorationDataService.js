@@ -31,7 +31,7 @@ oppia.factory('ExplorationDataService', [
     var pathnameArray = UrlService.getPathname().split('/');
     for (var i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create') {
-        var explorationId = pathnameArray[i + 1];
+        explorationId = pathnameArray[i + 1];
         break;
       }
     }

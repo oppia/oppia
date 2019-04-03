@@ -14,7 +14,7 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <div class="oppia-dashboard-container" ng-controller="DashboardNotifications">
+  <div class="oppia-dashboard-container" ng-controller="NotificationsDashboard">
     <h2 class="oppia-page-heading">Notifications</h2>
     <div class="oppia-page-heading-subtext" ng-if="jobQueuedMsec">
       Last updated: <[getLocaleAbbreviatedDatetimeString(jobQueuedMsec)]>

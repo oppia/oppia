@@ -17,14 +17,14 @@
  */
 
 oppia.factory('ShowSuggestionModalForEditorViewService', [
-  '$uibModal', '$rootScope', 'ExplorationStatesService',
-  'UrlInterpolationService', 'ThreadDataService',
-  'ExplorationDataService', 'StateObjectFactory',
-  '$log', 'SuggestionModalService',
-  function($uibModal, $rootScope, ExplorationStatesService,
-      UrlInterpolationService, ThreadDataService,
-      ExplorationDataService, StateObjectFactory, $log,
-      SuggestionModalService) {
+  '$log', '$rootScope', '$uibModal',
+  'ExplorationDataService', 'ExplorationStatesService',
+  'StateObjectFactory', 'SuggestionModalService',
+  'ThreadDataService', 'UrlInterpolationService',
+  function($log, $rootScope, $uibModal,
+      ExplorationDataService, ExplorationStatesService,
+      StateObjectFactory, SuggestionModalService,
+      ThreadDataService, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
       'editor_view_suggestion_modal_directive.html'

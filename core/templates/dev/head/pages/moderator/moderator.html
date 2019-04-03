@@ -106,7 +106,20 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertUnicodeWithParamsToHtmlFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertHtmlToUnicodeFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertUnicodeToHtmlFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsAtLeastFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsAtMostFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsFloatFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsIntegerFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsNonemptyFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
+  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
+
+  <script src="/templates/dev/head/services/RteHelperService.js"></script>
+  <script src="/templates/dev/head/services/IdGenerationService.js"></script>
   <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
   <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
   <script src="/templates/dev/head/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>

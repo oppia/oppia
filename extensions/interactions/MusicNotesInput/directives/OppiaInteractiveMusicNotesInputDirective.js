@@ -38,15 +38,15 @@ oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
 });
 
 oppia.directive('oppiaInteractiveMusicNotesInput', [
-  'HtmlEscaperService', 'NOTE_NAMES_TO_MIDI_VALUES',
-  'musicNotesInputRulesService', 'musicPhrasePlayerService',
-  'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  'CurrentInteractionService', 'WindowDimensionsService',
+  'CurrentInteractionService', 'HtmlEscaperService',
+  'MusicNotesInputRulesService', 'MusicPhrasePlayerService',
+  'UrlInterpolationService', 'WindowDimensionsService',
+  'EVENT_NEW_CARD_AVAILABLE', 'NOTE_NAMES_TO_MIDI_VALUES',
   function(
-      HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
-      musicNotesInputRulesService, musicPhrasePlayerService,
-      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
-      CurrentInteractionService, WindowDimensionsService) {
+      CurrentInteractionService, HtmlEscaperService,
+      MusicNotesInputRulesService, MusicPhrasePlayerService,
+      UrlInterpolationService, WindowDimensionsService,
+      EVENT_NEW_CARD_AVAILABLE, NOTE_NAMES_TO_MIDI_VALUES) {
     return {
       restrict: 'E',
       scope: {
@@ -59,7 +59,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // This is needed in order for the scope to be retrievable during Karma
         // unit testing. See http://stackoverflow.com/a/29833832 for more
         // details.
-        element[0].isolateScope = function() {
+        element[0].getControllerScope = function() {
           return scope;
         };
 
@@ -173,12 +173,12 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           scope.VERTICAL_GRID_SPACING = scope.CONTAINER_HEIGHT /
             verticalGridKeys.length;
 
-          staffTop = computeStaffTop();
-          staffBottom = computeStaffBottom();
+          var staffTop = computeStaffTop();
+          var staffBottom = computeStaffBottom();
 
           // The farthest edge of the staff. If a note is placed beyond this
           // position, it will be discarded.
-          RIGHT_EDGE_OF_STAFF_POSITION =
+          var RIGHT_EDGE_OF_STAFF_POSITION =
             element.find('.oppia-music-input-valid-note-area').width();
 
           clearNotesFromStaff();
@@ -381,7 +381,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                       noteId = scope.generateNoteId();
                       $(ui.helper).data('noteId', noteId);
                     }
-                    drawLedgerLine(topPos, leftPos, lineValue, noteId);
+                    drawLedgerLine(topPos, leftPos);
                   }
                 },
                 out: function() {
@@ -595,8 +595,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         var isCloneOffStaff = function(helperClone) {
-          return (!(helperClone.position().top > staffTop &&
-                  helperClone.position().top < staffBottom));
+          return (!(helperClone.position().top > scope.staffTop &&
+                  helperClone.position().top < scope.staffBottom));
         };
 
         var isLedgerLineNote = function(lineValue) {
@@ -635,9 +635,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             if (isLedgerLineNote(lineValue)) {
               drawLedgerLine(
                 getVerticalPosition(note.baseNoteMidiNumber),
-                getHorizontalPosition(getNoteStartAsFloat(note)),
-                lineValue,
-                note.noteId
+                getHorizontalPosition(getNoteStartAsFloat(note))
               );
             }
           }
@@ -736,7 +734,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           }
           readableSequence = _makeAllNotesHaveDurationOne(readableSequence);
           CurrentInteractionService.onSubmit(
-            readableSequence, musicNotesInputRulesService);
+            readableSequence, MusicNotesInputRulesService);
         };
 
         CurrentInteractionService.registerCurrentInteraction(
@@ -788,7 +786,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             }
           }
 
-          musicPhrasePlayerService.playMusicPhrase(notes);
+          MusicPhrasePlayerService.playMusicPhrase(notes);
         };
 
         // A MIDI pitch is the baseNoteMidiNumber of the note plus the offset.
