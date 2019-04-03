@@ -32,7 +32,10 @@ var createExploration = function() {
 };
 
 var setTitleForExploration = function(name) {
-  element(by.model('explorationTitleService.displayed')).sendKeys(name);
+  element(by.model('explorationTitleService.displayed')).clear().then(
+    function() {
+      element(by.model('explorationTitleService.displayed')).sendKeys(name);
+    });
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
