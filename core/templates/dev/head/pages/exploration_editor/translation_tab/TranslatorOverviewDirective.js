@@ -79,6 +79,22 @@ oppia.directive('translatorOverview', [
             $window.localStorage.setItem(
               LAST_SELECTED_TRANSLATION_LANGUAGE, $scope.languageCode);
           };
+
+          $scope.getTranslationProgressAriaLabel = function() {
+            if ($scope.numberOfRequiredAudio -
+              $scope.numberOfAudioNotAvailable === 1) {
+              return (
+                $scope.numberOfRequiredAudio -
+                $scope.numberOfAudioNotAvailable + ' item translated out of ' +
+                $scope.numberOfRequiredAudio + ' items');
+            } else {
+              return (
+                $scope.numberOfRequiredAudio -
+                $scope.numberOfAudioNotAvailable +
+                ' items translated out of ' +
+                $scope.numberOfRequiredAudio + ' items');
+            }
+          };
         }
       ]
     };
