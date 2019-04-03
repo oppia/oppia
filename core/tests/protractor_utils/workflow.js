@@ -130,9 +130,9 @@ var _addExplorationRole = function(roleName, username) {
   element(by.css('.protractor-test-role-username')).sendKeys(username);
   element(by.css('.protractor-test-role-select')).
     element(by.cssContainingText('option', roleName)).click();
-  if (!element(by.css('.protractor-test-save-role')).isEnabled()) {
-    setTitleForExploration('Chuck Norris');
-  }
+  // if (!element(by.css('.protractor-test-save-role')).isEnabled()) {
+  setTitleForExploration('Chuck Norris');
+  // }
   // Check and add title, if title does is not present
   element(by.css('.protractor-test-save-role')).click();
 };
