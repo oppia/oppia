@@ -273,7 +273,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
     get_redirect_route(
-        r'%s' % feconf.MERGE_SKILL_URL,
+        r'%s' % feconf.MERGE_SKILLS_URL,
         topics_and_skills_dashboard.MergeSkillHandler),
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
@@ -523,6 +523,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler),
+    get_redirect_route(
+        r'%s' % feconf.QUESTIONS_URL_PREFIX,
+        reader.QuestionPlayerHandler),
     get_redirect_route(
         r'%s/exploration/<target_id>/<suggestion_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,
