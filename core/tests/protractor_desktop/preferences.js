@@ -48,16 +48,20 @@ describe('Preferences', function() {
     expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
   });
 
-  fit('should add bio to profile', function() {
+  it('should set and edit bio in user profile', function() {
     users.createUser('lisa@preferences.com', 'lisaPreferences');
     users.login('lisa@preferences.com');
     preferencesPage.get();
-    preferencesPage.setUserBio("abc;");
+    preferencesPage.setUserBio("I am Lisa.");
     browser.refresh();
-    preferencesPage.expectUserBioToBe("abc;");
-    preferencesPage.setUserBio("3d year CS student");
+    preferencesPage.expectUserBioToBe("I am Lisa");
+    preferencesPage.setUserBio("Junior student");
     browser.refresh();
-    preferencesPage.expectUserBioToBe("3d year CS student");
+    preferencesPage.expectUserBioToBe("Junior student");
+    preferencesPage.editUserBio(" from USA");
+    preferencesPage.editUserBio(" studying CS!");
+    browser.refresh();
+    preferencesPage.expectUserBioToBe("Junior student from USA studying CS!");
   });
 
   afterEach(function() {
