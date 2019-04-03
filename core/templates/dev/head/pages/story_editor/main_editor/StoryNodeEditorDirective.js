@@ -90,7 +90,7 @@ oppia.directive('storyNodeEditor', [
           $scope.canSaveExpId = true;
           $scope.checkCanSaveExpId = function() {
             $scope.canSaveExpId = $scope.explorationIdPattern.test(
-            $scope.explorationId);
+              $scope.explorationId);
           };
           $scope.updateTitle = function(newTitle) {
             if (newTitle === $scope.currentTitle) {
