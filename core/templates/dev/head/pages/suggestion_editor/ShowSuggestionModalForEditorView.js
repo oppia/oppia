@@ -77,8 +77,7 @@ oppia.controller('ShowSuggestionModalForEditorView', [
     $scope.isSaveButtonDisabled = function() {
       return (
         $scope.oldContent === $scope.editedContent ||
-        $scope.summaryMessage === null ||
-        $scope.summaryMessage === '');
+        $scope.summaryMessage === null || $scope.summaryMessage === '');
     };
 
     $scope.editSuggestion = function() {
