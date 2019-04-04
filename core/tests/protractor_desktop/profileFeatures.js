@@ -73,7 +73,7 @@ describe('Profile Features functionality', function() {
 
   it('Subscribe to a particular User', function() {
     users.login('FirstUser@profileFeatures.com');
-    
+
     // Subscribe to both the creators.
     subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
     subscriptionDashboardPage.navigateToSubscriptionButton();
