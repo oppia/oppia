@@ -60,6 +60,10 @@ var LibraryPage = function() {
     );
   };
 
+  var getAllExplorationElements = function() {
+    return element.all(by.css('.protractor-test-exp-summary-tile')).length;
+  };
+
   var _submitSearchQuery = function(searchQuery) {
     // The library page has two search bar input elements.
     // The first search bar input element is visible only in a desktop
