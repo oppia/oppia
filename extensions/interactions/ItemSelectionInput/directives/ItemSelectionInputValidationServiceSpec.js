@@ -241,7 +241,7 @@ describe('ItemSelectionInputValidationService', function() {
         message: (
           'In answer group 1, rule 1, the number of correct options in ' +
           'the "Equals" rule should be between 2 and 2 (' +
-          'the minimum and maximum allowed selection count).')
+          'the minimum and maximum allowed selection counts).')
       }]);
     });
 
