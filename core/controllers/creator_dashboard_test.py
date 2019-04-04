@@ -679,7 +679,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['subscribers_list']), 0)
 
-    def test_can_create_new_topic(self):
+    def test_get_topic_summary_dicts(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
@@ -709,7 +709,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(display_preference, 'list')
         self.logout()
 
-    def test_can_create_collection(self):
+    def test_get_collections_list(self):
         self.set_admins([self.OWNER_USERNAME])
         self.login(self.OWNER_EMAIL)
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
@@ -726,7 +726,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection_list), 1)
         self.logout()
 
-    def test_can_create_suggestion(self):
+    def test_get_suggestions_list(self):
         self.login(self.OWNER_EMAIL)
         suggestions = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['created_suggestions_list']

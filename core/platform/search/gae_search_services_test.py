@@ -473,6 +473,8 @@ class SearchQueryTests(test_utils.GenericTestBase):
         gae_search_services.add_documents_to_index([doc], 'index')
         result = gae_search_services.search('NOT:abc', 'my_index')
         self.assertEqual(result, ([], None))
+        result = gae_search_services.search(r'\k:abc', 'my_index')
+        self.assertEqual(result, ([], None))
 
     def test_respect_search_query(self):
         doc1 = search.Document(doc_id='doc1', rank=1, language='en', fields=[
@@ -603,9 +605,14 @@ class SearchQueryTests(test_utils.GenericTestBase):
         # Fields in the sort expression need to start with '+' or '-'
         # to indicate sort direction. If no such indicator is there, it will
         # raise ValueError.
+        sort_expression = 'k'
         with self.assertRaisesRegexp(
-            ValueError, 'Fields in the sort expression'):
-            gae_search_services.search('k:abc', 'index', sort='k')
+            ValueError,
+            'Fields in the sort expression must start with "\+"'
+            ' or "-" to indicate sort direction. The field %s has no such '
+            'indicator in expression "%s".'
+            % (sort_expression, sort_expression)):
+            gae_search_services.search('k:abc', 'index', sort=sort_expression)
 
     def test_search_using_multiple_sort_expressions(self):
         doc1 = {'id': 'doc1', 'k1': 2, 'k2': 'abc ghi'}
