@@ -38,6 +38,18 @@ var setTitleForExploration = function(name) {
     });
 };
 
+var openEditTestRolesForm = function() {
+  element(by.css('.protractor-test-edit-roles')).click();
+};
+
+var canAddUser = function() {
+  return element(by.css('.protractor-test-save-role')).isEnabled();
+};
+
+var closeEditTestRolesForm = function() {
+  element(by.css('protractor-test-cancel-save-role')).click();
+};
+
 // Creates a new exploration and wait for the exploration tutorial to start.
 var createExplorationAndStartTutorial = function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
@@ -133,10 +145,6 @@ var _addExplorationRole = function(roleName, username) {
   element(by.css('.protractor-test-role-username')).sendKeys(username);
   element(by.css('.protractor-test-role-select')).
     element(by.cssContainingText('option', roleName)).click();
-  // if (!element(by.css('.protractor-test-save-role')).isEnabled()) {
-  setTitleForExploration('Chuck Norris');
-  // }
-  // Check and add title, if title does is not present
   element(by.css('.protractor-test-save-role')).click();
 };
 
@@ -189,6 +197,11 @@ exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
 exports.createCollectionAsAdmin = createCollectionAsAdmin;
 exports.createExplorationAsAdmin = createExplorationAsAdmin;
+
+exports.openEditTestRolesForm = openEditTestRolesForm;
+exports.canAddUser = canAddUser;
+exports.closeEditTestRolesForm = closeEditTestRolesForm;
+exports.setTitleForExploration = setTitleForExploration;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;

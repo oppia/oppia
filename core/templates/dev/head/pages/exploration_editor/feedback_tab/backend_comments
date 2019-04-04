@@ -1,0 +1,14 @@
+// What all functions do I need for now:
+return {
+    fetchThreads: function(successCallback){},
+    fetchMessages: function(threadId){},
+    createNewThread: function(newSubject, newText, successCallback){},
+    addNewMessage: function(threadId, newMessage, newStatus, successCallback, errorCallback){}
+}
+
+
+
+
+
+
+

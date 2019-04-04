@@ -217,6 +217,14 @@ describe('Permissions for private explorations', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
+  it('should not allow adding users if title is not given', function() {
+    workflow.openEditTestRolesForm();
+    expect(workflow.canAddUser()).toBe('false');
+    workflow.setTitleForExploration('Chuck Norris');
+    expect(workflow.canAddUser()).toBe('true');
+    workflow.closeEditTestRolesForm();
+  })
+
   it('should be correct for collaborators', function() {
     users.createUser('alice@privileges.com', 'alicePrivileges');
     users.createUser('bob@privileges.com', 'bobPrivileges');
