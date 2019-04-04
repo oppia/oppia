@@ -218,6 +218,14 @@ describe('Permissions for private explorations', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
   it('should not allow adding users if title is not given', function() {
+    users.createUser('alice@privileges.com', 'alicePrivileges');
+    users.createUser('bob@privileges.com', 'bobPrivileges');
+    users.createUser('eve@privileges.com', 'evePrivileges');
+
+    users.login('alice@privileges.com');
+    workflow.createExploration();
+    explorationEditorPage.navigateToSettingsTab();
+
     workflow.openEditTestRolesForm();
     expect(workflow.canAddUser()).toBe('false');
     workflow.setTitleForExploration('Chuck Norris');
@@ -226,13 +234,6 @@ describe('Permissions for private explorations', function() {
   })
 
   it('should be correct for collaborators', function() {
-    users.createUser('alice@privileges.com', 'alicePrivileges');
-    users.createUser('bob@privileges.com', 'bobPrivileges');
-    users.createUser('eve@privileges.com', 'evePrivileges');
-
-    users.login('alice@privileges.com');
-    workflow.createExploration();
-    explorationEditorPage.navigateToSettingsTab();
     workflow.addExplorationCollaborator('bobPrivileges');
     expect(workflow.getExplorationManagers()).toEqual(['alicePrivileges']);
     expect(workflow.getExplorationCollaborators()).toEqual(['bobPrivileges']);
