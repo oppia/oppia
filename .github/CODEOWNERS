@@ -187,7 +187,7 @@
 
 
 # Rich text editor team.
-/core/templates/dev/head/components/CkEditorRteDirective.js @AllanYangZhou @bansalnitish
+/core/templates/dev/head/components/CkEditorRteDirective.ts @AllanYangZhou @bansalnitish
 /extensions/rich_text_components/ @AllanYangZhou @bansalnitish
 /extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
 
