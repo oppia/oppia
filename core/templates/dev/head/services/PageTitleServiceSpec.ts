@@ -17,11 +17,11 @@
  */
 
 describe('Page title service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
   var pts = null;
   var $document = null;
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     $document = $injector.get('$document');
     pts = $injector.get('PageTitleService');
   }));
