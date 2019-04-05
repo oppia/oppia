@@ -15,7 +15,8 @@
 /**
  * @fileoverview Directive for managing the state responses in the state editor.
  */
-oppia.directive('stateResponses', [
+
+angular.module('stateResponsesModule').directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -29,7 +30,7 @@ oppia.directive('stateResponses', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state_editor/state_responses_directive.html'),
+        '/pages/state-editor/state-responses/state-responses.directive.html'),
       controller: [
         '$filter', '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'AnswerGroupObjectFactory', 'ContextService', 'EditabilityService',

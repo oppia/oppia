@@ -15,7 +15,8 @@
 /**
  * @fileoverview Controller for the state editor directive.
  */
-oppia.directive('stateEditor', [
+
+angular.module('stateEditorModule').directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -36,7 +37,7 @@ oppia.directive('stateEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state_editor/state_editor_directive.html'),
+        '/pages/state-editor/state-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', 'INTERACTION_SPECS', 'StateEditorService',
         'StateContentService', 'StateHintsService', 'StateSolutionService',
