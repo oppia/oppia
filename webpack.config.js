@@ -22,12 +22,15 @@ var htmlMinifyConfig = {
     /<\[[\s\S]*?\]>/]
 };
 
+
 module.exports = {
   entries: {
     app: './core/templates/dev/head/App.js',
     about: './core/templates/dev/head/pages/about/About.js',
     donate: './core/templates/dev/head/pages/donate/Donate.js',
-    error: './core/templates/dev/head/pages/error/Error.js'
+    error: './core/templates/dev/head/pages/error/Error.js',
+    landing: './core/templates/dev/head/pages/landing/TopicLandingPage.js',
+    stewards: './core/templates/dev/head/pages/landing/stewards/Stewards.js'
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -56,6 +59,27 @@ module.exports = {
       chunks: ['error'],
       filename: 'error.html',
       template: 'core/templates/dev/head/pages/error/error.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['stewards'],
+      filename: 'landing_page_stewards.html',
+      template: 'core/templates/dev/head/pages/landing/stewards/landing_page_stewards.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+  new HtmlWebpackPlugin({
+      chunks: ['landing'],
+      filename: 'topic_landing_page.html',
+      template: 'core/templates/dev/head/pages/landing/topic_landing_page.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['stewards'],
+      filename: 'landing_page_stewards.html',
+      template: 'core/templates/dev/head/pages/landing/stewards/landing_page_stewards.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

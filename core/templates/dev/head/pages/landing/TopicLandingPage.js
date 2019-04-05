@@ -17,6 +17,9 @@
  */
 
 require('domain/utilities/UrlInterpolationService.js');
+require('filters/CapitalizeFilter.js');
+require('pages/landing/TopicLandingPage.js');
+require('services/PageTitleService.js');
 require('services/SiteAnalyticsService.js');
 
 // Note: This oppia constant needs to be keep in sync with

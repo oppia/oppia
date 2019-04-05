@@ -167,9 +167,9 @@
   <script src="/templates/dev/head/appInit.js"></script>
   <% for (var chunk in htmlWebpackPlugin.files.js) { %>
     <% if (webpackConfig.mode == 'production') { %> 
-      <script src="build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
     <% } else { %>
-      <script src="dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
     <% } %>
   <% } %>
 
