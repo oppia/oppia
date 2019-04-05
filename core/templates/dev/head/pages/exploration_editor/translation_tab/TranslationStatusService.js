@@ -26,9 +26,9 @@ oppia.factory('TranslationStatusService', [
       TranslationTabActiveModeService, INTERACTION_SPECS) {
     var AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var TRANSLATION_NEEDS_UPDATE_MESSAGE = ['Translation needs update!'];
-    var ALL_AUDIO_AVAILABLE_COLOR = '#16A765';
-    var FEW_AUDIO_AVAILABLE_COLOR = '#E9B330';
-    var NO_AUDIO_AVAILABLE_COLOR = '#D14836';
+    var ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
+    var FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
+    var NO_ASSETS_AVAILABLE_COLOR = '#D14836';
 
     var langCode = TranslationLanguageService.getActiveLanguageCode();
     var stateNeedsUpdateWarnings = {};
@@ -67,6 +67,7 @@ oppia.factory('TranslationStatusService', [
         available: false,
         needsUpdate: false,
       };
+      langCode = TranslationLanguageService.getActiveLanguageCode();
       var availableLanguages = (
         writtenTranslations.getTranslationsLanguageCodes(contentId));
       if (availableLanguages.indexOf(langCode) !== -1) {
@@ -146,32 +147,40 @@ oppia.factory('TranslationStatusService', [
           });
           explorationContentNotAvailableCount += noTranslationCount;
           if (noTranslationCount === 0) {
-            stateWiseStatusColor[stateName] = ALL_AUDIO_AVAILABLE_COLOR;
+            stateWiseStatusColor[stateName] = ALL_ASSETS_AVAILABLE_COLOR;
           } else if (noTranslationCount === allContentId.length) {
-            stateWiseStatusColor[stateName] = NO_AUDIO_AVAILABLE_COLOR;
+            stateWiseStatusColor[stateName] = NO_ASSETS_AVAILABLE_COLOR;
           } else {
-            stateWiseStatusColor[stateName] = FEW_AUDIO_AVAILABLE_COLOR;
+            stateWiseStatusColor[stateName] = FEW_ASSETS_AVAILABLE_COLOR;
           }
         });
       }
     };
 
     var _getContentIdListRelatedToComponent = function(componentName) {
-      contentIdsToAudioTranslations =
-        StateContentIdsToAudioTranslationsService.displayed;
       var contentIdList = [];
-      if (contentIdsToAudioTranslations) {
+      var availableContentIds = [];
+
+      if (TranslationTabActiveModeService.isTranslationModeActive()) {
+        var writtenTranslations = StateWrittenTranslationsService.displayed;
+        availableContentIds = writtenTranslations.getAllContentId();
+      } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
+        var contentIdsToAudioTranslations = (
+          StateContentIdsToAudioTranslationsService.displayed);
+        availableContentIds = contentIdsToAudioTranslations.getAllContentId();
+      }
+
+      if (availableContentIds.length > 0) {
         if (componentName === 'solution' || componentName === 'content') {
           contentIdList.push(componentName);
         } else {
           var searchKey = componentName + '_';
-          contentIdsToAudioTranslations.getAllContentId().forEach(
-            function(contentId) {
-              if (contentId.indexOf(searchKey) > -1) {
-                contentIdList.push(contentId);
-              }
+          availableContentIds.forEach(function(contentId) {
+            if (contentId.indexOf(searchKey) > -1) {
+              contentIdList.push(contentId);
             }
-          );
+          });
+
           if (componentName === 'feedback') {
             contentIdList.push('default_outcome');
           }
@@ -192,11 +201,11 @@ oppia.factory('TranslationStatusService', [
           }
         });
         if (contentIdList.length === availableAudioCount) {
-          return ALL_AUDIO_AVAILABLE_COLOR;
+          return ALL_ASSETS_AVAILABLE_COLOR;
         } else if (availableAudioCount === 0) {
-          return NO_AUDIO_AVAILABLE_COLOR;
+          return NO_ASSETS_AVAILABLE_COLOR;
         } else {
-          return FEW_AUDIO_AVAILABLE_COLOR;
+          return FEW_ASSETS_AVAILABLE_COLOR;
         }
       }
     };
@@ -221,9 +230,9 @@ oppia.factory('TranslationStatusService', [
       var availabilityStatus = _getActiveStateContentAvailabilityStatus(
         contentId);
       if (availabilityStatus.available) {
-        return ALL_AUDIO_AVAILABLE_COLOR;
+        return ALL_ASSETS_AVAILABLE_COLOR;
       } else {
-        return NO_AUDIO_AVAILABLE_COLOR;
+        return NO_ASSETS_AVAILABLE_COLOR;
       }
     };
 
@@ -234,6 +243,9 @@ oppia.factory('TranslationStatusService', [
     };
 
     return {
+      refresh: function() {
+        _computeAllStatesStatus();
+      },
       getAllStatesNeedUpdatewarning: function() {
         return stateNeedsUpdateWarnings;
       },
