@@ -18,7 +18,6 @@
 
 describe('Translation status service', function() {
   beforeEach(module('oppia', function($provide) {
-    var activeLanguageCode = null;
     $provide.value('LanguageUtilService', {
       getAllAudioLanguageCodes: function() {
         return ['en', 'hi'];
