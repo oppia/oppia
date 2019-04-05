@@ -30,7 +30,8 @@ module.exports = {
     donate: './core/templates/dev/head/pages/donate/Donate.js',
     error: './core/templates/dev/head/pages/error/Error.js',
     landing: './core/templates/dev/head/pages/landing/TopicLandingPage.js',
-    stewards: './core/templates/dev/head/pages/landing/stewards/Stewards.js'
+    stewards: './core/templates/dev/head/pages/landing/stewards/Stewards.js',
+    thanks: './core/templates/dev/head/pages/thanks/Thanks.js',
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -80,6 +81,13 @@ module.exports = {
       chunks: ['stewards'],
       filename: 'landing_page_stewards.html',
       template: 'core/templates/dev/head/pages/landing/stewards/landing_page_stewards.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['thanks'],
+      filename: 'thanks.html',
+      template: 'core/templates/dev/head/pages/thanks/thanks.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

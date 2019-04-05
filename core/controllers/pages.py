@@ -134,7 +134,7 @@ class ThanksPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/thanks/thanks.html')
+        self.render_template('dist/thanks.html')
 
 
 class ForumRedirectPage(base.BaseHandler):
