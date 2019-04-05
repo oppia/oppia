@@ -298,3 +298,19 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             search_services.update_exploration_status_in_search(self.EXP_ID)
 
         self.assertEqual(delete_docs_counter.times_called, 1)
+
+    def test_clear_exploration_search_index(self):
+        exp_services.load_demo('0')
+        result = search_services.search_explorations('Welcome', 2)[0]
+        self.assertEqual(result, ['0'])
+        search_services.clear_exploration_search_index()
+        result = search_services.search_explorations('Welcome', 2)[0]
+        self.assertEqual(result, [])
+
+    def test_clear_collection_search_index(self):
+        collection_services.load_demo('0')
+        result = search_services.search_collections('Welcome', 2)[0]
+        self.assertEqual(result, ['0'])
+        search_services.clear_collection_search_index()
+        result = search_services.search_collections('Welcome', 2)[0]
+        self.assertEqual(result, [])
