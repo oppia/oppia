@@ -45,10 +45,10 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            self.render_template('pages/splash/splash.html')
+            self.render_template('dist/splash.html')
         else:
             try:
-                self.render_template('pages/splash/splash_%s.html' % c_value)
+                self.render_template('dist/splash_%s.html' % c_value)
             except Exception:
                 # Old c values may have been deprecated, in which case we
                 # revert to the default splash page URL. When redirecting,

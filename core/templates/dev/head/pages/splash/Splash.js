@@ -16,6 +16,10 @@
  * @fileoverview Data and controllers for the Oppia splash page.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+require('services/SiteAnalyticsService.js');
+require('services/UserService.js');
+
 oppia.controller('Splash', [
   '$rootScope', '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'UserService',

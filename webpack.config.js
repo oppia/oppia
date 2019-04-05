@@ -30,6 +30,7 @@ module.exports = {
     donate: './core/templates/dev/head/pages/donate/Donate.js',
     error: './core/templates/dev/head/pages/error/Error.js',
     landing: './core/templates/dev/head/pages/landing/TopicLandingPage.js',
+    splash: './core/templates/dev/head/pages/splash/Splash.js',
     stewards: './core/templates/dev/head/pages/landing/stewards/Stewards.js',
     thanks: './core/templates/dev/head/pages/thanks/Thanks.js',
   },
@@ -64,16 +65,100 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['stewards'],
-      filename: 'landing_page_stewards.html',
-      template: 'core/templates/dev/head/pages/landing/stewards/landing_page_stewards.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-  new HtmlWebpackPlugin({
       chunks: ['landing'],
       filename: 'topic_landing_page.html',
       template: 'core/templates/dev/head/pages/landing/topic_landing_page.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash.html',
+      template: 'core/templates/dev/head/pages/splash/splash.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_ah0.html',
+      template: 'core/templates/dev/head/pages/splash/splash_ah0.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_ah1.html',
+      template: 'core/templates/dev/head/pages/splash/splash_ah1.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_ah2.html',
+      template: 'core/templates/dev/head/pages/splash/splash_ah2.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_ai0.html',
+      template: 'core/templates/dev/head/pages/splash/splash_ai0.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_ai1.html',
+      template: 'core/templates/dev/head/pages/splash/splash_ai1.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_ai2.html',
+      template: 'core/templates/dev/head/pages/splash/splash_ai2.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_ai3.html',
+      template: 'core/templates/dev/head/pages/splash/splash_ai3.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_at0.html',
+      template: 'core/templates/dev/head/pages/splash/splash_at0.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_at1.html',
+      template: 'core/templates/dev/head/pages/splash/splash_at1.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_at2.html',
+      template: 'core/templates/dev/head/pages/splash/splash_at2.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_av0.html',
+      template: 'core/templates/dev/head/pages/splash/splash_av0.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['splash'],
+      filename: 'splash_av1.html',
+      template: 'core/templates/dev/head/pages/splash/splash_av1.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
