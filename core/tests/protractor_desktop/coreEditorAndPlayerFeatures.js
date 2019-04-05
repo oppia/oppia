@@ -243,7 +243,7 @@ describe('Core exploration functionality', function() {
     users.logout();
   });
 
-  it('should be able to edit title', function() {
+  fit('should be able to edit title', function() {
     users.createUser('user6@stateEditor.com', 'user6StateEditor');
     users.login('user6@stateEditor.com');
 
@@ -258,8 +258,8 @@ describe('Core exploration functionality', function() {
   });
 
   it('should be able to edit goal', function() {
-    users.createUser('user6@stateEditor.com', 'user6StateEditor');
-    users.login('user6@stateEditor.com');
+    users.createUser('user7@stateEditor.com', 'user7StateEditor');
+    users.login('user7@stateEditor.com');
 
     workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
@@ -272,8 +272,8 @@ describe('Core exploration functionality', function() {
   });
 
   it('should be able to select category from the dropdown menu', function() {
-    users.createUser('user7@stateEditor.com', 'user7StateEditor');
-    users.login('user7@stateEditor.com');
+    users.createUser('user8@stateEditor.com', 'user8StateEditor');
+    users.login('user8@stateEditor.com');
 
     workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
@@ -286,8 +286,8 @@ describe('Core exploration functionality', function() {
   });
 
   it('should be able to create new category which is not in the dropdown menu', function() {
-    users.createUser('user8@stateEditor.com', 'user8StateEditor');
-    users.login('user8@stateEditor.com');
+    users.createUser('user9@stateEditor.com', 'user9StateEditor');
+    users.login('user9@stateEditor.com');
 
     workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
@@ -300,8 +300,8 @@ describe('Core exploration functionality', function() {
   });
 
   it('should be able to select language from the dropdown menu', function() {
-    users.createUser('user9@stateEditor.com', 'user9StateEditor');
-    users.login('user9@stateEditor.com');
+    users.createUser('user10@stateEditor.com', 'user10StateEditor');
+    users.login('user10@stateEditor.com');
 
     workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
@@ -314,8 +314,8 @@ describe('Core exploration functionality', function() {
   });
 
   it('should change the first card of the exploration', function() {
-    users.createUser('user10@stateEditor.com', 'user10StateEditor');
-    users.login('user10@stateEditor.com');
+    users.createUser('user11@stateEditor.com', 'user11StateEditor');
+    users.login('user11@stateEditor.com');
     workflow.createExploration();
 
     explorationEditorMainTab.setStateName('card 1');
