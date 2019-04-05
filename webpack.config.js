@@ -29,9 +29,11 @@ module.exports = {
     about: './core/templates/dev/head/pages/about/About.js',
     donate: './core/templates/dev/head/pages/donate/Donate.js',
     error: './core/templates/dev/head/pages/error/Error.js',
+    get_started: './core/templates/dev/head/pages/get_started/GetStarted.js',
     landing: './core/templates/dev/head/pages/landing/TopicLandingPage.js',
     splash: './core/templates/dev/head/pages/splash/Splash.js',
     stewards: './core/templates/dev/head/pages/landing/stewards/Stewards.js',
+    teach: './core/templates/dev/head/pages/teach/Teach.js',
     thanks: './core/templates/dev/head/pages/thanks/Thanks.js',
   },
   plugins: [
@@ -61,6 +63,13 @@ module.exports = {
       chunks: ['error'],
       filename: 'error.html',
       template: 'core/templates/dev/head/pages/error/error.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['get_started'],
+      filename: 'get_started.html',
+      template: 'core/templates/dev/head/pages/get_started/get_started.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -166,6 +175,13 @@ module.exports = {
       chunks: ['stewards'],
       filename: 'landing_page_stewards.html',
       template: 'core/templates/dev/head/pages/landing/stewards/landing_page_stewards.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['teach'],
+      filename: 'teach.html',
+      template: 'core/templates/dev/head/pages/teach/teach.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
