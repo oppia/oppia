@@ -1068,9 +1068,9 @@ class LintChecksManager(object):
             process.daemon = False
             process.start()
 
-        # file_groups_to_lint = [
-        #     html_files_to_lint_for_css, css_files_to_lint,
-        #     js_files_to_lint, py_files_to_lint]
+        file_groups_to_lint = [
+            html_files_to_lint_for_css, css_files_to_lint,
+            js_files_to_lint, py_files_to_lint]
         # number_of_files_to_lint = sum(
         #     len(file_group) for file_group in file_groups_to_lint)
 
