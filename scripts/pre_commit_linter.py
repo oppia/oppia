@@ -1068,25 +1068,8 @@ class LintChecksManager(object):
             process.daemon = False
             process.start()
 
-        file_groups_to_lint = [
-            html_files_to_lint_for_css, css_files_to_lint,
-            js_files_to_lint, py_files_to_lint]
-        # number_of_files_to_lint = sum(
-        #     len(file_group) for file_group in file_groups_to_lint)
-
-        # timeout_multiplier = 2000.
-        for _, process in zip(file_groups_to_lint, linting_processes):
-            # try..except block is needed to catch ZeroDivisionError
-            # when there are no CSS, HTML, JavaScript and Python files to lint.
-            try:
-                # Require timeout parameter to prevent against endless
-                # waiting for the linting function to return.
-                # process.join(timeout=(
-                #     timeout_multiplier * (
-                #         len(file_group) / number_of_files_to_lint)))
-                process.join()
-            except ZeroDivisionError:
-                break
+        for processin linting_processes:
+            process.join()
 
         js_messages = []
         while not js_stdout.empty():
