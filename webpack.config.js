@@ -27,6 +27,7 @@ module.exports = {
   entries: {
     app: './core/templates/dev/head/App.js',
     about: './core/templates/dev/head/pages/about/About.js',
+    contact: './core/templates/dev/head/pages/contact/Contact.js',
     donate: './core/templates/dev/head/pages/donate/Donate.js',
     error: './core/templates/dev/head/pages/error/Error.js',
     get_started: './core/templates/dev/head/pages/get_started/GetStarted.js',
@@ -49,6 +50,13 @@ module.exports = {
       chunks: ['about'],
       filename: 'about.html',
       template: 'core/templates/dev/head/pages/about/about.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['contact'],
+      filename: 'contact.html',
+      template: 'core/templates/dev/head/pages/contact/contact.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
