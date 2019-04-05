@@ -1068,7 +1068,7 @@ class LintChecksManager(object):
             process.daemon = False
             process.start()
 
-        for processin linting_processes:
+        for process in linting_processes:
             process.join()
 
         js_messages = []
