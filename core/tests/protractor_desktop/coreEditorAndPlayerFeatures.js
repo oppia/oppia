@@ -243,7 +243,7 @@ describe('Core exploration functionality', function() {
     users.logout();
   });
 
-  fit('should be able to edit title', function() {
+  it('should be able to edit title', function() {
     users.createUser('user6@stateEditor.com', 'user6StateEditor');
     users.login('user6@stateEditor.com');
 
