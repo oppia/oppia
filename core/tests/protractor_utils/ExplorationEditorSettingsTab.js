@@ -28,6 +28,8 @@ var ExplorationEditorSettingsTab = function() {
     by.css('.protractor-test-exploration-edit-param-changes'));
   var explorationCategoryInput = element(
     by.css('.protractor-test-exploration-category-input'));
+  var explorationLanguageInput = element(
+    by.css('.protractor-test-exploration-language-select'));
   var explorationObjectiveInput = element(
     by.css('.protractor-test-exploration-objective-input'));
   var explorationSummaryTile = element(
@@ -142,6 +144,26 @@ var ExplorationEditorSettingsTab = function() {
   this.setTitle = function(title) {
     explorationTitleInput.clear();
     explorationTitleInput.sendKeys(title);
+  };
+
+  this.expectCategoryToBe = function(category) {
+    expect(explorationCategoryInput.$('option:checked').getText()).toEqual(category);
+  };
+
+  this.expectFirstStateToBe = function(firstState) {
+    expect(initialStateSelect.$('option:checked').getText()).toEqual(firstState);
+  };
+
+  this.expectLanguageToBe = function(language) {
+    expect(explorationLanguageInput.$('option:checked').getText()).toEqual(language);
+  };
+
+  this.expectObjectiveToBe = function(objective) {
+    expect(explorationObjectiveInput.getAttribute('value')).toEqual(objective);
+  };
+
+  this.expectTitleToBe = function(title) {
+    expect(explorationTitleInput.getAttribute('value')).toEqual(title);
   };
 };
 

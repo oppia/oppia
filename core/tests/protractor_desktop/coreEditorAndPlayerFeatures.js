@@ -243,6 +243,95 @@ describe('Core exploration functionality', function() {
     users.logout();
   });
 
+  it('should be able to edit title', function() {
+    users.createUser('user6@stateEditor.com', 'user6StateEditor');
+    users.login('user6@stateEditor.com');
+
+    workflow.createExploration();
+    explorationEditorPage.navigateToSettingsTab();
+    
+    explorationEditorSettingsTab.expectTitleToBe('');
+    explorationEditorSettingsTab.setTitle('title1');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectTitleToBe('title1');
+  });
+
+  it('should be able to edit goal', function() {
+    users.createUser('user6@stateEditor.com', 'user6StateEditor');
+    users.login('user6@stateEditor.com');
+
+    workflow.createExploration();
+    explorationEditorPage.navigateToSettingsTab();
+
+    explorationEditorSettingsTab.expectObjectiveToBe('');
+    explorationEditorSettingsTab.setObjective('It is just a test.');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectObjectiveToBe('It is just a test.');
+  });
+
+  it('should be able to select category from the dropdown menu', function() {
+    users.createUser('user7@stateEditor.com', 'user7StateEditor');
+    users.login('user7@stateEditor.com');
+
+    workflow.createExploration();
+    explorationEditorPage.navigateToSettingsTab();
+
+    explorationEditorSettingsTab.expectCategoryToBe('');
+    explorationEditorSettingsTab.setCategory('Biology');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectCategoryToBe('Biology');
+  });
+
+  it('should be able to create new category which is not in the dropdown menu', function() {
+    users.createUser('user8@stateEditor.com', 'user8StateEditor');
+    users.login('user8@stateEditor.com');
+
+    workflow.createExploration();
+    explorationEditorPage.navigateToSettingsTab();
+
+    explorationEditorSettingsTab.expectCategoryToBe('');
+    explorationEditorSettingsTab.setCategory('New');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectCategoryToBe('New');
+  });
+
+  it('should be able to select language from the dropdown menu', function() {
+    users.createUser('user9@stateEditor.com', 'user9StateEditor');
+    users.login('user9@stateEditor.com');
+
+    workflow.createExploration();
+    explorationEditorPage.navigateToSettingsTab();
+
+    explorationEditorSettingsTab.expectLanguageToBe('English');
+    explorationEditorSettingsTab.setLanguage('italiano (Italian)');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectLanguageToBe('italiano (Italian)');
+  });
+
+  it('should change the first card of the exploration', function() {
+    users.createUser('user10@stateEditor.com', 'user10StateEditor');
+    users.login('user10@stateEditor.com');
+    workflow.createExploration();
+
+    explorationEditorMainTab.setStateName('card 1');
+    explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
+    explorationEditorMainTab.setInteraction('Continue');
+    explorationEditorMainTab.getResponseEditor('default').setDestination(
+      'card 2', true, null);
+    
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectFirstStateToBe('card 1');
+    explorationEditorSettingsTab.setFirstState('card 2');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectFirstStateToBe('card 2');
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });
