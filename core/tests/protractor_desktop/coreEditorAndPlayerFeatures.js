@@ -249,7 +249,7 @@ describe('Core exploration functionality', function() {
 
     workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
-    
+
     explorationEditorSettingsTab.expectTitleToBe('');
     explorationEditorSettingsTab.setTitle('title1');
     explorationEditorPage.navigateToMainTab();
@@ -291,7 +291,8 @@ describe('Core exploration functionality', function() {
     users.logout();
   });
 
-  it('should be able to create new category which is not in the dropdown menu', function() {
+  it('should be able to create new category which is not' +
+  ' in the dropdown menu', function() {
     users.createUser('user9@stateEditor.com', 'user9StateEditor');
     users.login('user9@stateEditor.com');
 
@@ -333,7 +334,7 @@ describe('Core exploration functionality', function() {
     explorationEditorMainTab.setInteraction('Continue');
     explorationEditorMainTab.getResponseEditor('default').setDestination(
       'card 2', true, null);
-    
+
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectFirstStateToBe('card 1');
     explorationEditorSettingsTab.setFirstState('card 2');
