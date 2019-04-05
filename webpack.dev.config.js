@@ -20,12 +20,8 @@ module.exports = {
   mode: 'development',
   resolve: {
     modules: [path.resolve(__dirname, 'core/templates/dev/head')],
-  },  
-  entry: {
-    app: './core/templates/dev/head/app.js',
-    about: './core/templates/dev/head/pages/about/About.js',
-    donate: './core/templates/dev/head/pages/donate/Donate.js'
   },
+  entry: commonWebpackConfig.entries,
   plugins: commonWebpackConfig.plugins,
   output: {
     filename: '[name].bundle.js',

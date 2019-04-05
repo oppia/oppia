@@ -68,7 +68,7 @@ install_node_module webpack 4.29.6
 install_node_module webpack-cli
 install_node_module clean-webpack-plugin
 install_node_module html-webpack-plugin 4.0.0-beta.5
-install_node_module karma-webpack
+# install_node_module karma-webpack
 install_node_module enhanced-resolve
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
@@ -150,7 +150,7 @@ echo Checking if pylint is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/pylint-1.9.3" ]; then
   echo Installing Pylint
 
-  pip_install pylint==1.9.3 --target="$TOOLS_DIR/pylint-1.9.3"
+  pip_install pylint==1.9.3 --target="$TOOLS_DIR/pylint-1.9.3" --user --prefix= --system
   # Add __init__.py file so that pylint dependency backports are resolved
   # correctly.
   touch $TOOLS_DIR/pylint-1.9.3/backports/__init__.py
@@ -210,21 +210,21 @@ echo Checking if browsermob-proxy is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
   echo Installing browsermob-proxy
 
-  pip_install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+  pip_install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1" --user --prefix= --system
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   echo Installing selenium
 
-  pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
+  pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2" --user --prefix= --system
 fi
 
 echo Checking if PIL is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
   echo Installing PIL
 
-  pip_install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
+  pip_install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7" --user --prefix= --system
 
   if [[ $? != 0 && ${OS} == "Darwin" ]]; then
     echo "  PIL install failed. See troubleshooting instructions at:"
@@ -236,7 +236,7 @@ echo Checking if PyGithub is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/PyGithub-1.43.5" ]; then
   echo Installing PyGithub
 
-  pip install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5"
+  pip install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5" --user --prefix= --system
 fi
 
 # install pre-push script

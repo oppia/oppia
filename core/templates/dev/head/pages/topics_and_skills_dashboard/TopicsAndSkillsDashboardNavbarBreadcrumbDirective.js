@@ -15,6 +15,9 @@
 /**
  * @fileoverview Controller for the navbar breadcrumb of the collection editor.
  */
+
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.directive('topicsAndSkillsDashboardNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

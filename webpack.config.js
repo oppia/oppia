@@ -23,8 +23,14 @@ var htmlMinifyConfig = {
 };
 
 module.exports = {
+  entries: {
+    app: './core/templates/dev/head/App.js',
+    about: './core/templates/dev/head/pages/about/About.js',
+    donate: './core/templates/dev/head/pages/donate/Donate.js',
+    error: './core/templates/dev/head/pages/error/Error.js'
+  },
   plugins: [
-    new CleanWebpackPlugin(['core/templates/dev/head/dist']),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       chunks: ['app'],
       filename: 'base.html',
@@ -45,6 +51,13 @@ module.exports = {
       template: 'core/templates/dev/head/pages/donate/donate.html',
       minify: htmlMinifyConfig,
       inject: false
-    })
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['error'],
+      filename: 'error.html',
+      template: 'core/templates/dev/head/pages/error/error.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
   ]
 };

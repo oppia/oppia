@@ -15,6 +15,10 @@
 /**
  * @fileoverview Directive for the stories list.
  */
+
+require('domain/utilities/UrlInterpolationService.js');
+require('services/contextual/WindowDimensionsService.js');
+
 oppia.directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
