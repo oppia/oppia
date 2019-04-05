@@ -147,23 +147,28 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.expectCategoryToBe = function(category) {
-    expect(explorationCategoryInput.$('option:checked').getText()).toEqual(category);
+    expect(explorationCategoryInput.$('option:checked').getText()).
+      toEqual(category);
   };
 
   this.expectFirstStateToBe = function(firstState) {
-    expect(initialStateSelect.$('option:checked').getText()).toEqual(firstState);
+    expect(initialStateSelect.$('option:checked').getText()).
+      toEqual(firstState);
   };
 
   this.expectLanguageToBe = function(language) {
-    expect(explorationLanguageInput.$('option:checked').getText()).toEqual(language);
+    expect(explorationLanguageInput.$('option:checked').getText()).
+      toEqual(language);
   };
 
   this.expectObjectiveToBe = function(objective) {
-    expect(explorationObjectiveInput.getAttribute('value')).toEqual(objective);
+    expect(explorationObjectiveInput.getAttribute('value')).
+      toEqual(objective);
   };
 
   this.expectTitleToBe = function(title) {
-    expect(explorationTitleInput.getAttribute('value')).toEqual(title);
+    expect(explorationTitleInput.getAttribute('value')).
+      toEqual(title);
   };
 };
 
