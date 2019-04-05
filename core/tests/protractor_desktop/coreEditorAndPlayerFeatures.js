@@ -255,6 +255,8 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectTitleToBe('title1');
+
+    users.logout();
   });
 
   it('should be able to edit goal', function() {
@@ -269,6 +271,8 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectObjectiveToBe('It is just a test.');
+
+    users.logout();
   });
 
   it('should be able to select category from the dropdown menu', function() {
@@ -283,6 +287,8 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectCategoryToBe('Biology');
+
+    users.logout();
   });
 
   it('should be able to create new category which is not in the dropdown menu', function() {
@@ -297,6 +303,8 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectCategoryToBe('New');
+
+    users.logout();
   });
 
   it('should be able to select language from the dropdown menu', function() {
@@ -311,6 +319,8 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectLanguageToBe('italiano (Italian)');
+
+    users.logout();
   });
 
   it('should change the first card of the exploration', function() {
@@ -330,6 +340,8 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectFirstStateToBe('card 2');
+
+    users.logout();
   });
 
   afterEach(function() {
