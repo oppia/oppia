@@ -23,6 +23,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
@@ -67,6 +68,59 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.user_b = user_services.UserActionsInfo(self.user_id_b)
         self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
 
+    def test_migrate_suptopics_to_latest_schema(self):
+        versioned_subtopics = {
+            'schema_version': 1,
+            'subtopics': self.VERSION_1_SUBTOPIC_DICT}
+
+        topic_services._migrate_subtopics_to_latest_schema(versioned_subtopics)
+
+    def test_migrate_suptopics_to_latest_schema_with_unsuppported_schema(self):
+        versioned_subtopics = {
+            'schema_version': 0,
+            'subtopics': self.VERSION_1_SUBTOPIC_DICT}
+
+        with self.assertRaisesRegexp(Exception,
+            'Sorry, we can only process v1-v%d subtopic '
+            'schemas at present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+            topic_services._migrate_subtopics_to_latest_schema(
+                versioned_subtopics)
+
+    def test_get_topic_memcache_key_with_version(self):
+        topic_memcache_key = topic_services._get_topic_memcache_key(
+            self.topic.id, self.topic.version)
+
+        self.assertEqual(topic_memcache_key,
+            'topic-version:%s:%s' % (self.TOPIC_ID, self.topic.version))
+
+    def test_save_new_topic_with_existing_topic(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Topic with name \'Name\' already exists'):
+            self.save_new_topic(
+                self.TOPIC_ID, self.user_id, 'Name', 'Description',
+                [], [], [], [], 1)
+
+    def test_save_topic_with_invalid_change_list(self):
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Unexpected error: received an invalid change list when'
+            ' trying to save topic %s: %s' % (self.TOPIC_ID, None)):
+            topic_services._save_topic('committer_id', topic,
+                'commit_message', None)
+
+    def test_check_can_edit_topic_with_no_topic_rights(self):
+        user_can_edit_topic = topic_services.check_can_edit_topic(
+            self.user_a, None)
+
+        self.assertFalse(user_can_edit_topic)
+
+    def test_check_can_edit_subtopic_page(self):
+        user_can_edit_subtopic = topic_services.check_can_edit_subtopic_page(
+            self.user_a)
+
+        self.assertTrue(user_can_edit_subtopic)
+
     def test_compute_summary(self):
         topic_summary = topic_services.compute_summary_of_topic(self.topic)
 
@@ -100,6 +154,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic = topic_services.get_topic_from_model(topic_model)
 
         self.assertEqual(topic.to_dict(), self.topic.to_dict())
+
+    def test_get_topic_from_model_with_unsupported_subtopic_schema(self):
+        topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
+        topic_model.subtopic_schema_version = 0
+
+        with self.assertRaisesRegexp(Exception,
+            'Sorry, we can only process v1-v%d subtopic '
+            'schemas at present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+            topic = topic_services.get_topic_from_model(topic_model)
 
     def test_get_topic_summary_from_model(self):
         topic_summary_model = topic_models.TopicSummaryModel.get(self.TOPIC_ID)
@@ -216,6 +279,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id_admin, self.TOPIC_ID, changelist,
                 'Added subtopic.')
+
+        # Test exception when user does not have enough rights to edit a topic.
+        with self.assertRaisesRegexp(
+            Exception, 'Expected a commit message, received none.'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin, self.TOPIC_ID, changelist, None)
 
         # Test whether the subtopic page was created for the above failed
         # attempt.
