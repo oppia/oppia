@@ -1081,9 +1081,10 @@ class LintChecksManager(object):
             try:
                 # Require timeout parameter to prevent against endless
                 # waiting for the linting function to return.
-                process.join(timeout=(
-                    timeout_multiplier * (
-                        len(file_group) / number_of_files_to_lint)))
+                # process.join(timeout=(
+                #     timeout_multiplier * (
+                #         len(file_group) / number_of_files_to_lint)))
+                process.join()
             except ZeroDivisionError:
                 break
 
