@@ -103,7 +103,7 @@ jobs:
             sudo sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
             rm google-chrome.deb
             bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env
-            # bash scripts/run_e2e_tests.sh --suite="additionalEditorAndPlayerFeatures" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="additionalEditorAndPlayerFeatures" --prod_env
             bash scripts/run_e2e_tests.sh --suite="collections" --prod_env
             bash scripts/run_e2e_tests.sh --suite="coreEditorAndPlayerFeatures" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env
