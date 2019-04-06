@@ -27,6 +27,10 @@ oppia.factory('WrittenTranslationObjectFactory', [function() {
     return this.html;
   };
 
+  WrittenTranslation.prototype.setHtml = function(html) {
+    this.html = html;
+  };
+
   WrittenTranslation.prototype.markAsNeedingUpdate = function() {
     this.needsUpdate = true;
   };

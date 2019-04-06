@@ -273,6 +273,9 @@ oppia.directive('audioTranslationBar', [
           $scope.$on('activeContentIdChanged', function() {
             $scope.initAudioBar();
           });
+          $scope.$on('activeLanguageChanged', function() {
+            $scope.initAudioBar();
+          });
 
           $scope.$on('showTranslationTabBusyModal', function() {
             $scope.openTranslationTabBusyModal();
