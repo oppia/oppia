@@ -268,6 +268,14 @@ CODEOWNER_DIR_PATHS = [
 
 CODEOWNER_FILE_PATHS = ['./app.yaml', './manifest.json']
 
+CODEOWNER_IMPORTANT_PATHS = [
+    '/manifest.json',
+    '/scripts/install_third_party.sh',
+    '/core/storage/',
+    '/core/domain/html*.py',
+    '/export/',
+    '/.github/CODEOWNERS']
+
 if not os.getcwd().endswith('oppia'):
     print ''
     print 'ERROR    Please run this script from the oppia root directory.'
@@ -2066,6 +2074,7 @@ class LintChecksManager(object):
             codeowner_filepath = '.github/CODEOWNERS'
             failed = False
             summary_messages = []
+            path_lines = []
             # Checks whether every pattern in the CODEOWNERS file matches at
             # least one dir/file.
             path_patterns = []
@@ -2080,6 +2089,9 @@ class LintChecksManager(object):
                     else:
                         # Extract the file pattern from the line.
                         line_in_concern = line.split('@')[0].strip()
+                        # This is being populated for the important rules
+                        # check.
+                        path_lines.append(line_in_concern)
                         # Adjustments to the dir paths in CODEOWNERS syntax
                         # for glob-style patterns to match correctly.
                         if line_in_concern.endswith('/'):
@@ -2177,6 +2189,25 @@ class LintChecksManager(object):
                         if not match and self.verbose_mode_enabled:
                             print ('WARNING! %s/%s is not covered under '
                                    'CODEOWNERS' % (root, file_name))
+
+            # Checks that the most important rules/patterns are at the bottom
+            # of the CODEOWNERS file.
+            important_path_match_bool_list = ([
+                imp_path in path_lines[-1 * len(
+                    CODEOWNER_IMPORTANT_PATHS):]
+                for imp_path in CODEOWNER_IMPORTANT_PATHS])
+            if not all(important_path_match_bool_list):
+                for index, bool_value in enumerate(
+                        important_path_match_bool_list):
+                    if not bool_value:
+                        # Adding a '/' before the path since the CODEOWNERS
+                        # syntax has files/folders starting from a '/'.
+                        print ('%s --> Please ensure that pattern \'%s\' is'
+                               ' the end since it is an important rule.'
+                               % (
+                                   codeowner_filepath,
+                                   CODEOWNER_IMPORTANT_PATHS[index]))
+                failed = True
 
             if failed:
                 summary_message = '%s   CODEOWNERS file check failed' % (
