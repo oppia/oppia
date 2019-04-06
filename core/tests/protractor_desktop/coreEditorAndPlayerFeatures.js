@@ -270,10 +270,10 @@ describe('Core exploration functionality', function() {
 
     // Color grey when there is no warning, red when there is a warning
     explorationEditorSettingsTab.expectWarningsColorToBe(
-      "rgba(115, 115, 115, 1)");
+      'rgba(115, 115, 115, 1)');
     explorationEditorSettingsTab.setObjective('short goal');
     explorationEditorSettingsTab.expectWarningsColorToBe(
-      "rgba(169, 68, 66, 1)");
+      'rgba(169, 68, 66, 1)');
   });
 
   it('should be able to select category from the dropdown menu', function() {
