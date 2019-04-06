@@ -18,6 +18,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.js');
+require('filters/NormalizeWhitespaceFilter.js');
 require('pages/exploration_editor/ExplorationStatesService.js');
 require('pages/exploration_editor/RouterService.js');
 require('pages/state_editor/StateEditorService.js');

@@ -17,6 +17,8 @@
  * the learner and editor views.
  */
 
+require('filters/CamelCaseToHyphensFilter.js');
+
 // A service that provides a number of utility functions useful to both the
 // editor and player.
 oppia.factory('ExplorationHtmlFormatterService', [

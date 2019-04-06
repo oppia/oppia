@@ -24,6 +24,7 @@ require('domain/question/QuestionObjectFactory.js');
 require('domain/skill/EditableSkillBackendApiService.js');
 require('domain/skill/MisconceptionObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
+require('filters/TruncateFilter.js');
 require('pages/topic_editor/TopicEditorStateService.js');
 require('pages/state_editor/StateEditorService.js');
 require('services/AlertsService.js');

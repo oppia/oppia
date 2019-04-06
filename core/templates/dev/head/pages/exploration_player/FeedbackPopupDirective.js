@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.js');
+require('filters/GetAbbreviatedTextFilter.js');
 require('pages/exploration_player/ExplorationEngineService.js');
 require('pages/exploration_player/PlayerPositionService.js');
 require('services/AlertsService.js');

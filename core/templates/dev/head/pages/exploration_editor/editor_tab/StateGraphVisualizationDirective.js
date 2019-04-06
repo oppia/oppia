@@ -18,6 +18,7 @@
 
 require('components/StateGraphLayoutService.js');
 require('domain/utilities/UrlInterpolationService.js');
+require('filters/TruncateFilter.js');
 require('pages/exploration_editor/ExplorationWarningsService.js');
 require('pages/exploration_editor/translation_tab/TranslationStatusService.js');
 

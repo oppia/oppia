@@ -19,6 +19,7 @@
 
 require('domain/exploration/SolutionObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
+require('filters/ConvertToPlainTextFilter.js');
 require('pages/exploration_editor/editor_tab/ResponsesService.js');
 require('pages/exploration_editor/editor_tab/SolutionValidityService.js');
 require('pages/exploration_editor/editor_tab/SolutionVerificationService.js');

@@ -20,6 +20,7 @@
 
 require('domain/state/StatesObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
+require('filters/NormalizeWhitespaceFilter.js');
 require('pages/exploration_editor/AngularNameService.js');
 require('pages/exploration_editor/ChangeListService.js');
 require('pages/exploration_editor/ExplorationInitStateNameService.js');

@@ -16,6 +16,13 @@
  * @fileoverview Data and controllers for the Oppia contributors' library page.
  */
 
+require('components/loading/LoadingDotsDirective.js');
+require('components/summary_tile/ExplorationSummaryTileDirective.js');
+require('components/summary_tile/CollectionSummaryTileDirective.js');
+require('pages/library/LibraryFooter.js');
+require('pages/library/SearchBarDirective.js');
+require('pages/library/SearchResultsDirective.js');
+
 require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.js');
 require('domain/learner_dashboard/LearnerDashboardIdsBackendApiService.js');
 require('domain/learner_dashboard/LearnerPlaylistService.js');

@@ -16,6 +16,8 @@
  * @fileoverview Directive for showing search results.
  */
 
+require('pages/library/ActivityTilesInfinityGridDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('services/SiteAnalyticsService.js');
 require('services/UserService.js');

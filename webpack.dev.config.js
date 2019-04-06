@@ -34,5 +34,9 @@ module.exports = {
       minSize: 1024 * 10,
       maxInitialRequests: 9,
     }
+  },
+  watchOptions: {
+    aggregateTimeout: 500,
+    poll: 1000
   }
 };

@@ -32,13 +32,13 @@ module.exports = {
     error: './core/templates/dev/head/pages/error/Error.js',
     get_started: './core/templates/dev/head/pages/get_started/GetStarted.js',
     landing: './core/templates/dev/head/pages/landing/TopicLandingPage.js',
+    library: './core/templates/dev/head/pages/library/Library.js',
     splash: './core/templates/dev/head/pages/splash/Splash.js',
     stewards: './core/templates/dev/head/pages/landing/stewards/Stewards.js',
     teach: './core/templates/dev/head/pages/teach/Teach.js',
     thanks: './core/templates/dev/head/pages/thanks/Thanks.js',
   },
   plugins: [
-    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       chunks: ['app'],
       filename: 'base.html',
@@ -85,6 +85,19 @@ module.exports = {
       chunks: ['landing'],
       filename: 'topic_landing_page.html',
       template: 'core/templates/dev/head/pages/landing/topic_landing_page.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['library'],
+      filename: 'library.html',
+      template: 'core/templates/dev/head/pages/library/library.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'privacy.html',
+      template: 'core/templates/dev/head/pages/privacy/privacy.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -190,6 +203,12 @@ module.exports = {
       chunks: ['teach'],
       filename: 'teach.html',
       template: 'core/templates/dev/head/pages/teach/teach.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'terms.html',
+      template: 'core/templates/dev/head/pages/terms/terms.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

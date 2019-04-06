@@ -16,6 +16,7 @@
  * @fileoverview Directive for the Search Bar.
  */
 
+require('domain/utilities/LanguageUtilService.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('services/ConstructTranslationIdsService.js');
 require('services/DebouncerService.js');

@@ -16,7 +16,11 @@
  * @fileoverview Directive containing the exploration material to be translated.
  */
 
-*require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('filters/ConvertToPlainTextFilter.js');
+require('filters/ParameterizeRuleDescriptionFilter.js');
+require('filters/TruncateFilter.js');
+require('filters/WrapTextWithEllipsisFilter.js');
 require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.js');
 require('pages/exploration_editor/ExplorationInitStateNameService.js');
 require('pages/exploration_editor/ExplorationStatesService.js');

@@ -17,6 +17,8 @@
  * footer.
  */
 
+require('components/profile_link/ProfileLinkImageDirective.js');
+
 require('components/RatingComputationService.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('services/ContextService.js');

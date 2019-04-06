@@ -20,6 +20,7 @@
 require('domain/exploration/ReadOnlyExplorationBackendApiService.js');
 require('domain/state/StatesObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
+require('filters/CamelCaseToHyphensFilter.js');
 require('pages/exploration_editor/ExplorationDataService.js');
 require('pages/exploration_editor/ExplorationStatesService.js');
 require('pages/exploration_editor/RouterService.js');

@@ -16,6 +16,7 @@
  * @fileoverview Service for interpolating expressions.
  */
 
+require('components/forms/ConvertHtmlToUnicodeFilter.js');
 require('expressions/ExpressionEvaluatorService.js');
 require('expressions/ExpressionParserService.js');
 require('expressions/ExpressionSyntaxTreeService.js');

@@ -17,6 +17,8 @@
  * warning messages if the validation fails.
  */
 
+require('filters/NormalizeWhitespaceFilter.js');
+
 oppia.factory('ValidatorsService', [
   '$filter', 'AlertsService', 'INVALID_NAME_CHARS',
   function($filter, AlertsService, INVALID_NAME_CHARS) {

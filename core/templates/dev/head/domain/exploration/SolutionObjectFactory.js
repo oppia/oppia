@@ -20,6 +20,7 @@
 require('domain/exploration/SubtitledHtmlObjectFactory.js');
 require('domain/objects/FractionObjectFactory.js');
 require('domain/objects/NumberWithUnitsObjectFactory.js');
+require('filters/ConvertToPlainTextFilter.js');
 require('services/ExplorationHtmlFormatterService.js');
 require('services/HtmlEscaperService.js');
 

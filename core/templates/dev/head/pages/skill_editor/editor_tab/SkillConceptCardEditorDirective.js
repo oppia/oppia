@@ -19,6 +19,7 @@
 require('domain/exploration/SubtitledHtmlObjectFactory.js');
 require('domain/skill/SkillUpdateService.js');
 require('domain/utilities/UrlInterpolationService.js');
+require('filters/FormatRtePreviewFilter.js');
 require('pages/skill_editor/SkillEditorStateService.js');
 require('services/GenerateContentIdService.js');
 

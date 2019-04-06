@@ -16,6 +16,7 @@
  * @fileoverview Directive for the audio translation bar.
  */
 
+require('filters/FormatTimerFilter.js');
 require('pages/exploration_editor/ExplorationStatesService.js');
 require('pages/exploration_editor/translation_tab/TranslationLanguageService.js');
 require('pages/exploration_editor/translation_tab/TranslationTabActiveContentIdService.js');

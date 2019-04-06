@@ -16,6 +16,11 @@
  * @fileoverview Component for an exploration summary tile.
  */
 
+require('components/summary_tile/CircularImageDirective.js');
+require('domain/learner_dashboard/LearnerDashboardIconsDirective.js');
+require('filters/TruncateAndCapitalizeFilter.js');
+require('filters/TruncateFilter.js');
+
 require('components/RatingComputationService.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('services/DateTimeFormatService.js');

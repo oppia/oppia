@@ -155,7 +155,7 @@ class TermsPage(base.BaseHandler):
             'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
         })
 
-        self.render_template('pages/terms/terms.html')
+        self.render_template('dist/terms.html')
 
 
 class PrivacyPage(base.BaseHandler):
@@ -164,7 +164,7 @@ class PrivacyPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/privacy/privacy.html')
+        self.render_template('dist/privacy.html')
 
 
 class AboutRedirectPage(base.BaseHandler):

@@ -16,6 +16,8 @@
  * @fileoverview Directive for applying validation.
  */
 
+require('filters/UnderscoresToCamelCaseFilter.js');
+
 /* eslint-disable angular/directive-restrict */
 oppia.directive('applyValidation', ['$filter', function($filter) {
   return {

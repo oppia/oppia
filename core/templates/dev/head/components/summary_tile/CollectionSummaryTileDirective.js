@@ -16,6 +16,9 @@
  * @fileoverview Summary tile for collections.
  */
 
+require('domain/learner_dashboard/LearnerDashboardIconsDirective.js');
+require('filters/TruncateAndCapitalizeFilter.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('services/DateTimeFormatService.js');
 require('services/UserService.js');
