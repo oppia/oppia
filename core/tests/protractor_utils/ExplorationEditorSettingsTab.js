@@ -32,6 +32,8 @@ var ExplorationEditorSettingsTab = function() {
     by.css('.protractor-test-exploration-language-select'));
   var explorationObjectiveInput = element(
     by.css('.protractor-test-exploration-objective-input'));
+  var explorationObjectiveWarning = element(
+    by.css('.protractor-test-exploration-objective-warning'));
   var explorationSummaryTile = element(
     by.css('.protractor-test-exploration-summary-tile'));
   var explorationTitleInput = element(
@@ -169,6 +171,11 @@ var ExplorationEditorSettingsTab = function() {
   this.expectTitleToBe = function(title) {
     expect(explorationTitleInput.getAttribute('value')).
       toEqual(title);
+  };
+
+  this.expectWarningsColorToBe = function(color) {
+    expect(explorationObjectiveWarning.getCssValue('color')).
+      toEqual(color);
   };
 };
 

@@ -69,8 +69,6 @@ describe('Core exploration functionality', function() {
     explorationPlayerPage.expectInteractionToMatch('Continue', 'click here');
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.expectExplorationToBeOver();
-
-    users.logout();
   });
 
   it('should create content and multiple choice interactions', function() {
@@ -104,7 +102,6 @@ describe('Core exploration functionality', function() {
       [forms.toRichText('option A'), forms.toRichText('option B')]);
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
     explorationPlayerPage.expectExplorationToBeOver();
-    users.logout();
   });
 
   it('should obey numeric interaction rules and display feedback', function() {
@@ -150,8 +147,6 @@ describe('Core exploration functionality', function() {
       });
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
-
-    users.logout();
   });
 
   it('should skip the customization modal for interactions having no ' +
@@ -169,8 +164,6 @@ describe('Core exploration functionality', function() {
     // The Continue input has customization options. Therefore the
     // customization modal does appear and so does the save interaction button.
     explorationEditorMainTab.setInteraction('Continue');
-
-    users.logout();
   });
 
   it('should open appropriate modal on re-clicking an interaction to ' +
@@ -203,8 +196,6 @@ describe('Core exploration functionality', function() {
       by.css('.protractor-test-save-interaction'));
     expect(saveInteractionBtn.isPresent()).toBe(true);
     saveInteractionBtn.click();
-
-    users.logout();
   });
 
   it('should correctly display contents, rule parameters, feedback' +
@@ -240,7 +231,6 @@ describe('Core exploration functionality', function() {
     explorationEditorMainTab.getResponseEditor(1).expectRuleToBe(
       'TextInput', 'FuzzyEquals', ['"sad"']);
     explorationEditorPage.saveChanges();
-    users.logout();
   });
 
   it('should be able to edit title', function() {
@@ -255,8 +245,6 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectTitleToBe('title1');
-
-    users.logout();
   });
 
   it('should be able to edit goal', function() {
@@ -271,13 +259,26 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectObjectiveToBe('It is just a test.');
+  });
 
-    users.logout();
+  it('should show warnings when the length of goal < 15', function() {
+    users.createUser('user8@stateEditor.com', 'user8StateEditor');
+    users.login('user8@stateEditor.com');
+
+    workflow.createExploration();
+    explorationEditorPage.navigateToSettingsTab();
+
+    // Color grey when there is no warning, red when there is a warning
+    explorationEditorSettingsTab.expectWarningsColorToBe(
+      "rgba(115, 115, 115, 1)");
+    explorationEditorSettingsTab.setObjective('short goal');
+    explorationEditorSettingsTab.expectWarningsColorToBe(
+      "rgba(169, 68, 66, 1)");
   });
 
   it('should be able to select category from the dropdown menu', function() {
-    users.createUser('user8@stateEditor.com', 'user8StateEditor');
-    users.login('user8@stateEditor.com');
+    users.createUser('user9@stateEditor.com', 'user9StateEditor');
+    users.login('user9@stateEditor.com');
 
     workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
@@ -287,14 +288,12 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectCategoryToBe('Biology');
-
-    users.logout();
   });
 
   it('should be able to create new category which is not' +
   ' in the dropdown menu', function() {
-    users.createUser('user9@stateEditor.com', 'user9StateEditor');
-    users.login('user9@stateEditor.com');
+    users.createUser('user10@stateEditor.com', 'user10StateEditor');
+    users.login('user10@stateEditor.com');
 
     workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
@@ -304,13 +303,11 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectCategoryToBe('New');
-
-    users.logout();
   });
 
   it('should be able to select language from the dropdown menu', function() {
-    users.createUser('user10@stateEditor.com', 'user10StateEditor');
-    users.login('user10@stateEditor.com');
+    users.createUser('user11@stateEditor.com', 'user11StateEditor');
+    users.login('user11@stateEditor.com');
 
     workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
@@ -320,13 +317,11 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectLanguageToBe('italiano (Italian)');
-
-    users.logout();
   });
 
   it('should change the first card of the exploration', function() {
-    users.createUser('user11@stateEditor.com', 'user11StateEditor');
-    users.login('user11@stateEditor.com');
+    users.createUser('user12@stateEditor.com', 'user12StateEditor');
+    users.login('user12@stateEditor.com');
     workflow.createExploration();
 
     explorationEditorMainTab.setStateName('card 1');
@@ -341,11 +336,10 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.expectFirstStateToBe('card 2');
-
-    users.logout();
   });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
+    users.logout();
   });
 });
