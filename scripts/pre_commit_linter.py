@@ -2200,8 +2200,6 @@ class LintChecksManager(object):
                 for index, bool_value in enumerate(
                         important_path_match_bool_list):
                     if not bool_value:
-                        # Adding a '/' before the path since the CODEOWNERS
-                        # syntax has files/folders starting from a '/'.
                         print ('%s --> Please ensure that pattern \'%s\' is'
                                ' the end since it is an important rule.'
                                % (
