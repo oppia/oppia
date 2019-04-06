@@ -15,21 +15,14 @@
 # limitations under the License.
 
 """One-off jobs for validating prod models."""
-import logging
-
 from core import jobs
 from core.platform import models
-
 
 (
     user_models, exp_models, collection_models,
     feedback_models) = models.Registry.import_models([
         models.NAMES.user, models.NAMES.exploration,
         models.NAMES.collection, models.NAMES.feedback])
-
-INVALID_USER_SUBSCRIPTION_MODEL = 'invalid_user_subscription_model'
-VALID_USER_SUBSCRIPTION_MODEL = 'valid_user_subscription_model'
-
 
 
 def has_model_for_id(model_class, model_id):
@@ -46,11 +39,10 @@ def has_model_for_id(model_class, model_id):
     return model is not None and model.deleted is False
 
 
-class ValidateUserSubscriptionsModel(object):
-    """Validate UserSubscriptionsModels."""
+class UserSubscriptionsModelValidator(object):
+    """Class for validating UserSubscriptionModels."""
 
     errors = []
-    checks_passed = 0
 
     @classmethod
     def validate(cls, item):
@@ -62,11 +54,14 @@ class ValidateUserSubscriptionsModel(object):
         Returns:
             string. Validation status.
         """
+        # For each key, checks the entries in that field of
+        # UserSubscriptionsModel should be valid non-deleted instances of the
+        # given model classes.
         external_ids_checks = {
             'activity_ids': exp_models.ExplorationModel,
             'collection_ids': collection_models.CollectionModel,
-            'general_feedback_thread_ids':
-            feedback_models.GeneralFeedbackThreadModel,
+            'general_feedback_thread_ids': (
+                feedback_models.GeneralFeedbackThreadModel),
             'creator_ids': user_models.UserSettingsModel,
         }
         if not has_model_for_id(user_models.UserSettingsModel, item.id):
@@ -74,10 +69,10 @@ class ValidateUserSubscriptionsModel(object):
                 'id %s is not valid %s' % (
                     item.id,
                     user_models.UserSettingsModel.__name__))
-        cls.check_external_ids(item, external_ids_checks=external_ids_checks)
+        cls._check_external_ids(item, external_ids_checks=external_ids_checks)
 
     @classmethod
-    def check_external_ids(cls, item, **kwargs):
+    def _check_external_ids(cls, item, **kwargs):
         """Check whether the external id properties on the model correspond
         to valid instances.
         """
@@ -85,21 +80,15 @@ class ValidateUserSubscriptionsModel(object):
         for prop_name, model_class in external_ids_checks.iteritems():
             model_ids = getattr(item, prop_name)
             if not model_ids:
-                if model_ids is None:
-                    logging.warning(
-                        '%s is not a valid property on %s' %
-                        (prop_name, item.__class__.__name__))
                 continue
-
-            if isinstance(model_ids, str):
-                model_ids = [model_ids]
             for model_id in model_ids:
                 if not has_model_for_id(model_class, model_id):
                     cls.errors.append(
-                        'There\'s no corresponding model %s for id %s' %
-                        (str(model_class.__name__), model_id))
-                else:
-                    cls.checks_passed += 1
+                        'UserSubscriptionsModel id %s: based on field %s having'
+                        ' value %s, expect model %s with id %s but it doesn\'t'
+                        ' exist' % (
+                            item.id, prop_name, model_id,
+                            str(model_class.__name__), model_id))
 
 
 class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -110,24 +99,22 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [user_models.UserSubscriptionsModel]
 
     @staticmethod
-    def map(item):
-        if not item.deleted:
-            if isinstance(item, user_models.UserSubscriptionsModel):
-                validate_user_subs_model = ValidateUserSubscriptionsModel()
-                validate_user_subs_model.validate(item)
+    def map(model_instance):
+        if not model_instance.deleted:
+            if isinstance(model_instance, user_models.UserSubscriptionsModel):
+                validate_user_subs_model = UserSubscriptionsModelValidator()
+                validate_user_subs_model.validate(model_instance)
                 if len(validate_user_subs_model.errors) > 0:
                     yield (
-                        INVALID_USER_SUBSCRIPTION_MODEL,
+                        'user_subscription_model checks failed',
                         validate_user_subs_model.errors)
                 else:
                     yield (
-                        VALID_USER_SUBSCRIPTION_MODEL,
-                        'checks passed: %d' %
-                        validate_user_subs_model.checks_passed)
+                        'user_subscription_model checks passed', 1)
 
     @staticmethod
     def reduce(key, values):
-        if key == VALID_USER_SUBSCRIPTION_MODEL:
-            yield (key, values)
+        if key == 'user_subscription_model checks passed':
+            yield (key, len(values))
         else:
             yield (key, values)
