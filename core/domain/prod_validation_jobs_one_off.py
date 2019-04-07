@@ -23,6 +23,7 @@ from core.platform import models
     feedback_models) = models.Registry.import_models([
         models.NAMES.user, models.NAMES.exploration,
         models.NAMES.collection, models.NAMES.feedback])
+datastore_services = models.Registry.import_datastore_services()
 
 
 def has_model_for_id(model_class, model_id):
@@ -43,6 +44,7 @@ class UserSubscriptionsModelValidator(object):
     """Class for validating UserSubscriptionModels."""
 
     errors = []
+    checks_passed = []
 
     @classmethod
     def validate(cls, item):
@@ -69,6 +71,8 @@ class UserSubscriptionsModelValidator(object):
                 'id %s is not valid %s' % (
                     item.id,
                     user_models.UserSettingsModel.__name__))
+        else:
+            cls.checks_passed.append(['id check passed'])
         cls._check_external_ids(item, external_ids_checks=external_ids_checks)
 
     @classmethod
@@ -76,19 +80,35 @@ class UserSubscriptionsModelValidator(object):
         """Check whether the external id properties on the model correspond
         to valid instances.
         """
+        external_ids_errors = []
         external_ids_checks = kwargs.get('external_ids_checks', {})
+        multiple_models_keys_to_fetch = {}
         for prop_name, model_class in external_ids_checks.iteritems():
             model_ids = getattr(item, prop_name)
-            if not model_ids:
-                continue
-            for model_id in model_ids:
-                if not has_model_for_id(model_class, model_id):
-                    cls.errors.append(
+            if model_ids:
+                multiple_models_keys_to_fetch[prop_name] = (
+                    model_class, model_ids)
+        multiple_models = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                multiple_models_keys_to_fetch.values()))
+
+        for prop_name, keys_to_fetch, model_class_models in zip(
+                multiple_models_keys_to_fetch.keys(),
+                multiple_models_keys_to_fetch.values(),
+                multiple_models):
+            model_class, model_ids = keys_to_fetch
+            for model_id, model in zip(model_ids, model_class_models):
+                if model is None or model.deleted:
+                    external_ids_errors.append(
                         'UserSubscriptionsModel id %s: based on field %s having'
                         ' value %s, expect model %s with id %s but it doesn\'t'
                         ' exist' % (
                             item.id, prop_name, model_id,
                             str(model_class.__name__), model_id))
+        if len(external_ids_errors) > 0:
+            cls.errors.extend(external_ids_errors)
+        else:
+            cls.checks_passed.append('external id check passed')
 
 
 class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -101,6 +121,9 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(model_instance):
         if not model_instance.deleted:
+            # Check if model_instance is a UserSubscriptionsModel here because
+            # we will add more model classes to iterate over in the future.
+            # TODO(sshou) remove this comment after we added other classes.
             if isinstance(model_instance, user_models.UserSubscriptionsModel):
                 validate_user_subs_model = UserSubscriptionsModelValidator()
                 validate_user_subs_model.validate(model_instance)
@@ -110,11 +133,9 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         validate_user_subs_model.errors)
                 else:
                     yield (
-                        'user_subscription_model checks passed', 1)
+                        'user_subscription_model checks passed',
+                        validate_user_subs_model.checks_passed)
 
     @staticmethod
     def reduce(key, values):
-        if key == 'user_subscription_model checks passed':
-            yield (key, len(values))
-        else:
-            yield (key, values)
+        yield (key, values)
