@@ -20,7 +20,7 @@
 
 
 # Audio and Translation team.
-/core/controllers/translator*.py @DubeySandeep
+/core/controllers/voice_artist*.py @DubeySandeep
 /core/templates/dev/head/pages/exploration_editor/translation_tab/ @DubeySandeep
 
 
