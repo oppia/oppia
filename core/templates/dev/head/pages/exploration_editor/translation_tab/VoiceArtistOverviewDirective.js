@@ -28,7 +28,7 @@ oppia.directive('voiceArtistOverview', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
-        'translator_overview_directive.html'),
+        'voice_artist_overview_directive.html'),
       controller: [
         '$scope', '$rootScope', '$window', 'SUPPORTED_AUDIO_LANGUAGES',
         'LanguageUtilService', 'TranslationLanguageService',
