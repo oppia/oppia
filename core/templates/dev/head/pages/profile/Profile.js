@@ -16,6 +16,21 @@
  * @fileoverview Data and controllers for the Oppia profile page.
  */
 
+require('components/RatingComputationService.js');
+require('filters/ConvertToPlainTextFilter.js');
+require('filters/SummarizeNonnegativeNumberFilter.js');
+require('filters/TruncateAndCapitalizeFilter.js');
+
+
+require('components/summary_tile/ExplorationSummaryTileDirective.js');
+require('components/background/BackgroundBannerDirective.js');
+require('filters/TruncateFilter.js');
+require('components/summary_tile/ExplorationSummaryTileDirective.js');
+
+require('domain/utilities/UrlInterpolationService.js');
+require('services/UserService.js');
+require('services/DateTimeFormatService.js');
+
 oppia.controller('Profile', [
   '$http', '$log', '$rootScope', '$scope', '$window', 'DateTimeFormatService',
   'UrlInterpolationService', 'UserService',

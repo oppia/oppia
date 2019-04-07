@@ -33,6 +33,8 @@ module.exports = {
     get_started: './core/templates/dev/head/pages/get_started/GetStarted.js',
     landing: './core/templates/dev/head/pages/landing/TopicLandingPage.js',
     library: './core/templates/dev/head/pages/library/Library.js',
+    profile: './core/templates/dev/head/pages/profile/Profile.js',
+    signup: './core/templates/dev/head/pages/signup/Signup.js',
     splash: './core/templates/dev/head/pages/splash/Splash.js',
     stewards: './core/templates/dev/head/pages/landing/stewards/Stewards.js',
     teach: './core/templates/dev/head/pages/teach/Teach.js',
@@ -98,6 +100,20 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'privacy.html',
       template: 'core/templates/dev/head/pages/privacy/privacy.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['profile'],
+      filename: 'profile.html',
+      template: 'core/templates/dev/head/pages/profile/profile.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['signup'],
+      filename: 'signup.html',
+      template: 'core/templates/dev/head/pages/signup/signup.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
