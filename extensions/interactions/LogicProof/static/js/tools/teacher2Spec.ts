@@ -21,7 +21,7 @@ describe('Build line templates', function() {
       dubiousFunction, ...input) {
     return function() {
       try {
-          dubiousFunction(...input);
+        dubiousFunction(...input);
       } catch (err) {
         throw new Error(logicProofShared.renderError(
           err, logicProofTeacher.TEACHER_ERROR_MESSAGES,

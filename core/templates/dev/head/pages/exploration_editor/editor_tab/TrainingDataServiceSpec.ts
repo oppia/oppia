@@ -21,7 +21,8 @@ describe('TrainingDataService', function() {
   var scope, siis, ecs, cls, rs, tds, ess, IS, oof;
   var mockExplorationData;
 
-  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(
+    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(function() {
     angular.mock.module('oppia');

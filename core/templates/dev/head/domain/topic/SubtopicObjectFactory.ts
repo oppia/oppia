@@ -106,8 +106,9 @@ oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
 
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
-    Subtopic['create'] = function(subtopicBackendDict, skillIdToDescriptionMap) {
+    Subtopic['create'] = function(
     /* eslint-enable dot-notation */
+        subtopicBackendDict, skillIdToDescriptionMap) {
       return new Subtopic(
         subtopicBackendDict.id, subtopicBackendDict.title,
         subtopicBackendDict.skill_ids, skillIdToDescriptionMap);

@@ -20,9 +20,11 @@ describe('Preferences Controller', function() {
       angular.mock.module('oppia');
     });
 
-    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(
+      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(angular.mock.inject(function($controller, $http, _$httpBackend_, $rootScope) {
+    beforeEach(angular.mock.inject(function(
+        $controller, $http, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/preferenceshandler/data').respond({
         can_receive_email_updates: false,

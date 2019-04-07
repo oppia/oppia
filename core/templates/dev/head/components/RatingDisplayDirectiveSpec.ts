@@ -20,21 +20,23 @@ describe('Rating display directive', function() {
   var outerScope, ctrlScope;
 
   beforeEach(angular.mock.module('directiveTemplates'));
-  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(angular.mock.inject(function($compile, $rootScope, $templateCache) {
-    var templateHtml = $templateCache.get(
-      '/core/templates/dev/head/components/rating_display_directive.html');
-    $compile(templateHtml)($rootScope);
-    $rootScope.$digest();
+  beforeEach(
+    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(
+    angular.mock.inject(function($compile, $rootScope, $templateCache) {
+      var templateHtml = $templateCache.get(
+        '/core/templates/dev/head/components/rating_display_directive.html');
+      $compile(templateHtml)($rootScope);
+      $rootScope.$digest();
 
-    outerScope = $rootScope.$new();
-    var elem = angular.element(
-      '<rating-display rating-value="5" is-editable="true">' +
-      '</rating-display>');
-    var compiledElem = $compile(elem)(outerScope);
-    outerScope.$digest();
-    ctrlScope = compiledElem[0].getControllerScope();
-  }));
+      outerScope = $rootScope.$new();
+      var elem = angular.element(
+        '<rating-display rating-value="5" is-editable="true">' +
+        '</rating-display>');
+      var compiledElem = $compile(elem)(outerScope);
+      outerScope.$digest();
+      ctrlScope = compiledElem[0].getControllerScope();
+    }));
   it('should display the correct number of stars', function() {
     ctrlScope.ratingValue = 4.2;
     outerScope.$digest();

@@ -46,14 +46,15 @@ describe('HTML to text', function() {
     '{{a}\\}'
   ];
 
-  it('should detect invalid unicode strings', angular.mock.inject(function($filter) {
-    invalidUnicodeStrings.forEach(function(s) {
-      var fn = function() {
-        return $filter('convertUnicodeWithParamsToHtml')(s);
-      };
-      expect(fn).toThrow();
-    });
-  }));
+  it('should detect invalid unicode strings', angular.mock.inject(
+    function($filter) {
+      invalidUnicodeStrings.forEach(function(s) {
+        var fn = function() {
+          return $filter('convertUnicodeWithParamsToHtml')(s);
+        };
+        expect(fn).toThrow();
+      });
+    }));
 
   var validUnicodeStrings = [
     '{{}}',
@@ -62,20 +63,21 @@ describe('HTML to text', function() {
     '\\{{{abc}}'
   ];
 
-  it('should detect valid unicode strings', angular.mock.inject(function($filter) {
-    var results = [
-      '<oppia-parameter></oppia-parameter>',
-      '<oppia-parameter>abc</oppia-parameter>',
-      '\\<oppia-parameter>abc</oppia-parameter>',
-      '{<oppia-parameter>abc</oppia-parameter>',
-    ];
-    validUnicodeStrings.forEach(function(s, i) {
-      var fn = (function() {
-        return $filter('convertUnicodeWithParamsToHtml')(s);
-      })();
-      expect(fn).toEqual(results[i]);
-    });
-  }));
+  it('should detect valid unicode strings', angular.mock.inject(
+    function($filter) {
+      var results = [
+        '<oppia-parameter></oppia-parameter>',
+        '<oppia-parameter>abc</oppia-parameter>',
+        '\\<oppia-parameter>abc</oppia-parameter>',
+        '{<oppia-parameter>abc</oppia-parameter>',
+      ];
+      validUnicodeStrings.forEach(function(s, i) {
+        var fn = (function() {
+          return $filter('convertUnicodeWithParamsToHtml')(s);
+        })();
+        expect(fn).toEqual(results[i]);
+      });
+    }));
 });
 
 describe('Normalizer tests', function() {
@@ -238,137 +240,141 @@ describe('Testing apply-validation directive', function() {
       '</form>';
   }));
 
-  it('should apply isAtLeast validation', angular.mock.inject(function($compile) {
-    scope.validators = function() {
-      return [{
-        id: 'isAtLeast',
-        minValue: -2.5
-      }];
-    };
-    $compile(element)(scope);
-    testInput = scope.testForm.inputValue;
+  it('should apply isAtLeast validation', angular.mock.inject(
+    function($compile) {
+      scope.validators = function() {
+        return [{
+          id: 'isAtLeast',
+          minValue: -2.5
+        }];
+      };
+      $compile(element)(scope);
+      testInput = scope.testForm.inputValue;
 
-    testInput.$setViewValue(-1);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue(-1);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue('1');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue('1');
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue(-2.5);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue(-2.5);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue(-3);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(false);
-    expect(Object.keys(testInput.$error).length).toEqual(1);
+      testInput.$setViewValue(-3);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(false);
+      expect(Object.keys(testInput.$error).length).toEqual(1);
 
-    testInput.$setViewValue('-3');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(false);
-    expect(Object.keys(testInput.$error).length).toEqual(1);
-  }));
+      testInput.$setViewValue('-3');
+      scope.$digest();
+      expect(testInput.$valid).toEqual(false);
+      expect(Object.keys(testInput.$error).length).toEqual(1);
+    }));
 
-  it('should apply isAtMost validation', angular.mock.inject(function($compile) {
-    scope.validators = function() {
-      return [{
-        id: 'isAtMost',
-        maxValue: 5
-      }];
-    };
-    $compile(element)(scope);
-    testInput = scope.testForm.inputValue;
+  it('should apply isAtMost validation', angular.mock.inject(
+    function($compile) {
+      scope.validators = function() {
+        return [{
+          id: 'isAtMost',
+          maxValue: 5
+        }];
+      };
+      $compile(element)(scope);
+      testInput = scope.testForm.inputValue;
 
-    testInput.$setViewValue(-1);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue(-1);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue('1');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue('1');
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue(5);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue(5);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue(6);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(false);
-    expect(Object.keys(testInput.$error).length).toEqual(1);
+      testInput.$setViewValue(6);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(false);
+      expect(Object.keys(testInput.$error).length).toEqual(1);
 
-    testInput.$setViewValue('10');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(false);
-    expect(Object.keys(testInput.$error).length).toEqual(1);
-  }));
+      testInput.$setViewValue('10');
+      scope.$digest();
+      expect(testInput.$valid).toEqual(false);
+      expect(Object.keys(testInput.$error).length).toEqual(1);
+    }));
 
-  it('should apply isNonempty validation', angular.mock.inject(function($compile) {
-    scope.validators = function() {
-      return [{
-        id: 'isNonempty'
-      }];
-    };
-    $compile(element)(scope);
-    testInput = scope.testForm.inputValue;
+  it('should apply isNonempty validation', angular.mock.inject(
+    function($compile) {
+      scope.validators = function() {
+        return [{
+          id: 'isNonempty'
+        }];
+      };
+      $compile(element)(scope);
+      testInput = scope.testForm.inputValue;
 
-    testInput.$setViewValue(-1);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue(-1);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue('1');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue('1');
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue('');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(false);
-    expect(Object.keys(testInput.$error).length).toEqual(1);
-  }));
+      testInput.$setViewValue('');
+      scope.$digest();
+      expect(testInput.$valid).toEqual(false);
+      expect(Object.keys(testInput.$error).length).toEqual(1);
+    }));
 
-  it('should apply isInteger validation', angular.mock.inject(function($compile) {
-    scope.validators = function() {
-      return [{
-        id: 'isInteger'
-      }];
-    };
-    $compile(element)(scope);
-    testInput = scope.testForm.inputValue;
+  it('should apply isInteger validation', angular.mock.inject(
+    function($compile) {
+      scope.validators = function() {
+        return [{
+          id: 'isInteger'
+        }];
+      };
+      $compile(element)(scope);
+      testInput = scope.testForm.inputValue;
 
-    testInput.$setViewValue(-3);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue(-3);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue('1');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue('1');
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue('3.0');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(true);
-    expect(Object.keys(testInput.$error).length).toEqual(0);
+      testInput.$setViewValue('3.0');
+      scope.$digest();
+      expect(testInput.$valid).toEqual(true);
+      expect(Object.keys(testInput.$error).length).toEqual(0);
 
-    testInput.$setViewValue(3.5);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(false);
-    expect(Object.keys(testInput.$error).length).toEqual(1);
+      testInput.$setViewValue(3.5);
+      scope.$digest();
+      expect(testInput.$valid).toEqual(false);
+      expect(Object.keys(testInput.$error).length).toEqual(1);
 
-    testInput.$setViewValue('O');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(false);
-    expect(Object.keys(testInput.$error).length).not.toEqual(0);
-  }));
+      testInput.$setViewValue('O');
+      scope.$digest();
+      expect(testInput.$valid).toEqual(false);
+      expect(Object.keys(testInput.$error).length).not.toEqual(0);
+    }));
 
   it('should apply isFloat validation', angular.mock.inject(function($compile) {
     scope.validators = function() {
@@ -425,17 +431,18 @@ describe('Testing apply-validation directive', function() {
     expect(Object.keys(testInput.$error).length).not.toEqual(0);
   }));
 
-  it('should not apply nonexistent validation', angular.mock.inject(function($compile) {
-    scope.validators = function() {
-      return [{
-        id: 'testFilterFilter'
-      }];
-    };
-    $compile(element)(scope);
-    testInput = scope.testForm.inputValue;
+  it('should not apply nonexistent validation', angular.mock.inject(
+    function($compile) {
+      scope.validators = function() {
+        return [{
+          id: 'testFilterFilter'
+        }];
+      };
+      $compile(element)(scope);
+      testInput = scope.testForm.inputValue;
 
-    testInput.$setViewValue('-abc');
-    scope.$digest();
-    expect(Object.keys(testInput.$error).length).not.toEqual(0);
-  }));
+      testInput.$setViewValue('-abc');
+      scope.$digest();
+      expect(Object.keys(testInput.$error).length).not.toEqual(0);
+    }));
 });

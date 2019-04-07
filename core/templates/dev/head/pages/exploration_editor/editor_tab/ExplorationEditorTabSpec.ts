@@ -21,7 +21,8 @@ describe('Exploration editor tab controller', function() {
     var scope, ecs, ess, scs, rootScope;
 
     beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.inject(function($controller, $injector, $rootScope) {
+    beforeEach(angular.mock.inject(function(
+        $controller, $injector, $rootScope) {
       scope = $rootScope.$new();
       rootScope = $injector.get('$rootScope');
       spyOn(rootScope, '$broadcast');

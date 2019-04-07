@@ -443,7 +443,7 @@ describe('Match expression to expression template', function() {
       dubiousFunction, ...input) {
     return function() {
       try {
-          dubiousFunction(...input);
+        dubiousFunction(...input);
       } catch (err) {
         throw new Error(logicProofShared.renderError(
           err, logicProofData.BASE_GENERAL_MESSAGES,

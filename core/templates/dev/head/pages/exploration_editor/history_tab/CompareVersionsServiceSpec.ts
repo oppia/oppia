@@ -26,7 +26,8 @@ describe('Compare versions service', function() {
     var $httpBackend = null;
     var mockExplorationData = null;
 
-    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(
+      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
     beforeEach(function() {
       mockExplorationData = {
         explorationId: '0'

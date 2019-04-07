@@ -52,7 +52,8 @@ describe('Creator dashboard controller', function() {
       }
     };
 
-    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(
+      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(function() {
       angular.mock.module('oppia');

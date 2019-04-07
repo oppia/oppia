@@ -28,25 +28,27 @@ describe('MusicNotesInput interaction', function() {
       }
     ));
 
-    beforeEach(angular.mock.inject(function($compile, $rootScope, _$templateCache_) {
-      $templateCache = _$templateCache_;
-      var templatesHtml = $templateCache.get(
-        '/extensions/interactions/MusicNotesInput/MusicNotesInput.html');
-      $compile(templatesHtml)($rootScope);
-      $rootScope.$digest();
-    }));
+    beforeEach(
+      angular.mock.inject(function($compile, $rootScope, _$templateCache_) {
+        $templateCache = _$templateCache_;
+        var templatesHtml = $templateCache.get(
+          '/extensions/interactions/MusicNotesInput/MusicNotesInput.html');
+        $compile(templatesHtml)($rootScope);
+        $rootScope.$digest();
+      }));
 
-    beforeEach(angular.mock.inject(function($compile, _$httpBackend_, $rootScope) {
-      $httpBackend = _$httpBackend_;
+    beforeEach(
+      angular.mock.inject(function($compile, _$httpBackend_, $rootScope) {
+        $httpBackend = _$httpBackend_;
 
-      var TAG_NAME = 'oppia-interactive-music-notes-input';
-      scope = $rootScope.$new();
-      elt = angular.element(
-        '<' + TAG_NAME + ' last-answer="null"></' + TAG_NAME + '>');
-      $compile(elt)(scope);
-      scope.$digest();
-      ctrlScope = elt[0].getControllerScope();
-    }));
+        var TAG_NAME = 'oppia-interactive-music-notes-input';
+        scope = $rootScope.$new();
+        elt = angular.element(
+          '<' + TAG_NAME + ' last-answer="null"></' + TAG_NAME + '>');
+        $compile(elt)(scope);
+        scope.$digest();
+        ctrlScope = elt[0].getControllerScope();
+      }));
 
     afterEach(function() {
       scope.$apply();
@@ -217,7 +219,8 @@ describe('MusicNotesInput interaction', function() {
 describe('Music phrase player service', function() {
   describe('music phrase player service', function() {
     var mpps = null;
-    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(
+      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
     beforeEach(angular.mock.inject(function($injector, $window) {
       mpps = $injector.get('MusicPhrasePlayerService');
       // This is here so that, if the test environment is modified

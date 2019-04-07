@@ -363,8 +363,9 @@ oppia.factory('StoryContentsObjectFactory', [
     // story python dict.
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
-    StoryContents['createFromBackendDict'] = function(storyContentsBackendObject) {
+    StoryContents['createFromBackendDict'] = function(
     /* eslint-enable dot-notation */
+        storyContentsBackendObject) {
       var nodes = [];
       for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
         nodes.push(

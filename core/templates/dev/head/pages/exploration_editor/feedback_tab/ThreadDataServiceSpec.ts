@@ -19,7 +19,8 @@
 
 describe('retrieving threads service', function() {
   var expId = '12345';
-  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(
+    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module(function($provide) {

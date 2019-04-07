@@ -26,9 +26,11 @@ describe('Library controller', function() {
       angular.mock.module('ui.bootstrap');
     });
 
-    beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(
+      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(angular.mock.inject(function($controller, _$httpBackend_, $rootScope) {
+    beforeEach(angular.mock.inject(function(
+        $controller, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/searchhandler/data').respond({
         allow_yaml_file_upload: false,

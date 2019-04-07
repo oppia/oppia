@@ -23,7 +23,8 @@ describe('Topic rights backend API service', function() {
   var $httpBackend = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(
+    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(angular.mock.inject(function($injector) {
     TopicRightsBackendApiService = $injector.get(

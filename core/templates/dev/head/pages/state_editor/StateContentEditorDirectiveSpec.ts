@@ -44,192 +44,193 @@ describe('State content editor directive', function() {
     });
   });
 
-  beforeEach(angular.mock.inject(function($compile, $injector, $rootScope, $templateCache) {
-    shof = $injector.get('SubtitledHtmlObjectFactory');
-    cls = $injector.get('ChangeListService');
-    citat = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
-    scitat = $injector.get('StateContentIdsToAudioTranslationsService');
-    scs = $injector.get('StateContentService');
-    es = $injector.get('EditabilityService');
-    ess = $injector.get('ExplorationStatesService');
+  beforeEach(angular.mock.inject(
+    function($compile, $injector, $rootScope, $templateCache) {
+      shof = $injector.get('SubtitledHtmlObjectFactory');
+      cls = $injector.get('ChangeListService');
+      citat = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
+      scitat = $injector.get('StateContentIdsToAudioTranslationsService');
+      scs = $injector.get('StateContentService');
+      es = $injector.get('EditabilityService');
+      ess = $injector.get('ExplorationStatesService');
 
-    var citatDict = {
-      content: {},
-      default_outcome: {},
-      feedback_1: {}
-    };
+      var citatDict = {
+        content: {},
+        default_outcome: {},
+        feedback_1: {}
+      };
 
-    scs.init('Third State', _getContent('content', 'This is some content.'));
-    scitat.init('Third State', _getContentIdsToAUdioTranslations(citatDict));
-    es.markEditable();
-    ess.init({
-      'First State': {
-        content: {
-          content_id: 'content',
-          html: 'First State Content'
-        },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
-        },
-        interaction: {
-          id: 'TextInput',
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'unused',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
-            },
-          }],
-          default_outcome: {
-            dest: 'default',
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null
+      scs.init('Third State', _getContent('content', 'This is some content.'));
+      scitat.init('Third State', _getContentIdsToAUdioTranslations(citatDict));
+      es.markEditable();
+      ess.init({
+        'First State': {
+          content: {
+            content_id: 'content',
+            html: 'First State Content'
           },
-          hints: []
-        },
-        param_changes: [],
-        written_translations: {
-          translations_mapping: {
+          content_ids_to_audio_translations: {
             content: {},
             default_outcome: {},
             feedback_1: {}
-          }
-        }
-      },
-      'Second State': {
-        content: {
-          content_id: 'content',
-          html: 'Second State Content'
-        },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
-        },
-        interaction: {
-          id: 'TextInput',
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'unused',
+          },
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              rule_specs: [],
+              outcome: {
+                dest: 'unused',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+            }],
+            default_outcome: {
+              dest: 'default',
               feedback: {
-                content_id: 'feedback_1',
+                content_id: 'default_outcome',
                 html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
+            },
+            hints: []
+          },
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          }
+        },
+        'Second State': {
+          content: {
+            content_id: 'content',
+            html: 'Second State Content'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          },
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              rule_specs: [],
+              outcome: {
+                dest: 'unused',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
+            }],
+            default_outcome: {
+              dest: 'default',
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            hints: []
+          },
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          }
+        },
+        'Third State': {
+          content: {
+            content_id: 'content',
+            html: 'This is some content.'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          },
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              rule_specs: [],
+              outcome: {
+                dest: 'unused',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
+            }],
+            default_outcome: {
+              dest: 'default',
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            hints: []
+          },
+          param_changes: [{
+            name: 'comparison',
+            generator_id: 'Copier',
+            customization_args: {
+              value: 'something clever',
+              parse_with_jinja: false
             }
           }],
-          default_outcome: {
-            dest: 'default',
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null
-          },
-          hints: []
-        },
-        param_changes: [],
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        }
-      },
-      'Third State': {
-        content: {
-          content_id: 'content',
-          html: 'This is some content.'
-        },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
-        },
-        interaction: {
-          id: 'TextInput',
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'unused',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
             }
-          }],
-          default_outcome: {
-            dest: 'default',
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null
-          },
-          hints: []
-        },
-        param_changes: [{
-          name: 'comparison',
-          generator_id: 'Copier',
-          customization_args: {
-            value: 'something clever',
-            parse_with_jinja: false
-          }
-        }],
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
           }
         }
-      }
-    });
+      });
 
-    var templateHtml = $templateCache.get(
-      '/pages/exploration_editor/editor_tab/' +
-      'state_content_editor_directive.html');
-    $compile(templateHtml, $rootScope);
-    $rootScope.$digest();
+      var templateHtml = $templateCache.get(
+        '/pages/exploration_editor/editor_tab/' +
+        'state_content_editor_directive.html');
+      $compile(templateHtml, $rootScope);
+      $rootScope.$digest();
 
-    outerScope = $rootScope.$new();
-    outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
-    outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired = (
-      jasmine.createSpy(''));
-    var elem = angular.element(
-      '<state-content-editor ' +
-      'on-save-state-content="saveStateContent" ' +
-      'show-mark-all-audio-as-needing-update-modal-if-required=' +
-      '"showMarkAllAudioAsNeedingUpdateModalIfRequired">' +
-      '</state-content-editor>');
-    var compiledElem = $compile(elem)(outerScope);
-    outerScope.$digest();
-    ctrlScope = compiledElem[0].getControllerScope();
-  }));
+      outerScope = $rootScope.$new();
+      outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
+      outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired = (
+        jasmine.createSpy(''));
+      var elem = angular.element(
+        '<state-content-editor ' +
+        'on-save-state-content="saveStateContent" ' +
+        'show-mark-all-audio-as-needing-update-modal-if-required=' +
+        '"showMarkAllAudioAsNeedingUpdateModalIfRequired">' +
+        '</state-content-editor>');
+      var compiledElem = $compile(elem)(outerScope);
+      outerScope.$digest();
+      ctrlScope = compiledElem[0].getControllerScope();
+    }));
 
   it('should start with the content editor not being open', function() {
     expect(ctrlScope.contentEditorIsOpen).toBe(false);

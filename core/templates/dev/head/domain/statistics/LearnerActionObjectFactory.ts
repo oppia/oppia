@@ -76,8 +76,9 @@ oppia.factory('LearnerActionObjectFactory', [
      */
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
-    LearnerAction['createFromBackendDict'] = function(learnerActionBackendDict) {
+    LearnerAction['createFromBackendDict'] = function(
     /* eslint-enable dot-notation */
+        learnerActionBackendDict) {
       return new LearnerAction(
         learnerActionBackendDict.action_type,
         learnerActionBackendDict.action_customization_args,

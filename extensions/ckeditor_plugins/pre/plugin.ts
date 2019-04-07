@@ -21,7 +21,7 @@ CKEDITOR.plugins.add('pre', {
     var style = new CKEDITOR.style({element: 'pre'}, null);
 
     editor.addCommand(
-      'pre', <CKEDITOR.commandDefinition>new CKEDITOR.styleCommand(style));
+      'pre', <CKEDITOR.commandDefinition> new CKEDITOR.styleCommand(style));
 
     // This part will provide toolbar button highlighting in editor.
     editor.attachStyleStateChange(style, function(state) {
