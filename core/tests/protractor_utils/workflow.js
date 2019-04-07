@@ -164,7 +164,7 @@ var getExplorationCollaborators = function() {
 };
 
 var getExplorationVoiceArtists = function() {
-  return _getExplorationRoles('voice artist');
+  return _getExplorationRoles('voiceArtist');
 };
 
 var getExplorationPlaytesters = function() {
