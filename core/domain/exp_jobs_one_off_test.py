@@ -223,7 +223,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exp_rights_model.community_owned,
                     exp_rights_model.owner_ids,
                     exp_rights_model.editor_ids,
-                    exp_rights_model.translator_ids,
+                    exp_rights_model.voice_artist_ids,
                     exp_rights_model.viewer_ids,
                     [self.admin_id],
                     {self.admin_id: 1},
@@ -245,9 +245,9 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 if exp_rights_model.editor_ids:
                     expected_job_output[exp_id].editor_ids = (
                         exp_rights_model.editor_ids)
-                if exp_rights_model.translator_ids:
-                    expected_job_output[exp_id].translator_ids = (
-                        exp_rights_model.translator_ids)
+                if exp_rights_model.voice_artist_ids:
+                    expected_job_output[exp_id].voice_artist_ids = (
+                        exp_rights_model.voice_artist_ids)
                 if exp_rights_model.viewer_ids:
                     expected_job_output[exp_id].viewer_ids = (
                         exp_rights_model.viewer_ids)
@@ -272,7 +272,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             simple_props = ['id', 'title', 'category', 'objective',
                             'language_code', 'tags', 'ratings', 'status',
                             'community_owned', 'owner_ids',
-                            'editor_ids', 'translator_ids', 'viewer_ids',
+                            'editor_ids', 'voice_artist_ids', 'viewer_ids',
                             'contributor_ids', 'contributors_summary',
                             'version', 'exploration_model_created_on']
             for exp_id in actual_job_output:

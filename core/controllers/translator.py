@@ -139,8 +139,8 @@ class AudioUploadHandler(base.BaseHandler):
         self.render_json({'filename': filename})
 
 
-class TranslatorAutosaveHandler(base.BaseHandler):
-    """Handles requests from the translator for draft autosave."""
+class VoiceArtistAutosaveHandler(base.BaseHandler):
+    """Handles requests from the voice artist for draft autosave."""
 
     @acl_decorators.can_translate_exploration
     def put(self, exploration_id):
@@ -155,7 +155,7 @@ class TranslatorAutosaveHandler(base.BaseHandler):
             version = self.payload.get('version')
             exp_services.create_or_update_draft(
                 exploration_id, self.user_id, change_list, version,
-                datetime.datetime.utcnow(), is_by_translator=True)
+                datetime.datetime.utcnow(), is_by_voice_artist=True)
         except utils.ValidationError as e:
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
@@ -207,7 +207,7 @@ class ExplorationTranslationHandler(base.BaseHandler):
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message,
-                is_by_translator=True)
+                is_by_voice_artist=True)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

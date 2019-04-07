@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the exploration translator work."""
+"""Tests for the exploration voice artist work."""
 
 import datetime
 
@@ -25,21 +25,21 @@ import feconf
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class BaseTranslatorControllerTests(test_utils.GenericTestBase):
+class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        """Completes the sign-up process for self.TRANSLATOR_EMAIL."""
-        super(BaseTranslatorControllerTests, self).setUp()
+        """Completes the sign-up process for self.VOICE_ARTIST_EMAIL."""
+        super(BaseVoiceArtistControllerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(self.VOICE_ARTIST_EMAIL)
 
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
 
-class TranslatorTest(BaseTranslatorControllerTests):
+class VoiceArtistTest(BaseVoiceArtistControllerTests):
     """Test the handling of saving translation work."""
 
     EXP_ID = 'exp1'
@@ -56,16 +56,16 @@ class TranslatorTest(BaseTranslatorControllerTests):
     }
 
     def setUp(self):
-        super(TranslatorTest, self).setUp()
+        super(VoiceArtistTest, self).setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.translator_id,
-            rights_manager.ROLE_TRANSLATOR)
+            self.owner, self.EXP_ID, self.voice_artist_id,
+            rights_manager.ROLE_VOICE_ARTIST)
         self.logout()
 
-        self.login(self.TRANSLATOR_EMAIL)
+        self.login(self.VOICE_ARTIST_EMAIL)
         # Generate CSRF token.
         response = self.get_html_response('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
@@ -88,7 +88,7 @@ class TranslatorTest(BaseTranslatorControllerTests):
             response['states'][state_name]['content_ids_to_audio_translations'],
             self.CONTENT_IDS_TO_AUDIO_TRANSLATION)
 
-    def test_translator_cannot_save_invalid_change_list(self):
+    def test_voice_artist_cannot_save_invalid_change_list(self):
         # Trying to change exploration objective.
         response = self.put_json(
             '/createhandler/translate/%s' % self.EXP_ID, {
@@ -105,13 +105,13 @@ class TranslatorTest(BaseTranslatorControllerTests):
         self.assertEqual(
             response, {'status_code': 400,
                        'error': (
-                           'Translator does not have permission to make'
+                           'Voice artist does not have permission to make'
                            ' some changes in the change list.')
                       })
 
 
-class TranslatorAutosaveTest(BaseTranslatorControllerTests):
-    """Test the handling of translator autosave actions."""
+class VoiceArtistAutosaveTest(BaseVoiceaArtistControllerTests):
+    """Test the handling of voice artist autosave actions."""
 
     EXP_ID = 'expId'
     # 30 days into the future.
@@ -141,19 +141,19 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTests):
         'new_value': 'New title'}]
 
     def setUp(self):
-        super(TranslatorAutosaveTest, self).setUp()
+        super(VoiceArtistAutosaveTest, self).setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.translator_id,
-            rights_manager.ROLE_TRANSLATOR)
+            self.owner, self.EXP_ID, self.voice_artist_id,
+            rights_manager.ROLE_VOICE_ARTIST)
         self.logout()
 
-        self.login(self.TRANSLATOR_EMAIL)
+        self.login(self.VOICE_ARTIST_EMAIL)
         user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.translator_id, self.EXP_ID),
-            user_id=self.translator_id, exploration_id=self.EXP_ID,
+            id='%s.%s' % (self.voice_artist_id, self.EXP_ID),
+            user_id=self.voice_artist_id, exploration_id=self.EXP_ID,
             draft_change_list=self.VALID_DRAFT_CHANGELIST,
             draft_change_list_last_updated=self.OLDER_DATETIME,
             draft_change_list_exp_version=1,
@@ -172,7 +172,7 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTests):
             '/createhandler/autosave_translation_draft/%s' % self.EXP_ID,
             payload, csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.translator_id, self.EXP_ID))
+            '%s.%s' % (self.voice_artist_id, self.EXP_ID))
         self.assertEqual(
             exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
@@ -186,14 +186,14 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTests):
                 'version': 1,
             }, csrf_token=self.csrf_token, expected_status_int=400)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.translator_id, self.EXP_ID))
+            '%s.%s' % (self.voice_artist_id, self.EXP_ID))
         self.assertEqual(
             exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_id, 1)
         self.assertEqual(
             response, {'status_code': 400,
                        'error': (
-                           'Translator does not have permission to make'
+                           'Voice artist does not have permission to make'
                            ' some changes in the change list.')
                       })
 
@@ -206,7 +206,7 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTests):
             '/createhandler/autosave_translation_draft/%s' % self.EXP_ID,
             payload, csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.translator_id, self.EXP_ID))
+            '%s.%s' % (self.voice_artist_id, self.EXP_ID))
         self.assertEqual(
             exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
@@ -218,13 +218,13 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTests):
             '/createhandler/autosave_translation_draft/%s' % self.EXP_ID, {},
             csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
-            '%s.%s' % (self.translator_id, self.EXP_ID))
+            '%s.%s' % (self.voice_artist_id, self.EXP_ID))
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
 
 
-class TranslationFirstTimeTutorialTest(BaseTranslatorControllerTests):
+class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
     """This controller tests the first time tutorial for translations."""
     EXP_ID = 'exp1'
 
@@ -234,11 +234,11 @@ class TranslationFirstTimeTutorialTest(BaseTranslatorControllerTests):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.translator_id,
-            rights_manager.ROLE_TRANSLATOR)
+            self.owner, self.EXP_ID, self.voice_artist_id,
+            rights_manager.ROLE_VOICE_ARTIST)
         self.logout()
 
-        self.login(self.TRANSLATOR_EMAIL)
+        self.login(self.VOICE_ARTIST_EMAIL)
         # Generate CSRF token.
         response = self.get_html_response('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)

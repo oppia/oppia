@@ -52,14 +52,14 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
-        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(self.VOICE_ARTIST_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -598,8 +598,8 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             rights_manager.ROLE_EDITOR)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, unpublished_exp_id, self.translator_id,
-            rights_manager.ROLE_TRANSLATOR)
+            self.owner, unpublished_exp_id, self.voice_artist_id,
+            rights_manager.ROLE_VOICE_ARTIST)
 
         self.login(self.EDITOR_EMAIL)
         self.delete_json(
@@ -613,7 +613,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
-        self.login(self.TRANSLATOR_EMAIL)
+        self.login(self.VOICE_ARTIST_EMAIL)
         self.delete_json(
             '/createhandler/data/%s' % unpublished_exp_id,
             expected_status_int=401)
@@ -636,8 +636,8 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             self.owner, published_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
         rights_manager.assign_role_for_exploration(
-            self.owner, published_exp_id, self.translator_id,
-            rights_manager.ROLE_TRANSLATOR)
+            self.owner, published_exp_id, self.voice_artist_id,
+            rights_manager.ROLE_VOICE_ARTIST)
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
@@ -652,7 +652,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
-        self.login(self.TRANSLATOR_EMAIL)
+        self.login(self.VOICE_ARTIST_EMAIL)
         self.delete_json(
             '/createhandler/data/%s' % published_exp_id,
             expected_status_int=401)
@@ -964,8 +964,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_username': self.TRANSLATOR_USERNAME,
-                'new_member_role': rights_manager.ROLE_TRANSLATOR
+                'new_member_username': self.VOICE_ARTIST_USERNAME,
+                'new_member_role': rights_manager.ROLE_VOICE_ARTIST
             }, csrf_token=csrf_token)
         self.put_json(
             rights_url, {
@@ -1071,14 +1071,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         self.logout()
 
-        # Check that translator can access editor page and can only translate.
-        self.login(self.TRANSLATOR_EMAIL)
+        # Check that voice artist can access editor page and can only translate.
+        self.login(self.VOICE_ARTIST_EMAIL)
         response = self.get_html_response('/create/%s' % exp_id)
         self.assert_cannot_edit(response.body)
         self.assert_can_translate(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        # Check that translator cannot add new members.
+        # Check that voice artist cannot add new members.
         exploration = exp_services.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         self.put_json(

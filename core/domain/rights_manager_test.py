@@ -224,7 +224,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
 
-    def test_inviting_translator_to_exploration(self):
+    def test_inviting_voice_artist_to_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
@@ -240,7 +240,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_TRANSLATOR)
+            rights_manager.ROLE_VOICE_ARTIST)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
@@ -295,7 +295,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_TRANSLATOR)
+            rights_manager.ROLE_VOICE_ARTIST)
 
         with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
@@ -323,7 +323,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.ROLE_EDITOR)
         rights_manager.assign_role_for_exploration(
             self.user_b, self.EXP_ID, self.user_id_e,
-            rights_manager.ROLE_TRANSLATOR)
+            rights_manager.ROLE_VOICE_ARTIST)
         rights_manager.assign_role_for_exploration(
             self.user_b, self.EXP_ID, self.user_id_f,
             rights_manager.ROLE_VIEWER)
@@ -420,7 +420,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_d,
-            rights_manager.ROLE_TRANSLATOR)
+            rights_manager.ROLE_VOICE_ARTIST)
 
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
@@ -430,8 +430,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(exp_rights.is_viewer(self.user_id_a))
         self.assertFalse(exp_rights.is_owner(self.user_id_b))
         self.assertFalse(exp_rights.is_editor(self.user_id_b))
-        self.assertTrue(exp_rights.is_translator(self.user_id_d))
-        self.assertFalse(exp_rights.is_translator(self.user_id_b))
+        self.assertTrue(exp_rights.is_voice_artist(self.user_id_d))
+        self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
 
 
     def test_get_multiple_exploration_rights(self):

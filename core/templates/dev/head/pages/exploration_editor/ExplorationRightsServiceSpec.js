@@ -30,7 +30,7 @@ describe('Exploration rights service', function() {
     it('correctly initializes the service', function() {
       expect(ers.ownerNames).toBeUndefined();
       expect(ers.editorNames).toBeUndefined();
-      expect(ers.translatorNames).toBeUndefined();
+      expect(ers.voiceArtistNames).toBeUndefined();
       expect(ers.viewerNames).toBeUndefined();
       expect(ers._status).toBeUndefined();
       expect(ers._clonedFrom).toBeUndefined();
@@ -41,7 +41,7 @@ describe('Exploration rights service', function() {
 
       expect(ers.ownerNames).toEqual(['abc']);
       expect(ers.editorNames).toEqual([]);
-      expect(ers.translatorNames).toEqual([]);
+      expect(ers.voiceArtistNames).toEqual([]);
       expect(ers.viewerNames).toEqual([]);
       expect(ers._status).toEqual('private');
       expect(ers._clonedFrom).toEqual('e1234');

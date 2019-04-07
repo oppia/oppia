@@ -19,7 +19,7 @@
 
 oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
 
-oppia.directive('translatorOverview', [
+oppia.directive('voiceArtistOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

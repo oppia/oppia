@@ -165,7 +165,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationRightsService.init(
           explorationData.rights.owner_names,
           explorationData.rights.editor_names,
-          explorationData.rights.translator_names,
+          explorationData.rights.voice_artist_names,
           explorationData.rights.viewer_names, explorationData.rights.status,
           explorationData.rights.cloned_from,
           explorationData.rights.community_owned,

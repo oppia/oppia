@@ -136,8 +136,8 @@ var addExplorationCollaborator = function(username) {
   _addExplorationRole('Collaborator', username);
 };
 
-var addExplorationTranslator = function(username) {
-  _addExplorationRole('Translator', username);
+var addExplorationVoiceArtist = function(username) {
+  _addExplorationRole('Voice Artist', username);
 };
 
 var addExplorationPlaytester = function(username) {
@@ -163,8 +163,8 @@ var getExplorationCollaborators = function() {
   return _getExplorationRoles('editor');
 };
 
-var getExplorationTranslators = function() {
-  return _getExplorationRoles('translator');
+var getExplorationVoiceArtists = function() {
+  return _getExplorationRoles('voice artist');
 };
 
 var getExplorationPlaytesters = function() {
@@ -180,9 +180,9 @@ exports.createExplorationAsAdmin = createExplorationAsAdmin;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
-exports.addExplorationTranslator = addExplorationTranslator;
+exports.addExplorationVoiceArtist = addExplorationVoiceArtist;
 exports.addExplorationPlaytester = addExplorationPlaytester;
 exports.getExplorationManagers = getExplorationManagers;
 exports.getExplorationCollaborators = getExplorationCollaborators;
-exports.getExplorationTranslators = getExplorationTranslators;
+exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;

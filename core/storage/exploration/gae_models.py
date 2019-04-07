@@ -170,7 +170,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to translate this exploration.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 
@@ -390,7 +390,7 @@ class ExpSummaryModel(base_models.BaseModel):
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to translate this exploration.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
@@ -454,7 +454,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).filter(
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
                    ExpSummaryModel.editor_ids == user_id,
-                   ExpSummaryModel.translator_ids == user_id,
+                   ExpSummaryModel.voice_artist_ids == user_id,
                    ExpSummaryModel.viewer_ids == user_id)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison

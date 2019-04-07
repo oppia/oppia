@@ -493,7 +493,7 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.EditorAutosaveHandler),
     get_redirect_route(
         r'/createhandler/autosave_translation_draft/<exploration_id>',
-        translator.TranslatorAutosaveHandler),
+        translator.VoiceArtistAutosaveHandler),
     get_redirect_route(
         r'/createhandler/get_top_unresolved_answers/<exploration_id>',
         editor.TopUnresolvedAnswersHandler),
