@@ -231,6 +231,10 @@
 /core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
 
 
+# Typings.
+/typings @ankita240796
+
+
 # User’s profile page.
 # TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
 /core/templates/dev/head/domain/user/ @nithusha21
