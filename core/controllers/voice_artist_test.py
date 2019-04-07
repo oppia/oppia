@@ -110,7 +110,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
                       })
 
 
-class VoiceArtistAutosaveTest(BaseVoiceaArtistControllerTests):
+class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
     """Test the handling of voice artist autosave actions."""
 
     EXP_ID = 'expId'
