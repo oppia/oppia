@@ -246,7 +246,7 @@ describe('Permissions for private explorations', function() {
     });
   });
 
-  fit('should be correct for voice artists', function() {
+  it('should be correct for voice artists', function() {
     users.createUser('expOwner@oppia.tests', 'expOwner');
     users.createUser('voiceArtist@oppia.tests', 'voiceArtist');
     users.createUser('guestUser@oppia.tests', 'guestUser');
