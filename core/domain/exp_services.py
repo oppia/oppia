@@ -1144,7 +1144,7 @@ def update_exploration(
     """
     if is_by_voice_artist and not is_translation_change_list(change_list):
         raise utils.ValidationError(
-            'Voice artists does not have permission to make some '
+            'Voice artist does not have permission to make some '
             'changes in the change list.')
 
     is_public = rights_manager.is_exploration_public(exploration_id)
