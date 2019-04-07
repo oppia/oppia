@@ -128,7 +128,7 @@ oppia.factory('SearchService', [
           var checkMismatch = function(searchQuery) {
             var isMismatch = true;
             $('.oppia-search-bar-input').each(function(index) {
-              if ((<string><any>$(this).val()).trim() === searchQuery) {
+              if ((<string>$(this).val()).trim() === searchQuery) {
                 isMismatch = false;
               }
             });
