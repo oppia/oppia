@@ -34,7 +34,7 @@
     </div>
   </li>
   <li style="margin-right: 20px; margin-top: 8px;">
-    <button type="button" ng-if="!topicRights.isPublished() && topicRights.canPublishTopic()"
+    <button type="button" ng-if="!topicRights.isPublished()"
             class="btn btn-default oppia-editor-publish-button protractor-test-publish-topic-button"
             ng-click="publishTopic()"
             ng-class="{'btn-success': !isTopicSaveable()}"
