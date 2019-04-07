@@ -13,6 +13,7 @@ core/tests/.browserstack.env
 .viminfo
 .vscode/*
 libpeerconnection.log
+tsc_output_log.txt
 uploads/*
 venv/
 *.db

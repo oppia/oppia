@@ -1177,6 +1177,40 @@ def compile_typescript_files(project_dir):
     subprocess.check_call(cmd, shell=True)
 
 
+def compile_typescript_files_in_watch_mode(project_dir):
+    """Compiles typescript files in watch mode to produce javascript
+    files in local_compiled_js folder.
+
+    Args:
+        project_dir: str. The project directory which contains the ts files
+            to be compiled.
+    """
+    kill_cmd = (
+        'kill `ps aux | grep "[.]./node_modules/typescript/bin/tsc --project . '
+        '--watch" | awk \'{print $2}\'`'
+    )
+    subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
+    print 'Compiling ts files in watch mode...'
+    cmd = '../node_modules/typescript/bin/tsc --project %s --watch' % (
+        project_dir)
+    subprocess.Popen('%s > tsc_output_log.txt' % cmd, shell=True)
+
+    while True:
+        if os.path.isfile('tsc_output_log.txt'):
+            with open('tsc_output_log.txt', 'r') as f:
+                lines = f.readlines()
+                if len(lines):
+                    # We are checking only the last line here since
+                    # whenever typescript is done with compilation
+                    # with or without errors, the last line will
+                    # always read Found x errors. Watching for file
+                    # changes.
+                    last_output = lines[len(lines) - 1]
+                    if 'Watching for file changes' in last_output:
+                        return
+
+
+
 def build():
     """The main method of this script.
 
@@ -1190,12 +1224,17 @@ def build():
     parser.add_option(
         '--minify_third_party_libs_only', action='store_true', default=False,
         dest='minify_third_party_libs_only')
+    parser.add_option(
+        '--enable_watcher', action='store_true', default=False)
     options = parser.parse_args()[0]
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
-    compile_typescript_files('.')
+    if not options.enable_watcher:
+        compile_typescript_files('.')
+    else:
+        compile_typescript_files_in_watch_mode('.')
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.

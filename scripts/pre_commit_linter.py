@@ -2248,7 +2248,8 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
-        js_and_ts_component_messages = self._check_js_and_ts_component_name_and_count()
+        js_and_ts_component_messages = (
+            self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())

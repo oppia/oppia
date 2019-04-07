@@ -157,6 +157,10 @@ skip_files:
 - ^(.*/)?\..*$
 # Karma test files
 - ^(.*/)Spec.js$
+# Typescript files
+- ^(.*/)?.*\.ts$
+# Typescript output log file
+- ^(.*/)tsc_output_log.txt$
 # Other folders to ignore
 - tests/
 - scripts/
