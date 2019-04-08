@@ -438,6 +438,61 @@ var constants = {
     "LIST": "list"
   },
 
+  "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
+    "name": "General",
+    "interaction_ids": [
+        "MultipleChoiceInput",
+        "TextInput"
+    ]
+  }, {
+    "name": "Math",
+    "interaction_ids": [
+        "NumericInput"
+    ]
+  }],
+
+  // These categories and interactions are displayed in the order in which they
+  // appear in the interaction selector.
+  "ALLOWED_INTERACTION_CATEGORIES": [{
+    "name": "General",
+    "interaction_ids": [
+        "Continue",
+        "EndExploration",
+        "ImageClickInput",
+        "ItemSelectionInput",
+        "MultipleChoiceInput",
+        "TextInput",
+        "DragAndDropSortInput"
+    ]
+  }, {
+    "name": "Math",
+    "interaction_ids": [
+        "FractionInput",
+        "GraphInput",
+        "LogicProof",
+        "NumericInput",
+        "SetInput",
+        "MathExpressionInput",
+        "NumberWithUnits"
+    ]
+  }, {
+    "name": "Programming",
+    "interaction_ids": [
+        "CodeRepl",
+        "PencilCodeEditor"
+    ]
+  }, {
+    "name": "Music",
+    "interaction_ids": [
+        "MusicNotesInput"
+    ]
+  }, {
+    "name": "Geography",
+    "interaction_ids": [
+        "InteractiveMap"
+    ]
+  }],
+
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,

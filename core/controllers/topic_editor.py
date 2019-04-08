@@ -167,9 +167,7 @@ class TopicEditorPage(base.BaseHandler):
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
-            'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'ALLOWED_INTERACTION_CATEGORIES': (
-                feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES)
+            'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
 
         self.render_template('pages/topic_editor/topic_editor.html')

@@ -20,6 +20,7 @@ import itertools
 import os
 import pkgutil
 
+from constants import constants
 import feconf
 
 
@@ -34,7 +35,7 @@ class Registry(object):
         """Get a list of all interaction ids."""
         return list(itertools.chain(*[
             interaction_category['interaction_ids']
-            for interaction_category in feconf.ALLOWED_INTERACTION_CATEGORIES
+            for interaction_category in constants.ALLOWED_INTERACTION_CATEGORIES
         ]))
 
     @classmethod
