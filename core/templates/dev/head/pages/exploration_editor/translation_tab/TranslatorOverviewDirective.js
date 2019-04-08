@@ -48,7 +48,7 @@ oppia.directive('translatorOverview', [
             .getAllAudioLanguageCodes();
 
           $scope.VOICEOVER_MODE = 'Record';
-          $scope.TRANSLATION_MODE = 'Translate';
+          $scope.TRANSLATION_MODE = 'Voiceover';
 
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.languageCode =

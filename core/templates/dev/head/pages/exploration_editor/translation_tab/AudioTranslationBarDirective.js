@@ -251,6 +251,10 @@ oppia.directive('audioTranslationBar', [
             });
           };
           var toggleStartAndStopRecording = function() {
+            if ($scope.isAudioAvailable) {
+              return;
+            }
+
             if (!$scope.recorder.status.isRecording && !$scope.audioBlob) {
               $scope.checkAndStartRecording();
             } else {
