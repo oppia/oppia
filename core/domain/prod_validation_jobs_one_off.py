@@ -18,6 +18,7 @@
 from core import jobs
 from core.platform import models
 
+
 (
     user_models, exp_models, collection_models,
     feedback_models) = models.Registry.import_models([
@@ -26,64 +27,48 @@ from core.platform import models
 datastore_services = models.Registry.import_datastore_services()
 
 
-def has_model_for_id(model_class, model_id):
+def has_undeleted_model_for_id(model_class, model_id):
     """Checks there's an existing nondeleted model for given model_id.
 
     Args:
         model_class: BaseModel. Class of the model.
-        model_id: str. Key of the model.
+        model_id: str. Id of the model.
 
     Returns:
         bool. True if there exists a model with given model_id.
-        """
+    """
     model = model_class.get_by_id(model_id)
     return model is not None and model.deleted is False
 
-
-class UserSubscriptionsModelValidator(object):
-    """Class for validating UserSubscriptionModels."""
+class BaseModelValidator(object):
+    """Base class for validating models."""
 
     errors = []
     checks_passed = []
 
     @classmethod
-    def validate(cls, item):
-        """Validates a UserSubscriptionsModel entity.
+    def _external_id_relationships(cls):
+        """Defines a mapping of external id to model class.
+
+        Returns a dictionary of which keys are field of the model to validate
+        and values are the corresponding model class. Checks the entries in that
+        field of the model should be valid non-deleted instances of the given
+        model classes.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def _validate_external_id_relationships(cls, item):
+        """Check whether the external id properties on the model correspond
+        to valid instances.
 
         Args:
             item: UserSubscriptionsModel. Entity to validate.
-
-        Returns:
-            string. Validation status.
-        """
-        # For each key, checks the entries in that field of
-        # UserSubscriptionsModel should be valid non-deleted instances of the
-        # given model classes.
-        external_ids_checks = {
-            'activity_ids': exp_models.ExplorationModel,
-            'collection_ids': collection_models.CollectionModel,
-            'general_feedback_thread_ids': (
-                feedback_models.GeneralFeedbackThreadModel),
-            'creator_ids': user_models.UserSettingsModel,
-        }
-        if not has_model_for_id(user_models.UserSettingsModel, item.id):
-            cls.errors.append(
-                'id %s is not valid %s' % (
-                    item.id,
-                    user_models.UserSettingsModel.__name__))
-        else:
-            cls.checks_passed.append(['id check passed'])
-        cls._check_external_ids(item, external_ids_checks=external_ids_checks)
-
-    @classmethod
-    def _check_external_ids(cls, item, **kwargs):
-        """Check whether the external id properties on the model correspond
-        to valid instances.
         """
         external_ids_errors = []
-        external_ids_checks = kwargs.get('external_ids_checks', {})
         multiple_models_keys_to_fetch = {}
-        for prop_name, model_class in external_ids_checks.iteritems():
+        for prop_name, model_class in (
+                cls._external_id_relationships().items()):
             model_ids = getattr(item, prop_name)
             if model_ids:
                 multiple_models_keys_to_fetch[prop_name] = (
@@ -111,6 +96,44 @@ class UserSubscriptionsModelValidator(object):
             cls.checks_passed.append('external id check passed')
 
 
+class UserSubscriptionsModelValidator(BaseModelValidator):
+    """Class for validating UserSubscriptionsModels."""
+
+    @classmethod
+    def _external_id_relationships(cls):
+        return {
+            'activity_ids': exp_models.ExplorationModel,
+            'collection_ids': collection_models.CollectionModel,
+            'general_feedback_thread_ids': (
+                feedback_models.GeneralFeedbackThreadModel),
+            'creator_ids': user_models.UserSettingsModel,
+        }
+
+    @classmethod
+    def validate(cls, item):
+        """Validates a UserSubscriptionsModel entity.
+
+        Args:
+            item: UserSubscriptionsModel. Entity to validate.
+
+        Returns:
+            a 2-tuple, both list(str). The first element is a list of error
+            strings, and the second element is a list of checks passed.
+        """
+        cls.errors = []
+        cls.checks_passed = []
+
+        if not has_undeleted_model_for_id(
+                user_models.UserSettingsModel, item.id):
+            cls.errors.append(
+                'id %s is not valid %s' % (
+                    item.id,
+                    user_models.UserSettingsModel.__name__))
+        else:
+            cls.checks_passed.append(['id check passed'])
+        cls._validate_external_id_relationships(item)
+
+
 class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that audits and validates production models."""
 
@@ -123,7 +146,7 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if not model_instance.deleted:
             # Check if model_instance is a UserSubscriptionsModel here because
             # we will add more model classes to iterate over in the future.
-            # TODO(sshou) remove this comment after we added other classes.
+            # TODO(sshou) remove this comment after we add other classes.
             if isinstance(model_instance, user_models.UserSubscriptionsModel):
                 validate_user_subs_model = UserSubscriptionsModelValidator()
                 validate_user_subs_model.validate(model_instance)
