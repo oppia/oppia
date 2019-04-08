@@ -33,7 +33,8 @@ fdescribe('State content editor directive', function() {
 
   beforeEach(module('directiveTemplates'));
   beforeEach(function() {
-    module('stateContentEditorModule', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS);
+    module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS);
+    module('stateContentEditorModule');
 
     mockExplorationData = {
       explorationId: 0,
@@ -44,7 +45,7 @@ fdescribe('State content editor directive', function() {
     });
   });
 
-  beforeEach(inject(function($compile, $injector, $scope, $templateCache) {
+  beforeEach(inject(function($compile, $injector, $rootScope, $templateCache) {
     shof = $injector.get('SubtitledHtmlObjectFactory');
     cls = $injector.get('ChangeListService');
     citat = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
@@ -213,10 +214,10 @@ fdescribe('State content editor directive', function() {
     var templateHtml = $templateCache.get(
       '/pages/exploration_editor/editor_tab/' +
       'state_content_editor_directive.html');
-    $compile(templateHtml, $scope);
-    $scope.$digest();
+    $compile(templateHtml, $rootScope);
+    $rootScope.$digest();
 
-    outerScope = $scope.$new();
+    outerScope = $rootScope.$new();
     outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
     outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired = (
       jasmine.createSpy(''));
@@ -231,7 +232,7 @@ fdescribe('State content editor directive', function() {
     ctrlScope = compiledElem[0].getControllerScope();
   }));
 
-  it('should start with the content editor not being open', function() {
+  fit('should start with the content editor not being open', function() {
     expect(ctrlScope.contentEditorIsOpen).toBe(false);
   });
 
