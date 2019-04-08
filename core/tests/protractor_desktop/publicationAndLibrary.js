@@ -227,9 +227,9 @@ describe('Permissions for private explorations', function() {
     explorationEditorPage.navigateToSettingsTab();
 
     workflow.openEditTestRolesForm();
-    expect(workflow.canAddUser()).toBe('false');
+    expect(workflow.canAddUser()).toBe(false);
     workflow.setTitleForExploration('Chuck Norris');
-    expect(workflow.canAddUser()).toBe('true');
+    expect(workflow.canAddUser()).toBe(true);
     workflow.closeEditTestRolesForm();
   })
 
