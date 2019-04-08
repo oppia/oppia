@@ -25,14 +25,18 @@ var htmlMinifyConfig = {
 
 module.exports = {
   entries: {
+    admin: './core/templates/dev/head/pages/admin/Admin.js',
     app: './core/templates/dev/head/App.js',
     about: './core/templates/dev/head/pages/about/About.js',
     contact: './core/templates/dev/head/pages/contact/Contact.js',
+    creator_dashboard: './core/templates/dev/head/pages/creator_dashboard/CreatorDashboard.js',
     donate: './core/templates/dev/head/pages/donate/Donate.js',
     error: './core/templates/dev/head/pages/error/Error.js',
     get_started: './core/templates/dev/head/pages/get_started/GetStarted.js',
     landing: './core/templates/dev/head/pages/landing/TopicLandingPage.js',
     library: './core/templates/dev/head/pages/library/Library.js',
+    notifications_dashboard: './core/templates/dev/head/pages/notifications_dashboard/NotificationsDashboard.js',
+    preferences: './core/templates/dev/head/pages/preferences/Preferences.js',
     profile: './core/templates/dev/head/pages/profile/Profile.js',
     signup: './core/templates/dev/head/pages/signup/Signup.js',
     splash: './core/templates/dev/head/pages/splash/Splash.js',
@@ -41,6 +45,13 @@ module.exports = {
     thanks: './core/templates/dev/head/pages/thanks/Thanks.js',
   },
   plugins: [
+   new HtmlWebpackPlugin({
+      chunks: ['app', 'admin'],
+      filename: 'admin.html',
+      template: 'core/templates/dev/head/pages/admin/admin.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
     new HtmlWebpackPlugin({
       chunks: ['app'],
       filename: 'base.html',
@@ -59,6 +70,13 @@ module.exports = {
       chunks: ['contact'],
       filename: 'contact.html',
       template: 'core/templates/dev/head/pages/contact/contact.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['creator_dashboard'],
+      filename: 'creator_dashboard.html',
+      template: 'core/templates/dev/head/pages/creator_dashboard/creator_dashboard.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -100,6 +118,20 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'privacy.html',
       template: 'core/templates/dev/head/pages/privacy/privacy.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['notifications_dashboard'],
+      filename: 'notifications_dashboard.html',
+      template: 'core/templates/dev/head/pages/notifications_dashboard/notifications_dashboard.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['preferences'],
+      filename: 'preferences.html',
+      template: 'core/templates/dev/head/pages/preferences/preferences.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

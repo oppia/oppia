@@ -18,6 +18,7 @@
  */
 
 require('domain/objects/FractionObjectFactory.js');
+require('domain/objects/UnitsObjectFactory.js');
 
 oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
   INVALID_VALUE:

@@ -20,8 +20,8 @@ require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/ExplorationDataService.js');
 require('pages/exploration_editor/ExplorationStatesService.js');
 require('pages/exploration_editor/StateTutorialFirstTimeService.js');
-require('pages/state_editor/StateEditorService.js');
-require('pages/state_editor/StatePropertyServices.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
+require('pages/state_editor/state_properties/StatePropertyService.js');
 require('services/ContextService.js');
 require('services/EditabilityService.js');
 

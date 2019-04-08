@@ -16,6 +16,37 @@
  * @fileoverview Data and controllers for the Oppia admin page.
  */
 
+//vvv this block of requires should be removed vvv
+require('directives/FocusOnDirective.js');
+require('components/forms/validators/IsAtLeastFilter.js');
+require('components/forms/validators/IsAtMostFilter.js');
+require('components/forms/validators/IsFloatFilter.js');
+require('components/forms/validators/IsIntegerFilter.js');
+require('components/forms/validators/IsNonemptyFilter.js');
+require('components/forms/ApplyValidationDirective.js');
+require('components/forms/ObjectEditorDirective.js');
+require('components/forms/RequireIsFloatDirective.js');
+require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedDictEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedIntEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedListEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js');
+//^^^ this block of requires should be removed ^^^
+
+require('pages/admin/AdminNavbarDirective.js');
+require('pages/admin/activities_tab/AdminDevModeActivitiesTabDirective.js');
+require('pages/admin/activities_tab/AdminProdModeActivitiesTabDirective.js');
+require('pages/admin/config_tab/AdminConfigTabDirective.js');
+require('pages/admin/jobs_tab/AdminJobsTabDirective.js');
+require('pages/admin/misc_tab/AdminMiscTabDirective.js');
+require('pages/admin/roles_tab/AdminRolesTabDirective.js');
+
 require('domain/objects/NumberWithUnitsObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/admin/AdminRouterService.js');

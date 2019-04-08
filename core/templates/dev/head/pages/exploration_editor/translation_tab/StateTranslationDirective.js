@@ -27,7 +27,7 @@ require('pages/exploration_editor/ExplorationStatesService.js');
 require('pages/exploration_editor/RouterService.js');
 require('pages/exploration_editor/translation_tab/TranslationStatusService.js');
 require('pages/exploration_editor/translation_tab/TranslationTabActiveContentIdService.js');
-require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
 
 oppia.directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {

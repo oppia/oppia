@@ -21,7 +21,7 @@ require('domain/exploration/ParamChangeObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/ExplorationParamSpecsService.js');
 require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
 require('services/AlertsService.js');
 require('services/EditabilityService.js');
 

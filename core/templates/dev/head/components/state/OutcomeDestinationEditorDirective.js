@@ -19,7 +19,7 @@
 require('../StateGraphLayoutService.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/EditorFirstTimeEventsService.js');
-require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
 require('services/EditabilityService.js');
 require('services/UserService.js');
 require('services/stateful/FocusManagerService.js');

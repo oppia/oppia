@@ -21,8 +21,8 @@ require('domain/exploration/OutcomeObjectFactory.js');
 require('pages/exploration_editor/editor_tab/AnswerGroupsCacheService.js');
 require('pages/exploration_editor/editor_tab/SolutionValidityService.js');
 require('pages/exploration_editor/editor_tab/SolutionVerificationService.js');
-require('pages/state_editor/StateEditorService.js');
-require('pages/state_editor/StatePropertyServices.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
+require('pages/state_editor/state_properties/StatePropertyService.js');
 require('services/AlertsService.js');
 require('services/ContextService.js');
 

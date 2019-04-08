@@ -16,6 +16,9 @@
  * @fileoverview Primary controller for the topic editor page.
  */
 
+require('pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.js');
+require('pages/topic_editor/TopicEditorNavbarDirective.js');
+
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.constant(
   'EDITABLE_TOPIC_DATA_URL_TEMPLATE', '/topic_editor_handler/data/<topic_id>');

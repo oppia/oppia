@@ -26,7 +26,7 @@ require('domain/skill/MisconceptionObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('filters/TruncateFilter.js');
 require('pages/topic_editor/TopicEditorStateService.js');
-require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
 require('services/AlertsService.js');
 require('services/contextual/UrlService.js');
 

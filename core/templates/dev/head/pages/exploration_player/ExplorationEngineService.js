@@ -31,7 +31,7 @@ require('pages/exploration_player/ImagePreloaderService.js');
 require('pages/exploration_player/LearnerParamsService.js');
 require('pages/exploration_player/NumberAttemptsService.js');
 require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.js');
-require('pages/exploration_player/PlayerTranscriptService.js');');
+require('pages/exploration_player/PlayerTranscriptService.js');
 require('pages/exploration_player/StateClassifierMappingService.js');
 require('pages/exploration_player/StatsReportingService.js');
 require('services/AlertsService.js');

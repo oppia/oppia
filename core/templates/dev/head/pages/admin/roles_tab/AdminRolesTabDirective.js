@@ -16,6 +16,8 @@
  * @fileoverview Directive for the Roles tab in the admin panel.
  */
 
+require('pages/admin/roles_tab/RoleGraphDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/admin/AdminTaskManagerService.js');
 

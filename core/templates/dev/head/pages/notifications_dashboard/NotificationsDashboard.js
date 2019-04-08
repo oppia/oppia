@@ -16,6 +16,8 @@
  * @fileoverview Data and controllers for the user's notifications dashboard.
  */
 
+require('services/DateTimeFormatService.js');
+
 oppia.controller('NotificationsDashboard', [
   '$http', '$rootScope', '$scope', 'DateTimeFormatService',
   function($http, $rootScope, $scope, DateTimeFormatService) {

@@ -32,7 +32,7 @@ require('pages/exploration_player/ExplorationEngineService.js');
 require('pages/exploration_player/LearnerParamsService.js');
 require('pages/exploration_player/NumberAttemptsService.js');
 require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.js');
-require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
 require('services/ContextService.js');
 require('services/ExplorationFeaturesService.js');
 

@@ -23,7 +23,7 @@ require('pages/exploration_editor/ExplorationStatesService.js');
 require('pages/exploration_editor/ExplorationWarningsService.js');
 require('pages/exploration_editor/GraphDataService.js');
 require('pages/exploration_editor/RouterService.js');
-require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
 require('services/AlertsService.js');
 require('services/ContextService.js');
 require('services/ExplorationFeaturesService.js');

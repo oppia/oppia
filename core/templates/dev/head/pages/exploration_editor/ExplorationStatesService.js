@@ -18,7 +18,7 @@
  * keeps no mementos.
  */
 
-require('domain/state/StatesObjectFactory.js');
+require('domain/exploration/StatesObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('filters/NormalizeWhitespaceFilter.js');
 require('pages/exploration_editor/AngularNameService.js');
@@ -26,7 +26,7 @@ require('pages/exploration_editor/ChangeListService.js');
 require('pages/exploration_editor/ExplorationInitStateNameService.js');
 require('pages/exploration_editor/editor_tab/SolutionValidityService.js');
 require('pages/exploration_player/AnswerClassificationService.js');
-require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
 require('services/AlertsService.js');
 require('services/ContextService.js');
 require('services/ValidatorsService.js');

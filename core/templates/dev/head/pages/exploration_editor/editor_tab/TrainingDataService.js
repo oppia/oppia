@@ -22,7 +22,7 @@ require('domain/exploration/RuleObjectFactory.js');
 require('pages/exploration_editor/ExplorationStatesService.js');
 require('pages/exploration_editor/GraphDataService.js');
 require('pages/exploration_editor/editor_tab/ResponsesService.js');
-require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
 
 oppia.factory('TrainingDataService', [
   '$http', '$rootScope', 'ExplorationStatesService', 'GraphDataService',

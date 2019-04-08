@@ -16,7 +16,12 @@
  * @fileoverview NormalizeWhitespace filter for Oppia.
  */
 
-require('services/UtilsService.js');
+//this is intentional since normalizeWhitespace is use from /extensions
+try {
+  require('services/UtilsService.js');
+} catch (e) {
+
+}
 
 // Filter that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.

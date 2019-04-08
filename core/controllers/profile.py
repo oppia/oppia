@@ -108,7 +108,7 @@ class PreferencesPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/preferences/preferences.html')
+        self.render_template('dist/preferences.html')
 
 
 class PreferencesHandler(base.BaseHandler):

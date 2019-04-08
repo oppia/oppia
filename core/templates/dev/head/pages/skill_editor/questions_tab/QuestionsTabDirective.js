@@ -24,7 +24,7 @@ require('domain/question/QuestionObjectFactory.js');
 require('domain/skill/EditableSkillBackendApiService.js');
 require('domain/skill/MisconceptionObjectFactory.js');
 require('pages/skill_editor/SkillEditorStateService.js');
-require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
 require('services/AlertsService.js');
 require('services/contextual/UrlService.js');
 

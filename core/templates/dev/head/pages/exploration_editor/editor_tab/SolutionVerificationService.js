@@ -18,7 +18,7 @@
 
 require('pages/exploration_editor/AngularNameService.js');
 require('pages/exploration_player/AnswerClassificationService.js');
-require('pages/state_editor/StateEditorService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
 
 oppia.factory('SolutionVerificationService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',

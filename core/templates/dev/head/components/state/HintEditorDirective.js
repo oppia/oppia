@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.js');
-require('pages/state_editor/StatePropertyServices.js');
+require('pages/state_editor/state_properties/StatePropertyService.js');
 require('services/EditabilityService.js');
 
 oppia.directive('hintEditor', [

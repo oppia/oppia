@@ -19,6 +19,8 @@
 // This should come before 'apply-validation', if that is defined as
 // an attribute on the HTML tag.
 
+require('components/forms/validators/IsFloatFilter.js');
+
 /* eslint-disable angular/directive-restrict */
 oppia.directive('requireIsFloat', ['$filter', function($filter) {
   return {
