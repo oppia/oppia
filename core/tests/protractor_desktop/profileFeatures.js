@@ -71,7 +71,7 @@ describe('Profile Features functionality', function() {
     users.logout();
   });
 
-  it('Subscribe to a particular User', function() {
+  it('should subscribe to a particular user', function() {
     users.login('FirstUser@profileFeatures.com');
 
     // Subscribe to both the creators.
