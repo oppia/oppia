@@ -40,6 +40,7 @@ def has_undeleted_model_for_id(model_class, model_id):
     model = model_class.get_by_id(model_id)
     return model is not None and model.deleted is False
 
+
 class BaseModelValidator(object):
     """Base class for validating models."""
 
