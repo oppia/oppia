@@ -70,6 +70,7 @@ oppia.directive('storyNodeEditor', [
             $scope.oldOutline = $scope.getOutline();
             $scope.editableOutline = $scope.getOutline();
             $scope.explorationId = $scope.getExplorationId();
+            $scope.currentExplorationId = $scope.explorationId;
             $scope.nodeTitleEditorIsShown = false;
             $scope.OUTLINE_SCHEMA = {
               type: 'html',
@@ -112,6 +113,7 @@ oppia.directive('storyNodeEditor', [
           $scope.updateExplorationId = function(explorationId) {
             StoryUpdateService.setStoryNodeExplorationId(
               $scope.story, $scope.getId(), explorationId);
+            $scope.currentExplorationId = explorationId;
           };
 
           $scope.addPrerequisiteSkillId = function(skillId) {

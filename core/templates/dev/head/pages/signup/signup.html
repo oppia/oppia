@@ -15,10 +15,6 @@
 
 {% block header_js %}
   {{ super() }}
-  <script type="text/javascript">
-    GLOBALS.CAN_SEND_EMAILS = JSON.parse(
-      '{{CAN_SEND_EMAILS|js_string}}');
-  </script>
 {% endblock header_js %}
 
 {% block content %}
