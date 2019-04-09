@@ -38,7 +38,7 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
 
         self.render_template(
             'pages/topics_and_skills_dashboard/'
-            'topics_and_skills_dashboard.html', redirect_url_on_logout='/')
+            'topics_and_skills_dashboard.html')
 
 
 class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):

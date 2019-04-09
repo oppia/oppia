@@ -21,7 +21,7 @@ describe('Text Input rules service', function() {
 
   var tirs = null;
   beforeEach(inject(function($injector) {
-    tirs = $injector.get('textInputRulesService');
+    tirs = $injector.get('TextInputRulesService');
   }));
 
   var RULE_INPUT = {

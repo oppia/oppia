@@ -21,7 +21,7 @@ describe('Item Selection rules service', function() {
 
   var isirs = null;
   beforeEach(inject(function($injector) {
-    isirs = $injector.get('itemSelectionInputRulesService');
+    isirs = $injector.get('ItemSelectionInputRulesService');
   }));
 
   it('should have a correct \'equals\' rule', function() {
@@ -70,6 +70,22 @@ describe('Item Selection rules service', function() {
         ['a', 'b', 'c'], RULE_INPUT)).toBe(false);
       expect(isirs.DoesNotContainAtLeastOneOf(
         ['a', 'b', 'c', 'd'], RULE_INPUT)).toBe(false);
+    }
+  );
+  it('should have a correct \'is a proper subset of\' rule',
+    function() {
+      var RULE_INPUT = {
+        x: ['a', 'b', 'c']
+      };
+      expect(isirs.IsProperSubsetOf([], RULE_INPUT)).toBe(true);
+      expect(isirs.IsProperSubsetOf(['a'], RULE_INPUT)).toBe(true);
+      expect(isirs.IsProperSubsetOf(['a', 'b'], RULE_INPUT)).toBe(true);
+      expect(isirs.IsProperSubsetOf(['a', 'b', 'c'], RULE_INPUT)).toBe(false);
+      expect(isirs.IsProperSubsetOf(['d', 'e'], RULE_INPUT)).toBe(false);
+      expect(isirs.IsProperSubsetOf(
+        ['a', 'b', 'c', 'd'], RULE_INPUT)).toBe(false);
+      expect(isirs.IsProperSubsetOf(
+        ['b', 'c', 'd', 'e'], RULE_INPUT)).toBe(false);
     }
   );
 });

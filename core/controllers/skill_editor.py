@@ -95,13 +95,10 @@ class SkillEditorPage(base.BaseHandler):
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
-            'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'ALLOWED_INTERACTION_CATEGORIES': (
-                feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES)
+            'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
 
-        self.render_template(
-            'pages/skill_editor/skill_editor.html', redirect_url_on_logout='/')
+        self.render_template('pages/skill_editor/skill_editor.html')
 
 
 def check_can_edit_skill_description(user):

@@ -24,18 +24,18 @@ oppia.directive('searchBar', [
         '/pages/library/' +
         'search_bar_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', '$window', '$location',
-        '$translate', 'SearchService', 'NavigationService',
-        'DebouncerService', 'HtmlEscaperService',
-        'UrlService', 'ConstructTranslationIdsService',
+        '$location', '$rootScope', '$scope', '$timeout', '$translate',
+        '$window', 'ConstructTranslationIdsService', 'DebouncerService',
+        'HtmlEscaperService', 'LanguageUtilService', 'NavigationService',
+        'SearchService', 'UrlService', 'SEARCH_DROPDOWN_CATEGORIES',
         function(
-            $scope, $rootScope, $timeout, $window, $location,
-            $translate, SearchService, NavigationService,
-            DebouncerService, HtmlEscaperService,
-            UrlService, ConstructTranslationIdsService) {
+            $location, $rootScope, $scope, $timeout, $translate,
+            $window, ConstructTranslationIdsService, DebouncerService,
+            HtmlEscaperService, LanguageUtilService, NavigationService,
+            SearchService, UrlService, SEARCH_DROPDOWN_CATEGORIES) {
           $scope.isSearchInProgress = SearchService.isSearchInProgress;
           $scope.SEARCH_DROPDOWN_CATEGORIES = (
-            GLOBALS.SEARCH_DROPDOWN_CATEGORIES.map(
+            SEARCH_DROPDOWN_CATEGORIES.map(
               function(categoryName) {
                 return {
                   id: categoryName,
@@ -74,13 +74,8 @@ oppia.directive('searchBar', [
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
             $scope.activeMenuName = NavigationService.activeMenuName;
           };
-          $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
-            function(languageItem) {
-              return {
-                id: languageItem.code,
-                text: languageItem.name
-              };
-            });
+          $scope.ALL_LANGUAGE_CODES = (
+            LanguageUtilService.getLanguageIdsAndTexts());
 
           $scope.searchQuery = '';
           $scope.selectionDetails = {

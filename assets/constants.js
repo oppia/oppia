@@ -30,6 +30,13 @@ var constants = {
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
 
+  // These categories are shown in the library navbar. The categories should
+  // be in sorted order.
+  "SEARCH_DROPDOWN_CATEGORIES": ["Algorithms", "Architecture", "Art",
+    "Biology", "Business", "Chemistry", "Economics", "English", "Geography",
+    "History", "Mathematics", "Medicine", "Music", "Physics", "Programming",
+    "Reading", "Statistics"],
+
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
@@ -431,6 +438,61 @@ var constants = {
     "LIST": "list"
   },
 
+  "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
+    "name": "General",
+    "interaction_ids": [
+        "MultipleChoiceInput",
+        "TextInput"
+    ]
+  }, {
+    "name": "Math",
+    "interaction_ids": [
+        "NumericInput"
+    ]
+  }],
+
+  // These categories and interactions are displayed in the order in which they
+  // appear in the interaction selector.
+  "ALLOWED_INTERACTION_CATEGORIES": [{
+    "name": "General",
+    "interaction_ids": [
+        "Continue",
+        "EndExploration",
+        "ImageClickInput",
+        "ItemSelectionInput",
+        "MultipleChoiceInput",
+        "TextInput",
+        "DragAndDropSortInput"
+    ]
+  }, {
+    "name": "Math",
+    "interaction_ids": [
+        "FractionInput",
+        "GraphInput",
+        "LogicProof",
+        "NumericInput",
+        "SetInput",
+        "MathExpressionInput",
+        "NumberWithUnits"
+    ]
+  }, {
+    "name": "Programming",
+    "interaction_ids": [
+        "CodeRepl",
+        "PencilCodeEditor"
+    ]
+  }, {
+    "name": "Music",
+    "interaction_ids": [
+        "MusicNotesInput"
+    ]
+  }, {
+    "name": "Geography",
+    "interaction_ids": [
+        "InteractiveMap"
+    ]
+  }],
+
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
@@ -455,6 +517,8 @@ var constants = {
     "\\u0014", "\\u0015", "\\u0016", "\\u0017", "\\u0018", "\\u0019", "\\u001a",
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
+
+  "DEFAULT_SKILL_DIFFICULTY": 0.3,
 
   "ENABLE_NEW_STRUCTURE_EDITORS": true,
 

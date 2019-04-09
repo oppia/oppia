@@ -102,10 +102,10 @@ md-input-group.md-default-theme label {
 }
 
 .md-button.oppia-learner-reload-image-button {
-  background:#ffffff;
+  background: #ffffff;
   border: 2px solid;
-  border-color:#0D48A1;
-  color:  #0D48A1;
+  border-color: #0D48A1;
+  color: #0D48A1;
   padding-bottom: 12px;
   padding-left: 20px;
   padding-right: 20px;
@@ -358,6 +358,22 @@ p:last-child {
   margin: 1.4em 0;
 }
 
+/* This will prevent the enlargement of the text in the RTE. A span tag gets
+   introduced when a user selects the text from the end of first line, goes to the
+   second one and then writes some text to replace that. The span tag carries
+   along with it a style=font-size:1.6em;, due to which the text is enlarged.
+   This size seems to be taken from the font-size from the body element's
+   CSS class, but we do not know what JS code is causing it to be inlined in the
+   span tag. There is as such no way to remove !important as of now, it's a
+   CKEditor bug (issue #6206 on Oppia). */
+.oppia-rte p span {
+  font-size: 1em !important;
+}
+
+.oppia-rte-editor p span {
+  font-size: 1em !important;
+}
+
 .oppia-long-text-image {
   display: block;
   margin-left: auto;
@@ -480,6 +496,11 @@ textarea {
   position: relative;
   transition: transform 0.5s;
   -webkit-transition: -webkit-transform 0.5s;
+}
+
+.oppia-correctness-label-editor {
+  margin-left: 4px;
+  margin-top: 18px;
 }
 
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
@@ -1926,16 +1947,16 @@ pre.oppia-pre-wrapped-text {
   -webkit-transform: rotate(-10deg);
 
   background-color: yellow;
-  border:1px solid black;
+  border: 1px solid black;
   color: firebrick;
   cursor: pointer;
   font-size: 20px;
   font-weight: bold;
-  height:22px;
+  height: 22px;
   line-height: 22px;
   text-align: center;
   transform: rotate(-10deg);
-  width:22px;
+  width: 22px;
 }
 
 .oppia-rule-details-header {
@@ -2511,7 +2532,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-modal-information-card .modal-dialog .modal-content md-card {
-  border-radius:0;
+  border-radius: 0;
   margin: 0;
   padding: 0;
 }
@@ -3853,16 +3874,19 @@ span.oppia-issues-learner-action {
   width: 200px;
   height: 115.47px;
   background-color: #009A8B;
-  margin: 20px 0;
+  margin: 15px 0;
   border-left: solid 2px #009A8B;
   border-right: solid 2px #009A8B;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
 }
 
 .oppia-hexagon:before,
 .oppia-hexagon:after {
   content: "";
   position: absolute;
-  z-index: 1;
+  z-index: -1;
   width: 141.42px;
   height: 141.42px;
   -webkit-transform: scaleY(0.5774) rotate(-45deg);

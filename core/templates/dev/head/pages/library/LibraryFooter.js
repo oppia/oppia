@@ -17,8 +17,9 @@
  */
 
 oppia.controller('LibraryFooter', [
-  '$scope', 'LIBRARY_PAGE_MODES', function($scope, LIBRARY_PAGE_MODES) {
-    $scope.pageMode = GLOBALS.PAGE_MODE;
-    $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
+  '$scope', '$window', 'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
+  function($scope, $window, LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES) {
+    var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];
+    $scope.footerIsDisplayed = (pageMode !== LIBRARY_PAGE_MODES.SEARCH);
   }
 ]);

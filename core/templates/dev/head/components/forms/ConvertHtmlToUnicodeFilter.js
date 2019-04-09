@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,18 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the mark_all_audio_as_needing_update modal.
+ * @fileoverview Converts HTML to unicode.
  */
 
-oppia.controller('MarkAllAudioAsNeedingUpdateController', [
-  '$scope', '$uibModalInstance',
-  function($scope, $uibModalInstance) {
-    $scope.flagAll = function() {
-      $uibModalInstance.close();
-    };
-
-    $scope.cancel = function() {
-      $uibModalInstance.dismiss('cancel');
-    };
-  }
-]);
+oppia.filter('convertHtmlToUnicode', [function() {
+  return function(html) {
+    return angular.element('<div>' + html + '</div>').text();
+  };
+}]);

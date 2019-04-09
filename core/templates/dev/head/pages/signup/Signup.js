@@ -30,7 +30,6 @@ oppia.controller('Signup', [
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
     $scope.warningI18nCode = '';
     $scope.siteName = SITE_NAME;
-    $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS;
     $scope.submissionInProcess = false;
 
     $http.get(_SIGNUP_DATA_URL).then(function(response) {
@@ -39,6 +38,7 @@ oppia.controller('Signup', [
       $scope.username = data.username;
       $scope.hasEverRegistered = data.has_ever_registered;
       $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
+      $scope.showEmailPreferencesForm = data.can_send_emails;
       $scope.hasUsername = Boolean($scope.username);
       FocusManagerService.setFocus('usernameInputField');
     });
@@ -197,11 +197,11 @@ oppia.controller('Signup', [
           function($scope, $uibModalInstance, SiteAnalyticsService,
               UserService, $timeout, $window) {
             $scope.continueRegistration = function() {
-              UserService.getLoginAndLogoutUrls().then(
-                function(urlObject) {
-                  if (urlObject.login_url) {
+              UserService.getLoginUrlAsync().then(
+                function(loginUrl) {
+                  if (loginUrl) {
                     $timeout(function() {
-                      $window.location = urlObject.login_url;
+                      $window.location = loginUrl;
                     }, 150);
                   } else {
                     throw Error('Login url not found.');
