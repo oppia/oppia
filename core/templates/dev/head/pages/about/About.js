@@ -17,8 +17,8 @@
  */
 
 oppia.controller('About', [
-  '$scope', 'UrlInterpolationService',
-  function($scope, UrlInterpolationService) {
+  '$scope', 'PageTitleService', 'UrlInterpolationService',
+  function($scope, PageTitleService, UrlInterpolationService) {
     // Define constants
     $scope.TAB_ID_ABOUT = 'about';
     $scope.TAB_ID_FOUNDATION = 'foundation';
@@ -91,5 +91,9 @@ oppia.controller('About', [
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.aboutPageMascotImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/about_page_mascot.png');
+
+    // Set page title
+    var pageTitle = 'About us - Oppia';
+    PageTitleService.setPageTitle(pageTitle);
   }
 ]);
