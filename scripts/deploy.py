@@ -159,7 +159,7 @@ def preprocess_release():
         assert content.count('version: default') == 1
     os.remove('app.yaml')
     content = content.replace('version: default', '')
-    with open('app.yaml', 'w+') as f:
+    with open('app.yaml', 'w') as f:
         f.write(content)
     print 'Version field removed.'
 
