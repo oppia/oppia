@@ -50,7 +50,7 @@ describe('Profile Features functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('View a particular exploration created by another User', function() {
+  it('should view a particular exploration created by another user', function() {
     users.login(creator1Id + '@profileFeatures.com');
     workflow.createAndPublishExploration(
       'Activation',
