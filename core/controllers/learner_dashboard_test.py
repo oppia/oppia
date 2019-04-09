@@ -246,6 +246,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(LearnerDashboardFeedbackThreadHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
         # Load exploration 0.
         exp_services.load_demo(self.EXP_ID_1)
 
@@ -277,6 +278,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list']
         first_message = messages_summary[0]
+
         self.assertDictContainsSubset({
             'text': 'a sample message',
             'author_username': 'editor'
