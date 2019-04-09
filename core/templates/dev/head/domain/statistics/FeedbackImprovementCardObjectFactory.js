@@ -34,7 +34,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
 
     /** @returns {string} - A concise summary of the card. */
     FeedbackImprovementCard.prototype.getTitle = function() {
-      return "Feedback Thread";
+      return 'Feedback Thread';
     };
 
     /** @returns {string} - The directive type used to render the card. */
