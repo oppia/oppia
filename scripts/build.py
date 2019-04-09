@@ -1173,13 +1173,13 @@ def compile_typescript_files(project_dir):
             to be compiled.
     """
     print 'Compiling ts files...'
-    cmd = '../node_modules/typescript/bin/tsc --project %s' % project_dir
-    subprocess.check_call(cmd, shell=True)
+    cmd = ['../node_modules/typescript/bin/tsc', '--project', project_dir]
+    subprocess.check_call(cmd)
 
 
-def compile_typescript_files_in_watch_mode(project_dir):
-    """Compiles typescript files in watch mode to produce javascript
-    files in local_compiled_js folder.
+def compile_typescript_files_continuously(project_dir):
+    """Compiles typescript files continuously i.e enable a watcher which
+    monitors any changes in js files and recompiles them to ts files.
 
     Args:
         project_dir: str. The project directory which contains the ts files
@@ -1201,14 +1201,12 @@ def compile_typescript_files_in_watch_mode(project_dir):
                 lines = f.readlines()
                 if len(lines):
                     # We are checking only the last line here since
-                    # whenever typescript is done with compilation
-                    # with or without errors, the last line will
-                    # always read Found x errors. Watching for file
-                    # changes.
+                    # whenever typescript is done with compilation with or
+                    # without errors, the last line will always read
+                    # 'Found x errors. Watching for file changes'.
                     last_output = lines[len(lines) - 1]
                     if 'Watching for file changes' in last_output:
                         return
-
 
 
 def build():
@@ -1234,7 +1232,7 @@ def build():
     if not options.enable_watcher:
         compile_typescript_files('.')
     else:
-        compile_typescript_files_in_watch_mode('.')
+        compile_typescript_files_continuously('.')
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
