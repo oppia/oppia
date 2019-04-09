@@ -33,10 +33,22 @@ fi
 sudo apt-get update
 sudo apt-get install curl
 sudo apt-get install git
-sudo apt-get install openjdk-8-jre
+sudo apt-get install default-jdk
 sudo apt-get install python-setuptools
 sudo apt-get install python-dev
-sudo apt-get install python-pip
 sudo apt-get install unzip
 sudo apt-get install python-yaml
-sudo pip install --upgrade pip
+
+# this pip installation is used for problems arising with python-pip package installation and python 2.7.9
+
+hash pip 2> /dev/null
+
+if [ $? -eq 0 ]
+then
+  sudo pip install --upgrade pip
+else
+  wget https://bootstrap.pypa.io/get-pip.py
+  sudo python get-pip.py
+  rm get-pip.py
+fi
+

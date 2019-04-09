@@ -17,6 +17,7 @@ SCRIPT
 
 $script = <<SCRIPT
 cd /home/vagrant/oppia
+bash ./scripts/install_python279.sh
 bash ./scripts/install_prerequisites.sh
 bash ./scripts/start.sh
 SCRIPT

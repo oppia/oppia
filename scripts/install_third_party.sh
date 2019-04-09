@@ -65,6 +65,27 @@ install_node_module @types/selenium-webdriver 2.53.43
 install_node_module uglify-js 3.3.11
 install_node_module yargs 3.29.0
 
+# Checking if pip is installed. If you are having
+# trouble, please ensure that you have pip installed (see "Installing Oppia"
+# on the Oppia developers' wiki page).
+echo Checking if pip is installed on the local machine
+if ! type pip > /dev/null 2>&1 ; then
+    echo ""
+    echo "  Pip is required to install Oppia dependencies, but pip wasn't found"
+    echo "  on your local machine."
+    echo ""
+    echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
+
+    if [ "${OS}" == "Darwin" ] ; then
+      echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
+    else
+      echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
+    fi
+
+    # If pip is not installed, quit.
+    exit 1
+fi
+
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
 # GitPython, however the patches to it below (with the sed operations) lead to
@@ -82,6 +103,9 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
     cd skulpt-0.10.0
     git clone https://github.com/skulpt/skulpt
     cd skulpt
+
+    echo Installing Git-python on main interpreter for skulpt building
+    pip install --user GitPython
 
     # Use a specific Skulpt release.
     git checkout 0.10.0
@@ -107,27 +131,6 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
   # Move the build directory to the static resources folder.
   mkdir -p $THIRD_PARTY_DIR/static/skulpt-0.10.0
   cp -r $TOOLS_DIR/skulpt-0.10.0/skulpt/dist/* $THIRD_PARTY_DIR/static/skulpt-0.10.0
-fi
-
-# Checking if pip is installed. If you are having
-# trouble, please ensure that you have pip installed (see "Installing Oppia"
-# on the Oppia developers' wiki page).
-echo Checking if pip is installed on the local machine
-if ! type pip > /dev/null 2>&1 ; then
-    echo ""
-    echo "  Pip is required to install Oppia dependencies, but pip wasn't found"
-    echo "  on your local machine."
-    echo ""
-    echo "  Please see \"Installing Oppia\" on the Oppia developers' wiki page:"
-
-    if [ "${OS}" == "Darwin" ] ; then
-      echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-OS%29"
-    else
-      echo "    https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux%29"
-    fi
-
-    # If pip is not installed, quit.
-    exit 1
 fi
 
 echo Checking if pylint is installed in $TOOLS_DIR
