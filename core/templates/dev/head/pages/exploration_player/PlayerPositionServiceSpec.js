@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for the player position service.
-*/
+ * @fileoverview Unit tests for the player position service.
+ */
 
 describe('Player position service', function() {
   beforeEach(module('oppia'));

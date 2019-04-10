@@ -13,9 +13,9 @@
 // limitations under the License.
 
 /**
-* @fileoverview Service for managing the state of the skill being edited
-* in the skill editor.
-*/
+ * @fileoverview Service for managing the state of the skill being edited
+ * in the skill editor.
+ */
 
 oppia.constant('EVENT_SKILL_INITIALIZED', 'skillInitialized');
 oppia.constant('EVENT_SKILL_REINITIALIZED', 'skillReinitialized');

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for FeedbackThreadObjectFactory.
-*/
+ * @fileoverview Unit tests for FeedbackThreadObjectFactory.
+ */
 
 describe('Feedback thread object factory', function() {
   beforeEach(module('oppia'));

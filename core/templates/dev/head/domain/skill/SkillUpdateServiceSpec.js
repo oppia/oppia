@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SkillUpdateService.
-*/
+ * @fileoverview Unit tests for SkillUpdateService.
+ */
 
 describe('Skill update service', function() {
   var SkillUpdateService,

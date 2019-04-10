@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Service to handle the updating of a question.
-*/
+ * @fileoverview Service to handle the updating of a question.
+ */
 
 oppia.constant('QUESTION_PROPERTY_LANGUAGE_CODE', 'language_code');
 oppia.constant('QUESTION_PROPERTY_QUESTION_STATE_DATA', 'question_state_data');

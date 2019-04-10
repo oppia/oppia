@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SkillEditorStateService.js
-*/
+ * @fileoverview Unit tests for SkillEditorStateService.js
+ */
 
 describe('Skill editor state service', function() {
   var SkillEditorStateService, $q, $rootScope,

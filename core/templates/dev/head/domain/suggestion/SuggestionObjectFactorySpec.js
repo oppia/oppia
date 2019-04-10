@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SuggestionObjectFactory.
-*/
+ * @fileoverview Unit tests for SuggestionObjectFactory.
+ */
 
 describe('Suggestion object factory', function() {
   beforeEach(function() {

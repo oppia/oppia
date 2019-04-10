@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for ConceptCardObjectFactory.
-*/
+ * @fileoverview Unit tests for ConceptCardObjectFactory.
+ */
 
 describe('Concept card object factory', function() {
   beforeEach(module('oppia'));

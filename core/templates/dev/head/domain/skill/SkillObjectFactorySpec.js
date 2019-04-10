@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SkillObjectFactory.
-*/
+ * @fileoverview Unit tests for SkillObjectFactory.
+ */
 
 describe('Skill object factory', function() {
   beforeEach(module('oppia'));

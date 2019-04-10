@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @fileoverview A data service that stores tags for the exploration. */
+/**
+ * @fileoverview A data service that stores tags for the exploration.
+ */
 
 oppia.factory('ExplorationTagsService', [
   'ExplorationPropertyService',

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Data and controllers for the Oppia moderator page.
-*/
+ * @fileoverview Data and controllers for the Oppia moderator page.
+ */
 
 oppia.controller('Moderator', [
   '$http', '$rootScope', '$scope', 'AlertsService', 'DateTimeFormatService',

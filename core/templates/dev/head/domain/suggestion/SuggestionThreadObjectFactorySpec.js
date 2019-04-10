@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SuggestionThreadObjectFactory.
-*/
+ * @fileoverview Unit tests for SuggestionThreadObjectFactory.
+ */
 
 describe('Suggestion thread object factory', function() {
   beforeEach(function() {

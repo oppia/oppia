@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- *  @fileoverview Service for handling all interactions
- *  with the exploration editor backend.
+ * @fileoverview Service for handling all interactions
+ * with the exploration editor backend.
  */
 
 oppia.factory('ExplorationDataService', [

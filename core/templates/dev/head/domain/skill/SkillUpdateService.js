@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Service to handle the updating of a skill.
-*/
+ * @fileoverview Service to handle the updating of a skill.
+ */
 
 oppia.constant('SKILL_PROPERTY_DESCRIPTION', 'description');
 oppia.constant('SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');

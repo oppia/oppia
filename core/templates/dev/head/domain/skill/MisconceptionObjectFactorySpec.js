@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for MisconceptionObjectFacfory.
-*/
+ * @fileoverview Unit tests for MisconceptionObjectFacfory.
+ */
 
 describe('Misconception object factory', function() {
   beforeEach(module('oppia'));
