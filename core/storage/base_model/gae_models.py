@@ -63,7 +63,7 @@ class BaseModel(ndb.Model):
 
     @staticmethod
     def export_data(user_id):
-        """This method should be implemented in the inherited classes.
+        """This method should be implemented by subclasses.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
