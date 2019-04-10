@@ -182,6 +182,16 @@ BAD_PATTERNS_JS_REGEXP = [
     }
 ]
 
+MANDATORY_PATTERNS_JS_REGEXP = [
+    {
+        'regexp': r'^\s\*\s@fileoverview\s[a-zA-Z0-9_]+',
+        'message': 'Please ensure this file should contain a file '
+                   'overview i.e. a short description of the file.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    }
+]
+
 BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': r'text\/ng-template',
@@ -949,7 +959,8 @@ class LintChecksManager(object):
         """
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
-        self.parsed_js_files = self._validate_and_parse_js_files()
+        self.parsed_js_files, self.read_js_files = (
+            self._validate_and_parse_js_files())
 
     def _validate_and_parse_js_files(self):
         """This function validates JavaScript files and returns the parsed
@@ -963,19 +974,22 @@ class LintChecksManager(object):
             and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                         EXCLUDED_PATHS)]
         parsed_js_files = dict()
+        read_js_files = dict()
         if not files_to_check:
-            return parsed_js_files
+            return (parsed_js_files, read_js_files)
         if not self.verbose_mode_enabled:
             print 'Validating and parsing JS files ...'
         for filepath in files_to_check:
             if self.verbose_mode_enabled:
                 print 'Validating and parsing %s file ...' % filepath
             file_content = FileCache.read(filepath).decode('utf-8')
+            file_content_lines = FileCache.readlines(filepath)
+            read_js_files[filepath] = file_content_lines
 
             # Use esprima to parse a JS file.
             parsed_js_files[filepath] = esprima.parseScript(
                 file_content, comment=True)
-        return parsed_js_files
+        return (parsed_js_files, read_js_files)
 
     def _lint_all_files(self):
         """This function is used to check if node-eslint dependencies are
@@ -1321,12 +1335,12 @@ class LintChecksManager(object):
             print ''
             return summary_messages
 
-    def _check_js_file_overview(self):
-        """This function checks that all JS files contain their respective
-        file overview.
+    def _check_mandatory_js_patterns(self):
+        """This function checks that all JS files contain the mandatory
+        patternss.
         """
         if self.verbose_mode_enabled:
-            print 'Starting JS file overview check'
+            print 'Starting mandatory js patterns check'
             print '----------------------------------------'
 
         summary_messages = []
@@ -1340,28 +1354,33 @@ class LintChecksManager(object):
 
         with _redirect_stdout(_TARGET_STDOUT):
             for filepath in files_to_check:
-                parsed_script = self.parsed_js_files[filepath]
-                file_overview_found = False
-                for comment in parsed_script.comments:
-                    if '@fileoverview' in comment.value:
-                        file_overview_found = True
-                        if comment.type != 'Block':
-                            failed = True
-                            print ('%s --> File overview must be in block '
-                                   'comments.' % filepath)
-                if not file_overview_found:
+                parsed_script = self.read_js_files[filepath]
+                # This boolean list keeps track of the regex matches
+                # found in the file.
+                pattern_found_list = []
+                for index, regexp_to_check in enumerate(
+                        MANDATORY_PATTERNS_JS_REGEXP):
+                    pattern_found_list.append(False)
+                    for line in parsed_script:
+                        if re.match(regexp_to_check['regexp'], line):
+                            pattern_found_list[index] = True
+                            break
+                if not all(pattern_found_list):
                     failed = True
-                    print ('Please ensure that file %s should contain a file'
-                           'overview i.e. a short description of the file.'
-                           % filepath)
+                    for index, pattern_found_bool in enumerate(
+                            pattern_found_list):
+                        if not pattern_found_bool:
+                            print '%s --> %s' % (
+                                filepath,
+                                MANDATORY_PATTERNS_JS_REGEXP[index]['message'])
 
             if failed:
                 summary_message = (
-                    '%s  JS file overview check failed' % (
+                    '%s  Mandatory JS pattern check failed' % (
                         _MESSAGE_TYPE_FAILED))
             else:
                 summary_message = (
-                    '%s  JS file overview check passed' % (
+                    '%s  Mandatory JS pattern check passed' % (
                         _MESSAGE_TYPE_SUCCESS))
             print summary_message
 
@@ -2105,7 +2124,7 @@ class LintChecksManager(object):
         linter_messages = self._lint_all_files()
         js_component_messages = self._check_js_component_name_and_count()
         directive_scope_messages = self._check_directive_scope()
-        file_overview_messages = self._check_js_file_overview()
+        mandatory_js_patterns_messages = self._check_mandatory_js_patterns()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
         controller_dependency_messages = (
@@ -2127,8 +2146,8 @@ class LintChecksManager(object):
             js_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
             html_directive_name_messages + import_order_messages +
-            file_overview_messages + docstring_messages + comment_messages +
-            html_tag_and_attribute_messages +
+            mandatory_js_patterns_messages + docstring_messages +
+            comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
             copyright_notice_messages)
         return all_messages
