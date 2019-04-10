@@ -1191,9 +1191,12 @@ def compile_typescript_files_continuously(project_dir):
     )
     subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
     print 'Compiling ts files in watch mode...'
-    cmd = '../node_modules/typescript/bin/tsc --project %s --watch' % (
-        project_dir)
-    subprocess.Popen('%s > tsc_output_log.txt' % cmd, shell=True)
+    cmd = [
+        '../node_modules/typescript/bin/tsc', '--project', project_dir,
+        '--watch']
+
+    with open('tsc_output_log.txt', 'w') as out:
+        subprocess.Popen(cmd, stdout=out)
 
     while True:
         if os.path.isfile('tsc_output_log.txt'):
