@@ -55,6 +55,8 @@ oppia.directive('feedbackPopup', [
           // elements on the same page.
           $scope.feedbackPopoverId = (
             'feedbackPopover' + Math.random().toString(36).slice(2));
+          $scope.feedbackTitle = ('Feedback for card ' +
+            PlayerPositionService.getCurrentStateName());
 
           if (WindowDimensionsService.isWindowNarrow()) {
             BackgroundMaskService.activateMask();
@@ -115,7 +117,7 @@ oppia.directive('feedbackPopup', [
             if ($scope.feedbackText) {
               $http.post(feedbackUrl, {
                 subject: $filter('getAbbreviatedText')(
-                  $scope.feedbackText, FEEDBACK_SUBJECT_MAX_CHAR_LIMIT),
+                  $scope.feedbackTitle, FEEDBACK_SUBJECT_MAX_CHAR_LIMIT),
                 feedback: $scope.feedbackText,
                 include_author: (
                   !$scope.isSubmitterAnonymized && $scope.isLoggedIn),
