@@ -265,6 +265,7 @@ describe('Permissions for private explorations', function() {
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorPage.saveChanges('Added content to first card.');
     explorationEditorPage.navigateToSettingsTab();
+    workflow.setTitleForExploration('Lady haha');
     workflow.addExplorationTranslator('translator');
     expect(workflow.getExplorationManagers()).toEqual(['expOwner']);
     expect(workflow.getExplorationCollaborators()).toEqual([]);
