@@ -18,9 +18,9 @@
 
 oppia.factory('ShowSuggestionModalForCreatorViewService', [
   '$http', '$log', '$rootScope',
-  '$uibModal', 'UrlInterpolationService',
+  '$uibModal', 'UrlInterpolationService', 'COMPONENT_NAME_CONTENT',
   function($http, $log, $rootScope,
-      $uibModal, UrlInterpolationService) {
+      $uibModal, UrlInterpolationService, COMPONENT_NAME_CONTENT) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
       'creator_view_suggestion_modal_directive.html'
@@ -82,7 +82,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
             summary_message: result.summaryMessage,
             change: {
               cmd: 'edit_state_property',
-              property_name: 'content',
+              property_name: COMPONENT_NAME_CONTENT,
               state_name: result.stateName,
               old_value: result.oldContent,
               new_value: {
@@ -102,7 +102,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
             summary_message: result.summaryMessage,
             change: {
               cmd: 'edit_state_property',
-              property_name: 'content',
+              property_name: COMPONENT_NAME_CONTENT,
               state_name: result.stateName,
               old_value: result.oldContent,
               new_value: {

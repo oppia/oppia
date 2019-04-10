@@ -94,8 +94,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
             }
           };
 
-          // Ajax request for update suggestion
-          $http.put(url, data);
+          ThreadDataService.editSuggestion(url, data);
 
           // Updates suggestion.
           suggestion.newValue.html = result.newSuggestionHtml;

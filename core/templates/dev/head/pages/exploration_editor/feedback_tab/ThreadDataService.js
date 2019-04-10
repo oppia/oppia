@@ -213,6 +213,9 @@ oppia.factory('ThreadDataService', [
             }
           }
         );
+      },
+      editSuggestion: function(url, data) {
+        $http.put(url, data);
       }
     };
   }
