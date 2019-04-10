@@ -52,16 +52,16 @@ describe('Preferences', function() {
     users.createUser('lisa@preferences.com', 'lisaPreferences');
     users.login('lisa@preferences.com');
     preferencesPage.get();
-    preferencesPage.setUserBio("I am Lisa.");
+    preferencesPage.setUserBio('I am Lisa');
     browser.refresh();
-    preferencesPage.expectUserBioToBe("I am Lisa");
-    preferencesPage.setUserBio("Junior student");
+    preferencesPage.expectUserBioToBe('I am Lisa');
+    preferencesPage.setUserBio('Junior student');
     browser.refresh();
-    preferencesPage.expectUserBioToBe("Junior student");
-    preferencesPage.editUserBio(" from USA");
-    preferencesPage.editUserBio(" studying CS!");
+    preferencesPage.expectUserBioToBe('Junior student');
+    preferencesPage.editUserBio(' from USA');
+    preferencesPage.editUserBio(' studying CS!');
     browser.refresh();
-    preferencesPage.expectUserBioToBe("Junior student from USA studying CS!");
+    preferencesPage.expectUserBioToBe('Junior student from USA studying CS!');
   });
 
   afterEach(function() {

@@ -26,7 +26,9 @@ var PreferencesPage = function() {
   var feedbackMessageEmailsCheckbox = element(
     by.css('.protractor-test-feedback-message-email-checkbox'));
   var languageOptionsList = element.all(by.css('.select2-results'));
+  var navBar = element(by.css('.oppia-navbar-dropdown-toggle'));
   var pageHeader = element(by.css('.protractor-test-preferences-title'));
+  var preferencesLink = element(by.css('.protractor-test-preferences-link'));
   var preferredAudioLanguageSelector = element(
     by.css('.protractor-test-preferred-audio-language-selector'));
   var selectedAudioLanguageElement = preferredAudioLanguageSelector.element(
@@ -38,7 +40,8 @@ var PreferencesPage = function() {
 
   this.editUserBio = function(bio) {
     userBioElement.sendKeys(bio);
-    pageHeader.click();
+    navBar.click();
+    preferencesLink.click();
   };
 
   this.get = function() {
@@ -79,7 +82,8 @@ var PreferencesPage = function() {
   this.setUserBio = function(bio) {
     userBioElement.clear();
     userBioElement.sendKeys(bio);
-    pageHeader.click();
+    navBar.click();
+    preferencesLink.click();
   };
 
   this.isFeedbackEmailsCheckboxSelected = function() {
