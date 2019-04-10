@@ -47,7 +47,7 @@ var canAddUser = function() {
 };
 
 var closeEditTestRolesForm = function() {
-  element(by.css('protractor-test-cancel-save-role')).click();
+  element(by.css('.protractor-test-cancel-save-role')).click();
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
