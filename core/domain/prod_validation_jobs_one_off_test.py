@@ -90,9 +90,28 @@ class ProdValidationJobTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         actual_output = job.get_output(job_id)
-        expected_output = (
-            u'[u\'user_subscription_model checks passed\', '
-            '[u"[[\'id check passed\'], \'external id check passed\']", '
-            'u"[[\'id check passed\'], \'external id check passed\']"]]')
+        expected_output = [
+            u'[u\'fully-validated UserSubscriptionModels\', 2]']
+        self.assertEqual(actual_output, expected_output)
 
-        self.assertEqual(actual_output, [expected_output])
+    def test_external_id_relationship_failure(self):
+        nonexist_thread_id = 'nonexist_thread_id'
+        subscription_services.subscribe_to_thread(
+            self.user_id, nonexist_thread_id)
+
+        job = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
+        job_id = (
+            job.create_new())
+        job.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        actual_output = job.get_output(job_id)
+        expected_output = [
+            (
+                u'[u\'failed validation check for general_feedback_thread_ids '
+                'field check of UserSubscriptionModel\', '
+                '[u"UserSubscriptionsModel id 110211048197157141232: based on '
+                'field general_feedback_thread_ids having value '
+                'nonexist_thread_id, expect model GeneralFeedbackThreadModel '
+                'with id nonexist_thread_id but it doesn\'t exist"]]'),
+            u'[u\'fully-validated UserSubscriptionModels\', 1]']
+        self.assertEqual(sorted(actual_output), sorted(expected_output))

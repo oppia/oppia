@@ -44,8 +44,7 @@ def has_undeleted_model_for_id(model_class, model_id):
 class BaseModelValidator(object):
     """Base class for validating models."""
 
-    errors = []
-    checks_passed = []
+    errors = {}
 
     @classmethod
     def _external_id_relationships(cls):
@@ -66,7 +65,6 @@ class BaseModelValidator(object):
         Args:
             item: UserSubscriptionsModel. Entity to validate.
         """
-        external_ids_errors = []
         multiple_models_keys_to_fetch = {}
         for prop_name, model_class in (
                 cls._external_id_relationships().items()):
@@ -85,16 +83,12 @@ class BaseModelValidator(object):
             model_class, model_ids = keys_to_fetch
             for model_id, model in zip(model_ids, model_class_models):
                 if model is None or model.deleted:
-                    external_ids_errors.append(
+                    cls.errors['%s field check' % prop_name] = (
                         'UserSubscriptionsModel id %s: based on field %s having'
                         ' value %s, expect model %s with id %s but it doesn\'t'
                         ' exist' % (
                             item.id, prop_name, model_id,
                             str(model_class.__name__), model_id))
-        if len(external_ids_errors) > 0:
-            cls.errors.extend(external_ids_errors)
-        else:
-            cls.checks_passed.append('external id check passed')
 
 
 class UserSubscriptionsModelValidator(BaseModelValidator):
@@ -116,22 +110,15 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
 
         Args:
             item: UserSubscriptionsModel. Entity to validate.
-
-        Returns:
-            a 2-tuple, both list(str). The first element is a list of error
-            strings, and the second element is a list of checks passed.
         """
-        cls.errors = []
-        cls.checks_passed = []
+        cls.errors.clear()
 
         if not has_undeleted_model_for_id(
                 user_models.UserSettingsModel, item.id):
-            cls.errors.append(
+            cls.errors['id check'] = (
                 'id %s is not valid %s' % (
                     item.id,
                     user_models.UserSettingsModel.__name__))
-        else:
-            cls.checks_passed.append(['id check passed'])
         cls._validate_external_id_relationships(item)
 
 
@@ -152,14 +139,18 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 validate_user_subs_model = UserSubscriptionsModelValidator()
                 validate_user_subs_model.validate(model_instance)
                 if len(validate_user_subs_model.errors) > 0:
-                    yield (
-                        'user_subscription_model checks failed',
-                        validate_user_subs_model.errors)
+                    for error_key, error_val in (
+                            validate_user_subs_model.errors.iteritems()):
+                        yield (
+                            'failed validation check for %s of '
+                            'UserSubscriptionModel' % error_key, error_val)
                 else:
                     yield (
-                        'user_subscription_model checks passed',
-                        validate_user_subs_model.checks_passed)
+                        'fully-validated UserSubscriptionModels', 1)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if key == 'fully-validated UserSubscriptionModels':
+            yield (key, sum([int(value) for value in values]))
+        else:
+            yield (key, values)
