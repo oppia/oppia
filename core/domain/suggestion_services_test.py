@@ -443,11 +443,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description',
                     self.reviewer_id)
-        can_resubmit = (suggestion_services.check_can_resubmit_suggestion(
-            self.suggestion_id, self.author_id))
+        can_resubmit = suggestion_services.check_can_resubmit_suggestion(
+            self.suggestion_id, self.author_id)
         self.assertEqual(can_resubmit, True)
-        can_resubmit = (suggestion_services.check_can_resubmit_suggestion(
-            self.suggestion_id, self.normal_user_id))
+        can_resubmit = suggestion_services.check_can_resubmit_suggestion(
+            self.suggestion_id, self.normal_user_id)
         self.assertEqual(can_resubmit, False)
 
     def test_edit_suggestion(self):

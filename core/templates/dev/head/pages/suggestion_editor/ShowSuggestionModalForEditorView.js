@@ -59,7 +59,6 @@ oppia.controller('ShowSuggestionModalForEditorView', [
     $scope.oldContent = $scope.newContent;
     $scope.editedContent = $scope.newContent;
     $scope.commitMessage = description;
-    $scope.reviewMessage = null;
 
     $scope.isEditButtonShown = function() {
       return $scope.editButtonIsShown;

@@ -42,9 +42,9 @@
   <button class="btn btn-info" ng-show="isEditButtonShown()" ng-click="editSuggestion()">Edit</button>
   <button class="btn btn-info" ng-show="isSaveButtonShown()" ng-click="saveSuggestion()" ng-disabled="isSaveButtonDisabled()">Save</button>
   <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
-    <button class="btn btn-danger protractor-test-exploration-reject-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject || reviewMessage.length == 0">Reject</button>
+    <button class="btn btn-danger protractor-test-exploration-reject-suggestion-btn" ng-show="canEdit && isNotHandled && !isSaveButtonShown()" ng-click="rejectSuggestion()" ng-disabled="!canReject || reviewMessage.length == 0">Reject</button>
   </span>
   <span uib-tooltip="Enter commit message before accepting" tooltip-placement="bottom" tooltip-enable="commitMessage.length == 0">
-    <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
+    <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled && !isSaveButtonShown()" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
   </span>
 </div>

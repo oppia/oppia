@@ -20,11 +20,11 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
   '$http', '$log', '$rootScope', '$uibModal',
   'ExplorationDataService', 'ExplorationStatesService',
   'StateObjectFactory', 'SuggestionModalService',
-  'ThreadDataService', 'UrlInterpolationService',
+  'ThreadDataService', 'UrlInterpolationService', 'COMPONENT_NAME_CONTENT',
   function($http, $log, $rootScope, $uibModal,
       ExplorationDataService, ExplorationStatesService,
       StateObjectFactory, SuggestionModalService,
-      ThreadDataService, UrlInterpolationService) {
+      ThreadDataService, UrlInterpolationService, COMPONENT_NAME_CONTENT) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
       'editor_view_suggestion_modal_directive.html'
@@ -68,21 +68,24 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
         controller: 'ShowSuggestionModalForEditorView'
       }).result.then(function(result) {
         var suggestion = activeThread.getSuggestion();
+        var suggestionId = activeThread.suggestion.suggestionId;
         var stateName = suggestion.stateName;
+        var url = null;
+        var data = null;
 
         if (result.action === 'edit' &&
                 result.suggestionType === 'edit_exploration_state_content') {
           url = UrlInterpolationService.interpolateUrl(
             EDIT_SUGGESTION_URL_TEMPLATE, {
-              suggestion_id: activeThread.suggestion.suggestionId,
+              suggestion_id: suggestionId,
             }
-          ),
+          );
           data = {
             action: result.action,
             summary_message: result.summaryMessage,
             change: {
               cmd: 'edit_state_property',
-              property_name: 'content',
+              property_name: COMPONENT_NAME_CONTENT,
               state_name: stateName,
               old_value: result.oldContent,
               new_value: {
@@ -94,7 +97,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
           // Ajax request for update suggestion
           $http.put(url, data);
 
-          //Updates suggestion.
+          // Updates suggestion.
           suggestion.newValue.html = result.newSuggestionHtml;
         } else {
           ThreadDataService.resolveSuggestion(

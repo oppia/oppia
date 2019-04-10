@@ -92,12 +92,12 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
           };
         } else if (result.action === 'edit' &&
           result.suggestionType === 'edit_exploration_state_content') {
-          url = UrlInterpolationService.interpolateUrl(
+          var url = UrlInterpolationService.interpolateUrl(
             EDIT_SUGGESTION_URL_TEMPLATE, {
               suggestion_id: activeThread.suggestion.suggestionId,
             }
           );
-          data = {
+          var data = {
             action: result.action,
             summary_message: result.summaryMessage,
             change: {
@@ -131,7 +131,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
           };
         }
 
-        $http.put(url, data).then(function(response) {
+        $http.put(url, data).then(function() {
           for (var i = 0; i < suggestionsToReviewList.length; i++) {
             if (suggestionsToReviewList[i] === activeThread) {
               suggestionsToReviewList.splice(i, 1);

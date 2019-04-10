@@ -567,7 +567,7 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
         suggestion_id: str. Id of a suggestion.
 
     Returns:
-        bool: Whether the user can resubmit the suggestion.
+        bool: Whether the user can edit the suggestion.
     """
 
     suggestion = get_suggestion_by_id(suggestion_id)
