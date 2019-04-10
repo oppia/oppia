@@ -173,7 +173,7 @@ def edit_suggestion(suggestion, change_object):
 
     Args:
         suggestion: Suggestion. The suggestion to be updated.
-        change_object: Change. Object of change in suugestion.
+        change_object: ExplorationChange. Object of change in suggestion.
     """
     suggestion.change = change_object
     _update_suggestion(suggestion)
