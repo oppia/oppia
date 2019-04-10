@@ -345,7 +345,8 @@ def send_job_failure_email(job_id):
     send_mail_to_admin(mail_subject, mail_body)
     other_recipients = (
         NOTIFICATION_EMAILS_FOR_FAILED_TASKS.value)
-    system_name_email = '%s <%s>' % ('SYSTEM', feconf.SYSTEM_EMAIL_ADDRESS)
+    system_name_email = '%s <%s>' % (
+        feconf.SYSTEM_NAME_EMAIL, feconf.SYSTEM_EMAIL_ADDRESS)
     if other_recipients:
         email_services.send_bulk_mail(
             system_name_email, other_recipients,
