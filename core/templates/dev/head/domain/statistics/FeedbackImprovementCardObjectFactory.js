@@ -19,9 +19,19 @@
 oppia.constant('FEEDBACK_IMPROVEMENT_CARD_TYPE', 'feedback');
 
 oppia.factory('FeedbackImprovementCardObjectFactory', [
-  'FEEDBACK_IMPROVEMENT_CARD_TYPE', function(FEEDBACK_IMPROVEMENT_CARD_TYPE) {
+  'ImprovementActionButtonObjectFactory', 'ThreadDataService',
+  'FEEDBACK_IMPROVEMENT_CARD_TYPE',
+  function(
+      ImprovementActionButtonObjectFactory, ThreadDataService,
+      FEEDBACK_IMPROVEMENT_CARD_TYPE) {
     /** @constructor */
-    var FeedbackImprovementCard = function() {
+    var FeedbackImprovementCard = function(feedbackThread) {
+      /** @type {FeedbackThread} */
+      this._feedbackThread = feedbackThread;
+      /** @type {ImprovementActionButton[]} */
+      this._actionButtons = [
+        ImprovementActionButtonObjectFactory.createNew('Test', function() {}),
+      ];
     };
 
     /**
@@ -34,7 +44,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
 
     /** @returns {string} - A concise summary of the card. */
     FeedbackImprovementCard.prototype.getTitle = function() {
-      return 'Feedback Thread';
+      return this._feedbackThread.subject;
     };
 
     /** @returns {string} - The directive type used to render the card. */
@@ -50,7 +60,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * @returns {{}}
      */
     FeedbackImprovementCard.prototype.getDirectiveData = function() {
-      return {};
+      return angular.copy(this._feedbackThread);
     };
 
     /**
@@ -58,20 +68,20 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      *    displayed on the card.
      */
     FeedbackImprovementCard.prototype.getActionButtons = function() {
-      return [];
+      return this._actionButtons;
     };
 
     return {
       /** @returns {FeedbackImprovementCard} */
-      createNew: function() {
-        return new FeedbackImprovementCard();
+      createNew: function(feedbackThread) {
+        return new FeedbackImprovementCard(feedbackThread);
       },
       /**
        * @returns {Promise<FeedbackImprovementCard[]>} - The list of feedback
        *    threads associated to the current exploration.
        */
       fetchCards: function() {
-        return Promise.resolve([]);
+        return ThreadDataService.data.feedbackThreads.map(this.createNew);
       },
     };
   }
