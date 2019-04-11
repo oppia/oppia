@@ -219,6 +219,7 @@ describe('Permissions for private explorations', function() {
   });
   it('should not allow adding roles if Exploration title is not given',
     function() {
+      users.createUser('alice@privileges.com', 'alicePrivileges');
       users.login('alice@privileges.com');
       workflow.createExploration();
       explorationEditorPage.navigateToSettingsTab();
@@ -232,7 +233,6 @@ describe('Permissions for private explorations', function() {
   );
 
   it('should be correct for collaborators', function() {
-    users.createUser('alice@privileges.com', 'alicePrivileges');
     users.createUser('bob@privileges.com', 'bobPrivileges');
     users.createUser('eve@privileges.com', 'evePrivileges');
 
