@@ -31,19 +31,21 @@ def filter_a(tag, name, value):
     whitelisted.
 
     Args:
+        tag: str. The name of the tag.
         name: str. The name of the attribute.
         value: str. The value of the attribute.
 
     Returns:
         bool. Whether the given attribute should be whitelisted.
     """
-    if name in ('title', 'target'):
-        return True
-    if name == 'href':
-        url_components = urlparse.urlsplit(value)
-        if url_components[0] in ['http', 'https']:
+    if tag == 'a':
+        if name in ('title', 'target'):
             return True
-        logging.error('Found invalid URL href: %s' % value)
+        if name == 'href':
+            url_components = urlparse.urlsplit(value)
+            if url_components[0] in ['http', 'https']:
+                return True
+            logging.error('Found invalid URL href: %s' % value)
 
     return False
 
