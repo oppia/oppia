@@ -94,7 +94,7 @@ describe('Profile Features functionality', function() {
     users.logout();
   });
 
-  it('View number of explorations created by a User', function() {
+  it('should check number of explorations created by a user', function() {
     users.login('FirstUser@profileFeatures.com');
 
     // Creating some explorations.
