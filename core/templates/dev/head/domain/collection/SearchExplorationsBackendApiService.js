@@ -17,7 +17,6 @@
  */
 
 require('domain/utilities/UrlInterpolationService.js');
-require('pages/collection_editor/CollectionEditor.js:');
 require('services/AlertsService.js');
 
 oppia.factory('SearchExplorationsBackendApiService', [

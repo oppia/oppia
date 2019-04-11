@@ -19,8 +19,9 @@
 
 require('domain/utilities/LanguageUtilService.js');
 
-oppia.factory('TranslationLanguageService', ['$log', 'LanguageUtilService',
-  function($log, LanguageUtilService) {
+oppia.factory('TranslationLanguageService', [
+  '$log', '$rootScope', 'LanguageUtilService',
+  function($log, $rootScope, LanguageUtilService) {
     var activeLanguageCode = null;
     var allAudioLanguageCodes = LanguageUtilService.getAllAudioLanguageCodes();
     return {
@@ -33,6 +34,7 @@ oppia.factory('TranslationLanguageService', ['$log', 'LanguageUtilService',
           return;
         }
         activeLanguageCode = newActiveLanguageCode;
+        $rootScope.$broadcast('activeLanguageChanged');
       }
     };
   }]);

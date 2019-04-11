@@ -16,6 +16,13 @@
  * @fileoverview Primary controller for the collection editor page.
  */
 
+require('pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.js');
+require('pages/collection_editor/CollectionEditorNavbarDirective.js');
+require('pages/collection_editor/editor_tab/CollectionEditorTabDirective.js');
+require('pages/collection_editor/history_tab/CollectionHistoryTabDirective.js');
+require('pages/collection_editor/settings_tab/CollectionSettingsTabDirective.js');
+require('pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.js');
+
 // TODO(bhenning): These constants should be provided by the backend.
 oppia.constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');

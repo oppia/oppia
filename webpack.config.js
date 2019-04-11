@@ -28,6 +28,8 @@ module.exports = {
     admin: './core/templates/dev/head/pages/admin/Admin.js',
     app: './core/templates/dev/head/App.js',
     about: './core/templates/dev/head/pages/about/About.js',
+    collection_editor: './core/templates/dev/head/pages/collection_editor/CollectionEditor.js',
+    collection_player: './core/templates/dev/head/pages/collection_player/CollectionPlayer.js',
     contact: './core/templates/dev/head/pages/contact/Contact.js',
     creator_dashboard: './core/templates/dev/head/pages/creator_dashboard/CreatorDashboard.js',
     donate: './core/templates/dev/head/pages/donate/Donate.js',
@@ -63,6 +65,20 @@ module.exports = {
       chunks: ['about'],
       filename: 'about.html',
       template: 'core/templates/dev/head/pages/about/about.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['collection_editor'],
+      filename: 'collection_editor.html',
+      template: 'core/templates/dev/head/pages/collection_editor/collection_editor.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['collection_player'],
+      filename: 'collection_player.html',
+      template: 'core/templates/dev/head/pages/collection_player/collection_player.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

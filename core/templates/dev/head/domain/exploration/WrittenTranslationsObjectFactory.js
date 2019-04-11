@@ -22,11 +22,7 @@ require('domain/exploration/WrittenTranslationObjectFactory.js');
 require('domain/utilities/LanguageUtilService.js');
 
 oppia.factory('WrittenTranslationsObjectFactory', [
-  'AudioTranslationObjectFactory', 'LanguageUtilService',
-  'WrittenTranslationObjectFactory', 'COMPONENT_NAME_FEEDBACK',
-  function(
-      AudioTranslationObjectFactory, LanguageUtilService,
-      WrittenTranslationObjectFactory, COMPONENT_NAME_FEEDBACK) {
+  'WrittenTranslationObjectFactory', function(WrittenTranslationObjectFactory) {
     var WrittenTranslations = function(translationsMapping) {
       this.translationsMapping = translationsMapping;
     };
@@ -37,7 +33,7 @@ oppia.factory('WrittenTranslationsObjectFactory', [
 
     WrittenTranslations.prototype.getWrittenTranslation = function(
         contentId, langCode) {
-      return this.translationsMapping[contentId][langCode].getHtml();
+      return this.translationsMapping[contentId][langCode];
     };
 
     WrittenTranslations.prototype.markAllTranslationsAsNeedingUpdate = (
@@ -56,6 +52,9 @@ oppia.factory('WrittenTranslationsObjectFactory', [
 
     WrittenTranslations.prototype.hasWrittenTranslation = function(
         contentId, langaugeCode) {
+      if (!this.translationsMapping.hasOwnProperty(contentId)) {
+        return false;
+      }
       return this.getTranslationsLanguageCodes(
         contentId).indexOf(langaugeCode) !== -1;
     };
@@ -93,6 +92,15 @@ oppia.factory('WrittenTranslationsObjectFactory', [
       }
       writtenTranslations[languageCode] = (
         WrittenTranslationObjectFactory.createNew(html));
+    };
+
+    WrittenTranslations.prototype.updateWrittenTranslationHtml = function(
+        contentId, languageCode, html) {
+      var writtenTranslations = this.translationsMapping[contentId];
+      if (!writtenTranslations.hasOwnProperty(languageCode)) {
+        throw Error('Unable to find the given language code.');
+      }
+      writtenTranslations[languageCode].setHtml(html);
     };
 
     WrittenTranslations.prototype.toggleNeedsUpdateAttribute = (

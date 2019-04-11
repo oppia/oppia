@@ -16,6 +16,9 @@
  * @fileoverview Controller for the main tab of the collection editor.
  */
 
+require('pages/collection_editor/editor_tab/CollectionNodeCreatorDirective.js');
+require('pages/collection_editor/editor_tab/CollectionNodeEditorDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/collection_editor/CollectionEditorStateService.js');
 require('pages/collection_editor/editor_tab/CollectionLinearizerService.js');

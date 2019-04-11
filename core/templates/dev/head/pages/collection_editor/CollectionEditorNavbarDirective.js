@@ -16,6 +16,9 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
+require('components/forms/Select2DropdownDirective.js');
+require('components/loading/LoadingDotsDirective.js');
+
 require('domain/collection/CollectionRightsBackendApiService.js');
 require('domain/collection/CollectionUpdateService.js');
 require('domain/collection/CollectionValidationService.js');

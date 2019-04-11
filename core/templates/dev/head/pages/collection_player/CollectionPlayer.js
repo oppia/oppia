@@ -16,6 +16,19 @@
  * @fileoverview Controller for the learner's view of a collection.
  */
 
+require('pages/collection_player/CollectionPlayer.js');
+require('pages/collection_player/CollectionNodeListDirective.js');
+require('pages/collection_player/CollectionLocalNav.js');
+
+require('pages/collection_player/CollectionFooterDirective.js');
+require('components/share/SharingLinksDirective.js');
+require('components/HintAndSolutionButtonsDirective.js');
+require('components/attribution_guide/AttributionGuideDirective.js');
+require('components/background/BackgroundBannerDirective.js');
+require('components/summary_tile/ExplorationSummaryTileDirective.js');
+require('components/summary_tile/CircularImageDirective.js');
+
+
 require('domain/collection/CollectionObjectFactory.js');
 require('domain/collection/CollectionPlaythroughObjectFactory.js');
 require('domain/collection/GuestCollectionProgressService.js');

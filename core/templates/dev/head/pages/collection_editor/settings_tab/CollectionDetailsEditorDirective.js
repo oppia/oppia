@@ -18,6 +18,8 @@
  * adding a new exploration.
  */
 
+require('components/forms/Select2DropdownDirective.js');
+
 require('domain/collection/CollectionUpdateService.js');
 require('domain/collection/CollectionValidationService.js');
 require('domain/utilities/UrlInterpolationService.js');
