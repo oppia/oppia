@@ -175,6 +175,20 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             self.assertEqual(len(questions), 2)
             self.logout()
 
+    def test_post_with_invalid_question_returns_400_status(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            question_dict = self.question.to_dict()
+            question_dict['id'] = None
+            question_dict['question_state_data'] = 'invalid_question_state_data'
+            self.post_json(
+                '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id), {
+                    'question_dict': question_dict
+                }, csrf_token=csrf_token, expected_status_int=400)
+            self.logout()
+
 
 class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
     """Tests link and unlink question from skills."""

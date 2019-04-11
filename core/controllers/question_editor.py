@@ -114,10 +114,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
         question = question_services.get_question_by_id(
             question_id, strict=False)
 
-        if question is None:
-            raise self.PageNotFoundException(
-                'The question with the given id doesn\'t exist.')
-
         associated_skills = question_services.get_skills_linked_to_question(
             question_id)
         associated_skill_dicts = [
@@ -137,10 +133,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
         question = question_services.get_question_by_id(
             question_id, strict=False)
-
-        if question is None:
-            raise self.PageNotFoundException(
-                'The question with the given id doesn\'t exist.')
 
         commit_message = self.payload.get('commit_message')
 
