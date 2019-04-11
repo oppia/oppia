@@ -15,12 +15,18 @@
 describe('ItemSelectionInputValidationService', function() {
   var WARNING_TYPES, validatorService;
 
-  var currentState;
-  var goodAnswerGroups, goodDefaultOutcome;
-  var customizationArguments;
-  var IsProperSubsetValidOption;
-  var oof, agof, rof;
-  var badAnswerGroup;
+  var currentState = null;
+  var goodAnswerGroups = null,
+    goodDefaultOutcome = null;
+  var customizationArguments = null;
+  var IsProperSubsetValidOption = null;
+  var oof = null,
+    agof = null,
+    rof = null;
+  var badAnswerGroup = null;
+  var ThreeInputsAnswerGroups = null,
+    OneInputAnswerGroups = null,
+    NoInputAnswerGroups = null;
 
   beforeEach(function() {
     angular.mock.module('oppia');
