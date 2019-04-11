@@ -16,6 +16,9 @@
  * @fileoverview Directive for the solution editor.
  */
 
+require('directives/AngularHtmlBindDirective.js');
+require('domain/state/SolutionExplanationEditorDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('domain/exploration/SolutionObjectFactory.js');
 require('pages/exploration_editor/editor_tab/SolutionVerificationService.js');

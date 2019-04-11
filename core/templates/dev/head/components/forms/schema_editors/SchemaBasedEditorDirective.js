@@ -16,6 +16,16 @@
  * @fileoverview Directive for general schema-based editors.
  */
 
+require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedDictEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedIntEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedListEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 
 oppia.directive('schemaBasedEditor', [

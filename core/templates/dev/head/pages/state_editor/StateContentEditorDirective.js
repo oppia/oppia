@@ -16,6 +16,9 @@
  * @fileoverview Directive for the state content editor.
  */
 
+require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
+require('directives/AngularHtmlBindDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/EditorFirstTimeEventsService.js');
 require('pages/state_editor/state_properties/StatePropertyService.js');

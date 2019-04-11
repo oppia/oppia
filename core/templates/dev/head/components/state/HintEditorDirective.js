@@ -16,6 +16,9 @@
  * @fileoverview Directive for the hint editor.
  */
 
+require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
+require('directives/AngularHtmlBindDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/state_editor/state_properties/StatePropertyService.js');
 require('services/EditabilityService.js');

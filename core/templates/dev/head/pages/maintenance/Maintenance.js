@@ -16,6 +16,8 @@
  * @fileoverview The controller for the maintenance page.
  */
 
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.controller('Maintenance', [
   '$rootScope', '$scope', 'UrlInterpolationService', 'DEV_MODE',
   function($rootScope, $scope, UrlInterpolationService, DEV_MODE) {

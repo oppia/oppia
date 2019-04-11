@@ -17,6 +17,8 @@
  * editor.
  */
 
+require('directives/AngularHtmlBindDirective.js');
+
 require('domain/exploration/SubtitledHtmlObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/EditorFirstTimeEventsService.js');

@@ -16,6 +16,12 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+require('components/background/BackgroundBannerDirective.js');
+require('components/loading/LoadingDotsDirective.js');
+require('components/summary_tile/CollectionSummaryTileDirective.js');
+require('components/summary_tile/ExplorationSummaryTileDirective.js');
+require('filters/TruncateFilter.js');
+
 require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.js');
 require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.js');
 require('domain/learner_dashboard/LearnerDashboardBackendApiService.js');

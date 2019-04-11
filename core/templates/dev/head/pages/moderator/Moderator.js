@@ -16,6 +16,28 @@
 * @fileoverview Data and controllers for the Oppia moderator page.
 */
 
+//vvv this block of requires should be removed vvv
+require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.js');
+require('components/forms/ConvertHtmlToUnicodeFilter.js');
+require('components/forms/ConvertUnicodeToHtmlFilter.js');
+require('components/forms/validators/IsAtLeastFilter.js');
+require('components/forms/validators/IsAtMostFilter.js');
+require('components/forms/validators/IsFloatFilter.js');
+require('components/forms/validators/IsIntegerFilter.js');
+require('components/forms/validators/IsNonemptyFilter.js');
+require('components/forms/ApplyValidationDirective.js');
+require('components/forms/RequireIsFloatDirective.js');
+require('filters/UnderscoresToCamelCaseFilter.js');
+require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedDictEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedListEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js');
+//^^^ this block of requires should be removed ^^^
+
+require('services/AlertsService.js');
+require('services/DateTimeFormatService.js');
+
 oppia.controller('Moderator', [
   '$http', '$rootScope', '$scope', 'AlertsService', 'DateTimeFormatService',
   function($http, $rootScope, $scope, AlertsService, DateTimeFormatService) {

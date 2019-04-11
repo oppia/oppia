@@ -15,6 +15,8 @@
 /**
  * @fileoverview Directive for managing the state responses in the state editor.
  */
+require('components/state/AnswerGroupEditorDirective.js');
+require('components/state/ResponseHeaderDirective.js');
 
 require('domain/exploration/AnswerGroupObjectFactory.js');
 require('domain/exploration/HintObjectFactory.js');

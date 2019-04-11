@@ -17,6 +17,9 @@
  * editor.
  */
 
+require('components/state/HintEditorDirective.js');
+require('components/state/ResponseHeaderDirective.js');
+
 require('domain/exploration/HintObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/state_editor/state_properties/StateEditorService.js');

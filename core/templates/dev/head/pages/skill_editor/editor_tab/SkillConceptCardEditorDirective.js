@@ -16,6 +16,11 @@
  * @fileoverview Directive for the concept card editor.
  */
 
+require('components/SummaryListHeaderDirective.js');
+require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
+require('directives/AngularHtmlBindDirective.js');
+require('pages/skill_editor/editor_tab/WorkedExampleEditorDirective.js');
+
 require('domain/exploration/SubtitledHtmlObjectFactory.js');
 require('domain/skill/SkillUpdateService.js');
 require('domain/utilities/UrlInterpolationService.js');

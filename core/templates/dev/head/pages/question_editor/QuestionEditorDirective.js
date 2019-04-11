@@ -16,6 +16,8 @@
  * @fileoverview Controller for the questions editor directive.
  */
 
+require('pages/state_editor/StateEditorDirective.js');
+
 require('components/QuestionCreationService.js');
 require('domain/question/EditableQuestionBackendApiService.js');
 require('domain/question/QuestionObjectFactory.js');

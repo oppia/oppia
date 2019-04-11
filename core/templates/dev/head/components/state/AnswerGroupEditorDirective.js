@@ -16,6 +16,10 @@
  * @fileoverview Directive for the answer group editor.
  */
 
+require('components/state/OutcomeEditorDirective.js');
+require('components/state/RuleEditorDirective.js');
+require('directives/AngularHtmlBindDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('domain/exploration/RuleObjectFactory.js');
 require('pages/exploration_editor/editor_tab/ResponsesService.js');

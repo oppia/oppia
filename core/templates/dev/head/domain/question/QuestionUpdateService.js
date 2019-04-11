@@ -17,6 +17,7 @@
 */
 
 require('domain/editor/undo_redo/ChangeObjectFactory.js');
+require('domain/editor/undo_redo/QuestionUndoRedoService.js');
 require('domain/editor/undo_redo/UndoRedoService.js');
 require('domain/question/QuestionObjectFactory.js');
 

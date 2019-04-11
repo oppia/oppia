@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   Practice Session: {{ topic_name }} - Oppia
@@ -48,8 +48,11 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
-
-  <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
-  <script src="/templates/dev/head/pages/practice_session/PracticeSession.js"></script>
+<% for (var chunk in htmlWebpackPlugin.files.js) { %>
+  <% if (webpackConfig.mode == 'production') { %> 
+    <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <% } else { %>
+    <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <% } %>
+<% } %>
 {% endblock footer_js %}

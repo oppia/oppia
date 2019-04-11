@@ -16,6 +16,10 @@
  * @fileoverview Controller for the main tab of the skill editor.
  */
 
+require('pages/skill_editor/editor_tab/SkillDescriptionEditorDirective.js');
+require('pages/skill_editor/editor_tab/SkillConceptCardEditorDirective.js');
+require('pages/skill_editor/editor_tab/SkillMisconceptionsEditorDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/skill_editor/SkillEditorStateService.js');
 

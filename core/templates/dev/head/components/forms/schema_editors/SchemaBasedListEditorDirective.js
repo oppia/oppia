@@ -16,6 +16,8 @@
  * @fileoverview Directive for a schema-based editor for lists.
  */
 
+require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('services/IdGenerationService.js');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.js');

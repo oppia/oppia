@@ -25,26 +25,33 @@ var htmlMinifyConfig = {
 
 module.exports = {
   entries: {
+    about: './core/templates/dev/head/pages/about/About.js',
     admin: './core/templates/dev/head/pages/admin/Admin.js',
     app: './core/templates/dev/head/App.js',
-    about: './core/templates/dev/head/pages/about/About.js',
     collection_editor: './core/templates/dev/head/pages/collection_editor/CollectionEditor.js',
     collection_player: './core/templates/dev/head/pages/collection_player/CollectionPlayer.js',
     contact: './core/templates/dev/head/pages/contact/Contact.js',
     creator_dashboard: './core/templates/dev/head/pages/creator_dashboard/CreatorDashboard.js',
     donate: './core/templates/dev/head/pages/donate/Donate.js',
+    email_dashboard: './core/templates/dev/head/pages/email_dashboard/EmailDashboard.js',
     error: './core/templates/dev/head/pages/error/Error.js',
     get_started: './core/templates/dev/head/pages/get_started/GetStarted.js',
     landing: './core/templates/dev/head/pages/landing/TopicLandingPage.js',
+    learner_dashboard: './core/templates/dev/head/pages/learner_dashboard/LearnerDashboard.js',
     library: './core/templates/dev/head/pages/library/Library.js',
+    maintenance: './core/templates/dev/head/pages/maintenance/Maintenance.js',
+    moderator: './core/templates/dev/head/pages/moderator/Moderator.js',
     notifications_dashboard: './core/templates/dev/head/pages/notifications_dashboard/NotificationsDashboard.js',
+    practice_session: './core/templates/dev/head/pages/practice_session/PracticeSession.js',
     preferences: './core/templates/dev/head/pages/preferences/Preferences.js',
     profile: './core/templates/dev/head/pages/profile/Profile.js',
     signup: './core/templates/dev/head/pages/signup/Signup.js',
+    skill_editor: './core/templates/dev/head/pages/skill_editor/SkillEditor.js',
     splash: './core/templates/dev/head/pages/splash/Splash.js',
     stewards: './core/templates/dev/head/pages/landing/stewards/Stewards.js',
     teach: './core/templates/dev/head/pages/teach/Teach.js',
     thanks: './core/templates/dev/head/pages/thanks/Thanks.js',
+    topics_and_skills_dashboard: './core/templates/dev/head/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboard.js',
   },
   plugins: [
    new HtmlWebpackPlugin({
@@ -104,6 +111,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['email_dashboard'],
+      filename: 'email_dashboard.html',
+      template: 'core/templates/dev/head/pages/email_dashboard/email_dashboard.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error.html',
       template: 'core/templates/dev/head/pages/error/error.html',
@@ -125,9 +139,30 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['learner_dashboard'],
+      filename: 'learner_dashboard.html',
+      template: 'core/templates/dev/head/pages/learner_dashboard/learner_dashboard.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['library'],
       filename: 'library.html',
       template: 'core/templates/dev/head/pages/library/library.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['app', 'maintenance'],
+      filename: 'maintenance.html',
+      template: 'core/templates/dev/head/pages/maintenance/maintenance.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['moderator'],
+      filename: 'moderator.html',
+      template: 'core/templates/dev/head/pages/moderator/moderator.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -141,6 +176,13 @@ module.exports = {
       chunks: ['notifications_dashboard'],
       filename: 'notifications_dashboard.html',
       template: 'core/templates/dev/head/pages/notifications_dashboard/notifications_dashboard.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['practice_session'],
+      filename: 'practice_session.html',
+      template: 'core/templates/dev/head/pages/practice_session/practice_session.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -162,6 +204,13 @@ module.exports = {
       chunks: ['signup'],
       filename: 'signup.html',
       template: 'core/templates/dev/head/pages/signup/signup.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['skill_editor'],
+      filename: 'skill_editor.html',
+      template: 'core/templates/dev/head/pages/skill_editor/skill_editor.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -280,6 +329,13 @@ module.exports = {
       chunks: ['thanks'],
       filename: 'thanks.html',
       template: 'core/templates/dev/head/pages/thanks/thanks.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['topics_and_skills_dashboard'],
+      filename: 'topics_and_skills_dashboard.html',
+      template: 'core/templates/dev/head/pages/topics_and_skills_dashboard/topics_and_skills_dashboard.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

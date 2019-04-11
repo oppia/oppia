@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   Topics and Skills Dashboard - Oppia
@@ -239,19 +239,11 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
-  <script src="/templates/dev/head/components/TopicCreationService.js"></script>
-  <script src="/templates/dev/head/components/SkillCreationService.js"></script>
-
-  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/SelectTopicsDirective.js"></script>
-  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/SkillsListDirective.js"></script>
-  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboard.js"></script>
-  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarBreadcrumbDirective.js"></script>
-  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarDirective.js"></script>
-  <script src="/templates/dev/head/pages/topics_and_skills_dashboard/TopicsListDirective.js"></script>
-
-  <script src="/templates/dev/head/domain/topic/EditableTopicBackendApiService.js"></script>
-  <script src="/templates/dev/head/domain/skill/EditableSkillBackendApiService.js"></script>
-  <script src="/templates/dev/head/domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js"></script>
-  <script src="/templates/dev/head/domain/skill/EditableSkillBackendApiService.js"></script>
+<% for (var chunk in htmlWebpackPlugin.files.js) { %>
+  <% if (webpackConfig.mode == 'production') { %> 
+    <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <% } else { %>
+    <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <% } %>
+<% } %>
 {% endblock footer_js %}

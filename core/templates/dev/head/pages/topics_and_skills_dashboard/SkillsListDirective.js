@@ -16,6 +16,8 @@
  * @fileoverview Controller for the skills list viewer.
  */
 
+require('pages/topics_and_skills_dashboard/SelectTopicsDirective.js');
+
 require('domain/skill/EditableSkillBackendApiService.js');
 require('domain/topic/EditableTopicBackendApiService.js');
 require('domain/utilities/UrlInterpolationService.js');

@@ -16,6 +16,9 @@
  * @fileoverview Directive for the skill misconceptions editor.
  */
 
+require('components/SummaryListHeaderDirective.js');
+require('pages/skill_editor/editor_tab/MisconceptionEditorDirective.js');
+
 require('domain/skill/MisconceptionObjectFactory.js');
 require('domain/skill/SkillUpdateService.js');
 require('domain/utilities/UrlInterpolationService.js');

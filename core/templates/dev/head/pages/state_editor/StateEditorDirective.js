@@ -16,6 +16,12 @@
  * @fileoverview Controller for the state editor directive.
  */
 
+require('pages/state_editor/StateContentEditorDirective.js');
+require('pages/state_editor/StateHintsEditorDirective.js');
+require('pages/state_editor/StateInteractionEditorDirective.js');
+require('pages/state_editor/StateResponsesDirective.js');
+require('pages/state_editor/StateSolutionEditorDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/state_editor/state_properties/StateEditorService.js');
 require('pages/state_editor/state_properties/StatePropertyService.js');

@@ -17,6 +17,9 @@
  * state editor.
  */
 
+require('components/state/ResponseHeaderDirective.js');
+require('components/state/SolutionEditorDirective.js');
+
 require('domain/exploration/SolutionObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('filters/ConvertToPlainTextFilter.js');

@@ -16,6 +16,8 @@
  * @fileoverview Directive for the navbar of the skill editor.
  */
 
+require('components/loading/LoadingDotsDirective.js');
+
 require('domain/editor/undo_redo/UndoRedoService.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/skill_editor/SkillEditorStateService.js');

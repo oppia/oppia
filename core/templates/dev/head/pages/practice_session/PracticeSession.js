@@ -16,6 +16,11 @@
  * @fileoverview Controllers for the practice session.
  */
 
+require('components/background/BackgroundBannerDirective.js');
+
+require('services/AlertsService.js');
+require('services/contextual/UrlService.js');
+
 oppia.controller('PracticeSession', [
   '$rootScope', '$scope', '$window', 'AlertsService',
   'UrlService', 'FATAL_ERROR_CODES',

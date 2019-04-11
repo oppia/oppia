@@ -17,6 +17,9 @@
  * @fileoverview Controller for the questions list.
  */
 
+require('directives/AngularHtmlBindDirective.js');
+require('pages/question_editor/QuestionEditorDirective.js');
+
 require('components/QuestionCreationService.js');
 require('domain/editor/undo_redo/UndoRedoService.js');
 require('domain/question/EditableQuestionBackendApiService.js');
