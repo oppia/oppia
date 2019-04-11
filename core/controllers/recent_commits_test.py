@@ -129,7 +129,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_recent_commits_with_invalid_query_type_returns_404_status(
-        self):
+            self):
         self.login(self.MODERATOR_EMAIL)
         self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
