@@ -131,9 +131,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
-        question = question_services.get_question_by_id(
-            question_id, strict=False)
-
         commit_message = self.payload.get('commit_message')
 
         if not commit_message:
