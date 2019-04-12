@@ -381,19 +381,6 @@ ENABLE_MAINTENANCE_MODE = False
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
 
-ALLOWED_QUESTION_INTERACTION_CATEGORIES = [{
-    'name': 'General',
-    'interaction_ids': [
-        'MultipleChoiceInput',
-        'TextInput'
-    ],
-}, {
-    'name': 'Math',
-    'interaction_ids': [
-        'NumericInput'
-    ]
-}]
-
 # Flag to disable sending emails related to reviews for suggestions. To be
 # flipped after deciding (and implementing) whether a user should be scored
 # only for curated lessons.
@@ -505,48 +492,6 @@ ALLOWED_RTE_EXTENSIONS = {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
 }
-
-# These categories and interactions are displayed in the order in which they
-# appear in the interaction selector.
-ALLOWED_INTERACTION_CATEGORIES = [{
-    'name': 'General',
-    'interaction_ids': [
-        'Continue',
-        'EndExploration',
-        'ImageClickInput',
-        'ItemSelectionInput',
-        'MultipleChoiceInput',
-        'TextInput',
-        'DragAndDropSortInput'
-    ],
-}, {
-    'name': 'Math',
-    'interaction_ids': [
-        'FractionInput',
-        'GraphInput',
-        'LogicProof',
-        'NumericInput',
-        'SetInput',
-        'MathExpressionInput',
-        'NumberWithUnits',
-    ]
-}, {
-    'name': 'Programming',
-    'interaction_ids': [
-        'CodeRepl',
-        'PencilCodeEditor',
-    ],
-}, {
-    'name': 'Music',
-    'interaction_ids': [
-        'MusicNotesInput'
-    ],
-}, {
-    'name': 'Geography',
-    'interaction_ids': [
-        'InteractiveMap'
-    ],
-}]
 
 # The list of interaction IDs which correspond to interactions that set their
 # is_linear property to true. Linear interactions do not support branching and
@@ -714,6 +659,7 @@ TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
 TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
+TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
 TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
