@@ -65,7 +65,8 @@ oppia.factory('TopicRightsBackendApiService', [
       });
     };
 
-    var _sendMail = function(topicId, topicName, successCallback, errorCallback) {
+    var _sendMail = function(topicId, topicName, successCallback,
+        errorCallback) {
       var sendMailUrl = UrlInterpolationService.interpolateUrl(
         '/rightshandler/send_topic_publish_mail/<topic_id>', {
           topic_id: topicId

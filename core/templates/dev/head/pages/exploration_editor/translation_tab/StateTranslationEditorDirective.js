@@ -47,7 +47,7 @@ oppia.directive('stateTranslationEditor', [
               state.contentIdsToAudioTranslations);
             var availableAudioLanguages = (
               contentIdsToAudioTranslations.getAudioLanguageCodes(contentId));
-            if (availableAudioLanguages.indexOf(langaugeCode) != -1) {
+            if (availableAudioLanguages.indexOf(langaugeCode) !== -1) {
               var audioTranslation = (
                 contentIdsToAudioTranslations.getAudioTranslation(
                   contentId, langaugeCode));

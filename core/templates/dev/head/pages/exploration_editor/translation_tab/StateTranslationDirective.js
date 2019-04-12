@@ -329,7 +329,7 @@ oppia.directive('stateTranslation', [
             $scope.answerChoices = StateEditorService.getAnswerChoices(
               $scope.stateInteractionId, currentCustomizationArgs);
 
-            if(TranslationTabActiveModeService.isVoiceoverModeActive()) {
+            if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
               $scope.needsUpdateTooltipMessage = 'Audio needs update to ' +
                 'match text. Please record new audio.';
             } else {

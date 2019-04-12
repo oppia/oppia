@@ -34,10 +34,10 @@ oppia.factory('TranslationTabActiveModeService', [
         $rootScope.$broadcast('translationTabModeChange');
       },
       isTranslationModeActive: function() {
-        return activeMode == TRANSLATION_MODE;
+        return activeMode === TRANSLATION_MODE;
       },
       isVoiceoverModeActive: function() {
-        return activeMode == VOICEOVER_MODE;
+        return activeMode === VOICEOVER_MODE;
       }
     };
   }]);

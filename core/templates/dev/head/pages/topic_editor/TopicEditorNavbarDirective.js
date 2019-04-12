@@ -54,7 +54,8 @@ oppia.directive('topicEditorNavbar', [
             if (!$scope.topicRights.canPublishTopic()) {
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic_editor/topic_editor_send_mail_modal_directive.html'),
+                  '/pages/topic_editor/' +
+                  'topic_editor_send_mail_modal_directive.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',
@@ -71,7 +72,7 @@ oppia.directive('topicEditorNavbar', [
 
               modalInstance.result.then(function() {
                 TopicRightsBackendApiService.sendMail(
-                    $scope.topicId, $scope.topicName).then(function() {
+                  $scope.topicId, $scope.topicName).then(function() {
                   var successToast = 'Mail Sent.';
                   AlertsService.addSuccessMessage(
                     successToast, 1000);
