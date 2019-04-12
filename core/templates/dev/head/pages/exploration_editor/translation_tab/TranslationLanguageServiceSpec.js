@@ -19,7 +19,7 @@
 describe('Translation language service', function() {
   beforeEach(module('oppia', function($provide) {
     $provide.value('LanguageUtilService', {
-      getAllAudioLanguageCodes: function() {
+      getAllVoiceoverLanguageCodes: function() {
         return ['en', 'hi'];
       }
     });

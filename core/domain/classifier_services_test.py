@@ -80,7 +80,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         # Modify such that job creation is triggered.
         new_answer_group = copy.deepcopy(state.interaction.answer_groups[1])
         new_answer_group.outcome.feedback.content_id = 'new_feedback'
-        state.content_ids_to_audio_translations['new_feedback'] = {}
+        state.recorded_voiceovers['new_feedback'] = {}
         state.interaction.answer_groups.insert(3, new_answer_group)
         answer_groups = []
         for answer_group in state.interaction.answer_groups:
@@ -93,8 +93,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'state_name': 'Home',
-            'property_name': 'content_ids_to_audio_translations',
-            'new_value': state.content_ids_to_audio_translations
+            'property_name': 'recorded_voiceovers',
+            'new_value': state.recorded_voiceovers
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(

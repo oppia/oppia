@@ -18,7 +18,7 @@
 
 describe('Translation tab active content id service', function() {
   beforeEach(module('oppia', function($provide) {
-    $provide.value('StateContentIdsToAudioTranslationsService', {
+    $provide.value('StateRecordedVoiceoversService', {
       displayed: {
         getAllContentId: function() {
           return ['content', 'feedback_1'];

@@ -99,8 +99,7 @@ oppia.factory('PretestEngineService', [
       var initialCard =
         StateCardObjectFactory.createNewCard(
           null, questionHtml, interactionHtml, interaction,
-          initialState.contentIdsToAudioTranslations,
-          initialState.content.getContentId());
+          initialState.recordedVoiceovers, initialState.content.getContentId());
       successCallback(initialCard, nextFocusLabel);
     };
 
@@ -169,8 +168,7 @@ oppia.factory('PretestEngineService', [
         answerIsBeingProcessed = true;
         var oldIndex = currentIndex;
         var oldState = _getCurrentStateData();
-        var contentIdsToAudioTranslations =
-          oldState.contentIdsToAudioTranslations;
+        var recordedVoiceovers = oldState.recordedVoiceovers;
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             null, oldState.interaction, answer,
@@ -187,9 +185,8 @@ oppia.factory('PretestEngineService', [
         var feedbackHtml =
           makeFeedback(outcome.feedback.getHtml(), [oldParams]);
         var feedbackContentId = outcome.feedback.getContentId();
-        var feedbackAudioTranslations =
-          contentIdsToAudioTranslations.getBindableAudioTranslations(
-            feedbackContentId);
+        var feedbackAudioTranslations = (
+          recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
         if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');
@@ -236,7 +233,7 @@ oppia.factory('PretestEngineService', [
           nextCard = StateCardObjectFactory.createNewCard(
             true, questionHtml, nextInteractionHtml,
             _getNextStateData().interaction,
-            _getNextStateData().contentIdsToAudioTranslations,
+            _getNextStateData().recordedVoiceovers,
             _getNextStateData().content.getContentId()
           );
         }

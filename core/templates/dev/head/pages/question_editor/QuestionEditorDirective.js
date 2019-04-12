@@ -161,12 +161,10 @@ oppia.directive('questionEditor', [
           $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
               contentId) {
             var state = $scope.question.getStateData();
-            var contentIdsToAudioTranslations = (
-              state.contentIdsToAudioTranslations);
+            var recordedVoiceovers = state.recordedVoiceovers;
             var writtenTranslations = state.writtenTranslations;
             var updateQuestion = _updateQuestion;
-            if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
-              contentId)) {
+            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/components/forms/mark_all_audio_and_translations_as_' +
@@ -176,8 +174,7 @@ oppia.directive('questionEditor', [
                   'MarkAllAudioAndTranslationsAsNeedingUpdateController')
               }).result.then(function() {
                 updateQuestion(function() {
-                  contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
-                    contentId);
+                  recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
                   writtenTranslations.markAllTranslationsAsNeedingUpdate(
                     contentId);
                 });

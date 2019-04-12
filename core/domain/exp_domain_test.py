@@ -578,51 +578,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.validate(strict=True)
 
-    def test_content_ids_to_audio_translations_validation(self):
-        """Test validation of content_ids_to_audio_translations."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')
-        exploration.objective = 'Objective'
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
-        exploration.validate()
-
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': {}
-            }
-        })
-        init_state.update_interaction_hints(hints_list)
-
-        # Removing content id directly from content_ids_to_audio_translation for
-        # testing validation error.
-        init_state.content_ids_to_audio_translations.pop('hint_1')
-
-        self._assert_validation_error(
-            exploration,
-            r'Expected state content_ids_to_audio_translations to match '
-            r'the listed content ids \[\'content\', \'default_outcome\', '
-            r'\'hint_1\'\], found \[\'content\', \'default_outcome\'\]')
-
-        # Undo above changes.
-        init_state.content_ids_to_audio_translations['hint_1'] = {}
-
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': {}
-            }
-        })
-        init_state.update_interaction_hints(hints_list)
-
-        self._assert_validation_error(
-            exploration, 'Found a duplicate content id hint_1')
-
-        hints_list[1]['hint_content']['content_id'] = 'hint_2'
-        init_state.update_interaction_hints(hints_list)
-        exploration.validate()
-
     def test_get_trainable_states_dict(self):
         """Test the get_trainable_states_dict() method."""
         exp_id = 'exp_id1'
@@ -4576,9 +4531,11 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'content_id': 'content',
                     'html': content_str,
                 },
-                'content_ids_to_audio_translations': {
-                    'content': {},
-                    'default_outcome': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content': {},
+                        'default_outcome': {}
+                    }
                 },
                 'written_translations': {
                     'translations_mapping': {

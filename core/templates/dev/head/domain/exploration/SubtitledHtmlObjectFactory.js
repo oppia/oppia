@@ -17,9 +17,7 @@
  * domain objects.
  */
 
-oppia.factory('SubtitledHtmlObjectFactory', [
-  'AudioTranslationObjectFactory',
-  function(AudioTranslationObjectFactory) {
+oppia.factory('SubtitledHtmlObjectFactory', [function() {
     var SubtitledHtml = function(html, contentId) {
       this._html = html;
       this._contentId = contentId;

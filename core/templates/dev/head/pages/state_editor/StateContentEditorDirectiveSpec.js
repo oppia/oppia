@@ -17,7 +17,7 @@
  */
 
 describe('State content editor directive', function() {
-  var outerScope, ctrlScope, shof, cls, scs, es, ess, citat, scitat;
+  var outerScope, ctrlScope, shof, cls, scs, es, ess, rv, srv;
   var mockExplorationData;
 
   var _getContent = function(contentId, contentString) {
@@ -25,10 +25,6 @@ describe('State content editor directive', function() {
       content_id: contentId,
       html: contentString
     });
-  };
-
-  var _getContentIdsToAUdioTranslations = function(citatDict) {
-    return citat.createFromBackendDict(citatDict);
   };
 
   beforeEach(module('directiveTemplates'));
@@ -47,20 +43,22 @@ describe('State content editor directive', function() {
   beforeEach(inject(function($compile, $injector, $rootScope, $templateCache) {
     shof = $injector.get('SubtitledHtmlObjectFactory');
     cls = $injector.get('ChangeListService');
-    citat = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
-    scitat = $injector.get('StateContentIdsToAudioTranslationsService');
+    rv = $injector.get('RecordedVoiceoversObjectFactory');
+    srv = $injector.get('StateRecordedVoiceoversService');
     scs = $injector.get('StateContentService');
     es = $injector.get('EditabilityService');
     ess = $injector.get('ExplorationStatesService');
 
-    var citatDict = {
-      content: {},
-      default_outcome: {},
-      feedback_1: {}
+    var rvDict = {
+      voiceovers_mapping: {
+        content: {},
+        default_outcome: {},
+        feedback_1: {}
+      }
     };
 
     scs.init('Third State', _getContent('content', 'This is some content.'));
-    scitat.init('Third State', _getContentIdsToAUdioTranslations(citatDict));
+    srv.init('Third State', rv.createFromBackendDict(rvDict));
     es.markEditable();
     ess.init({
       'First State': {
@@ -68,10 +66,12 @@ describe('State content editor directive', function() {
           content_id: 'content',
           html: 'First State Content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'TextInput',
@@ -114,10 +114,12 @@ describe('State content editor directive', function() {
           content_id: 'content',
           html: 'Second State Content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'TextInput',
@@ -160,10 +162,12 @@ describe('State content editor directive', function() {
           content_id: 'content',
           html: 'This is some content.'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'TextInput',

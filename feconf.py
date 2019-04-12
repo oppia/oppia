@@ -212,10 +212,12 @@ DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 # Default content id for the explanation in the concept card of a skill.
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
-# Default content_ids_to_audio_translations dict for a default state template.
-DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
-    'content': {},
-    'default_outcome': {}
+# Default recorded_voiceovers dict for a default state template.
+DEFAULT_RECORDED_VOICEOVERS = {
+    'voiceovers_mapping': {
+        'content': {},
+        'default_outcome': {}
+    }
 }
 # Default written_translations dict for a default state template.
 DEFAULT_WRITTEN_TRANSLATIONS = {

@@ -35,10 +35,12 @@ describe('StateImprovementSuggestionService', function() {
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'RuleTest',
@@ -88,10 +90,12 @@ describe('StateImprovementSuggestionService', function() {
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'RuleTest',
@@ -137,10 +141,12 @@ describe('StateImprovementSuggestionService', function() {
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'RuleTest',
@@ -190,10 +196,12 @@ describe('StateImprovementSuggestionService', function() {
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'RuleTest',
@@ -239,10 +247,12 @@ describe('StateImprovementSuggestionService', function() {
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'RuleTest',

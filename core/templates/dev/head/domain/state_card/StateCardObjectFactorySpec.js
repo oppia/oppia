@@ -19,9 +19,9 @@
 describe('State card object factory', function() {
   var StateCardObjectFactory = null;
   var InteractionObjectFactory = null;
-  var ContentIdsToAudioTranslations = null;
-  var ContentIdsToAudioTranslationsObjectFactory = null;
-  var AudioTranslationObjectFactory = null;
+  var RecordedVoiceovers = null;
+  var RecordedVoiceoversObjectFactory = null;
+  var VoiceoverObjectFactory = null;
   var _sampleCard = null;
 
   beforeEach(module('oppia'));
@@ -29,10 +29,10 @@ describe('State card object factory', function() {
   beforeEach(inject(function($injector) {
     StateCardObjectFactory = $injector.get('StateCardObjectFactory');
     InteractionObjectFactory = $injector.get('InteractionObjectFactory');
-    ContentIdsToAudioTranslationsObjectFactory =
-      $injector.get('ContentIdsToAudioTranslationsObjectFactory');
-    AudioTranslationObjectFactory =
-      $injector.get('AudioTranslationObjectFactory');
+    RecordedVoiceoversObjectFactory =  (
+      $injector.get('RecordedVoiceoversObjectFactory'));
+    VoiceoverObjectFactory =
+      $injector.get('VoiceoverObjectFactory');
 
     var interactionDict = {
       answer_groups: [],
@@ -59,17 +59,19 @@ describe('State card object factory', function() {
     _sampleCard = StateCardObjectFactory.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       InteractionObjectFactory.createFromBackendDict(interactionDict),
-      ContentIdsToAudioTranslationsObjectFactory.createFromBackendDict({
-        content: {
-          en: {
-            filename: 'filename1.mp3',
-            file_size_bytes: 100000,
-            needs_update: false
-          },
-          hi: {
-            filename: 'filename2.mp3',
-            file_size_bytes: 11000,
-            needs_update: false
+      RecordedVoiceoversObjectFactory.createFromBackendDict({
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'filename1.mp3',
+              file_size_bytes: 100000,
+              needs_update: false
+            },
+            hi: {
+              filename: 'filename2.mp3',
+              file_size_bytes: 11000,
+              needs_update: false
+            }
           }
         }
       }),
@@ -85,27 +87,26 @@ describe('State card object factory', function() {
     expect(_sampleCard.getInputResponsePairs()).toEqual([]);
     expect(_sampleCard.getLastInputResponsePair()).toEqual(null);
     expect(_sampleCard.getLastOppiaResponse()).toEqual(null);
-    expect(
-      _sampleCard.getContentIdsToAudioTranslations().
-        getBindableAudioTranslations('content')).toEqual({
-      en: AudioTranslationObjectFactory.createFromBackendDict({
+    expect(_sampleCard.getRecordedVoiceovers().getBindableVoiceovers(
+      'content')).toEqual({
+      en: VoiceoverObjectFactory.createFromBackendDict({
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false
       }),
-      hi: AudioTranslationObjectFactory.createFromBackendDict({
+      hi: VoiceoverObjectFactory.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: false
       })
     });
-    expect(_sampleCard.getAudioTranslations()).toEqual({
-      en: AudioTranslationObjectFactory.createFromBackendDict({
+    expect(_sampleCard.getVoiceovers()).toEqual({
+      en: VoiceoverObjectFactory.createFromBackendDict({
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false
       }),
-      hi: AudioTranslationObjectFactory.createFromBackendDict({
+      hi: VoiceoverObjectFactory.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: false

@@ -20,11 +20,11 @@ describe('States object factory', function() {
   beforeEach(module('oppia'));
 
   describe('StatesObjectFactory', function() {
-    var scope, sof, ssof, statesDict, statesWithAudioDict, atof;
+    var scope, sof, ssof, statesDict, statesWithAudioDict, vof;
     beforeEach(inject(function($injector) {
       ssof = $injector.get('StatesObjectFactory');
       sof = $injector.get('StateObjectFactory');
-      atof = $injector.get('AudioTranslationObjectFactory');
+      vof = $injector.get('VoiceoverObjectFactory');
 
       constants.NEW_STATE_TEMPLATE = {
         classifier_model_id: null,
@@ -32,9 +32,11 @@ describe('States object factory', function() {
           content_id: 'content',
           html: ''
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {}
+          }
         },
         interaction: {
           answer_groups: [],
@@ -73,10 +75,12 @@ describe('States object factory', function() {
             content_id: 'content',
             html: 'content'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           interaction: {
             id: 'RuleTest',
@@ -127,55 +131,57 @@ describe('States object factory', function() {
             content_id: 'content',
             html: 'content'
           },
-          content_ids_to_audio_translations: {
-            content: {
-              en: {
-                filename: 'myfile1.mp3',
-                file_size_bytes: 0.5,
-                needs_update: false
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                en: {
+                  filename: 'myfile1.mp3',
+                  file_size_bytes: 0.5,
+                  needs_update: false
+                },
+                'hi-en': {
+                  filename: 'myfile3.mp3',
+                  file_size_bytes: 0.8,
+                  needs_update: false
+                }
               },
-              'hi-en': {
-                filename: 'myfile3.mp3',
-                file_size_bytes: 0.8,
-                needs_update: false
-              }
-            },
-            default_outcome: {
-              he: {
-                filename: 'myfile10.mp3',
-                file_size_bytes: 0.5,
-                needs_update: false
-              }
-            },
-            feedback_1: {
-              zh: {
-                filename: 'myfile4.mp3',
-                file_size_bytes: 1.1,
-                needs_update: false
-              }
-            },
-            hint_1: {
-              es: {
-                filename: 'myfile5.mp3',
-                file_size_bytes: 0.7,
-                needs_update: false
+              default_outcome: {
+                he: {
+                  filename: 'myfile10.mp3',
+                  file_size_bytes: 0.5,
+                  needs_update: false
+                }
               },
-              zh: {
-                filename: 'myfile6.mp3',
-                file_size_bytes: 0.9,
-                needs_update: false
+              feedback_1: {
+                zh: {
+                  filename: 'myfile4.mp3',
+                  file_size_bytes: 1.1,
+                  needs_update: false
+                }
               },
-              'hi-en': {
-                filename: 'myfile8.mp3',
-                file_size_bytes: 1.2,
-                needs_update: false
-              }
-            },
-            hint_2: {
-              cs: {
-                filename: 'myfile7.mp3',
-                file_size_bytes: 0.2,
-                needs_update: false
+              hint_1: {
+                es: {
+                  filename: 'myfile5.mp3',
+                  file_size_bytes: 0.7,
+                  needs_update: false
+                },
+                zh: {
+                  filename: 'myfile6.mp3',
+                  file_size_bytes: 0.9,
+                  needs_update: false
+                },
+                'hi-en': {
+                  filename: 'myfile8.mp3',
+                  file_size_bytes: 1.2,
+                  needs_update: false
+                }
+              },
+              hint_2: {
+                cs: {
+                  filename: 'myfile7.mp3',
+                  file_size_bytes: 0.2,
+                  needs_update: false
+                }
               }
             }
           },
@@ -238,20 +244,22 @@ describe('States object factory', function() {
             content_id: 'content',
             html: 'more content'
           },
-          content_ids_to_audio_translations: {
-            content: {
-              'hi-en': {
-                filename: 'myfile2.mp3',
-                file_size_bytes: 0.8,
-                needs_update: false
-              }
-            },
-            default_outcome: {},
-            solution: {
-              de: {
-                filename: 'myfile9.mp3',
-                file_size_bytes: 0.5,
-                needs_update: false
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                'hi-en': {
+                  filename: 'myfile2.mp3',
+                  file_size_bytes: 0.8,
+                  needs_update: false
+                }
+              },
+              default_outcome: {},
+              solution: {
+                de: {
+                  filename: 'myfile9.mp3',
+                  file_size_bytes: 0.5,
+                  needs_update: false
+                }
               }
             }
           },
@@ -300,9 +308,11 @@ describe('States object factory', function() {
             content_id: 'content',
             html: ''
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           interaction: {
             answer_groups: [],
@@ -338,24 +348,24 @@ describe('States object factory', function() {
 
     it('should correctly get all audio language codes in states', function() {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
-      expect(statesWithAudio.getAllAudioLanguageCodes())
+      expect(statesWithAudio.getAllVoiceoverLanguageCodes())
         .toEqual(['en', 'hi-en', 'he', 'zh', 'es', 'cs', 'de']);
     });
 
     it('should correctly get all audio translations in states', function() {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
-      expect(statesWithAudio.getAllAudioTranslations('hi-en'))
+      expect(statesWithAudio.getAllVoiceovers('hi-en'))
         .toEqual({
-          'first state': [atof.createFromBackendDict({
+          'first state': [vof.createFromBackendDict({
             filename: 'myfile3.mp3',
             file_size_bytes: 0.8,
             needs_update: false
-          }), atof.createFromBackendDict({
+          }), vof.createFromBackendDict({
             filename: 'myfile8.mp3',
             file_size_bytes: 1.2,
             needs_update: false
           })],
-          'second state': [atof.createFromBackendDict({
+          'second state': [vof.createFromBackendDict({
             filename: 'myfile2.mp3',
             file_size_bytes: 0.8,
             needs_update: false

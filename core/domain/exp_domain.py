@@ -45,8 +45,7 @@ import utils
 # 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
-STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = (
-    'content_ids_to_audio_translations')
+STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
@@ -113,7 +112,7 @@ class ExplorationChange(object):
     STATE_PROPERTIES = (
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
-        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+        STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
@@ -578,15 +577,10 @@ class Exploration(object):
                 [state_domain.Hint.from_dict(h) for h in idict['hints']],
                 solution)
 
-            state.content_ids_to_audio_translations = {
-                content_id: {
-                    language_code: state_domain.AudioTranslation.from_dict(
-                        audio_translation_dict)
-                    for language_code, audio_translation_dict in
-                    audio_translations.iteritems()
-                } for content_id, audio_translations in (
-                    sdict['content_ids_to_audio_translations'].iteritems())
-            }
+            state.recorded_voiceovers = (
+                state_domain.RecordedVoiceovers.from_dict(
+                    sdict['recorded_voiceovers']))
+
             state.written_translations = (
                 state_domain.WrittenTranslations.from_dict(
                     sdict['written_translations']))

@@ -147,8 +147,8 @@ oppia.controller('ExplorationEditorTab', [
         angular.copy(displayedValue));
     };
 
-    $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
-      ExplorationStatesService.saveContentIdsToAudioTranslations(
+    $scope.saveRecordedVoiceovers = function(displayedValue) {
+      ExplorationStatesService.saveRecordedVoiceovers(
         $scope.stateName, angular.copy(displayedValue));
     };
 
@@ -156,10 +156,9 @@ oppia.controller('ExplorationEditorTab', [
         contentId) {
       var stateName = StateEditorService.getActiveStateName();
       var state = ExplorationStatesService.getState(stateName);
-      var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
+      var recordedVoiceovers = state.recordedVoiceovers;
       var writtenTranslations = state.writtenTranslations;
-      if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
-        contentId)) {
+      if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/forms/mark_all_audio_and_translations_as_needing_' +
@@ -167,9 +166,9 @@ oppia.controller('ExplorationEditorTab', [
           backdrop: true,
           controller: 'MarkAllAudioAndTranslationsAsNeedingUpdateController'
         }).result.then(function() {
-          contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(contentId);
-          ExplorationStatesService.saveContentIdsToAudioTranslations(
-            stateName, contentIdsToAudioTranslations);
+          recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
+          ExplorationStatesService.saveRecordedVoiceovers(
+            stateName, recordedVoiceovers);
           writtenTranslations.markAllTranslationsAsNeedingUpdate(contentId);
           ExplorationStatesService.saveWrittenTranslations(
             stateName, writtenTranslations);

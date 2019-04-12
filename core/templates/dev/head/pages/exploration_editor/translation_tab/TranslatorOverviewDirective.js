@@ -45,7 +45,7 @@ oppia.directive('translatorOverview', [
           var prevLanguageCode = $window.localStorage.getItem(
             LAST_SELECTED_TRANSLATION_LANGUAGE);
           var allAudioLanguageCodes = LanguageUtilService
-            .getAllAudioLanguageCodes();
+            .getAllVoiceoverLanguageCodes();
 
           $scope.VOICEOVER_MODE = 'Record';
           $scope.TRANSLATION_MODE = 'Translate';
@@ -83,7 +83,7 @@ oppia.directive('translatorOverview', [
             $scope.inVoiceoverMode = (
               TranslationTabActiveModeService.isVoiceoverModeActive());
             allAudioLanguageCodes = (
-              LanguageUtilService.getAllAudioLanguageCodes());
+              LanguageUtilService.getAllVoiceoverLanguageCodes());
             if($scope.inTranslationMode) {
               var index = allAudioLanguageCodes.indexOf(
                 ExplorationLanguageCodeService.displayed);

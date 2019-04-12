@@ -686,17 +686,17 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         self.old_content = state_domain.SubtitledHtml(
             'content', 'old content').to_dict()
-        self.old_content_ids_to_audio_translations = {
+        self.old_recorded_voiceovers = state_domain.RecordedVoiceovers({
             'content': {
-                self.TRANSLATION_LANGUAGE_CODE: state_domain.AudioTranslation(
+                self.TRANSLATION_LANGUAGE_CODE: state_domain.Voiceover(
                     'filename.mp3', 20, False).to_dict()
             },
             'default_outcome': {}
-        }
+        })
         # Create content in State A with a single audio subtitle.
         exploration.states['State 1'].update_content(self.old_content)
-        exploration.states['State 1'].update_content_ids_to_audio_translations(
-            self.old_content_ids_to_audio_translations)
+        exploration.states['State 1'].update_recorded_voiceoverss(
+            self.old_recorded_voiceovers)
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
