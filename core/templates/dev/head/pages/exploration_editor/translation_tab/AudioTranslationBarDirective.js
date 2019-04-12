@@ -74,7 +74,7 @@ oppia.directive('audioTranslationBar', [
             $filter, $rootScope, $scope, $timeout, $uibModal,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
-            IdGenerationService , SiteAnalyticsService,
+            IdGenerationService, SiteAnalyticsService,
             StateContentIdsToAudioTranslationsService,
             StateEditorService, TranslationLanguageService,
             recorderService, TranslationTabActiveContentIdService,
@@ -271,6 +271,9 @@ oppia.directive('audioTranslationBar', [
           });
 
           $scope.$on('activeContentIdChanged', function() {
+            $scope.initAudioBar();
+          });
+          $scope.$on('activeLanguageChanged', function() {
             $scope.initAudioBar();
           });
 
