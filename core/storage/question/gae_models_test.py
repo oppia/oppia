@@ -19,10 +19,8 @@ import datetime
 from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
+import types
 
-(base_models, skill_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.skill
-])
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
@@ -41,21 +39,23 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             question_model.question_state_data, question_state_data)
         self.assertEqual(question_model.language_code, language_code)
 
-    def test_create_question_raise_exception(self):
+    
+    def test_raise_exception_by_forcing_collision(self):
         state = state_domain.State.create_default_state('ABC')
         question_state_data = state.to_dict()
         language_code = 'en'
-        version = '1'
+        version = 1
+        question_model = None
 
         try:
-            base_models.MAX_RETRIES = 0
-            question_model = None
-            question_model = question_models.QuestionModel.create(
-                question_state_data, language_code, version)
+            with self.swap(question_models.QuestionModel, 'get_by_id',
+                types.MethodType(lambda x, y: True,
+                    question_models.QuestionModel)):
+                question_model = question_models.QuestionModel.create(
+                    question_state_data, language_code, version)
         except Exception:
-            base_models.MAX_RETRIES = 10
             self.assertIsNone(question_model)
-
+        
 
 class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionSummaryModel class."""
