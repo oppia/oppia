@@ -394,7 +394,8 @@ oppia.controller('ExplorationEditor', [
     // exploration since in that case Save Draft button will not be visible
     // on the create page.
     if (!GLOBALS.can_edit) {
-      var index = $scope.EDITOR_TUTORIAL_OPTIONS.indexOf(saveButtonTutorialElement);
+      var index = $scope.EDITOR_TUTORIAL_OPTIONS.indexOf(
+        saveButtonTutorialElement);
       $scope.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
     }
 

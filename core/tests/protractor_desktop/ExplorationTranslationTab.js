@@ -120,7 +120,7 @@ describe('Exploration translation', function() {
     users.logout();
     general.checkForConsoleErrors([]);
   });
-  
+
   it('should contain accessibility elements', function() {
     users.login('common@translationTab.com');
     creatorDashboardPage.get();
