@@ -70,7 +70,7 @@ oppia.controller('Library', [
     if ($scope.pageMode === LIBRARY_PAGE_MODES.GROUP ||
         $scope.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
       title = 'Find explorations to learn from - Oppia';
-    } else {
+    } else if ($scope.pageMode === LIBRARY_PAGE_MODES.INDEX) {
       title = 'Exploration Library - Oppia';
     }
     PageTitleService.setPageTitle(title);
