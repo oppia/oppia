@@ -96,7 +96,8 @@ oppia.factory('QuestionPlayerBackendApiService', [
     return {
       fetchQuestions: function(skillIds, questionCount, resetHistory) {
         return $q(function(resolve, reject) {
-          _fetchQuestions(skillIds, questionCount, resetHistory, resolve, reject);
+          _fetchQuestions(
+            skillIds, questionCount, resetHistory, resolve, reject);
         });
       }
     };
