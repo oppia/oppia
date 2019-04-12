@@ -175,6 +175,24 @@ class Question(object):
             None, is_initial_state=True)
 
     @classmethod
+    def _convert_state_v27_dict_to_v28_dict(cls, question_state_dict):
+        """Converts from version 27 to 28. Version 28 replaces
+        content_ids_to_audio_translations with recorded_voiceovers.
+
+         Args:
+            question_state_dict: dict. The dict representation of
+                question_state_data.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        question_state_dict['recorded_voiceovers'] = {
+            'voiceovers_mapping': (
+                question_state_dict.pop('content_ids_to_audio_translations'))
+        }
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
