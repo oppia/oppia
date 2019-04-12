@@ -38,13 +38,11 @@ def _is_email_valid(email_address):
     """Determines whether an email address is invalid.
 
     Args:
-        email_address: Email address to check.
+        email_address: str. Email address to check.
 
     Returns:
         bool. Whether specified email address is valid.
     """
-
-
     if not isinstance(email_address, basestring):
         return False
 
@@ -65,7 +63,6 @@ def _is_sender_email_valid(sender_email):
     Returns:
         bool. Whether the sender_email is valid.
     """
-
     if not _is_email_valid(sender_email):
         return False
 

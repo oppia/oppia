@@ -137,7 +137,7 @@ class EmailTests(test_utils.GenericTestBase):
         messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(0, len(messages))
 
-        # Case when malformed_sender_email does not have name of the sender
+        # Case when malformed_sender_email does not have name of the sender,
         # only the email address.
         messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(0, len(messages))
@@ -168,7 +168,7 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertEqual(0, len(messages))
 
         # Case when malformed_sender_email does not have email address of the
-        # in the form '<sender_email_address>'.
+        # form '<sender_email_address>'.
         messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
         self.assertEqual(0, len(messages))
         malformed_sender_email = 'MalformedSender malformed_sender@gmail.com'
@@ -204,7 +204,6 @@ class EmailTests(test_utils.GenericTestBase):
             gae_email_services.send_mail(
                 self.SENDER_EMAIL, malformed_recipient_email,
                 'subject', 'body', 'html')
-
 
 
 class BulkEmailsTests(test_utils.GenericTestBase):
@@ -260,7 +259,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         malformed.
         """
 
-        # Case when malformed_sender_email is an empty string.
+        # Case when malformed_sender_email is None.
         message_a = self.mail_stub.get_sent_messages(
             to=self.RECIPIENT_EMAILS[0])
         self.assertEqual(0, len(message_a))
@@ -351,7 +350,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         self.assertEqual(0, len(message_b))
 
         # Case when malformed_sender_email does not have email address of the
-        # in the form '<sender_email_address>'.
+        # form '<sender_email_address>'.
         message_a = self.mail_stub.get_sent_messages(
             to=self.RECIPIENT_EMAILS[0])
         self.assertEqual(0, len(message_a))
