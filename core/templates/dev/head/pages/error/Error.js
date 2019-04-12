@@ -17,12 +17,15 @@
  */
 
 oppia.controller('Error', [
-  '$scope', 'UrlInterpolationService',
+  '$scope', 'PageTitleService', 'UrlInterpolationService',
   function(
-      $scope, UrlInterpolationService) {
+      $scope, PageTitleService, UrlInterpolationService) {
     $scope.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/oops_mint.png');
 
     $scope.statusCode = GLOBALS.status_code;
+
+    var title = 'Error ' + $scope.statusCode + ' - Oppia';
+    PageTitleService.setPageTitle(title);
   }
 ]);
