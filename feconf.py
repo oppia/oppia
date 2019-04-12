@@ -329,6 +329,7 @@ SYSTEM_COMMITTER_ID = 'admin'
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
+SYSTEM_EMAIL_NAME = '.'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
