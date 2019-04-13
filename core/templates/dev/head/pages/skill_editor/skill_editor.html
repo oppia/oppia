@@ -8,8 +8,6 @@
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
-    GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
-      '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
     GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
       '{{DEFAULT_OBJECT_VALUES|js_string}}');
   </script>
@@ -81,6 +79,7 @@
   <script src="/templates/dev/head/pages/state_editor/state_properties/StateHintsService.js"></script>
   <script src="/templates/dev/head/pages/state_editor/state_properties/StateSolutionService.js"></script>
   <script src="/templates/dev/head/pages/state_editor/state_properties/StateContentIdsToAudioTranslationsService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateWrittenTranslationsService.js"></script>
 
   <script src="/templates/dev/head/domain/skill/SkillObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/skill/SkillRightsObjectFactory.js"></script>
@@ -108,6 +107,7 @@
   <script src="/templates/dev/head/pages/exploration_editor/editor_tab/TrainingDataEditorPanelService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/editor_tab/AnswerGroupsCacheService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/AngularNameService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/MarkAllAudioAndTranslationsAsNeedingUpdateController.js"></script>
   <script src="/templates/dev/head/domain/classifier/AnswerClassificationResultObjectFactory.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/PredictionAlgorithmRegistryService.js"></script>
   <script src="/templates/dev/head/pages/exploration_player/AnswerClassificationService.js"></script>

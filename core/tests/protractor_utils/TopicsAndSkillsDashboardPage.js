@@ -73,15 +73,16 @@ var TopicsAndSkillsDashboardPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.mergeSkillWithIndexToSkillWithIndex = function(oldSkillIndex, newSkillIndex) {
-    mergeSkillsButtons.then(function(elems) {
-      elems[oldSkillIndex].click();
-      skillsListItems.then(function(skills) {
-        skills[newSkillIndex].click();
-        confirmSkillsMergeButton.click();
+  this.mergeSkillWithIndexToSkillWithIndex = (
+    function(oldSkillIndex, newSkillIndex) {
+      mergeSkillsButtons.then(function(elems) {
+        elems[oldSkillIndex].click();
+        skillsListItems.then(function(skills) {
+          skills[newSkillIndex].click();
+          confirmSkillsMergeButton.click();
+        });
       });
     });
-  };
 
   this.navigateToTopicWithIndex = function(index) {
     topicsListItems.then(function(elems) {
