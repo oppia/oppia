@@ -17,6 +17,7 @@
   - These should run automatically, but if not, you can manually trigger them locally using `python scripts/pre_commit_linter.py` and `bash scripts/run_frontend_tests.sh`.
 - [ ] The PR is made from a branch that's **not** called "develop".
 - [ ] The PR follows the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide).
+- [ ] Checked the codeowners for the files/folders changed and also carried out the corresponding checks for the files as laid out in the [codeowner's wiki](https://github.com/oppia/oppia/wiki/Oppia%27s-code-owners-and-checks-to-be-carried-out-by-developers).
 - [ ] The PR is assigned to an appropriate reviewer.
   - If you're a new contributor, please ask on [Gitter](https://gitter.im/oppia/oppia-chat) for someone to assign a reviewer.
   - If you're not sure who the appropriate reviewer is, please assign to the issue's "owner" -- see the "talk-to" label on the issue.
