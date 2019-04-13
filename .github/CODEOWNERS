@@ -20,17 +20,17 @@
 
 
 # Collection project.
-# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
-/core/controllers/collection*.py @nithusha21
-/core/domain/collection*.py @nithusha21
-/core/storage/collection/ @nithusha21
-/core/templates/dev/head/domain/collection/ @nithusha21
-/core/templates/dev/head/pages/collection_editor/ @nithusha21
-/core/templates/dev/head/pages/collection_player/ @nithusha21
+/core/controllers/collection*.py @kevinlee12
+/core/domain/collection*.py @kevinlee12
+/core/storage/collection/ @kevinlee12
+/core/templates/dev/head/domain/collection/ @kevinlee12
+/core/templates/dev/head/pages/collection_editor/ @kevinlee12
+/core/templates/dev/head/pages/collection_player/ @kevinlee12
 
 
 # Dashboard pages.
 /core/controllers/creator_dashboard*.py @nithusha21
+/core/domain/activity*.py @nithusha21
 /core/domain/learner_playlist_services*.py @nithusha21
 /core/domain/learner_progress*.py @nithusha21
 /core/domain/subscription_services*.py @nithusha21
@@ -49,8 +49,12 @@
 # Exploration project.
 /core/controllers/editor*.py @DubeySandeep
 /core/domain/exp*.py @DubeySandeep
+/core/domain/fs*.py @aks681
+/core/domain/param_domain*.py @aks681
 /core/domain/rating_services*.py @DubeySandeep
 /core/domain/state_domain*.py @aks681
+/core/domain/summary_services*.py @aks681
+/core/domain/value_generators_domain*.py @seanlip
 /core/storage/exploration/ @aks681
 /core/templates/dev/head/domain/editor/ @DubeySandeep
 /core/templates/dev/head/domain/exploration/ @DubeySandeep
@@ -87,26 +91,25 @@
 
 
 # Interaction project.
-# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10 for the
-# following directories:
-# - /core/templates/dev/head/domain/objects/
-# - /extensions/interactions/
 /core/domain/customization_args_util*.py @seanlip
 /core/domain/interaction_registry*.py @seanlip
 /core/domain/obj_services*.py @seanlip
-/core/templates/dev/head/domain/objects/ @nithusha21
+/core/templates/dev/head/domain/objects/ @kevinlee12
 /core/templates/dev/head/expressions/ @seanlip
 /extensions/dependencies/ @seanlip
-/extensions/interactions/ @nithusha21
+/extensions/interactions/ @kevinlee12
 /extensions/objects/ @seanlip
 /extensions/value_generators/ @seanlip
 
 
+
 # Lesson Analytics team.
 /core/domain/action_registry*.py @brianrodri
+/core/domain/calculation_registry*.py @brianrodri
+/core/domain/event_services*.py @brianrodri
 /core/domain/playthrough_issue_registry*.py @brianrodri
 /core/domain/stats*.py @brianrodri
-/core/domain/event_services*.py @brianrodri
+/core/domain/visualization_registry*.py @brianrodri
 /core/storage/statistics/ @brianrodri
 /core/templates/dev/head/domain/statistics/ @brianrodri
 /core/templates/dev/head/pages/exploration_editor/improvements_tab/ @brianrodri
@@ -118,10 +121,10 @@
 
 
 # Library page.
-# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
-/core/controllers/library*.py @nithusha21
-/core/domain/search_services*.py @nithusha21
-/core/templates/dev/head/pages/library/ @nithusha21
+/core/controllers/library*.py @kevinlee12
+/core/domain/recommendations*.py @seanlip
+/core/domain/search_services*.py @kevinlee12
+/core/templates/dev/head/pages/library/ @kevinlee12
 
 
 # Navigation bar project.
@@ -171,10 +174,13 @@
 
 
 # Infrastructure.
+/core/domain/email*.py @aks681
 /core/platform/ @seanlip
 
 
 # Miscellaneous.
+/core/domain/__init__.py @DubeySandeep
+/core/domain/config*.py @seanlip
 /core/templates/dev/head/pages/about/ @seanlip
 /core/templates/dev/head/pages/privacy/ @seanlip
 /core/templates/dev/head/pages/terms/ @seanlip
@@ -240,9 +246,8 @@
 
 
 # User’s profile page.
-# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
-/core/templates/dev/head/domain/user/ @nithusha21
-/core/templates/dev/head/pages/profile/ @nithusha21
+/core/templates/dev/head/domain/user/ @kevinlee12
+/core/templates/dev/head/pages/profile/ @kevinlee12
 
 
 # Critical files.
@@ -253,10 +258,12 @@
 #
 #     https://help.github.com/en/articles/about-code-owners
 #
+/core/domain/dependency_registry*.py @seanlip
 /core/domain/html*.py @seanlip
 /core/domain/rights_manager*.py @seanlip
 /core/domain/role_services*.py @seanlip
 /core/storage/ @seanlip
+/core/domain/user*.py @seanlip
 /export/ @seanlip
 /manifest.json @seanlip @vojtechjelinek
 /scripts/install_third_party.sh @seanlip @vojtechjelinek
