@@ -41,9 +41,11 @@ oppia.directive('translationTab', [
 
       controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
         'EditabilityService', 'StateTutorialFirstTimeService',
+        'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
         'UrlInterpolationService',
         function($scope, $rootScope, $templateCache, $uibModal,
             EditabilityService, StateTutorialFirstTimeService,
+            StateWrittenTranslationsService, TranslationTabActiveModeService,
             UrlInterpolationService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
@@ -55,7 +57,11 @@ oppia.directive('translationTab', [
               stateName,
               ExplorationStatesService.getContentIdsToAudioTranslationsMemento(
                 stateName));
+            StateWrittenTranslationsService.init(stateName,
+              ExplorationStatesService.getWrittenTranslationsMemento(
+                stateName));
             $scope.showTranslationTabSubDirectives = true;
+            TranslationTabActiveModeService.activateVoiceoverMode();
             $rootScope.loadingMessage = '';
           };
 

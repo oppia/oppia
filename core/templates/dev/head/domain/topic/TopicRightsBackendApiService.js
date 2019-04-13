@@ -65,6 +65,28 @@ oppia.factory('TopicRightsBackendApiService', [
       });
     };
 
+    var _sendMail = function(topicId, topicName, successCallback,
+        errorCallback) {
+      var sendMailUrl = UrlInterpolationService.interpolateUrl(
+        '/rightshandler/send_topic_publish_mail/<topic_id>', {
+          topic_id: topicId
+        });
+
+      var putParams = {
+        topic_name: topicName
+      };
+
+      $http.put(sendMailUrl, putParams).then(function(response) {
+        if (successCallback) {
+          successCallback();
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     var _isCached = function(topicId) {
       return topicRightsCache.hasOwnProperty(topicId);
     };
@@ -129,6 +151,12 @@ oppia.factory('TopicRightsBackendApiService', [
       publishTopic: function(topicId) {
         return $q(function(resolve, reject) {
           _setTopicStatus(topicId, true, resolve, reject);
+        });
+      },
+
+      sendMail: function(topicId, topicName) {
+        return $q(function(resolve, reject) {
+          _sendMail(topicId, topicName, resolve, reject);
         });
       },
 
