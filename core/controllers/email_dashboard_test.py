@@ -79,6 +79,20 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
+        self.login(self.SUBMITTER_EMAIL)
+        # Check that EmailDashboardDataHandler get request works properly.
+        response = self.get_json(
+            '/emaildashboarddatahandler',
+            params={'cursor': '', 'num_queries_to_fetch': len(query_models)})
+        self.assertEqual(response['recent_queries'][0]['id'], query_model.id)
+        # Check that querystatuscheck returns correct query.
+        response = self.get_json(
+            '/querystatuscheck', params={'query_id': query_model.id})
+        self.assertEqual(response['query']['id'], query_model.id)
+        self.assertEqual(
+            response['query']['submitter_username'], self.SUBMITTER_USERNAME)
+        self.logout()
+
     def test_that_page_is_accessible_to_authorised_users_only(self):
         # Make sure that only authorised users can access query pages.
         self.login(self.USER_A_EMAIL)
@@ -112,6 +126,12 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'created_fewer_than_n_exps': 'None',
                     'edited_at_least_n_exps': None
                 }}, csrf_token=csrf_token, expected_status_int=400)
+        # Checks InvalidInputException catch for
+        # EmailDashboardDataHandler isdigit()
+        with self.assertRaisesRegexp(Exception, '400 Bad Request'):
+            self.get_json(
+                '/emaildashboarddatahandler',
+                params={'cursor': '', 'num_queries_to_fetch': 'a b c'})
         self.logout()
 
 
@@ -259,6 +279,27 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_csrf_token_from_response(
             self.get_html_response('/emaildashboard'))
+        # Check that exception is raised for incorrect query id (POST)
+        with self.assertRaisesRegexp(Exception, '400 Bad Request'):
+            self.post_json(
+                '/emaildashboardresult/%s' % 'q123', {
+                    'data': {
+                        'email_subject': 'subject',
+                        'email_body': 'body',
+                        'max_recipients': None,
+                        'email_intent': 'bulk_email_marketing'
+                        }}, csrf_token=csrf_token)
+
+        # Check that exception is raised for incorrect query id (mass email)
+        email_subject = 'email_subject'
+        email_body = 'email_body'
+        with self.assertRaisesRegexp(Exception, '400 Bad Request'):
+            self.post_json(
+                '/emaildashboardtestbulkemailhandler/%s' % 'q123', {
+                    'email_body': email_body,
+                    'email_subject': email_subject
+                }, csrf_token=csrf_token)
+
         self.post_json(
             '/emaildashboarddatahandler', {
                 'data': {
@@ -290,19 +331,29 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 query_models[0].query_status,
                 feconf.USER_QUERY_STATUS_COMPLETED)
 
-        # Check that exception is raised for unauthorized user.
-        self.login(self.USER_A_EMAIL)
-        with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
-            self.get_html_response(
-                '/emaildashboardresult/%s' % query_models[0].id)
-        self.logout()
-
         # Check that exception is raised if current user is not submitter of
         # that query.
         self.login(self.NEW_SUBMITTER_EMAIL)
         with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
             self.get_html_response(
                 '/emaildashboardresult/%s' % query_models[0].id)
+        # FIXME: Not catching unauthorized call for post requests.
+        with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
+            self.post_json(
+                '/emaildashboardresult/%s' % query_models[0].id, {
+                    'data': {
+                        'email_subject': 'subject',
+                        'email_body': 'body',
+                        'max_recipients': None,
+                        'email_intent': 'bulk_email_marketing'}})
+        with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
+            self.post_json(
+                '/emaildashboardcancelresult/%s' % query_models[0].id, {})
+        with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
+            self.post_json(
+                '/emaildashboardtestbulkemailhandler/%s' % query_models[0].id, {
+                    'email_body': 'email_body',
+                    'email_subject': 'email_subject'})
         self.logout()
 
         # Check that exception is raised for accessing query result after
@@ -409,6 +460,11 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             csrf_token = self.get_csrf_token_from_response(
                 self.get_html_response(
                     '/emaildashboardresult/%s' % query_models[0].id))
+            # Check that exception is raised for incorrect query id (POST)
+            with self.assertRaisesRegexp(Exception, '400 Bad Request'):
+                self.post_json('/emaildashboardcancelresult/%s' % 'q123', {},
+                               csrf_token=csrf_token)
+
             self.post_json(
                 '/emaildashboardcancelresult/%s' % query_models[0].id, {},
                 csrf_token=csrf_token)
