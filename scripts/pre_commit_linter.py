@@ -189,6 +189,13 @@ MANDATORY_PATTERNS_JS_REGEXP = [
                    'overview i.e. a short description of the file.',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': r'^//\sCopyright\s\d{4}\sThe\sOppia\sAuthors\.\sAll\sRights\sReserved\.',
+        'message': 'Please ensure this file should contain a proper '
+                   'copyright notice.',
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -2065,10 +2072,6 @@ class LintChecksManager(object):
         if self.verbose_mode_enabled:
             print 'Starting copyright notice check'
             print '----------------------------------------'
-        js_files_to_check = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.js') and (not filepath.endswith(GENERATED_FILE_PATHS)) and (
-                    not filepath.endswith(CONFIG_FILE_PATHS))]
         py_files_to_check = [
             filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.py') and (not filepath.endswith('__init__.py'))]
@@ -2076,7 +2079,7 @@ class LintChecksManager(object):
             filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.sh')]
         all_files_to_check = (
-            js_files_to_check + py_files_to_check + sh_files_to_check)
+            py_files_to_check + sh_files_to_check)
         regexp_to_check = (
             r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.')
 
