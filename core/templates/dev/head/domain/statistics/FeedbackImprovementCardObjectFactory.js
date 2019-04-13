@@ -32,6 +32,12 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew('Test', function() {}),
       ];
+      this._directiveData = {
+        status: feedbackThread.status,
+        subject: feedbackThread.subject,
+        originalAuthorName: feedbackThread.originalAuthorName,
+        lastUpdated: feedbackThread.lastUpdated,
+      };
     };
 
     /**
@@ -60,7 +66,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * @returns {{}}
      */
     FeedbackImprovementCard.prototype.getDirectiveData = function() {
-      return angular.copy(this._feedbackThread);
+      return this._directiveData;
     };
 
     /**

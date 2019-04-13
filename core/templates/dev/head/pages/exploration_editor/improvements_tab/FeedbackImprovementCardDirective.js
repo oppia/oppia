@@ -22,7 +22,16 @@ oppia.directive('feedbackImprovementCard', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/improvements_tab/' +
         'feedback_improvement_card_directive.html'),
-      controller: ['$scope', function($scope) {}],
-    };
+      controller: [
+        '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
+        function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
+          $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
+          $scope.getHumanReadableStatus = (
+            ThreadStatusDisplayService.getHumanReadableStatus);
+          $scope.getLocaleAbbreviatedDatetimeString = (
+            DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
+        }
+      ],
+    }
   }
 ]);
