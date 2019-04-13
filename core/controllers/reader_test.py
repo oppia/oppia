@@ -342,8 +342,8 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 3)
         question_ids = [data['id'] for data in json_response['question_dicts']]
-        self.assertItemsEqual([self.question_id, self.question_id_2,
-                               question_id_3], question_ids)
+        self.assertItemsEqual(
+            [self.question_id, self.question_id_2, question_id_3], question_ids)
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
@@ -356,7 +356,8 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         # Call the handler.
         url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
             feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id)
-        self.get_json(url, expected_status_int = 400)
+        self.get_json(url, expected_status_int=400)
+
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
     """Test methods relating to exploration parameters."""
