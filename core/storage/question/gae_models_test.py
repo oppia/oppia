@@ -51,7 +51,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             Exception, 'The id generator for QuestionModel is producing too '
             'many collisions.'
             ):
-            # Swap dependent method 'get_by_id' to simulate collision every time
+            # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(question_models.QuestionModel, 'get_by_id',
                 types.MethodType(lambda x, y: True,
                     question_models.QuestionModel)):
