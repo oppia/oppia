@@ -353,6 +353,7 @@ class TopicRightsHandler(base.BaseHandler):
 
         self.render_json(self.values)
 
+
 class TopicPublishSendMailHandler(base.BaseHandler):
     """A handler for sending mail to admins to review and publish topic."""
 
