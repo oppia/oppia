@@ -146,9 +146,8 @@ class CreatorDashboardPage(base.BaseHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
-        })
-        self.render_template('pages/creator_dashboard' +
-        '/creator-dashboard.mainpage.html')
+        }
+        self.render_template('pages/creator_dashboard/creator_dashboard.html')
 
 
 class CreatorDashboardHandler(base.BaseHandler):
