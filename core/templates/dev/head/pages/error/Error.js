@@ -25,7 +25,6 @@ oppia.controller('Error', [
 
     $scope.statusCode = GLOBALS.status_code;
 
-    var title = 'Error ' + $scope.statusCode + ' - Oppia';
-    PageTitleService.setPageTitle(title);
+    PageTitleService.setPageTitle('Error ' + $scope.statusCode + ' - Oppia');
   }
 ]);

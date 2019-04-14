@@ -65,13 +65,10 @@ oppia.controller('Library', [
     $scope.pageMode = LIBRARY_PATHS_TO_MODES[currentPath];
     $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
 
-    // Set page title
-    var title = '';
+    var title = 'Exploration Library - Oppia';
     if ($scope.pageMode === LIBRARY_PAGE_MODES.GROUP ||
         $scope.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
       title = 'Find explorations to learn from - Oppia';
-    } else if ($scope.pageMode === LIBRARY_PAGE_MODES.INDEX) {
-      title = 'Exploration Library - Oppia';
     }
     PageTitleService.setPageTitle(title);
 
