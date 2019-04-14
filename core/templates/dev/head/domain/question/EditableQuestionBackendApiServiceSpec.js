@@ -121,6 +121,7 @@ describe('Editable question backend API service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
+      var question = null;
 
       // Loading a question the first time should fetch it from the backend.
       $httpBackend.expect('GET', '/question_editor_handler/data/0').respond(

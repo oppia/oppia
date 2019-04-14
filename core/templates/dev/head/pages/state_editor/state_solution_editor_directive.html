@@ -13,7 +13,7 @@
             <div class="oppia-rule-header-warning-placement"
                  ng-if="!isSolutionValid()"
                  ng-click="toggleInlineSolutionEditorIsActive()"
-                 uib-tooltip="This solution does not lead to another card. Verify the responses specified or change the solution."
+                 uib-tooltip="<[getInvalidSolutionTooltip()]>"
                  tooltip-placement="bottom">
               <div class="oppia-rule-header-warning-style">
                 ⚠
@@ -33,7 +33,7 @@
                                  correct-answer-editor-html="correctAnswerEditorHtml"
                                  on-open-solution-editor="openAddOrUpdateSolutionModal()"
                                  on-save-solution="onSaveSolution"
-                                 on-save-content-ids-to-audio-translations="onSaveContentIdsToAudioTranslations">
+                                 show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired">
                 </solution-editor>
               </div>
             </div>

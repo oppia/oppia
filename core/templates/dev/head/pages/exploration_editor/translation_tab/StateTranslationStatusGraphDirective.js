@@ -29,10 +29,11 @@ oppia.directive('stateTranslationStatusGraph', [
       controller: [
         '$scope', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
         'StateEditorService', 'StateContentIdsToAudioTranslationsService',
-        'TranslationStatusService', function(
+        'StateWrittenTranslationsService', 'TranslationStatusService',
+        function(
             $scope, $rootScope, ExplorationStatesService, GraphDataService,
             StateEditorService, StateContentIdsToAudioTranslationsService,
-            TranslationStatusService) {
+            StateWrittenTranslationsService, TranslationStatusService) {
           $scope.getGraphData = GraphDataService.getGraphData;
           $scope.nodeColors = TranslationStatusService.getAllStateStatusColors;
           $scope.getActiveStateName = function() {
@@ -50,8 +51,10 @@ oppia.directive('stateTranslationStatusGraph', [
               StateContentIdsToAudioTranslationsService.init(
                 StateEditorService.getActiveStateName(),
                 stateData.contentIdsToAudioTranslations);
+              StateWrittenTranslationsService.init(
+                StateEditorService.getActiveStateName(),
+                stateData.writtenTranslations);
               $rootScope.$broadcast('refreshStateTranslation');
-              $rootScope.$broadcast('refreshAudioTranslationBar');
             }
           };
         }

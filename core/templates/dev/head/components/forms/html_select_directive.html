@@ -1,6 +1,6 @@
 <div uib-dropdown class="oppia-html-select">
   <button uib-dropdown-toggle class="btn btn-default oppia-html-select-selection" type="button" aria-expanded="false" data-toggle="dropdown">
-    <div style="white-space: normal; word-break: break-all;">
+    <div style="white-space: normal; word-wrap: break-word;">
       <angular-html-bind class="oppia-html-select-selection-element" html-data="options[getSelectionIndex()].val">
       </angular-html-bind>
     </div>
@@ -8,8 +8,8 @@
   </button>
   <ul uib-dropdown-menu style="max-width: 80%; overflow: auto; width: auto;">
     <li ng-repeat="choice in options" style="float: left;">
-      <a>
-        <angular-html-bind class="oppia-html-select-option protractor-test-html-select-option" html-data="choice.val" ng-click="select(choice.id)">
+      <a ng-click="select(choice.id)">
+        <angular-html-bind class="oppia-html-select-option protractor-test-html-select-option" html-data="choice.val">
         </angular-html-bind>
       </a>
     </li>
@@ -48,7 +48,7 @@
   }
   .oppia-html-select .oppia-html-select-option:hover {
     background: #1485E6;
-    color: white;
+    color: black;
   }
   .oppia-html-select .oppia-html-select-option oppia-noninteractive-image {
     display: inline-block;

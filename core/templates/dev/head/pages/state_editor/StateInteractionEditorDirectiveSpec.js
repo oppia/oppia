@@ -36,9 +36,10 @@ describe('State Interaction controller', function() {
       });
     });
 
-    var scope, ecs, cls, ess, siis, scas, idc, IS;
+    var scope, ecs, cls, ess, siis, scas, scs, idc, IS;
     var $httpBackend;
     var mockExplorationData;
+    var outerScope, directiveScope;
 
     beforeEach(module('directiveTemplates'));
     beforeEach(function() {
@@ -106,7 +107,14 @@ describe('State Interaction controller', function() {
             },
             hints: []
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          }
         },
         'End State': {
           content: {
@@ -145,7 +153,14 @@ describe('State Interaction controller', function() {
             },
             hints: []
           },
-          param_changes: []
+          param_changes: [],
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
+          }
         }
       });
 

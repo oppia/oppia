@@ -161,9 +161,6 @@ class EditorTests(BaseEditorControllerTests):
         # Validates if the current NEW_STATE_TEMPLATE is the latest version
         # by validating it.
         exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
-        self.assertEqual(
-            feconf.CURRENT_STATES_SCHEMA_VERSION,
-            constants.CURRENT_STATES_SCHEMA_VERSION)
 
 
     def test_that_default_exploration_cannot_be_published(self):
@@ -267,115 +264,6 @@ class EditorTests(BaseEditorControllerTests):
 class ExplorationEditorLogoutTest(BaseEditorControllerTests):
     """Test handler for logout from exploration editor page."""
 
-    def test_logout_from_invalid_url(self):
-        """Logour from invalid url should redirect to library.
-        To be caught by regex.
-        """
-
-        published_exp_id = '_published_exp_id-1200'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            published_exp_id)
-        exp_services.save_new_exploration(self.owner_id, exploration)
-        rights_manager.publish_exploration(self.owner, published_exp_id)
-
-        invalid_current_page = '/doesnotexit/%s' % published_exp_id
-        invalid_logout_url = ('/exploration_editor_logout?return_url=%s' % (
-            invalid_current_page))
-
-        self.login(self.OWNER_EMAIL)
-        response = self.get_html_response(
-            invalid_logout_url, expected_status_int=302)
-        self.assertEqual(response.status_int, 302)
-        response.follow()
-        self.assertEqual(response.status_int, 302)
-        self.assertIn('library', response.headers['location'])
-        self.logout()
-
-    def test_logout_from_invalid_extra_url(self):
-        """Logour from invalid url should redirect to library.
-        To be caught by regex.
-        """
-
-        published_exp_id = '123-published_exp_id'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            published_exp_id)
-        exp_services.save_new_exploration(self.owner_id, exploration)
-        rights_manager.publish_exploration(self.owner, published_exp_id)
-
-        invalid_current_page = '%s/%s/extra' % (
-            feconf.EDITOR_URL_PREFIX, published_exp_id)
-        invalid_logout_url = ('/exploration_editor_logout?return_url=%s' % (
-            invalid_current_page))
-
-        self.login(self.OWNER_EMAIL)
-        response = self.get_html_response(
-            invalid_logout_url, expected_status_int=302)
-        self.assertEqual(response.status_int, 302)
-        response.follow()
-        self.assertEqual(response.status_int, 302)
-        self.assertIn('library', response.headers['location'])
-        self.logout()
-
-    def test_logout_from_invalid_regex_exp_id(self):
-        """Logour from invalid url should redirect to library.
-        To be caught by regex.
-        """
-
-        invalid_regex_exp_id = '1?23-inv@alid_ex#p_id'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            invalid_regex_exp_id)
-        exp_services.save_new_exploration(self.owner_id, exploration)
-        rights_manager.publish_exploration(self.owner, invalid_regex_exp_id)
-
-        invalid_current_page = '%s/%s' % (
-            feconf.EDITOR_URL_PREFIX, invalid_regex_exp_id)
-        invalid_logout_url = ('/exploration_editor_logout?return_url=%s' % (
-            invalid_current_page))
-
-        self.login(self.OWNER_EMAIL)
-        response = self.get_html_response(
-            invalid_logout_url, expected_status_int=302)
-        self.assertEqual(response.status_int, 302)
-        response.follow()
-        self.assertEqual(response.status_int, 302)
-        self.assertIn('library', response.headers['location'])
-        self.logout()
-
-    def test_logout_from_empty_url(self):
-        """Logout from empty exploration id should redirect
-        to library page.
-        """
-        empty_redirect_logout_url = '/exploration_editor_logout?return_url='
-
-        self.login(self.OWNER_EMAIL)
-        response = self.get_html_response(
-            empty_redirect_logout_url, expected_status_int=302)
-        self.assertEqual(response.status_int, 302)
-
-        response.follow()
-        self.assertEqual(response.status_int, 302)
-        self.assertIn('library', response.headers['location'])
-        self.logout()
-
-    def test_logout_from_invalid_exploration_id(self):
-        """Logout from invalid exploration id should redirect
-        to library page.
-        """
-
-        invalid_current_page = '%s/%s' % (
-            feconf.EDITOR_URL_PREFIX, 'invalid_eid')
-        invalid_logout_url = (
-            '/exploration_editor_logout?return_url=%s' % invalid_current_page)
-
-        self.login(self.OWNER_EMAIL)
-        response = self.get_html_response(
-            invalid_logout_url, expected_status_int=302)
-        self.assertEqual(response.status_int, 302)
-        response.follow()
-        self.assertEqual(response.status_int, 302)
-        self.assertIn('library', response.headers['location'])
-        self.logout()
-
     def test_logout_from_unpublished_exploration_editor(self):
         """Logout from unpublished exploration should redirect
         to library page.
@@ -391,13 +279,11 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTests):
         self.login(self.OWNER_EMAIL)
         response = self.get_html_response(current_page_url)
 
-        response = self.get_html_response(
-            '/exploration_editor_logout?return_url=%s' % current_page_url,
-            expected_status_int=302)
+        response = self.get_html_response('/logout', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
-        response = response.follow()
-        self.assertEqual(response.status_int, 302)
-        self.assertIn('library', response.headers['location'])
+        self.assertEqual(
+            response.headers['location'], 'https://www.google.com/accounts' +
+            '/Logout?continue=http%3A//localhost/')
         self.logout()
 
     def test_logout_from_published_exploration_editor(self):
@@ -417,13 +303,11 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTests):
 
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
-        response = self.get_html_response(
-            '/exploration_editor_logout?return_url=%s' % current_page_url,
-            expected_status_int=302)
+        response = self.get_html_response('/logout', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
-        response = response.follow()
-        self.assertEqual(response.status_int, 302)
-        self.assertIn(current_page_url, response.headers['location'])
+        self.assertEqual(
+            response.headers['location'], 'https://www.google.com/accounts' +
+            '/Logout?continue=http%3A//localhost/')
         self.logout()
 
 
@@ -459,6 +343,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  translations_mapping:
+    content: {}
+    default_outcome: {}
 """),
         'State B': ("""classifier_model_id: null
 content:
@@ -488,6 +376,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  translations_mapping:
+    content: {}
+    default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
 content:
@@ -517,6 +409,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  translations_mapping:
+    content: {}
+    default_outcome: {}
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
@@ -548,6 +444,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+written_translations:
+  translations_mapping:
+    content: {}
+    default_outcome: {}
 """)
 
     def test_exploration_download_handler_for_default_exploration(self):

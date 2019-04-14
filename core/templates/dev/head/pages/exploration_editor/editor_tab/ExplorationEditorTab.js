@@ -17,13 +17,13 @@
  */
 
 oppia.controller('ExplorationEditorTab', [
-  '$rootScope', '$scope', 'AlertsService', 'ContextService',
+  '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
   'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
   'ExplorationInitStateNameService', 'ExplorationStatesService',
   'ExplorationWarningsService', 'GraphDataService', 'RouterService',
   'StateEditorService', 'UrlInterpolationService',
   function(
-      $rootScope, $scope, AlertsService, ContextService,
+      $rootScope, $scope, $uibModal, AlertsService, ContextService,
       ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
       ExplorationInitStateNameService, ExplorationStatesService,
       ExplorationWarningsService, GraphDataService, RouterService,
@@ -152,108 +152,33 @@ oppia.controller('ExplorationEditorTab', [
         $scope.stateName, angular.copy(displayedValue));
     };
 
+    $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
+        contentId) {
+      var stateName = StateEditorService.getActiveStateName();
+      var state = ExplorationStatesService.getState(stateName);
+      var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
+      var writtenTranslations = state.writtenTranslations;
+      if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
+        contentId)) {
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/forms/mark_all_audio_and_translations_as_needing_' +
+            'update_modal_directive.html'),
+          backdrop: true,
+          controller: 'MarkAllAudioAndTranslationsAsNeedingUpdateController'
+        }).result.then(function() {
+          contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(contentId);
+          ExplorationStatesService.saveContentIdsToAudioTranslations(
+            stateName, contentIdsToAudioTranslations);
+          writtenTranslations.markAllTranslationsAsNeedingUpdate(contentId);
+          ExplorationStatesService.saveWrittenTranslations(
+            stateName, writtenTranslations);
+        });
+      }
+    };
+
     $scope.navigateToState = function(stateName) {
       RouterService.navigateToMainTab(stateName);
     };
   }
 ]);
-
-oppia.directive('trainingPanel', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        answer: '=',
-        // The classification input is an object with two keys:
-        //   -answerGroupIndex: This refers to which answer group the answer
-        //      being trained has been classified to (for displaying feedback
-        //      to the creator). If answerGroupIndex is equal to the number of
-        //      answer groups, then it represents the default outcome feedback.
-        //      This index is changed by the panel when the creator specifies
-        //      which feedback should be associated with the answer.
-        //   -newOutcome: This refers to an outcome structure (containing a
-        //      list of feedback and a destination state name) which is
-        //      non-null if, and only if, the creator has specified that a new
-        //      response should be created for the trained answer.
-        classification: '=',
-        onFinishTraining: '&',
-        addingNewResponse: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/' +
-        'training_answer_modal_directive.html'),
-      controller: [
-        '$scope', 'ExplorationHtmlFormatterService',
-        'StateEditorService', 'ExplorationStatesService',
-        'TrainingDataService', 'ResponsesService', 'StateInteractionIdService',
-        'StateCustomizationArgsService', 'AnswerGroupObjectFactory',
-        'OutcomeObjectFactory', 'GenerateContentIdService',
-        'COMPONENT_NAME_FEEDBACK',
-        'StateContentIdsToAudioTranslationsService',
-        function(
-            $scope, ExplorationHtmlFormatterService,
-            StateEditorService, ExplorationStatesService,
-            TrainingDataService, ResponsesService, StateInteractionIdService,
-            StateCustomizationArgsService, AnswerGroupObjectFactory,
-            OutcomeObjectFactory, GenerateContentIdService,
-            COMPONENT_NAME_FEEDBACK,
-            StateContentIdsToAudioTranslationsService) {
-          $scope.addingNewResponse = false;
-
-          var _stateName = StateEditorService.getActiveStateName();
-          var _state = ExplorationStatesService.getState(_stateName);
-          $scope.allOutcomes = TrainingDataService.getAllPotentialOutcomes(
-            _state);
-
-          var _updateAnswerTemplate = function() {
-            $scope.answerTemplate = (
-              ExplorationHtmlFormatterService.getAnswerHtml(
-                $scope.answer, StateInteractionIdService.savedMemento,
-                StateCustomizationArgsService.savedMemento));
-          };
-
-          $scope.$watch('answer', _updateAnswerTemplate);
-          _updateAnswerTemplate();
-          $scope.selectedAnswerGroupIndex = (
-            $scope.classification.answerGroupIndex);
-
-          $scope.getCurrentStateName = function() {
-            return StateEditorService.getActiveStateName();
-          };
-
-          $scope.beginAddingNewResponse = function() {
-            var contentId = GenerateContentIdService.getNextId(
-              StateContentIdsToAudioTranslationsService.displayed
-                .getAllContentId(),
-              COMPONENT_NAME_FEEDBACK);
-            $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
-              StateEditorService.getActiveStateName(), contentId, '', []);
-            $scope.addingNewResponse = true;
-          };
-
-          $scope.cancelAddingNewResponse = function() {
-            $scope.addingNewResponse = false;
-            $scope.classification.newOutcome = null;
-          };
-
-          $scope.selectAnswerGroupIndex = function(index) {
-            $scope.selectedAnswerGroupIndex = index;
-            $scope.classification.answerGroupIndex = index;
-            if (index > ResponsesService.getAnswerGroupCount()) {
-              $scope.classification.newOutcome = $scope.allOutcomes[index];
-            }
-          };
-
-          $scope.confirmNewFeedback = function() {
-            if ($scope.classification.newOutcome) {
-              // Push the new outcome at the end of the existing outcomes.
-              $scope.allOutcomes.push($scope.classification.newOutcome);
-              $scope.selectAnswerGroupIndex($scope.allOutcomes.length - 1);
-              $scope.addingNewResponse = false;
-            }
-          };
-        }
-      ]
-    };
-  }]
-);

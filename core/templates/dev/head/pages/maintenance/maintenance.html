@@ -49,8 +49,11 @@
     </div>
 
     {% include 'pages/footer_js_libs.html' %}
-    <script src="/templates/dev/head/app.js"></script>
-    <script src="/templates/dev/head/i18n.js"></script>
+    <script src="/templates/dev/head/App.js"></script>
+    <script src="/templates/dev/head/I18nFooter.js"></script>
+
+    <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
+
     <script src="/templates/dev/head/services/AlertsService.js"></script>
     <script src="/templates/dev/head/services/UtilsService.js"></script>
     <script src="/templates/dev/head/services/ContextService.js"></script>
@@ -59,7 +62,16 @@
     <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
     <script src="/templates/dev/head/services/RteHelperService.js"></script>
     <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
-    <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+    <script src="/templates/dev/head/components/forms/ConvertUnicodeWithParamsToHtmlFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/ConvertHtmlToUnicodeFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/ConvertUnicodeToHtmlFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/validators/IsAtLeastFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/validators/IsAtMostFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/validators/IsFloatFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/validators/IsIntegerFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/validators/IsNonemptyFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
     <script src="/templates/dev/head/components/forms/ObjectEditorDirective.js"></script>
     <script src="/templates/dev/head/domain/utilities/UrlInterpolationService.js"></script>
     <script src="/templates/dev/head/pages/maintenance/Maintenance.js"></script>

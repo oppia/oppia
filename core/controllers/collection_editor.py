@@ -18,8 +18,8 @@
 
 import base64
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -66,6 +66,7 @@ class CollectionEditorPage(CollectionEditorHandler):
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
             'TAG_REGEX': feconf.TAG_REGEX,
+            'title': collection.title,
         })
 
         self.render_template('pages/collection_editor/collection_editor.html')

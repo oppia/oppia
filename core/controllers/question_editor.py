@@ -17,8 +17,8 @@ and are created.
 """
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -46,17 +46,21 @@ class QuestionCreationHandler(base.BaseHandler):
                 (question_dict['id'] is not None) or
                 ('question_state_data' not in question_dict) or
                 ('language_code' not in question_dict) or
-                (question_dict['version'] != 1) or
-                (question_dict['question_state_schema_version'] != (
-                    feconf.CURRENT_STATES_SCHEMA_VERSION))):
+                (question_dict['version'] != 1)):
             raise self.InvalidInputException
 
-
+        question_dict['question_state_data_schema_version'] = (
+            feconf.CURRENT_STATES_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
-        question = question_domain.Question.from_dict(question_dict)
+        try:
+            question = question_domain.Question.from_dict(question_dict)
+        except:
+            raise self.InvalidInputException
         question_services.add_question(self.user_id, question)
+        # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
+        # with a value passed from the frontend.
         question_services.create_new_question_skill_link(
-            question.id, skill_id)
+            question.id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
         self.values.update({
             'question_id': question.id
         })
@@ -78,8 +82,10 @@ class QuestionSkillLinkHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The skill with the given id doesn\'t exist.')
 
+        # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
+        # with a value passed from the frontend.
         question_services.create_new_question_skill_link(
-            question_id, skill_id)
+            question_id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
         self.render_json(self.values)
 
     @acl_decorators.can_manage_question_skill_status
@@ -137,8 +143,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
                 'The question with the given id doesn\'t exist.')
 
         commit_message = self.payload.get('commit_message')
-        if not question_id:
-            raise self.PageNotFoundException
+
         if not commit_message:
             raise self.PageNotFoundException
         if not self.payload.get('change_list'):

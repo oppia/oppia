@@ -46,7 +46,7 @@
           <li><a class="oppia-navbar-tab-content protractor-test-playbook-link " href="/teach#playbook" translate="I18N_TOPNAV_PARTICIPATION_PLAYBOOK"></a></li>
           <li><a class="oppia-navbar-tab-content" href="https://medium.com/oppia-org" target="_blank"  translate="I18N_TOPNAV_BLOG">Blog</a></li>
           <li><a class="oppia-navbar-tab-content" href="http://oppiafoundation.org"  target="_blank" translate="I18N_TOPNAV_OPPIA_FOUNDATION"></a></li>
-          <li><a ng-keydown="onMenuKeypress($event, 'aboutMenu', {tab: ACTION_CLOSE})" class="oppia-navbar-tab-content" href="http://oppiafoundation.org/get-involved" target="_blank" translate="I18N_TOPNAV_GET_INVOLVED"></a></li>
+          <li><a ng-keydown="onMenuKeypress($event, 'aboutMenu', {tab: ACTION_CLOSE})" class="oppia-navbar-tab-content" href="https://oppiafoundation.org/volunteer" target="_blank" translate="I18N_TOPNAV_GET_INVOLVED"></a></li>
         </ul>
       </li>
       <li ng-mouseover="blurNavigationLinks($event)" ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
@@ -113,19 +113,19 @@
         <hr class="oppia-top-right-menu-item-separator">
         <li>
           <a ng-click="closeSubmenuIfNotMobile($event)" href="/creator_dashboard"
-             class="protractor-test-dashboard-link protractor-test-creator-dashboard-link">
+             class="protractor-test-creator-dashboard-link">
             <span translate="I18N_TOPNAV_CREATOR_DASHBOARD"></span>
           </a>
         </li>
         <li>
           <a ng-click="closeSubmenuIfNotMobile($event)" href="/learner_dashboard"
-             class="protractor-test-dashboard-link protractor-test-learner-dashboard-link">
+             class="protractor-test-learner-dashboard-link">
             <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
           </a>
         </li>
         <li>
           <a ng-if="(isAdmin || isTopicManager) && newStructuresEnabled" ng-click="closeSubmenuIfNotMobile($event)" href="/topics_and_skills_dashboard"
-             class="protractor-test-dashboard-link">
+             class="protractor-test-topics-and-skills-dashboard-link">
             <span translate="I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD"></span>
           </a>
         </li>

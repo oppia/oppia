@@ -9,7 +9,6 @@
       var GLOBALS = {
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         USER_EMAIL: JSON.parse('{{user_email|js_string}}'),
-        LOGOUT_URL: JSON.parse('{{logout_url|js_string}}'),
         DEMO_EXPLORATIONS: JSON.parse('{{demo_explorations|js_string}}'),
         DEMO_EXPLORATION_IDS: JSON.parse('{{demo_exploration_ids|js_string}}'),
         DEMO_COLLECTIONS: JSON.parse('{{demo_collections|js_string}}'),
@@ -71,7 +70,13 @@
 
     {% include 'pages/footer_js_libs.html' %}
 
-    <script src="/templates/dev/head/app.js"></script>
+    <script src="/templates/dev/head/App.js"></script>
+
+    <script src="/templates/dev/head/directives/FocusOnDirective.js"></script>
+
+    <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
+    <script src="/templates/dev/head/filters/TruncateFilter.js"></script>
+    <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
 
     <script src="/templates/dev/head/pages/admin/Admin.js"></script>
     <script src="/templates/dev/head/pages/admin/AdminNavbarDirective.js"></script>
@@ -82,13 +87,10 @@
     <script src="/templates/dev/head/pages/admin/config_tab/AdminConfigTabDirective.js"></script>
     <script src="/templates/dev/head/pages/admin/jobs_tab/AdminJobsTabDirective.js"></script>
 
-    <script src="/templates/dev/head/pages/admin/roles_tab/RolesTabDirective.js"></script>
+    <script src="/templates/dev/head/pages/admin/roles_tab/AdminRolesTabDirective.js"></script>
     <script src="/templates/dev/head/pages/admin/roles_tab/RoleGraphDirective.js"></script>
     <script src="/templates/dev/head/components/StateGraphLayoutService.js"></script>
-    <script src="/templates/dev/head/filters.js"></script>
-
     <script src="/templates/dev/head/pages/admin/misc_tab/AdminMiscTabDirective.js"></script>
-    <script src="/templates/dev/head/directives.js"></script>
     <script src="/templates/dev/head/services/AlertsService.js"></script>
     <script src="/templates/dev/head/services/ContextService.js"></script>
     <script src="/templates/dev/head/services/UtilsService.js"></script>
@@ -104,7 +106,16 @@
     <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
     <script src="/templates/dev/head/services/stateful/FocusManagerService.js"></script>
 
-    <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
+    <script src="/templates/dev/head/components/forms/ConvertUnicodeWithParamsToHtmlFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/ConvertHtmlToUnicodeFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/ConvertUnicodeToHtmlFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/validators/IsAtLeastFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/validators/IsAtMostFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/validators/IsFloatFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/validators/IsIntegerFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/validators/IsNonemptyFilter.js"></script>
+    <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
+    <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
     <script src="/templates/dev/head/components/forms/ObjectEditorDirective.js"></script>
     <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
     <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>

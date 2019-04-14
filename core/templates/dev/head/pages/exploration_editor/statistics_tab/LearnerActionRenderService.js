@@ -27,11 +27,12 @@
  */
 
 oppia.factory('LearnerActionRenderService', [
-  '$sce', 'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_START',
-  'ACTION_TYPE_EXPLORATION_QUIT', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  '$sce', 'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
+  'ACTION_TYPE_EXPLORATION_START', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
-      $sce, ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_START,
-      ACTION_TYPE_EXPLORATION_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+      $sce, ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
+      ACTION_TYPE_EXPLORATION_START,
+      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
       var htmlString =
         '<span class="oppia-issues-learner-action">' + actionIndex +
@@ -134,7 +135,7 @@ oppia.factory('LearnerActionRenderService', [
           custArgs.state_name.value,
           custArgs.time_spent_in_state_in_msecs.value, actionIndex);
       } else if (actionType === ACTION_TYPE_ANSWER_SUBMIT) {
-        interactionId = custArgs.interaction_id.value;
+        var interactionId = custArgs.interaction_id.value;
         if (interactionId === 'Continue') {
           return renderContinueButtonSubmitActionHTML(
             custArgs.dest_state_name.value,

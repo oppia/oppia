@@ -18,16 +18,14 @@
 
 oppia.controller('Base', [
   '$scope', '$rootScope', '$document', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService', 'SITE_NAME',
+  'SidebarStatusService', 'UrlService', 'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function($scope, $rootScope, $document, AlertsService, BackgroundMaskService,
-      SidebarStatusService, SITE_NAME) {
+      SidebarStatusService, UrlService, SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
-    $scope.iframed = GLOBALS.iframed;
-    $scope.siteFeedbackFormUrl = GLOBALS.SITE_FEEDBACK_FORM_URL;
-    $scope.promoBarIsEnabled = GLOBALS.PROMO_BAR_IS_ENABLED;
-    $scope.promoBarMessage = GLOBALS.PROMO_BAR_MESSAGE;
+    $scope.iframed = UrlService.isIframed();
+    $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
 
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.

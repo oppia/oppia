@@ -20,9 +20,9 @@ import random
 from constants import constants
 from core import jobs
 from core import jobs_registry
+from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import editor
-from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -31,6 +31,7 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import search_services
 from core.domain import stats_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -155,7 +156,8 @@ class AdminHandler(base.BaseHandler):
                     self._generate_dummy_explorations(
                         num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif self.payload.get('action') == 'clear_search_index':
-                exp_services.clear_search_index()
+                search_services.clear_collection_search_index()
+                search_services.clear_exploration_search_index()
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
@@ -266,7 +268,7 @@ class AdminHandler(base.BaseHandler):
             exploration_ids_to_publish = []
             for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
-                category = random.choice(feconf.SEARCH_DROPDOWN_CATEGORIES)
+                category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_services.get_new_exploration_id()
                 exploration = exp_domain.Exploration.create_default_exploration(
                     new_exploration_id, title=title, category=category,
@@ -326,6 +328,13 @@ class AdminRoleHandler(base.BaseHandler):
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
+
+        if (
+                user_services.get_user_role_from_id(user_id) ==
+                feconf.ROLE_ID_TOPIC_MANAGER):
+            topic_services.deassign_user_from_all_topics(
+                user_services.get_system_user(), user_id)
+
         user_services.update_user_role(user_id, role)
         role_services.log_role_query(
             self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
@@ -374,7 +383,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         exp_id = self.request.get('exp_id')
-        exp_version = self.request.get('exp_version')
+        exp_version = int(self.request.get('exp_version'))
         state_name = self.request.get('state_name')
         num_answers = int(self.request.get('num_answers'))
 

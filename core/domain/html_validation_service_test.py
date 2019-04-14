@@ -25,7 +25,7 @@ import feconf
 
 
 class ContentMigrationTests(test_utils.GenericTestBase):
-    """ Tests the function associated with the migration of html
+    """Tests the function associated with the migration of html
     strings to valid RTE format.
     """
 

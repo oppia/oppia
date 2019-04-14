@@ -17,9 +17,9 @@
  */
 
 oppia.controller('Profile', [
-  '$scope', '$http', '$window', '$rootScope', '$log', 'DateTimeFormatService',
+  '$http', '$log', '$rootScope', '$scope', '$window', 'DateTimeFormatService',
   'UrlInterpolationService', 'UserService',
-  function($scope, $http, $window, $rootScope, $log, DateTimeFormatService,
+  function($http, $log, $rootScope, $scope, $window, DateTimeFormatService,
       UrlInterpolationService, UserService) {
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
     var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService.getStaticImageUrl(
@@ -88,10 +88,12 @@ oppia.controller('Profile', [
 
       $scope.changeSubscriptionStatus = function() {
         if ($scope.userNotLoggedIn) {
-          UserService.getLoginAndLogoutUrls().then(
-            function(urlObject) {
-              if (urlObject.login_url) {
-                window.location.href = urlObject.login_url;
+          UserService.getLoginUrlAsync().then(
+            function(loginUrl) {
+              if (loginUrl) {
+                window.location.href = loginUrl;
+              } else {
+                throw Error('Login url not found.');
               }
             }
           );

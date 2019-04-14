@@ -17,11 +17,11 @@
  */
 
 oppia.directive('adminMiscTab', [
-  '$http', '$window', 'AdminTaskManagerService', 'ADMIN_HANDLER_URL',
-  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'UrlInterpolationService',
+  '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
+  'ADMIN_HANDLER_URL', 'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
   function(
-      $http, $window, AdminTaskManagerService, ADMIN_HANDLER_URL,
-      ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, UrlInterpolationService) {
+      $http, $window, AdminTaskManagerService, UrlInterpolationService,
+      ADMIN_HANDLER_URL, ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL) {
     return {
       restrict: 'E',
       scope: {

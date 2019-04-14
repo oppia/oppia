@@ -18,15 +18,15 @@
  */
 
 oppia.factory('GenerateContentIdService', [
-  'StateContentIdsToAudioTranslationsService', 'COMPONENT_NAME_FEEDBACK',
-  'COMPONENT_NAME_HINT', 'COMPONENT_NAME_WORKED_EXAMPLE', function(
-      StateContentIdsToAudioTranslationsService, COMPONENT_NAME_FEEDBACK,
-      COMPONENT_NAME_HINT, COMPONENT_NAME_WORKED_EXAMPLE) {
+  'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
+  'COMPONENT_NAME_WORKED_EXAMPLE', function(
+      COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
+      COMPONENT_NAME_WORKED_EXAMPLE) {
     var generateIdForComponent = function(existingComponentIds, componentName) {
       var contentIdList = angular.copy(existingComponentIds);
       var searchKey = componentName + '_';
       var count = 0;
-      for (contentId in contentIdList) {
+      for (var contentId in contentIdList) {
         if (contentIdList[contentId].indexOf(searchKey) === 0) {
           var splitContentId = contentIdList[contentId].split('_');
           var tempCount =

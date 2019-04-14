@@ -15,8 +15,8 @@
 """Controllers for the skill editor."""
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import dependency_registry
 from core.domain import interaction_registry
 from core.domain import obj_services
@@ -95,13 +95,10 @@ class SkillEditorPage(base.BaseHandler):
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
-            'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'ALLOWED_INTERACTION_CATEGORIES': (
-                feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES)
+            'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
 
-        self.render_template(
-            'pages/skill_editor/skill_editor.html', redirect_url_on_logout='/')
+        self.render_template('pages/skill_editor/skill_editor.html')
 
 
 def check_can_edit_skill_description(user):

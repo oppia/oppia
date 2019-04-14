@@ -30,14 +30,15 @@ oppia.directive('topNavigationBar', [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
-        'DebouncerService', 'DeviceInfoService',
+        'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
         function(
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
-            DebouncerService, DeviceInfoService) {
+            DebouncerService, DeviceInfoService, LOGOUT_URL) {
           $scope.isModerator = null;
           $scope.isAdmin = null;
+          $scope.isTopicManager = null;
           $scope.isSuperAdmin = null;
           $scope.userIsLoggedIn = null;
           $scope.username = '';
@@ -47,6 +48,7 @@ oppia.directive('topNavigationBar', [
             }
             $scope.isModerator = userInfo.isModerator();
             $scope.isAdmin = userInfo.isAdmin();
+            $scope.isTopicManager = userInfo.isTopicManager();
             $scope.isSuperAdmin = userInfo.isSuperAdmin();
             $scope.userIsLoggedIn = userInfo.isLoggedIn();
             $scope.username = userInfo.getUsername();
@@ -84,19 +86,21 @@ oppia.directive('topNavigationBar', [
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURE_EDITORS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-          $scope.logoutUrl = GLOBALS.logoutUrl;
+          $scope.logoutUrl = LOGOUT_URL;
           $scope.userMenuIsShown = ($scope.currentUrl !== NAV_MODE_SIGNUP);
           $scope.standardNavIsShown = (
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.currentUrl) === -1);
 
           $scope.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
-            UserService.getLoginAndLogoutUrls().then(
-              function(urlObject) {
-                if (urlObject.login_url) {
+            UserService.getLoginUrlAsync().then(
+              function(loginUrl) {
+                if (loginUrl) {
                   $timeout(function() {
-                    $window.location = urlObject.login_url;
+                    $window.location = loginUrl;
                   }, 150);
+                } else {
+                  throw Error('Login url not found.');
                 }
               }
             );

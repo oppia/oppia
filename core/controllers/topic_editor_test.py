@@ -91,7 +91,7 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
                 question_id, self.admin_id,
                 self._create_valid_question_data('ABC'))
             question_services.create_new_question_skill_link(
-                question_id, self.skill_id)
+                question_id, self.skill_id, 0.5)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.ADMIN_EMAIL)
@@ -174,6 +174,11 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -195,6 +200,11 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                },
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -212,6 +222,11 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -357,6 +372,11 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'content_ids_to_audio_translations': {
                     'content': {}
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             json_response = self.get_json(
                 '%s/%s/%s' % (
@@ -376,6 +396,11 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                         }
                     }
                 },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {}
+                    }
+                }
             }, json_response['subtopic_page']['page_contents'])
             self.logout()
 
@@ -525,6 +550,30 @@ class TopicManagerRightsHandlerTests(BaseTopicEditorControllerTests):
                     feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
                     self.new_user_id),
                 {}, csrf_token=csrf_token, expected_status_int=401)
+
+
+class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
+
+    def test_send_mail(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
+                {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
+        messages = self.mail_stub.get_sent_messages(
+            to=feconf.ADMIN_EMAIL_ADDRESS)
+        expected_email_html_body = (
+            'wants to publish topic: Topic Name at URL %s, please review'
+            ' and publish if it looks good.'
+            % (feconf.TOPIC_EDITOR_URL_PREFIX + '/' + self.topic_id))
+        self.assertEqual(len(messages), 1)
+        self.assertIn(
+            expected_email_html_body,
+            messages[0].html.decode())
 
 
 class TopicRightsHandlerTests(BaseTopicEditorControllerTests):

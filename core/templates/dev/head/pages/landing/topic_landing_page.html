@@ -1,0 +1,492 @@
+{% extends 'pages/base.html' %}
+
+{% block content %}
+  <div ng-controller="TopicLandingPage">
+    <div class="oppia-landing-section text-center" style="background-color: #afd2eb">
+      <div class="oppia-landing-section-inner">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-6 col-sm-push-6 oppia-landing-image-div" style="height: auto">
+              <img ng-src="<[getRowImageUrl(1)]>" class="oppia-landing-image" style="width: 60%;" alt="">
+            </div>
+            <div class="col-sm-6 col-sm-pull-6" style="z-index: 20">
+              <div class="oppia-landing-text-box-0">
+                <h1 class="oppia-landing-h1"><[topic | capitalize]> just got easier</h1>
+                <h2 class="oppia-landing-h2" style="padding-right: 15px;">Get your students and kids started with our free, effective <[subject]> lessons.</h2>
+              </div>
+              <button class="btn oppia-landing-get-started" ng-click="onClickGetStartedButton('teacher')">Get Started</button>
+              <button class="btn oppia-landing-learn-more" ng-click="onClickLearnMoreButton()">Learn More</button>
+            </div>
+          </div>
+        </div>
+        <div style="position: absolute; top: 115px">
+          <div class="oppia-landing-background-icon-row" style="margin-top: 20px">
+            <img ng-src="<[getStaticSubjectImageUrl('Humor')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Cooking')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Government')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Architecture')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('History')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Microbiology')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Engineering')]>" class="oppia-landing-background-icon" alt="">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Algorithms')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Economics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Computing')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Reading')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Art')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Creativity')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Physics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Language')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Arithmetic')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Chess')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Astronomy')]>" class="oppia-landing-background-icon" alt="">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Religion')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Mathematics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Philosophy')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Humor')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Cooking')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Government')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Architecture')]>" class="oppia-landing-background-icon" alt="">
+          </div>
+
+          <div class="oppia-landing-background-icon-row">
+            <img ng-src="<[getStaticSubjectImageUrl('Genetics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Space')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Algebra')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Music')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Chemistry')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Poetry')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Puzzles')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Calculus')]>" class="oppia-landing-background-icon" alt="">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Business')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Geography')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Biology')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Genetics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Space')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Algebra')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Music')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Chemistry')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Poetry')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Puzzles')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Calculus')]>" class="oppia-landing-background-icon" alt="">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Business')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Geography')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Biology')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Genetics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Space')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Algebra')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Music')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Chemistry')]>" class="oppia-landing-background-icon" alt="">
+          </div>
+
+          <div class="oppia-landing-background-icon-row">
+            <img ng-src="<[getStaticSubjectImageUrl('Economics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Algorithms')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Creativity')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Astronomy')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Chess')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Arithmetic')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Language')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Physics')]>" class="oppia-landing-background-icon" alt="">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Humor')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Philosophy')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Mathematics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Religion')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Cooking')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Engineering')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Microbiology')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('History')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Architecture')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Government')]>" class="oppia-landing-background-icon" alt="">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Art')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Reading')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Computing')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Economics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Algorithms')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Creativity')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Astronomy')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Chess')]>" class="oppia-landing-background-icon" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oppia-landing-section text-center" style="background-color: #e8e7e3">
+      <div class="oppia-landing-section-inner">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-6 col-sm-push-6 oppia-landing-image-div">
+              <img ng-src="<[getRowImageUrl(2)]>" class="oppia-landing-image" alt="">
+            </div>
+            <div class="col-sm-6 col-sm-pull-6">
+              <div class="oppia-landing-text-box-1">
+                <h1 class="oppia-landing-h1" style="color: #242424">Fun storytelling for all</h1>
+                <h2 class="oppia-landing-h2" style="color: #242424">Students are guided through explorations with targeted feedback and immersive storytelling.
+                  <br>
+                  <br>
+                  Oppia guides students step-by-step with helpful hints, so they can complete the lessons on their own.
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oppia-landing-section text-center" style="background-color: #429488;  ">
+      <div class="oppia-landing-section-inner" style="margin-bottom: 2%;">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-6 oppia-landing-image-div">
+              <div class="oppia-landing-video-frame">
+                <video controls type="video/mp4" ng-src="<[getVideoUrl()]>" class="oppia-landing-image
+                oppia-landing-image-desktop" onclick="this.paused ? this.play() : this.pause();">Sorry, your browser doesn't support embedded videos.
+                </video>
+                <video controls type="video/mp4" ng-src="<[getVideoUrl()]>" class="oppia-landing-image
+                oppia-landing-image-mobile" onclick="this.paused ? this.play() : this.pause();">Sorry, your browser doesn't support embedded videos.
+                </video>
+              </div>
+            </div>
+            <div class="col-sm-6 oppia-landing-text-box-2">
+              <h1 class="oppia-landing-h1" style="color: #FFFFFF;">Easy-to-follow lessons</h1>
+              <h2 class="oppia-landing-h2" style="color: #FFFFFF;">By working through lessons on Oppia, your young learners can apply their knowledge to real-world problems.
+                <br>
+                <br>
+                Our lessons also have audio subtitles, to support students with reading difficulties.
+              </h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oppia-landing-section text-center" style="background-color: #afd2eb">
+      <div class="oppia-landing-section-inner">
+        <h1 class="oppia-landing-h1" style="margin-left: 10%; margin-right: 10%; padding-left: 0px; padding-bottom: 10px; text-align: center;white-space: pre-line;">Imagine what your students could learn today!</h1>
+        <button class="btn oppia-landing-get-started oppia-landing-get-started-mobile" style="margin-top: 2%;" ng-click="onClickGetStartedButton('teacher')">Get Started</button>
+        <h2 class="oppia-landing-h2 oppia-landing-centered-h2 library-text" style="margin-top: 2.5%; text-align: center; width: 55%;">To see high quality lessons on subjects other than <[topic | capitalize]>, visit our Library.</h2>
+        <button class="btn oppia-landing-explore-lessons oppia-landing-explore-lessons-mobile" ng-click="onClickExploreLessonsButton()">Explore Lessons</button>
+        <div style="position: absolute; top: 40%">
+          <div class="oppia-landing-background-icon-row">
+            <img ng-src="<[getStaticSubjectImageUrl('Humor')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Cooking')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Government')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Architecture')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('History')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Microbiology')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Engineering')]>" class="oppia-landing-background-icon" alt="">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Algorithms')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Economics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Computing')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Reading')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Art')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Creativity')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Physics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Language')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Arithmetic')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Chess')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Astronomy')]>" class="oppia-landing-background-icon" alt="">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Religion')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Mathematics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Philosophy')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Humor')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Cooking')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Government')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Architecture')]>" class="oppia-landing-background-icon" alt="">
+          </div>
+
+          <div class="oppia-landing-background-icon-row">
+            <img ng-src="<[getStaticSubjectImageUrl('Genetics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Space')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Algebra')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Music')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Chemistry')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Poetry')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Puzzles')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Calculus')]>" class="oppia-landing-background-icon" alt="">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Business')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Geography')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Biology')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Genetics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Space')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Algebra')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Music')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Chemistry')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Poetry')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Puzzles')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Calculus')]>" class="oppia-landing-background-icon" alt="">
+
+            <img ng-src="<[getStaticSubjectImageUrl('Business')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Geography')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Biology')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Genetics')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Space')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Algebra')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Music')]>" class="oppia-landing-background-icon" alt="">
+            <img ng-src="<[getStaticSubjectImageUrl('Chemistry')]>" class="oppia-landing-background-icon" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .oppia-landing-section {
+      height: auto;
+      margin-left: auto;
+      margin-right: auto;
+      overflow: hidden;
+      position: relative;
+    }
+    .oppia-landing-h1 {
+      font-size: 2.8vw;
+      margin: 0;
+      text-align: left;
+      top: 160px;
+      white-space: pre;
+    }
+    .oppia-landing-section-inner {
+      height: auto;
+      margin-left: auto;
+      margin-right: auto;
+      padding-bottom: 3%;
+      padding-top: 8%;
+      position: relative;
+    }
+    .oppia-landing-h2 {
+      font-size: 1.95vmax;
+      line-height: 1.6em;
+      margin-top: 5%;
+      position: relative;
+      text-align: left;
+      width: 80%;
+      z-index: 20;
+    }
+    .oppia-landing-h1, .oppia-landing-h2 {
+      color: #005c5e;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+    }
+
+    .oppia-landing-learn-more,
+    .oppia-landing-get-started,
+    .oppia-landing-explore-lessons {
+      border-radius: 0;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+      font-size: 1.9vmax;
+      height: 56px;
+      position: relative;
+      text-align: center;
+      text-transform: uppercase;
+      width: 38%;
+      z-index: 20;
+    }
+    .oppia-landing-get-started,
+    .oppia-landing-explore-lessons {
+      background-color: #015c53;
+      color: #fff;
+      left: 0;
+      margin-right: 15px;
+    }
+    .oppia-landing-learn-more {
+      background-color: transparent;
+      border: 4px solid #265a53;
+      box-sizing: border-box;
+      color: #265a53;
+      margin-right: 15px;
+    }
+    .oppia-landing-get-started:hover,
+    .oppia-landing-get-started:focus,
+    .oppia-landing-get-started:active,
+    .oppia-landing-explore-lessons:hover,
+    .oppia-landing-explore-lessons:focus,
+    .oppia-landing-explore-lessons:active {
+      background-color: #05beb2;
+      color: #fff;
+    }
+    .oppia-landing-learn-more:hover,
+    .oppia-landing-learn-more:focus,
+    .oppia-landing-learn-more:active {
+      border-color: #05beb2;
+      color: #05beb2;
+    }
+    .oppia-landing-centered-h2 {
+      left: 0px;
+      margin-left: 25%;
+      margin-right: 25%;
+      padding-left: 0px;
+    }
+    .library-text {
+      margin-left: 22%;
+    }
+    .oppia-landing-text-box-0,
+    .oppia-landing-text-box-1,
+    .oppia-landing-text-box-2 {
+      margin-left: 60px;
+    }
+    .oppia-landing-text-box-2 {
+      margin-left: auto;
+      margin-top: 100px;
+      padding-right: 40px;
+    }
+    .oppia-landing-background-icon-row {
+      margin-top: 0;
+      margin-bottom: 0;
+      margin-left: -webkit-calc((100% - 2700px) / 2);
+      margin-left: -moz-calc((100% - 2700px) / 2);
+      margin-left: -o-calc((100% - 2700px) / 2);
+      margin-left: calc((100% - 2700px) / 2);
+      margin-right: -webkit-calc((100% - 2700px) / 2);
+      margin-right: -moz-calc((100% - 2700px) / 2);
+      margin-right: -o-calc((100% - 2700px) / 2);
+      margin-right: calc((100% - 2700px) / 2);
+      opacity: 0.4;
+      position: relative;
+      text-align: center;
+      width: 2700px;
+    }
+    .oppia-landing-background-icon {
+      margin: -1px;
+      max-width: 96px;
+      width: 10%;
+    }
+    .oppia-landing-image {
+      max-width: 100%;
+      max-height: 500px;
+      position: relative;
+      z-index: 20;
+    }
+    .oppia-landing-image-mobile {
+      display: none;
+    }
+    .oppia-landing-video-frame {
+      border: 11px black solid;
+      border-top-width: 50px;
+      border-bottom-width: 50px;
+      border-radius: 36px;
+      background: #000000;
+      height: 600px;
+      margin: auto;
+      position: relative;
+      width: 270px;
+    }
+    .oppia-landing-video-frame:before {
+      background: #333;
+      border-radius: 10px;
+      content: '';
+      display: block;
+      height: 5px;
+      left: 50%;
+      position: absolute;
+      top: -25px;
+      transform: translate(-50%, -50%);
+      width: 60px;
+    }
+    .oppia-landing-video-frame:after {
+      background: #333;
+      border-radius: 50%;
+      bottom: -58px;
+      content: '';
+      display: block;
+      height: 35px;
+      left: 50%;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 35px;
+    }
+    video::-webkit-media-controls-fullscreen-button,
+    video::-webkit-media-controls-overlay-play-button,
+    video::-webkit-media-controls-timeline,
+    video::-webkit-media-controls-mute-button,
+    video::-webkit-media-controls-toggle-closed-captions-button,
+    video::-webkit-media-controls-volume-slider {
+      cursor: pointer;
+    }
+
+    @media screen and (max-width: 768px) {
+      .oppia-landing-section-inner,
+      .oppia-landing-section {
+        height: auto;
+      }
+      .oppia-landing-h1 {
+        font-size: 1.6em;
+        margin-left: 10%;
+        margin-right: 20%;
+        padding-left: 0;
+        padding-right: 0;
+        padding-top: 40px;
+        text-align: center;
+        width: 80%;
+      }
+      .oppia-landing-h2 {
+        font-size: 1em;
+        left: 10%;
+        text-align: center;
+        width: 80%;
+      }
+      .oppia-landing-text-box-0,
+      .oppia-landing-text-box-1,
+      .oppia-landing-text-box-2 {
+        margin-left: auto;
+      }
+      .oppia-landing-learn-more,
+      .oppia-landing-get-started,
+      .oppia-landing-explore-lessons {
+        font-size: 2.3vmax;
+        margin-bottom: 30px;
+        width: auto;
+      }
+      .oppia-landing-get-started-mobile {
+        left: 9.5px;
+      }
+      .oppia-landing-explore-lessons-mobile {
+        left: 10.5px;
+      }
+      .oppia-landing-image-mobile {
+        display: block;
+        margin: auto;
+      }
+      .oppia-landing-image-desktop {
+        display: none;
+      }
+      .oppia-landing-centered-h2 {
+        left: 0;
+        margin-right: 10%;
+      }
+      .oppia-landing-text-box-2 {
+        margin-top: 0;
+        padding-right: inherit;
+      }
+    }
+    @media screen and (max-width: 320px) {
+      .oppia-landing-learn-more,
+      .oppia-landing-get-started,
+      .oppia-landing-explore-lessons {
+        font-size: 2.8vmax;
+      }
+      .oppia-landing-h1 {
+        white-space: normal;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/templates/dev/head/filters/CapitalizeFilter.js"></script>
+  <script src="/templates/dev/head/pages/landing/TopicLandingPage.js"></script>
+  <script src="/templates/dev/head/services/PageTitleService.js"></script>
+  <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
+{% endblock footer_js %}

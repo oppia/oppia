@@ -1,6 +1,275 @@
 # Per-directory ownership and automatic assignment for pull requests.
-/core/domain/html_cleaner.py @seanlip
-/core/storage/ @BenHenning @seanlip
-/core/tests/ @apb7 @seanlip
-manifest.json @vojtechjelinek @hoangviet1993 @seanlip
-/scripts/ @apb7 @seanlip @BenHenning @nithusha21
+
+# The paths to the directory/files must be relative to the location of this
+# file. Wildcards such as '**', '!' are not allowed. Only glob style patterns
+# are allowed. For information about supported glob patterns please refer
+# https://docs.python.org/2/library/glob.html.
+
+# Note: The e2e test files are owned by both the dev workflow and QA teams.
+# - The QA team will do an initial review to verify the PR's test coverage. They
+#   will then ask the dev workflow team for a final review.
+# - The dev workflow team will review the code quality to see if the e2e tests
+#   can be optimized further.
+
+# Answer classification team.
+/core/controllers/classifier*.py @prasanna08
+/core/domain/classifier*.py @prasanna08
+/core/storage/classifier/ @prasanna08
+/core/templates/dev/head/domain/classifier/ @prasanna08
+/extensions/classifiers/ @prasanna08
+
+
+# Audio and Translation team.
+/core/controllers/translator*.py @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/translation_tab/ @DubeySandeep
+
+
+# Collection project.
+/core/controllers/collection*.py @kevinlee12
+/core/domain/collection*.py @kevinlee12
+/core/storage/collection/ @kevinlee12
+/core/templates/dev/head/domain/collection/ @kevinlee12
+/core/templates/dev/head/pages/collection_editor/ @kevinlee12
+/core/templates/dev/head/pages/collection_player/ @kevinlee12
+
+
+# Dashboard pages.
+/core/controllers/creator_dashboard*.py @nithusha21
+/core/domain/activity*.py @nithusha21
+/core/domain/learner_playlist_services*.py @nithusha21
+/core/domain/learner_progress*.py @nithusha21
+/core/domain/subscription_services*.py @nithusha21
+/core/templates/dev/head/domain/creator_dashboard/ @nithusha21
+/core/templates/dev/head/domain/learner_dashboard/ @nithusha21
+/core/templates/dev/head/pages/creator_dashboard/ @nithusha21
+/core/templates/dev/head/pages/email_dashboard/ @nithusha21
+/core/templates/dev/head/pages/learner_dashboard/ @nithusha21
+/core/templates/dev/head/pages/notifications_dashboard/ @nithusha21
+
+
+# Dev workflow team.
+/scripts/ @apb7
+
+
+# Exploration project.
+/core/controllers/editor*.py @DubeySandeep
+/core/domain/exp*.py @DubeySandeep
+/core/domain/fs*.py @aks681
+/core/domain/param_domain*.py @aks681
+/core/domain/rating_services*.py @DubeySandeep
+/core/domain/state_domain*.py @aks681
+/core/domain/summary_services*.py @aks681
+/core/domain/value_generators_domain*.py @seanlip
+/core/storage/exploration/ @aks681
+/core/templates/dev/head/domain/editor/ @DubeySandeep
+/core/templates/dev/head/domain/exploration/ @DubeySandeep
+/core/templates/dev/head/domain/state/ @aks681
+/core/templates/dev/head/domain/state_card/ @aks681
+/core/templates/dev/head/pages/exploration_editor/editor_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/history_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/preview_tab/ @aks681
+/core/templates/dev/head/pages/exploration_editor/settings_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration_player/ @aks681
+/core/templates/dev/head/pages/state_editor/ @aks681
+/core/templates/dev/head/components/state/ @aks681
+
+
+# Forms pages.
+/core/templates/dev/head/components/forms/ @DubeySandeep
+
+
+# Global components.
+/core/templates/dev/head/components/alerts/ @ankita240796
+/core/templates/dev/head/components/attribution_guide/ @ankita240796
+/core/templates/dev/head/components/background/ @ankita240796
+/core/templates/dev/head/components/embed_modal/ @ankita240796
+/core/templates/dev/head/components/loading/ @ankita240796
+/core/templates/dev/head/components/profile_link/ @ankita240796
+/core/templates/dev/head/components/promo/ @ankita240796
+/core/templates/dev/head/components/share/ @ankita240796
+/core/templates/dev/head/components/social_buttons/ @ankita240796
+/core/templates/dev/head/components/summary_tile/ @ankita240796
+
+
+# Global stylesheet.
+/core/templates/dev/head/css/oppia.css @ankita240796
+
+
+# Interaction project.
+/core/domain/customization_args_util*.py @seanlip
+/core/domain/interaction_registry*.py @seanlip
+/core/domain/obj_services*.py @seanlip
+/core/templates/dev/head/domain/objects/ @kevinlee12
+/core/templates/dev/head/expressions/ @seanlip
+/extensions/dependencies/ @seanlip
+/extensions/interactions/ @kevinlee12
+/extensions/objects/ @seanlip
+/extensions/value_generators/ @seanlip
+
+
+
+# Lesson Analytics team.
+/core/domain/action_registry*.py @brianrodri
+/core/domain/calculation_registry*.py @brianrodri
+/core/domain/event_services*.py @brianrodri
+/core/domain/playthrough_issue_registry*.py @brianrodri
+/core/domain/stats*.py @brianrodri
+/core/domain/visualization_registry*.py @brianrodri
+/core/storage/statistics/ @brianrodri
+/core/templates/dev/head/domain/statistics/ @brianrodri
+/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @brianrodri
+/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @brianrodri
+/extensions/actions/ @brianrodri
+/extensions/answer_summarizers/ @brianrodri
+/extensions/issues/ @brianrodri
+/extensions/visualizations/ @brianrodri
+
+
+# Library page.
+/core/controllers/library*.py @kevinlee12
+/core/domain/recommendations*.py @seanlip
+/core/domain/search_services*.py @kevinlee12
+/core/templates/dev/head/pages/library/ @kevinlee12
+
+
+# Navigation bar project.
+/core/templates/dev/head/domain/sidebar/ @nithusha21
+/core/templates/dev/head/components/create_button/ @nithusha21
+/core/templates/dev/head/components/side_navigation_bar/ @nithusha21
+/core/templates/dev/head/components/top_navigation_bar/ @nithusha21
+
+
+# New structures team.
+# Question project.
+/core/controllers/question*.py @aks681
+/core/domain/question*.py  @aks681
+/core/storage/question/ @aks681
+/core/templates/dev/head/domain/question/ @aks681
+/core/templates/dev/head/pages/question_editor/ @aks681
+/core/templates/dev/head/pages/questions_list/ @aks681
+
+# Skill project.
+/core/controllers/skill*.py @aks681
+/core/domain/skill*.py  @aks681
+/core/storage/skill/ @aks681
+/core/templates/dev/head/domain/skill/ @aks681
+/core/templates/dev/head/pages/skill_editor/ @aks681
+
+# Story project.
+/core/controllers/story*.py @aks681
+/core/domain/story*.py  @aks681
+/core/storage/story/ @aks681
+/core/templates/dev/head/domain/story/ @aks681
+/core/templates/dev/head/pages/story_editor/ @aks681
+
+# Topic project.
+# Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
+/core/controllers/topic_*.py @aks681
+/core/domain/topic*.py @aks681
+/core/storage/topic/ @aks681
+/core/templates/dev/head/domain/topic/ @aks681
+/core/templates/dev/head/domain/topic_viewer @aks681
+/core/templates/dev/head/pages/topic_editor/ @aks681
+/core/templates/dev/head/pages/topic_viewer/ @aks681
+
+# Topics and skills dashboard project.
+/core/controllers/topics_and_skills_dashboard.py @aks681
+/core/templates/dev/head/domain/topics_and_skills_dashboard/ @aks681
+/core/templates/dev/head/pages/topics_and_skills_dashboard/ @aks681
+
+
+# Infrastructure.
+/core/domain/email*.py @aks681
+/core/platform/ @seanlip
+
+
+# Miscellaneous.
+/core/domain/__init__.py @DubeySandeep
+/core/domain/config*.py @seanlip
+/core/templates/dev/head/pages/about/ @seanlip
+/core/templates/dev/head/pages/privacy/ @seanlip
+/core/templates/dev/head/pages/terms/ @seanlip
+/core/templates/dev/head/pages/tests/ @seanlip
+/core/templates/dev/head/domain/utilities/ @DubeySandeep
+
+
+# Restricted pages.
+/core/controllers/admin*.py @seanlip
+/core/domain/moderator_services*.py @seanlip
+/core/templates/dev/head/pages/admin/ @seanlip
+/core/templates/dev/head/pages/moderator/ @seanlip
+
+
+# QA team.
+/core/tests/ @apb7 @nithusha21
+
+
+# Rich text editor team.
+/core/domain/rte_component_registry*.py @AllanYangZhou @bansalnitish
+/core/templates/dev/head/components/CkEditorRteDirective.js @AllanYangZhou @bansalnitish
+/extensions/rich_text_components/ @AllanYangZhou @bansalnitish
+/extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
+
+
+# Suggestion and feedback team.
+# Suggestion project.
+/core/controllers/suggestion*.py @nithusha21
+/core/domain/suggestion*.py @nithusha21
+/core/storage/suggestion/ @nithusha21
+/core/templates/dev/head/domain/suggestion/ @nithusha21
+/core/templates/dev/head/pages/suggestion_editor/ @nithusha21
+
+# Feedback project.
+/core/controllers/feedback*.py @nithusha21
+/core/domain/feedback*.py @nithusha21
+/core/storage/feedback/ @nithusha21
+/core/templates/dev/head/domain/feedback_message/ @nithusha21
+/core/templates/dev/head/domain/feedback_thread/ @nithusha21
+/core/templates/dev/head/pages/exploration_editor/feedback_tab/ @nithusha21
+
+
+# Simple pages.
+/core/templates/dev/head/pages/contact/ @vojtechjelinek
+/core/templates/dev/head/pages/donate/ @vojtechjelinek
+/core/templates/dev/head/pages/error/ @vojtechjelinek
+/core/templates/dev/head/pages/get_started/ @vojtechjelinek
+/core/templates/dev/head/pages/landing/ @vojtechjelinek
+/core/templates/dev/head/pages/maintenance/ @vojtechjelinek
+/core/templates/dev/head/pages/preferences/ @vojtechjelinek
+/core/templates/dev/head/pages/signup/ @vojtechjelinek
+/core/templates/dev/head/pages/splash/ @vojtechjelinek
+/core/templates/dev/head/pages/teach/ @vojtechjelinek
+/core/templates/dev/head/pages/thanks/ @vojtechjelinek
+
+
+# Speed Improvement team.
+/app.yaml @vojtechjelinek
+/core/templates/dev/head/pages/base.html @vojtechjelinek
+/core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
+/core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
+/core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
+
+
+# User’s profile page.
+/core/templates/dev/head/domain/user/ @kevinlee12
+/core/templates/dev/head/pages/profile/ @kevinlee12
+
+
+# Critical files.
+#
+# IMPORTANT NOTE: Please ensure that these files are always located at the end
+# of the CODEOWNERS file, since later rows override earlier ones. For details,
+# see the example at the bottom of this page:
+#
+#     https://help.github.com/en/articles/about-code-owners
+#
+/core/domain/dependency_registry*.py @seanlip
+/core/domain/html*.py @seanlip
+/core/domain/rights_manager*.py @seanlip
+/core/domain/role_services*.py @seanlip
+/core/storage/ @seanlip
+/core/domain/user*.py @seanlip
+/export/ @seanlip
+/manifest.json @seanlip @vojtechjelinek
+/scripts/install_third_party.sh @seanlip @vojtechjelinek
+/.github/CODEOWNERS @seanlip

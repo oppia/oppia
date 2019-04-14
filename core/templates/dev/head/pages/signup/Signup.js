@@ -17,18 +17,19 @@
  */
 
 oppia.controller('Signup', [
-  '$scope', '$http', '$rootScope', '$uibModal', 'AlertsService', 'UrlService',
-  'FocusManagerService', 'SiteAnalyticsService', 'UrlInterpolationService',
+  '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
+  'FocusManagerService',
+  'SiteAnalyticsService', 'UrlInterpolationService', 'UrlService',
   'SITE_NAME',
   function(
-      $scope, $http, $rootScope, $uibModal, AlertsService, UrlService,
-      FocusManagerService, SiteAnalyticsService, UrlInterpolationService,
+      $http, $rootScope, $scope, $uibModal, AlertsService,
+      FocusManagerService,
+      SiteAnalyticsService, UrlInterpolationService, UrlService,
       SITE_NAME) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
     $scope.warningI18nCode = '';
     $scope.siteName = SITE_NAME;
-    $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS;
     $scope.submissionInProcess = false;
 
     $http.get(_SIGNUP_DATA_URL).then(function(response) {
@@ -37,6 +38,7 @@ oppia.controller('Signup', [
       $scope.username = data.username;
       $scope.hasEverRegistered = data.has_ever_registered;
       $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
+      $scope.showEmailPreferencesForm = data.can_send_emails;
       $scope.hasUsername = Boolean($scope.username);
       FocusManagerService.setFocus('usernameInputField');
     });
@@ -141,7 +143,7 @@ oppia.controller('Signup', [
         defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
       }
 
-      var requestParams = {
+      requestParams = {
         agreed_to_terms: agreedToTerms,
         can_receive_email_updates: null,
         default_dashboard: defaultDashboard
@@ -173,8 +175,43 @@ oppia.controller('Signup', [
       $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
         window.location = window.decodeURIComponent(
           UrlService.getUrlParams().return_url);
-      }, function() {
+      }, function(rejection) {
+        if (
+          rejection.data && rejection.data.status_code === 401) {
+          $scope.showRegistrationSessionExpiredModal();
+        }
         $scope.submissionInProcess = false;
+      });
+    };
+
+    $scope.showRegistrationSessionExpiredModal = function() {
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/signup/registration_session_expired_modal_directive.html'),
+        backdrop: 'static',
+        keyboard: false,
+        resolve: {},
+        controller: [
+          '$scope', '$uibModalInstance', 'SiteAnalyticsService',
+          'UserService', '$timeout', '$window',
+          function($scope, $uibModalInstance, SiteAnalyticsService,
+              UserService, $timeout, $window) {
+            $scope.continueRegistration = function() {
+              UserService.getLoginUrlAsync().then(
+                function(loginUrl) {
+                  if (loginUrl) {
+                    $timeout(function() {
+                      $window.location = loginUrl;
+                    }, 150);
+                  } else {
+                    throw Error('Login url not found.');
+                  }
+                }
+              );
+              $uibModalInstance.dismiss('cancel');
+            };
+          }
+        ]
       });
     };
   }

@@ -27,20 +27,22 @@ oppia.constant(
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
 oppia.factory('TopicEditorStateService', [
-  '$rootScope', 'AlertsService', 'TopicObjectFactory',
-  'TopicRightsObjectFactory', 'SubtopicPageObjectFactory',
-  'TopicRightsBackendApiService', 'UndoRedoService',
-  'EditableTopicBackendApiService', 'EditableStoryBackendApiService',
-  'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-  'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_STORY_SUMMARIES_INITIALIZED',
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', function(
-      $rootScope, AlertsService, TopicObjectFactory,
-      TopicRightsObjectFactory, SubtopicPageObjectFactory,
-      TopicRightsBackendApiService, UndoRedoService,
-      EditableTopicBackendApiService, EditableStoryBackendApiService,
-      EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
-      EVENT_SUBTOPIC_PAGE_LOADED, EVENT_STORY_SUMMARIES_INITIALIZED,
-      EVENT_QUESTION_SUMMARIES_INITIALIZED) {
+  '$rootScope', 'AlertsService',
+  'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
+  'SubtopicPageObjectFactory',
+  'TopicObjectFactory', 'TopicRightsBackendApiService',
+  'TopicRightsObjectFactory', 'UndoRedoService',
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'EVENT_STORY_SUMMARIES_INITIALIZED',
+  'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_TOPIC_INITIALIZED',
+  'EVENT_TOPIC_REINITIALIZED', function(
+      $rootScope, AlertsService,
+      EditableStoryBackendApiService, EditableTopicBackendApiService,
+      SubtopicPageObjectFactory,
+      TopicObjectFactory, TopicRightsBackendApiService,
+      TopicRightsObjectFactory, UndoRedoService,
+      EVENT_QUESTION_SUMMARIES_INITIALIZED, EVENT_STORY_SUMMARIES_INITIALIZED,
+      EVENT_SUBTOPIC_PAGE_LOADED, EVENT_TOPIC_INITIALIZED,
+      EVENT_TOPIC_REINITIALIZED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
     // The array that caches all the subtopic pages loaded by the user.
@@ -386,7 +388,7 @@ oppia.factory('TopicEditorStateService', [
               if (changeList[i].property_name === 'canonical_story_ids') {
                 if (changeList[i].new_value.length ===
                     changeList[i].old_value.length - 1) {
-                  deletedStoryId = changeList[i].old_value.filter(
+                  var deletedStoryId = changeList[i].old_value.filter(
                     function(storyId) {
                       return changeList[i].new_value.indexOf(storyId) === -1;
                     }

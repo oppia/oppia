@@ -1,0 +1,108 @@
+var_for_docker_image: &docker_image circleci/python:2.7.14-jessie-browsers
+
+anchor_for_job_defaults: &job_defaults
+  working_directory: /home/circleci/oppia
+  docker:
+    - image: *docker_image
+
+anchor_for_installing_dependencies: &install_dependencies
+  name: Install dependencies
+  command: |
+    source scripts/setup.sh || exit 1
+    source scripts/setup_gae.sh || exit 1
+
+anchor_for_restoring_cache: &restore_cache
+  keys:
+    - setup-files-cache-{{ checksum "date" }}
+    - third-party-cache-{{ checksum "date" }}
+
+version: 2
+jobs:
+  setup:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run:
+          <<: *install_dependencies
+      - save_cache:
+          key: setup-files-cache-{{ checksum "date" }}
+          paths:
+            - ../node_modules/
+            - ../oppia_tools/
+
+  lint_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run:
+          name: Run lint tests
+          command: |
+            bash scripts/install_third_party.sh
+            python scripts/third_party_size_check.py
+            python scripts/pre_commit_linter.py --path=. --verbose
+      - save_cache:
+          key: third-party-cache-{{ checksum "date" }}
+          paths:
+            - third_party/
+
+  frontend_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run:
+          name: Run frontend tests
+          command: |
+            bash -x scripts/run_frontend_tests.sh --run-minified-tests=true
+      - run:
+          name: Generate frontend coverage report
+          command: |
+            sudo pip install codecov
+            codecov --file ../karma_coverage_reports/coverage-final.json
+          when: on_success
+
+  backend_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run:
+          name: Run backend tests
+          command: |
+            bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests
+      - run:
+          name: Generate backend coverage report
+          command: |
+            sudo pip install codecov
+            codecov
+          when: on_success
+
+workflows:
+  version: 2
+  circleci_tests:
+    jobs:
+      - setup
+      - lint_tests:
+          requires:
+            - setup
+      - frontend_tests:
+          requires:
+            - setup
+      - backend_tests:
+          requires:
+            - setup
+notify:
+  webhooks:
+    # A list of hook hashes, containing the url field
+    # gitter hook
+    - url: https://webhooks.gitter.im/e/71ac71505d1d45161035

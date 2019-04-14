@@ -61,6 +61,19 @@ class BaseModel(ndb.Model):
         """Raised when no entity for a given id exists in the datastore."""
         pass
 
+    @staticmethod
+    def export_data(user_id):
+        """This method should be implemented by subclasses.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in derived
+                classes.
+        """
+        raise NotImplementedError
+
     @classmethod
     def get(cls, entity_id, strict=True):
         """Gets an entity by id.
@@ -689,8 +702,10 @@ class VersionedModel(BaseModel):
         cls.get(entity_id)._require_not_marked_deleted()
 
         snapshot_id = cls._get_snapshot_id(entity_id, version_number)
-        return cls(id=entity_id)._reconstitute_from_snapshot_id(
-            snapshot_id)
+
+        return cls(
+            id=entity_id,
+            version=version_number)._reconstitute_from_snapshot_id(snapshot_id)
         # pylint: enable=protected-access
 
     @classmethod

@@ -14,8 +14,8 @@
 
 """Controller for user query related pages and handlers."""
 
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import email_manager
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services

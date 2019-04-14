@@ -15,10 +15,6 @@
 
 {% block header_js %}
   {{ super() }}
-  <script type="text/javascript">
-    GLOBALS.CAN_SEND_EMAILS = JSON.parse(
-      '{{CAN_SEND_EMAILS|js_string}}');
-  </script>
 {% endblock header_js %}
 
 {% block content %}
@@ -114,5 +110,6 @@
 {% block footer_js %}
   {{ super() }}
   <script src="/templates/dev/head/pages/signup/Signup.js"></script>
+  <script src="/templates/dev/head/services/IdGenerationService.js"></script>
   <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
 {% endblock footer_js %}

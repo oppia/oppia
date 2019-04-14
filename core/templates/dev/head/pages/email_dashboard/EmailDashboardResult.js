@@ -17,8 +17,8 @@
  */
 
 oppia.controller('EmailDashboardResult', [
-  '$scope', '$http', '$window', '$timeout', 'UrlInterpolationService',
-  function($scope, $http, $window, $timeout, UrlInterpolationService) {
+  '$http', '$scope', '$timeout', '$window', 'UrlInterpolationService',
+  function($http, $scope, $timeout, $window, UrlInterpolationService) {
     var RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
     var CANCEL_EMAIL_HANDLER_URL = '/emaildashboardcancelresult/<query_id>';
     var EMAIL_DASHBOARD_PAGE = '/emaildashboard';

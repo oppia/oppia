@@ -21,9 +21,9 @@ oppia.directive('stateSolutionEditor', [
     return {
       restrict: 'E',
       scope: {
-        onSaveContentIdsToAudioTranslations: '=',
         onSaveSolution: '=',
-        refreshWarnings: '&'
+        refreshWarnings: '&',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/state_editor/state_solution_editor_directive.html'),
@@ -34,7 +34,7 @@ oppia.directive('stateSolutionEditor', [
         'ExplorationHtmlFormatterService', 'StateInteractionIdService',
         'StateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
         'ContextService', 'StateCustomizationArgsService',
-        'EditabilityService', 'StateContentIdsToAudioTranslationsService',
+        'EditabilityService',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
         function(
@@ -44,7 +44,7 @@ oppia.directive('stateSolutionEditor', [
             ExplorationHtmlFormatterService, StateInteractionIdService,
             StateHintsService, UrlInterpolationService, SolutionObjectFactory,
             ContextService, StateCustomizationArgsService,
-            EditabilityService, StateContentIdsToAudioTranslationsService,
+            EditabilityService,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION) {
           $scope.EditabilityService = EditabilityService;
@@ -56,6 +56,16 @@ oppia.directive('stateSolutionEditor', [
           $scope.StateHintsService = StateHintsService;
           $scope.StateInteractionIdService = StateInteractionIdService;
           $scope.StateSolutionService = StateSolutionService;
+
+          $scope.getInvalidSolutionTooltip = function() {
+            if (StateEditorService.isInQuestionMode()) {
+              return 'This solution doesn\'t correspond to an answer ' +
+                'marked as correct. Verify the rules specified for the ' +
+                'answers or change the solution.';
+            }
+            return 'This solution does not lead to another card. Verify the ' +
+              'responses specified or change the solution.';
+          };
 
 
           $scope.refreshWarnings()();
@@ -185,17 +195,6 @@ oppia.directive('stateSolutionEditor', [
               ]
             }).result.then(function(result) {
               StateSolutionService.displayed = result.solution;
-
-              if (!StateSolutionService.savedMemento) {
-                var explanationContentId =
-                  result.solution.explanation.getContentId();
-                StateContentIdsToAudioTranslationsService.displayed
-                  .addContentId(explanationContentId);
-                StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-                $scope.onSaveContentIdsToAudioTranslations(
-                  StateContentIdsToAudioTranslationsService.displayed
-                );
-              }
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
               var solutionIsValid = SolutionVerificationService.verifySolution(
@@ -242,17 +241,9 @@ oppia.directive('stateSolutionEditor', [
                 }
               ]
             }).result.then(function() {
-              var explanationContentId = StateSolutionService.displayed
-                .explanation.getContentId();
-              StateContentIdsToAudioTranslationsService.displayed
-                .deleteContentId(explanationContentId);
               StateSolutionService.displayed = null;
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
-              StateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.onSaveContentIdsToAudioTranslations(
-                StateContentIdsToAudioTranslationsService.displayed
-              );
               StateEditorService.deleteCurrentSolutionValidity();
             });
           };

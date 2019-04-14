@@ -23,6 +23,7 @@ $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
 install_node_module ajv 5.0.0
+install_node_module babel-eslint 10.0.1
 install_node_module browserstack-local 1.3.3
 install_node_module dotenv 6.0.0
 install_node_module eslint 4.19.0
@@ -41,6 +42,26 @@ install_node_module postcss-syntax 0.10.0
 install_node_module stylelint 9.2.1
 install_node_module stylelint-config-standard 18.2.0
 install_node_module through2 2.0.0
+install_node_module typescript 3.3.3
+install_node_module @types/angular 1.6.54
+install_node_module @types/angular-animate 1.5.10
+install_node_module @types/angular-mocks 1.7.0
+install_node_module @types/ckeditor 4.9.2
+install_node_module @types/d3 3.5.40
+install_node_module @types/google.visualization 0.0.46
+install_node_module @types/jasmine 3.3.8
+install_node_module @types/jasmine-jquery 1.5.33
+install_node_module @types/jasminewd2 2.0.6
+install_node_module @types/jquery 3.3.29
+install_node_module @types/jqueryui 1.12.1
+install_node_module @types/leaflet 1.4.0
+install_node_module @types/mathjax 0.0.35
+install_node_module @types/mathjs 5.0.0
+install_node_module @types/mousetrap 1.6.1
+install_node_module @types/node 6.14.3
+install_node_module @types/select2 4.0.48
+install_node_module @types/q 1.5.1
+install_node_module @types/selenium-webdriver 2.53.43
 install_node_module uglify-js 3.3.11
 install_node_module yargs 3.29.0
 
@@ -75,7 +96,12 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
     # third party commands. These are only used for unit tests and generating
     # documentation and are not necessary when building Skulpt.
     sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
-    sed -e "s/  doc()/  pass#doc()/" > $TMP_FILE
+    sed -e "s/  doc()/  pass#doc()/" |\
+    # This and the next command disable unit and compressed unit tests for the
+    # compressed distribution of Skulpt. These tests don't work on some
+    # Ubuntu environments and cause a libreadline dependency issue.
+    sed -e "s/ret = os.system(\"{0}/ret = 0 #os.system(\"{0}/" |\
+    sed -e "s/ret = rununits(opt=True)/ret = 0/" > $TMP_FILE
     mv $TMP_FILE $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py
     $PYTHON_CMD $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
 
@@ -109,11 +135,17 @@ if ! type pip > /dev/null 2>&1 ; then
     exit 1
 fi
 
+function pip_install {
+  # Attempt standard pip install, or pass in --system if the local environment requires it.
+  # See https://github.com/pypa/pip/issues/3826 for context on when this situation may occur.
+  pip install "$@" || pip install --system "$@"
+}
+
 echo Checking if pylint is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/pylint-1.9.3" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.9.3 --target="$TOOLS_DIR/pylint-1.9.3"
+  pip_install pylint==1.9.3 --target="$TOOLS_DIR/pylint-1.9.3"
   # Add __init__.py file so that pylint dependency backports are resolved
   # correctly.
   touch $TOOLS_DIR/pylint-1.9.3/backports/__init__.py
@@ -158,14 +190,14 @@ if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
   rm pycodestyle-2.3.1.tar.gz
 fi
 
-# Install pyjsparser.
-echo Checking if pyjsparser is installed in third_party
-if [ ! -d "$TOOLS_DIR/pyjsparser-2.5.2" ]; then
-  echo Installing pyjsparser
+# Install esprima.
+echo Checking if esprima is installed in third_party
+if [ ! -d "$TOOLS_DIR/esprima-4.0.1" ]; then
+  echo Installing esprima
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o pyjsparser-2.5.2.tar.gz -L https://pypi.python.org/packages/17/3d/59f7f0cd6a7cdab611b36d8921c9d2d6c5564033d938ec2eb934cdca0e48/pyjsparser-2.5.2.tar.gz
-  tar xzf pyjsparser-2.5.2.tar.gz -C $TOOLS_DIR
-  rm pyjsparser-2.5.2.tar.gz
+  curl -o esprima-4.0.1.tar.gz -L https://files.pythonhosted.org/packages/cc/a1/50fccd68a12bcfc27adfc9969c090286670a9109a0259f3f70943390b721/esprima-4.0.1.tar.gz
+  tar xzf esprima-4.0.1.tar.gz -C $TOOLS_DIR
+  rm esprima-4.0.1.tar.gz
 fi
 
 # Python API for browsermob-proxy.
@@ -173,26 +205,33 @@ echo Checking if browsermob-proxy is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
   echo Installing browsermob-proxy
 
-  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+  pip_install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   echo Installing selenium
 
-  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
+  pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
 echo Checking if PIL is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
   echo Installing PIL
 
-  pip install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
+  pip_install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
 
   if [[ $? != 0 && ${OS} == "Darwin" ]]; then
     echo "  PIL install failed. See troubleshooting instructions at:"
     echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
   fi
+fi
+
+echo Checking if PyGithub is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/PyGithub-1.43.5" ]; then
+  echo Installing PyGithub
+
+  pip install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5"
 fi
 
 # install pre-push script

@@ -56,7 +56,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         question = (
             question_services.get_question_by_id(self.QUESTION_ID))
         self.assertEqual(
-            question.question_state_schema_version,
+            question.question_state_data_schema_version,
             feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         # Start migration job.
@@ -70,7 +70,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         updated_question = (
             question_services.get_question_by_id(self.QUESTION_ID))
         self.assertEqual(
-            updated_question.question_state_schema_version,
+            updated_question.question_state_data_schema_version,
             feconf.CURRENT_STATES_SCHEMA_VERSION)
         self.assertEqual(question.question_state_data.to_dict(),
                          updated_question.question_state_data.to_dict())
@@ -116,12 +116,12 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         correctly and an old question is converted to new
         version.
         """
-        # Generate question with old(v26) state data.
-        self.save_new_question_with_state_data_schema_v26(
+        # Generate question with old(v27) state data.
+        self.save_new_question_with_state_data_schema_v27(
             self.QUESTION_ID, self.albert_id)
         question = (
             question_services.get_question_by_id(self.QUESTION_ID))
-        self.assertEqual(question.question_state_schema_version, 26)
+        self.assertEqual(question.question_state_data_schema_version, 27)
 
         # Start migration job.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
@@ -134,7 +134,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         updated_question = (
             question_services.get_question_by_id(self.QUESTION_ID))
         self.assertEqual(
-            updated_question.question_state_schema_version,
+            updated_question.question_state_data_schema_version,
             feconf.CURRENT_STATES_SCHEMA_VERSION)
 
         output = question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long

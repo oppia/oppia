@@ -12,7 +12,7 @@
 {% endblock header_js %}
 
 {% block content %}
-  <div class="container" ng-controller="FormBuilderTests">
+  <div class="container" ng-controller="FormBuilderTestPage">
     <h3>Test page for object editors</h3>
 
     <h4>Editors sharing a common value</h4>
@@ -100,13 +100,44 @@
 {% endblock %}
 
 {% block footer_js %}
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
   <script src="/third_party/static/code-mirror-3.19.0/lib/codemirror.js"></script>
   <script src="/third_party/static/code-mirror-3.19.0/mode/python/python.js"></script>
   <script src="/third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js"></script>
   {{ super() }}
-  <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
-  <script src="/templates/dev/head/filters.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertUnicodeWithParamsToHtmlFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertHtmlToUnicodeFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ConvertUnicodeToHtmlFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsAtLeastFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsAtMostFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsFloatFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsIntegerFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/validators/IsNonemptyFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
+  <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
+  <script src="/templates/dev/head/filters/CapitalizeFilter.js"></script>
+  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
+  <script src="/templates/dev/head/filters/FormatRtePreviewFilter.js"></script>
+  <script src="/templates/dev/head/filters/FormatTimerFilter.js"></script>
+  <script src="/templates/dev/head/filters/GetAbbreviatedTextFilter.js"></script>
+  <script src="/templates/dev/head/filters/NormalizeWhitespaceFilter.js"></script>
+  <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
+  <script src="/templates/dev/head/filters/ParameterizeRuleDescriptionFilter.js"></script>
+  <script src="/templates/dev/head/filters/RemoveDuplicatesInArrayFilter.js"></script>
+  <script src="/templates/dev/head/filters/ReplaceInputsWithEllipsesFilter.js"></script>
+  <script src="/templates/dev/head/filters/SummarizeNonnegativeNumberFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAndCapitalizeFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAtFirstEllipsisFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateFilter.js"></script>
+  <script src="/templates/dev/head/filters/TruncateInputBasedOnInteractionAnswerTypeFilter.js"></script>
+  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
+  <script src="/templates/dev/head/filters/WrapTextWithEllipsisFilter.js"></script>
   <script src="/templates/dev/head/pages/tests/FormBuilderTestPage.js"></script>
+  <script src="/templates/dev/head/pages/tests/FormOverlayDirective.js"></script>
+  <script src="/templates/dev/head/components/CkEditorRteDirective.js"></script>
+  <script src="/templates/dev/head/components/CkEditorWidgetsInitializer.js"></script>
 
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
@@ -127,4 +158,7 @@
   <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
   <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
 
+  <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
+  <script src="/templates/dev/head/services/IdGenerationService.js"></script>
+  <script src="/templates/dev/head/services/RteHelperService.js"></script>
 {% endblock footer_js %}
