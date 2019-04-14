@@ -169,7 +169,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # The user_ids of users who are allowed to translate this exploration.
+    # The user_ids of users who are allowed to voiceover this exploration.
     voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
@@ -389,7 +389,7 @@ class ExpSummaryModel(base_models.BaseModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # The user_ids of users who are allowed to translate this exploration.
+    # The user_ids of users who are allowed to voiceover this exploration.
     voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)

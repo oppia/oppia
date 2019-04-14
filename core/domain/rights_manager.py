@@ -664,8 +664,8 @@ def check_can_edit_activity(user, activity_rights):
     return False
 
 
-def check_can_translate_activity(user, activity_rights):
-    """Checks whether the user can translate given activity.
+def check_can_voiceover_activity(user, activity_rights):
+    """Checks whether the user can voiceover given activity.
 
     Args:
         user: UserActionsInfo. Object having user_id, role and actions for
@@ -674,7 +674,7 @@ def check_can_translate_activity(user, activity_rights):
             activity.
 
     Returns:
-        bool. Whether the given user can translate this activity.
+        bool. Whether the given user can voiceover this activity.
     """
     if activity_rights is None:
         return False
@@ -855,7 +855,7 @@ def _assign_role(
         Exception. The committer does not have rights to modify a role.
         Exception. The user already owns the activity.
         Exception. The user can already edit the activity.
-        Exception. The user can already translate the activity.
+        Exception. The user can already voiceover the activity.
         Exception. The activity is already publicly editable.
         Exception. The activity is already publicly translatable.
         Exception. The user can already view the activity.
@@ -917,10 +917,10 @@ def _assign_role(
                 activity_rights.is_voice_artist(assignee_id) or
                 activity_rights.is_owner(assignee_id)):
             raise Exception(
-                'This user already can translate this %s.' % activity_type)
+                'This user already can voiceover this %s.' % activity_type)
         if activity_rights.community_owned:
             raise Exception(
-                'Community-owned %ss can be translated by anyone.' %
+                'Community-owned %ss can be voiceovered by anyone.' %
                 activity_type)
 
         activity_rights.voice_artist_ids.append(assignee_id)

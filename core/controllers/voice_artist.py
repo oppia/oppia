@@ -60,7 +60,7 @@ class AudioUploadHandler(base.BaseHandler):
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'audio'
 
-    @acl_decorators.can_translate_exploration
+    @acl_decorators.can_voiceover_exploration
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
 
@@ -142,7 +142,7 @@ class AudioUploadHandler(base.BaseHandler):
 class VoiceArtistAutosaveHandler(base.BaseHandler):
     """Handles requests from the voice artist for draft autosave."""
 
-    @acl_decorators.can_translate_exploration
+    @acl_decorators.can_voiceover_exploration
     def put(self, exploration_id):
         """Handles PUT requests for draft updation."""
         # Raise an Exception if the draft change list fails non-strict
@@ -170,7 +170,7 @@ class VoiceArtistAutosaveHandler(base.BaseHandler):
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
                 exploration_id, version)})
 
-    @acl_decorators.can_translate_exploration
+    @acl_decorators.can_voiceover_exploration
     def post(self, exploration_id):
         """Handles POST request for discarding draft changes."""
         exp_services.discard_draft(exploration_id, self.user_id)
@@ -184,7 +184,7 @@ class ExplorationTranslationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_translate_exploration
+    @acl_decorators.can_voiceover_exploration
     def put(self, exploration_id):
         """Updates properties of the given exploration.
 

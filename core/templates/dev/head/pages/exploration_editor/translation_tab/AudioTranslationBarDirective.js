@@ -30,7 +30,7 @@ oppia.directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
-          scope.dropAreaIsAccessible = GLOBALS.can_translate;
+          scope.dropAreaIsAccessible = GLOBALS.can_voiceover;
           scope.userIsGuest = !GLOBALS.userIsLoggedIn;
           scope.$digest();
           return false;
@@ -90,7 +90,7 @@ oppia.directive('audioTranslationBar', [
           $scope.languageCode = null;
           $scope.cannotRecord = false;
           $scope.audioNeedsUpdate = false;
-          $scope.canTranslate = false;
+          $scope.canVoiceover = false;
           $scope.showRecorderWarning = false;
           $scope.audioLoadingIndicatorIsShown = false;
           $scope.checkingMicrophonePermission = false;
@@ -380,7 +380,7 @@ oppia.directive('audioTranslationBar', [
             $scope.showRecorderWarning = false;
             $scope.languageCode = TranslationLanguageService
               .getActiveLanguageCode();
-            $scope.canTranslate = EditabilityService.isTranslatable();
+            $scope.canVoiceover = EditabilityService.isTranslatable();
             $scope.contentId = (
               TranslationTabActiveContentIdService.getActiveContentId());
             var audioTranslationObject = getAvailableAudio(

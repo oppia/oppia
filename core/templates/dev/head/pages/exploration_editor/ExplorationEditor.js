@@ -31,7 +31,7 @@ oppia.constant(
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>');
 oppia.constant(
-  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
+  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
   '/createhandler/translate/<exploration_id>');
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
@@ -178,7 +178,7 @@ oppia.controller('ExplorationEditor', [
           EditabilityService.markEditable();
         }
 
-        if (GLOBALS.can_translate || GLOBALS.can_edit) {
+        if (GLOBALS.can_voiceover || GLOBALS.can_edit) {
           EditabilityService.markTranslatable();
         }
 

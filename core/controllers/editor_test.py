@@ -41,8 +41,8 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
 
     CAN_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'true\');'
     CANNOT_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'false\');'
-    CAN_TRANSLATE_STR = 'GLOBALS.can_translate = JSON.parse(\'true\');'
-    CANNOT_TRANSLATE_STR = 'GLOBALS.can_translate = JSON.parse(\'false\');'
+    CAN_VOICEOVER_STR = 'GLOBALS.can_voiceover = JSON.parse(\'true\');'
+    CANNOT_VOICEOVER_STR = 'GLOBALS.can_voiceover = JSON.parse(\'false\');'
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
@@ -82,19 +82,19 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.assertIn(self.CANNOT_EDIT_STR, response_body)
         self.assertNotIn(self.CAN_EDIT_STR, response_body)
 
-    def assert_can_translate(self, response_body):
-        """Returns True if the response body indicates that the exploration is
-        translatable.
+    def assert_can_voiceover(self, response_body):
+        """Returns True if the response body indicates that the exploration can
+        be voiceovered.
         """
-        self.assertIn(self.CAN_TRANSLATE_STR, response_body)
-        self.assertNotIn(self.CANNOT_TRANSLATE_STR, response_body)
+        self.assertIn(self.CAN_VOICEOVER_STR, response_body)
+        self.assertNotIn(self.CANNOT_VOICEOVER_STR, response_body)
 
-    def assert_cannot_translate(self, response_body):
-        """Returns True if the response body indicates that the exploration is
-        not translatable.
+    def assert_cannot_voiceover(self, response_body):
+        """Returns True if the response body indicates that the exploration can
+        not be voiceovered.
         """
-        self.assertIn(self.CANNOT_TRANSLATE_STR, response_body)
-        self.assertNotIn(self.CAN_TRANSLATE_STR, response_body)
+        self.assertIn(self.CANNOT_VOICEOVER_STR, response_body)
+        self.assertNotIn(self.CAN_VOICEOVER_STR, response_body)
 
 
 class MockInteractionAnswerSummariesAggregator(
@@ -986,14 +986,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.login(self.VIEWER_EMAIL)
         response = self.get_html_response('/create/%s' % exp_id)
         self.assert_cannot_edit(response.body)
-        self.assert_cannot_translate(response.body)
+        self.assert_cannot_voiceover(response.body)
         self.logout()
 
         # Check that collaborator can access editor page and can edit.
         self.login(self.COLLABORATOR_EMAIL)
         response = self.get_html_response('/create/%s' % exp_id)
         self.assert_can_edit(response.body)
-        self.assert_can_translate(response.body)
+        self.assert_can_voiceover(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Check that collaborator can add a new state called 'State 4'.
@@ -1071,11 +1071,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         self.logout()
 
-        # Check that voice artist can access editor page and can only translate.
+        # Check that voice artist can access editor page and can only voiceover.
         self.login(self.VOICE_ARTIST_EMAIL)
         response = self.get_html_response('/create/%s' % exp_id)
         self.assert_cannot_edit(response.body)
-        self.assert_can_translate(response.body)
+        self.assert_can_voiceover(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Check that voice artist cannot add new members.

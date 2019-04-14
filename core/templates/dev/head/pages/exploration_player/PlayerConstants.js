@@ -65,7 +65,7 @@ oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 oppia.constant(
-  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
+  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
   '/createhandler/translate/<exploration_id>');
 
 
