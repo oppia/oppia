@@ -911,7 +911,7 @@ title: Title
         state = exp.states[exp.init_state_name]
         interaction = state.interaction
         content_id = state.content.content_id
-        voiceovers_mapping = recorded_voiceovers.voiceovers_mapping
+        voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
         content_voiceovers = voiceovers_mapping[content_id]
         feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
         answer_group_voiceovers = voiceovers_mapping[feedback_id]
@@ -943,7 +943,7 @@ title: Title
         state = exp.states[exp.init_state_name]
         interaction = state.interaction
         content_id = state.content.content_id
-        voiceovers_mapping = recorded_voiceovers.voiceovers_mapping
+        voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
         content_voiceovers = voiceovers_mapping[content_id]
         feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
         answer_group_voiceovers = voiceovers_mapping[feedback_id]

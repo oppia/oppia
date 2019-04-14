@@ -49,16 +49,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'content_id': 'content',
                 'html': ''
             },
-            'content_ids_to_audio_translations': {
-                'content': {},
-                'default_outcome': {}
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    'content': {},
-                    'default_outcome': {}
-                }
-            },
             'interaction': {
                 'answer_groups': [],
                 'confirmed_unclassified_answers': [],
@@ -79,6 +69,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'solution': None,
             },
             'param_changes': [],
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {},
+                    'default_outcome': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {},
+                    'default_outcome': {}
+                }
+            }
         }
         self.assertEqual(expected_dict, state_dict)
 

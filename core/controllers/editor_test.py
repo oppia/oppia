@@ -376,8 +376,8 @@ interaction:
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-      content: {}
-      default_outcome: {}
+    content: {}
+    default_outcome: {}
 written_translations:
   translations_mapping:
     content: {}
@@ -410,8 +410,8 @@ interaction:
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-      content: {}
-      default_outcome: {}
+    content: {}
+    default_outcome: {}
 written_translations:
   translations_mapping:
     content: {}
@@ -446,8 +446,8 @@ interaction:
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
-      content: {}
-      default_outcome: {}
+    content: {}
+    default_outcome: {}
 written_translations:
   translations_mapping:
     content: {}
