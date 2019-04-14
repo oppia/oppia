@@ -36,7 +36,7 @@ describe('WrittenTranslation object factory', function() {
         needs_update: false
       }));
       expect(writtenTranslation.getHtml()).toEqual('<p>HTML</p>');
-      writtenTranslation.setHtml('<p>New HTML</p>')
+      writtenTranslation.setHtml('<p>New HTML</p>');
       expect(writtenTranslation.getHtml()).toEqual('<p>New HTML</p>');
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
         html: '<p>New HTML</p>',

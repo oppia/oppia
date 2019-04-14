@@ -84,7 +84,7 @@ oppia.directive('translatorOverview', [
               TranslationTabActiveModeService.isVoiceoverModeActive());
             allAudioLanguageCodes = (
               LanguageUtilService.getAllVoiceoverLanguageCodes());
-            if($scope.inTranslationMode) {
+            if ($scope.inTranslationMode) {
               var index = allAudioLanguageCodes.indexOf(
                 ExplorationLanguageCodeService.displayed);
               if (index !== -1) {

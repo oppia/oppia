@@ -73,7 +73,7 @@ oppia.directive('audioTranslationBar', [
             $filter, $rootScope, $scope, $timeout, $uibModal,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
-            IdGenerationService , SiteAnalyticsService,
+            IdGenerationService, SiteAnalyticsService,
             StateRecordedVoiceoversService, StateEditorService,
             TranslationLanguageService, recorderService,
             TranslationTabActiveContentIdService, RECORDING_TIME_LIMIT) {
@@ -183,7 +183,7 @@ oppia.directive('audioTranslationBar', [
 
           $scope.toggleAudioNeedsUpdate = function() {
             StateRecordedVoiceoversService.displayed.toggleNeedsUpdateAttribute(
-                $scope.contentId, $scope.languageCode);
+              $scope.contentId, $scope.languageCode);
             saveRecordedVoiceoversChanges();
             $scope.audioNeedsUpdate = !$scope.audioNeedsUpdate;
           };

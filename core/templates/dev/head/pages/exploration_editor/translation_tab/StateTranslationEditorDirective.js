@@ -47,9 +47,9 @@ oppia.directive('stateTranslationEditor', [
             var availableAudioLanguages = (
               recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
             if (availableAudioLanguages.indexOf(langaugeCode) != -1) {
-              var audioTranslation = recordedVoiceovers.getVoiceover(
-                  contentId, langaugeCode);
-              if (audioTranslation.needsUpdate) {
+              var voiceover = recordedVoiceovers.getVoiceover(
+                contentId, langaugeCode);
+              if (voiceover.needsUpdate) {
                 return;
               }
               $uibModal.open({
