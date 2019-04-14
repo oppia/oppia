@@ -15,6 +15,7 @@
 """Tests for core.storage.question.gae_models."""
 
 import datetime
+import types
 
 from core.domain import state_domain
 from core.platform import models
@@ -37,6 +38,26 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_model.question_state_data, question_state_data)
         self.assertEqual(question_model.language_code, language_code)
+
+
+    def test_raise_exception_by_mocking_collision(self):
+        state = state_domain.State.create_default_state('ABC')
+        question_state_data = state.to_dict()
+        language_code = 'en'
+        version = 1
+
+        with self.assertRaisesRegexp(
+            Exception, 'The id generator for QuestionModel is producing too '
+            'many collisions.'
+            ):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                question_models.QuestionModel, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    question_models.QuestionModel)):
+                question_models.QuestionModel.create(
+                    question_state_data, language_code, version)
 
 
 class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
