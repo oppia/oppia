@@ -392,7 +392,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'exploration, "Title", on Oppia.org.\n'
             '\n'
             'This allows you to:\n'
-            '- Voiceover xploration\n'
+            '- Voiceover the exploration\n'
             '- View and playtest the exploration\n'
             'You can find the exploration here.\n'
             '\n'
