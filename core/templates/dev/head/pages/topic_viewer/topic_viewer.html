@@ -80,6 +80,7 @@
     .oppia-topic-viewer-tabs {
       background-color: #7e7e7e;
       margin: 0 auto 0 10%;
+      display: inline-block;
     }
     .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:hover {
       padding: 10px;
@@ -108,6 +109,15 @@
       }
       stories-list {
         display: inline-grid;
+      }
+    }
+
+    @media(max-width: 426px) {
+      .oppia-topic-viewer-tabs span {
+        width: auto;
+      }
+      .oppia-topic-viewer-container .oppia-topic-viewer-tabs {
+        max-width: 280px;
       }
     }
   </style>
