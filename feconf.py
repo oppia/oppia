@@ -329,6 +329,7 @@ SYSTEM_COMMITTER_ID = 'admin'
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
+SYSTEM_EMAIL_NAME = '.'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
@@ -380,19 +381,6 @@ ENABLE_MAINTENANCE_MODE = False
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
-
-ALLOWED_QUESTION_INTERACTION_CATEGORIES = [{
-    'name': 'General',
-    'interaction_ids': [
-        'MultipleChoiceInput',
-        'TextInput'
-    ],
-}, {
-    'name': 'Math',
-    'interaction_ids': [
-        'NumericInput'
-    ]
-}]
 
 # Flag to disable sending emails related to reviews for suggestions. To be
 # flipped after deciding (and implementing) whether a user should be scored
@@ -505,48 +493,6 @@ ALLOWED_RTE_EXTENSIONS = {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
 }
-
-# These categories and interactions are displayed in the order in which they
-# appear in the interaction selector.
-ALLOWED_INTERACTION_CATEGORIES = [{
-    'name': 'General',
-    'interaction_ids': [
-        'Continue',
-        'EndExploration',
-        'ImageClickInput',
-        'ItemSelectionInput',
-        'MultipleChoiceInput',
-        'TextInput',
-        'DragAndDropSortInput'
-    ],
-}, {
-    'name': 'Math',
-    'interaction_ids': [
-        'FractionInput',
-        'GraphInput',
-        'LogicProof',
-        'NumericInput',
-        'SetInput',
-        'MathExpressionInput',
-        'NumberWithUnits',
-    ]
-}, {
-    'name': 'Programming',
-    'interaction_ids': [
-        'CodeRepl',
-        'PencilCodeEditor',
-    ],
-}, {
-    'name': 'Music',
-    'interaction_ids': [
-        'MusicNotesInput'
-    ],
-}, {
-    'name': 'Geography',
-    'interaction_ids': [
-        'InteractiveMap'
-    ],
-}]
 
 # The list of interaction IDs which correspond to interactions that set their
 # is_linear property to true. Linear interactions do not support branching and
