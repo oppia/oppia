@@ -49,16 +49,23 @@ CUSTOMIZATION OPTIONS
 
 Note that the root folder MUST be named 'oppia'.
  """
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
-# Pylint has issues with the import order of argparse.
-# pylint: disable=wrong-import-order
-import HTMLParser
-import StringIO
+
 import argparse
 import ast
+from builtins import object
+from builtins import range
+from builtins import str
+from builtins import zip
 import contextlib
 import fnmatch
 import glob
+import html.parser
+import io
 import multiprocessing
 import os
 import re
@@ -68,6 +75,15 @@ import threading
 import time
 
 import docstrings_checker  # pylint: disable=relative-import
+import python_utils  # pylint: disable=relative-import
+
+# pylint: disable=wrong-import-order
+from future import standard_library
+from past.utils import old_div
+
+# Pylint has issues with the import order of argparse.
+
+standard_library.install_aliases()
 
 # pylint: enable=wrong-import-order
 
@@ -269,15 +285,15 @@ CODEOWNER_DIR_PATHS = [
 CODEOWNER_FILE_PATHS = ['./app.yaml', './manifest.json']
 
 if not os.getcwd().endswith('oppia'):
-    print ''
-    print 'ERROR    Please run this script from the oppia root directory.'
+    print('')
+    print('ERROR    Please run this script from the oppia root directory.')
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.3')
 if not os.path.exists(_PYLINT_PATH):
-    print ''
-    print 'ERROR    Please run start.sh first to install pylint '
-    print '         and its dependencies.'
+    print('')
+    print('ERROR    Please run start.sh first to install pylint ')
+    print('         and its dependencies.')
     sys.exit(1)
 
 _PATHS_TO_INSERT = [
@@ -327,7 +343,9 @@ from pylint import lint  # isort:skip
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
-_TARGET_STDOUT = StringIO.StringIO()
+
+
+_TARGET_STDOUT = python_utils.import_string_io()
 
 
 class FileCache(object):
@@ -400,7 +418,7 @@ class FileCache(object):
         if key not in cls._CACHE_DATA_DICT:
             with cls._get_cache_lock(key):
                 if key not in cls._CACHE_DATA_DICT:
-                    with open(filepath, mode) as f:
+                    with io.open(filepath, mode, encoding='utf-8') as f:
                         lines = f.readlines()
                     cls._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return cls._CACHE_DATA_DICT[key]
@@ -543,8 +561,9 @@ def _get_all_filepaths(input_path, input_filenames):
     if input_path:
         input_path = os.path.join(os.getcwd(), input_path)
         if not os.path.exists(input_path):
-            print 'Could not locate file or directory %s. Exiting.' % input_path
-            print '----------------------------------------'
+            print(
+                'Could not locate file or directory %s. Exiting.' % input_path)
+            print('----------------------------------------')
             sys.exit(1)
         if os.path.isfile(input_path):
             all_filepaths = [input_path]
@@ -561,12 +580,14 @@ def _get_all_filepaths(input_path, input_filenames):
             else:
                 invalid_filepaths.append(filename)
         if invalid_filepaths:
-            print ('The following file(s) do not exist: %s\n'
+            print('The following file(s) do not exist: %s\n'
                    'Exiting.' % invalid_filepaths)
             sys.exit(1)
         all_filepaths = valid_filepaths
     else:
         all_filepaths = _get_changed_filepaths()
+        all_filepaths = [
+            filename.decode('utf-8') for filename in all_filepaths]
     all_filepaths = [
         filename for filename in all_filepaths if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
@@ -598,9 +619,9 @@ def _check_bad_pattern_in_file(filepath, file_content, pattern):
             if line.endswith('disable-bad-pattern-check'):
                 continue
             if re.search(regexp, line):
-                print '%s --> Line %s: %s' % (
-                    filepath, line_num, pattern['message'])
-                print ''
+                print('%s --> Line %s: %s' % (
+                    filepath, line_num, pattern['message']))
+                print('')
                 bad_pattern_count += 1
         if bad_pattern_count:
             return True
@@ -612,12 +633,12 @@ class TagMismatchException(Exception):
     pass
 
 
-class CustomHTMLParser(HTMLParser.HTMLParser):
+class CustomHTMLParser(html.parser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
     def __init__(self, filepath, file_lines, debug, failed=False):
         """Define various variables to parse HTML."""
-        HTMLParser.HTMLParser.__init__(self)
+        html.parser.HTMLParser.__init__(self)
         self.tag_stack = []
         self.debug = debug
         self.failed = failed
@@ -639,13 +660,13 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
         opening_tag = '<' + tag
         if tag_line.startswith(opening_tag) and (
                 column_number != expected_indentation):
-            print (
+            print(
                 '%s --> Expected indentation '
                 'of %s, found indentation of %s '
                 'for %s tag on line %s ' % (
                     self.filepath, expected_indentation,
                     column_number, tag, line_number))
-            print ''
+            print('')
             self.failed = True
 
         if tag not in self.void_elements:
@@ -653,8 +674,8 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             self.indentation_level += 1
 
         if self.debug:
-            print 'DEBUG MODE: Start tag_stack'
-            print self.tag_stack
+            print('DEBUG MODE: Start tag_stack')
+            print(self.tag_stack)
 
         # Check the indentation of the attributes of the tag.
         indentation_of_first_attribute = (
@@ -684,7 +705,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                         'be enclosed within double quotes.' % (
                             self.filepath, value, attr,
                             tag, line_number))
-                    print ''
+                    print('')
 
         for line_num, line in enumerate(starttag_text.splitlines()):
             if line_num == 0:
@@ -706,7 +727,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                     'attribute on line %s ' % (
                         self.filepath, tag,
                         line_num_of_error, line_number))
-                print ''
+                print('')
                 self.failed = True
 
     def handle_endtag(self, tag):
@@ -734,14 +755,14 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                 'start tag %s on line %s ' % (
                     self.filepath, tag, line_number,
                     last_starttag, last_starttag_line_num))
-            print ''
+            print('')
             self.failed = True
 
         self.indentation_level -= 1
 
         if self.debug:
-            print 'DEBUG MODE: End tag_stack'
-            print self.tag_stack
+            print('DEBUG MODE: End tag_stack')
+            print(self.tag_stack)
 
     def handle_data(self, data):
         """Handle indentation level."""
@@ -776,32 +797,32 @@ def _lint_css_files(
     num_css_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
-        print 'There are no CSS files to lint.'
+        print('There are no CSS files to lint.')
         return
 
-    print 'Total css files: ', num_css_files
+    print('Total css files: ', num_css_files)
     stylelint_cmd_args = [
         node_path, stylelint_path, '--config=' + config_path]
     result_list = []
     if not verbose_mode_enabled:
-        print 'Linting CSS files.'
+        print('Linting CSS files.')
     for _, filepath in enumerate(files_to_lint):
         if verbose_mode_enabled:
-            print 'Linting: ', filepath
+            print('Linting: ', filepath)
         proc_args = stylelint_cmd_args + [filepath]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         linter_stdout, linter_stderr = proc.communicate()
         if linter_stderr:
-            print 'LINTER FAILED'
-            print linter_stderr
+            print('LINTER FAILED')
+            print(linter_stderr)
             sys.exit(1)
 
         if linter_stdout:
             num_files_with_errors += 1
             result_list.append(linter_stdout)
-            print linter_stdout
+            print(linter_stdout)
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
@@ -813,7 +834,7 @@ def _lint_css_files(
         result.put('%s   %s CSS file linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_css_files, time.time() - start_time))
 
-    print 'CSS linting finished.'
+    print('CSS linting finished.')
 
 
 def _lint_js_files(
@@ -835,24 +856,24 @@ def _lint_js_files(
     num_js_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
-        print 'There are no JavaScript files to lint.'
+        print('There are no JavaScript files to lint.')
         return
 
-    print 'Total js files: ', num_js_files
+    print('Total js files: ', num_js_files)
     eslint_cmd_args = [node_path, eslint_path, '--quiet']
     result_list = []
-    print 'Linting JS files.'
+    print('Linting JS files.')
     for _, filepath in enumerate(files_to_lint):
         if verbose_mode_enabled:
-            print 'Linting: ', filepath
+            print('Linting: ', filepath)
         proc_args = eslint_cmd_args + [filepath]
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         linter_stdout, linter_stderr = proc.communicate()
         if linter_stderr:
-            print 'LINTER FAILED'
-            print linter_stderr
+            print('LINTER FAILED')
+            print(linter_stderr)
             sys.exit(1)
 
         if linter_stdout:
@@ -869,7 +890,7 @@ def _lint_js_files(
         result.put('%s   %s JavaScript files linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_js_files, time.time() - start_time))
 
-    print 'Js linting finished.'
+    print('Js linting finished.')
 
 
 def _lint_py_files(
@@ -890,10 +911,10 @@ def _lint_py_files(
     num_py_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
-        print 'There are no Python files to lint.'
+        print('There are no Python files to lint.')
         return
 
-    print 'Linting %s Python files' % num_py_files
+    print('Linting %s Python files' % num_py_files)
 
     _batch_size = 50
     current_batch_start_index = 0
@@ -906,8 +927,8 @@ def _lint_py_files(
         current_files_to_lint = files_to_lint[
             current_batch_start_index: current_batch_end_index]
         if verbose_mode_enabled:
-            print 'Linting Python files %s to %s...' % (
-                current_batch_start_index + 1, current_batch_end_index)
+            print('Linting Python files %s to %s...' % (
+                current_batch_start_index + 1, current_batch_end_index))
 
         with _redirect_stdout(_TARGET_STDOUT):
             # This line invokes Pylint and prints its output
@@ -933,7 +954,7 @@ def _lint_py_files(
         result.put('%s   %s Python files linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
-    print 'Python linting finished.'
+    print('Python linting finished.')
 
 
 class LintChecksManager(object):
@@ -972,11 +993,11 @@ class LintChecksManager(object):
         if not files_to_check:
             return parsed_js_files
         if not self.verbose_mode_enabled:
-            print 'Validating and parsing JS files ...'
+            print('Validating and parsing JS files ...')
         for filepath in files_to_check:
             if self.verbose_mode_enabled:
-                print 'Validating and parsing %s file ...' % filepath
-            file_content = FileCache.read(filepath).decode('utf-8')
+                print('Validating and parsing %s file ...' % filepath)
+            file_content = FileCache.read(filepath)
 
             # Use esprima to parse a JS file.
             parsed_js_files[filepath] = esprima.parseScript(file_content)
@@ -988,7 +1009,7 @@ class LintChecksManager(object):
         HTML, CSS) with their respective third party linters.
         """
 
-        print 'Starting linter...'
+        print('Starting linter...')
 
         pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
@@ -1010,9 +1031,9 @@ class LintChecksManager(object):
             parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
             'css', '.stylelintrc')
         if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
-            print ''
-            print 'ERROR    Please run start.sh first to install node-eslint '
-            print '         or node-stylelint and its dependencies.'
+            print('')
+            print('ERROR    Please run start.sh first to install node-eslint ')
+            print('         or node-stylelint and its dependencies.')
             sys.exit(1)
 
         js_files_to_lint = [
@@ -1068,8 +1089,8 @@ class LintChecksManager(object):
                 py_result, self.verbose_mode_enabled)))
 
         if self.verbose_mode_enabled:
-            print 'Starting CSS, Javascript and Python Linting'
-            print '----------------------------------------'
+            print('Starting CSS, Javascript and Python Linting')
+            print('----------------------------------------')
 
         for process in linting_processes:
             process.daemon = False
@@ -1090,7 +1111,7 @@ class LintChecksManager(object):
                 # waiting for the linting function to return.
                 process.join(timeout=(
                     timeout_multiplier * (
-                        len(file_group) / number_of_files_to_lint)))
+                        old_div(len(file_group), number_of_files_to_lint))))
             except ZeroDivisionError:
                 break
 
@@ -1098,8 +1119,8 @@ class LintChecksManager(object):
         while not js_stdout.empty():
             js_messages.append(js_stdout.get())
 
-        print ''
-        print '\n'.join(js_messages)
+        print('')
+        print('\n'.join(js_messages))
 
         summary_messages = []
 
@@ -1112,8 +1133,8 @@ class LintChecksManager(object):
                 summary_messages.append(result_queue.get())
 
         with _redirect_stdout(_TARGET_STDOUT):
-            print '\n'.join(summary_messages)
-            print ''
+            print('\n'.join(summary_messages))
+            print('')
 
         return summary_messages
 
@@ -1122,8 +1143,8 @@ class LintChecksManager(object):
         scope: {} and it should not be scope: true.
         """
         if self.verbose_mode_enabled:
-            print 'Starting directive scope check'
-            print '----------------------------------------'
+            print('Starting directive scope check')
+            print('----------------------------------------')
         # Select JS files which need to be checked.
         files_to_check = [
             filepath for filepath in self.all_filepaths if
@@ -1211,7 +1232,7 @@ class LintChecksManager(object):
                                                 'does not have scope set to '
                                                 'true.' %
                                                 (directive_name, filepath))
-                                            print ''
+                                            print('')
                                         elif scope_value.type != (
                                                 'ObjectExpression'):
                                             # Check whether the directive has
@@ -1223,21 +1244,21 @@ class LintChecksManager(object):
                                                 'directive in %s file has a '
                                                 'scope: {}.' % (
                                                     directive_name, filepath))
-                                            print ''
+                                            print('')
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
                 summary_message = '%s   Directive scope check failed' % (
                     _MESSAGE_TYPE_FAILED)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s  Directive scope check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
 
-            print ''
+            print('')
             return summary_messages
 
     def _check_js_component_name_and_count(self):
@@ -1246,8 +1267,8 @@ class LintChecksManager(object):
         matches the filename.
         """
         if self.verbose_mode_enabled:
-            print 'Starting js component name and count check'
-            print '----------------------------------------'
+            print('Starting js component name and count check')
+            print('----------------------------------------')
         # Select JS files which need to be checked.
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
@@ -1315,16 +1336,16 @@ class LintChecksManager(object):
                 summary_message = (
                     '%s  Js component name and count check failed' %
                     (_MESSAGE_TYPE_FAILED))
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s  Js component name and count check passed' %
                     (_MESSAGE_TYPE_SUCCESS))
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
 
-            print ''
+            print('')
             return summary_messages
 
     def _check_sorted_dependencies(self):
@@ -1334,8 +1355,8 @@ class LintChecksManager(object):
         imports, and constant imports, all in sorted order.
         """
         if self.verbose_mode_enabled:
-            print 'Starting sorted dependencies check'
-            print '----------------------------------------'
+            print('Starting sorted dependencies check')
+            print('----------------------------------------')
         files_to_check = [
             filepath for filepath in self.all_filepaths if
             filepath.endswith('.js') and not
@@ -1417,10 +1438,10 @@ class LintChecksManager(object):
                         _MESSAGE_TYPE_SUCCESS))
 
         summary_messages.append(summary_message)
-        print ''
-        print summary_message
+        print('')
+        print(summary_message)
         if self.verbose_mode_enabled:
-            print '----------------------------------------'
+            print('----------------------------------------')
 
         return summary_messages
 
@@ -1430,8 +1451,8 @@ class LintChecksManager(object):
         between the arguments of the controller function.
         """
         if self.verbose_mode_enabled:
-            print 'Starting controller dependency line break check'
-            print '----------------------------------------'
+            print('Starting controller dependency line break check')
+            print('----------------------------------------')
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
@@ -1466,22 +1487,22 @@ class LintChecksManager(object):
                             'exactly match.' % (
                                 filepath, stringfied_dependencies,
                                 function_parameters))
-                        print ''
+                        print('')
 
             if failed:
                 summary_message = (
                     '%s   Controller dependency line break check failed' % (
                         _MESSAGE_TYPE_FAILED))
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s  Controller dependency line break check passed' % (
                         _MESSAGE_TYPE_SUCCESS))
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
 
-            print ''
+            print('')
 
         return summary_messages
 
@@ -1490,8 +1511,8 @@ class LintChecksManager(object):
         with _directive.html.
         """
         if self.verbose_mode_enabled:
-            print 'Starting HTML directive name check'
-            print '----------------------------------------'
+            print('Starting HTML directive name check')
+            print('----------------------------------------')
         total_files_checked = 0
         total_error_count = 0
         files_to_check = [
@@ -1519,7 +1540,7 @@ class LintChecksManager(object):
                         print (
                             '%s --> Please ensure that this file ends'
                             'with _directive.html.' % directive_filepath)
-                        print ''
+                        print('')
 
             if failed:
                 summary_message = '%s   HTML directive name check failed' % (
@@ -1530,14 +1551,14 @@ class LintChecksManager(object):
                     _MESSAGE_TYPE_SUCCESS)
                 summary_messages.append(summary_message)
 
-            print ''
+            print('')
             if total_files_checked == 0:
                 if self.verbose_mode_enabled:
-                    print 'There are no files to be checked.'
+                    print('There are no files to be checked.')
             else:
-                print '(%s files checked, %s errors found)' % (
-                    total_files_checked, total_error_count)
-                print summary_message
+                print('(%s files checked, %s errors found)' % (
+                    total_files_checked, total_error_count))
+                print(summary_message)
 
         return summary_messages
 
@@ -1546,8 +1567,8 @@ class LintChecksManager(object):
         has imports placed in alphabetical order.
         """
         if self.verbose_mode_enabled:
-            print 'Starting import-order checks'
-            print '----------------------------------------'
+            print('Starting import-order checks')
+            print('----------------------------------------')
         summary_messages = []
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
@@ -1564,18 +1585,18 @@ class LintChecksManager(object):
                         filepath, check=True, show_diff=(
                             True)).incorrectly_sorted):
                     failed = True
-                    print ''
+                    print('')
 
-            print ''
+            print('')
             if failed:
                 summary_message = (
                     '%s   Import order checks failed' % _MESSAGE_TYPE_FAILED)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
 
         return summary_messages
@@ -1589,8 +1610,8 @@ class LintChecksManager(object):
             check.
         """
         if self.verbose_mode_enabled:
-            print 'Starting docstring checks'
-            print '----------------------------------------'
+            print('Starting docstring checks')
+            print('----------------------------------------')
         summary_messages = []
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
@@ -1637,19 +1658,19 @@ class LintChecksManager(object):
                     if re.match(r'^""".+$', line) and is_docstring and (
                             line[3] == ' '):
                         failed = True
-                        print '%s --> Line %s: %s' % (
+                        print('%s --> Line %s: %s' % (
                             filepath, line_num + 1,
-                            space_after_triple_quotes_in_docstring_message)
-                        print ''
+                            space_after_triple_quotes_in_docstring_message))
+                        print('')
                         is_docstring = False
 
                     # Check if single line docstring span two lines.
                     if line == '"""' and prev_line.startswith('"""') and (
                             is_docstring):
                         failed = True
-                        print '%s --> Line %s: %s' % (
-                            filepath, line_num, single_line_docstring_message)
-                        print ''
+                        print('%s --> Line %s: %s' % (
+                            filepath, line_num, single_line_docstring_message))
+                        print('')
                         is_docstring = False
 
                     # Check for single line docstring.
@@ -1660,9 +1681,9 @@ class LintChecksManager(object):
                                 line[-4] not in
                                 ALLOWED_TERMINATING_PUNCTUATIONS):
                             failed = True
-                            print '%s --> Line %s: %s' % (
-                                filepath, line_num + 1, missing_period_message)
-                            print ''
+                            print('%s --> Line %s: %s' % (
+                                filepath, line_num + 1, missing_period_message))
+                            print('')
                         is_docstring = False
 
                     # Check for multiline docstring.
@@ -1673,9 +1694,9 @@ class LintChecksManager(object):
                             # Check for empty line before the end of docstring.
                             if prev_line == '':
                                 failed = True
-                                print '%s --> Line %s: %s' % (
-                                    filepath, line_num, previous_line_message)
-                                print ''
+                                print('%s --> Line %s: %s' % (
+                                    filepath, line_num, previous_line_message))
+                                print('')
                             # Check for punctuation at end of docstring.
                             else:
                                 last_char_is_invalid = prev_line[-1] not in (
@@ -1687,48 +1708,48 @@ class LintChecksManager(object):
                                 if last_char_is_invalid and (
                                         no_word_is_present_in_excluded_phrases):
                                     failed = True
-                                    print '%s --> Line %s: %s' % (
+                                    print('%s --> Line %s: %s' % (
                                         filepath, line_num,
-                                        missing_period_message)
-                                    print ''
+                                        missing_period_message))
+                                    print('')
 
                         # Case 2: line contains some words before """. """
                         # should shift to next line.
                         elif not any(word in line for word in EXCLUDED_PHRASES):
                             failed = True
-                            print '%s --> Line %s: %s' % (
+                            print('%s --> Line %s: %s' % (
                                 filepath, line_num + 1,
-                                multiline_docstring_message)
-                            print ''
+                                multiline_docstring_message))
+                            print('')
 
                         is_docstring = False
 
-            docstring_checker = docstrings_checker.ASTDocStringChecker()
-            for filepath in files_to_check:
-                ast_file = ast.walk(ast.parse(FileCache.read(filepath)))
-                func_defs = [n for n in ast_file if isinstance(
-                    n, ast.FunctionDef)]
-                for func in func_defs:
-                    # Check that the args in the docstring are listed in the
-                    # same order as they appear in the function definition.
-                    func_result = docstring_checker.check_docstrings_arg_order(
-                        func)
-                    for error_line in func_result:
-                        print '%s --> Func %s: %s' % (
-                            filepath, func.name, error_line)
-                        print ''
-                        failed = True
+        docstring_checker = docstrings_checker.ASTDocStringChecker()
+        for filepath in files_to_check:
+            ast_file = ast.walk(ast.parse(FileCache.read(filepath).encode()))
+            func_defs = [n for n in ast_file if isinstance(
+                n, ast.FunctionDef)]
+            for func in func_defs:
+                # Check that the args in the docstring are listed in the
+                # same order as they appear in the function definition.
+                func_result = docstring_checker.check_docstrings_arg_order(
+                    func)
+                for error_line in func_result:
+                    print('%s --> Func %s: %s' % (
+                        filepath, func.name, error_line))
+                    print('')
+                    failed = True
 
-            print ''
+            print('')
             if failed:
                 summary_message = (
                     '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
 
         return summary_messages
@@ -1736,8 +1757,8 @@ class LintChecksManager(object):
     def _check_comments(self):
         """This function ensures that comments follow correct style."""
         if self.verbose_mode_enabled:
-            print 'Starting comment checks'
-            print '----------------------------------------'
+            print('Starting comment checks')
+            print('----------------------------------------')
         summary_messages = []
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
@@ -1770,9 +1791,9 @@ class LintChecksManager(object):
                         if last_char_is_invalid and (
                                 no_word_is_present_in_excluded_phrases):
                             failed = True
-                            print '%s --> Line %s: %s' % (
-                                filepath, line_num + 1, message)
-                            print ''
+                            print('%s --> Line %s: %s' % (
+                                filepath, line_num + 1, message))
+                            print('')
 
                     # Check that comment starts with a space and is not a
                     # shebang expression at the start of a bash script which
@@ -1782,9 +1803,9 @@ class LintChecksManager(object):
                             'There should be a space at the beginning '
                             'of the comment.')
                         failed = True
-                        print '%s --> Line %s: %s' % (
-                            filepath, line_num + 1, message)
-                        print ''
+                        print('%s --> Line %s: %s' % (
+                            filepath, line_num + 1, message))
+                        print('')
 
                     # Check that comment starts with a capital letter.
                     if not previous_line.startswith('#') and (
@@ -1793,20 +1814,20 @@ class LintChecksManager(object):
                             'There should be a capital letter'
                             ' to begin the content of the comment.')
                         failed = True
-                        print '%s --> Line %s: %s' % (
-                            filepath, line_num + 1, message)
-                        print ''
+                        print('%s --> Line %s: %s' % (
+                            filepath, line_num + 1, message))
+                        print('')
 
-            print ''
+            print('')
             if failed:
                 summary_message = (
                     '%s   Comments check failed' % _MESSAGE_TYPE_FAILED)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
 
         return summary_messages
@@ -1815,8 +1836,8 @@ class LintChecksManager(object):
         """This function checks the indentation of lines in HTML files."""
 
         if self.verbose_mode_enabled:
-            print 'Starting HTML tag and attribute check'
-            print '----------------------------------------'
+            print('Starting HTML tag and attribute check')
+            print('----------------------------------------')
 
         html_files_to_lint = [
             filepath for filepath in self.all_filepaths if filepath.endswith(
@@ -1841,15 +1862,15 @@ class LintChecksManager(object):
             if failed:
                 summary_message = '%s   HTML tag and attribute check failed' % (
                     _MESSAGE_TYPE_FAILED)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s  HTML tag and attribute check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
 
-            print ''
+            print('')
 
         return summary_messages
 
@@ -1870,15 +1891,15 @@ class LintChecksManager(object):
             filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.html')]
         if self.verbose_mode_enabled:
-            print 'Starting HTML linter...'
-            print '----------------------------------------'
-        print ''
+            print('Starting HTML linter...')
+            print('----------------------------------------')
+        print('')
         if not self.verbose_mode_enabled:
-            print 'Linting HTML files.'
+            print('Linting HTML files.')
         for filepath in html_files_to_lint:
             proc_args = htmllint_cmd_args + [filepath]
             if self.verbose_mode_enabled:
-                print 'Linting %s file' % filepath
+                print('Linting %s file' % filepath)
             with _redirect_stdout(_TARGET_STDOUT):
                 proc = subprocess.Popen(
                     proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -1891,17 +1912,17 @@ class LintChecksManager(object):
                     [int(s) for s in linter_stdout.split() if s.isdigit()][-2])
                 if error_count:
                     error_summary.append(error_count)
-                    print linter_stdout
+                    print(linter_stdout)
 
         with _redirect_stdout(_TARGET_STDOUT):
             if self.verbose_mode_enabled:
-                print '----------------------------------------'
+                print('----------------------------------------')
             for error_count in error_summary:
                 total_error_count += error_count
             total_files_checked = len(html_files_to_lint)
             if total_error_count:
-                print '(%s files checked, %s errors found)' % (
-                    total_files_checked, total_error_count)
+                print('(%s files checked, %s errors found)' % (
+                    total_files_checked, total_error_count))
                 summary_message = '%s   HTML linting failed' % (
                     _MESSAGE_TYPE_FAILED)
                 summary_messages.append(summary_message)
@@ -1910,18 +1931,18 @@ class LintChecksManager(object):
                     _MESSAGE_TYPE_SUCCESS)
                 summary_messages.append(summary_message)
 
-            print ''
-            print summary_message
-            print 'HTML linting finished.'
-            print ''
+            print('')
+            print(summary_message)
+            print('HTML linting finished.')
+            print('')
 
         return summary_messages
 
     def _check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
         if self.verbose_mode_enabled:
-            print 'Starting Pattern Checks'
-            print '----------------------------------------'
+            print('Starting Pattern Checks')
+            print('----------------------------------------')
         total_files_checked = 0
         total_error_count = 0
         summary_messages = []
@@ -1942,9 +1963,9 @@ class LintChecksManager(object):
                             not _is_filepath_excluded_for_bad_patterns_check(
                                 pattern, filepath)):
                         failed = True
-                        print '%s --> %s' % (
-                            filepath, BAD_PATTERNS[pattern]['message'])
-                        print ''
+                        print('%s --> %s' % (
+                            filepath, BAD_PATTERNS[pattern]['message']))
+                        print('')
                         total_error_count += 1
 
                 if filepath.endswith('.js'):
@@ -1972,10 +1993,10 @@ class LintChecksManager(object):
                     for pattern in REQUIRED_STRINGS_CONSTANTS:
                         if pattern not in file_content:
                             failed = True
-                            print '%s --> %s' % (
+                            print('%s --> %s' % (
                                 filepath,
-                                REQUIRED_STRINGS_CONSTANTS[pattern]['message'])
-                            print ''
+                                REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
+                            print('')
                             total_error_count += 1
             if failed:
                 summary_message = '%s Pattern checks failed' % (
@@ -1986,13 +2007,13 @@ class LintChecksManager(object):
                     _MESSAGE_TYPE_SUCCESS)
                 summary_messages.append(summary_message)
 
-            print ''
+            print('')
             if total_files_checked == 0:
-                print 'There are no files to be checked.'
+                print('There are no files to be checked.')
             else:
-                print '(%s files checked, %s errors found)' % (
-                    total_files_checked, total_error_count)
-                print summary_message
+                print('(%s files checked, %s errors found)' % (
+                    total_files_checked, total_error_count))
+                print(summary_message)
 
         return summary_messages
 
@@ -2001,8 +2022,8 @@ class LintChecksManager(object):
         is present at the beginning of files.
         """
         if self.verbose_mode_enabled:
-            print 'Starting copyright notice check'
-            print '----------------------------------------'
+            print('Starting copyright notice check')
+            print('----------------------------------------')
         js_files_to_check = [
             filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.js') and (not filepath.endswith(GENERATED_FILE_PATHS)) and (
@@ -2034,20 +2055,20 @@ class LintChecksManager(object):
                     print (
                         '%s --> Please add a proper copyright notice to this '
                         'file.' % (filepath))
-                    print ''
+                    print('')
 
             if failed:
                 summary_message = '%s   Copyright notice check failed' % (
                     _MESSAGE_TYPE_FAILED)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s  Copyright notice check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
-                print summary_message
+                print(summary_message)
                 summary_messages.append(summary_message)
 
-            print ''
+            print('')
 
         return summary_messages
 
@@ -2059,8 +2080,8 @@ class LintChecksManager(object):
         please refer https://docs.python.org/2/library/glob.html.
         """
         if self.verbose_mode_enabled:
-            print 'Starting CODEOWNERS file check'
-            print '----------------------------------------'
+            print('Starting CODEOWNERS file check')
+            print('----------------------------------------')
 
         with _redirect_stdout(_TARGET_STDOUT):
             codeowner_filepath = '.github/CODEOWNERS'
@@ -2186,8 +2207,8 @@ class LintChecksManager(object):
                     _MESSAGE_TYPE_SUCCESS)
 
             summary_messages.append(summary_message)
-            print summary_message
-            print ''
+            print(summary_message)
+            print('')
 
         return summary_messages
 
@@ -2235,9 +2256,9 @@ def _print_complete_summary_of_errors():
     """Print complete summary of errors."""
     error_messages = _TARGET_STDOUT.getvalue()
     if error_messages != '':
-        print 'Summary of Errors:'
-        print '----------------------------------------'
-        print error_messages
+        print('Summary of Errors:')
+        print('----------------------------------------')
+        print(error_messages)
 
 
 def main():
@@ -2255,14 +2276,14 @@ def main():
 
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
-        print '---------------------------'
-        print 'Checks Not Passed.'
-        print '---------------------------'
+        print('---------------------------')
+        print('Checks Not Passed.')
+        print('---------------------------')
         sys.exit(1)
     else:
-        print '---------------------------'
-        print 'All Checks Passed.'
-        print '---------------------------'
+        print('---------------------------')
+        print('All Checks Passed.')
+        print('---------------------------')
 
 
 if __name__ == '__main__':

@@ -17,15 +17,20 @@
 """Implements additional custom Pylint checkers to be used as part of
 presubmit checks.
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+from builtins import range
 import re
+
 import astroid
-import docstrings_checker  # pylint: disable=relative-import
 
 from pylint import checkers
 from pylint import interfaces
 from pylint.checkers import typecheck
 from pylint.checkers import utils as checker_utils
+
+from . import docstrings_checker  # pylint: disable=relative-import
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):
@@ -162,10 +167,10 @@ class HangingIndentChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        file_content = node.stream().readlines()
+        file_content = [str(line) for line in node.stream().readlines()]
         file_length = len(file_content)
         exclude = False
-        for line_num in xrange(file_length):
+        for line_num in range(file_length):
             line = file_content[line_num].lstrip().rstrip()
             if line.startswith('"""') and not line.endswith('"""'):
                 exclude = True
@@ -175,7 +180,7 @@ class HangingIndentChecker(checkers.BaseChecker):
                 continue
             line_length = len(line)
             bracket_count = 0
-            for char_num in xrange(line_length):
+            for char_num in range(line_length):
                 char = line[char_num]
                 if char == '(':
                     if bracket_count == 0:
@@ -751,7 +756,7 @@ class BackslashContinuationChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
         with node.stream() as stream:
-            file_content = stream.readlines()
+            file_content = [str(line) for line in stream.readlines()]
             for (line_num, line) in enumerate(file_content):
                 if line.rstrip('\r\n').endswith('\\'):
                     self.add_message(
@@ -888,7 +893,7 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
 
-        file_content = node.stream().readlines()
+        file_content = [str(line) for line in node.stream().readlines()]
         file_length = len(file_content)
 
         if file_length == 1 and len(file_content[0]) == 1:
