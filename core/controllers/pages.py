@@ -45,7 +45,7 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            self.render_template('pages/splash/splash.html')
+            self.render_template('pages/splash-page/splash-page.mainpage.html')
         else:
             try:
                 self.render_template('pages/splash/splash_%s.html' % c_value)

@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia splash page.
  */
 
-oppia.controller('Splash', [
+angular.module('splashPageModule').controller('Splash', [
   '$rootScope', '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'UserService',
   function($rootScope, $scope, $timeout, $window, SiteAnalyticsService,

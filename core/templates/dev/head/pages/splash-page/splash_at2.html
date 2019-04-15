@@ -154,6 +154,14 @@
       <div class="oppia-splash-h2-container">
         <h2 class="oppia-splash-h2" style="padding-bottom: 30px; font-size: 1.6em; padding-top: 100px; max-width: 700px;">
         </h2>
+
+        <div style="height: 0; margin: 0 auto 60px auto; width: 70%; padding-bottom: 56.25%; position: relative;">
+          <iframe title="Oppia.org - Intelligent Online Learning" width="100%"
+                  height="100%" src="https://www.youtube.com/embed/Ntcw0H0hwPU"
+                  frameborder="0" allowfullscreen
+                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+          </iframe>
+        </div>
       </div>
     </div>
 
@@ -210,6 +218,7 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/pages/splash/Splash.js"></script>
+  <script src="/templates/dev/head/pages/splash-page/splash-page.module.js"></script>
+  <script src="/templates/dev/head/pages/splash-page/splash-page.controller.js"></script>
   <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
 {% endblock footer_js %}

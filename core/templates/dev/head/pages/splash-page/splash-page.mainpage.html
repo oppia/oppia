@@ -18,15 +18,8 @@
 {% block content %}
   <div ng-controller="Splash">
     <div class="oppia-splash-section-one text-center">
-      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.0em; line-height: 1.5em; padding-bottom: 0.5em;">Multiply the impact of your volunteer teaching</h1>
-
-      <div class="oppia-splash-button-heading">
-        <h2 style="max-width: 400px; color: #005c53; font-size: 1.6em; font-family: Capriola; line-height: 1.5em;">
-          Reach hundreds of students.
-        </h2>
-      </div>
-
-      <div style="position: relative;">
+      <h1 class="oppia-splash-h1" translate="I18N_SPLASH_TITLE"></h1>
+      <div style="position: relative; margin-left: auto; margin-right: auto; max-width: 2000px;">
         <div style="padding-left: 200px;">
           <div class="oppia-splash-background-icon-row">
             <img ng-src="<[getStaticImageUrl('/splash/books.svg')]>" class="oppia-splash-books" style="margin-left: -250px; width: 500px; top: 95px;" alt="">
@@ -128,54 +121,52 @@
         </div>
 
         <div class="oppia-splash-button-container">
+          <button type="button" ng-click="onClickBrowseLibraryButton()"
+                  class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
+                  style="bottom: 210px; z-index: 10;"
+                  translate="I18N_ACTION_BROWSE_LESSONS">
+          </button>
+
           <!-- User must complete the registration process. -->
           <button type="button"
                   ng-if="!userIsLoggedIn"
                   ng-click="onRedirectToLogin('/creator_dashboard?mode=create')"
                   class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                  style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 210px; z-index: 10;"
+                  style="bottom: 150px; z-index: 10;"
                   translate="I18N_ACTION_CREATE_LESSON">
           </button>
           <button type="button"
                   ng-if="userIsLoggedIn"
                   ng-click="onClickCreateExplorationButton()"
                   class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                  style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 210px; z-index: 10;"
+                  style="bottom: 150px; z-index: 10;"
                   translate="I18N_ACTION_CREATE_LESSON">
-          </button>
-          <button type="button" ng-click="onClickBrowseLibraryButton()"
-                  class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
-                  style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 150px; font-size: 0.93em; z-index: 10;"
-                  translate="I18N_ACTION_BROWSE_LESSONS">
           </button>
         </div>
       </div>
 
       <div class="oppia-splash-h2-container">
-        <h2 class="oppia-splash-h2" style="padding-bottom: 30px; font-size: 1.6em; padding-top: 100px; max-width: 700px;">
-        </h2>
+        <h2 class="oppia-splash-h2" translate="I18N_SPLASH_SUBTITLE" style="padding-bottom: 30px; font-size: 1.6em; padding-top: 100px; max-width: 700px;"></h2>
       </div>
     </div>
 
     <div class="oppia-splash-section-two">
       <div class="oppia-splash-section-two-content" style="padding-top: 0;">
-        <div class="oppia-splash-bullet" style="overflow: visible;">
+        <div class="oppia-splash-bullet" style="clear: both; overflow: visible;">
           <div class="oppia-splash-bullet-block oppia-splash-block-left-image">
             <img ng-src="<[getStaticImageUrl('/splash/bullet1icon.svg')]>" class="oppia-splash-overlapping-image-1" alt="">
           </div>
-          <div class="oppia-splash-bullet-block oppia-splash-block-right-text">
-            Make an impact with your volunteering. Oppia enables you to reach more students than you can alone.
+          <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
+               translate="I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION">
           </div>
         </div>
 
-        <div class="oppia-splash-bullet" style="clear: both;">
+        <div class="oppia-splash-bullet">
           <div class="oppia-splash-bullet-block oppia-splash-block-right-image">
             <img ng-src="<[getStaticImageUrl('/splash/bullet2icon.svg')]>" alt="">
           </div>
-          <div class="oppia-splash-bullet-block oppia-splash-block-left-text">
-            It's easy and free to create a lesson in Oppia. Just <a ng-click="onRedirectToLogin('/creator_dashboard?mode=create')">sign up</a> and get
-            started! You'll be able to see how many students have started your
-            lessons, and get detailed information on their progress.
+          <div class="oppia-splash-bullet-block oppia-splash-block-left-text"
+               translate="I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION">
           </div>
         </div>
 
@@ -183,11 +174,8 @@
           <div class="oppia-splash-bullet-block oppia-splash-block-left-image">
             <img ng-src="<[getStaticImageUrl('/splash/bullet3icon.svg')]>" alt="">
           </div>
-          <div class="oppia-splash-bullet-block oppia-splash-block-right-text">
-            You can also improve your lessons over time. For example, if many
-            students get stuck at a particular step, you can add extra
-            information to be shown only to those students who answered a
-            certain question incorrectly.
+          <div class="oppia-splash-bullet-block oppia-splash-block-right-text"
+               translate="I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION">
           </div>
         </div>
       </div>
@@ -215,6 +203,7 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/pages/splash/Splash.js"></script>
+  <script src="/templates/dev/head/pages/splash-page/splash-page.module.js"></script>
+  <script src="/templates/dev/head/pages/splash-page/splash-page.controller.js"></script>
   <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
 {% endblock footer_js %}

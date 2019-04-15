@@ -25,7 +25,7 @@ var oppia = angular.module(
     'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
     'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
     'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate', 'libraryPageModule',
-    'showSuggestionModalForCreatorViewModule',
+    'splashPageModule', 'showSuggestionModalForCreatorViewModule',
     'showSuggestionModalForEditorViewModule',
     'showSuggestionModalForLearnerViewModule',
     'showSuggestionModalForLocalViewModule', ,'storyEditorModule',

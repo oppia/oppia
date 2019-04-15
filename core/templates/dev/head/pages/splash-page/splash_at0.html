@@ -18,11 +18,11 @@
 {% block content %}
   <div ng-controller="Splash">
     <div class="oppia-splash-section-one text-center">
-      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Students don't want to do homework?</h1>
+      <h1 class="oppia-splash-h1" style="max-width: 800px; font-size: 2.3em; line-height: 1.5em; padding-bottom: 0.5em;">Lesson plans aren't just for the schoolday</h1>
 
       <div class="oppia-splash-button-heading">
         <h2 style="max-width: 400px; color: #005c53; font-size: 1.6em; font-family: Capriola; line-height: 1.5em;">
-          Transform your existing homework exercises into fun online activities.
+          Create fun interactive quizzes that students can do at home.
         </h2>
       </div>
 
@@ -210,6 +210,7 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/pages/splash/Splash.js"></script>
+  <script src="/templates/dev/head/pages/splash-page/splash-page.module.js"></script>
+  <script src="/templates/dev/head/pages/splash-page/splash-page.controller.js"></script>
   <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
 {% endblock footer_js %}
