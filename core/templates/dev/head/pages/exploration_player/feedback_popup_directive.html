@@ -15,21 +15,9 @@
     <br>
 
     <div>
-      <div style="margin: 0px 0px 5px 0px;">
-        <strong>Title :</strong>
-      </div>
-      <div>
-        <textarea ng-model="feedbackTitle" class="oppia-feedback-popover-textarea" rows="2">
-        </textarea>
-      </div>
-      <div style="margin: 10px 0px 5px 0px;">
-        <strong>Feedback :</strong>
-      </div>
-      <div>
-        <textarea ng-model="feedbackText" rows="5" class="protractor-test-exploration-feedback-textarea oppia-feedback-popover-textarea"
-                  placeholder="<['I18N_PLAYER_LEAVE_FEEDBACK' | translate]>" focus-on="<[feedbackPopoverId]>">
-        </textarea>
-      </div>
+      <textarea ng-model="feedbackText" rows="5" class="protractor-test-exploration-feedback-textarea oppia-feedback-popover-textarea"
+                placeholder="<['I18N_PLAYER_LEAVE_FEEDBACK' | translate]>" focus-on="<[feedbackPopoverId]>">
+      </textarea>
     </div>
 
     <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
