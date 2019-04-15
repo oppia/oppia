@@ -16,7 +16,8 @@
  * @fileoverview Directive for the add and view hints section of the state
  * editor.
  */
-oppia.directive('stateHintsEditor', [
+
+angular.module('stateHintsEditorModule').directive('stateHintsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -26,7 +27,8 @@ oppia.directive('stateHintsEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state_editor/state_hints_editor_directive.html'),
+        '/pages/state-editor/state-hints-editor/' +
+        'state-hints-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',
