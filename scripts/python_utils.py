@@ -18,14 +18,31 @@
 
 
 def import_string_io():
+    """Returns StringIO from StringIO module if run under Python 2 and from io
+    module if run under Python 3.
+
+    Returns:
+        StringIO.StringIO or io.StringIO. The StringIO object.
+    """
     try:
         from StringIO import StringIO
     except ImportError:
         from io import StringIO
-    finally:
-        return StringIO()
+    return StringIO()
+
 
 def get_args_of_function(function_node, args_to_ignore):
+    """Extracts the arguments from a function definition.
+
+    Args:
+        function_node: ast.FunctionDef. Represents a function.
+        args_to_ignore: list(str). Ignore these arguments in a function
+        defination.
+
+    Returns:
+        list(str). The args for a function as listed in the function
+        definition.
+    """
     try:
         return [
             a.arg for a in function_node.args.args if a.arg not in
@@ -33,4 +50,3 @@ def get_args_of_function(function_node, args_to_ignore):
     except AttributeError:
         return [
             a.id for a in function_node.args.args if a.id not in args_to_ignore]
-
