@@ -13,13 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the current interaction solution.
+ * @fileoverview A data service that stores the current interaction id.
  */
 
-angular.module('stateEditorModule').factory('StateSolutionService', [
+// TODO(sll): Add validation.
+oppia.factory('StateInteractionIdService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveSolution';
+    child.setterMethodKey = 'saveInteractionId';
     return child;
   }
 ]);

@@ -16,8 +16,7 @@
  * @fileoverview Directive for the solution viewer and editor section in the
  * state editor.
  */
-
-angular.module('stateSolutionEditorModule').directive('stateSolutionEditor', [
+oppia.directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -27,8 +26,7 @@ angular.module('stateSolutionEditorModule').directive('stateSolutionEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor/state-solution-editor/' +
-        'state-solution-editor.directive.html'),
+        '/pages/state_editor/state_solution_editor_directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter', 'StateEditorService',
         'AlertsService', 'INTERACTION_SPECS', 'StateSolutionService',

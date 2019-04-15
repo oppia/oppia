@@ -22,7 +22,7 @@ angular.module('subtopicsListTabModule').directive('subtopicsListTab', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-editor-page/subtopics-list-tab/' +
+        '/pages/topic-editor-page/subtopics_editor/' +
         'subtopics-list-tab.directive.html'),
       controller: [
         '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',

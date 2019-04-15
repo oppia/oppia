@@ -13,14 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the current state content.
+ * @fileoverview A data service that stores the current state customization
+ * args for theinteraction. This is a dict mapping customization arg names
+ * to dicts of the form {value: customization_arg_value}.
  */
 
 // TODO(sll): Add validation.
-angular.module('stateEditorModule').factory('StateContentService', [
+oppia.factory('StateCustomizationArgsService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveStateContent';
+    child.setterMethodKey = 'saveInteractionCustomizationArgs';
     return child;
   }
 ]);

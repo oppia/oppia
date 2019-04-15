@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the interaction editor section in the state
- * editor.
+ * @fileoverview A data service that stores the current state content.
  */
 
-angular.module('stateInteractionEditorModule', []);
+// TODO(sll): Add validation.
+oppia.factory('StateContentService', [
+  'StatePropertyService', function(StatePropertyService) {
+    var child = Object.create(StatePropertyService);
+    child.setterMethodKey = 'saveStateContent';
+    return child;
+  }
+]);

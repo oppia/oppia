@@ -13,14 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the current interaction id.
+ * @fileoverview A data service that stores the current list of
+ * state parameter changes.
  */
 
 // TODO(sll): Add validation.
-angular.module('stateEditorModule').factory('StateInteractionIdService', [
+oppia.factory('StateParamChangesService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveInteractionId';
+    child.setterMethodKey = 'saveStateParamChanges';
     return child;
   }
 ]);

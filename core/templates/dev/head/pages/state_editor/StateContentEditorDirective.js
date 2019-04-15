@@ -16,7 +16,7 @@
  * @fileoverview Directive for the state content editor.
  */
 
-angular.module('stateContentEditorModule').directive('stateContentEditor', [
+oppia.directive('stateContentEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -33,8 +33,7 @@ angular.module('stateContentEditorModule').directive('stateContentEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor/state-content-editor/' +
-        'state-content-editor.directive.html'),
+        '/pages/state_editor/state_content_editor_directive.html'),
       controller: [
         '$scope', 'StateContentService', 'EditabilityService',
         'EditorFirstTimeEventsService',
