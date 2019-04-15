@@ -39,8 +39,8 @@ describe('User Service', function() {
       username: 'tester',
       user_is_logged_in: true
     };
-    $httpBackend.when('GET', '/userinfohandler').respond(
-      200, sampleUserInfoBackendObject);
+    $httpBackend.when('GET', '/userinfohandler').respond(200,
+      sampleUserInfoBackendObject);
 
     $httpBackend.expect('GET', requestUrl).respond(200, {
       profile_picture_data_url: 'image data'
@@ -51,8 +51,8 @@ describe('User Service', function() {
     });
     $httpBackend.flush();
 
-    $httpBackend.when('GET', '/userinfohandler').respond(
-      200, sampleUserInfoBackendObject);
+    $httpBackend.when('GET', '/userinfohandler').respond(200,
+      sampleUserInfoBackendObject);
     $httpBackend.expect('GET', requestUrl).respond(404);
 
     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
