@@ -16,7 +16,7 @@
  * @fileoverview Controller for the questions list.
  */
 
-angular.module('questionsListPageModule').directive('questionsList', [
+angular.module('questionListPageModule').directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
