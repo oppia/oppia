@@ -32,7 +32,7 @@ oppia.constant(
   '/createhandler/data/<exploration_id>');
 oppia.constant(
   'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
-  '/createhandler/translate/<exploration_id>');
+  '/createhandler/voiceover/<exploration_id>');
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');

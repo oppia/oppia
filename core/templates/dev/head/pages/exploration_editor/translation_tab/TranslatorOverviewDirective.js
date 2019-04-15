@@ -19,7 +19,7 @@
 
 oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
 
-oppia.directive('voiceArtistOverview', [
+oppia.directive('translatorOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -28,7 +28,7 @@ oppia.directive('voiceArtistOverview', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
-        'voice_artist_overview_directive.html'),
+        'translator_overview_directive.html'),
       controller: [
         '$rootScope', '$scope', '$timeout', '$window',
         'ExplorationLanguageCodeService', 'LanguageUtilService',

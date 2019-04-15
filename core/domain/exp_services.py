@@ -1142,7 +1142,7 @@ def update_exploration(
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
-    if is_by_voice_artist and not is_translation_change_list(change_list):
+    if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
             'Voice artist does not have permission to make some '
             'changes in the change list.')
@@ -1802,7 +1802,7 @@ def index_explorations_given_ids(exp_ids):
         if exploration_summary is not None])
 
 
-def is_translation_change_list(change_list):
+def is_voiceover_change_list(change_list):
     """Checks whether the change list contains only the changes which are
     allowed for voice artist to do.
 
@@ -1931,7 +1931,7 @@ def create_or_update_draft(
         is_by_voice_artist: bool. Whether the changes are made by a
             voice artist.
     """
-    if is_by_voice_artist and not is_translation_change_list(change_list):
+    if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
             'Voice artist does not have permission to make some '
             'changes in the change list.')

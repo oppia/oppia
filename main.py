@@ -439,7 +439,7 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.ExplorationHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.TRANSLATION_DATA_PREFIX,
-        voice_artist.ExplorationTranslationHandler),
+        voice_artist.ExplorationVoiceoverHandler),
     get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
@@ -492,7 +492,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/autosave_draft/<exploration_id>',
         editor.EditorAutosaveHandler),
     get_redirect_route(
-        r'/createhandler/autosave_translation_draft/<exploration_id>',
+        r'/createhandler/autosave_voiceover_draft/<exploration_id>',
         voice_artist.VoiceArtistAutosaveHandler),
     get_redirect_route(
         r'/createhandler/get_top_unresolved_answers/<exploration_id>',

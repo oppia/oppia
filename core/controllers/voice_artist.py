@@ -177,8 +177,8 @@ class VoiceArtistAutosaveHandler(base.BaseHandler):
         self.render_json({})
 
 
-class ExplorationTranslationHandler(base.BaseHandler):
-    """Handles updates to exploration translations. It returns json format
+class ExplorationVoiceoverHandler(base.BaseHandler):
+    """Handles updates to exploration voiceovers. It returns json format
     response when an exception is raised.
     """
 

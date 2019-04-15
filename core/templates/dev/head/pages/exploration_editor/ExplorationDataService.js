@@ -51,7 +51,7 @@ oppia.factory('ExplorationDataService', [
         '/createhandler/autosave_draft/' + explorationId);
     } else if (GLOBALS.can_voiceover) {
       explorationDraftAutosaveUrl = (
-        '/createhandler/autosave_translation_draft/' + explorationId);
+        '/createhandler/autosave_voiceover_draft/' + explorationId);
     }
 
 

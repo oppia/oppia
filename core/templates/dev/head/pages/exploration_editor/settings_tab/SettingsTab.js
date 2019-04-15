@@ -125,7 +125,7 @@ oppia.controller('SettingsTab', [
       name: 'Collaborator (can make changes)',
       value: 'editor'
     }, {
-      name: 'Voice Artist (can do audio translations)',
+      name: 'Voice Artist (can do voiceover)',
       value: 'voice artist'
     }, {
       name: 'Playtester (can give feedback)',
