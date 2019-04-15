@@ -732,20 +732,20 @@ class Voiceover(object):
         }
 
     @classmethod
-    def from_dict(cls, audio_translation_dict):
+    def from_dict(cls, voiceover_dict):
         """Return a Voiceover domain object from a dict.
 
         Args:
-            audio_translation_dict: dict. The dict representation of
+            voiceover_dict: dict. The dict representation of
                 Voiceover object.
 
         Returns:
             Voiceover. The corresponding Voiceover domain object.
         """
         return cls(
-            audio_translation_dict['filename'],
-            audio_translation_dict['file_size_bytes'],
-            audio_translation_dict['needs_update'])
+            voiceover_dict['filename'],
+            voiceover_dict['file_size_bytes'],
+            voiceover_dict['needs_update'])
 
     def __init__(self, filename, file_size_bytes, needs_update):
         """Initializes a Voiceover domain object.
@@ -1781,7 +1781,7 @@ class State(object):
 
         Args:
             recorded_voiceovers: RecordedVoiceovers. The new RecordedVoiceovers
-            object for the state.
+                object for the state.
         """
         self.recorded_voiceovers = recorded_voiceovers
 

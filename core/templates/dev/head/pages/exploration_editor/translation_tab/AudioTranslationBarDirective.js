@@ -66,7 +66,7 @@ oppia.directive('audioTranslationBar', [
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
         'IdGenerationService', 'SiteAnalyticsService',
-        'StateRecordedVoiceoversService', 'StateEditorService',
+        'StateEditorService', 'StateRecordedVoiceoversService',
         'TranslationLanguageService', 'recorderService',
         'TranslationTabActiveContentIdService', 'RECORDING_TIME_LIMIT',
         function(
@@ -74,7 +74,7 @@ oppia.directive('audioTranslationBar', [
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
             IdGenerationService, SiteAnalyticsService,
-            StateRecordedVoiceoversService, StateEditorService,
+            StateEditorService, StateRecordedVoiceoversService,
             TranslationLanguageService, recorderService,
             TranslationTabActiveContentIdService, RECORDING_TIME_LIMIT) {
           $scope.RECORDER_ID = 'recorderId';
