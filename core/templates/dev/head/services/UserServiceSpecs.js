@@ -28,10 +28,19 @@ describe('User Service', function() {
 
   it('should return image data', function() {
     var requestUrl = '/preferenceshandler/profile_picture';
-
-    $httpBackend.expect('GET','/userisloggedinhandler').respond(200,{
-      user_is_logged_in : true
-    });
+    // creating a test user for checking profile picture of user.
+    var sampleUserInfoBackendObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      user_is_logged_in: true
+    };
+    $httpBackend.when('GET', '/userinfohandler').respond(
+      200, sampleUserInfoBackendObject);
 
     $httpBackend.expect('GET', requestUrl).respond(200, {
       profile_picture_data_url: 'image data'
@@ -42,9 +51,8 @@ describe('User Service', function() {
     });
     $httpBackend.flush();
 
-    $httpBackend.expect('GET','/userisloggedinhandler').respond(200,{
-      user_is_logged_in : true
-    });
+    $httpBackend.when('GET', '/userinfohandler').respond(
+      200, sampleUserInfoBackendObject);
     $httpBackend.expect('GET', requestUrl).respond(404);
 
     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
