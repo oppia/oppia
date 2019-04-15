@@ -61,7 +61,7 @@ describe('Translation status service', function() {
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(angular.mock.inject(function($injector) {
       tss = $injector.get('TranslationStatusService');
       ess = $injector.get('ExplorationStatesService');
       ttams = $injector.get('TranslationTabActiveModeService');
@@ -351,25 +351,25 @@ describe('Translation status service', function() {
       expect(explorationTranslationsRequiredCount).toBe(9);
     });
 
-    it('should return a correct count of audio not available in an ' +
-      'exploration', function() {
-      ttams.activateVoiceoverMode();
-      var explorationAudioNotAvailableCount = tss
-        .getExplorationContentNotAvailableCount();
-      expect(explorationAudioNotAvailableCount).toBe(6);
+    it('should return a correct count of audio not available in an exploration',
+      function() {
+        ttams.activateVoiceoverMode();
+        var explorationAudioNotAvailableCount = tss
+          .getExplorationContentNotAvailableCount();
+        expect(explorationAudioNotAvailableCount).toBe(6);
 
-      ess.addState('Fourth');
-      ess.saveInteractionId('Third', 'MultipleChoiceInput');
-      ess.saveInteractionId('Fourth', 'EndExploration');
-      tss.refresh();
+        ess.addState('Fourth');
+        ess.saveInteractionId('Third', 'MultipleChoiceInput');
+        ess.saveInteractionId('Fourth', 'EndExploration');
+        tss.refresh();
 
-      explorationAudioNotAvailableCount = (
-        tss.getExplorationContentNotAvailableCount());
-      expect(explorationAudioNotAvailableCount).toBe(7);
-    });
+        explorationAudioNotAvailableCount = (
+          tss.getExplorationContentNotAvailableCount());
+        expect(explorationAudioNotAvailableCount).toBe(7);
+      });
 
     it('should return a correct count of translations not available in an ' +
-    'exploration', function() {
+      'exploration', function() {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
       var explorationTranslationNotAvailableCount = (
@@ -388,7 +388,7 @@ describe('Translation status service', function() {
 
 
     it('should correctly return an object containing status colors of audio ' +
-    'for all states in the exploration', function() {
+      'for all states in the exploration', function() {
       ttams.activateVoiceoverMode();
       var stateWiseStatusColor = tss.getAllStateStatusColors();
       expect(stateWiseStatusColor.First).toBe(
@@ -409,7 +409,7 @@ describe('Translation status service', function() {
     });
 
     it('should correctly return an object containing status colors of ' +
-    'translations for all states in the exploration', function() {
+      'translations for all states in the exploration', function() {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
       swts.init('Second', ess.getWrittenTranslationsMemento('Second'));
@@ -426,7 +426,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct status color for audio availability in the ' +
-    'active state components', function() {
+      'active state components', function() {
       ttams.activateVoiceoverMode();
       scitats.init('First', ess.getContentIdsToAudioTranslationsMemento(
         'First'));
@@ -461,7 +461,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct status color for translations availability in ' +
-    'the active state components', function() {
+      'the active state components', function() {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
 
@@ -484,14 +484,14 @@ describe('Translation status service', function() {
     });
 
     it('should correctly return whether active state component audio needs ' +
-    'update', function() {
+      'update', function() {
       ttams.activateVoiceoverMode();
       scitats.init('First', ess.getContentIdsToAudioTranslationsMemento(
         'First'));
       var activeStateComponentNeedsUpdateStatus = tss
         .getActiveStateComponentNeedsUpdateStatus('feedback');
-      // To check that initially the state component "feedback" does not
-      // contain audio that needs update.
+        // To check that initially the state component "feedback" does not
+        // contain audio that needs update.
       expect(activeStateComponentNeedsUpdateStatus).toBe(false);
       var value = scitats.displayed;
       // To test changes after changing "needs update" status of an audio.
@@ -506,7 +506,7 @@ describe('Translation status service', function() {
     });
 
     it('should correctly return whether active state component translation ' +
-    'needs update', function() {
+      'needs update', function() {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
 
@@ -523,7 +523,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct audio availability status color of a contentId ' +
-    'of active state', function() {
+      'of active state', function() {
       ttams.activateVoiceoverMode();
       scitats.init('First', ess.getContentIdsToAudioTranslationsMemento(
         'First'));
@@ -561,7 +561,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct translation availability status color of a ' +
-    'contentId of active state', function() {
+      'contentId of active state', function() {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
 
@@ -595,7 +595,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct needs update status of voice-over of active ' +
-    'state contentId', function() {
+      'state contentId', function() {
       ttams.activateVoiceoverMode();
       scitats.init(
         'First', ess.getContentIdsToAudioTranslationsMemento('First'));
@@ -616,7 +616,7 @@ describe('Translation status service', function() {
     });
 
     it('should return correct needs update status of translation of active ' +
-    'state contentId', function() {
+      'state contentId', function() {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
       swts.init('First', ess.getWrittenTranslationsMemento('First'));
