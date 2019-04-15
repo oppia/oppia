@@ -97,6 +97,8 @@ oppia.factory('WrittenTranslationsObjectFactory', [
         throw Error('Unable to find the given language code.');
       }
       writtenTranslations[languageCode].setHtml(html);
+      // Marking translation updated.
+      writtenTranslations[languageCode].needsUpdate = false;
     };
 
     WrittenTranslations.prototype.toggleNeedsUpdateAttribute = (
