@@ -24,29 +24,23 @@ oppia.factory('UserService', [
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
     var userInfo = null;
-    var isUserLoggedIn = function (){
-      var currentUrl = $window.location.href;
-      if(currentUrl.includes('signup')){
-        return Promise.resolve(false);
-      }
-      return $http.get('/userisloggedinhandler').then(function(response){
-          return response.data.user_is_logged_in;
-      });
-    };
 
     var getUserInfoAsync = function() {
-      return this.isUserLoggedIn().then(function(userIsLoggedIn){
-        if (userIsLoggedIn) {
-          if (userInfo) {
-            return $q.resolve(userInfo);
-          }
-          return $http.get(
-            '/userinfohandler'
-          ).then(function(response) {
-            userInfo =
-              UserInfoObjectFactory.createFromBackendDict(response.data);
-            return userInfo;
-          });
+      var currentUrl = $window.location.href;
+      if (currentUrl.includes('signup')) {
+        return $q.resolve(UserInfoObjectFactory.createDefault());
+      }
+      if (userInfo) {
+        return $q.resolve(userInfo);
+      }
+      return $http.get(
+        '/userinfohandler'
+      ).then(function(response) {
+        // console.log(response.data);
+        if (response.data.user_is_logged_in) {
+          userInfo =
+            UserInfoObjectFactory.createFromBackendDict(response.data);
+          return $q.resolve(userInfo);
         } else {
           return $q.resolve(UserInfoObjectFactory.createDefault());
         }
@@ -58,13 +52,14 @@ oppia.factory('UserService', [
         var profilePictureDataUrl = (
           UrlInterpolationService.getStaticImageUrl(
             DEFAULT_PROFILE_IMAGE_PATH));
-        return this.isUserLoggedIn().then(function(userIsLoggedIn){
-          if (userIsLoggedIn) {
+        return getUserInfoAsync().then(function(userInfo) {
+          if (userInfo.isLoggedIn()) {
             return $http.get(
               '/preferenceshandler/profile_picture'
             ).then(function(response) {
               if (response.data.profile_picture_data_url) {
-                profilePictureDataUrl = response.data.profile_picture_data_url;
+                profilePictureDataUrl =
+                  response.data.profile_picture_data_url;
               }
               return profilePictureDataUrl;
             });
@@ -89,8 +84,7 @@ oppia.factory('UserService', [
           }
         );
       },
-      getUserInfoAsync: getUserInfoAsync,
-      isUserLoggedIn: isUserLoggedIn
+      getUserInfoAsync: getUserInfoAsync
     };
   }
 ]);
