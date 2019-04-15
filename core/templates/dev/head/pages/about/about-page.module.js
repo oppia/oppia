@@ -17,4 +17,4 @@
  */
 
 angular.module('aboutPageModule', []);
-console.log("RAN! :) ");
+//console.log("RAN! :) ");
