@@ -32,8 +32,8 @@ oppia.directive('audioTranslationBar', [
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
           scope.dropAreaIsAccessible = GLOBALS.can_translate;
-          UserService.isUserLoggedIn().then(function(response){
-            scope.userIsGuest = !response;
+          UserService.getUserInfoAsync().then(function(userInfo){
+            scope.userIsGuest = !userInfo.isLoggedIn();
           });
           scope.$digest();
           return false;
