@@ -18,9 +18,9 @@
  */
 
 oppia.factory('RecordedVoiceoversObjectFactory', [
-  'LanguageUtilService', 'VoiceoverObjectFactory', 'COMPONENT_NAME_FEEDBACK',
+  'VoiceoverObjectFactory', 'COMPONENT_NAME_FEEDBACK',
   function(
-      LanguageUtilService, VoiceoverObjectFactory, COMPONENT_NAME_FEEDBACK) {
+    VoiceoverObjectFactory, COMPONENT_NAME_FEEDBACK) {
     var RecordedVoiceovers = function(voiceoversMapping) {
       this.voiceoversMapping = voiceoversMapping;
     };
@@ -47,7 +47,8 @@ oppia.factory('RecordedVoiceoversObjectFactory', [
       }
     };
 
-    RecordedVoiceovers.prototype.getVoiceoverLanguageCodes = function(contentId) {
+    RecordedVoiceovers.prototype.getVoiceoverLanguageCodes = function(
+        contentId) {
       return Object.keys(this.voiceoversMapping[contentId]);
     };
 
