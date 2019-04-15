@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the state editor directive.
+ * @fileoverview A data service that stores the current interaction hints.
  */
 
-angular.module('stateEditorModule', ['stateSolutionEditorModule',
-  'stateResponsesModule', 'stateInteractionEditorModule',
-  'stateHintsEditorModule', 'stateContentEditorModule']);
+oppia.factory('StateHintsService', [
+  'StatePropertyService', function(StatePropertyService) {
+    var child = Object.create(StatePropertyService);
+    child.setterMethodKey = 'saveHints';
+    return child;
+  }
+]);

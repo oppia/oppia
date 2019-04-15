@@ -16,9 +16,7 @@
  * @fileoverview Directive for the interaction editor section in the state
  * editor.
  */
-
-angular.module('stateInteractionEditorModule').directive(
-  'stateInteractionEditor', [
+oppia.directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -37,8 +35,7 @@ angular.module('stateInteractionEditorModule').directive(
         recomputeGraph: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor/state-interaction-editor/' +
-        'state-interaction-editor.directive.html'),
+        '/pages/state_editor/state_interaction_editor_directive.html'),
       controller: [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
         'AlertsService', 'HtmlEscaperService', 'StateEditorService',

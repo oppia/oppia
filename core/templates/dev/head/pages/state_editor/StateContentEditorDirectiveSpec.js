@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the state content editor directive.
  */
 
-fdescribe('State content editor directive', function() {
+describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, citat, scitat;
   var mockExplorationData;
 
@@ -33,8 +33,6 @@ fdescribe('State content editor directive', function() {
 
   beforeEach(module('directiveTemplates'));
   beforeEach(function() {
-    module('stateContentEditorModule');
-    module('stateEditorModule');
     module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS);
 
     mockExplorationData = {
@@ -222,40 +220,18 @@ fdescribe('State content editor directive', function() {
     outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
     outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired = (
       jasmine.createSpy(''));
-    var elem1 = angular.element(
-    '<state-editor on-save-state-content="saveStateContent"' +
-    'on-save-interaction-customization-args="saveInteractionCustomizationArgs"' +
-    'on-save-interaction-id="saveInteractionId"' +
-    'on-save-interaction-default-outcome="saveInteractionDefaultOutcome"' +
-    'on-save-interaction-answer-groups="saveInteractionAnswerGroups"' +
-    'on-save-solution="saveSolution"' +
-    'on-save-hints="saveHints"' +
-    'recompute-graph="recomputeGraph"' +
-    'show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired"' +
-    'state-content-placeholder="getStateContentPlaceholder()"' +
-    'navigate-to-state="navigateToState"' +
-    'add-state="addState"' +
-    'refresh-warnings="refreshWarnings"' +
-    'interaction-is-shown="interactionIsShown">' +
-'</state-editor>');
-var compiledElem1 = $compile(elem1)(outerScope);
-outerScope.$digest();
-console.log(compiledElem1)
-ctrlScope1 = compiledElem1[0].getControllerScope();
     var elem = angular.element(
       '<state-content-editor ' +
       'on-save-state-content="saveStateContent" ' +
       'show-mark-all-audio-as-needing-update-modal-if-required=' +
       '"showMarkAllAudioAsNeedingUpdateModalIfRequired">' +
       '</state-content-editor>');
-    var compiledElem = $compile(elem)(ctrlScope1);
-    ctrlScope1.$digest();
-    console.log(compiledElem);
-    
+    var compiledElem = $compile(elem)(outerScope);
+    outerScope.$digest();
     ctrlScope = compiledElem[0].getControllerScope();
   }));
 
-  fit('should start with the content editor not being open', function() {
+  it('should start with the content editor not being open', function() {
     expect(ctrlScope.contentEditorIsOpen).toBe(false);
   });
 
