@@ -689,8 +689,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {
-                    self.TRANSLATION_LANGUAGE_CODE: state_domain.Voiceover(
-                        'filename.mp3', 20, False)
+                    self.TRANSLATION_LANGUAGE_CODE: {
+                        'filename': 'filename3.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False
+                    }
                 },
                 'default_outcome': {}
             }
