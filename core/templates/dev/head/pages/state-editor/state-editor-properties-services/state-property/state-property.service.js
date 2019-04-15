@@ -16,7 +16,7 @@
  * @fileoverview Standalone services for the general state editor page.
  */
 
-oppia.factory('StatePropertyService', [
+angular.module('stateEditorModule').factory('StatePropertyService', [
   '$log', 'AlertsService',
   function($log, AlertsService) {
     // Public base API for data services corresponding to state properties

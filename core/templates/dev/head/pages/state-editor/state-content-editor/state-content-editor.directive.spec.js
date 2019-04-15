@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the state content editor directive.
  */
 
-describe('State content editor directive', function() {
+fdescribe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, citat, scitat;
   var mockExplorationData;
 
@@ -34,6 +34,7 @@ describe('State content editor directive', function() {
   beforeEach(module('directiveTemplates'));
   beforeEach(function() {
     module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS);
+    module('stateContentEditorModule');
 
     mockExplorationData = {
       explorationId: 0,
@@ -231,7 +232,7 @@ describe('State content editor directive', function() {
     ctrlScope = compiledElem[0].getControllerScope();
   }));
 
-  it('should start with the content editor not being open', function() {
+  fit('should start with the content editor not being open', function() {
     expect(ctrlScope.contentEditorIsOpen).toBe(false);
   });
 
