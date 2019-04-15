@@ -2806,7 +2806,8 @@ class Exploration(object):
     def _convert_v32_dict_to_v33_dict(cls, exploration_dict):
         """Converts a v32 exploration dict into a v33 exploration dict.
 
-        Adds content_tranlations in state for adding text translation.
+        Replaces content_ids_to_audio_translations with recorded_voiceovers in
+        each state of the exploration.
         """
         exploration_dict['schema_version'] = 33
 

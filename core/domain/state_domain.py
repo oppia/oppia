@@ -635,6 +635,7 @@ class AudioTranslation(object):
 
     def to_dict(self):
         """Returns a dict representing this AudioTranslation domain object.
+
         Returns:
             dict. A dict, mapping all fields of AudioTranslation instance.
         """
@@ -647,9 +648,11 @@ class AudioTranslation(object):
     @classmethod
     def from_dict(cls, audio_translation_dict):
         """Return a AudioTranslation domain object from a dict.
+
         Args:
             audio_translation_dict: dict. The dict representation of
                 AudioTranslation object.
+
         Returns:
             AudioTranslation. The corresponding AudioTranslation domain object.
         """
@@ -660,6 +663,7 @@ class AudioTranslation(object):
 
     def __init__(self, filename, file_size_bytes, needs_update):
         """Initializes a AudioTranslation domain object.
+
         Args:
             filename: str. The corresponding audio file path.
             file_size_bytes: int. The file size, in bytes. Used to display
@@ -678,6 +682,7 @@ class AudioTranslation(object):
 
     def validate(self):
         """Validates properties of the AudioTranslation.
+
         Raises:
             ValidationError: One or more attributes of the AudioTranslation are
             invalid.
