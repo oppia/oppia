@@ -36,7 +36,6 @@ oppia.factory('UserService', [
       return $http.get(
         '/userinfohandler'
       ).then(function(response) {
-        // console.log(response.data);
         if (response.data.user_is_logged_in) {
           userInfo =
             UserInfoObjectFactory.createFromBackendDict(response.data);
