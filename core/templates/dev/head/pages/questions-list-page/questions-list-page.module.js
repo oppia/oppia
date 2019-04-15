@@ -16,4 +16,4 @@
  * @fileoverview Module for the questions list.
  */
 
-angular.module('questionListPageModule', []);
+angular.module('questionsListPageModule', []);
