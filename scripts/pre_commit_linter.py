@@ -60,7 +60,6 @@ import ast
 from builtins import object
 from builtins import range
 from builtins import str
-from builtins import zip
 import contextlib
 import fnmatch
 import glob
@@ -79,7 +78,6 @@ import python_utils  # pylint: disable=relative-import
 
 # pylint: disable=wrong-import-order
 from future import standard_library
-from past.utils import old_div
 
 # Pylint has issues with the import order of argparse.
 
