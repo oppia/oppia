@@ -34,7 +34,8 @@ class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(self.VOICE_ARTIST_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
 
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
@@ -70,7 +71,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         response = self.get_html_response('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
 
-    def test_transator_can_save_valid_change_list(self):
+    def test_voice_artist_can_save_valid_change_list(self):
         state_name = feconf.DEFAULT_INIT_STATE_NAME
         response = self.put_json(
             '/createhandler/voiceover/%s' % self.EXP_ID, {
