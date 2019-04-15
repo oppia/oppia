@@ -581,7 +581,7 @@ def _get_all_filepaths(input_path, input_filenames):
                 invalid_filepaths.append(filename)
         if invalid_filepaths:
             print('The following file(s) do not exist: %s\n'
-                   'Exiting.' % invalid_filepaths)
+                  'Exiting.' % invalid_filepaths)
             sys.exit(1)
         all_filepaths = valid_filepaths
     else:
@@ -699,7 +699,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
                 if not expected_value in rendered_text:
                     self.failed = True
-                    print (
+                    print(
                         '%s --> The value %s of attribute '
                         '%s for the tag %s on line %s should '
                         'be enclosed within double quotes.' % (
@@ -721,7 +721,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 continue
             if indentation_of_first_attribute != leading_spaces_count:
                 line_num_of_error = line_number + line_num
-                print (
+                print(
                     '%s --> Attribute for tag %s on line '
                     '%s should align with the leftmost '
                     'attribute on line %s ' % (
@@ -749,7 +749,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
         if leading_spaces_count != last_starttag_col_num and (
                 last_starttag_line_num != line_number):
-            print (
+            print(
                 '%s --> Indentation for end tag %s on line '
                 '%s does not match the indentation of the '
                 'start tag %s on line %s ' % (
@@ -1226,7 +1226,7 @@ class LintChecksManager(object):
                                         if scope_value.type == 'Literal' and (
                                                 scope_value.value):
                                             failed = True
-                                            print (
+                                            print(
                                                 'Please ensure that %s '
                                                 'directive in %s file '
                                                 'does not have scope set to '
@@ -1239,7 +1239,7 @@ class LintChecksManager(object):
                                             # scope: {} else report the error
                                             # message.
                                             failed = True
-                                            print (
+                                            print(
                                                 'Please ensure that %s '
                                                 'directive in %s file has a '
                                                 'scope: {}.' % (
@@ -1296,7 +1296,7 @@ class LintChecksManager(object):
                     # Check if the number of components in each file exceeds
                     # one.
                     if component_num > 1:
-                        print (
+                        print(
                             '%s -> Please ensure that there is exactly one '
                             'component in the file.' % (filepath))
                         failed = True
@@ -1314,7 +1314,7 @@ class LintChecksManager(object):
                     if component == 'directive' or component == 'filter':
                         if (component_name[0].swapcase() + component_name[1:] +
                                 component.capitalize() != (exact_filename)):
-                            print (
+                            print(
                                 '%s -> Please ensure that the %s name '
                                 'matches the filename'
                                 % (filepath, component))
@@ -1325,7 +1325,7 @@ class LintChecksManager(object):
                     # filename should be xxx.js.
                     else:
                         if component_name != exact_filename:
-                            print (
+                            print(
                                 '%s -> Please ensure that the %s name '
                                 'matches the filename'
                                 % (filepath, component))
@@ -1410,7 +1410,7 @@ class LintChecksManager(object):
                             dollar_imports + regular_imports + constant_imports)
                         if sorted_imports != function_args:
                             failed = True
-                            print (
+                            print(
                                 'Please ensure that in %s in file %s, the '
                                 'injected dependencies should be in the '
                                 'following manner: dollar imports, regular '
@@ -1419,7 +1419,7 @@ class LintChecksManager(object):
                                 % (property_value, filepath))
                         if sorted_imports != literal_args:
                             failed = True
-                            print (
+                            print(
                                 'Please ensure that in %s in file %s, the '
                                 'stringfied dependencies should be in the '
                                 'following manner: dollar imports, regular '
@@ -1478,7 +1478,7 @@ class LintChecksManager(object):
                         function_parameters.strip().replace(' ', ''))
                     if stringfied_dependencies != function_parameters:
                         failed = True
-                        print (
+                        print(
                             'Please ensure that in file %s the line breaks '
                             'pattern between the dependencies mentioned as '
                             'strings:\n[%s]\nand the dependencies mentioned '
@@ -1537,7 +1537,7 @@ class LintChecksManager(object):
                     if not directive_filepath.endswith('_directive.html'):
                         failed = True
                         total_error_count += 1
-                        print (
+                        print(
                             '%s --> Please ensure that this file ends'
                             'with _directive.html.' % directive_filepath)
                         print('')
@@ -2052,7 +2052,7 @@ class LintChecksManager(object):
 
                 if not has_copyright_notice:
                     failed = True
-                    print (
+                    print(
                         '%s --> Please add a proper copyright notice to this '
                         'file.' % (filepath))
                     print('')
@@ -2095,8 +2095,8 @@ class LintChecksManager(object):
                 stripped_line = line.strip()
                 if stripped_line and stripped_line[0] != '#':
                     if '@' not in line:
-                        print ('%s --> Pattern on line %s doesn\'t have'
-                               'codeowner' % (codeowner_filepath, line_num + 1))
+                        print('%s --> Pattern on line %s doesn\'t have'
+                              'codeowner' % (codeowner_filepath, line_num + 1))
                         failed = True
                     else:
                         # Extract the file pattern from the line.
@@ -2113,9 +2113,9 @@ class LintChecksManager(object):
                         # the '/' character. Therefore the leading '/' has to
                         # be removed for glob patterns to match correctly.
                         if not glob.glob(line_in_concern.replace('/', '', 1)):
-                            print ('%s --> Pattern on line %s doesn\'t match '
-                                   'any file or directory' % (
-                                       codeowner_filepath, line_num + 1))
+                            print('%s --> Pattern on line %s doesn\'t match '
+                                  'any file or directory' % (
+                                      codeowner_filepath, line_num + 1))
                             failed = True
                         # Checks if the path is the full path relative to the
                         # root oppia directory. Patterns starting with '/' are
@@ -2124,17 +2124,17 @@ class LintChecksManager(object):
                         if (not line_in_concern.startswith('/') and
                                 not './' +
                                 line_in_concern in CODEOWNER_FILE_PATHS):
-                            print ('%s --> Pattern on line %s is invalid. Use '
-                                   'full path relative to the root directory'
-                                   % (codeowner_filepath, line_num + 1))
+                            print('%s --> Pattern on line %s is invalid. Use '
+                                  'full path relative to the root directory'
+                                  % (codeowner_filepath, line_num + 1))
                             failed = True
                         # The double asterisks pattern is supported by the
                         # CODEOWNERS syntax but not the glob in Python 2.
                         # The following condition checks this.
                         if '**' in line_in_concern:
-                            print ('%s --> Pattern on line %s is invalid. '
-                                   '\'**\' wildcard not allowed' % (
-                                       codeowner_filepath, line_num + 1))
+                            print('%s --> Pattern on line %s is invalid. '
+                                  '\'**\' wildcard not allowed' % (
+                                      codeowner_filepath, line_num + 1))
                             failed = True
                         # The following list is being populated with the
                         # paths in the CODEOWNERS file with the removal of the
@@ -2196,8 +2196,8 @@ class LintChecksManager(object):
                                 match = True
                                 break
                         if not match and self.verbose_mode_enabled:
-                            print ('WARNING! %s/%s is not covered under '
-                                   'CODEOWNERS' % (root, file_name))
+                            print('WARNING! %s/%s is not covered under '
+                                  'CODEOWNERS' % (root, file_name))
 
             if failed:
                 summary_message = '%s   CODEOWNERS file check failed' % (
