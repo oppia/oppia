@@ -34,7 +34,8 @@ class LearnerDashboardPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.render_template(
-            'pages/learner-dashboard-page/learner-dashboard-page.mainpage.html')
+            'pages/learner-dashboard-page/learner-dashboard-page.mainpage.html'
+            )
 
 
 class LearnerDashboardHandler(base.BaseHandler):
