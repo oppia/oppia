@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the about page.
+ * @fileoverview Module for the about page.
  */
 
 angular.module('aboutPageModule', []);
-
+console.log("RAN! :) ");
