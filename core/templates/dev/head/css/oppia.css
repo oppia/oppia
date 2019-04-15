@@ -3068,6 +3068,7 @@ md-card.preview-conversation-skin-supplemental-card {
   transition: all 300ms;
   -webkit-transition: all 300ms;
   width: 100%;
+  overflow: auto; 
 }
 
 .oppia-activity-summary-tile-mobile .title-section {
