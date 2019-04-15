@@ -16,8 +16,6 @@
  * @fileoverview Controllers for the about page.
  */
 
-angular.module('aboutPageModule', []);
-
 angular.module('aboutPageModule').controller('About', [
   '$scope', 'UrlInterpolationService',
   function($scope, UrlInterpolationService) {
