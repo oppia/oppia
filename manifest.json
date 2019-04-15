@@ -10,9 +10,9 @@
         "targetDirPrefix": "backports.functools_lru_cache-"
       },
       "bleach": {
-        "version": "1.2.2",
+        "version": "3.1.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/jsocol/bleach/archive/v1.2.2.zip",
+        "url": "https://github.com/jsocol/bleach/archive/v3.1.0.zip",
         "rootDirPrefix": "bleach-",
         "targetDirPrefix": "bleach-"
       },
@@ -49,9 +49,9 @@
         "targetDirPrefix": "graphy-"
       },
       "html5Lib": {
-        "version": "0.95",
+        "version": "1.0.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/html5lib/html5lib-python/archive/0.95.zip",
+        "url": "https://github.com/html5lib/html5lib-python/archive/1.0.1.zip",
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
@@ -70,6 +70,30 @@
         "tarRootDirPrefix": "simplejson-",
         "rootDirPrefix": "simplejson-",
         "targetDirPrefix": "simplejson-"
+      }, 
+      "six": {
+        "version": "1.12.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/dd/bf/4138e7bfb757de47d1f4b6994648ec67a51efe58fa907c1e11e350cddfca/six-1.12.0.tar.gz",
+        "tarRootDirPrefix": "six-",
+        "rootDirPrefix": "six-",
+        "targetDirPrefix": "six-"
+      },
+      "webencodings": {
+        "version": "0.5.1",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/0b/02/ae6ceac1baeda530866a85075641cec12989bd8d31af6d5ab4a3e8c92f47/webencodings-0.5.1.tar.gz",
+        "tarRootDirPrefix": "webencodings-",
+        "rootDirPrefix": "webencodings-",
+        "targetDirPrefix": "webencodings-"
+      },
+      "callbacks": {
+        "version": "0.3.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/eb/15/c71150189ea1cfd04a5853a40e2e074ec777755bd3924980fe51e5c6dd44/callbacks-0.3.0.tar.gz",
+        "tarRootDirPrefix": "callbacks-",
+        "rootDirPrefix": "callbacks-",
+        "targetDirPrefix": "callbacks-"
       },
       "beautifulSoup": {
         "version": "4.7.1",

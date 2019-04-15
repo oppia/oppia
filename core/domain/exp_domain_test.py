@@ -333,7 +333,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         outcome.dest = destination
 
-        outcome.feedback = state_domain.SubtitledHtml('feedback_1', {})
+        outcome.feedback = state_domain.SubtitledHtml('feedback_1', '')
         exploration.validate()
 
         outcome.labelled_as_correct = 'hello'
@@ -590,7 +590,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         hints_list.append({
             'hint_content': {
                 'content_id': 'hint_1',
-                'html': {}
+                'html': ''
             }
         })
         init_state.update_interaction_hints(hints_list)
@@ -611,7 +611,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         hints_list.append({
             'hint_content': {
                 'content_id': 'hint_1',
-                'html': {}
+                'html': ''
             }
         })
         init_state.update_interaction_hints(hints_list)
