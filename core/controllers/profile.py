@@ -374,7 +374,7 @@ class UserInfoHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.require_user_id_else_redirect_to_homepage
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         if self.user_id:
