@@ -22,8 +22,15 @@ import collections
 import os
 import re
 import subprocess
+import sys
 
-import github
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.5')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
 GIT_CMD_GET_TAGS = 'git tag'
@@ -144,7 +151,9 @@ def _extract_pr_numbers(logs):
     pr_numbers = PR_NUMBER_REGEX.findall(
         ' '.join([log.message for log in logs]))
     # Delete duplicates.
-    return list(set(pr_numbers))
+    pr_numbers = list(set(pr_numbers))
+    pr_numbers.sort(reverse=True)
+    return pr_numbers
 
 
 def get_prs_from_pr_numbers(pr_numbers, personal_access_token):

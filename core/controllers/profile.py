@@ -276,6 +276,7 @@ class SignupHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         self.render_json({
+            'can_send_emails': feconf.CAN_SEND_EMAILS,
             'has_agreed_to_latest_terms': (
                 user_settings.last_agreed_to_terms and
                 user_settings.last_agreed_to_terms >=

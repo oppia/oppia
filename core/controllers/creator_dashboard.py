@@ -140,8 +140,6 @@ class CreatorDashboardPage(base.BaseHandler):
                 DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'ALLOWED_INTERACTION_CATEGORIES': (
-                feconf.ALLOWED_INTERACTION_CATEGORIES),
             'additional_angular_modules': additional_angular_modules,
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),

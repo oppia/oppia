@@ -83,7 +83,7 @@ oppia.factory('LanguageUtilService', [
         return audioLanguagesCount;
       },
       getAllAudioLanguageCodes: function() {
-        return allAudioLanguageCodes;
+        return angular.copy(allAudioLanguageCodes);
       },
       getAudioLanguageDescription: function(audioLanguageCode) {
         return supportedAudioLanguages[audioLanguageCode].description;
