@@ -278,14 +278,14 @@
         }
       },
       "fontAwesome": {
-        "version": "4.7.0",
+        "version": "5.8.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
+        "url": "https://github.com/FortAwesome/Font-Awesome/archive/5.8.1.zip",
         "rootDirPrefix": "Font-Awesome-",
         "targetDirPrefix": "font-awesome-",
         "bundle": {
-          "css": ["css/font-awesome.css"],
-          "fontsPath": "fonts"
+          "css": ["css/all.css"],
+          "fontsPath": "webfonts"
         }
       },
       "angularUiLeaflet": {
