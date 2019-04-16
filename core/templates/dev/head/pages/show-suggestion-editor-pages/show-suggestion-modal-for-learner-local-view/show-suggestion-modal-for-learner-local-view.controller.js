@@ -18,41 +18,41 @@
 
 angular.module('showSuggestionModalForLocalViewModule').controller(
   'ShowSuggestionModalForLearnerLocalView', [
-  '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
-  'PlayerPositionService', 'PlayerTranscriptService',
-  'SuggestionModalService',
-  function(
-      $scope, $timeout, $uibModalInstance, ExplorationEngineService,
-      PlayerPositionService, PlayerTranscriptService,
-      SuggestionModalService) {
-    var stateName = PlayerPositionService.getCurrentStateName();
-    var displayedCard = PlayerTranscriptService.getCard(
-      PlayerPositionService.getDisplayedCardIndex());
-    $scope.originalHtml = displayedCard.getContentHtml();
-    $scope.description = '';
-    // ng-model needs to bind to a property of an object on
-    // the scope (the property cannot sit directly on the scope)
-    // Reference https://stackoverflow.com/q/12618342
-    $scope.suggestionData = {suggestionHtml: $scope.originalHtml};
-    $scope.showEditor = false;
-    // Rte initially displays content unrendered for a split second
-    $timeout(function() {
-      $scope.showEditor = true;
-    }, 500);
+    '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
+    'PlayerPositionService', 'PlayerTranscriptService',
+    'SuggestionModalService',
+    function(
+        $scope, $timeout, $uibModalInstance, ExplorationEngineService,
+        PlayerPositionService, PlayerTranscriptService,
+        SuggestionModalService) {
+      var stateName = PlayerPositionService.getCurrentStateName();
+      var displayedCard = PlayerTranscriptService.getCard(
+        PlayerPositionService.getDisplayedCardIndex());
+      $scope.originalHtml = displayedCard.getContentHtml();
+      $scope.description = '';
+      // ng-model needs to bind to a property of an object on
+      // the scope (the property cannot sit directly on the scope)
+      // Reference https://stackoverflow.com/q/12618342
+      $scope.suggestionData = {suggestionHtml: $scope.originalHtml};
+      $scope.showEditor = false;
+      // Rte initially displays content unrendered for a split second
+      $timeout(function() {
+        $scope.showEditor = true;
+      }, 500);
 
-    $scope.cancelSuggestion = function() {
-      SuggestionModalService.cancelSuggestion($uibModalInstance);
-    };
-    $scope.submitSuggestion = function() {
-      var data = {
-        target_id: ExplorationEngineService.getExplorationId(),
-        version: ExplorationEngineService.getExplorationVersion(),
-        stateName: stateName,
-        suggestion_type: 'edit_exploration_state_content',
-        target_type: 'exploration',
-        description: $scope.description,
-        suggestionHtml: $scope.suggestionData.suggestionHtml,
+      $scope.cancelSuggestion = function() {
+        SuggestionModalService.cancelSuggestion($uibModalInstance);
       };
-      $uibModalInstance.close(data);
-    };
-  }]);
+      $scope.submitSuggestion = function() {
+        var data = {
+          target_id: ExplorationEngineService.getExplorationId(),
+          version: ExplorationEngineService.getExplorationVersion(),
+          stateName: stateName,
+          suggestion_type: 'edit_exploration_state_content',
+          target_type: 'exploration',
+          description: $scope.description,
+          suggestionHtml: $scope.suggestionData.suggestionHtml,
+        };
+        $uibModalInstance.close(data);
+      };
+    }]);

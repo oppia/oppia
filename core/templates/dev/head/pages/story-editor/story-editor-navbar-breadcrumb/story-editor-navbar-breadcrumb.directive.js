@@ -16,56 +16,56 @@
  * @fileoverview Controller for the navbar breadcrumb of the story editor.
  */
 
- angular.module('storyEditorNavbarBreadcrumbModule').directive(
+angular.module('storyEditorNavbarBreadcrumbModule').directive(
   'storyEditorNavbarBreadcrumb', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/story-editor/story-editor-navbar-breadcrumb/' +
-        'story-editor-navbar-breadcrumb.directive.html'),
-      controller: [
-        '$scope', '$uibModal', '$window', 'UrlService',
-        'UrlInterpolationService', 'UndoRedoService', 'StoryEditorStateService',
-        'EVENT_STORY_INITIALIZED',
-        function(
-            $scope, $uibModal, $window, UrlService,
-            UrlInterpolationService, UndoRedoService, StoryEditorStateService,
-            EVENT_STORY_INITIALIZED
-        ) {
-          $scope.story = StoryEditorStateService.getStory();
-          var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
-          var topicId = UrlService.getTopicIdFromUrl();
-          $scope.$on(EVENT_STORY_INITIALIZED, function() {
-            $scope.topicName = StoryEditorStateService.getTopicName();
-          });
-          $scope.returnToTopicEditorPage = function() {
-            if (UndoRedoService.getChangeCount() > 0) {
-              var modalInstance = $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/story-editor/story-editor-templates/' +
-                  'save-pending-changes-modal.template.html'),
-                backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
-              });
-            } else {
-              $window.open(
-                UrlInterpolationService.interpolateUrl(
-                  TOPIC_EDITOR_URL_TEMPLATE, {
-                    topicId: topicId
-                  }
-                ), '_self');
-            }
-          };
-        }
-      ]
-    };
-  }]);
+    'UrlInterpolationService', function(UrlInterpolationService) {
+      return {
+        restrict: 'E',
+        scope: {},
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/story-editor/story-editor-navbar-breadcrumb/' +
+          'story-editor-navbar-breadcrumb.directive.html'),
+        controller: [
+          '$scope', '$uibModal', '$window', 'UrlService',
+          'UrlInterpolationService', 'UndoRedoService',
+          'StoryEditorStateService', 'EVENT_STORY_INITIALIZED',
+          function(
+              $scope, $uibModal, $window, UrlService,
+              UrlInterpolationService, UndoRedoService,
+              StoryEditorStateService, EVENT_STORY_INITIALIZED
+          ) {
+            $scope.story = StoryEditorStateService.getStory();
+            var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
+            var topicId = UrlService.getTopicIdFromUrl();
+            $scope.$on(EVENT_STORY_INITIALIZED, function() {
+              $scope.topicName = StoryEditorStateService.getTopicName();
+            });
+            $scope.returnToTopicEditorPage = function() {
+              if (UndoRedoService.getChangeCount() > 0) {
+                var modalInstance = $uibModal.open({
+                  templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                    '/pages/story-editor/story-editor-templates/' +
+                    'save-pending-changes-modal.template.html'),
+                  backdrop: true,
+                  controller: [
+                    '$scope', '$uibModalInstance',
+                    function($scope, $uibModalInstance) {
+                      $scope.cancel = function() {
+                        $uibModalInstance.dismiss('cancel');
+                      };
+                    }
+                  ]
+                });
+              } else {
+                $window.open(
+                  UrlInterpolationService.interpolateUrl(
+                    TOPIC_EDITOR_URL_TEMPLATE, {
+                      topicId: topicId
+                    }
+                  ), '_self');
+              }
+            };
+          }
+        ]
+      };
+    }]);

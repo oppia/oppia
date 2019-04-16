@@ -16,4 +16,6 @@
  * @fileoverview Module for the main tab of the skill editor.
  */
 
-angular.module('skillEditorMainTabModule', ['skillConceptCardEditorModule', 'skillDescriptionEditorModule', 'skillMisconceptionsEditorModule']);
+angular.module('skillEditorMainTabModule', [
+  'skillConceptCardEditorModule', 'skillDescriptionEditorModule',
+  'skillMisconceptionsEditorModule']);

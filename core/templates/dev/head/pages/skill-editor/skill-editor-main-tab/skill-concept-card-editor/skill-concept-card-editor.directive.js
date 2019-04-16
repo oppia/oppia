@@ -16,182 +16,186 @@
  * @fileoverview Directive for the concept card editor.
  */
 
-angular.module('skillConceptCardEditorModule').directive('skillConceptCardEditor', [
-  'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
-  'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
-  'COMPONENT_NAME_EXPLANATION', 'COMPONENT_NAME_WORKED_EXAMPLE',
-  function(
-      GenerateContentIdService, SkillEditorStateService, SkillUpdateService,
-      SubtitledHtmlObjectFactory, UrlInterpolationService,
-      COMPONENT_NAME_EXPLANATION, COMPONENT_NAME_WORKED_EXAMPLE) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor/skill-editor-editor-tab' +
-        '/skill-concept-card-editor/skill-concept-card-editor.directive.html'),
-      controller: [
-        '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
-        function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {
-          $scope.skill = SkillEditorStateService.getSkill();
-          $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/drag_dots.png');
-          $scope.HTML_SCHEMA = {
-            type: 'html'
-          };
-
-          var initBindableFieldsDict = function() {
-            $scope.bindableFieldsDict = {
-              displayedConceptCardExplanation:
-                $scope.skill.getConceptCard().getExplanation().getHtml(),
-              displayedWorkedExamples:
-                $scope.skill.getConceptCard().getWorkedExamples()
+angular.module('skillConceptCardEditorModule').directive(
+  'skillConceptCardEditor', [
+    'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
+    'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
+    'COMPONENT_NAME_EXPLANATION', 'COMPONENT_NAME_WORKED_EXAMPLE',
+    function(
+        GenerateContentIdService, SkillEditorStateService, SkillUpdateService,
+        SubtitledHtmlObjectFactory, UrlInterpolationService,
+        COMPONENT_NAME_EXPLANATION, COMPONENT_NAME_WORKED_EXAMPLE) {
+      return {
+        restrict: 'E',
+        scope: {},
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/skill-editor/skill-editor-editor-tab' +
+          '/skill-concept-card-editor' +
+          '/skill-concept-card-editor.directive.html'),
+        controller: [
+          '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
+          function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {
+            $scope.skill = SkillEditorStateService.getSkill();
+            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/drag_dots.png');
+            $scope.HTML_SCHEMA = {
+              type: 'html'
             };
-          };
 
-          var explanationMemento = null;
-          var workedExamplesMemento = null;
+            var initBindableFieldsDict = function() {
+              $scope.bindableFieldsDict = {
+                displayedConceptCardExplanation:
+                  $scope.skill.getConceptCard().getExplanation().getHtml(),
+                displayedWorkedExamples:
+                  $scope.skill.getConceptCard().getWorkedExamples()
+              };
+            };
 
-          $scope.isEditable = function() {
-            return true;
-          };
+            var explanationMemento = null;
+            var workedExamplesMemento = null;
 
-          initBindableFieldsDict();
-          $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+            $scope.isEditable = function() {
+              return true;
+            };
+
             initBindableFieldsDict();
-          });
+            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+              initBindableFieldsDict();
+            });
 
-          // When the page is scrolled so that the top of the page is above the
-          // browser viewport, there are some bugs in the positioning of the
-          // helper. This is a bug in jQueryUI that has not been fixed yet.
-          // For more details, see http://stackoverflow.com/q/5791886
-          $scope.WORKED_EXAMPLES_SORTABLE_OPTIONS = {
-            axis: 'y',
-            cursor: 'move',
-            handle: '.oppia-worked-example-sort-handle',
-            items: '.oppia-sortable-worked-example',
-            revert: 100,
-            tolerance: 'pointer',
-            start: function(e, ui) {
-              $scope.activeWorkedExampleIndex = null;
-              ui.placeholder.height(ui.item.height());
-            },
-            stop: function() {
-              var newWorkedExamples =
-                $scope.bindableFieldsDict.displayedWorkedExamples;
-              SkillUpdateService.updateWorkedExamples(
-                $scope.skill, newWorkedExamples);
-            }
-          };
+            // When the page is scrolled so that the top of the page is above
+            // the browser viewport, there are some bugs in the positioning of
+            // the helper. This is a bug in jQueryUI that has not been fixed
+            // yet. For more details, see http://stackoverflow.com/q/5791886
+            $scope.WORKED_EXAMPLES_SORTABLE_OPTIONS = {
+              axis: 'y',
+              cursor: 'move',
+              handle: '.oppia-worked-example-sort-handle',
+              items: '.oppia-sortable-worked-example',
+              revert: 100,
+              tolerance: 'pointer',
+              start: function(e, ui) {
+                $scope.activeWorkedExampleIndex = null;
+                ui.placeholder.height(ui.item.height());
+              },
+              stop: function() {
+                var newWorkedExamples =
+                  $scope.bindableFieldsDict.displayedWorkedExamples;
+                SkillUpdateService.updateWorkedExamples(
+                  $scope.skill, newWorkedExamples);
+              }
+            };
 
-          $scope.changeActiveWorkedExampleIndex = function(idx) {
-            if (idx === $scope.activeWorkedExampleIndex) {
-              $scope.activeWorkedExampleIndex = null;
-            } else {
-              $scope.activeWorkedExampleIndex = idx;
-            }
-          };
+            $scope.changeActiveWorkedExampleIndex = function(idx) {
+              if (idx === $scope.activeWorkedExampleIndex) {
+                $scope.activeWorkedExampleIndex = null;
+              } else {
+                $scope.activeWorkedExampleIndex = idx;
+              }
+            };
 
-          $scope.conceptCardExplanationEditorIsShown = false;
-
-          $scope.openConceptCardExplanationEditor = function() {
-            $scope.conceptCardExplanationEditorIsShown = true;
-            explanationMemento =
-              $scope.bindableFieldsDict.displayedConceptCardExplanation;
-          };
-
-          $scope.closeConceptCardExplanationEditor = function() {
             $scope.conceptCardExplanationEditorIsShown = false;
-            $scope.bindableFieldsDict.displayedConceptCardExplanation =
-              explanationMemento;
-          };
 
-          $scope.saveConceptCardExplanation = function() {
-            $scope.conceptCardExplanationEditorIsShown = false;
-            SkillUpdateService.setConceptCardExplanation(
-              $scope.skill,
-              SubtitledHtmlObjectFactory.createDefault(
-                $scope.bindableFieldsDict.displayedConceptCardExplanation,
-                COMPONENT_NAME_EXPLANATION));
-            explanationMemento = null;
-            $scope.displayedConceptCardExplanation =
-              $scope.skill.getConceptCard().getExplanation().getHtml();
-          };
+            $scope.openConceptCardExplanationEditor = function() {
+              $scope.conceptCardExplanationEditorIsShown = true;
+              explanationMemento =
+                $scope.bindableFieldsDict.displayedConceptCardExplanation;
+            };
 
-          $scope.deleteWorkedExample = function(index, evt) {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                'core/templates/dev/head/pages/skill-editor/' +
-                'skill-editor-templates/delete-worked-example-modal.directive.html'),
-              backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.confirm = function() {
-                    $uibModalInstance.close();
-                  };
+            $scope.closeConceptCardExplanationEditor = function() {
+              $scope.conceptCardExplanationEditorIsShown = false;
+              $scope.bindableFieldsDict.displayedConceptCardExplanation =
+                explanationMemento;
+            };
 
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }]
-            }).result.then(function(result) {
-              SkillUpdateService.deleteWorkedExample($scope.skill, index);
+            $scope.saveConceptCardExplanation = function() {
+              $scope.conceptCardExplanationEditorIsShown = false;
+              SkillUpdateService.setConceptCardExplanation(
+                $scope.skill,
+                SubtitledHtmlObjectFactory.createDefault(
+                  $scope.bindableFieldsDict.displayedConceptCardExplanation,
+                  COMPONENT_NAME_EXPLANATION));
+              explanationMemento = null;
+              $scope.displayedConceptCardExplanation =
+                $scope.skill.getConceptCard().getExplanation().getHtml();
+            };
+
+            $scope.deleteWorkedExample = function(index, evt) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  'core/templates/dev/head/pages/skill-editor/' +
+                  'skill-editor-templates/' +
+                  'delete-worked-example-modal.directive.html'),
+                backdrop: 'static',
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.confirm = function() {
+                      $uibModalInstance.close();
+                    };
+
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }]
+              }).result.then(function(result) {
+                SkillUpdateService.deleteWorkedExample($scope.skill, index);
+                $scope.bindableFieldsDict.displayedWorkedExamples =
+                  $scope.skill.getConceptCard().getWorkedExamples();
+                $scope.activeWorkedExampleIndex = null;
+              });
+            };
+
+            $scope.getWorkedExampleSummary = function(workedExample) {
+              return $filter('formatRtePreview')(workedExample);
+            };
+
+            $scope.openAddWorkedExampleModal = function() {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/skill-editor/skill-editor-templates' +
+                  '/add-worked-example-modal.directive.html'),
+                backdrop: 'static',
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
+                      type: 'html',
+                      ui_config: {}
+                    };
+
+                    $scope.tmpWorkedExampleHtml = '';
+                    $scope.saveWorkedExample = function() {
+                      $uibModalInstance.close({
+                        workedExampleHtml: $scope.tmpWorkedExampleHtml
+                      });
+                    };
+
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              }).result.then(function(result) {
+                SkillUpdateService.addWorkedExample(
+                  $scope.skill, SubtitledHtmlObjectFactory.createDefault(
+                    result.workedExampleHtml,
+                    GenerateContentIdService.getNextId(
+                      $scope.skill.getConceptCard()
+                        .getContentIdsToAudioTranslations().getAllContentId(),
+                      COMPONENT_NAME_WORKED_EXAMPLE)));
+                $scope.bindableFieldsDict.displayedWorkedExamples =
+                  $scope.skill.getConceptCard().getWorkedExamples();
+              });
+            };
+
+            $scope.onWorkedExampleSaved = function() {
               $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
-              $scope.activeWorkedExampleIndex = null;
-            });
-          };
-
-          $scope.getWorkedExampleSummary = function(workedExample) {
-            return $filter('formatRtePreview')(workedExample);
-          };
-
-          $scope.openAddWorkedExampleModal = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor/skill-editor-templates' +
-                '/add-worked-example-modal.directive.html'),
-              backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
-                    type: 'html',
-                    ui_config: {}
-                  };
-
-                  $scope.tmpWorkedExampleHtml = '';
-                  $scope.saveWorkedExample = function() {
-                    $uibModalInstance.close({
-                      workedExampleHtml: $scope.tmpWorkedExampleHtml
-                    });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            }).result.then(function(result) {
-              SkillUpdateService.addWorkedExample(
-                $scope.skill, SubtitledHtmlObjectFactory.createDefault(
-                  result.workedExampleHtml,
-                  GenerateContentIdService.getNextId(
-                    $scope.skill.getConceptCard()
-                      .getContentIdsToAudioTranslations().getAllContentId(),
-                    COMPONENT_NAME_WORKED_EXAMPLE)));
-              $scope.bindableFieldsDict.displayedWorkedExamples =
-                $scope.skill.getConceptCard().getWorkedExamples();
-            });
-          };
-
-          $scope.onWorkedExampleSaved = function() {
-            $scope.bindableFieldsDict.displayedWorkedExamples =
-              $scope.skill.getConceptCard().getWorkedExamples();
-          };
-        }
-      ]
-    };
-  }
-]);
+            };
+          }
+        ]
+      };
+    }
+  ]
+);

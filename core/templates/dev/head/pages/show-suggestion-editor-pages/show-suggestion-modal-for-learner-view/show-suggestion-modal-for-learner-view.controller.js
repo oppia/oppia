@@ -18,15 +18,15 @@
 
 angular.module('showSuggestionModalForLearnerViewModule').controller(
   'ShowSuggestionModalForLearnerView', [
-  '$scope', '$uibModalInstance', 'SuggestionModalService', 'description',
-  'newContent', 'oldContent',
-  function($scope, $uibModalInstance, SuggestionModalService, description,
-      newContent, oldContent) {
-    $scope.newContent = newContent;
-    $scope.oldContent = oldContent;
-    $scope.description = description;
-    $scope.cancel = function() {
-      SuggestionModalService.cancelSuggestion($uibModalInstance);
-    };
-  }
-]);
+    '$scope', '$uibModalInstance', 'SuggestionModalService', 'description',
+    'newContent', 'oldContent',
+    function($scope, $uibModalInstance, SuggestionModalService, description,
+        newContent, oldContent) {
+      $scope.newContent = newContent;
+      $scope.oldContent = oldContent;
+      $scope.description = description;
+      $scope.cancel = function() {
+        SuggestionModalService.cancelSuggestion($uibModalInstance);
+      };
+    }
+  ]);

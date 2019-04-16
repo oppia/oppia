@@ -16,4 +16,5 @@
  * @fileoverview Module for the concept card editor.
  */
 
-angular.module('skillConceptCardEditorModule', ['workedExampleEditorModule']);
+angular.module('skillConceptCardEditorModule', [
+  'workedExampleEditorModule']);

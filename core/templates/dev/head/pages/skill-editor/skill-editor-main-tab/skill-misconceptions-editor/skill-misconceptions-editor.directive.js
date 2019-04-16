@@ -16,124 +16,127 @@
  * @fileoverview Directive for the skill misconceptions editor.
  */
 
-angular.module('skillMisconceptionsEditorModule').directive('skillMisconceptionsEditor', [
-  'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
-  function(
-      SkillEditorStateService, SkillUpdateService, UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor/skill-editor-editor-tab' +
-        '/skill-misconceptions-editor/skill-misconceptions-editor.directive.html'),
-      controller: [
-        '$scope', '$filter', '$uibModal', '$rootScope',
-        'MisconceptionObjectFactory', 'EVENT_SKILL_REINITIALIZED',
-        function(
-            $scope, $filter, $uibModal, $rootScope,
-            MisconceptionObjectFactory, EVENT_SKILL_REINITIALIZED) {
-          $scope.skill = SkillEditorStateService.getSkill();
-          $scope.misconceptions = $scope.skill.getMisconceptions();
-
-          $scope.isEditable = function() {
-            return true;
-          };
-
-          $scope.changeActiveMisconceptionIndex = function(idx) {
-            if (idx === $scope.activeMisconceptionIndex) {
-              $scope.activeMisconceptionIndex = null;
-            } else {
-              $scope.activeMisconceptionIndex = idx;
-            }
-          };
-
-          $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+angular.module('skillMisconceptionsEditorModule').directive(
+  'skillMisconceptionsEditor', [
+    'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
+    function(
+        SkillEditorStateService, SkillUpdateService, UrlInterpolationService) {
+      return {
+        restrict: 'E',
+        scope: {},
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/skill-editor/skill-editor-editor-tab' +
+          '/skill-misconceptions-editor' +
+          '/skill-misconceptions-editor.directive.html'),
+        controller: [
+          '$scope', '$filter', '$uibModal', '$rootScope',
+          'MisconceptionObjectFactory', 'EVENT_SKILL_REINITIALIZED',
+          function(
+              $scope, $filter, $uibModal, $rootScope,
+              MisconceptionObjectFactory, EVENT_SKILL_REINITIALIZED) {
+            $scope.skill = SkillEditorStateService.getSkill();
             $scope.misconceptions = $scope.skill.getMisconceptions();
-          });
 
-          $scope.getMisconceptionSummary = function(misconception) {
-            return misconception.getName();
-          };
+            $scope.isEditable = function() {
+              return true;
+            };
 
-          $scope.openDeleteMisconceptionModal = function(index, evt) {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor/skill-editor-templates' +
-                '/delete-misconception-modal.directive.html'),
-              backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.skill = SkillEditorStateService.getSkill();
+            $scope.changeActiveMisconceptionIndex = function(idx) {
+              if (idx === $scope.activeMisconceptionIndex) {
+                $scope.activeMisconceptionIndex = null;
+              } else {
+                $scope.activeMisconceptionIndex = idx;
+              }
+            };
 
-                  $scope.confirm = function() {
-                    $uibModalInstance.close({
-                      id: $scope.skill.getMisconceptionAtIndex(index).getId()
-                    });
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }]
-            }).result.then(function(result) {
-              SkillUpdateService.deleteMisconception($scope.skill, result.id);
-              $scope.misconceptions = $scope.skill.getMisconceptions();
-              $scope.activeMisconceptionIndex = null;
-            });
-          };
-
-          $scope.openAddMisconceptionModal = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor/skill-editor-templates' +
-                '/add-misconception-modal.directive.html'),
-              backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.skill = SkillEditorStateService.getSkill();
-                  $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
-                    type: 'html',
-                    ui_config: {
-                      startupFocusEnabled: false
-                    }
-                  };
-
-                  $scope.MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA = {
-                    type: 'html',
-                    ui_config: {
-                      hide_complex_extensions: true,
-                      startupFocusEnabled: false
-                    }
-                  };
-
-                  $scope.misconceptionName = '';
-                  $scope.misconceptionNotes = '';
-                  $scope.misconceptionFeedback = '';
-
-                  $scope.saveMisconception = function() {
-                    var newMisconceptionId =
-                      $scope.skill.getNextMisconceptionId();
-                    $uibModalInstance.close({
-                      misconception: MisconceptionObjectFactory.create(
-                        newMisconceptionId,
-                        $scope.misconceptionName,
-                        $scope.misconceptionNotes,
-                        $scope.misconceptionFeedback)
-                    });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }]
-            }).result.then(function(result) {
-              SkillUpdateService.addMisconception(
-                $scope.skill, result.misconception);
+            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
               $scope.misconceptions = $scope.skill.getMisconceptions();
             });
-          };
-        }]
-    };
-  }
-]);
+
+            $scope.getMisconceptionSummary = function(misconception) {
+              return misconception.getName();
+            };
+
+            $scope.openDeleteMisconceptionModal = function(index, evt) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/skill-editor/skill-editor-templates' +
+                  '/delete-misconception-modal.directive.html'),
+                backdrop: 'static',
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.skill = SkillEditorStateService.getSkill();
+
+                    $scope.confirm = function() {
+                      $uibModalInstance.close({
+                        id: $scope.skill.getMisconceptionAtIndex(index).getId()
+                      });
+                    };
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }]
+              }).result.then(function(result) {
+                SkillUpdateService.deleteMisconception($scope.skill, result.id);
+                $scope.misconceptions = $scope.skill.getMisconceptions();
+                $scope.activeMisconceptionIndex = null;
+              });
+            };
+
+            $scope.openAddMisconceptionModal = function() {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/skill-editor/skill-editor-templates' +
+                  '/add-misconception-modal.directive.html'),
+                backdrop: 'static',
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.skill = SkillEditorStateService.getSkill();
+                    $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
+                      type: 'html',
+                      ui_config: {
+                        startupFocusEnabled: false
+                      }
+                    };
+
+                    $scope.MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA = {
+                      type: 'html',
+                      ui_config: {
+                        hide_complex_extensions: true,
+                        startupFocusEnabled: false
+                      }
+                    };
+
+                    $scope.misconceptionName = '';
+                    $scope.misconceptionNotes = '';
+                    $scope.misconceptionFeedback = '';
+
+                    $scope.saveMisconception = function() {
+                      var newMisconceptionId =
+                        $scope.skill.getNextMisconceptionId();
+                      $uibModalInstance.close({
+                        misconception: MisconceptionObjectFactory.create(
+                          newMisconceptionId,
+                          $scope.misconceptionName,
+                          $scope.misconceptionNotes,
+                          $scope.misconceptionFeedback)
+                      });
+                    };
+
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }]
+              }).result.then(function(result) {
+                SkillUpdateService.addMisconception(
+                  $scope.skill, result.misconception);
+                $scope.misconceptions = $scope.skill.getMisconceptions();
+              });
+            };
+          }]
+      };
+    }
+  ]
+);

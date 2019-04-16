@@ -18,63 +18,65 @@
 
 angular.module('topicsAndSkillsDashboardNavbarModule').directive(
   'topicsAndSkillsDashboardNavbar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics-and-skills-dashboard/' +
-        'topics-and-skills-dashboard-navbar/' +
-        'topics-and-skills-dashboard-navbar.directive.html'),
-      controller: [
-        '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
-        'SkillCreationService', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
-        'EVENT_TYPE_SKILL_CREATION_ENABLED', 'EditableTopicBackendApiService',
-        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-        function(
-            $scope, $rootScope, $uibModal, TopicCreationService,
-            SkillCreationService, EVENT_TYPE_TOPIC_CREATION_ENABLED,
-            EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
-          $scope.createTopic = function() {
-            TopicCreationService.createNewTopic();
-          };
-          $scope.createSkill = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard/' +
-                'topics-and-skills-dashboard-templates/' +
-                'create-new-skill-modal.template.html'),
-              backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.newSkillDescription = '';
-                  $scope.createNewSkill = function() {
-                    $uibModalInstance.close({
-                      description: $scope.newSkillDescription
-                    });
-                  };
+    'UrlInterpolationService', function(UrlInterpolationService) {
+      return {
+        restrict: 'E',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/topics-and-skills-dashboard/' +
+          'topics-and-skills-dashboard-navbar/' +
+          'topics-and-skills-dashboard-navbar.directive.html'),
+        controller: [
+          '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
+          'SkillCreationService', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
+          'EVENT_TYPE_SKILL_CREATION_ENABLED', 'EditableTopicBackendApiService',
+          'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+          function(
+              $scope, $rootScope, $uibModal, TopicCreationService,
+              SkillCreationService, EVENT_TYPE_TOPIC_CREATION_ENABLED,
+              EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
+              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            $scope.createTopic = function() {
+              TopicCreationService.createNewTopic();
+            };
+            $scope.createSkill = function() {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/topics-and-skills-dashboard/' +
+                  'topics-and-skills-dashboard-templates/' +
+                  'create-new-skill-modal.template.html'),
+                backdrop: 'static',
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.newSkillDescription = '';
+                    $scope.createNewSkill = function() {
+                      $uibModalInstance.close({
+                        description: $scope.newSkillDescription
+                      });
+                    };
 
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            }).result.then(function(result) {
-              SkillCreationService.createNewSkill(result.description, []);
-            });
-          };
-          $rootScope.$on(
-            EVENT_TYPE_TOPIC_CREATION_ENABLED, function(evt, canCreateTopic) {
-              $scope.userCanCreateTopic = canCreateTopic;
-            }
-          );
-          $rootScope.$on(
-            EVENT_TYPE_SKILL_CREATION_ENABLED, function(evt, canCreateSkill) {
-              $scope.userCanCreateSkill = canCreateSkill;
-            }
-          );
-        }
-      ]
-    };
-  }]);  
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              }).result.then(function(result) {
+                SkillCreationService.createNewSkill(result.description, []);
+              });
+            };
+            $rootScope.$on(
+              EVENT_TYPE_TOPIC_CREATION_ENABLED, function(evt, canCreateTopic) {
+                $scope.userCanCreateTopic = canCreateTopic;
+              }
+            );
+            $rootScope.$on(
+              EVENT_TYPE_SKILL_CREATION_ENABLED, function(evt, canCreateSkill) {
+                $scope.userCanCreateSkill = canCreateSkill;
+              }
+            );
+          }
+        ]
+      };
+    }
+  ]
+);

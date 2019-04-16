@@ -16,4 +16,4 @@
  * @fileoverview Module for the navbar breadcrumb of the story editor.
  */
 
- angular.module('storyEditorNavbarBreadcrumbModule', []);
+angular.module('storyEditorNavbarBreadcrumbModule', []);

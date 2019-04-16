@@ -21,6 +21,6 @@ angular.module('storyEditorModule', ['storyEditorNavbarBreadcrumbModule',
 
 angular.module('storyEditorModule').constant('NODE_ID_PREFIX', 'node_');
 angular.module('storyEditorModule').constant(
-    'EVENT_STORY_INITIALIZED', 'storyInitialized');
+  'EVENT_STORY_INITIALIZED', 'storyInitialized');
 angular.module('storyEditorModule').constant(
-    'EVENT_STORY_REINITIALIZED', 'storyReinitialized');
+  'EVENT_STORY_REINITIALIZED', 'storyReinitialized');

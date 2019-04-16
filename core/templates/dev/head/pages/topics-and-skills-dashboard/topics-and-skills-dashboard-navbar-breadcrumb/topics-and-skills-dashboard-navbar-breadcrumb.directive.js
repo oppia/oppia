@@ -18,16 +18,18 @@
  */
 angular.module('topicsAndSkillsDashboardNavbarBreadcrumbModule').directive(
   'topicsAndSkillsDashboardNavbarBreadcrumb', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics-and-skills-dashboard/' +
-        'topics-and-skills-dashboard-navbar-breadcrumb/' +
-        'topics-and-skills-dashboard-navbar-breadcrumb.directive.html'),
-      controller: [
-        function() {}
-      ]
-    };
-  }]);
+    'UrlInterpolationService', function(UrlInterpolationService) {
+      return {
+        restrict: 'E',
+        scope: {},
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/topics-and-skills-dashboard/' +
+          'topics-and-skills-dashboard-navbar-breadcrumb/' +
+          'topics-and-skills-dashboard-navbar-breadcrumb.directive.html'),
+        controller: [
+          function() {}
+        ]
+      };
+    }
+  ]
+);

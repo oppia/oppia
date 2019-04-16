@@ -17,4 +17,4 @@
  */
 
 angular.module('topicViewerPageModule', [
-    'storiesListModule', 'topicViewerNavbarBreadcrumbModule']);
+  'storiesListModule', 'topicViewerNavbarBreadcrumbModule']);

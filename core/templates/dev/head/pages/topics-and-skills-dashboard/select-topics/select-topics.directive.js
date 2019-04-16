@@ -16,7 +16,7 @@
  * @fileoverview Directive for the select topics viewer.
  */
 
- angular.module('selectTopicsModule').directive('selectTopics', [
+angular.module('selectTopicsModule').directive('selectTopics', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

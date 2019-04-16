@@ -16,22 +16,25 @@
  * @fileoverview Directive for the navbar breadcrumb of the topic viewer.
  */
 
-angular.module('topicViewerNavbarBreadcrumbModule').directive('topicViewerNavbarBreadcrumb', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-viewer-page/topic-viewer-navbar-breadcrumb/' +
-        'topic-viewer-navbar-breadcrumb.directive.html'),
-      controller: ['$scope', 'TopicViewerBackendApiService', 'UrlService',
-        function($scope, TopicViewerBackendApiService, UrlService) {
-          TopicViewerBackendApiService.fetchTopicData(
-            UrlService.getTopicNameFromLearnerUrl()).then(
-            function(topicDataDict) {
-              $scope.topicName = topicDataDict.topic_name;
-            });
-        }
-      ]
-    };
-  }]);
+angular.module('topicViewerNavbarBreadcrumbModule').directive(
+  'topicViewerNavbarBreadcrumb', [
+    'UrlInterpolationService', function(UrlInterpolationService) {
+      return {
+        restrict: 'E',
+        scope: {},
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/topic-viewer-page/topic-viewer-navbar-breadcrumb/' +
+          'topic-viewer-navbar-breadcrumb.directive.html'),
+        controller: ['$scope', 'TopicViewerBackendApiService', 'UrlService',
+          function($scope, TopicViewerBackendApiService, UrlService) {
+            TopicViewerBackendApiService.fetchTopicData(
+              UrlService.getTopicNameFromLearnerUrl()).then(
+              function(topicDataDict) {
+                $scope.topicName = topicDataDict.topic_name;
+              });
+          }
+        ]
+      };
+    }
+  ]
+);

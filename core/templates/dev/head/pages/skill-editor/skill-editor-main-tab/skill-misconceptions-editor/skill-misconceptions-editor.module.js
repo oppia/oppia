@@ -16,4 +16,5 @@
  * @fileoverview Module for the skill misconceptions editor.
  */
 
-angular.module('skillMisconceptionsEditorModule', ['misconceptionEditorModule']);
+angular.module('skillMisconceptionsEditorModule', [
+  'misconceptionEditorModule']);

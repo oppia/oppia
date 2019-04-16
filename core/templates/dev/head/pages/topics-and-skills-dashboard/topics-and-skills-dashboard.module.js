@@ -17,23 +17,24 @@
  */
 
 angular.module('topicsAndSkillsDashboardModule', [
-    'selectTopicsModule', 'skillsListModule',
-    'topicsAndSkillsDashboardNavbarBreadcrumbModule',
-    'topicsAndSkillsDashboardNavbarModule', 'topicsListModule']);
+  'selectTopicsModule', 'skillsListModule',
+  'topicsAndSkillsDashboardNavbarBreadcrumbModule',
+  'topicsAndSkillsDashboardNavbarModule', 'topicsListModule']);
 
 angular.module('topicsAndSkillsDashboardModule').constant(
-    'EDITABLE_TOPIC_DATA_URL_TEMPLATE', '/topic_editor_handler/data/<topic_id>');
+  'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
+  '/topic_editor_handler/data/<topic_id>');
 
 angular.module('topicsAndSkillsDashboardModule').constant(
-    'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
-    '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
+  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
+  '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
 
 angular.module('topicsAndSkillsDashboardModule').constant(
-    'EVENT_TYPE_TOPIC_CREATION_ENABLED', 'topicCreationEnabled');
+  'EVENT_TYPE_TOPIC_CREATION_ENABLED', 'topicCreationEnabled');
 
 angular.module('topicsAndSkillsDashboardModule').constant(
-    'EVENT_TYPE_SKILL_CREATION_ENABLED', 'skillCreationEnabled');
+  'EVENT_TYPE_SKILL_CREATION_ENABLED', 'skillCreationEnabled');
 
 angular.module('topicsAndSkillsDashboardModule').constant(
-    'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-    'topicsAndSkillsDashboardReinitialized');
+  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+  'topicsAndSkillsDashboardReinitialized');

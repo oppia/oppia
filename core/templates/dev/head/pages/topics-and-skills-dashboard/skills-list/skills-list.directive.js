@@ -16,7 +16,7 @@
  * @fileoverview Directive for the skills list viewer.
  */
 
- angular.module('skillsListModule').directive('skillsList', [
+angular.module('skillsListModule').directive('skillsList', [
   '$http', 'AlertsService', 'UrlInterpolationService',
   function(
       $http, AlertsService, UrlInterpolationService) {
@@ -99,7 +99,8 @@
             var topicSummaries = $scope.getEditableTopicSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard/topics-and-skills-dashboard-templates/' +
+                '/pages/topics-and-skills-dashboard/' +
+                'topics-and-skills-dashboard-templates/' +
                 'assign-skill-to-topic-modal.template.html'),
               backdrop: true,
               controller: [
@@ -154,7 +155,8 @@
             var skillSummaries = $scope.getMergeableSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard/topics-and-skills-dashboard-templates/' +
+                '/pages/topics-and-skills-dashboard/' +
+                'topics-and-skills-dashboard-templates/' +
                 'merge-skill-modal.template.html'),
               backdrop: true,
               controller: [

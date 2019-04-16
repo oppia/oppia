@@ -19,4 +19,4 @@
 angular.module('mainStoryEditorModule', ['storyNodeEditorModule']);
 
 angular.module('mainStoryEditorModule').constant(
-    'EVENT_VIEW_STORY_NODE_EDITOR', 'viewStoryNodeEditor');
+  'EVENT_VIEW_STORY_NODE_EDITOR', 'viewStoryNodeEditor');
