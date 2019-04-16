@@ -16,7 +16,7 @@
  * @fileoverview Directive for the worked example editor.
  */
 
-oppia.directive('workedExampleEditor', [
+angular.module('workedExampleEditorModule').directive('workedExampleEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

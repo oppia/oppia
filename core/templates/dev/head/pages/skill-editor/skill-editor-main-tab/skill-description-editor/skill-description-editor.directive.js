@@ -16,7 +16,7 @@
  * @fileoverview Directive for the skill description editor.
  */
 
-oppia.directive('skillDescriptionEditor', [
+angular.module('skillDescriptionEditorModule').directive('skillDescriptionEditor', [
   'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
   'UrlInterpolationService',
   function(

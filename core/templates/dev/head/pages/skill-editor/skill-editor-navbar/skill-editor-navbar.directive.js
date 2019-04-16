@@ -16,12 +16,13 @@
  * @fileoverview Directive for the navbar of the skill editor.
  */
 
-oppia.directive('skillEditorNavbar', [
+angular.module('skillEditorNavbarModule').directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/skill_editor_navbar_directive.html'),
+        '/pages/skill-editor/skill-editor-navbar/' +
+        'skill-editor-navbar.directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
@@ -118,8 +119,8 @@ oppia.directive('skillEditorNavbar', [
           $scope.saveChanges = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/' +
-                'skill_editor_save_modal_directive.html'),
+                '/pages/skill-editor/skill-editor-templates' +
+                '/skill-editor-save-modal.directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -143,8 +144,8 @@ oppia.directive('skillEditorNavbar', [
           $scope.publishSkill = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/' +
-                'skill_editor_pre_publish_modal_directive.html'),
+                '/pages/skill-editor/skill-editor-templates' +
+                '/skill-editor-pre-publish-modal.directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

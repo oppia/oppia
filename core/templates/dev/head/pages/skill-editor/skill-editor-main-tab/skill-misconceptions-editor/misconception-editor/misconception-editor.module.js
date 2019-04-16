@@ -13,20 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Primary controller for the skill editor page.
+ * @fileoverview Directive for the misconception editor.
  */
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant(
-  'SKILL_RIGHTS_URL_TEMPLATE',
-  '/skill_editor_handler/rights/<skill_id>');
 
-oppia.constant(
-  'SKILL_PUBLISH_URL_TEMPLATE',
-  '/skill_editor_handler/publish_skill/<skill_id>');
-
-oppia.controller('SkillEditor', [
-  'SkillEditorStateService', 'UrlService',
-  function(SkillEditorStateService, UrlService) {
-    SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
-  }
-]);
+angular.module('misconceptionEditorModule', []);

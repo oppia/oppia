@@ -234,8 +234,8 @@ oppia.directive('questionsList', [
 
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/questions_tab/' +
-                'question_editor_modal_directive.html'),
+                '/pages/skill-editor/skill-editor-templates/' +
+                'question-editor-modal.directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [
@@ -275,8 +275,8 @@ oppia.directive('questionsList', [
                       var modalInstance = $uibModal.open({
                         templateUrl:
                           UrlInterpolationService.getDirectiveTemplateUrl(
-                            '/pages/skill_editor/questions_tab/' +
-                            'confirm_question_modal_exit_modal_directive.html'),
+                            '/pages/skill-editor/skill-editor-templates/' +
+                            'confirm-question-modal-exit-modal.directive.html'),
                         backdrop: true,
                         controller: [
                           '$scope', '$uibModalInstance',

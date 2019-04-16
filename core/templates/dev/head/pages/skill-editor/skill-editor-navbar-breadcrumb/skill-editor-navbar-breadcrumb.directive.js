@@ -15,13 +15,14 @@
 /**
  * @fileoverview Controller for the navbar breadcrumb of the skill editor.
  */
-oppia.directive('skillEditorNavbarBreadcrumb', [
+angular.module('skillEditorNavbarBreadcrumbModule').directive('skillEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/skill_editor_navbar_breadcrumb_directive.html'),
+        '/pages/skill-editor/skill-editor-navbar-breadcrumb' +
+        '/skill-editor-navbar-breadcrumb.directive.html'),
       controller: [
         '$scope', 'SkillEditorStateService',
         function($scope, SkillEditorStateService) {

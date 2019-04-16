@@ -16,7 +16,7 @@
  * @fileoverview Directive for the skill misconceptions editor.
  */
 
-oppia.directive('skillMisconceptionsEditor', [
+angular.module('skillMisconceptionsEditorModule').directive('skillMisconceptionsEditor', [
   'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
   function(
       SkillEditorStateService, SkillUpdateService, UrlInterpolationService) {
@@ -24,8 +24,8 @@ oppia.directive('skillMisconceptionsEditor', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/editor_tab/' +
-        'skill_misconceptions_editor_directive.html'),
+        '/pages/skill-editor/skill-editor-editor-tab' +
+        '/skill-misconceptions-editor/skill-misconceptions-editor.directive.html'),
       controller: [
         '$scope', '$filter', '$uibModal', '$rootScope',
         'MisconceptionObjectFactory', 'EVENT_SKILL_REINITIALIZED',
@@ -58,8 +58,8 @@ oppia.directive('skillMisconceptionsEditor', [
           $scope.openDeleteMisconceptionModal = function(index, evt) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/editor_tab/' +
-                'delete_misconception_modal_directive.html'),
+                '/pages/skill-editor/skill-editor-templates' +
+                '/delete-misconception-modal.directive.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
@@ -85,8 +85,8 @@ oppia.directive('skillMisconceptionsEditor', [
           $scope.openAddMisconceptionModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/editor_tab/' +
-                'add_misconception_modal_directive.html'),
+                '/pages/skill-editor/skill-editor-templates' +
+                '/add-misconception-modal.directive.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',

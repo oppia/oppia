@@ -16,7 +16,7 @@
  * @fileoverview Directive for the misconception editor.
  */
 
-oppia.directive('misconceptionEditor', [
+angular.module('misconceptionEditorModule').directive('misconceptionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       retrict: 'E',
@@ -26,7 +26,8 @@ oppia.directive('misconceptionEditor', [
         isEditable: '&isEditable'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/editor_tab/misconception_editor_directive.html'),
+        '/pages/skill-editor/skill-editor-editor-tab/misconception-editor/' +
+        'misconception-editor.directive.html'),
       controller: [
         '$scope', 'SkillUpdateService', 'SkillEditorStateService',
         function($scope, SkillUpdateService, SkillEditorStateService) {

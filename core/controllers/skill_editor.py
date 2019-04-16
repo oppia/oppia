@@ -100,7 +100,7 @@ class SkillEditorPage(base.BaseHandler):
                 feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES)
         })
 
-        self.render_template('pages/skill_editor/skill_editor.html')
+        self.render_template('pages/skill-editor/skill-editor.mainpage.html')
 
 
 def check_can_edit_skill_description(user):

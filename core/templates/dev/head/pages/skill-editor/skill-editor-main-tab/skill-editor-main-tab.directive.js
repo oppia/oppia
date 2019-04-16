@@ -16,15 +16,15 @@
  * @fileoverview Controller for the main tab of the skill editor.
  */
 
-oppia.directive('skillEditorMainTab', [
+angular.module('skillEditorMainTabModule').directive('skillEditorMainTab', [
   'SkillEditorStateService', 'UrlInterpolationService',
   function(SkillEditorStateService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/editor_tab/' +
-        'skill_editor_main_tab_directive.html'),
+        '/pages/skill-editor/skill-editor-editor-tab/' +
+        'skill-editor-main-tab/skill-editor-main-tab.directive.html'),
       controller: [
         '$scope', 'SkillEditorStateService',
         function($scope, SkillEditorStateService) {

@@ -1,4 +1,3 @@
-
 // Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +15,14 @@
 /**
  * @fileoverview Controller for the questions tab.
  */
-oppia.directive('questionsTab', [
+angular.module('skillEditorQuestionsTabModule').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/questions_tab/questions_tab_directive.html'),
+        '/pages/skill-editor/skill-editor-questions-tab' +
+        '/skill-editor-questions-tab.directive.html'),
       controller: [
         '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
         'SkillEditorStateService', 'QuestionCreationService', 'UrlService',

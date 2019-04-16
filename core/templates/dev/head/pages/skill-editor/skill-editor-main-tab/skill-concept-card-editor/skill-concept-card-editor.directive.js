@@ -16,7 +16,7 @@
  * @fileoverview Directive for the concept card editor.
  */
 
-oppia.directive('skillConceptCardEditor', [
+angular.module('skillConceptCardEditorModule').directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
   'COMPONENT_NAME_EXPLANATION', 'COMPONENT_NAME_WORKED_EXAMPLE',
@@ -28,8 +28,8 @@ oppia.directive('skillConceptCardEditor', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/editor_tab/' +
-        'skill_concept_card_editor_directive.html'),
+        '/pages/skill-editor/skill-editor-editor-tab' +
+        '/skill-concept-card-editor/skill-concept-card-editor.directive.html'),
       controller: [
         '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
         function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {
@@ -121,8 +121,8 @@ oppia.directive('skillConceptCardEditor', [
           $scope.deleteWorkedExample = function(index, evt) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/editor_tab/' +
-                'delete_worked_example_modal_directive.html'),
+                'core/templates/dev/head/pages/skill-editor/' +
+                'skill-editor-templates/delete-worked-example-modal.directive.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
@@ -150,8 +150,8 @@ oppia.directive('skillConceptCardEditor', [
           $scope.openAddWorkedExampleModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/editor_tab/' +
-                'add_worked_example_modal_directive.html'),
+                '/pages/skill-editor/skill-editor-templates' +
+                '/add-worked-example-modal.directive.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
