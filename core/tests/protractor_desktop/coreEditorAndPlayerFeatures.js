@@ -40,19 +40,23 @@ describe('Core exploration functionality', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
+  var userNumber = 1;
 
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+
+    users.createUser(
+      `user${userNumber}@stateEditor.com`, `user${userNumber}StateEditor`);
+    users.login(`user${userNumber}@stateEditor.com`);
+    workflow.createExploration();
+
+    userNumber++;
   });
 
   it('should display plain text content', function() {
-    users.createUser('user1@stateEditor.com', 'user1StateEditor');
-    users.login('user1@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText('plain text'));
     explorationEditorMainTab.setInteraction('Continue', 'click here');
     explorationEditorMainTab.getResponseEditor('default')
@@ -72,9 +76,6 @@ describe('Core exploration functionality', function() {
   });
 
   it('should create content and multiple choice interactions', function() {
-    users.createUser('user2@stateEditor.com', 'user2StateEditor');
-    users.login('user2@stateEditor.com');
-    workflow.createExploration();
     explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold text');
       richTextEditor.appendPlainText(' ');
@@ -105,10 +106,6 @@ describe('Core exploration functionality', function() {
   });
 
   it('should obey numeric interaction rules and display feedback', function() {
-    users.createUser('user3@stateEditor.com', 'user3StateEditor');
-    users.login('user3@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText('some content'));
     explorationEditorMainTab.setInteraction('NumericInput');
     explorationEditorMainTab.addResponse('NumericInput',
@@ -151,10 +148,6 @@ describe('Core exploration functionality', function() {
 
   it('should skip the customization modal for interactions having no ' +
       'customization options', function() {
-    users.createUser('user4@stateEditor.com', 'user4StateEditor');
-    users.login('user4@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
     // Numeric input does not have any customization arguments. Therefore the
@@ -168,10 +161,6 @@ describe('Core exploration functionality', function() {
 
   it('should open appropriate modal on re-clicking an interaction to ' +
      'customize it', function() {
-    users.createUser('user5@stateEditor.com', 'user5StateEditor');
-    users.login('user5@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
     // Numeric input does not have any customization arguments. Therefore, on
@@ -200,9 +189,6 @@ describe('Core exploration functionality', function() {
 
   it('should correctly display contents, rule parameters, feedback' +
   ' instructions and newly created state', function() {
-    users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
-    users.login('stateEditorUser1@example.com');
-    workflow.createExploration();
     // Verify exploration's text content.
     explorationEditorMainTab.setContent(forms.toRichText('Happiness Checker'));
     explorationEditorMainTab.expectContentToMatch(
@@ -234,10 +220,6 @@ describe('Core exploration functionality', function() {
   });
 
   it('should be able to edit title', function() {
-    users.createUser('user6@stateEditor.com', 'user6StateEditor');
-    users.login('user6@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
 
     explorationEditorSettingsTab.expectTitleToBe('');
@@ -248,10 +230,6 @@ describe('Core exploration functionality', function() {
   });
 
   it('should be able to edit goal', function() {
-    users.createUser('user7@stateEditor.com', 'user7StateEditor');
-    users.login('user7@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
 
     explorationEditorSettingsTab.expectObjectiveToBe('');
@@ -262,10 +240,6 @@ describe('Core exploration functionality', function() {
   });
 
   it('should show warnings when the length of goal < 15', function() {
-    users.createUser('user8@stateEditor.com', 'user8StateEditor');
-    users.login('user8@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
 
     // Color grey when there is no warning, red when there is a warning
@@ -277,10 +251,6 @@ describe('Core exploration functionality', function() {
   });
 
   it('should be able to select category from the dropdown menu', function() {
-    users.createUser('user9@stateEditor.com', 'user9StateEditor');
-    users.login('user9@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
 
     explorationEditorSettingsTab.expectCategoryToBe('');
@@ -292,10 +262,6 @@ describe('Core exploration functionality', function() {
 
   it('should be able to create new category which is not' +
   ' in the dropdown menu', function() {
-    users.createUser('user10@stateEditor.com', 'user10StateEditor');
-    users.login('user10@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
 
     explorationEditorSettingsTab.expectCategoryToBe('');
@@ -306,10 +272,6 @@ describe('Core exploration functionality', function() {
   });
 
   it('should be able to select language from the dropdown menu', function() {
-    users.createUser('user11@stateEditor.com', 'user11StateEditor');
-    users.login('user11@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
 
     explorationEditorSettingsTab.expectLanguageToBe('English');
@@ -320,10 +282,6 @@ describe('Core exploration functionality', function() {
   });
 
   it('should change the first card of the exploration', function() {
-    users.createUser('user12@stateEditor.com', 'user12StateEditor');
-    users.login('user12@stateEditor.com');
-    workflow.createExploration();
-
     explorationEditorMainTab.setStateName('card 1');
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorMainTab.setInteraction('Continue');
