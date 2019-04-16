@@ -28,7 +28,8 @@ oppia.factory('UserService', [
     var getUserInfoAsync = function() {
       var currentUrl = $window.location.href;
       if (currentUrl.includes('signup')) {
-        return $q.resolve(UserInfoObjectFactory.createDefault());
+        userInfo = UserInfoObjectFactory.createDefault();
+        return $q.resolve(userInfo);
       }
       if (userInfo) {
         return $q.resolve(userInfo);
@@ -37,12 +38,12 @@ oppia.factory('UserService', [
         '/userinfohandler'
       ).then(function(response) {
         if (response.data.user_is_logged_in) {
-          userInfo =
-            UserInfoObjectFactory.createFromBackendDict(response.data);
-          return $q.resolve(userInfo);
+          userInfo = (
+            UserInfoObjectFactory.createFromBackendDict(response.data));
         } else {
-          return $q.resolve(UserInfoObjectFactory.createDefault());
+          userInfo = UserInfoObjectFactory.createDefault();
         }
+        return $q.resolve(userInfo);
       });
     };
 
