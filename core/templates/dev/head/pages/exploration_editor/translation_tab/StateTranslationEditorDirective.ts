@@ -122,7 +122,7 @@ oppia.directive('stateTranslationEditor', [
             if (oldWrittenTranslation === null || (
               oldWrittenTranslation.html !== newWrittenTranslation.html || (
                 oldWrittenTranslation.needsUpdate !== (
-                  newWrittenTranslation.needsUpdate))))  {
+                  newWrittenTranslation.needsUpdate)))) {
               var stateName = StateEditorService.getActiveStateName();
               showMarkAudioAsNeedingUpdateModalIfRequired(
                 contentId, langaugeCode);
