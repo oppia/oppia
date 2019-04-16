@@ -25,6 +25,7 @@ from google.appengine.ext import ndb
 
 # Constants defining types of entities to which suggestions can be created.
 TARGET_TYPE_EXPLORATION = 'exploration'
+TARGET_TYPE_COLLECTION = 'collection'
 TARGET_TYPE_QUESTION = 'question'
 TARGET_TYPE_SKILL = 'skill'
 TARGET_TYPE_TOPIC = 'topic'

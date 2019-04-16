@@ -327,8 +327,8 @@ def can_edit_suggestion(handler):
         Raises:
             NotLoggedInException: The user is not logged in.
             PageNotFoundException: The page is not found.
-            UnauthorizedUserException: The user does not have
-                credentials to edit a suggestion.
+            UnauthorizedUserException: The user does not have credentials to
+                edit a suggestion.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException

@@ -583,7 +583,7 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
     if suggestion.author_id == user_id:
         return True
 
-    if suggestion.target_type == 'exploration':
+    if suggestion.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         exploration_rights = rights_manager.get_exploration_rights(
             suggestion.target_id)
         if exploration_rights is None:
@@ -593,7 +593,7 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
                 user, exploration_rights):
             return True
 
-    elif suggestion.target_type == 'collection':
+    elif suggestion.target_type == suggestion_models.TARGET_TYPE_COLLECTION:
         collection_rights = rights_manager.get_collection_rights(
             suggestion.target_id)
         if collection_rights is None:
@@ -603,7 +603,7 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
                 user, collection_rights):
             return True
 
-    elif suggestion.target_type == 'question':
+    elif suggestion.target_type == suggestion_models.TARGET_TYPE_QUESTION:
         question_rights = question_services.get_question_rights(
             suggestion.target_id, strict=False)
         if question_rights is None:
