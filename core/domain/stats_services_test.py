@@ -319,9 +319,15 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration_stats.num_completions_v2 = 1
         stats_services.save_stats_model_transactional(exploration_stats)
 
-        # Update exploration to next version.
+        # Update exploration to next version 2 and its stats.
         exp_services.update_exploration(
             'committer_id_v2', exploration.id, [], 'Updated')
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exp_id, 2)
+        exploration_stats.num_starts_v2 = 4
+        exploration_stats.num_actual_starts_v2 = 3
+        exploration_stats.num_completions_v2 = 2
+        stats_services.save_stats_model_transactional(exploration_stats)
 
         # Revert to an older version.
         exp_services.revert_exploration(
