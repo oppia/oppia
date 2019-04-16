@@ -583,7 +583,7 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
     if suggestion.author_id == user_id:
         return True
 
-    elif suggestion.target_type == 'exploration':
+    if suggestion.target_type == 'exploration':
         exploration_rights = rights_manager.get_exploration_rights(
             suggestion.target_id)
         if exploration_rights is None:
