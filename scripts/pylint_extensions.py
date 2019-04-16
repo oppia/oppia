@@ -168,8 +168,8 @@ class HangingIndentChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        file_content =
-            [utils.convert_to_str(line) for line in node.stream().readlines()]
+        file_content = [
+            utils.convert_to_str(line) for line in node.stream().readlines()]
         file_length = len(file_content)
         exclude = False
         for line_num in range(file_length):
