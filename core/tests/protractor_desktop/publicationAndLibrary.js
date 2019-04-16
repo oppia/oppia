@@ -221,6 +221,7 @@ describe('Permissions for private explorations', function() {
     function() {
       users.createUser('alice@privileges.com', 'alicePrivileges');
       users.login('alice@privileges.com');
+
       workflow.createExploration();
       explorationEditorPage.navigateToSettingsTab();
 
