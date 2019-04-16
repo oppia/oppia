@@ -59,7 +59,6 @@ import ast
 import contextlib
 import fnmatch
 import glob
-import html.parser
 import io
 import multiprocessing
 import os
@@ -82,7 +81,8 @@ sys.path.insert(0, _FUTURE_PATH)
 from builtins import object  # isort:skip
 from builtins import range  # isort:skip
 from builtins import str  # isort:skip
-from future import standard_library # isort:skip
+from future import standard_library  # isort:skip
+import html.parser  # isort:skip
 
 # Pylint has issues with the import order of argparse.
 
