@@ -1241,12 +1241,12 @@ class LintChecksManager(object):
             and filepath.endswith('.js') and not filepath.endswith('App.js')]
         failed = False
         summary_messages = []
-        # component_name = ''
+        # component_name = ''.
         components_to_check = ['controller', 'directive', 'factory', 'filter']
         for filepath in files_to_check:
             component_num = 0
             # Filename without its path and extension.
-            # exact_filename = filepath.split('/')[-1][:-3]
+            # exact_filename = filepath.split('/')[-1][:-3].
             parsed_script = self.parsed_js_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
