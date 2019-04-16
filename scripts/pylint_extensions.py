@@ -25,6 +25,7 @@ import re
 
 import astroid
 from . import docstrings_checker
+import utils
 
 from pylint import checkers
 from pylint import interfaces
@@ -167,7 +168,8 @@ class HangingIndentChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        file_content = [line.encode() for line in node.stream().readlines()]
+        file_content =
+            [utils.convert_to_str(line) for line in node.stream().readlines()]
         file_length = len(file_content)
         exclude = False
         for line_num in range(file_length):
@@ -756,7 +758,8 @@ class BackslashContinuationChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
         with node.stream() as stream:
-            file_content = [line.encode() for line in stream.readlines()]
+            file_content = [
+                utils.convert_to_str(line) for line in stream.readlines()]
             for (line_num, line) in enumerate(file_content):
                 if line.rstrip('\r\n').endswith('\\'):
                     self.add_message(
@@ -893,7 +896,8 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
 
-        file_content = [line.encode() for line in node.stream().readlines()]
+        file_content = [
+            utils.convert_to_str(line) for line in node.stream().readlines()]
         file_length = len(file_content)
 
         if file_length == 1 and len(file_content[0]) == 1:
