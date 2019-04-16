@@ -24,7 +24,6 @@ from builtins import range
 import re
 
 import astroid
-from . import docstrings_checker
 import utils
 
 from pylint import checkers
@@ -32,6 +31,7 @@ from pylint import interfaces
 from pylint.checkers import typecheck
 from pylint.checkers import utils as checker_utils
 
+from . import docstrings_checker
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):
