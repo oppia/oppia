@@ -110,7 +110,7 @@ class ContactPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/contact/contact.html')
+        self.render_template('pages/contact/contact-page.mainpage.html')
 
 
 class DonatePage(base.BaseHandler):
