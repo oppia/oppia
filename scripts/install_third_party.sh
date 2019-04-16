@@ -234,6 +234,15 @@ if [ ! -d "$TOOLS_DIR/PyGithub-1.43.5" ]; then
   pip install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5"
 fi
 
+echo Checking if Future is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/future-0.17.1" ]; then
+  echo Installing Future
+
+  curl -o future-0.17.1.tar.gz -L https://files.pythonhosted.org/packages/90/52/e20466b85000a181e1e144fd8305caf2cf475e2f9674e797b222f8105f5f/future-0.17.1.tar.gz
+  tar xzf future-0.17.1.tar.gz -C $TOOLS_DIR
+  rm future-0.17.1.tar.gz
+fi
+
 # install pre-push script
 echo Installing pre-push hook for git
 $PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install
