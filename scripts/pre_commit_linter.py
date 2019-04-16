@@ -304,6 +304,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.5'),
     os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
@@ -1121,24 +1122,8 @@ class LintChecksManager(object):
             process.daemon = False
             process.start()
 
-        file_groups_to_lint = [
-            html_files_to_lint_for_css, css_files_to_lint,
-            js_and_ts_files_to_lint, py_files_to_lint]
-        number_of_files_to_lint = sum(
-            len(file_group) for file_group in file_groups_to_lint)
-
-        timeout_multiplier = 2000
-        for file_group, process in zip(file_groups_to_lint, linting_processes):
-            # try..except block is needed to catch ZeroDivisionError
-            # when there are no CSS, HTML, JavaScript and Python files to lint.
-            try:
-                # Require timeout parameter to prevent against endless
-                # waiting for the linting function to return.
-                process.join(timeout=(
-                    timeout_multiplier * (
-                        len(file_group) / number_of_files_to_lint)))
-            except ZeroDivisionError:
-                break
+        for process in linting_processes:
+            process.join()
 
         js_and_ts_messages = []
         while not js_and_ts_stdout.empty():

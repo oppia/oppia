@@ -159,6 +159,7 @@ oppia.controller('ExplorationEditorTab', [
       var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
       var writtenTranslations = state.writtenTranslations;
       if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
+        contentId) || writtenTranslations.hasUnflaggedWrittenTranslations(
         contentId)) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -167,12 +168,19 @@ oppia.controller('ExplorationEditorTab', [
           backdrop: true,
           controller: 'MarkAllAudioAndTranslationsAsNeedingUpdateController'
         }).result.then(function() {
-          contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(contentId);
-          ExplorationStatesService.saveContentIdsToAudioTranslations(
-            stateName, contentIdsToAudioTranslations);
-          writtenTranslations.markAllTranslationsAsNeedingUpdate(contentId);
-          ExplorationStatesService.saveWrittenTranslations(
-            stateName, writtenTranslations);
+          if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
+            contentId)) {
+            contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
+              contentId);
+            ExplorationStatesService.saveContentIdsToAudioTranslations(
+              stateName, contentIdsToAudioTranslations);
+          }
+          if (writtenTranslations.hasUnflaggedWrittenTranslations(
+            contentId)) {
+            writtenTranslations.markAllTranslationsAsNeedingUpdate(contentId);
+            ExplorationStatesService.saveWrittenTranslations(
+              stateName, writtenTranslations);
+          }
         });
       }
     };
