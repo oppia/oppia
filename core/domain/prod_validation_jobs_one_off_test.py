@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.prod_validation_jobs_one_off."""
+
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -109,7 +110,7 @@ class ProdValidationJobTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for general_feedback_thread_ids '
                 'field check of UserSubscriptionModel\', '
-                '[u"UserSubscriptionsModel id 110211048197157141232: based on '
+                '[u"Model id 110211048197157141232: based on '
                 'field general_feedback_thread_ids having value '
                 'nonexist_thread_id, expect model GeneralFeedbackThreadModel '
                 'with id nonexist_thread_id but it doesn\'t exist"]]'),

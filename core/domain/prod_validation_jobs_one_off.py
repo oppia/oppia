@@ -15,15 +15,14 @@
 # limitations under the License.
 
 """One-off jobs for validating prod models."""
+
 from core import jobs
 from core.platform import models
 
-
-(
-    user_models, exp_models, collection_models,
-    feedback_models) = models.Registry.import_models([
+(user_models, exp_models, collection_models, feedback_models) = (
+    models.Registry.import_models([
         models.NAMES.user, models.NAMES.exploration,
-        models.NAMES.collection, models.NAMES.feedback])
+        models.NAMES.collection, models.NAMES.feedback]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -50,10 +49,10 @@ class BaseModelValidator(object):
     def _external_id_relationships(cls):
         """Defines a mapping of external id to model class.
 
-        Returns a dictionary of which keys are field of the model to validate
-        and values are the corresponding model class. Checks the entries in that
-        field of the model should be valid non-deleted instances of the given
-        model classes.
+        Returns:
+            dict(str, ndb.Model). A dictionary whose keys are fields of the
+            model to validate, and whose values are the corresponding model
+            classes.
         """
         raise NotImplementedError
 
@@ -63,31 +62,32 @@ class BaseModelValidator(object):
         to valid instances.
 
         Args:
-            item: UserSubscriptionsModel. Entity to validate.
+            item: ndb.Model. Entity to validate.
         """
         multiple_models_keys_to_fetch = {}
-        for prop_name, model_class in (
-                cls._external_id_relationships().items()):
-            model_ids = getattr(item, prop_name)
+        for field_name, model_class in (
+                cls._external_id_relationships().iteritems()):
+            model_ids = getattr(item, field_name)
             if model_ids:
-                multiple_models_keys_to_fetch[prop_name] = (
+                if isinstance(model_ids, str):
+                    model_ids = [model_ids]
+                multiple_models_keys_to_fetch[field_name] = (
                     model_class, model_ids)
-        multiple_models = (
+        fetched_model_instances = (
             datastore_services.fetch_multiple_entities_by_ids_and_models(
                 multiple_models_keys_to_fetch.values()))
 
-        for prop_name, keys_to_fetch, model_class_models in zip(
-                multiple_models_keys_to_fetch.keys(),
-                multiple_models_keys_to_fetch.values(),
-                multiple_models):
+        for (field_name, keys_to_fetch), model_class_models in zip(
+                multiple_models_keys_to_fetch.iteritems(),
+                fetched_model_instances):
             model_class, model_ids = keys_to_fetch
             for model_id, model in zip(model_ids, model_class_models):
                 if model is None or model.deleted:
-                    cls.errors['%s field check' % prop_name] = (
-                        'UserSubscriptionsModel id %s: based on field %s having'
+                    cls.errors['%s field check' % field_name] = (
+                        'Model id %s: based on field %s having'
                         ' value %s, expect model %s with id %s but it doesn\'t'
                         ' exist' % (
-                            item.id, prop_name, model_id,
+                            item.id, field_name, model_id,
                             str(model_class.__name__), model_id))
 
 
@@ -102,6 +102,7 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
             'general_feedback_thread_ids': (
                 feedback_models.GeneralFeedbackThreadModel),
             'creator_ids': user_models.UserSettingsModel,
+            'id': user_models.UserSettingsModel,
         }
 
     @classmethod
@@ -113,12 +114,6 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
         """
         cls.errors.clear()
 
-        if not has_undeleted_model_for_id(
-                user_models.UserSettingsModel, item.id):
-            cls.errors['id check'] = (
-                'id %s is not valid %s' % (
-                    item.id,
-                    user_models.UserSettingsModel.__name__))
         cls._validate_external_id_relationships(item)
 
 
@@ -151,6 +146,6 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         if key == 'fully-validated UserSubscriptionModels':
-            yield (key, sum([int(value) for value in values]))
+            yield (key, len(values))
         else:
             yield (key, values)
