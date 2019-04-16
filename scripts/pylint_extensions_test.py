@@ -18,6 +18,8 @@
 # https://github.com/oppia/oppia/wiki/Writing-Tests-For-Pylint
 
 """Unit tests for scripts/pylint_extensions."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import sys
@@ -34,7 +36,7 @@ sys.path.insert(0, _PYLINT_PATH)
 # pylint: disable=wrong-import-position
 # pylint: disable=relative-import
 import astroid  # isort:skip
-import pylint_extensions  # isort:skip
+from . import pylint_extensions  # isort:skip
 from pylint import testutils  # isort:skip
 # pylint: enable=wrong-import-position
 # pylint: enable=relative-import
