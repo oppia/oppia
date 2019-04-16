@@ -35,6 +35,10 @@
 
 # Dashboard pages.
 /core/controllers/creator_dashboard*.py @nithusha21
+/core/controllers/email_dashboard*.py @nithusha21
+/core/controllers/learner_dashboard*.py @nithusha21
+/core/controllers/learner_playlist*.py @nithusha21
+/core/controllers/subscriptions*.py @nithusha21
 /core/domain/activity*.py @nithusha21
 /core/domain/learner_playlist_services*.py @nithusha21
 /core/domain/learner_progress*.py @nithusha21
@@ -48,11 +52,15 @@
 
 
 # Dev workflow team.
+/core/templates/dev/head/css/.stylelintrc @apb7
 /scripts/ @apb7
+
 
 
 # Exploration project.
 /core/controllers/editor*.py @DubeySandeep
+/core/controllers/reader*.py @aks681
+/core/controllers/resources*.py @seanlip
 /core/domain/exp*.py @DubeySandeep
 /core/domain/fs*.py @aks681
 /core/domain/param_domain*.py @aks681
@@ -64,11 +72,9 @@
 /core/templates/dev/head/domain/editor/ @DubeySandeep
 /core/templates/dev/head/domain/exploration/ @DubeySandeep
 /core/templates/dev/head/domain/state/ @aks681
+/core/templates/dev/head/domain/summary/ @aks681
 /core/templates/dev/head/domain/state_card/ @aks681
-/core/templates/dev/head/pages/exploration_editor/editor_tab/ @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/history_tab/ @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/preview_tab/ @aks681
-/core/templates/dev/head/pages/exploration_editor/settings_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration_editor/ @DubeySandeep
 /core/templates/dev/head/pages/exploration_player/ @aks681
 /core/templates/dev/head/pages/state_editor/ @aks681
 /core/templates/dev/head/components/state/ @aks681
@@ -78,7 +84,7 @@
 /core/templates/dev/head/components/forms/ @DubeySandeep
 
 
-# Global components.
+# Global components and filters.
 /core/templates/dev/head/components/alerts/ @ankita240796
 /core/templates/dev/head/components/attribution_guide/ @ankita240796
 /core/templates/dev/head/components/background/ @ankita240796
@@ -89,6 +95,7 @@
 /core/templates/dev/head/components/share/ @ankita240796
 /core/templates/dev/head/components/social_buttons/ @ankita240796
 /core/templates/dev/head/components/summary_tile/ @ankita240796
+/core/templates/dev/head/filters/ @ankita240796
 
 
 # Global stylesheet.
@@ -109,6 +116,7 @@
 
 
 # Lesson Analytics team.
+/core/controllers/features*.py @brianrodri
 /core/domain/action_registry*.py @brianrodri
 /core/domain/calculation_registry*.py @brianrodri
 /core/domain/event_services*.py @brianrodri
@@ -142,22 +150,27 @@
 # New structures team.
 # Question project.
 /core/controllers/question*.py @aks681
-/core/domain/question*.py  @aks681
+/core/domain/question*.py @aks681
 /core/storage/question/ @aks681
 /core/templates/dev/head/domain/question/ @aks681
 /core/templates/dev/head/pages/question_editor/ @aks681
 /core/templates/dev/head/pages/questions_list/ @aks681
 
+# Practice session project.
+/core/templates/dev/head/pages/practice_session/ @aks681
+/core/controllers/practice_sessions*.py @aks681
+
 # Skill project.
+/core/controllers/concept_card_viewer*.py @aks681
 /core/controllers/skill*.py @aks681
-/core/domain/skill*.py  @aks681
+/core/domain/skill*.py @aks681
 /core/storage/skill/ @aks681
 /core/templates/dev/head/domain/skill/ @aks681
 /core/templates/dev/head/pages/skill_editor/ @aks681
 
 # Story project.
 /core/controllers/story*.py @aks681
-/core/domain/story*.py  @aks681
+/core/domain/story*.py @aks681
 /core/storage/story/ @aks681
 /core/templates/dev/head/domain/story/ @aks681
 /core/templates/dev/head/pages/story_editor/ @aks681
@@ -165,6 +178,8 @@
 # Topic project.
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
 /core/controllers/topic_*.py @aks681
+/core/domain/subtopic_page_domain*.py @aks681
+/core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
 /core/templates/dev/head/domain/topic/ @aks681
@@ -173,13 +188,18 @@
 /core/templates/dev/head/pages/topic_viewer/ @aks681
 
 # Topics and skills dashboard project.
-/core/controllers/topics_and_skills_dashboard.py @aks681
+/core/controllers/subtopic_viewer*.py @aks681
+/core/controllers/topics_and_skills_dashboard*.py @aks681
 /core/templates/dev/head/domain/topics_and_skills_dashboard/ @aks681
 /core/templates/dev/head/pages/topics_and_skills_dashboard/ @aks681
 
 
 # Infrastructure.
+/core/controllers/cron*.py @seanlip
+/core/controllers/incoming_emails*.py @aks681
+/core/controllers/tasks*.py @aks681
 /core/domain/email*.py @aks681
+/core/jobs*.py @seanlip
 /core/platform/ @seanlip
 
 
@@ -195,6 +215,8 @@
 
 # Restricted pages.
 /core/controllers/admin*.py @seanlip
+/core/controllers/moderator*.py @seanlip
+/core/controllers/recent_commits*.py @seanlip
 /core/domain/moderator_services*.py @seanlip
 /core/templates/dev/head/pages/admin/ @seanlip
 /core/templates/dev/head/pages/moderator/ @seanlip
@@ -229,6 +251,7 @@
 
 
 # Simple pages.
+/core/controllers/pages*.py @vojtechjelinek
 /core/templates/dev/head/pages/contact/ @vojtechjelinek
 /core/templates/dev/head/pages/donate/ @vojtechjelinek
 /core/templates/dev/head/pages/error/ @vojtechjelinek
@@ -251,6 +274,7 @@
 
 
 # User’s profile page.
+/core/controllers/profile*.py @kevinlee12
 /core/templates/dev/head/domain/user/ @kevinlee12
 /core/templates/dev/head/pages/profile/ @kevinlee12
 
@@ -263,6 +287,8 @@
 #
 #     https://help.github.com/en/articles/about-code-owners
 #
+/core/controllers/acl_decorators*.py @seanlip
+/core/controllers/base*.py @seanlip
 /core/domain/dependency_registry*.py @seanlip
 /core/domain/html*.py @seanlip
 /core/domain/rights_manager*.py @seanlip
@@ -272,4 +298,4 @@
 /export/ @seanlip
 /manifest.json @seanlip @vojtechjelinek
 /scripts/install_third_party.sh @seanlip @vojtechjelinek
-/.github/CODEOWNERS @seanlip
+/.github @seanlip
