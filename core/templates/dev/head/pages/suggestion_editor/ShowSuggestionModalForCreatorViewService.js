@@ -74,7 +74,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
             result.suggestionType === 'edit_exploration_state_content') {
           url = UrlInterpolationService.interpolateUrl(
             RESUBMIT_SUGGESTION_URL_TEMPLATE, {
-              suggestion_id: activeThread.suggestion.suggestionId,
+              suggestion_id: activeThread.suggestion.suggestionId
             }
           );
           data = {
@@ -94,7 +94,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
           result.suggestionType === 'edit_exploration_state_content') {
           var url = UrlInterpolationService.interpolateUrl(
             EDIT_SUGGESTION_URL_TEMPLATE, {
-              suggestion_id: activeThread.suggestion.suggestionId,
+              suggestion_id: activeThread.suggestion.suggestionId
             }
           );
           var data = {

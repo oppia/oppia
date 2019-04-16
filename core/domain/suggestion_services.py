@@ -611,4 +611,7 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
     elif suggestion.target_type not in target_types:
         raise Exception('Invalid suggestion target type')
 
+    elif suggestion is None:
+        raise Exception('Suggestion does not exists')
+
     return False
