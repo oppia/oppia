@@ -574,10 +574,16 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
     user_id = user.user_id
     target_types = ['exploration', 'collection', 'question']
 
+    if suggestion is None:
+        raise Exception('Suggestion does not exists.')
+
+    if suggestion.is_handled:
+        raise Exception('The suggestion has already been accepted/rejected.')
+
     if suggestion.author_id == user_id:
         return True
 
-    if suggestion.target_type == 'exploration':
+    elif suggestion.target_type == 'exploration':
         exploration_rights = rights_manager.get_exploration_rights(
             suggestion.target_id)
         if exploration_rights is None:
@@ -609,9 +615,6 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
             return True
 
     elif suggestion.target_type not in target_types:
-        raise Exception('Invalid suggestion target type')
-
-    elif suggestion is None:
-        raise Exception('Suggestion does not exists')
+        raise Exception('Invalid suggestion target type.')
 
     return False
