@@ -29,6 +29,9 @@ module.exports = function(config) {
       'third_party/static/angular-recorder-1.4.1/dist' +
       '/angular-audio-recorder.min.js',
       generatedJs,
+      // The module files have to be loaded before App.js since it depends
+      // on the other modules.
+      'core/templates/dev/head/**/*.module.js',
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
