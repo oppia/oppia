@@ -24,13 +24,13 @@ from builtins import range
 import re
 
 import astroid
+import docstrings_checker  # pylint: disable=relative-import
 
 from pylint import checkers
 from pylint import interfaces
 from pylint.checkers import typecheck
 from pylint.checkers import utils as checker_utils
 
-from . import docstrings_checker  # pylint: disable=relative-import
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):
