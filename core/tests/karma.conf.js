@@ -75,6 +75,8 @@ module.exports = function(config) {
     preprocessors: {
       'core/templates/dev/head/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/!(*\.spec).js': ['coverage'],
+      'core/templates/dev/head/**/!(*\.spec).js': ['coverage'],
       'extensions/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
