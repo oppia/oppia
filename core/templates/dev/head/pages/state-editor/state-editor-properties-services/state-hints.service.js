@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the current interaction solution.
+ * @fileoverview A data service that stores the current interaction hints.
  */
 
-oppia.factory('StateSolutionService', [
+angular.module('stateEditorModule').factory('StateHintsService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveSolution';
+    child.setterMethodKey = 'saveHints';
     return child;
   }
 ]);

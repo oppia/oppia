@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the MusicNotesInput interaction.
  */
 
-describe('MusicNotesInput interaction', function() {
+fdescribe('MusicNotesInput interaction', function() {
   describe('MusicNotesInput tests', function() {
     var $httpBackend, $templateCache;
     var elt, scope, ctrlScope;

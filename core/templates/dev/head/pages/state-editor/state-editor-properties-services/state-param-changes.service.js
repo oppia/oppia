@@ -13,14 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the content ids
- * to audio translations.
+ * @fileoverview A data service that stores the current list of
+ * state parameter changes.
  */
 
-oppia.factory('StateContentIdsToAudioTranslationsService', [
+// TODO(sll): Add validation.
+angular.module('stateEditorModule').factory('StateParamChangesService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveContentIdsToAudioTranslations';
+    child.setterMethodKey = 'saveStateParamChanges';
     return child;
   }
 ]);

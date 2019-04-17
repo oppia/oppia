@@ -29,9 +29,10 @@ var oppia = angular.module(
     'showSuggestionModalForCreatorViewModule',
     'showSuggestionModalForEditorViewModule',
     'showSuggestionModalForLearnerViewModule',
-    'showSuggestionModalForLocalViewModule', 'storyEditorModule',
-    'teachPageModule', 'thanksPageModule', 'topicsAndSkillsDashboardModule',
-    'topicEditorPageModule', 'topicViewerPageModule',
+    'showSuggestionModalForLocalViewModule', 'stateEditorModule',
+    'storyEditorModule', 'teachPageModule', 'thanksPageModule',
+    'topicsAndSkillsDashboardModule', 'topicEditorPageModule',
+    'topicViewerPageModule',
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
