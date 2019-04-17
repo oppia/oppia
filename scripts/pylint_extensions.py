@@ -169,7 +169,8 @@ class HangingIndentChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
         file_content = [
-            utils.convert_to_unicode(line) for line in node.stream().readlines()]
+            utils.convert_to_unicode(line) for line in
+            node.stream().readlines()]
         file_length = len(file_content)
         exclude = False
         for line_num in range(file_length):
@@ -897,7 +898,8 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
         """
 
         file_content = [
-            utils.convert_to_unicode(line) for line in node.stream().readlines()]
+            utils.convert_to_unicode(line) for line in
+            node.stream().readlines()]
         file_length = len(file_content)
 
         if file_length == 1 and len(file_content[0]) == 1:
