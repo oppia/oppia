@@ -16,4 +16,4 @@
  * @fileoverview Module for the practice session.
  */
 
-angular.module("practiceSessionPageModule", []);
+angular.module('practiceSessionPageModule', []);

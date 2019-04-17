@@ -16,4 +16,4 @@
  * @fileoverview The module for the maintenance page.
  */
 
-angular.module('maintenancePageModule', [])
+angular.module('maintenancePageModule', []);
