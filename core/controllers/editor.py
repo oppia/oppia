@@ -153,8 +153,6 @@ class ExplorationPage(EditorHandler):
                 get_value_generators_js()),
             'title': exploration.title,
             'visualizations_html': jinja2.utils.Markup(visualizations_html),
-            'ALLOWED_INTERACTION_CATEGORIES': (
-                feconf.ALLOWED_INTERACTION_CATEGORIES),
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
                 feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),

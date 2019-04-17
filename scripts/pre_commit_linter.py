@@ -58,6 +58,7 @@ import argparse
 import ast
 import contextlib
 import fnmatch
+import glob
 import multiprocessing
 import os
 import re
@@ -283,6 +284,11 @@ CONFIG_FILE_PATHS = (
     'assets/constants.js',
     'assets/rich_text_components_definitions.js')
 
+CODEOWNER_DIR_PATHS = [
+    './core', './extensions', './scripts', './export', './.github']
+
+CODEOWNER_FILE_PATHS = ['./app.yaml', './manifest.json']
+
 if not os.getcwd().endswith('oppia'):
     print ''
     print 'ERROR    Please run this script from the oppia root directory.'
@@ -317,6 +323,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.5'),
     os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
@@ -1083,31 +1090,16 @@ class LintChecksManager(object):
                 config_pylint, config_pycodestyle, py_files_to_lint,
                 py_result, self.verbose_mode_enabled)))
 
-        print 'Starting CSS, Javascript and Python Linting'
-        print '----------------------------------------'
+        if self.verbose_mode_enabled:
+            print 'Starting CSS, Javascript and Python Linting'
+            print '----------------------------------------'
 
         for process in linting_processes:
             process.daemon = False
             process.start()
 
-        file_groups_to_lint = [
-            html_files_to_lint_for_css, css_files_to_lint,
-            js_files_to_lint, py_files_to_lint]
-        number_of_files_to_lint = sum(
-            len(file_group) for file_group in file_groups_to_lint)
-
-        timeout_multiplier = 2000
-        for file_group, process in zip(file_groups_to_lint, linting_processes):
-            # try..except block is needed to catch ZeroDivisionError
-            # when there are no CSS, HTML, JavaScript and Python files to lint.
-            try:
-                # Require timeout parameter to prevent against endless
-                # waiting for the linting function to return.
-                process.join(timeout=(
-                    timeout_multiplier * (
-                        len(file_group) / number_of_files_to_lint)))
-            except ZeroDivisionError:
-                break
+        for process in linting_processes:
+            process.join()
 
         js_messages = []
         while not js_stdout.empty():
@@ -2087,6 +2079,146 @@ class LintChecksManager(object):
 
         return summary_messages
 
+    def _check_codeowner_file(self):
+        """Checks the CODEOWNERS file for any uncovered dirs/files and also
+        checks that every pattern in the CODEOWNERS file matches at least one
+        file/dir. Note that this checks the CODEOWNERS file according to the
+        glob patterns supported by Python2.7 environment. For more information
+        please refer https://docs.python.org/2/library/glob.html.
+        """
+        if self.verbose_mode_enabled:
+            print 'Starting CODEOWNERS file check'
+            print '----------------------------------------'
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            codeowner_filepath = '.github/CODEOWNERS'
+            failed = False
+            summary_messages = []
+            # Checks whether every pattern in the CODEOWNERS file matches at
+            # least one dir/file.
+            path_patterns = []
+            for line_num, line in enumerate(FileCache.readlines(
+                    codeowner_filepath)):
+                stripped_line = line.strip()
+                if stripped_line and stripped_line[0] != '#':
+                    if '@' not in line:
+                        print ('%s --> Pattern on line %s doesn\'t have'
+                               'codeowner' % (codeowner_filepath, line_num + 1))
+                        failed = True
+                    else:
+                        # Extract the file pattern from the line.
+                        line_in_concern = line.split('@')[0].strip()
+                        # Adjustments to the dir paths in CODEOWNERS syntax
+                        # for glob-style patterns to match correctly.
+                        if line_in_concern.endswith('/'):
+                            line_in_concern = line_in_concern[:-1]
+                        # The following condition checks whether the specified
+                        # path exists in the codebase or not. The CODEOWNERS
+                        # syntax has paths starting with '/' which refers to
+                        # full path relative to root, but python glob module
+                        # does not conform to this logic and literally matches
+                        # the '/' character. Therefore the leading '/' has to
+                        # be removed for glob patterns to match correctly.
+                        if not glob.glob(line_in_concern.replace('/', '', 1)):
+                            print ('%s --> Pattern on line %s doesn\'t match '
+                                   'any file or directory' % (
+                                       codeowner_filepath, line_num + 1))
+                            failed = True
+                        # Checks if the path is the full path relative to the
+                        # root oppia directory. Patterns starting with '/' are
+                        # considered relative to root whereas patterns starting
+                        # with './' are relative to the .github directory.
+                        if (not line_in_concern.startswith('/') and
+                                not './' +
+                                line_in_concern in CODEOWNER_FILE_PATHS):
+                            print ('%s --> Pattern on line %s is invalid. Use '
+                                   'full path relative to the root directory'
+                                   % (codeowner_filepath, line_num + 1))
+                            failed = True
+                        # The double asterisks pattern is supported by the
+                        # CODEOWNERS syntax but not the glob in Python 2.
+                        # The following condition checks this.
+                        if '**' in line_in_concern:
+                            print ('%s --> Pattern on line %s is invalid. '
+                                   '\'**\' wildcard not allowed' % (
+                                       codeowner_filepath, line_num + 1))
+                            failed = True
+                        # The following list is being populated with the
+                        # paths in the CODEOWNERS file with the removal of the
+                        # leading '/' to aid in the glob pattern matching in
+                        # the next part of the check wherein the valid patterns
+                        # are used to check if they cover the entire codebase.
+                        path_patterns.append(line_in_concern.replace(
+                            '/', '', 1))
+
+            # Checks that every dir/file is covered under CODEOWNERS.
+            for root, _, file_names in os.walk('.'):
+                for file_name in file_names:
+                    # This bool checks if the file belongs to the root
+                    # oppia directory.
+                    is_root_file = False
+                    if os.path.join(root, file_name) in CODEOWNER_FILE_PATHS:
+                        is_root_file = True
+                    if (any(root.startswith(
+                            dir_path) for dir_path in CODEOWNER_DIR_PATHS)
+                            or is_root_file):
+                        match = False
+                        # Ignore .pyc and __init__.py files.
+                        if file_name.endswith(
+                                '.pyc') or file_name == '__init__.py':
+                            match = True
+                            continue
+                        for path_to_match in path_patterns:
+                            # The level of the file in the directory
+                            # structure. For e.g. /core/controllers/
+                            # domain.py is on third level.
+                            # This condition checks if the path to check
+                            # is a directory or a file. If it is a
+                            # file, the level would be the same as found
+                            # by calculating len(path_to_match.split('/'))
+                            # but is reduced by one if it is a directory
+                            # since the split command will return an empty
+                            # string at the last of the list which will
+                            # wrongfully increase the level.
+                            if path_to_match.split('/')[-1]:
+                                level = len(path_to_match.split('/'))
+                            else:
+                                level = len(path_to_match.split('/')) - 1
+                            # This condition finally matches the file being
+                            # walked currently against the path from the
+                            # CODEOWNERS file. The level helps in matching
+                            # by considering the file name upto only the
+                            # the level of the CODEOWNERS path. For e.g.
+                            # if the file being walked upon is /core/domain
+                            # /domain.py and the path from CODEOWNERS to be
+                            # matched is /core/ then it will only consider
+                            # the file name upto level 1 i.e. just the '/core'
+                            # part of the file name since it is sufficient to
+                            # be matched.
+                            if os.path.join(*((
+                                    os.path.join(root, file_name).replace(
+                                        './', '', 1)).split(
+                                            '/')[:level])) in glob.glob(
+                                                path_to_match):
+                                match = True
+                                break
+                        if not match and self.verbose_mode_enabled:
+                            print ('WARNING! %s/%s is not covered under '
+                                   'CODEOWNERS' % (root, file_name))
+
+            if failed:
+                summary_message = '%s   CODEOWNERS file check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = '%s  CODEOWNERS file check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+
+            summary_messages.append(summary_message)
+            print summary_message
+            print ''
+
+        return summary_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2114,13 +2246,15 @@ class LintChecksManager(object):
             self._check_html_tags_and_attributes())
         html_linter_messages = self._lint_html_files()
         pattern_messages = self._check_bad_patterns()
+        codeowner_messages = self._check_codeowner_file()
         all_messages = (
             js_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
             html_directive_name_messages + import_order_messages +
             mandatory_patterns_messages + docstring_messages +
             comment_messages + html_tag_and_attribute_messages +
-            html_linter_messages + linter_messages + pattern_messages)
+            html_linter_messages + linter_messages + pattern_messages +
+            codeowner_messages)
         return all_messages
 
 
