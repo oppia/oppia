@@ -17,16 +17,21 @@
  */
 
 angular.module('topicLandingPageModule').controller('TopicLandingPage', [
-  '$scope', '$timeout', '$window', 'SiteAnalyticsService',
-  'UrlInterpolationService', 'TOPIC_LANDING_PAGE_DATA', function(
-      $scope, $timeout, $window, SiteAnalyticsService,
-      UrlInterpolationService, TOPIC_LANDING_PAGE_DATA) {
+   '$filter', '$scope', '$timeout', '$window', 'PageTitleService',
+  'SiteAnalyticsService', 'UrlInterpolationService', 'TOPIC_LANDING_PAGE_DATA',
+  function(
+      $filter, $scope, $timeout, $window, PageTitleService,
+      SiteAnalyticsService, UrlInterpolationService, TOPIC_LANDING_PAGE_DATA) {
     var pathArray = $window.location.pathname.split('/');
     $scope.subject = pathArray[2];
     $scope.topic = pathArray[3];
     var landingPageData = (
       TOPIC_LANDING_PAGE_DATA[$scope.subject][$scope.topic].page_data);
     var assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
+
+    var capitalizedTopic = $filter('capitalize')($scope.topic);
+    var pageTitle = 'Learn ' + capitalizedTopic + ' - Oppia';
+    PageTitleService.setPageTitle(pageTitle);
 
     $scope.getRowImageUrl = function(index) {
       var imageKey = 'image_' + index;

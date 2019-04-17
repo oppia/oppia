@@ -188,17 +188,23 @@ oppia.directive('stateInteractionEditor', [
                 backdrop: true,
                 resolve: {},
                 controller: [
-                  '$scope', '$uibModalInstance', '$injector',
-                  'StateSolutionService', 'StateInteractionIdService',
-                  'StateCustomizationArgsService',
-                  'InteractionDetailsCacheService', 'INTERACTION_SPECS',
-                  'UrlInterpolationService', 'EditorFirstTimeEventsService',
+                  '$injector', '$scope', '$uibModalInstance',
+                  'EditorFirstTimeEventsService',
+                  'InteractionDetailsCacheService',
+                  'StateCustomizationArgsService', 'StateEditorService',
+                  'StateInteractionIdService', 'StateSolutionService',
+                  'UrlInterpolationService', 'ALLOWED_INTERACTION_CATEGORIES',
+                  'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
+                  'INTERACTION_SPECS',
                   function(
-                      $scope, $uibModalInstance, $injector,
-                      StateSolutionService, StateInteractionIdService,
-                      StateCustomizationArgsService,
-                      InteractionDetailsCacheService, INTERACTION_SPECS,
-                      UrlInterpolationService, EditorFirstTimeEventsService) {
+                      $injector, $scope, $uibModalInstance,
+                      EditorFirstTimeEventsService,
+                      InteractionDetailsCacheService,
+                      StateCustomizationArgsService, StateEditorService,
+                      StateInteractionIdService, StateSolutionService,
+                      UrlInterpolationService, ALLOWED_INTERACTION_CATEGORIES,
+                      ALLOWED_QUESTION_INTERACTION_CATEGORIES,
+                      INTERACTION_SPECS) {
                     EditorFirstTimeEventsService
                       .registerFirstClickAddInteractionEvent();
 
@@ -213,8 +219,14 @@ oppia.directive('stateInteractionEditor', [
                       UrlInterpolationService.getInteractionThumbnailImageUrl);
 
                     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
-                    $scope.ALLOWED_INTERACTION_CATEGORIES = (
-                      GLOBALS.ALLOWED_INTERACTION_CATEGORIES);
+
+                    if (StateEditorService.isInQuestionMode()) {
+                      $scope.ALLOWED_INTERACTION_CATEGORIES = (
+                        ALLOWED_QUESTION_INTERACTION_CATEGORIES);
+                    } else {
+                      $scope.ALLOWED_INTERACTION_CATEGORIES = (
+                        ALLOWED_INTERACTION_CATEGORIES);
+                    }
 
                     if (StateInteractionIdService.savedMemento) {
                       $scope.customizationModalReopened = true;

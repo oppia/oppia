@@ -1,5 +1,10 @@
 # Per-directory ownership and automatic assignment for pull requests.
 
+# The paths to the directory/files must be relative to the location of this
+# file. Wildcards such as '**', '!' are not allowed. Only glob style patterns
+# are allowed. For information about supported glob patterns please refer
+# https://docs.python.org/2/library/glob.html.
+
 # Note: The e2e test files are owned by both the dev workflow and QA teams.
 # - The QA team will do an initial review to verify the PR's test coverage. They
 #   will then ask the dev workflow team for a final review.
@@ -20,17 +25,20 @@
 
 
 # Collection project.
-# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
-/core/controllers/collection*.py @nithusha21
-/core/domain/collection*.py @nithusha21
-/core/storage/collection/ @nithusha21
-/core/templates/dev/head/domain/collection/ @nithusha21
-/core/templates/dev/head/pages/collection_editor/ @nithusha21
-/core/templates/dev/head/pages/collection_player/ @nithusha21
+/core/controllers/collection*.py @kevinlee12
+/core/domain/collection*.py @kevinlee12
+/core/storage/collection/ @kevinlee12
+/core/templates/dev/head/domain/collection/ @kevinlee12
+/core/templates/dev/head/pages/collection_editor/ @kevinlee12
+/core/templates/dev/head/pages/collection_player/ @kevinlee12
 
 
-# Dashboard frontend pages.
+# Dashboard pages.
 /core/controllers/creator_dashboard*.py @nithusha21
+/core/domain/activity*.py @nithusha21
+/core/domain/learner_playlist_services*.py @nithusha21
+/core/domain/learner_progress*.py @nithusha21
+/core/domain/subscription_services*.py @nithusha21
 /core/templates/dev/head/domain/creator_dashboard/ @nithusha21
 /core/templates/dev/head/domain/learner_dashboard/ @nithusha21
 /core/templates/dev/head/pages/creator_dashboard/ @nithusha21
@@ -46,6 +54,12 @@
 # Exploration project.
 /core/controllers/editor*.py @DubeySandeep
 /core/domain/exp*.py @DubeySandeep
+/core/domain/fs*.py @aks681
+/core/domain/param_domain*.py @aks681
+/core/domain/rating_services*.py @DubeySandeep
+/core/domain/state_domain*.py @aks681
+/core/domain/summary_services*.py @aks681
+/core/domain/value_generators_domain*.py @seanlip
 /core/storage/exploration/ @aks681
 /core/templates/dev/head/domain/editor/ @DubeySandeep
 /core/templates/dev/head/domain/exploration/ @DubeySandeep
@@ -82,35 +96,40 @@
 
 
 # Interaction project.
-# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10 for the
-# following directories:
-# - /core/templates/dev/head/domain/objects/
-# - /extensions/interactions/
-/core/templates/dev/head/domain/objects/ @nithusha21
+/core/domain/customization_args_util*.py @seanlip
+/core/domain/interaction_registry*.py @seanlip
+/core/domain/obj_services*.py @seanlip
+/core/templates/dev/head/domain/objects/ @kevinlee12
 /core/templates/dev/head/expressions/ @seanlip
 /extensions/dependencies/ @seanlip
-/extensions/interactions/ @nithusha21
+/extensions/interactions/ @kevinlee12
 /extensions/objects/ @seanlip
 /extensions/value_generators/ @seanlip
 
 
+
 # Lesson Analytics team.
-# TODO(brianrodri): Revert ownership to @brianrodri after 2019-03-31.
-/core/domain/stats*.py @seanlip
-/core/storage/statistics/ @seanlip
-/core/templates/dev/head/domain/statistics/ @seanlip
-/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @seanlip
-/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @seanlip
-/extensions/actions/ @seanlip
-/extensions/answer_summarizers/ @seanlip
-/extensions/issues/ @seanlip
-/extensions/visualizations/ @seanlip
+/core/domain/action_registry*.py @brianrodri
+/core/domain/calculation_registry*.py @brianrodri
+/core/domain/event_services*.py @brianrodri
+/core/domain/playthrough_issue_registry*.py @brianrodri
+/core/domain/stats*.py @brianrodri
+/core/domain/visualization_registry*.py @brianrodri
+/core/storage/statistics/ @brianrodri
+/core/templates/dev/head/domain/statistics/ @brianrodri
+/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @brianrodri
+/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @brianrodri
+/extensions/actions/ @brianrodri
+/extensions/answer_summarizers/ @brianrodri
+/extensions/issues/ @brianrodri
+/extensions/visualizations/ @brianrodri
 
 
 # Library page.
-# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
-/core/controllers/library*.py @nithusha21
-/core/templates/dev/head/pages/library/ @nithusha21
+/core/controllers/library*.py @kevinlee12
+/core/domain/recommendations*.py @seanlip
+/core/domain/search_services*.py @kevinlee12
+/core/templates/dev/head/pages/library/ @kevinlee12
 
 
 # Navigation bar project.
@@ -160,10 +179,13 @@
 
 
 # Infrastructure.
+/core/domain/email*.py @aks681
 /core/platform/ @seanlip
 
 
 # Miscellaneous.
+/core/domain/__init__.py @DubeySandeep
+/core/domain/config*.py @seanlip
 /core/templates/dev/head/pages/about/ @seanlip
 /core/templates/dev/head/pages/privacy/ @seanlip
 /core/templates/dev/head/pages/terms/ @seanlip
@@ -173,6 +195,7 @@
 
 # Restricted pages.
 /core/controllers/admin*.py @seanlip
+/core/domain/moderator_services*.py @seanlip
 /core/templates/dev/head/pages/admin/ @seanlip
 /core/templates/dev/head/pages/moderator/ @seanlip
 
@@ -182,6 +205,7 @@
 
 
 # Rich text editor team.
+/core/domain/rte_component_registry*.py @AllanYangZhou @bansalnitish
 /core/templates/dev/head/components/CkEditorRteDirective.js @AllanYangZhou @bansalnitish
 /extensions/rich_text_components/ @AllanYangZhou @bansalnitish
 /extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
@@ -227,9 +251,8 @@
 
 
 # User’s profile page.
-# TODO(kevinlee12): Revert ownership to @kevinlee12 after 2019-04-10.
-/core/templates/dev/head/domain/user/ @nithusha21
-/core/templates/dev/head/pages/profile/ @nithusha21
+/core/templates/dev/head/domain/user/ @kevinlee12
+/core/templates/dev/head/pages/profile/ @kevinlee12
 
 
 # Critical files.
@@ -240,9 +263,13 @@
 #
 #     https://help.github.com/en/articles/about-code-owners
 #
+/core/domain/dependency_registry*.py @seanlip
+/core/domain/html*.py @seanlip
+/core/domain/rights_manager*.py @seanlip
+/core/domain/role_services*.py @seanlip
+/core/storage/ @seanlip
+/core/domain/user*.py @seanlip
+/export/ @seanlip
 /manifest.json @seanlip @vojtechjelinek
 /scripts/install_third_party.sh @seanlip @vojtechjelinek
-/core/storage/ @seanlip
-/core/domain/html*.py @seanlip
-/export/ @seanlip
 /.github/CODEOWNERS @seanlip
