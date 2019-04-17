@@ -182,18 +182,22 @@ BAD_PATTERNS_JS_REGEXP = [
     }
 ]
 
+MANDATORY_PATTERNS_REGEXP = [
+    {
+        'regexp': r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.',
+        'message': 'Please ensure this file should contain a proper '
+                   'copyright notice.',
+        'included_types': ('.py', '.js', '.sh'),
+        'excluded_files': (),
+        'excluded_dirs': ()
+    }
+]
+
 MANDATORY_PATTERNS_JS_REGEXP = [
     {
         'regexp': r'^\s\*\s@fileoverview\s[a-zA-Z0-9_]+',
         'message': 'Please ensure this file should contain a file '
                    'overview i.e. a short description of the file.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': r'^//\sCopyright\s\d{4}\sThe\sOppia\sAuthors\.\sAll\sRights\sReserved\.',
-        'message': 'Please ensure this file should contain a proper '
-                   'copyright notice.',
         'excluded_files': (),
         'excluded_dirs': ()
     }
@@ -966,8 +970,7 @@ class LintChecksManager(object):
         """
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
-        self.parsed_js_files, self.read_js_files = (
-            self._validate_and_parse_js_files())
+        self.parsed_js_files = self._validate_and_parse_js_files()
 
     def _validate_and_parse_js_files(self):
         """This function validates JavaScript files and returns the parsed
@@ -981,22 +984,19 @@ class LintChecksManager(object):
             and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                         EXCLUDED_PATHS)]
         parsed_js_files = dict()
-        read_js_files = dict()
         if not files_to_check:
-            return (parsed_js_files, read_js_files)
+            return parsed_js_files
         if not self.verbose_mode_enabled:
             print 'Validating and parsing JS files ...'
         for filepath in files_to_check:
             if self.verbose_mode_enabled:
                 print 'Validating and parsing %s file ...' % filepath
             file_content = FileCache.read(filepath).decode('utf-8')
-            file_content_lines = FileCache.readlines(filepath)
-            read_js_files[filepath] = file_content_lines
 
             # Use esprima to parse a JS file.
             parsed_js_files[filepath] = esprima.parseScript(
                 file_content, comment=True)
-        return (parsed_js_files, read_js_files)
+        return parsed_js_files
 
     def _lint_all_files(self):
         """This function is used to check if node-eslint dependencies are
@@ -1342,36 +1342,39 @@ class LintChecksManager(object):
             print ''
             return summary_messages
 
-    def _check_mandatory_js_patterns(self):
+    def _check_mandatory_patterns(self):
         """This function checks that all JS files contain the mandatory
         patternss.
         """
         if self.verbose_mode_enabled:
-            print 'Starting mandatory js patterns check'
+            print 'Starting mandatory patterns check'
             print '----------------------------------------'
 
         summary_messages = []
         failed = False
-        files_to_check = [
-            filepath for filepath in self.all_filepaths if (
-                filepath.endswith('.js'))
-            and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                        EXCLUDED_PATHS + GENERATED_FILE_PATHS +
-                        CONFIG_FILE_PATHS)]
+        all_files_to_check = [
+            filepath for filepath in self.all_filepaths if not any(
+                fnmatch.fnmatch(filepath, pattern) for pattern in
+                EXCLUDED_PATHS + GENERATED_FILE_PATHS +
+                CONFIG_FILE_PATHS) and not filepath.endswith(
+                    '__init__.py')]
 
         with _redirect_stdout(_TARGET_STDOUT):
-            for filepath in files_to_check:
-                parsed_script = self.read_js_files[filepath]
+            for filepath in all_files_to_check:
+                file_content = FileCache.readlines(filepath)
                 # This boolean list keeps track of the regex matches
                 # found in the file.
                 pattern_found_list = []
                 for index, regexp_to_check in enumerate(
-                        MANDATORY_PATTERNS_JS_REGEXP):
-                    pattern_found_list.append(False)
-                    for line in parsed_script:
-                        if re.match(regexp_to_check['regexp'], line):
-                            pattern_found_list[index] = True
-                            break
+                        MANDATORY_PATTERNS_REGEXP):
+                    if any([filepath.endswith(
+                            allowed_type) for allowed_type in regexp_to_check[
+                                'included_types']]):
+                        pattern_found_list.append(False)
+                        for line in file_content:
+                            if re.search(regexp_to_check['regexp'], line):
+                                pattern_found_list[index] = True
+                                break
                 if not all(pattern_found_list):
                     failed = True
                     for index, pattern_found_bool in enumerate(
@@ -1379,15 +1382,34 @@ class LintChecksManager(object):
                         if not pattern_found_bool:
                             print '%s --> %s' % (
                                 filepath,
-                                MANDATORY_PATTERNS_JS_REGEXP[index]['message'])
+                                MANDATORY_PATTERNS_REGEXP[index]['message'])
+
+                if filepath.endswith('.js'):
+                    pattern_found_list = []
+                    for index, regexp_to_check in enumerate(
+                            MANDATORY_PATTERNS_JS_REGEXP):
+                        pattern_found_list.append(False)
+                        for line in file_content:
+                            if re.search(regexp_to_check['regexp'], line):
+                                pattern_found_list[index] = True
+                                break
+                    if not all(pattern_found_list):
+                        failed = True
+                        for index, pattern_found_bool in enumerate(
+                                pattern_found_list):
+                            if not pattern_found_bool:
+                                print '%s --> %s' % (
+                                    filepath,
+                                    MANDATORY_PATTERNS_JS_REGEXP[index][
+                                        'message'])
 
             if failed:
                 summary_message = (
-                    '%s  Mandatory JS pattern check failed' % (
+                    '%s  Mandatory pattern check failed' % (
                         _MESSAGE_TYPE_FAILED))
             else:
                 summary_message = (
-                    '%s  Mandatory JS pattern check passed' % (
+                    '%s  Mandatory pattern check passed' % (
                         _MESSAGE_TYPE_SUCCESS))
             print summary_message
 
@@ -2065,57 +2087,6 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def _check_for_copyright_notice(self):
-        """This function checks whether the copyright notice
-        is present at the beginning of files.
-        """
-        if self.verbose_mode_enabled:
-            print 'Starting copyright notice check'
-            print '----------------------------------------'
-        py_files_to_check = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.py') and (not filepath.endswith('__init__.py'))]
-        sh_files_to_check = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.sh')]
-        all_files_to_check = (
-            py_files_to_check + sh_files_to_check)
-        regexp_to_check = (
-            r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.')
-
-        failed = False
-        summary_messages = []
-
-        with _redirect_stdout(_TARGET_STDOUT):
-            for filepath in all_files_to_check:
-                has_copyright_notice = False
-                for line in FileCache.readlines(filepath)[:5]:
-                    if re.search(regexp_to_check, line):
-                        has_copyright_notice = True
-                        break
-
-                if not has_copyright_notice:
-                    failed = True
-                    print (
-                        '%s --> Please add a proper copyright notice to this '
-                        'file.' % (filepath))
-                    print ''
-
-            if failed:
-                summary_message = '%s   Copyright notice check failed' % (
-                    _MESSAGE_TYPE_FAILED)
-                print summary_message
-                summary_messages.append(summary_message)
-            else:
-                summary_message = '%s  Copyright notice check passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
-                print summary_message
-                summary_messages.append(summary_message)
-
-            print ''
-
-        return summary_messages
-
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2127,7 +2098,7 @@ class LintChecksManager(object):
         linter_messages = self._lint_all_files()
         js_component_messages = self._check_js_component_name_and_count()
         directive_scope_messages = self._check_directive_scope()
-        mandatory_js_patterns_messages = self._check_mandatory_js_patterns()
+        mandatory_patterns_messages = self._check_mandatory_patterns()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
         controller_dependency_messages = (
@@ -2143,16 +2114,13 @@ class LintChecksManager(object):
             self._check_html_tags_and_attributes())
         html_linter_messages = self._lint_html_files()
         pattern_messages = self._check_bad_patterns()
-        copyright_notice_messages = (
-            self._check_for_copyright_notice())
         all_messages = (
             js_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
             html_directive_name_messages + import_order_messages +
-            mandatory_js_patterns_messages + docstring_messages +
+            mandatory_patterns_messages + docstring_messages +
             comment_messages + html_tag_and_attribute_messages +
-            html_linter_messages + linter_messages + pattern_messages +
-            copyright_notice_messages)
+            html_linter_messages + linter_messages + pattern_messages)
         return all_messages
 
 
