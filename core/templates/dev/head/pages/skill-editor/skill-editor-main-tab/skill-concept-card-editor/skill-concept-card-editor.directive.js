@@ -29,9 +29,8 @@ angular.module('skillConceptCardEditorModule').directive(
         restrict: 'E',
         scope: {},
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/skill-editor/skill-editor-editor-tab' +
-          '/skill-concept-card-editor' +
-          '/skill-concept-card-editor.directive.html'),
+          'core/templates/dev/head/pages/skill-editor/skill-editor-main-tab/' +
+          'skill-concept-card-editor/skill-concept-card-editor.directive.html'),
         controller: [
           '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
           function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {

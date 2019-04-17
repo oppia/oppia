@@ -90,6 +90,7 @@ angular.module('stateEditorModule').directive('stateEditor', [
 
           $rootScope.$broadcast('stateEditorDirectiveInitialized');
         }
-      ]
+      ],
+      controllerAs: 'stateEditorController'
     };
   }]);

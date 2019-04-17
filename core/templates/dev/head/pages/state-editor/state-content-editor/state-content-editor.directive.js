@@ -103,7 +103,8 @@ angular.module('stateContentEditorModule').directive('stateContentEditor', [
             $scope.contentEditorIsOpen = false;
           };
         }
-      ]
+      ],
+      controllerAs: 'stateContentEditorController'
     };
   }
 ]);

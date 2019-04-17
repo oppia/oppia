@@ -27,8 +27,9 @@ angular.module('misconceptionEditorModule').directive(
           isEditable: '&isEditable'
         },
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/skill-editor/skill-editor-editor-tab/misconception-editor/' +
-          'misconception-editor.directive.html'),
+          'core/templates/dev/head/pages/skill-editor/' +
+          'skill-editor-main-tab/skill-misconceptions-editor/' +
+          'misconception-editor/misconception-editor.directive.html'),
         controller: [
           '$scope', 'SkillUpdateService', 'SkillEditorStateService',
           function($scope, SkillUpdateService, SkillEditorStateService) {

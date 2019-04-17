@@ -23,8 +23,8 @@ angular.module('skillEditorMainTabModule').directive('skillEditorMainTab', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor/skill-editor-editor-tab/' +
-        'skill-editor-main-tab/skill-editor-main-tab.directive.html'),
+        'core/templates/dev/head/pages/skill-editor/skill-editor-main-tab' +
+        '/skill-editor-main-tab.directive.html'),
       controller: [
         '$scope', 'SkillEditorStateService',
         function($scope, SkillEditorStateService) {

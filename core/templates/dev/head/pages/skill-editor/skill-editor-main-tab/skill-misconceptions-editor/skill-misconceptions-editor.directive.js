@@ -25,9 +25,9 @@ angular.module('skillMisconceptionsEditorModule').directive(
         restrict: 'E',
         scope: {},
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/skill-editor/skill-editor-editor-tab' +
-          '/skill-misconceptions-editor' +
-          '/skill-misconceptions-editor.directive.html'),
+          'core/templates/dev/head/pages/skill-editor/skill-editor-main-tab/' +
+          'skill-misconceptions-editor/' +
+          'skill-misconceptions-editor.directive.html'),
         controller: [
           '$scope', '$filter', '$uibModal', '$rootScope',
           'MisconceptionObjectFactory', 'EVENT_SKILL_REINITIALIZED',
