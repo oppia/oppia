@@ -20,10 +20,12 @@ describe('ImprovementCardService', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     this.ImprovementCardService = $injector.get('ImprovementCardService');
+
     this.FeedbackImprovementCardObjectFactory =
       $injector.get('FeedbackImprovementCardObjectFactory');
     this.PlaythroughImprovementCardObjectFactory =
       $injector.get('PlaythroughImprovementCardObjectFactory');
+
     this.expectedFactories = [
       this.FeedbackImprovementCardObjectFactory,
       this.PlaythroughImprovementCardObjectFactory,
