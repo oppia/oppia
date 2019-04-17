@@ -26,20 +26,6 @@ from core.platform import models
 datastore_services = models.Registry.import_datastore_services()
 
 
-def has_undeleted_model_for_id(model_class, model_id):
-    """Checks there's an existing nondeleted model for given model_id.
-
-    Args:
-        model_class: BaseModel. Class of the model.
-        model_id: str. Id of the model.
-
-    Returns:
-        bool. True if there exists a model with given model_id.
-    """
-    model = model_class.get_by_id(model_id)
-    return model is not None and model.deleted is False
-
-
 class BaseModelValidator(object):
     """Base class for validating models."""
 
@@ -67,12 +53,11 @@ class BaseModelValidator(object):
         multiple_models_keys_to_fetch = {}
         for field_name, model_class in (
                 cls._external_id_relationships().iteritems()):
-            model_ids = getattr(item, field_name)
-            if model_ids:
-                if isinstance(model_ids, str):
-                    model_ids = [model_ids]
+            field_value = getattr(item, field_name)
+            if field_value:
                 multiple_models_keys_to_fetch[field_name] = (
-                    model_class, model_ids)
+                    model_class, [field_value] if isinstance(field_value, str)
+                    else field_value)
         fetched_model_instances = (
             datastore_services.fetch_multiple_entities_by_ids_and_models(
                 multiple_models_keys_to_fetch.values()))
@@ -145,7 +130,7 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key == 'fully-validated UserSubscriptionModels':
+        if 'fully-validated' in key:
             yield (key, len(values))
         else:
             yield (key, values)
