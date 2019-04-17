@@ -50,6 +50,10 @@ var closeEditTestRolesForm = function() {
   element(by.css('.protractor-test-cancel-save-role')).click();
 };
 
+var checkForAddTitleWarning = function() {
+  return element(by.className('protractor-test-title-warning')).isDisplayed();
+};
+
 // Creates a new exploration and wait for the exploration tutorial to start.
 var createExplorationAndStartTutorial = function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
@@ -202,6 +206,7 @@ exports.openEditTestRolesForm = openEditTestRolesForm;
 exports.canAddUser = canAddUser;
 exports.closeEditTestRolesForm = closeEditTestRolesForm;
 exports.setTitleForExploration = setTitleForExploration;
+exports.checkForAddTitleWarning = checkForAddTitleWarning;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
