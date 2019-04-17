@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the practice session.
  */
 
-angular.module("practiceSessionPageModule").controller('PracticeSession', [
+angular.module('practiceSessionPageModule').controller('PracticeSession', [
   '$rootScope', '$scope', '$window', 'AlertsService',
   'UrlService', 'FATAL_ERROR_CODES',
   function(

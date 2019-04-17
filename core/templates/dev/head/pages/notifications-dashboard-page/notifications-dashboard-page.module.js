@@ -16,4 +16,4 @@
  * @fileoverview Module for the user's notifications dashboard.
  */
 
-angular.module('notificationsDashboardPageModule', [])
+angular.module('notificationsDashboardPageModule', []);

@@ -16,4 +16,4 @@
 * @fileoverview Module for the Oppia moderator page.
 */
 
-angular.module('moderatorPageModule', [])
+angular.module('moderatorPageModule', []);

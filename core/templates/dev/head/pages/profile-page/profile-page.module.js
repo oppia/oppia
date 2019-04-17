@@ -16,4 +16,4 @@
  * @fileoverview Module for the Oppia profile page.
  */
 
-angular.module("profilePageModule", [])
+angular.module('profilePageModule', []);

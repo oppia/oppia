@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia profile page.
  */
 
-angular.module("profilePageModule").controller('Profile', [
+angular.module('profilePageModule').controller('Profile', [
   '$http', '$log', '$rootScope', '$scope', '$window', 'DateTimeFormatService',
   'UrlInterpolationService', 'UserService',
   function($http, $log, $rootScope, $scope, $window, DateTimeFormatService,

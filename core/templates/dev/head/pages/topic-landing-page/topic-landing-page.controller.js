@@ -17,7 +17,7 @@
  */
 
 angular.module('topicLandingPageModule').controller('TopicLandingPage', [
-   '$filter', '$scope', '$timeout', '$window', 'PageTitleService',
+  '$filter', '$scope', '$timeout', '$window', 'PageTitleService',
   'SiteAnalyticsService', 'UrlInterpolationService', 'TOPIC_LANDING_PAGE_DATA',
   function(
       $filter, $scope, $timeout, $window, PageTitleService,

@@ -16,4 +16,4 @@
  * @fileoverview Module for the Oppia 'edit preferences' page.
  */
 
-angular.module("preferencesPageModule", []);
+angular.module('preferencesPageModule', []);

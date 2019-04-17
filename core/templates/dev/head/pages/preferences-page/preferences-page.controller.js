@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
  */
 
-angular.module("preferencesPageModule").controller('Preferences', [
+angular.module('preferencesPageModule').controller('Preferences', [
   '$http', '$q', '$rootScope', '$scope', '$timeout', '$translate', '$uibModal',
   'AlertsService', 'LanguageUtilService', 'UrlInterpolationService',
   'UserService', 'UtilsService', 'DASHBOARD_TYPE_CREATOR',

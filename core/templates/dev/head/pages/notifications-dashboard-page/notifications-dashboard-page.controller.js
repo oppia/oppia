@@ -16,8 +16,9 @@
  * @fileoverview Data and controllers for the user's notifications dashboard.
  */
 
-angular.module('notificationsDashboardPageModule').controller('NotificationsDashboard', [
-  '$http', '$rootScope', '$scope', 'DateTimeFormatService',
+angular.module('notificationsDashboardPageModule').controller(
+  'NotificationsDashboard', ['$http', '$rootScope', '$scope',
+  'DateTimeFormatService',
   function($http, $rootScope, $scope, DateTimeFormatService) {
     $scope.getItemUrl = function(activityId, notificationType) {
       return (
