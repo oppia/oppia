@@ -116,8 +116,7 @@ oppia.directive('feedbackPopup', [
           $scope.saveFeedback = function() {
             if ($scope.feedbackText) {
               $http.post(feedbackUrl, {
-                subject: $filter('getAbbreviatedText')(
-                  $scope.feedbackTitle, FEEDBACK_SUBJECT_MAX_CHAR_LIMIT),
+                subject: $scope.feedbackTitle,
                 feedback: $scope.feedbackText,
                 include_author: (
                   !$scope.isSubmitterAnonymized && $scope.isLoggedIn),
