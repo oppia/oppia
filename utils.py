@@ -673,6 +673,21 @@ def convert_to_str(string_to_convert):
     return string_to_convert
 
 
+def convert_to_unicode(string_to_convert):
+    """Converts the given bytes string to a unicode string. If the string is
+    already unicode, we return the unicode string.
+
+    Args:
+        string_to_convert: unicode|bytes.
+
+    Returns:
+        unicode. The decoded string.
+    """
+    if isinstance(string_to_convert, bytes):
+        return string_to_convert.decode('utf-8')
+    return string_to_convert
+
+
 def get_hashable_value(value):
     """This function returns a hashable version of the input JSON-like value.
 
