@@ -56,7 +56,8 @@
         <ul class="nav oppia-option-list nav-stacked nav-pills"
             role="tablist"
             ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS"
-            ng-model="bindableFieldsDict.displayedWorkedExamples">
+            ng-model="bindableFieldsDict.displayedWorkedExamples"
+            style="position: relative;">
           <li ng-repeat="workedExample in bindableFieldsDict.displayedWorkedExamples"
               ng-class="{'active': activeWorkedExampleIndex === $index, 'last-element': $index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
               class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection"
