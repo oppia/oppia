@@ -157,19 +157,30 @@ oppia.controller('ExplorationEditorTab', [
       var stateName = StateEditorService.getActiveStateName();
       var state = ExplorationStatesService.getState(stateName);
       var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
+      var writtenTranslations = state.writtenTranslations;
       if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
+        contentId) || writtenTranslations.hasUnflaggedWrittenTranslations(
         contentId)) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/forms/' +
-            'mark_all_audio_as_needing_update_modal_directive.html'),
+            '/components/forms/mark_all_audio_and_translations_as_needing_' +
+            'update_modal_directive.html'),
           backdrop: true,
-          resolve: {},
-          controller: 'MarkAllAudioAsNeedingUpdateController'
+          controller: 'MarkAllAudioAndTranslationsAsNeedingUpdateController'
         }).result.then(function() {
-          contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(contentId);
-          ExplorationStatesService.saveContentIdsToAudioTranslations(
-            stateName, contentIdsToAudioTranslations);
+          if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
+            contentId)) {
+            contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
+              contentId);
+            ExplorationStatesService.saveContentIdsToAudioTranslations(
+              stateName, contentIdsToAudioTranslations);
+          }
+          if (writtenTranslations.hasUnflaggedWrittenTranslations(
+            contentId)) {
+            writtenTranslations.markAllTranslationsAsNeedingUpdate(contentId);
+            ExplorationStatesService.saveWrittenTranslations(
+              stateName, writtenTranslations);
+          }
         });
       }
     };

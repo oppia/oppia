@@ -19,6 +19,7 @@ describe('ItemSelectionInputValidationService', function() {
   var goodAnswerGroups, goodDefaultOutcome;
   var customizationArguments;
   var oof, agof, rof;
+  var badAnswerGroup;
 
   beforeEach(function() {
     module('oppia');
@@ -68,6 +69,50 @@ describe('ItemSelectionInputValidationService', function() {
       false,
       null)
     ];
+    ThreeInputsAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: ['Selection 1', 'Selection 2', 'Selection 3']
+        }
+      })],
+      goodDefaultOutcome,
+      false,
+      null)
+    ];
+    OneInputAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'Equals',
+        inputs: {
+          x: ['Selection 1']
+        }
+      })],
+      goodDefaultOutcome,
+      false,
+      null)
+    ];
+    NoInputAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'ContainsAtLeastOneOf',
+        inputs: {
+          x: []
+        }
+      })],
+      goodDefaultOutcome,
+      false,
+      null)
+    ];
+    IsProperSubsetValidOption = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'IsProperSubsetOf',
+        inputs: {
+          x: ['Selection 1']
+        }
+      })],
+      goodDefaultOutcome,
+      false,
+      null)
+    ];
   }));
 
   it('should be able to perform basic validation', function() {
@@ -91,14 +136,14 @@ describe('ItemSelectionInputValidationService', function() {
       customizationArguments.minAllowableSelectionCount.value = 3;
 
       var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups,
+        currentState, customizationArguments, ThreeInputsAnswerGroups,
         goodDefaultOutcome);
-      expect(warnings).toEqual([{
+      expect(warnings).toContain({
         type: WARNING_TYPES.CRITICAL,
         message: (
           'Please ensure that the max allowed count is not less than the ' +
           'min count.')
-      }]);
+      });
     });
 
   it(
@@ -131,7 +176,7 @@ describe('ItemSelectionInputValidationService', function() {
       customizationArguments.maxAllowableSelectionCount.value = 3;
 
       var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups,
+        currentState, customizationArguments, ThreeInputsAnswerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
@@ -165,4 +210,53 @@ describe('ItemSelectionInputValidationService', function() {
       message: 'Please ensure the choices are unique.'
     }]);
   });
+
+  it(
+    'should expect more that 1 element to be in the rule input, if the ' +
+    '"proper subset" rule is used.',
+    function() {
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, IsProperSubsetValidOption,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'In answer group 1, ' +
+          'rule 1, the "proper subset" rule must include at least 2 options.')
+      }]);
+    });
+
+  it(
+    'should expect number of correct options to be in between the maximum ' +
+    'and minimum allowed selections when the "Equals" rule is used.',
+    function() {
+      // Make min allowed selections greater than correct answers.
+      customizationArguments.minAllowableSelectionCount.value = 2;
+
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, OneInputAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'In answer group 1, rule 1, the number of correct options in ' +
+          'the "Equals" rule should be between 2 and 2 (the ' +
+          'minimum and maximum allowed selection counts).')
+      }]);
+    });
+
+  it(
+    'should expect at least one option when ' +
+    '"ContainsAtLeastOneOf" rule is used.',
+    function() {
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, NoInputAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'In answer group 1, rule 1, the "ContainsAtLeastOneOf" rule ' +
+          'should have at least one option.')
+      }]);
+    });
 });
