@@ -227,7 +227,7 @@ describe('Permissions for private explorations', function() {
 
       workflow.openEditTestRolesForm();
       expect(workflow.canAddUser()).toBe(false);
-      explorationEditorSettingsTab.setTitle('Chuck Norris');
+      workflow.setTitleForExploration('Chuck Norris');
       expect(workflow.canAddUser()).toBe(true);
       workflow.closeEditTestRolesForm();
     }
@@ -240,7 +240,7 @@ describe('Permissions for private explorations', function() {
     users.login('alice@privileges.com');
     workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Chuck Norris');
+    workflow.setTitleForExploration('Chuck Norris');
     workflow.addExplorationCollaborator('bobPrivileges');
     expect(workflow.getExplorationManagers()).toEqual(['alicePrivileges']);
     expect(workflow.getExplorationCollaborators()).toEqual(['bobPrivileges']);
@@ -272,7 +272,7 @@ describe('Permissions for private explorations', function() {
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorPage.saveChanges('Added content to first card.');
     explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Lady Haha')
+    workflow.setTitleForExploration('Lady haha');
     workflow.addExplorationTranslator('translator');
     expect(workflow.getExplorationManagers()).toEqual(['expOwner']);
     expect(workflow.getExplorationCollaborators()).toEqual([]);
