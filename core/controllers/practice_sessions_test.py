@@ -83,3 +83,29 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
                     feconf.PRACTICE_SESSION_URL_PREFIX,
                     'non_existent_topic_name'),
                 expected_status_int=404)
+
+
+class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
+
+    def test_any_user_can_access_practice_sessions_data(self):
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public_topic_name'))
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(len(json_response['skill_list']), 2)
+        self.assertEqual(json_response['skill_list'][0], 'skill_id_1')
+        self.assertEqual(json_response['skill_list'][1], 'skill_id_2')
+
+    def test_no_user_can_access_unpublished_topic_practice_session_data(self):
+        self.get_json(
+            '%s/%s' % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'private_topic_name'),
+            expected_status_int=404)
+
+    def test_get_fails_when_topic_doesnt_exist(self):
+        self.get_json(
+            '%s/%s' % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'non_existent_topic_name'),
+            expected_status_int=404)
