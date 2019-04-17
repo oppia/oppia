@@ -31,13 +31,6 @@ var createExploration = function() {
   explorationEditorMainTab.exitTutorial();
 };
 
-var setTitleForExploration = function(name) {
-  element(by.model('explorationTitleService.displayed')).clear().then(
-    function() {
-      element(by.model('explorationTitleService.displayed')).sendKeys(name);
-    });
-};
-
 var openEditTestRolesForm = function() {
   element(by.css('.protractor-test-edit-roles')).click();
 };
@@ -201,7 +194,6 @@ exports.createExplorationAsAdmin = createExplorationAsAdmin;
 exports.openEditTestRolesForm = openEditTestRolesForm;
 exports.canAddUser = canAddUser;
 exports.closeEditTestRolesForm = closeEditTestRolesForm;
-exports.setTitleForExploration = setTitleForExploration;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
