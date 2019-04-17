@@ -1,8 +1,4 @@
-<!--
-<span><[getHumanReadableStatus(data.status)]></span>
-<div><[data.subject]></div>
-<span ng-if="data.originalAuthorName"><[data.originalAuthorName]></span>
-<span><[getLocaleAbbreviatedDatetimeString(data.lastUpdated)]></span>
--->
-<[angular.toJson(data)]>
-:(
+<span><[getHumanReadableStatus(getData().status)]></span>
+<div><[getData().subject]></div>
+<span ng-if="getData().originalAuthorName"><[getData().originalAuthorName]></span>
+<span><[getLocaleAbbreviatedDatetimeString(getData().lastUpdated)]></span>

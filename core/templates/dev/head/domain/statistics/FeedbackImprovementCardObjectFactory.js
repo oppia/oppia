@@ -32,12 +32,6 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew('Test', function() {}),
       ];
-      this._directiveData = {
-        status: feedbackThread.status,
-        subject: feedbackThread.subject,
-        originalAuthorName: feedbackThread.originalAuthorName,
-        lastUpdated: feedbackThread.lastUpdated,
-      };
     };
 
     /**
@@ -66,7 +60,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * @returns {{}}
      */
     FeedbackImprovementCard.prototype.getDirectiveData = function() {
-      return this._directiveData;
+      return this._feedbackThread;
     };
 
     /**
@@ -80,6 +74,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
     return {
       /** @returns {FeedbackImprovementCard} */
       createNew: function(feedbackThread) {
+        // console.log(angular.toJson(feedbackThread));
         return new FeedbackImprovementCard(feedbackThread);
       },
       /**
@@ -87,7 +82,10 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
        *    threads associated to the current exploration.
        */
       fetchCards: function() {
-        return ThreadDataService.data.feedbackThreads.map(this.createNew);
+        var createNew = this.createNew;
+        return ThreadDataService.fetchThreads().then(function() {
+          return ThreadDataService.data.feedbackThreads.map(createNew);
+        });
       },
     };
   }

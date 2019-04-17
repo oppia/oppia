@@ -25,11 +25,13 @@ oppia.directive('feedbackImprovementCard', [
       controller: [
         '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
         function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
+          /*
           $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
           $scope.getHumanReadableStatus = (
             ThreadStatusDisplayService.getHumanReadableStatus);
           $scope.getLocaleAbbreviatedDatetimeString = (
             DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
+          */
         }
       ],
     };

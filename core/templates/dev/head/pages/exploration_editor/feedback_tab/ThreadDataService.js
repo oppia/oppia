@@ -48,15 +48,11 @@ oppia.factory('ThreadDataService', [
 
     var _fetchThreads = function(successCallback) {
       var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
-      var params = {
-        target_type: 'exploration',
-        target_id: _expId
-      };
       var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-        params: params
+        params: {target_type: 'exploration', target_id: _expId}
       });
 
-      $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
+      return $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
         _data.feedbackThreads = res[0].data.feedback_thread_dicts.map(
           FeedbackThreadObjectFactory.createFromBackendDict);
 
@@ -102,13 +98,13 @@ oppia.factory('ThreadDataService', [
     return {
       data: _data,
       fetchThreads: function(successCallback) {
-        _fetchThreads(successCallback);
+        return _fetchThreads(successCallback);
       },
       fetchMessages: function(threadId) {
-        _fetchMessages(threadId);
+        return _fetchMessages(threadId);
       },
       fetchFeedbackStats: function() {
-        $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
+        return $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
           _openThreadsCount = response.data.num_open_threads;
         });
       },
