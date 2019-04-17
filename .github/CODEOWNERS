@@ -56,7 +56,6 @@
 /scripts/ @apb7
 
 
-
 # Exploration project.
 /core/controllers/editor*.py @DubeySandeep
 /core/controllers/reader*.py @aks681
@@ -252,6 +251,7 @@
 
 # Simple pages.
 /core/controllers/pages*.py @vojtechjelinek
+/core/controllers/custom_landing_pages*.py @vojtechjelinek
 /core/templates/dev/head/pages/contact/ @vojtechjelinek
 /core/templates/dev/head/pages/donate/ @vojtechjelinek
 /core/templates/dev/head/pages/error/ @vojtechjelinek
