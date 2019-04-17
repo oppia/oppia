@@ -329,7 +329,7 @@ angular.module('creatorDashboardModule').controller('CreatorDashboard', [
       var topicSummaries = $scope.topicSummaries;
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/creator_dashboard/create-question-modal-directive.html'),
+          '/pages/creator_dashboard/create-question-modal.directive.html'),
         backdrop: 'static',
         keyboard: false,
         size: 'lg',
