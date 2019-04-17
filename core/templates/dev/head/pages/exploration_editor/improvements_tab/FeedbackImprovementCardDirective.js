@@ -32,6 +32,6 @@ oppia.directive('feedbackImprovementCard', [
             DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
         }
       ],
-    }
+    };
   }
 ]);
