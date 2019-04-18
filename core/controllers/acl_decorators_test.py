@@ -1184,6 +1184,78 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class EditSuggestionDecoratorsTests(test_utils.GenericTestBase):
+    """Test for can_edit_suggestion."""
+    owner_username = 'owner'
+    owner_email = 'owner@example.com'
+    username = 'user'
+    user_email = 'user@example.com'
+    author_username = 'author'
+    author_email = 'author@example.com'
+    exploration_id = 'exp_id'
+    TARGET_TYPE = 'exploration'
+    SUGGESTION_TYPE = 'edit_exploration_state_content'
+    exploration_id = 'exp_id'
+    target_version_id = 1
+    change_dict = {
+        'cmd': 'edit_state_property',
+        'property_name': 'content',
+        'state_name': 'Introduction',
+        'new_value': ''
+    }
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_edit_suggestion
+        def get(self, suggestion_id):
+            self.render_json({'suggestion_id': suggestion_id})
+
+    def setUp(self):
+        super(EditSuggestionDecoratorsTests, self).setUp()
+        self.signup(self.owner_email, self.owner_username)
+        self.signup(self.author_email, self.author_username)
+        self.signup(self.user_email, self.username)
+        self.author_id = self.get_user_id_from_email(self.author_email)
+        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.user_id = self.get_user_id_from_email(self.user_email)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<suggestion_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_default_exploration(self.exploration_id, self.owner_id)
+        suggestion_services.create_suggestion(
+            self.SUGGESTION_TYPE, self.TARGET_TYPE,
+            self.exploration_id, self.target_version_id,
+            self.author_id,
+            self.change_dict, '', None)
+        suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id),
+             ('target_id', self.exploration_id)])[0]
+        self.suggestion_id = suggestion.suggestion_id
+
+    def test_suggestion_creator_can_edit_suggestion(self):
+        self.login(self.author_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.suggestion_id)
+        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+        self.logout()
+
+    def test_exploration_owner_can_edit_suggestion(self):
+        self.login(self.owner_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.suggestion_id)
+        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+        self.logout()
+
+    def test_normal_user_can_edit_suggestion(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s' % self.suggestion_id,
+                          expected_status_int=401)
+        self.logout()
+
+
 class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
     """Tests for can_resubmit_suggestion decorator."""
     owner_username = 'owner'
