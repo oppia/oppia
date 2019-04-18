@@ -217,6 +217,20 @@ describe('Permissions for private explorations', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
+  it('should not be changeable if title is not given to exploration',
+    function() {
+      users.createUser('checkFor@title.com', 'Thanos');
+      users.login('checkFor@title.com');
+      workflow.createExploration();
+      explorationEditorPage.navigateToSettingsTab();
+
+      explorationEditorSettingsTab.setTitle('Pass');
+      expect(workflow.canAddRolesToUsers()).toBe(false);
+      workflow.triggerTitleOnBlurEvent();
+      expect(workflow.canAddRolesToUsers()).toBe(true);
+    }
+  );
+
   it('should be correct for collaborators', function() {
     users.createUser('alice@privileges.com', 'alicePrivileges');
     users.createUser('bob@privileges.com', 'bobPrivileges');
@@ -225,6 +239,7 @@ describe('Permissions for private explorations', function() {
     users.login('alice@privileges.com');
     workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle('CollaboratorPermissions');
     workflow.addExplorationCollaborator('bobPrivileges');
     expect(workflow.getExplorationManagers()).toEqual(['alicePrivileges']);
     expect(workflow.getExplorationCollaborators()).toEqual(['bobPrivileges']);
@@ -256,6 +271,7 @@ describe('Permissions for private explorations', function() {
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorPage.saveChanges('Added content to first card.');
     explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle('translators');
     workflow.addExplorationTranslator('translator');
     expect(workflow.getExplorationManagers()).toEqual(['expOwner']);
     expect(workflow.getExplorationCollaborators()).toEqual([]);

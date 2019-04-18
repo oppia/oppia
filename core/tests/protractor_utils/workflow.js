@@ -23,6 +23,16 @@ var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
 
+// check if the save roles button is clickable
+var canAddRolesToUsers = function() {
+  return element(by.css('.protractor-test-save-role')).isEnabled();
+};
+// trigger onblur event for title
+var triggerTitleOnBlurEvent = function() {
+  element(by.css('.protractor-test-exploration-title-input')).click();
+  element(by.css('.protractor-test-exploration-objective-input')).click();
+};
+
 // Creates an exploration, opens its editor and skips the tutorial.
 var createExploration = function() {
   createExplorationAndStartTutorial();
@@ -178,6 +188,8 @@ exports.createAndPublishExploration = createAndPublishExploration;
 exports.createCollectionAsAdmin = createCollectionAsAdmin;
 exports.createExplorationAsAdmin = createExplorationAsAdmin;
 
+exports.canAddRolesToUsers = canAddRolesToUsers;
+exports.triggerTitleOnBlurEvent = triggerTitleOnBlurEvent;
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
 exports.addExplorationTranslator = addExplorationTranslator;
