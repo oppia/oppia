@@ -95,7 +95,7 @@ oppia.directive('audioTranslationBar', [
           $scope.audioTimerIsShown = true;
           $scope.audioIsCurrentlyBeingSaved = false;
           document.body.onkeyup = function(e) {
-            if (e.keyCode === 82) {
+            if (e.keyCode === 82 && !$scope.isAudioAvailable) {
               // 82 belongs to the keycode for 'R'
               // Used as shortcut key for recording
               toggleStartAndStopRecording();
@@ -247,6 +247,10 @@ oppia.directive('audioTranslationBar', [
             });
           };
           var toggleStartAndStopRecording = function() {
+            if ($scope.isAudioAvailable) {
+              return;
+            }
+
             if (!$scope.recorder.status.isRecording && !$scope.audioBlob) {
               $scope.checkAndStartRecording();
             } else {

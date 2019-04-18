@@ -18,47 +18,47 @@
  */
 
 oppia.factory('SubtitledHtmlObjectFactory', [function() {
-    var SubtitledHtml = function(html, contentId) {
-      this._html = html;
-      this._contentId = contentId;
-    };
+  var SubtitledHtml = function(html, contentId) {
+    this._html = html;
+    this._contentId = contentId;
+  };
 
-    SubtitledHtml.prototype.getHtml = function() {
-      return this._html;
-    };
+  SubtitledHtml.prototype.getHtml = function() {
+    return this._html;
+  };
 
-    SubtitledHtml.prototype.getContentId = function() {
-      return this._contentId;
-    };
+  SubtitledHtml.prototype.getContentId = function() {
+    return this._contentId;
+  };
 
-    SubtitledHtml.prototype.setHtml = function(newHtml) {
-      this._html = newHtml;
-    };
+  SubtitledHtml.prototype.setHtml = function(newHtml) {
+    this._html = newHtml;
+  };
 
-    SubtitledHtml.prototype.hasNoHtml = function() {
-      return !this._html;
-    };
+  SubtitledHtml.prototype.hasNoHtml = function() {
+    return !this._html;
+  };
 
-    SubtitledHtml.prototype.toBackendDict = function() {
-      return {
-        html: this._html,
-        content_id: this._contentId
-      };
+  SubtitledHtml.prototype.toBackendDict = function() {
+    return {
+      html: this._html,
+      content_id: this._contentId
     };
+  };
 
-    SubtitledHtml.prototype.isEmpty = function() {
-      return this.hasNoHtml();
-    };
+  SubtitledHtml.prototype.isEmpty = function() {
+    return this.hasNoHtml();
+  };
 
-    SubtitledHtml.createFromBackendDict = function(subtitledHtmlBackendDict) {
-      return new SubtitledHtml(
-        subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
-    };
+  SubtitledHtml.createFromBackendDict = function(subtitledHtmlBackendDict) {
+    return new SubtitledHtml(
+      subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
+  };
 
-    SubtitledHtml.createDefault = function(html, contentId) {
-      return new SubtitledHtml(html, contentId);
-    };
+  SubtitledHtml.createDefault = function(html, contentId) {
+    return new SubtitledHtml(html, contentId);
+  };
 
-    return SubtitledHtml;
-  }
+  return SubtitledHtml;
+}
 ]);

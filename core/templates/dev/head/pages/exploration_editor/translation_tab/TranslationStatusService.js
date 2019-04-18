@@ -47,7 +47,7 @@ oppia.factory('TranslationStatusService', [
       if (availableLanguages.indexOf(langCode) !== -1) {
         availabilityStatus.available = true;
         var audioTranslation = recordedVoiceovers.getVoiceover(
-            contentId, langCode);
+          contentId, langCode);
         availabilityStatus.needsUpdate = audioTranslation.needsUpdate;
       }
       return availabilityStatus;

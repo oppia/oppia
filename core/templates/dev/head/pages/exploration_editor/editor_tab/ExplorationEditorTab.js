@@ -147,18 +147,14 @@ oppia.controller('ExplorationEditorTab', [
         angular.copy(displayedValue));
     };
 
-    $scope.saveRecordedVoiceovers = function(displayedValue) {
-      ExplorationStatesService.saveRecordedVoiceovers(
-        $scope.stateName, angular.copy(displayedValue));
-    };
-
     $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
         contentId) {
       var stateName = StateEditorService.getActiveStateName();
       var state = ExplorationStatesService.getState(stateName);
       var recordedVoiceovers = state.recordedVoiceovers;
       var writtenTranslations = state.writtenTranslations;
-      if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+      if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
+          writtenTranslations.hasUnflaggedWrittenTranslations(contentId)) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/forms/mark_all_audio_and_translations_as_needing_' +
@@ -166,12 +162,16 @@ oppia.controller('ExplorationEditorTab', [
           backdrop: true,
           controller: 'MarkAllAudioAndTranslationsAsNeedingUpdateController'
         }).result.then(function() {
-          recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
-          ExplorationStatesService.saveRecordedVoiceovers(
-            stateName, recordedVoiceovers);
-          writtenTranslations.markAllTranslationsAsNeedingUpdate(contentId);
-          ExplorationStatesService.saveWrittenTranslations(
-            stateName, writtenTranslations);
+          if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+            recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
+            ExplorationStatesService.saveRecordedVoiceovers(
+              stateName, recordedVoiceovers);
+          }
+          if (writtenTranslations.hasUnflaggedWrittenTranslations(contentId)) {
+            writtenTranslations.markAllTranslationsAsNeedingUpdate(contentId);
+            ExplorationStatesService.saveWrittenTranslations(
+              stateName, writtenTranslations);
+          }
         });
       }
     };

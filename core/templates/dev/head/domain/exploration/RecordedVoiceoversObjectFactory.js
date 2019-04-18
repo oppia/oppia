@@ -20,7 +20,7 @@
 oppia.factory('RecordedVoiceoversObjectFactory', [
   'VoiceoverObjectFactory', 'COMPONENT_NAME_FEEDBACK',
   function(
-    VoiceoverObjectFactory, COMPONENT_NAME_FEEDBACK) {
+      VoiceoverObjectFactory, COMPONENT_NAME_FEEDBACK) {
     var RecordedVoiceovers = function(voiceoversMapping) {
       this.voiceoversMapping = voiceoversMapping;
     };
@@ -124,7 +124,8 @@ oppia.factory('RecordedVoiceoversObjectFactory', [
       };
     };
 
-    RecordedVoiceovers.createFromBackendDict = function(recordedVoiceoversDict) {
+    RecordedVoiceovers.createFromBackendDict = function(
+        recordedVoiceoversDict) {
       var voiceoversMapping = {};
       var voiceoversMappingDict = recordedVoiceoversDict.voiceovers_mapping;
       Object.keys(voiceoversMappingDict).forEach(function(contentId) {

@@ -174,7 +174,8 @@ oppia.directive('questionEditor', [
                   'MarkAllAudioAndTranslationsAsNeedingUpdateController')
               }).result.then(function() {
                 updateQuestion(function() {
-                  recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
+                  recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
+                    contentId);
                   writtenTranslations.markAllTranslationsAsNeedingUpdate(
                     contentId);
                 });

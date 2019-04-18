@@ -1020,7 +1020,7 @@ class RecordedVoiceovers(object):
         """
         voiceovers_mapping = {}
         for (content_id, language_code_to_voiceover) in (
-            self.voiceovers_mapping.iteritems()):
+                self.voiceovers_mapping.iteritems()):
             voiceovers_mapping[content_id] = {}
             for (language_code, voiceover) in (
                     language_code_to_voiceover.iteritems()):
@@ -1087,7 +1087,7 @@ class RecordedVoiceovers(object):
                     'Expected content_id value to be a dict, received %s'
                     % language_code_to_voiceover)
             for (language_code, voiceover) in (
-                language_code_to_voiceover.iteritems()):
+                    language_code_to_voiceover.iteritems()):
                 if not isinstance(language_code, basestring):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'

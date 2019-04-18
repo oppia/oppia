@@ -29,7 +29,7 @@ describe('State card object factory', function() {
   beforeEach(inject(function($injector) {
     StateCardObjectFactory = $injector.get('StateCardObjectFactory');
     InteractionObjectFactory = $injector.get('InteractionObjectFactory');
-    RecordedVoiceoversObjectFactory =  (
+    RecordedVoiceoversObjectFactory = (
       $injector.get('RecordedVoiceoversObjectFactory'));
     VoiceoverObjectFactory =
       $injector.get('VoiceoverObjectFactory');
