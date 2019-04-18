@@ -16,6 +16,10 @@
  * @fileoverview Controller for the Tutor Card.
  */
 
+require('directives/AngularHtmlBindDirective.js');
+require('pages/exploration_player/AudioBarDirective.js');
+require('pages/exploration_player/InputResponsePairDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_player/AudioPreloaderService.js');
 require('pages/exploration_player/AudioTranslationManagerService.js');

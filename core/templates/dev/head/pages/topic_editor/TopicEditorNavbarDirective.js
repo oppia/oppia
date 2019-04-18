@@ -16,6 +16,8 @@
  * @fileoverview Directive for the navbar of the topic editor.
  */
 
+require('components/loading/LoadingDotsDirective.js');
+
 require('domain/editor/undo_redo/UndoRedoService.js');
 require('domain/topic/TopicRightsBackendApiService.js');
 require('pages/topic_editor/TopicEditorRoutingService.js');

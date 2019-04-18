@@ -35,6 +35,7 @@ module.exports = {
     donate: './core/templates/dev/head/pages/donate/Donate.js',
     email_dashboard: './core/templates/dev/head/pages/email_dashboard/EmailDashboard.js',
     error: './core/templates/dev/head/pages/error/Error.js',
+    exploration_player: './core/templates/dev/head/pages/exploration_player/ExplorationPlayer.js',
     get_started: './core/templates/dev/head/pages/get_started/GetStarted.js',
     landing: './core/templates/dev/head/pages/landing/TopicLandingPage.js',
     learner_dashboard: './core/templates/dev/head/pages/learner_dashboard/LearnerDashboard.js',
@@ -49,9 +50,12 @@ module.exports = {
     skill_editor: './core/templates/dev/head/pages/skill_editor/SkillEditor.js',
     splash: './core/templates/dev/head/pages/splash/Splash.js',
     stewards: './core/templates/dev/head/pages/landing/stewards/Stewards.js',
+    story_editor: './core/templates/dev/head/pages/story_editor/StoryEditor.js',
     teach: './core/templates/dev/head/pages/teach/Teach.js',
     thanks: './core/templates/dev/head/pages/thanks/Thanks.js',
+    topic_editor: './core/templates/dev/head/pages/topic_editor/TopicEditor.js',
     topics_and_skills_dashboard: './core/templates/dev/head/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboard.js',
+    topic_viewer: './core/templates/dev/head/pages/topic_viewer/TopicViewer.js',
   },
   plugins: [
    new HtmlWebpackPlugin({
@@ -121,6 +125,13 @@ module.exports = {
       chunks: ['error'],
       filename: 'error.html',
       template: 'core/templates/dev/head/pages/error/error.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['exploration_player'],
+      filename: 'exploration_player.html',
+      template: 'core/templates/dev/head/pages/exploration_player/exploration_player.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -243,6 +254,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['story_editor'],
+      filename: 'story_editor.html',
+      template: 'core/templates/dev/head/pages/story_editor/story_editor.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['teach'],
       filename: 'teach.html',
       template: 'core/templates/dev/head/pages/teach/teach.html',
@@ -263,9 +281,23 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['topic_editor'],
+      filename: 'topic_editor.html',
+      template: 'core/templates/dev/head/pages/topic_editor/topic_editor.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['topics_and_skills_dashboard'],
       filename: 'topics_and_skills_dashboard.html',
       template: 'core/templates/dev/head/pages/topics_and_skills_dashboard/topics_and_skills_dashboard.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['topic_viewer'],
+      filename: 'topic_viewer.html',
+      template: 'core/templates/dev/head/pages/topic_viewer/topic_viewer.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

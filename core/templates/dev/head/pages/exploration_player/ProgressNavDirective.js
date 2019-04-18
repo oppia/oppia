@@ -16,6 +16,8 @@
  * @fileoverview Directive for navigation in the conversation skin.
  */
 
+require('pages/exploration_player/ContinueButtonDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_player/ExplorationEngineService.js');
 require('pages/exploration_player/ExplorationPlayerStateService.js');

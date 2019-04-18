@@ -17,7 +17,6 @@
  */
 
 require('domain/utilities/UrlInterpolationService.js');
-require('pages/skill_editor/SkillEditor.js');
 
 oppia.factory('SkillRightsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',

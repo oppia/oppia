@@ -16,9 +16,11 @@
  * @fileoverview Controller for the local navigation in the learner view.
  */
 
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_player/ExplorationEngineService.js');
 require('pages/exploration_player/ExplorationPlayerStateService.js');
+require('pages/exploration_player/FeedbackPopupDirective.js');
 require('pages/exploration_player/PlayerPositionService.js');
 require('pages/suggestion_editor/ShowSuggestionModalForLearnerLocalViewService.js');
 require('services/AlertsService.js');

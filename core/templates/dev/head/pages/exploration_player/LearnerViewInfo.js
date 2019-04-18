@@ -18,6 +18,7 @@
  */
 
 require('components/profile_link/ProfileLinkImageDirective.js');
+require('components/share/SharingLinksDirective.js');
 
 require('components/RatingComputationService.js');
 require('domain/utilities/UrlInterpolationService.js');

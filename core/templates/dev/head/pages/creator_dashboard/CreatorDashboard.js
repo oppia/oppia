@@ -86,11 +86,10 @@ require('components/state/SolutionExplanationEditorDirective.js');
 require('components/forms/HtmlSelectDirective.js');
 //^^^ this block of requires should be removed ^^^
 
-
-require('pages/exploration_player/PlayerConstants.js');
 require('components/share/SharingLinksDirective.js');
 require('components/background/BackgroundBannerDirective.js');
 require('components/summary_tile/CollectionSummaryTileDirective.js');
+require('pages/exploration_player/PlayerConstants.js');
 require('pages/exploration_editor/feedback_tab/ThreadTableDirective.js');
 
 require('components/ExplorationCreationService.js');

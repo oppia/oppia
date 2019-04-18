@@ -37,7 +37,7 @@ class TopicViewerPage(base.BaseHandler):
         self.values.update({
             'topic_name': topic.name
         })
-        self.render_template('/pages/topic_viewer/topic_viewer.html')
+        self.render_template('dist/topic_viewer.html')
 
 
 class TopicPageDataHandler(base.BaseHandler):

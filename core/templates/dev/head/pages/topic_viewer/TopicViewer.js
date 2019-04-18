@@ -16,6 +16,14 @@
  * @fileoverview Controllers for the topic viewer.
  */
 
+require('components/background/BackgroundBannerDirective.js');
+require('pages/topic_viewer/StoriesListDirective.js');
+require('pages/topic_viewer/TopicViewerNavbarBreadcrumbDirective.js');
+
+require('domain/topic_viewer/TopicViewerBackendApiService.js');
+require('services/AlertsService.js');
+require('services/contextual/UrlService.js');
+
 oppia.controller('TopicViewer', [
   '$rootScope', '$scope', '$window', 'AlertsService',
   'TopicViewerBackendApiService',

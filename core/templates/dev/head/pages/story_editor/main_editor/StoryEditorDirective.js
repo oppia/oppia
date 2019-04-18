@@ -16,6 +16,10 @@
  * @fileoverview Controller for the main story editor.
  */
 
+require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
+require('directives/AngularHtmlBindDirective.js');
+require('pages/story_editor/main_editor/StoryNodeEditorDirective.js');
+
 require('domain/editor/undo_redo/UndoRedoService.js');
 require('domain/story/StoryUpdateService.js');
 require('pages/story_editor/StoryEditorStateService.js');

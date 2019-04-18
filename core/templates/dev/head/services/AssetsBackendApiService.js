@@ -17,6 +17,11 @@
  * assets from Google Cloud Storage.
  */
 
+require('domain/utilities/AudioFileObjectFactory.js');
+require('domain/utilities/FileDownloadRequestObjectFactory.js');
+require('domain/utilities/ImageFileObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+
 oppia.factory('AssetsBackendApiService', [
   '$http', '$q', 'AudioFileObjectFactory', 'FileDownloadRequestObjectFactory',
   'ImageFileObjectFactory', 'UrlInterpolationService', 'DEV_MODE',

@@ -16,6 +16,8 @@
  * @fileoverview Controller for the main topic editor.
  */
 
+require('pages/topic_editor/main_editor/StoriesListDirective.js');
+
 require('components/StoryCreationService.js');
 require('domain/editor/undo_redo/UndoRedoService.js');
 require('domain/topic/TopicUpdateService.js');

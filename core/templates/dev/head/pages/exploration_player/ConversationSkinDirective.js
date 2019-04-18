@@ -16,6 +16,15 @@
  * @fileoverview Controller for the conversation skin.
  */
 
+require('components/RatingDisplayDirective.js');
+require('components/summary_tile/ExplorationSummaryTileDirective.js');
+require('components/summary_tile/CollectionSummaryTileDirective.js');
+require('directives/AngularHtmlBindDirective.js');
+require('pages/exploration_player/CorrectnessFooterDirective.js');
+require('pages/exploration_player/ProgressNavDirective.js');
+require('pages/exploration_player/SupplementalCardDirective.js');
+require('pages/exploration_player/TutorCardDirective.js');
+
 require('domain/collection/GuestCollectionProgressService.js');
 require('domain/exploration/EditableExplorationBackendApiService.js');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.js');
@@ -30,6 +39,7 @@ require('pages/exploration_player/ExplorationEngineService.js');
 require('pages/exploration_player/ExplorationPlayerStateService.js');
 require('pages/exploration_player/ExplorationRecommendationsService.js');
 require('pages/exploration_player/FatigueDetectionService.js');
+require('pages/exploration_player/FeedbackPopupDirective.js');
 require('pages/exploration_player/HintsAndSolutionManagerService.js');
 require('pages/exploration_player/ImagePreloaderService.js');
 require('pages/exploration_player/LearnerParamsService.js');

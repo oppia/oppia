@@ -16,6 +16,8 @@
  * @fileoverview Standalone services for the general state editor page.
  */
 
+require('services/AlertsService.js');
+
 oppia.factory('StatePropertyService', [
   '$log', 'AlertsService',
   function($log, AlertsService) {

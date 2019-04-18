@@ -16,8 +16,49 @@
  * @fileoverview Primary controller for the topic editor page.
  */
 
+//vvv this block of requires should be removed vvv
+require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.js');
+require('components/forms/ConvertHtmlToUnicodeFilter.js');
+require('components/forms/ConvertUnicodeToHtmlFilter.js');
+require('components/forms/validators/IsAtLeastFilter.js');
+require('components/forms/validators/IsAtMostFilter.js');
+require('components/forms/validators/IsFloatFilter.js');
+require('components/forms/validators/IsIntegerFilter.js');
+require('components/forms/validators/IsNonemptyFilter.js');
+require('components/forms/ApplyValidationDirective.js');
+require('components/forms/RequireIsFloatDirective.js');
+require('directives/AngularHtmlBindDirective.js');
+require('directives/MathjaxBindDirective.js');
+require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedDictEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedIntEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedListEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js');
+require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js');
+require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.js');
+require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js');
+require('components/forms/schema_viewers/SchemaBasedListViewerDirective.js');
+require('components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js');
+require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js');
+require('components/forms/schema_viewers/SchemaBasedViewerDirective.js');
+require('components/forms/Select2DropdownDirective.js');
+require('components/forms/ImageUploaderDirective.js');
+//^^^ this block of requires should be removed ^^^
+
 require('pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.js');
 require('pages/topic_editor/TopicEditorNavbarDirective.js');
+require('pages/topic_editor/main_editor/TopicEditorTabDirective.js');
+require('pages/topic_editor/questions/QuestionsTabDirective.js');
+require('pages/topic_editor/subtopics_editor/SubtopicsListTabDirective.js');
+
+require('pages/topic_editor/TopicEditorStateService.js');
+require('services/contextual/UrlService.js');
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.constant(

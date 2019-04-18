@@ -16,6 +16,8 @@
  * @fileoverview Controller for the questions tab.
  */
 
+require('pages/questions_list/QuestionsListDirective.js');
+
 require('components/QuestionCreationService.js');
 require('domain/editor/undo_redo/QuestionUndoRedoService.js');
 require('domain/editor/undo_redo/UndoRedoService.js');

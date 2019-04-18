@@ -16,6 +16,12 @@
  * @fileoverview Service for recording and scrutinizing playthroughs.
  */
 
+require('domain/statistics/LearnerActionObjectFactory.js');
+require('domain/statistics/PlaythroughObjectFactory.js');
+require('domain/utilities/StopwatchObjectFactory.js');
+require('domain/utilities/UrlInterpolationService.js');
+require('services/ExplorationFeaturesService.js');
+
 oppia.constant(
   'STORE_PLAYTHROUGH_URL',
   '/explorehandler/store_playthrough/<exploration_id>');

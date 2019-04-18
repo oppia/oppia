@@ -18,6 +18,7 @@
 
 require('domain/editor/undo_redo/BaseUndoRedoService.js');
 require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/utilities/UrlInterpolationService.js');
 require('pages/story_editor/StoryEditorStateService.js');
 require('services/AlertsService.js');
 require('services/contextual/UrlService.js');
