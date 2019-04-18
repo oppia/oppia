@@ -223,16 +223,16 @@ fdescribe('State content editor directive', function() {
     outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
     outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired = (
       jasmine.createSpy(''));
-    var elem = angular.element(
-      '<state-content-editor ' +
-      'on-save-state-content="saveStateContent" ' +
-      'show-mark-all-audio-as-needing-update-modal-if-required=' +
-      '"showMarkAllAudioAsNeedingUpdateModalIfRequired">' +
-      '</state-content-editor>');
-    var compiledElem = $compile(elem)(outerScope);
-    outerScope.$digest();
-    ctrlScope = compiledElem[0].getControllerScope();
-    innerScope = $controller('stateEditorController', {$scope: ctrlScope})
+    // var elem = angular.element(
+    //   '<state-content-editor ' +
+    //   'on-save-state-content="saveStateContent" ' +
+    //   'show-mark-all-audio-as-needing-update-modal-if-required=' +
+    //   '"showMarkAllAudioAsNeedingUpdateModalIfRequired">' +
+    //   '</state-content-editor>');
+    // var compiledElem = $compile(elem)(outerScope);
+    // outerScope.$digest();
+    // ctrlScope = compiledElem[0].getControllerScope();
+    // innerScope = $controller('stateEditorController', {$scope: ctrlScope})
     ctrlScope = $controller('stateContentEditorController', {$scope: outerScope});
   }));
 
