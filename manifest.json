@@ -25,13 +25,13 @@
         "rootDirPrefix": "six-",
         "targetDirPrefix": "six-"
       },
-      "webencodings": {
+      "python-webencodings": {
         "version": "0.5.1",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/0b/02/ae6ceac1baeda530866a85075641cec12989bd8d31af6d5ab4a3e8c92f47/webencodings-0.5.1.tar.gz",
-        "tarRootDirPrefix": "webencodings-",
-        "rootDirPrefix": "webencodings-",
-        "targetDirPrefix": "webencodings-"
+        "url": "https://github.com/gsnedders/python-webencodings/archive/v0.5.1.tar.gz",
+        "tarRootDirPrefix": "python-webencodings-",
+        "rootDirPrefix": "python-webencodings-",
+        "targetDirPrefix": "python-webencodings-"
       },
       "callbacks": {
         "version": "0.3.0",

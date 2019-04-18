@@ -90,7 +90,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join(ROOT_PATH, 'third_party', 'bleach-3.1.0'),
     os.path.join(ROOT_PATH, 'third_party', 'six-1.12.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'webencodings-0.5.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'python-webencodings-0.5.1'),
     os.path.join(ROOT_PATH, 'third_party', 'callbacks-0.3.0'),
     os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.0.1'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.17.0'),
