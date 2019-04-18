@@ -187,6 +187,9 @@ body {
   width: 100%;
 }
 
+.oppia-search-bar-dropdown-menu {
+  width: 170px;
+}
 .oppia-skip-to-content {
   left: -10000px;
   padding: 6px;
