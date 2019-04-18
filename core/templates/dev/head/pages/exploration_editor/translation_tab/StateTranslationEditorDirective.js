@@ -47,7 +47,7 @@ oppia.directive('stateTranslationEditor', [
               state.contentIdsToAudioTranslations);
             var availableAudioLanguages = (
               contentIdsToAudioTranslations.getAudioLanguageCodes(contentId));
-            if (availableAudioLanguages.indexOf(langaugeCode) != -1) {
+            if (availableAudioLanguages.indexOf(langaugeCode) !== -1) {
               var audioTranslation = (
                 contentIdsToAudioTranslations.getAudioTranslation(
                   contentId, langaugeCode));
@@ -81,7 +81,7 @@ oppia.directive('stateTranslationEditor', [
           var langaugeCode = null;
           $scope.activeWrittenTranslation = null;
           $scope.translationEditorIsOpen = false;
-          $scope.isTranslatable = EditabilityService.isTranslatable;
+          $scope.isEditable = EditabilityService.isEditable;
           $scope.$on('activeContentIdChanged', function() {
             initEditor();
           });
@@ -104,8 +104,8 @@ oppia.directive('stateTranslationEditor', [
           };
           initEditor();
           var saveTranslation = function() {
-            var oldTranslationHtml = '';
-            var newTranslationHtml = '';
+            var oldWrittenTranslation = null;
+            var newWrittenTranslation = null;
             contentId = (
               TranslationTabActiveContentIdService.getActiveContentId());
             langaugeCode = TranslationLanguageService.getActiveLanguageCode();
@@ -113,12 +113,15 @@ oppia.directive('stateTranslationEditor', [
               .savedMemento.hasWrittenTranslation(contentId, langaugeCode)) {
               var writtenTranslation = (StateWrittenTranslationsService
                 .savedMemento.getWrittenTranslation(contentId, langaugeCode));
-              oldTranslation = writtenTranslation.getHtml();
+              oldWrittenTranslation = writtenTranslation;
             }
             var writtenTranslation = (StateWrittenTranslationsService
               .displayed.getWrittenTranslation(contentId, langaugeCode));
-            newTranslation = writtenTranslation.getHtml();
-            if (oldTranslation !== newTranslation) {
+            newWrittenTranslation = writtenTranslation;
+            if (oldWrittenTranslation === null || (
+              oldWrittenTranslation.html !== newWrittenTranslation.html || (
+                oldWrittenTranslation.needsUpdate !== (
+                  newWrittenTranslation.needsUpdate)))) {
               var stateName = StateEditorService.getActiveStateName();
               showMarkAudioAsNeedingUpdateModalIfRequired(
                 contentId, langaugeCode);
@@ -136,7 +139,7 @@ oppia.directive('stateTranslationEditor', [
           });
 
           $scope.openTranslationEditor = function() {
-            if ($scope.isTranslatable()) {
+            if ($scope.isEditable()) {
               $scope.translationEditorIsOpen = true;
               if (!$scope.activeWrittenTranslation) {
                 $scope.activeWrittenTranslation = (
