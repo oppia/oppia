@@ -92,7 +92,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'six-1.12.0'),
     os.path.join(ROOT_PATH, 'third_party', 'webencodings-0.5.1'),
     os.path.join(ROOT_PATH, 'third_party', 'callbacks-0.3.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-0.95'),
+    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.0.1'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.17.0'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.15.0'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.17.0'),

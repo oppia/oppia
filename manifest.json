@@ -12,7 +12,7 @@
       "bleach": {
         "version": "3.1.0",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/78/5a/0df03e8735cd9c75167528299c738702437589b9c71a849489d00ffa82e8/bleach-3.1.0.tar.gz",
+        "url": "https://github.com/mozilla/bleach/archive/v3.1.0.tar.gz",
         "tarRootDirPrefix": "bleach-",
         "rootDirPrefix": "bleach-",
         "targetDirPrefix": "bleach-"
@@ -20,7 +20,7 @@
       "six": {
         "version": "1.12.0",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/dd/bf/4138e7bfb757de47d1f4b6994648ec67a51efe58fa907c1e11e350cddfca/six-1.12.0.tar.gz",
+        "url": "https://github.com/benjaminp/six/archive/1.12.0.tar.gz",
         "tarRootDirPrefix": "six-",
         "rootDirPrefix": "six-",
         "targetDirPrefix": "six-"
@@ -28,7 +28,7 @@
       "webencodings": {
         "version": "0.5.1",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/0b/02/ae6ceac1baeda530866a85075641cec12989bd8d31af6d5ab4a3e8c92f47/webencodings-0.5.1.tar.gz",
+        "url": "https://github.com/gsnedders/python-webencodings/archive/v0.5.1.tar.gz",
         "tarRootDirPrefix": "webencodings-",
         "rootDirPrefix": "webencodings-",
         "targetDirPrefix": "webencodings-"
@@ -74,9 +74,10 @@
         "targetDirPrefix": "graphy-"
       },
       "html5Lib": {
-        "version": "0.95",
-        "downloadFormat": "zip",
-        "url": "https://github.com/html5lib/html5lib-python/archive/0.95.zip",
+        "version": "1.0.1",
+        "downloadFormat": "tar",
+        "url": "https://github.com/html5lib/html5lib-python/archive/1.0.1.tar.gz",
+        "tarRootDirPrefix": "html5lib-python-",
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
