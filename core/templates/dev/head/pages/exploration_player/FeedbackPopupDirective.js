@@ -55,8 +55,9 @@ oppia.directive('feedbackPopup', [
           // elements on the same page.
           $scope.feedbackPopoverId = (
             'feedbackPopover' + Math.random().toString(36).slice(2));
-          $scope.feedbackTitle = ('Feedback when the user was at card ' +
-            PlayerPositionService.getCurrentStateName());
+          $scope.feedbackTitle = (
+            'Feedback when the user was at card "' +
+            PlayerPositionService.getCurrentStateName() + '"');
 
           if (WindowDimensionsService.isWindowNarrow()) {
             BackgroundMaskService.activateMask();
