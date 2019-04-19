@@ -1,15 +1,21 @@
 <div class="oppia-translated-content-header">Translated content</div>
 <div class="oppia-state-translation-editor-section oppia-editor-card-section">
-  <div ng-if="!translationEditorIsOpen" >
+  <div ng-if="!translationEditorIsOpen">
+    <button class="btn oppia-translation-needs-update-button" ng-if="activeWrittenTranslation.needsUpdate">
+      <i class="material-icons md-18"
+         uib-tooltip="Translation needs update"
+         tooltip-placement="top">warning
+      </i>
+    </button>
     <div class="protractor-test-edit-content"
-         ng-class="{'oppia-editable-section': isTranslatable()}"
+         ng-class="{'oppia-editable-section': isEditable()}"
          ng-click="openTranslationEditor()">
-      <i ng-if="isTranslatable()" class="material-icons oppia-editor-edit-icon"
+      <i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon"
          title="Edit translation">&#xE254;
       </i>
       <div class="oppia-translated-content-display oppia-transition-200"
-           ng-class="{'oppia-prevent-selection': isTranslatable()}"
-           title="Card Content">
+           ng-class="{'oppia-prevent-selection': isEditable()}"
+           title="Translated Content">
         <span  class="oppia-placeholder" ng-if="!activeWrittenTranslation || activeWrittenTranslation.getHtml() === ''">
           No translation available. Click to add new!
         </span>
@@ -51,8 +57,16 @@
     position: absolute;
     top: 10px;
   }
+  .oppia-translation-needs-update-button {
+    border-radius: 14px;
+    color: yellow;
+    height: 28px;
+    left: 3px;
+    padding: 0 0 3px 0;
+    position: absolute;
+    width: 28px;
+  }
   .oppia-translation-editable-mask {
-    height: 200px;
     background-color: #eee;
   }
   .oppia-translated-content-display {
