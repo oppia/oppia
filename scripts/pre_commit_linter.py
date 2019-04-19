@@ -87,6 +87,29 @@ _PARSER.add_argument(
     help='verbose mode. All details will be printed.',
     action='store_true')
 
+EXCLUDED_PHRASES = [
+    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+
+EXCLUDED_PATHS = (
+    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
+    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
+    '*.mp3', '*.mp4')
+
+GENERATED_FILE_PATHS = (
+    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
+    'extensions/interactions/LogicProof/static/js/generatedParser.js',
+    'core/templates/dev/head/expressions/ExpressionParserService.js')
+
+CONFIG_FILE_PATHS = (
+    'core/tests/.browserstack.env.example',
+    'core/tests/protractor.conf.js',
+    'core/tests/karma.conf.js',
+    'core/templates/dev/head/mathjaxConfig.js',
+    'assets/constants.js',
+    'assets/rich_text_components_definitions.js')
+
 BAD_PATTERNS = {
     '__author__': {
         'message': 'Please remove author tags from this file.',
@@ -189,8 +212,9 @@ MANDATORY_PATTERNS_REGEXP = [
         'message': 'Please ensure this file should contain a proper '
                    'copyright notice.',
         'included_types': ('.py', '.js', '.sh'),
-        'excluded_files': (),
-        'excluded_dirs': ()
+        'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
+            '*__init__.py', ),
+        'excluded_dirs': EXCLUDED_PATHS
     }
 ]
 
@@ -260,29 +284,6 @@ REQUIRED_STRINGS_CONSTANTS = {
 }
 
 ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
-
-EXCLUDED_PHRASES = [
-    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
-
-EXCLUDED_PATHS = (
-    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
-    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
-    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4')
-
-GENERATED_FILE_PATHS = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
-    'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/ExpressionParserService.js')
-
-CONFIG_FILE_PATHS = (
-    'core/tests/.browserstack.env.example',
-    'core/tests/protractor.conf.js',
-    'core/tests/karma.conf.js',
-    'core/templates/dev/head/mathjaxConfig.js',
-    'assets/constants.js',
-    'assets/rich_text_components_definitions.js')
 
 CODEOWNER_DIR_PATHS = [
     './core', './extensions', './scripts', './export', './.github']
@@ -1335,8 +1336,8 @@ class LintChecksManager(object):
             return summary_messages
 
     def _check_mandatory_patterns(self):
-        """This function checks that all JS files contain the mandatory
-        patternss.
+        """This function checks that all files contain the mandatory
+        patterns.
         """
         if self.verbose_mode_enabled:
             print 'Starting mandatory patterns check'
@@ -1344,24 +1345,24 @@ class LintChecksManager(object):
 
         summary_messages = []
         failed = False
-        all_files_to_check = [
-            filepath for filepath in self.all_filepaths if not any(
-                fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS + GENERATED_FILE_PATHS +
-                CONFIG_FILE_PATHS) and not filepath.endswith(
-                    '__init__.py')]
 
         with _redirect_stdout(_TARGET_STDOUT):
-            for filepath in all_files_to_check:
-                file_content = FileCache.readlines(filepath)
+            for filepath in self.all_filepaths:
                 # This boolean list keeps track of the regex matches
                 # found in the file.
                 pattern_found_list = []
+                file_content = FileCache.readlines(filepath)
                 for index, regexp_to_check in enumerate(
                         MANDATORY_PATTERNS_REGEXP):
-                    if any([filepath.endswith(
-                            allowed_type) for allowed_type in regexp_to_check[
-                                'included_types']]):
+                    if (any([filepath.endswith(
+                            allowed_type) for allowed_type in (
+                                regexp_to_check['included_types'])]) and (
+                                    not any([fnmatch.fnmatch(
+                                        filepath, pattern) for pattern in (
+                                            regexp_to_check[
+                                                'excluded_files'] +
+                                            regexp_to_check[
+                                                'excluded_dirs'])]))):
                         pattern_found_list.append(False)
                         for line in file_content:
                             if re.search(regexp_to_check['regexp'], line):
@@ -1369,9 +1370,9 @@ class LintChecksManager(object):
                                 break
                 if not all(pattern_found_list):
                     failed = True
-                    for index, pattern_found_bool in enumerate(
+                    for index, pattern_found in enumerate(
                             pattern_found_list):
-                        if not pattern_found_bool:
+                        if not pattern_found:
                             print '%s --> %s' % (
                                 filepath,
                                 MANDATORY_PATTERNS_REGEXP[index]['message'])
@@ -1380,11 +1381,17 @@ class LintChecksManager(object):
                     pattern_found_list = []
                     for index, regexp_to_check in enumerate(
                             MANDATORY_PATTERNS_JS_REGEXP):
-                        pattern_found_list.append(False)
-                        for line in file_content:
-                            if re.search(regexp_to_check['regexp'], line):
-                                pattern_found_list[index] = True
-                                break
+                        if not any([fnmatch.fnmatch(
+                                filepath, pattern) for pattern in (
+                                    regexp_to_check[
+                                        'excluded_files'] +
+                                    regexp_to_check[
+                                        'excluded_dirs'])]):
+                            pattern_found_list.append(False)
+                            for line in file_content:
+                                if re.search(regexp_to_check['regexp'], line):
+                                    pattern_found_list[index] = True
+                                    break
                     if not all(pattern_found_list):
                         failed = True
                         for index, pattern_found_bool in enumerate(
