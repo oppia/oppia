@@ -115,10 +115,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic = topic_services.apply_change_list(self.TOPIC_ID, change_list)[0]
         subtopic_index = topic.get_subtopic_index(self.subtopic_id)
 
-        assert(topic.subtopics[subtopic_index].title == new_title)
+        self.assertTrue(topic.subtopics[subtopic_index].title == new_title)
 
     def test_apply_change_list_with_migrate_subtopic_schema_cmd(self):
-        new_title = 'new_title'
         change_list = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
             'from_version': None,
