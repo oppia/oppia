@@ -13,10 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the mark_all_audio_as_needing_update modal.
+ * @fileoverview Controller for the
+ * mark_all_audio_and_translations_as_needing_update modal.
  */
 
-oppia.controller('MarkAllAudioAsNeedingUpdateController', [
+oppia.controller('MarkAllAudioAndTranslationsAsNeedingUpdateController', [
   '$scope', '$uibModalInstance',
   function($scope, $uibModalInstance) {
     $scope.flagAll = function() {
