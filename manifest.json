@@ -11,25 +11,22 @@
       },
       "bleach": {
         "version": "3.1.0",
-        "downloadFormat": "tar",
-        "url": "https://github.com/mozilla/bleach/archive/v3.1.0.tar.gz",
-        "tarRootDirPrefix": "bleach-",
+        "downloadFormat": "zip",
+        "url": "https://github.com/mozilla/bleach/archive/v3.1.0.zip",
         "rootDirPrefix": "bleach-",
         "targetDirPrefix": "bleach-"
       },
       "six": {
         "version": "1.12.0",
-        "downloadFormat": "tar",
-        "url": "https://github.com/benjaminp/six/archive/1.12.0.tar.gz",
-        "tarRootDirPrefix": "six-",
+        "downloadFormat": "zip",
+        "url": "https://github.com/benjaminp/six/archive/1.12.0.zip",
         "rootDirPrefix": "six-",
         "targetDirPrefix": "six-"
       },
       "python-webencodings": {
         "version": "0.5.1",
-        "downloadFormat": "tar",
-        "url": "https://github.com/gsnedders/python-webencodings/archive/v0.5.1.tar.gz",
-        "tarRootDirPrefix": "python-webencodings-",
+        "downloadFormat": "zip",
+        "url": "https://github.com/gsnedders/python-webencodings/archive/v0.5.1.zip",
         "rootDirPrefix": "python-webencodings-",
         "targetDirPrefix": "python-webencodings-"
       },
