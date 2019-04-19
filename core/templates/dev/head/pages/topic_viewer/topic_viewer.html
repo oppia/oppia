@@ -80,19 +80,14 @@
     .oppia-topic-viewer-tabs {
       background-color: #7e7e7e;
       margin: 0 auto 0 10%;
-      width: fit-content;
+      display: inline-block;
     }
     .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:hover {
-      font-size: 1em;
       padding: 10px;
       text-transform: uppercase;
       width: 100%;
+      text-shadow: 0.5px 0.5px 0.5px #e7e7e2;
     }
-    .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:hover,
-    .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:focus {
-      text-decoration: underline;
-    }
-
     @media(max-width: 925px) {
       .oppia-topic-viewer-tabs {
         margin: 0 auto;
@@ -114,6 +109,15 @@
       }
       stories-list {
         display: inline-grid;
+      }
+    }
+
+    @media(max-width: 426px) {
+      .oppia-topic-viewer-tabs span {
+        width: auto;
+      }
+      .oppia-topic-viewer-container .oppia-topic-viewer-tabs {
+        max-width: 280px;
       }
     }
   </style>
