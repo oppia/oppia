@@ -23,7 +23,7 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImagePreloaderService',
-  'UrlInterpolationService', 'imageClickInputRulesService',
+  'UrlInterpolationService', 'ImageClickInputRulesService',
   'EVENT_NEW_CARD_AVAILABLE', 'EXPLORATION_EDITOR_TAB_CONTEXT',
   'LOADING_INDICATOR_URL',
   function(
