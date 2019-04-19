@@ -223,8 +223,8 @@ MANDATORY_PATTERNS_JS_REGEXP = [
         'regexp': r'^\s\*\s@fileoverview\s[a-zA-Z0-9_]+',
         'message': 'Please ensure this file should contain a file '
                    'overview i.e. a short description of the file.',
-        'excluded_files': (),
-        'excluded_dirs': ()
+        'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS,
+        'excluded_dirs': EXCLUDED_PATHS
     }
 ]
 
@@ -1357,8 +1357,8 @@ class LintChecksManager(object):
                     if (any([filepath.endswith(
                             allowed_type) for allowed_type in (
                                 regexp_to_check['included_types'])]) and (
-                                    not any([fnmatch.fnmatch(
-                                        filepath, pattern) for pattern in (
+                                    not any([
+                                        pattern in filepath for pattern in (
                                             regexp_to_check[
                                                 'excluded_files'] +
                                             regexp_to_check[
@@ -1381,8 +1381,8 @@ class LintChecksManager(object):
                     pattern_found_list = []
                     for index, regexp_to_check in enumerate(
                             MANDATORY_PATTERNS_JS_REGEXP):
-                        if not any([fnmatch.fnmatch(
-                                filepath, pattern) for pattern in (
+                        if not any([
+                                pattern in filepath for pattern in (
                                     regexp_to_check[
                                         'excluded_files'] +
                                     regexp_to_check[
