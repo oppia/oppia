@@ -80,8 +80,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'schema_version': 0,
             'subtopics': self.VERSION_1_SUBTOPIC_DICT}
 
-        with self.assertRaisesRegexp(Exception,
-            'Sorry, we can only process v1-v%d subtopic '
+        with self.assertRaisesRegexp(
+            Exception, 'Sorry, we can only process v1-v%d subtopic '
             'schemas at present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             topic_services._migrate_subtopics_to_latest_schema(
                 versioned_subtopics)
@@ -106,8 +106,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Unexpected error: received an invalid change list when'
             ' trying to save topic %s: %s' % (self.TOPIC_ID, None)):
-            topic_services._save_topic('committer_id', topic,
-                'commit_message', None)
+            topic_services._save_topic(
+                'committer_id', topic, 'commit_message', None)
 
     def test_check_can_edit_topic_with_no_topic_rights(self):
         user_can_edit_topic = topic_services.check_can_edit_topic(
@@ -159,8 +159,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
         topic_model.subtopic_schema_version = 0
 
-        with self.assertRaisesRegexp(Exception,
-            'Sorry, we can only process v1-v%d subtopic '
+        with self.assertRaisesRegexp(
+            Exception, 'Sorry, we can only process v1-v%d subtopic '
             'schemas at present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             topic = topic_services.get_topic_from_model(topic_model)
 
