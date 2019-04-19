@@ -224,10 +224,13 @@ describe('Permissions for private explorations', function() {
       workflow.createExploration();
       explorationEditorPage.navigateToSettingsTab();
 
-      explorationEditorSettingsTab.setTitle('Pass');
+      workflow.openEditRolesForm();
       expect(workflow.canAddRolesToUsers()).toBe(false);
+      expect(workflow.checkForAddTitleWarning()).toBe(true);
+      explorationEditorSettingsTab.setTitle('Pass');
       workflow.triggerTitleOnBlurEvent();
       expect(workflow.canAddRolesToUsers()).toBe(true);
+      expect(workflow.checkForAddTitleWarning()).toBe(false);
     }
   );
 
