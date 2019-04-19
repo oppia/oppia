@@ -17,14 +17,66 @@
  */
 
 describe('User Service', function() {
-  var UserService, $httpBackend, UrlInterpolationService;
+  var UserService, $httpBackend, UrlInterpolationService,
+    UserInfoObjectFactory;
   beforeEach(module('oppia'));
+
   beforeEach(inject(function($injector) {
     UserService = $injector.get('UserService');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');
+    UserInfoObjectFactory = $injector.get(
+      'UserInfoObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
   }));
+
+
+  it('should be return userInfo data', function() {
+    // creating a test user for checking profile picture of user.
+    var sampleUserInfoBackendObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      user_is_logged_in: true
+    };
+
+    $httpBackend.expect('GET', '/userinfohandler').respond(200,
+      sampleUserInfoBackendObject);
+
+    sampleUserInfo = UserInfoObjectFactory.createFromBackendDict(
+      sampleUserInfoBackendObject);
+
+    UserService.getUserInfoAsync().then(function(userInfo) {
+      expect(userInfo.is_admin).toBe(sampleUserInfo.is_admin);
+      expect(userInfo.is_super_admin).toBe(sampleUserInfo.is_super_admin);
+      expect(userInfo.is_moderator).toBe(sampleUserInfo.is_moderator);
+      except(userInfo.is_topic_manager).toBe(sampleUserInfo.is_topic_manager);
+      expect(userInfo.user_is_logged_in).toBe(
+        sampleUserInfo.user_is_logged_in);
+      except(userInfo.can_create_collections).toBe(
+        sampleUserInfo.can_create_collections);
+      except(userInfo.username).toBe(sampleUserInfo.username);
+      except(userInfo.preferred_site_language_code).toBe(
+        sampleUserInfo.preferred_site_language_code);
+    });
+    $httpBackend.flush();
+
+    // second call to /userinfohandler.
+    $httpBackend.expect('GET', '/userinfohandler').respond(200);
+    UserService.getUserInfoAsync().then(function(userInfo) {
+    });
+
+    try {
+      // throw exception because /userinfohandler was not called
+      $httpBackend.flush();
+    } catch (err) {
+      expect(err.message).toBe('No pending request to flush !');
+    }
+  });
 
   it('should return image data', function() {
     var requestUrl = '/preferenceshandler/profile_picture';
@@ -39,7 +91,7 @@ describe('User Service', function() {
       username: 'tester',
       user_is_logged_in: true
     };
-    $httpBackend.when('GET', '/userinfohandler').respond(200,
+    $httpBackend.expect('GET', '/userinfohandler').respond(200,
       sampleUserInfoBackendObject);
 
     $httpBackend.expect('GET', requestUrl).respond(200, {
