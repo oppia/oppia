@@ -31,8 +31,8 @@ import urlparse
 
 from core.domain import html_cleaner  # pylint: disable=relative-import
 
-SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
+SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_PROPERTIES = 'properties'
 SCHEMA_KEY_TYPE = 'type'
 SCHEMA_KEY_POST_NORMALIZERS = 'post_normalizers'
