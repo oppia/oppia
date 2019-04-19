@@ -40,19 +40,23 @@ describe('Core exploration functionality', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
+  var userNumber = 1;
 
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+
+    users.createUser(
+      `user${userNumber}@stateEditor.com`, `user${userNumber}StateEditor`);
+    users.login(`user${userNumber}@stateEditor.com`);
+    workflow.createExploration();
+
+    userNumber++;
   });
 
   it('should display plain text content', function() {
-    users.createUser('user1@stateEditor.com', 'user1StateEditor');
-    users.login('user1@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText('plain text'));
     explorationEditorMainTab.setInteraction('Continue', 'click here');
     explorationEditorMainTab.getResponseEditor('default')
@@ -69,14 +73,9 @@ describe('Core exploration functionality', function() {
     explorationPlayerPage.expectInteractionToMatch('Continue', 'click here');
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.expectExplorationToBeOver();
-
-    users.logout();
   });
 
   it('should create content and multiple choice interactions', function() {
-    users.createUser('user2@stateEditor.com', 'user2StateEditor');
-    users.login('user2@stateEditor.com');
-    workflow.createExploration();
     explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold text');
       richTextEditor.appendPlainText(' ');
@@ -104,14 +103,9 @@ describe('Core exploration functionality', function() {
       [forms.toRichText('option A'), forms.toRichText('option B')]);
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
     explorationPlayerPage.expectExplorationToBeOver();
-    users.logout();
   });
 
   it('should obey numeric interaction rules and display feedback', function() {
-    users.createUser('user3@stateEditor.com', 'user3StateEditor');
-    users.login('user3@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText('some content'));
     explorationEditorMainTab.setInteraction('NumericInput');
     explorationEditorMainTab.addResponse('NumericInput',
@@ -150,16 +144,10 @@ describe('Core exploration functionality', function() {
       });
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
-
-    users.logout();
   });
 
   it('should skip the customization modal for interactions having no ' +
       'customization options', function() {
-    users.createUser('user4@stateEditor.com', 'user4StateEditor');
-    users.login('user4@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
     // Numeric input does not have any customization arguments. Therefore the
@@ -169,16 +157,10 @@ describe('Core exploration functionality', function() {
     // The Continue input has customization options. Therefore the
     // customization modal does appear and so does the save interaction button.
     explorationEditorMainTab.setInteraction('Continue');
-
-    users.logout();
   });
 
   it('should open appropriate modal on re-clicking an interaction to ' +
      'customize it', function() {
-    users.createUser('user5@stateEditor.com', 'user5StateEditor');
-    users.login('user5@stateEditor.com');
-
-    workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
     // Numeric input does not have any customization arguments. Therefore, on
@@ -203,15 +185,10 @@ describe('Core exploration functionality', function() {
       by.css('.protractor-test-save-interaction'));
     expect(saveInteractionBtn.isPresent()).toBe(true);
     saveInteractionBtn.click();
-
-    users.logout();
   });
 
   it('should correctly display contents, rule parameters, feedback' +
   ' instructions and newly created state', function() {
-    users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
-    users.login('stateEditorUser1@example.com');
-    workflow.createExploration();
     // Verify exploration's text content.
     explorationEditorMainTab.setContent(forms.toRichText('Happiness Checker'));
     explorationEditorMainTab.expectContentToMatch(
@@ -240,10 +217,87 @@ describe('Core exploration functionality', function() {
     explorationEditorMainTab.getResponseEditor(1).expectRuleToBe(
       'TextInput', 'FuzzyEquals', ['"sad"']);
     explorationEditorPage.saveChanges();
-    users.logout();
+  });
+
+  it('should be able to edit title', function() {
+    explorationEditorPage.navigateToSettingsTab();
+
+    explorationEditorSettingsTab.expectTitleToBe('');
+    explorationEditorSettingsTab.setTitle('title1');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectTitleToBe('title1');
+  });
+
+  it('should be able to edit goal', function() {
+    explorationEditorPage.navigateToSettingsTab();
+
+    explorationEditorSettingsTab.expectObjectiveToBe('');
+    explorationEditorSettingsTab.setObjective('It is just a test.');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectObjectiveToBe('It is just a test.');
+  });
+
+  it('should show warnings when the length of goal < 15', function() {
+    explorationEditorPage.navigateToSettingsTab();
+
+    // Color grey when there is no warning, red when there is a warning
+    explorationEditorSettingsTab.expectWarningsColorToBe(
+      'rgba(115, 115, 115, 1)');
+    explorationEditorSettingsTab.setObjective('short goal');
+    explorationEditorSettingsTab.expectWarningsColorToBe(
+      'rgba(169, 68, 66, 1)');
+  });
+
+  it('should be able to select category from the dropdown menu', function() {
+    explorationEditorPage.navigateToSettingsTab();
+
+    explorationEditorSettingsTab.expectCategoryToBe('');
+    explorationEditorSettingsTab.setCategory('Biology');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectCategoryToBe('Biology');
+  });
+
+  it('should be able to create new category which is not' +
+  ' in the dropdown menu', function() {
+    explorationEditorPage.navigateToSettingsTab();
+
+    explorationEditorSettingsTab.expectCategoryToBe('');
+    explorationEditorSettingsTab.setCategory('New');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectCategoryToBe('New');
+  });
+
+  it('should be able to select language from the dropdown menu', function() {
+    explorationEditorPage.navigateToSettingsTab();
+
+    explorationEditorSettingsTab.expectLanguageToBe('English');
+    explorationEditorSettingsTab.setLanguage('italiano (Italian)');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectLanguageToBe('italiano (Italian)');
+  });
+
+  it('should change the first card of the exploration', function() {
+    explorationEditorMainTab.setStateName('card 1');
+    explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
+    explorationEditorMainTab.setInteraction('Continue');
+    explorationEditorMainTab.getResponseEditor('default').setDestination(
+      'card 2', true, null);
+
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectFirstStateToBe('card 1');
+    explorationEditorSettingsTab.setFirstState('card 2');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.expectFirstStateToBe('card 2');
   });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
+    users.logout();
   });
 });
