@@ -106,6 +106,8 @@ def preprocess_release():
 
     (1) Substitutes files from the per-app deployment data.
     (2) Change the DEV_MODE constant in assets/constants.js.
+    (3) Removes the "version" field from app.yaml, since gcloud does not like
+        it (when deploying).
     """
     if not os.path.exists(DEPLOY_DATA_PATH):
         raise Exception(
@@ -149,6 +151,17 @@ def preprocess_release():
     content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
     with open(os.path.join('assets', 'constants.js'), 'w+') as new_assets_file:
         new_assets_file.write(content)
+
+    # Removes the version field from app.yaml.
+    print 'Removing the version field from app.yaml ...'
+    with open('app.yaml', 'r') as f:
+        content = f.read()
+        assert content.count('version: default') == 1
+    os.remove('app.yaml')
+    content = content.replace('version: default', '')
+    with open('app.yaml', 'w') as f:
+        f.write(content)
+    print 'Version field removed.'
 
 
 def _execute_deployment():
