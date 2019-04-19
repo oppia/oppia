@@ -68,6 +68,68 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.user_b = user_services.UserActionsInfo(self.user_id_b)
         self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
 
+    def test_assign_roles_with_invalid_new_role(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid role: %s' % None):
+            topic_services.assign_role(
+                self.user_admin, self.user_a, None, self.TOPIC_ID)
+
+    def test_get_all_topic_rights(self):
+        topic_rights = topic_services.get_all_topic_rights()
+
+        self.assertTrue(topic_rights)
+
+    def test_apply_change_list_with_update_additional_story_ids(self):
+        story_ids = [self.story_id_1, self.story_id_2, self.story_id_3]
+        change_list = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_ADDITIONAL_STORY_IDS,
+            'old_value': None,
+            'new_value': story_ids,
+        })]
+        topic = topic_services.apply_change_list(self.TOPIC_ID, change_list)[0]
+
+        self.assertTrue(topic.additional_story_ids == story_ids)
+
+    def test_apply_change_list_with_language_code_change(self):
+        language_code = 'ENG'
+        change_list = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE,
+            'old_value': None,
+            'new_value': language_code,
+        })]
+        topic = topic_services.apply_change_list(self.TOPIC_ID, change_list)[0]
+
+        self.assertTrue(topic.language_code == language_code)
+
+    def test_apply_change_list_with_subtopic_property_title_change(self):
+        new_title = 'new_title'
+        change_list = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_TITLE,
+            'subtopic_id': self.subtopic_id,
+            'id': self.subtopic_id,
+            'new_value': new_title,
+            'old_value': None,
+        })]
+        topic = topic_services.apply_change_list(self.TOPIC_ID, change_list)[0]
+        subtopic_index = topic.get_subtopic_index(self.subtopic_id)
+
+        assert(topic.subtopics[subtopic_index].title == new_title)
+
+    def test_apply_change_list_with_migrate_subtopic_schema_cmd(self):
+        new_title = 'new_title'
+        change_list = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
+            'from_version': None,
+            'to_version': None,
+        })]
+        topic = topic_services.apply_change_list(self.TOPIC_ID, change_list)[0]
+
+        self.assertTrue(
+            topic.subtopic_schema_version ==
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
+
     def test_get_topic_memcache_key_with_version(self):
         topic = topic_services.get_topic_by_id(
             self.TOPIC_ID, version=self.topic.version)
@@ -100,8 +162,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_check_can_edit_subtopic_page(self):
         user_can_edit_subtopic = topic_services.check_can_edit_subtopic_page(
             self.user_a)
-
         self.assertTrue(user_can_edit_subtopic)
+
+        user_can_edit_subtopic = topic_services.check_can_edit_subtopic_page(
+            self.user_b)
+        self.assertFalse(user_can_edit_subtopic)
 
     def test_compute_summary(self):
         topic_summary = topic_services.compute_summary_of_topic(self.topic)
@@ -679,11 +744,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
-
         with self.assertRaisesRegexp(
-            Exception,
-            'The user does not have enough rights to unpublish the topic.'):
-            topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_a)
+            Exception, 'The topic is already published.'):
+            topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
 
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertTrue(topic_rights.topic_is_published)
@@ -691,11 +754,27 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_admin)
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
+        with self.assertRaisesRegexp(
+            Exception, 'The topic is already unpublished.'):
+            topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_admin)
 
         with self.assertRaisesRegexp(
             Exception,
             'The user does not have enough rights to publish the topic.'):
             topic_services.publish_topic(self.TOPIC_ID, self.user_id_a)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The user does not have enough rights to unpublish the topic.'):
+            topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_a)
+
+        new_topic_id = topic_services.get_new_topic_id()
+        with self.assertRaisesRegexp(
+            Exception, 'The given topic does not exist'):
+            topic_services.publish_topic(new_topic_id, self.user_id_admin)
+        with self.assertRaisesRegexp(
+            Exception, 'The given topic does not exist'):
+            topic_services.unpublish_topic(new_topic_id, self.user_id_admin)
 
     def test_create_new_topic_rights(self):
         topic_services.assign_role(
