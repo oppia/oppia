@@ -213,7 +213,7 @@ MANDATORY_PATTERNS_REGEXP = [
                    'copyright notice.',
         'included_types': ('.py', '.js', '.sh'),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
-            '*__init__.py', ),
+            '__init__.py', ),
         'excluded_dirs': EXCLUDED_PATHS
     }
 ]
@@ -1358,11 +1358,12 @@ class LintChecksManager(object):
                             allowed_type) for allowed_type in (
                                 regexp_to_check['included_types'])]) and (
                                     not any([
-                                        pattern in filepath for pattern in (
-                                            regexp_to_check[
-                                                'excluded_files'] +
-                                            regexp_to_check[
-                                                'excluded_dirs'])]))):
+                                        filepath.endswith(
+                                            pattern) for pattern in (
+                                                regexp_to_check[
+                                                    'excluded_files'] +
+                                                regexp_to_check[
+                                                    'excluded_dirs'])]))):
                         pattern_found_list.append(False)
                         for line in file_content:
                             if re.search(regexp_to_check['regexp'], line):
@@ -1382,7 +1383,7 @@ class LintChecksManager(object):
                     for index, regexp_to_check in enumerate(
                             MANDATORY_PATTERNS_JS_REGEXP):
                         if not any([
-                                pattern in filepath for pattern in (
+                                filepath.endswith(pattern) for pattern in (
                                     regexp_to_check[
                                         'excluded_files'] +
                                     regexp_to_check[
