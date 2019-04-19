@@ -90,7 +90,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_memcache_key = topic_services._get_topic_memcache_key(
             self.topic.id, self.topic.version)
 
-        self.assertEqual(topic_memcache_key,
+        self.assertTrue(topic_memcache_key ==
             'topic-version:%s:%s' % (self.TOPIC_ID, self.topic.version))
 
     def test_save_new_topic_with_existing_topic(self):
