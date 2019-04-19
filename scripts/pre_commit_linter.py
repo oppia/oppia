@@ -269,12 +269,12 @@ CODEOWNER_DIR_PATHS = [
 CODEOWNER_FILE_PATHS = ['./app.yaml', './manifest.json']
 
 CODEOWNER_IMPORTANT_PATHS = [
-    '/manifest.json',
-    '/scripts/install_third_party.sh',
-    '/core/storage/',
+    '/.github/CODEOWNERS',
     '/core/domain/html*.py',
+    '/core/storage/',
     '/export/',
-    '/.github/CODEOWNERS']
+    '/manifest.json',
+    '/scripts/install_third_party.sh']
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -2065,6 +2065,8 @@ class LintChecksManager(object):
         file/dir. Note that this checks the CODEOWNERS file according to the
         glob patterns supported by Python2.7 environment. For more information
         please refer https://docs.python.org/2/library/glob.html.
+        This function also ensures that the most important rules are at the
+        bottom of the CODEOWNERS file.
         """
         if self.verbose_mode_enabled:
             print 'Starting CODEOWNERS file check'
@@ -2192,17 +2194,24 @@ class LintChecksManager(object):
 
             # Checks that the most important rules/patterns are at the bottom
             # of the CODEOWNERS file.
+
+            # This list is populated by the boolean values resulted from
+            # matching the last lines of the CODEOWNERS file with the list of
+            # the important CODEOWNERS paths.
             important_path_match_bool_list = ([
                 imp_path in path_lines[-1 * len(
                     CODEOWNER_IMPORTANT_PATHS):]
                 for imp_path in CODEOWNER_IMPORTANT_PATHS])
+            # This condition checks that all the values in the boolean list are
+            # True. This ensures that the last 'n' lines of the CODEOWNERS file
+            # matches with the 'n'-element list of important CODEOWNER paths.
             if not all(important_path_match_bool_list):
                 for index, bool_value in enumerate(
                         important_path_match_bool_list):
                     if not bool_value:
-                        print ('%s --> Please ensure that pattern \'%s\' is'
-                               ' the end since it is an important rule.'
-                               % (
+                        print ('%s --> Please ensure that the rule \'%s\' lies '
+                               'towards the bottom of the CODEOWNERS file since'
+                               ' it is an important rule.' % (
                                    codeowner_filepath,
                                    CODEOWNER_IMPORTANT_PATHS[index]))
                 failed = True
