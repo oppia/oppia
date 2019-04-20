@@ -20,8 +20,9 @@ presubmit checks.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from builtins import range
+import os
 import re
+import sys
 
 import astroid
 import utils
@@ -32,6 +33,15 @@ from pylint.checkers import typecheck
 from pylint.checkers import utils as checker_utils
 
 from . import docstrings_checker
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+from builtins import range  # isort:skip
+# pylint: enable=wrong-import-position
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):
