@@ -143,9 +143,9 @@
         "files": ["angular-mocks.js", "angular-scenario.js"]
       },
       "angularTranslate": {
-        "version": "2.8.1",
+        "version": "2.18.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-translate/bower-angular-translate/archive/2.8.1.zip",
+        "url": "https://github.com/angular-translate/bower-angular-translate/archive/2.18.1.zip",
         "rootDirPrefix": "bower-angular-translate-",
         "targetDirPrefix": "bower-angular-translate-",
         "bundle": {
@@ -153,9 +153,9 @@
         }
       },
       "angularTranslateLoader": {
-        "version": "2.8.1",
+        "version": "2.18.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-translate/bower-angular-translate-loader-static-files/archive/2.8.1.zip",
+        "url": "https://github.com/angular-translate/bower-angular-translate-loader-static-files/archive/2.18.1.zip",
         "rootDirPrefix": "bower-angular-translate-loader-static-files-",
         "targetDirPrefix": "bower-angular-translate-loader-static-files-",
         "bundle": {
@@ -163,9 +163,9 @@
         }
       },
       "angularCookiesRev": {
-        "version": "1.4.0",
+        "version": "1.6.2",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.4.0.zip",
+        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.6.2.zip",
         "rootDirPrefix": "bower-angular-cookies-",
         "targetDirPrefix": "bower-angular-cookies-",
         "bundle": {
@@ -183,9 +183,9 @@
         }
       },
       "angularStorageCookiesRev": {
-        "version": "2.8.1",
+        "version": "2.18.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/PascalPrecht/bower-angular-translate-storage-cookie/archive/2.8.1.zip",
+        "url": "https://github.com/PascalPrecht/bower-angular-translate-storage-cookie/archive/2.18.1.zip",
         "rootDirPrefix": "bower-angular-translate-storage-cookie-",
         "targetDirPrefix": "bower-angular-translate-storage-cookie-",
         "bundle": {
@@ -203,9 +203,9 @@
         }
       },
       "angularTranslateInterpolationMessageFormat": {
-        "version": "2.11.0",
+        "version": "2.18.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-translate/bower-angular-translate-interpolation-messageformat/archive/2.11.0.zip",
+        "url": "https://github.com/angular-translate/bower-angular-translate-interpolation-messageformat/archive/2.18.1.zip",
         "rootDirPrefix": "bower-angular-translate-interpolation-messageformat-",
         "targetDirPrefix": "bower-angular-translate-interpolation-messageformat-",
         "bundle": {
@@ -236,9 +236,9 @@
         }
       },
       "bowerAngularTranslateLoaderPartial": {
-        "version": "2.7.2",
+        "version": "2.18.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-translate/bower-angular-translate-loader-partial/archive/2.7.2.zip",
+        "url": "https://github.com/angular-translate/bower-angular-translate-loader-partial/archive/2.18.1.zip",
         "rootDirPrefix": "bower-angular-translate-loader-partial-",
         "targetDirPrefix": "bower-angular-translate-loader-partial-",
         "bundle": {
@@ -246,10 +246,11 @@
         }
       },
       "bowerMaterial": {
-        "version": "0.6.0-rc1",
-        "downloadFormat": "files",
-        "url": "https://raw.github.com/angular/bower-material/252d44f381cab4f381ea41491744356295c381a0/",
-        "targetDirPrefix": "bower-material-",
+        "version": "1.1.18",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular/bower-material/archive/master.zip",
+        "rootDir": "bower-material-master",
+        "targetDir": "bower-material-master",
         "files": ["angular-material.css", "angular-material.js"],
         "bundle": {
           "css": ["angular-material.css"],
