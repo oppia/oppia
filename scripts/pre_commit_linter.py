@@ -1713,21 +1713,23 @@ class LintChecksManager(object):
 
                         is_docstring = False
 
-        docstring_checker = docstrings_checker.ASTDocStringChecker()
-        for filepath in files_to_check:
-            ast_file = ast.walk(ast.parse(FileCache.read(filepath).encode()))
-            func_defs = [n for n in ast_file if isinstance(
-                n, ast.FunctionDef)]
-            for func in func_defs:
-                # Check that the args in the docstring are listed in the
-                # same order as they appear in the function definition.
-                func_result = docstring_checker.check_docstrings_arg_order(
-                    func)
-                for error_line in func_result:
-                    print('%s --> Func %s: %s' % (
-                        filepath, func.name, error_line))
-                    print('')
-                    failed = True
+            docstring_checker = docstrings_checker.ASTDocStringChecker()
+            for filepath in files_to_check:
+                ast_file = ast.walk(
+                    ast.parse(FileCache.read(filepath).encode('utf-8',
+                                                              'ignore')))
+                func_defs = [n for n in ast_file if isinstance(
+                    n, ast.FunctionDef)]
+                for func in func_defs:
+                    # Check that the args in the docstring are listed in the
+                    # same order as they appear in the function definition.
+                    func_result = docstring_checker.check_docstrings_arg_order(
+                        func)
+                    for error_line in func_result:
+                        print('%s --> Func %s: %s' % (
+                            filepath, func.name, error_line))
+                        print('')
+                        failed = True
 
             print('')
             if failed:
