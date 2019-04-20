@@ -142,13 +142,10 @@ function pip_install {
 }
 
 echo Checking if pylint is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/pylint-1.9.3" ]; then
+if [ ! -d "$TOOLS_DIR/pylint-1.9.4" ]; then
   echo Installing Pylint
 
-  pip_install pylint==1.9.3 --target="$TOOLS_DIR/pylint-1.9.3"
-  # Add __init__.py file so that pylint dependency backports are resolved
-  # correctly.
-  touch $TOOLS_DIR/pylint-1.9.3/backports/__init__.py
+  pip_install pylint==1.9.4 --target="$TOOLS_DIR/pylint-1.9.4"
 fi
 
 echo Checking if pylint-quotes is installed in $TOOLS_DIR
