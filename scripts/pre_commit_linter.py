@@ -223,6 +223,7 @@ MANDATORY_PATTERNS_JS_REGEXP = [
         'regexp': r'^\s\*\s@fileoverview\s[a-zA-Z0-9_]+',
         'message': 'Please ensure this file should contain a file '
                    'overview i.e. a short description of the file.',
+        'included_types': ('.js',),
         'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS,
         'excluded_dirs': EXCLUDED_PATHS
     }
@@ -1335,6 +1336,50 @@ class LintChecksManager(object):
             print ''
             return summary_messages
 
+    def check_for_mandatory_pattern_in_file(
+            self, pattern_set, filepath, failed):
+        """Checks for a given mandatory pattern in a file.
+
+        Args:
+            pattern_set: list(dict). The mandatory pattern to be checked in the
+                file.
+            filepath: str. The path to the file to be linted.
+            failed: bool. Status of failure of the check.
+
+        Returns:
+            bool. The failure status of the check.
+        """
+        # This boolean list keeps track of the regex matches
+        # found in the file.
+        pattern_found_list = []
+        file_content = FileCache.readlines(filepath)
+        for index, regexp_to_check in enumerate(
+                pattern_set):
+            if (any([filepath.endswith(
+                    allowed_type) for allowed_type in (
+                        regexp_to_check['included_types'])]) and (
+                            not any([
+                                filepath.endswith(
+                                    pattern) for pattern in (
+                                        regexp_to_check[
+                                            'excluded_files'] +
+                                        regexp_to_check[
+                                            'excluded_dirs'])]))):
+                pattern_found_list.append(False)
+                for line in file_content:
+                    if re.search(regexp_to_check['regexp'], line):
+                        pattern_found_list[index] = True
+                        break
+        if not all(pattern_found_list):
+            failed = True
+            for index, pattern_found in enumerate(
+                    pattern_found_list):
+                if not pattern_found:
+                    print '%s --> %s' % (
+                        filepath,
+                        pattern_set[index]['message'])
+        return failed
+
     def _check_mandatory_patterns(self):
         """This function checks that all files contain the mandatory
         patterns.
@@ -1347,61 +1392,12 @@ class LintChecksManager(object):
         failed = False
 
         with _redirect_stdout(_TARGET_STDOUT):
+            sets_of_patterns_to_match = [
+                MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
             for filepath in self.all_filepaths:
-                # This boolean list keeps track of the regex matches
-                # found in the file.
-                pattern_found_list = []
-                file_content = FileCache.readlines(filepath)
-                for index, regexp_to_check in enumerate(
-                        MANDATORY_PATTERNS_REGEXP):
-                    if (any([filepath.endswith(
-                            allowed_type) for allowed_type in (
-                                regexp_to_check['included_types'])]) and (
-                                    not any([
-                                        filepath.endswith(
-                                            pattern) for pattern in (
-                                                regexp_to_check[
-                                                    'excluded_files'] +
-                                                regexp_to_check[
-                                                    'excluded_dirs'])]))):
-                        pattern_found_list.append(False)
-                        for line in file_content:
-                            if re.search(regexp_to_check['regexp'], line):
-                                pattern_found_list[index] = True
-                                break
-                if not all(pattern_found_list):
-                    failed = True
-                    for index, pattern_found in enumerate(
-                            pattern_found_list):
-                        if not pattern_found:
-                            print '%s --> %s' % (
-                                filepath,
-                                MANDATORY_PATTERNS_REGEXP[index]['message'])
-
-                if filepath.endswith('.js'):
-                    pattern_found_list = []
-                    for index, regexp_to_check in enumerate(
-                            MANDATORY_PATTERNS_JS_REGEXP):
-                        if not any([
-                                filepath.endswith(pattern) for pattern in (
-                                    regexp_to_check[
-                                        'excluded_files'] +
-                                    regexp_to_check[
-                                        'excluded_dirs'])]):
-                            pattern_found_list.append(False)
-                            for line in file_content:
-                                if re.search(regexp_to_check['regexp'], line):
-                                    pattern_found_list[index] = True
-                                    break
-                    if not all(pattern_found_list):
-                        failed = True
-                        for index, pattern_found_bool in enumerate(
-                                pattern_found_list):
-                            if not pattern_found_bool:
-                                print '%s --> %s' % (
-                                    filepath,
-                                    MANDATORY_PATTERNS_JS_REGEXP[index][
-                                        'message'])
+                for pattern_set in sets_of_patterns_to_match:
+                    failed = self.check_for_mandatory_pattern_in_file(
+                        pattern_set, filepath, failed)
 
             if failed:
                 summary_message = (
