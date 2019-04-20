@@ -16,7 +16,7 @@
  * @fileoverview Controller for oppia email dashboard page.
  */
 
-oppia.controller('EmailDashboardResult', [
+angular.module('emailDashboardResultModule').controller('EmailDashboardResult', [
   '$http', '$scope', '$timeout', '$window', 'UrlInterpolationService',
   function($http, $scope, $timeout, $window, UrlInterpolationService) {
     var RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
