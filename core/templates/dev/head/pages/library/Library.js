@@ -30,17 +30,23 @@ oppia.constant('LIBRARY_PATHS_TO_MODES', {
 });
 
 oppia.controller('Library', [
-  '$http', '$log', '$rootScope', '$scope', '$timeout', '$window',
-  'ConstructTranslationIdsService', 'PageTitleService',
-  'SearchService', 'UrlInterpolationService', 'UrlService',
-  'UserService', 'WindowDimensionsService', 'LIBRARY_PAGE_MODES',
-  'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
+  '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal', '$window',
+  'AlertsService', 'ConstructTranslationIdsService',
+  'LearnerDashboardActivityIdsObjectFactory',
+  'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
+  'PageTitleService', 'SearchService',
+  'UrlInterpolationService', 'UrlService', 'UserService',
+  'WindowDimensionsService', 'ALL_CATEGORIES',
+  'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
   function(
-      $http, $log, $rootScope, $scope, $timeout, $window,
-      ConstructTranslationIdsService, PageTitleService,
-      SearchService, UrlInterpolationService, UrlService,
-      UserService, WindowDimensionsService, LIBRARY_PAGE_MODES,
-      LIBRARY_PATHS_TO_MODES, LIBRARY_TILE_WIDTH_PX) {
+      $http, $log, $rootScope, $scope, $timeout, $uibModal, $window,
+      AlertsService, ConstructTranslationIdsService,
+      LearnerDashboardActivityIdsObjectFactory,
+      LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
+      PageTitleService, SearchService,
+      UrlInterpolationService, UrlService, UserService,
+      WindowDimensionsService, ALL_CATEGORIES,
+      LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES, LIBRARY_TILE_WIDTH_PX) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
