@@ -455,7 +455,7 @@ def create_classifier_training_job_for_reverted_exploration(
     state_names = exploration_to_revert_to.states.keys()
     for index, classifier_training_job in enumerate(
             classifier_training_jobs_for_old_version):
-        if classifier_training_job:
+        if classifier_training_job is not None:
             state_name = state_names[index]
             job_exploration_mapping = (
                 classifier_domain.TrainingJobExplorationMapping(
