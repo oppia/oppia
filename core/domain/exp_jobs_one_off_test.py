@@ -2166,6 +2166,105 @@ class CopyToNewDirectoryJobTests(test_utils.GenericTestBase):
             self.assertEqual(actual_output[0], expected_output[0])
 
 
+class ImagesAuditJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+
+    def setUp(self):
+        super(ImagesAuditJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_copying_of_image_and_audio_files(self):
+        """Checks that image audit job correctly returns verified or images
+        missing.
+        """
+
+        with self.swap(constants, 'DEV_MODE', False):
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+
+            fs_internal = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(self.VALID_EXP_ID))
+            fs_external = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem('exploration/' + self.VALID_EXP_ID))
+
+            with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+                raw_image = f.read()
+
+            fs_internal.commit(
+                self.albert_id, 'image/abc.png', raw_image,
+                mimetype='image/png'
+            )
+            fs_external.commit(
+                self.albert_id, 'image/abc.png', raw_image,
+                mimetype='image/png'
+            )
+
+            fs_internal.commit(
+                self.albert_id, 'image/def.png', raw_image,
+                mimetype='image/png'
+            )
+
+            fs_internal.commit(
+                self.albert_id, 'image/ghi.png', raw_image,
+                mimetype='image/png'
+            )
+
+            # External directory can have other images, as all new images are
+            # stored there.
+            fs_external.commit(
+                self.albert_id, 'image/xyz.png', raw_image,
+                mimetype='image/png'
+            )
+
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+            # Start ImagesAuditJob job on sample exploration.
+            job_id = exp_jobs_one_off.ImagesAuditJob.create_new()
+            exp_jobs_one_off.ImagesAuditJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+            actual_output = exp_jobs_one_off.ImagesAuditJob.get_output(
+                job_id)
+            expected_output = [
+                '[u\'Image(s) not found in external folder\', '
+                '[u\'Image def.png not found for exploration: exp_id0\', '
+                'u\'Image ghi.png not found for exploration: exp_id0\']]'
+            ]
+            self.assertEqual(len(actual_output), 1)
+            self.assertEqual(actual_output[0], expected_output[0])
+
+            fs_external.commit(
+                self.albert_id, 'image/def.png', raw_image,
+                mimetype='image/png'
+            )
+
+            fs_external.commit(
+                self.albert_id, 'image/ghi.png', raw_image,
+                mimetype='image/png'
+            )
+
+            job_id = exp_jobs_one_off.ImagesAuditJob.create_new()
+            exp_jobs_one_off.ImagesAuditJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+            actual_output = exp_jobs_one_off.ImagesAuditJob.get_output(
+                job_id)
+            expected_output = [
+                '[u\'All images verified for an exploration\', '
+                '[u\'All images verified for exploration: exp_id0\']]'
+            ]
+            self.assertEqual(len(actual_output), 1)
+            self.assertEqual(actual_output[0], expected_output[0])
+
+
 class InteractionCustomizationArgsValidationJobTests(
         test_utils.GenericTestBase):
 

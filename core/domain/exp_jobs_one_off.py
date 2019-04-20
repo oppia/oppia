@@ -40,6 +40,7 @@ gae_image_services = models.Registry.import_gae_image_services()
 
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
+ALL_IMAGES_VERIFIED = 'All images verified for an exploration'
 ERROR_IN_FILENAME = 'There is an error in the filename'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
@@ -49,6 +50,7 @@ FILE_REFERENCES_NON_EXISTENT_EXP_KEY = 'File references nonexistent exp'
 FILE_REFERENCES_DELETED_EXP_KEY = 'File references deleted exp'
 FILE_DELETED = 'File has been deleted'
 FILE_FOUND_IN_GCS = 'File is there in GCS'
+IMAGE_NOT_FOUND = 'Image(s) not found in external folder'
 EXP_REFERENCES_UNICODE_FILES = 'Exploration references unicode files'
 INVALID_GCS_URL = 'The url for the entity on GCS is invalid'
 NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
@@ -63,6 +65,9 @@ GCS_AUDIO_ID_REGEX = re.compile(
         ALLOWED_AUDIO_EXTENSIONS) + '))$')
 GCS_IMAGE_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
+        ALLOWED_IMAGE_EXTENSIONS) + '))$')
+GCS_EXTERNAL_IMAGE_ID_REGEX = re.compile(
+    r'^/([^/]+)/exploration/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
         ALLOWED_IMAGE_EXTENSIONS) + '))$')
 SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
 
@@ -595,6 +600,62 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, len(values))
         else:
             yield (status, values)
+
+
+
+class ImagesAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for checking whether all images in {{exp_id}}/assets/image/
+    are also present in exploration/{{exp_id}}/assets/image/.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        if exp_model.deleted:
+            return
+
+        if not constants.DEV_MODE:
+            exp_id = exp_model.id
+            fs_internal = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(exp_id))
+            fs_external = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem('exploration/' + exp_id))
+            # We have to make sure we pass the dir name without starting or
+            # ending with '/'.
+            image_urls_internal = fs_internal.listdir('image')
+            image_urls_external = fs_external.listdir('image')
+
+            image_filenames_internal = [
+                GCS_IMAGE_ID_REGEX.match(url).group(3)
+                for url in image_urls_internal]
+
+            image_filenames_external = [
+                GCS_EXTERNAL_IMAGE_ID_REGEX.match(url).group(3)
+                for url in image_urls_external]
+
+            # Currently in editor.py and exp_services.py, all images are stored
+            # in exploration/{{exp_id}}/ parent folder. So, we only need to
+            # check if all images in the internal folder are there in the
+            # external folder.
+            all_images_present = True
+            for image_filename in image_filenames_internal:
+                if image_filename not in image_filenames_external:
+                    all_images_present = False
+                    yield (
+                        IMAGE_NOT_FOUND,
+                        'Image %s not found for exploration: %s' % (
+                            image_filename, exp_id))
+
+            if all_images_present:
+                yield (
+                    ALL_IMAGES_VERIFIED,
+                    'All images verified for exploration: %s' % (exp_id))
+
+    @staticmethod
+    def reduce(status, values):
+        yield (status, values)
 
 
 class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
