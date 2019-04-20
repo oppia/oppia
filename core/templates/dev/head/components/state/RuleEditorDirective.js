@@ -50,7 +50,7 @@ oppia.directive('ruleEditor', [
             async: false,
             success: function(data){
                 DEFAULT_OBJECT_VALUES = data; //or something similar
-            }
+            },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.log(textStatus, errorThrown);
             }
