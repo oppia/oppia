@@ -29,7 +29,7 @@ oppia.directive('storiesList', [
         function(WindowDimensionsService, $scope, $timeout) {
           var STORY_TILE_WIDTH_PX = 360;
           $scope.leftmostCardIndices = 0;
-          var MAX_NUM_TILES_PER_ROW = 3;
+          var MAX_NUM_TILES_PER_ROW = 4;
           $scope.tileDisplayCount = 0;
 
           var initCarousels = function() {
@@ -38,7 +38,7 @@ oppia.directive('storiesList', [
               return;
             }
 
-            var windowWidth = $(window).width() * 0.85;
+            var windowWidth = $(window).width();
             $scope.tileDisplayCount = Math.min(
               Math.floor(windowWidth / (STORY_TILE_WIDTH_PX + 20)),
               MAX_NUM_TILES_PER_ROW);
