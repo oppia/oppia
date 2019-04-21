@@ -130,41 +130,41 @@ describe('Question Player backend Api service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     });
 
-    it('should successfully fetch questions with no blank start cursor if ' +
-    'resetHistory flag is set as true',
-      function() {
-        var successHandler = jasmine.createSpy('success');
-        var failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch questions with no blank start cursor if ' +
+  'resetHistory flag is set as true',
+  function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-        var sampleDataResultsWithCursor = sampleDataResults;
-        sampleDataResultsWithCursor.next_start_cursor = '1';
+    var sampleDataResultsWithCursor = sampleDataResults;
+    sampleDataResultsWithCursor.next_start_cursor = '1';
 
-        $httpBackend.expect(
-          'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
-          'start_cursor=').respond(
-          sampleDataResultsWithCursor);
-        QuestionPlayerBackendApiService.fetchQuestions(
-          ['1'], 1, true).then(successHandler, failHandler);
-        $httpBackend.flush();
+    $httpBackend.expect(
+      'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
+      'start_cursor=').respond(
+      sampleDataResultsWithCursor);
+    QuestionPlayerBackendApiService.fetchQuestions(
+      ['1'], 1, true).then(successHandler, failHandler);
+    $httpBackend.flush();
 
-        expect(successHandler).toHaveBeenCalledWith(
-          sampleDataResultsWithCursor.question_dicts);
-        expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(
+      sampleDataResultsWithCursor.question_dicts);
+    expect(failHandler).not.toHaveBeenCalled();
 
-        $httpBackend.expect(
-          'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
-          'start_cursor=').respond(
-          sampleDataResults);
+    $httpBackend.expect(
+      'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
+      'start_cursor=').respond(
+      sampleDataResults);
 
-        // Here we want to reset history, thus we pass true
-        QuestionPlayerBackendApiService.fetchQuestions(
-          ['1'], 1, true).then(successHandler, failHandler);
-        $httpBackend.flush();
+    // Here we want to reset history, thus we pass true
+    QuestionPlayerBackendApiService.fetchQuestions(
+      ['1'], 1, true).then(successHandler, failHandler);
+    $httpBackend.flush();
 
-        expect(successHandler).toHaveBeenCalledWith(
-          sampleDataResults.question_dicts);
-        expect(failHandler).not.toHaveBeenCalled();
-      });
+    expect(successHandler).toHaveBeenCalledWith(
+      sampleDataResults.question_dicts);
+    expect(failHandler).not.toHaveBeenCalled();
+  });
 
   it('should use the fail handler if the backend request failed',
     function() {

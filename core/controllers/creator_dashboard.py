@@ -138,7 +138,6 @@ class CreatorDashboardPage(base.BaseHandler):
         self.values.update({
             'DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD.value),
-            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'interaction_templates': jinja2.utils.Markup(
