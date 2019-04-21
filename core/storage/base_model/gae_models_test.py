@@ -43,6 +43,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             base_models.BaseModel.get('Invalid id', strict=False))
 
+    def test_export_data(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.export_data('1')
+
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
 
