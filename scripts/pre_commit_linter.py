@@ -1337,12 +1337,12 @@ class LintChecksManager(object):
             return summary_messages
 
     def check_for_mandatory_pattern_in_file(
-            self, pattern_set, filepath, failed):
+            self, pattern_list, filepath, failed):
         """Checks for a given mandatory pattern in a file.
 
         Args:
-            pattern_set: list(dict). The mandatory pattern to be checked in the
-                file.
+            pattern_list: list(dict). The list of the mandatory patterns list to
+                be checked for in the file.
             filepath: str. The path to the file to be linted.
             failed: bool. Status of failure of the check.
 
@@ -1354,7 +1354,7 @@ class LintChecksManager(object):
         pattern_found_list = []
         file_content = FileCache.readlines(filepath)
         for index, regexp_to_check in enumerate(
-                pattern_set):
+                pattern_list):
             if (any([filepath.endswith(
                     allowed_type) for allowed_type in (
                         regexp_to_check['included_types'])]) and (
@@ -1377,7 +1377,7 @@ class LintChecksManager(object):
                 if not pattern_found:
                     print '%s --> %s' % (
                         filepath,
-                        pattern_set[index]['message'])
+                        pattern_list[index]['message'])
         return failed
 
     def _check_mandatory_patterns(self):
@@ -1395,9 +1395,9 @@ class LintChecksManager(object):
             sets_of_patterns_to_match = [
                 MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
             for filepath in self.all_filepaths:
-                for pattern_set in sets_of_patterns_to_match:
+                for pattern_list in sets_of_patterns_to_match:
                     failed = self.check_for_mandatory_pattern_in_file(
-                        pattern_set, filepath, failed)
+                        pattern_list, filepath, failed)
 
             if failed:
                 summary_message = (
