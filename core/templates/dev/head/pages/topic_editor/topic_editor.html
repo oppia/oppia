@@ -8,6 +8,8 @@
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
+    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
+      '{{DEFAULT_OBJECT_VALUES|js_string}}');
   </script>
 
 {% endblock header_js %}
