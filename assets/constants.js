@@ -84,7 +84,7 @@ var constants = {
       },
       "units": []
     }
-  }
+  },
 
   // List of supported default categories. For now, each category has a specific
   // color associated with it. Each category also has a thumbnail icon whose
