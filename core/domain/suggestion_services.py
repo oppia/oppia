@@ -572,7 +572,6 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
 
     suggestion = get_suggestion_by_id(suggestion_id)
     user_id = user.user_id
-    target_types = ['exploration', 'collection', 'question']
 
     if suggestion is None:
         raise Exception('Suggestion does not exists.')
@@ -614,7 +613,7 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
                 question_rights.is_creator(user.user_id)):
             return True
 
-    elif suggestion.target_type not in target_types:
+    else:
         raise Exception('Invalid suggestion target type.')
 
     return False
