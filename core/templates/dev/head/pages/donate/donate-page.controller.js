@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the donate page.
+ * @fileoverview Modules for the donate page.
  */
 
 
-angular.module('aboutPageModule').controller('Donate', [
+angular.module('donatePageModule').controller('Donate', [
   '$http', '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'WindowDimensionsService',
   function(
