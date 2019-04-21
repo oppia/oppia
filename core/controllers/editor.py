@@ -124,7 +124,6 @@ class ExplorationPage(EditorHandler):
 
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
-            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR': (
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR.value),
             'additional_angular_modules': additional_angular_modules,
