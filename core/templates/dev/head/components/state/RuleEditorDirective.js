@@ -41,7 +41,7 @@ oppia.directive('ruleEditor', [
             $scope, $timeout, StateEditorService,
             ValidatorsService, INTERACTION_SPECS,
             ResponsesService, StateInteractionIdService) {
-          var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
+          var DEFAULT_OBJECT_VALUES = constants.DEFAULT_OBJECT_VALUES;
 
           $scope.currentInteractionId = StateInteractionIdService.savedMemento;
           $scope.editRuleForm = {};

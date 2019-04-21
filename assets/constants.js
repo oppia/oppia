@@ -40,6 +40,52 @@ var constants = {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
+  "DEFAULT_OBJECT_VALUES": {
+    "CodeString": "",
+    "CoordTwoDim": [0.0, 0.0],
+    "DragAndDropHtmlString": "",
+    "DragAndDropPositiveInt": 1,
+    "Graph": {
+        "edges": [],
+        "isDirected": false,
+        "isLabeled": false,
+        "isWeighted": false,
+        "vertices": []
+    },
+    "GraphProperty": "strongly_connected",
+    "Int": 0,
+    "ListOfCodeEvaluation": [],
+    "ListOfCoordTwoDim": [],
+    "ListOfGraph": [],
+    "ListOfSetsOfHtmlStrings": [],
+    "LogicErrorCategory": "mistake",
+    "MusicPhrase": [],
+    "NonnegativeInt": 0,
+    "NormalizedString": "",
+    "Real": 0.0,
+    "SetOfHtmlString": [],
+    "SetOfNormalizedString": [],
+    "SetOfUnicodeString": [],
+    "UnicodeString": "",
+    "Fraction": {
+      "isNegative": false,
+      "wholeNumber": 0,
+      "numerator": 0,
+      "denominator": 1
+    },
+    "NumberWithUnits": {
+      "type": "real",
+      "real": 0.0,
+      "fraction": {
+        "isNegative": false,
+        "wholeNumber": 0,
+        "numerator": 0,
+        "denominator": 1
+      },
+      "units": []
+    }
+  }
+
   // List of supported default categories. For now, each category has a specific
   // color associated with it. Each category also has a thumbnail icon whose
   // filename is '{{CategoryName}}.svg'.
