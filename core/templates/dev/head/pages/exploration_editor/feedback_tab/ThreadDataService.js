@@ -20,12 +20,16 @@
 oppia.factory('ThreadDataService', [
   '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionObjectFactory',
-  'SuggestionThreadObjectFactory', 'ACTION_ACCEPT_SUGGESTION',
+  'SuggestionThreadObjectFactory', 'UrlInterpolationService',
+  'ACTION_ACCEPT_SUGGESTION',
   function(
       $http, $log, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionObjectFactory,
-      SuggestionThreadObjectFactory, ACTION_ACCEPT_SUGGESTION) {
+      SuggestionThreadObjectFactory, UrlInterpolationService,
+      ACTION_ACCEPT_SUGGESTION) {
     var _expId = ExplorationDataService.explorationId;
+    var _EDIT_SUGGESTION_URL_HANDLER = (
+      '/suggestionactionhandler/edit/<suggestion_id>');
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
     var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
     var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
@@ -214,7 +218,17 @@ oppia.factory('ThreadDataService', [
           }
         );
       },
-      editSuggestion: function(url, data) {
+      editSuggestion: function(suggestionId, action,
+          summaryMessage, change) {
+        var url = UrlInterpolationService.interpolateUrl(
+          _EDIT_SUGGESTION_URL_HANDLER, {
+            suggestion_id: suggestionId,
+          });
+        var data = {
+          action: action,
+          summaryMessage: summaryMessage,
+          change: change
+        };
         $http.put(url, data);
       }
     };

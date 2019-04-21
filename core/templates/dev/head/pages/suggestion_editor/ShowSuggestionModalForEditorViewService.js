@@ -75,26 +75,21 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
 
         if (result.action === 'edit' &&
                 result.suggestionType === 'edit_exploration_state_content') {
-          url = UrlInterpolationService.interpolateUrl(
-            EDIT_SUGGESTION_URL_TEMPLATE, {
-              suggestion_id: suggestionId,
-            }
-          );
-          data = {
-            action: result.action,
-            summary_message: result.summaryMessage,
-            change: {
-              cmd: 'edit_state_property',
-              property_name: COMPONENT_NAME_CONTENT,
-              state_name: stateName,
-              old_value: result.oldContent,
-              new_value: {
-                html: result.newSuggestionHtml
-              }
+          var suggestionId = activeThread.suggestion.suggestionId;
+          var action = result.action;
+          var summaryMessage = result.summaryMessage;
+          var change = {
+            cmd: 'edit_state_property',
+            property_name: COMPONENT_NAME_CONTENT,
+            state_name: stateName,
+            old_value: result.oldContent,
+            new_value: {
+              html: result.newSuggestionHtml
             }
           };
 
-          ThreadDataService.editSuggestion(url, data);
+          ThreadDataService.editSuggestion(suggestionId, action,
+            summaryMessage, change);
 
           // Updates suggestion.
           suggestion.newValue.html = result.newSuggestionHtml;
