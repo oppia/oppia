@@ -41,7 +41,21 @@ oppia.directive('ruleEditor', [
             $scope, $timeout, StateEditorService,
             ValidatorsService, INTERACTION_SPECS,
             ResponsesService, StateInteractionIdService) {
-          var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
+
+          // get DEFAULT_OBJECT_VALUES from server
+          var DEFAULT_OBJECT_VALUES;
+          $.ajax({
+            type: "GET", 
+            url: 'extensions/objects/object_defaults.json',
+            dataType: "json", 
+            async: false,
+            success: function(data){
+                DEFAULT_OBJECT_VALUES = data; //or something similar
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+          });
 
           $scope.currentInteractionId = StateInteractionIdService.savedMemento;
           $scope.editRuleForm = {};
