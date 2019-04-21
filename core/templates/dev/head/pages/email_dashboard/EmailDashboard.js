@@ -16,7 +16,7 @@
  * @fileoverview Controller for oppia email dashboard page.
  */
 
-angular.module('emailDashboardModule').controller('EmailDashboard', [
+oppia.controller('EmailDashboard', [
   '$rootScope', '$scope', 'EmailDashboardDataService', 'UserService',
   function($rootScope, $scope, EmailDashboardDataService, UserService) {
     $scope.username = '';
