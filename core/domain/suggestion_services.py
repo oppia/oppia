@@ -19,9 +19,7 @@ suggestions.
 from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import question_services
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.domain import user_services
@@ -558,7 +556,7 @@ def check_can_resubmit_suggestion(suggestion_id, user_id):
     return suggestion.author_id == user_id
 
 
-def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-many-return-statements
+def check_can_edit_suggestion(user, suggestion_id):
     """Checks whether the user have permission to edit suggestion or not.
 
     Args:
@@ -582,38 +580,19 @@ def check_can_edit_suggestion(user, suggestion_id):    # pylint: disable=too-man
     if suggestion.author_id == user_id:
         return True
 
-    if suggestion.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-        exploration_rights = rights_manager.get_exploration_rights(
+    if suggestion.target_type == 'exploration':
+        activity_rights = rights_manager.get_exploration_rights(
             suggestion.target_id)
-        if exploration_rights is None:
-            return False
-
-        if rights_manager.check_can_edit_activity(
-                user, exploration_rights):
-            return True
-
-    elif suggestion.target_type == suggestion_models.TARGET_TYPE_COLLECTION:
-        collection_rights = rights_manager.get_collection_rights(
+    elif suggestion.target_type == 'collection':
+        activity_rights = rights_manager.get_collection_rights(
             suggestion.target_id)
-        if collection_rights is None:
-            return False
-
-        if rights_manager.check_can_edit_activity(
-                user, collection_rights):
-            return True
-
-    elif suggestion.target_type == suggestion_models.TARGET_TYPE_QUESTION:
-        question_rights = question_services.get_question_rights(
-            suggestion.target_id, strict=False)
-        if question_rights is None:
-            return False
-
-        if (
-                role_services.ACTION_EDIT_ANY_QUESTION in user.actions or
-                question_rights.is_creator(user.user_id)):
-            return True
-
+    elif suggestion.target_type == 'question':
+        activity_rights = rights_manager.get_question_rights(
+            suggestion.target_id)
     else:
         raise Exception('Invalid suggestion target type.')
 
+    if activity_rights is not None and rights_manager.check_can_edit_activity(
+            user, activity_rights):
+        return True
     return False
