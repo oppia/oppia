@@ -27,8 +27,10 @@ describe('Page title service', function() {
   }));
 
   it('should correctly set the page title', function() {
-    expect($document[0].title).toEqual('');
-    pts.setPageTitle('Test title');
-    expect($document[0].title).toEqual('Test title');
+    pts.setPageTitle('First Title');
+    expect($document[0].title).toEqual('First Title');
+
+    pts.setPageTitle('Second Title');
+    expect($document[0].title).toEqual('Second Title');
   });
 });
