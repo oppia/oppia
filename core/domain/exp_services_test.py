@@ -32,6 +32,7 @@ from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -993,9 +994,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'content_id': 'content',
             'html': '<p>Hello, this is state3</p>'
         }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
+        state1.update_content(state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(state_domain.SubtitledHtml.from_dict(content2_dict))
+        state3.update_content(state_domain.SubtitledHtml.from_dict(content3_dict))
 
         state1.update_interaction_id('ImageClickInput')
         state2.update_interaction_id('MultipleChoiceInput')
