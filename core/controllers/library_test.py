@@ -46,7 +46,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
     def test_library_page(self):
         """Test access to the library page."""
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        response.mustcontain('Library - Oppia')
+        response.mustcontain('ng-controller="Library"')
 
     def test_library_handler_demo_exploration(self):
         """Test the library data handler on demo explorations."""

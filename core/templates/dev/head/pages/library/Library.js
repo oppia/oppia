@@ -34,7 +34,7 @@ oppia.controller('Library', [
   'AlertsService', 'ConstructTranslationIdsService',
   'LearnerDashboardActivityIdsObjectFactory',
   'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
-  'SearchService',
+  'PageTitleService', 'SearchService',
   'UrlInterpolationService', 'UrlService', 'UserService',
   'WindowDimensionsService', 'ALL_CATEGORIES',
   'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
@@ -43,7 +43,7 @@ oppia.controller('Library', [
       AlertsService, ConstructTranslationIdsService,
       LearnerDashboardActivityIdsObjectFactory,
       LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
-      SearchService,
+      PageTitleService, SearchService,
       UrlInterpolationService, UrlService, UserService,
       WindowDimensionsService, ALL_CATEGORIES,
       LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES, LIBRARY_TILE_WIDTH_PX) {
@@ -64,6 +64,13 @@ oppia.controller('Library', [
     }
     $scope.pageMode = LIBRARY_PATHS_TO_MODES[currentPath];
     $scope.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
+
+    var title = 'Exploration Library - Oppia';
+    if ($scope.pageMode === LIBRARY_PAGE_MODES.GROUP ||
+        $scope.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
+      title = 'Find explorations to learn from - Oppia';
+    }
+    PageTitleService.setPageTitle(title);
 
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
