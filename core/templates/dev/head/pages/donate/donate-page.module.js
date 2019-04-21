@@ -16,4 +16,4 @@
  * @fileoverview Module for the donate page.
  */
 
-angular.module('donatePageModule', []);
+angular.module('aboutPageModule', []);
