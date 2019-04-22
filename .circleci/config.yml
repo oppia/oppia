@@ -11,10 +11,8 @@ anchor_for_installing_dependencies: &install_dependencies
     source scripts/setup.sh || exit 1
     source scripts/setup_gae.sh || exit 1
 
-anchor_for_restoring_cache: &restore_cache
-  keys:
-    - setup-files-cache-{{ checksum "date" }}
-    - third-party-cache-{{ checksum "date" }}
+anchor_for_restoring_setup_cache: &restore_setup_cache
+  key: setup-files-cache-{{ checksum "date" }}
 
 version: 2
 jobs:
@@ -27,19 +25,19 @@ jobs:
       #     <<: *restore_cache
       - run:
           <<: *install_dependencies
-      # - save_cache:
-      #     key: setup-files-cache-{{ checksum "date" }}
-      #     paths:
-      #       - ../node_modules/
-      #       - ../oppia_tools/
+      - save_setup_cache:
+          key: setup-files-cache-{{ checksum "date" }}
+          paths:
+            - ../node_modules/
+            - ../oppia_tools/
 
   lint_tests:
     <<: *job_defaults
     steps:
       - checkout
       - run: date +%F > date
-      # - restore_cache:
-      #     <<: *restore_cache
+      - restore_setup_cache:
+          <<: *restore_setup_cache
       - run:
           name: Run lint tests
           command: |
@@ -56,8 +54,8 @@ jobs:
     steps:
       - checkout
       - run: date +%F > date
-      # - restore_cache:
-      #     <<: *restore_cache
+      - restore_setup_cache:
+          <<: *restore_setup_cache
       - run:
           name: Run frontend tests
           command: |
@@ -74,8 +72,8 @@ jobs:
     steps:
       - checkout
       - run: date +%F > date
-      # - restore_cache:
-      #     <<: *restore_cache
+      - restore_setup_cache:
+          <<: *restore_setup_cache
       - run:
           name: Run backend tests
           command: |
