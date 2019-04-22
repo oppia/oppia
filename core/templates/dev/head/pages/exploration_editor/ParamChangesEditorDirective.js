@@ -17,6 +17,9 @@
  * both the exploration settings tab and the state editor page).
  */
 
+require('components/forms/Select2DropdownDirective.js');
+require('pages/exploration_editor/ValueGeneratorEditorDirective.js');
+
 require('domain/exploration/ParamChangeObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/ExplorationParamSpecsService.js');

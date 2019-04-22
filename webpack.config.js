@@ -35,6 +35,7 @@ module.exports = {
     donate: './core/templates/dev/head/pages/donate/Donate.js',
     email_dashboard: './core/templates/dev/head/pages/email_dashboard/EmailDashboard.js',
     error: './core/templates/dev/head/pages/error/Error.js',
+    exploration_editor: './core/templates/dev/head/pages/exploration_editor/ExplorationEditor.js',
     exploration_player: './core/templates/dev/head/pages/exploration_player/ExplorationPlayer.js',
     get_started: './core/templates/dev/head/pages/get_started/GetStarted.js',
     landing: './core/templates/dev/head/pages/landing/TopicLandingPage.js',
@@ -125,6 +126,13 @@ module.exports = {
       chunks: ['error'],
       filename: 'error.html',
       template: 'core/templates/dev/head/pages/error/error.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['exploration_editor'],
+      filename: 'exploration_editor.html',
+      template: 'core/templates/dev/head/pages/exploration_editor/exploration_editor.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

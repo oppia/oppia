@@ -17,7 +17,6 @@
  */
 
 require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/ExplorationEditor.js');
 require('pages/exploration_editor/editor_tab/ResponsesService.js');
 require('pages/state_editor/state_properties/StateEditorService.js');
 require('pages/state_editor/state_properties/StatePropertyService.js');

@@ -17,6 +17,8 @@
  *   versions of an exploration.
  */
 
+require('components/loading/LoadingDotsDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 
 oppia.directive('versionDiffVisualization', [

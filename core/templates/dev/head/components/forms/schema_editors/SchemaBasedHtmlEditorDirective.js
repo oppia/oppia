@@ -16,8 +16,6 @@
  * @fileoverview Directive for a schema-based editor for HTML.
  */
 
-require('components/CkEditorRteDirective.js');
-
 require('domain/utilities/UrlInterpolationService.js');
 
 oppia.directive('schemaBasedHtmlEditor', [

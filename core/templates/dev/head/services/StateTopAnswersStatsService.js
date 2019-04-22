@@ -17,6 +17,12 @@
  * each state of an exploration.
  */
 
+require('domain/exploration/AnswerStatsObjectFactory.js');
+require('pages/exploration_editor/AngularNameService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_player/AnswerClassificationService.js');
+require('services/ContextService.js');
+
 oppia.factory('StateTopAnswersStatsService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
   'AnswerStatsObjectFactory', 'ContextService',

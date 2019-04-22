@@ -19,7 +19,9 @@ var path = require('path');
 module.exports = {
   mode: 'development',
   resolve: {
-    modules: [path.resolve(__dirname, 'core/templates/dev/head')],
+    modules: [
+      path.resolve(__dirname, 'core/templates/dev/head'), 
+    ],
   },
   entry: commonWebpackConfig.entries,
   plugins: commonWebpackConfig.plugins,

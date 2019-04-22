@@ -17,6 +17,8 @@
  * exploration editor.
  */
 
+require('pages/exploration_editor/improvements_tab/PlaythroughImprovementCardDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('services/ImprovementCardService.js');
 

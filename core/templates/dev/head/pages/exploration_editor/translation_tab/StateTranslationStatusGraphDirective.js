@@ -16,12 +16,16 @@
  * @fileoverview Directive for the state translation status graph.
  */
 
-*require('domain/utilities/UrlInterpolationService.js');
-*require('pages/exploration_editor/ExplorationStatesService.js');
-*require('pages/exploration_editor/GraphDataService.js');
-*require('pages/exploration_editor/translation_tab/TranslationStatusService.js');
-*require('pages/state_editor/state_properties/StateEditorService.js');
-*require('pages/state_editor/state_properties/StatePropertyService.js');
+require('pages/exploration_editor/editor_tab/StateGraphVisualizationDirective.js');
+
+require('domain/utilities/UrlInterpolationService.js');
+require('pages/exploration_editor/ExplorationStatesService.js');
+require('pages/exploration_editor/GraphDataService.js');
+require('pages/exploration_editor/translation_tab/TranslationStatusService.js');
+require('pages/state_editor/state_properties/StateContentIdsToAudioTranslationsService.js');
+require('pages/state_editor/state_properties/StateEditorService.js');
+require('pages/state_editor/state_properties/StatePropertyService.js');
+require('pages/state_editor/state_properties/StateWrittenTranslationsService.js');
 
 oppia.directive('stateTranslationStatusGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {

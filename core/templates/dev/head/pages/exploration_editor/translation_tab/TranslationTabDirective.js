@@ -16,6 +16,11 @@
  * @fileoverview Directive for the translation tab.
  */
 
+require('components/attribution_guide/AttributionGuideDirective.js');
+require('pages/exploration_editor/translation_tab/StateTranslationDirective.js');
+require('pages/exploration_editor/translation_tab/StateTranslationStatusGraphDirective.js');
+require('pages/exploration_editor/translation_tab/TranslatorOverviewDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/ExplorationDataService.js');
 require('pages/exploration_editor/ExplorationStatesService.js');

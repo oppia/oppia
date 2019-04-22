@@ -16,6 +16,10 @@
  * @fileoverview Directive for visualizing issues.
  */
 
+require('pages/exploration_editor/statistics_tab/EarlyQuitIssueDirective.js');
+require('pages/exploration_editor/statistics_tab/MultipleIncorrectIssueDirective.js');
+require('pages/exploration_editor/statistics_tab/CyclicTransitionsIssueDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('services/PlaythroughIssuesService.js');
 

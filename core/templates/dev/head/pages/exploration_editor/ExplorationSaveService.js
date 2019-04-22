@@ -16,7 +16,9 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
-require('domain/state/StatesObjectFactory.js');
+require('components/share/SharingLinksDirective.js');
+
+require('domain/exploration/StatesObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/AutosaveInfoModalsService.js');
 require('pages/exploration_editor/ChangeListService.js');

@@ -19,7 +19,10 @@
 
 require('pages/exploration_editor/ExplorationStatesService.js');
 require('pages/exploration_editor/translation_tab/TranslationLanguageService.js');
+require('pages/exploration_editor/translation_tab/TranslationTabActiveModeService.js');
+require('pages/state_editor/state_properties/StateContentIdsToAudioTranslationsService.js');
 require('pages/state_editor/state_properties/StatePropertyService.js');
+require('pages/state_editor/state_properties/StateWrittenTranslationsService.js');
 
 oppia.factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateContentIdsToAudioTranslationsService',

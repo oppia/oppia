@@ -88,7 +88,8 @@ FILEPATHS_NOT_TO_RENAME = (
     '*.py',
     'third_party/generated/fonts/*',
     'third_party/generated/js/third_party.min.js.map',
-    '*.bundle.js')
+    '*.bundle.js',
+    '*.bundle.js.map')
 
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.

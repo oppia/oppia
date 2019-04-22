@@ -18,16 +18,18 @@ var path = require('path');
 
 module.exports = {
   mode: 'production',
-  entry: {
-    app: './core/templates/dev/head/app.js',
-    about: './core/templates/dev/head/pages/about/About.js',
-    donate: './core/templates/dev/head/pages/donate/Donate.js'
-  },
+  entry: commonWebpackConfig.entries,
   plugins: commonWebpackConfig.plugins,
+  resolve: {
+      modules: [
+        path.resolve(__dirname, 'core/templates/dev/head'), 
+      ],
+    },
   output: {
     filename: '[name].[contenthash].bundle.js',
     path: path.resolve(__dirname, 'core/templates/dev/head/dist')
   },
+  devtool: 'source-map',
   optimization: {
     splitChunks: {
       chunks: 'all',

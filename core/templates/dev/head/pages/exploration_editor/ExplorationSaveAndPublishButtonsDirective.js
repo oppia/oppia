@@ -16,6 +16,8 @@
  * @fileoverview Directive for the exploration save & publish buttons.
  */
 
+require('components/loading/LoadingDotsDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/ChangeListService.js');
 require('pages/exploration_editor/ExplorationRightsService.js');

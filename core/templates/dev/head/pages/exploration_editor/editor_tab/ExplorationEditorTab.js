@@ -16,6 +16,10 @@
  * @fileoverview Controller for the Editor tab in the exploration editor page.
  */
 
+require('pages/exploration_editor/editor_tab/StateNameEditorDirective.js');
+require('pages/exploration_editor/editor_tab/StateParamChangesEditorDirective.js');
+require('pages/state_editor/StateEditorDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.js');
 require('pages/exploration_editor/ExplorationInitStateNameService.js');

@@ -17,6 +17,8 @@
  * the training data editor of an answer group.
  */
 
+require('pages/exploration_editor/editor_tab/TestInteractionPanelDirective.js');
+
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/AngularNameService.js');
 require('pages/exploration_editor/ExplorationStatesService.js');

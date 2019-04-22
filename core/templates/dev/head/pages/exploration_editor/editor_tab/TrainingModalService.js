@@ -17,6 +17,8 @@
  * the training modal used for unresolved answers.
  */
 
+require('pages/exploration_editor/editor_tab/TrainingPanelDirective.js');
+
 require('domain/exploration/AnswerGroupObjectFactory.js');
 require('domain/utilities/UrlInterpolationService.js');
 require('pages/exploration_editor/AngularNameService.js');

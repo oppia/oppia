@@ -18,7 +18,6 @@
 
 require('filters/ReplaceInputsWithEllipsesFilter.js');
 require('filters/TruncateAtFirstEllipsisFilter.js');
-require('pages/exploration_editor/ExplorationEditor.js');
 require('pages/state_editor/state_properties/StatePropertyService.js');
 
 oppia.directive('ruleTypeSelector', [function() {

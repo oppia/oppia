@@ -15,6 +15,9 @@
 /**
  * @fileoverview Directive containing the exploration material to be translated.
  */
+require('components/state/ResponseHeaderDirective.js');
+require('pages/exploration_editor/translation_tab/AudioTranslationBarDirective.js');
+require('pages/exploration_editor/translation_tab/StateTranslationEditorDirective.js');
 
 require('domain/utilities/UrlInterpolationService.js');
 require('filters/ConvertToPlainTextFilter.js');
