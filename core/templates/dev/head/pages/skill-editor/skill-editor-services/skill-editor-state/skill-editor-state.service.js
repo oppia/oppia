@@ -20,7 +20,7 @@
 angular.module('skillEditorModule').constant(
   'EVENT_SKILL_INITIALIZED', 'skillInitialized');
 angular.module('skillEditorModule').constant(
-    'EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
+  'EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
 angular.module('skillEditorModule').constant(
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
