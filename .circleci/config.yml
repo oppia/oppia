@@ -12,7 +12,8 @@ anchor_for_installing_dependencies: &install_dependencies
     source scripts/setup_gae.sh || exit 1
 
 anchor_for_restoring_setup_cache: &restore_setup_cache
-  key: setup-files-cache-{{ checksum "date" }}
+  keys:
+    - setup-files-cache-{{ checksum "date" }}
 
 version: 2
 jobs:
