@@ -518,7 +518,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             if interaction.can_have_solution:
                 self.assertFalse(interaction.is_linear)
 
-            default_object_values = obj_services.get_default_object_values()
+            default_object_values = constants.DEFAULT_OBJECT_VALUES
 
             # Check that the rules for this interaction have object editor
             # templates and default values.

@@ -43,8 +43,8 @@ class ObjectRegistryUnitTests(test_utils.GenericTestBase):
 
 class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
     """Test that the default value of objects recorded in
-    extensions/objects/object_defaults.json correspond to
-    the defined default values in objects.py for all objects that
+    assets/constants.js correspond to the defined default
+    values in objects.py for all objects that
     are used in rules.
     """
 
@@ -53,7 +53,7 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
         is provided in get_default_values().
         """
         interactions = interaction_registry.Registry.get_all_interactions()
-        object_default_vals = obj_services.get_default_object_values()
+        object_default_vals = constants.DEFAULT_OBJECT_VALUES
 
         for interaction in interactions:
             for rule_name in interaction.rules_dict:
@@ -74,7 +74,7 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
         """Checks that the default values provided by get_default_values()
         correspond to the ones defined in objects.py.
         """
-        object_default_vals = obj_services.get_default_object_values()
+        object_default_vals = constants.DEFAULT_OBJECT_VALUES
         all_object_classes = obj_services.Registry.get_all_object_classes()
         for (obj_type, default_value) in object_default_vals.iteritems():
             self.assertIn(obj_type, all_object_classes)

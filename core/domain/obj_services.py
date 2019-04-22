@@ -67,11 +67,3 @@ class Registry(object):
         if obj_type not in cls.objects_dict:
             raise TypeError('\'%s\' is not a valid object class.' % obj_type)
         return cls.objects_dict[obj_type]
-
-
-def get_default_object_values():
-    """Returns a dictionary containing the default object values."""
-    # TODO(wxy): Cache this as it is accessed many times.
-
-    return json.loads(
-        utils.get_file_contents(feconf.OBJECT_DEFAULT_VALUES_FILE_PATH))
