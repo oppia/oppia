@@ -3,11 +3,6 @@
 {% block navbar_breadcrumb %}
 {% endblock navbar_breadcrumb %}
 
-{% block maintitle %}
-  Error {{status_code}} - Oppia
-{% endblock maintitle %}
-
-
 {% block content %}
   <div class="oppia-content oppia-error-page-main-content" ng-controller="Error">
     <br>
@@ -67,6 +62,7 @@
   {{ super() }}
   <script src="/templates/dev/head/pages/error/error.module.js"></script>
   <script src="/templates/dev/head/pages/error/error.controller.js"></script>
+  <script src="/templates/dev/head/services/PageTitleService.js"></script>
 {% endblock footer_js %}
 
 {% block footer %}
