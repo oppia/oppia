@@ -1,13 +1,5 @@
 {% extends 'pages/base.html' %}
 
-{% block maintitle %}
-  {% if page_mode in ['group', 'search'] %}
-    Find explorations to learn from - Oppia
-  {% else %}
-    Exploration Library - Oppia
-  {% endif %}
-{% endblock maintitle %}
-
 {% block navbar_breadcrumb %}
 {% endblock navbar_breadcrumb %}
 
@@ -383,6 +375,7 @@
   <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
 
   <script src="/templates/dev/head/domain/learner_dashboard/LearnerDashboardIconsDirective.js"></script>
+  <script src="/templates/dev/head/services/PageTitleService.js"></script>
 
   <script src="/templates/dev/head/services/ConstructTranslationIdsService.js"></script>
 {% endblock footer_js %}
