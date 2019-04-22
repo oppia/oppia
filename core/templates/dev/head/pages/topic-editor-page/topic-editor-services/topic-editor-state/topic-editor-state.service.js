@@ -18,15 +18,18 @@
  * retrieving the topic, saving it, and listening for changes.
  */
 
-oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
-oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
-oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
-oppia.constant(
+angular.module('topicEditorPageModule').constant(
+  'EVENT_TOPIC_INITIALIZED', 'topicInitialized');
+angular.module('topicEditorPageModule').constant(
+  'EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
+angular.module('topicEditorPageModule').constant(
+  'EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
+angular.module('topicEditorPageModule').constant(
   'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
-oppia.constant(
+angular.module('topicEditorPageModule').constant(
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
-oppia.factory('TopicEditorStateService', [
+angular.module('topicEditorPageModule').factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
   'SubtopicPageObjectFactory',

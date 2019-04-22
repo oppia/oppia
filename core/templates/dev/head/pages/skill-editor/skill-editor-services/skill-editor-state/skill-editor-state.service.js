@@ -17,12 +17,14 @@
 * in the skill editor.
 */
 
-oppia.constant('EVENT_SKILL_INITIALIZED', 'skillInitialized');
-oppia.constant('EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
-oppia.constant(
+angular.module('skillEditorModule').constant(
+  'EVENT_SKILL_INITIALIZED', 'skillInitialized');
+angular.module('skillEditorModule').constant(
+    'EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
+angular.module('skillEditorModule').constant(
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
-oppia.factory('SkillEditorStateService', [
+angular.module('skillEditorModule').factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
   'SkillObjectFactory', 'SkillRightsBackendApiService',
   'SkillRightsObjectFactory', 'UndoRedoService',

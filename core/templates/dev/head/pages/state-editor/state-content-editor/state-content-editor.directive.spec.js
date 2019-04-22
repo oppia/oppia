@@ -33,8 +33,6 @@ describe('State content editor directive', function() {
 
   beforeEach(module('directiveTemplates'));
   beforeEach(function() {
-    module('stateContentEditorModule');
-    module('stateEditorModule');
     module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS);
 
     mockExplorationData = {
