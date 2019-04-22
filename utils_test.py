@@ -233,7 +233,7 @@ class UtilsTests(test_utils.GenericTestBase):
         string2 = u'Лорем'
         self.assertEqual(utils.convert_to_unicode(string2), string2)
         self.assertEqual(
-            utils.convert_to_unicode(string1), string1.decode('utf-8'))
+            utils.convert_to_unicode(string1), string1.decode(encoding='utf-8'))
 
     def test_get_hashable_value(self):
         json1 = ['foo', 'bar', {'baz': 3}]
