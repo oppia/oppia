@@ -251,9 +251,13 @@ class Normalizers(object):
         raw = urlparse.urlunsplit(quoted_url_components)
 
         acceptable = html_cleaner.filter_a('href', obj)
+        # We store the semicolon in a variable and use it as string substitution
+        # instead of directly using it to prevent Pylint reporting false
+        # multiple-statement errors.
+        semicolon_char = ';'
         assert acceptable, (
             'Invalid URL: Sanitized URL should start with '
-            '\'http://\' or \'https://\'; received %s' % raw)
+            '\'http://\' or \'https://\'%s received %s' % (semicolon_char, raw))
         return raw
 
 
