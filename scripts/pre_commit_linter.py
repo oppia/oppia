@@ -999,17 +999,17 @@ class LintChecksManager(object):
 
         parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
-        node_path = os.path.join(
-            parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
+        # node_path = os.path.join(
+        #     parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
         eslint_path = os.path.join(
             parent_dir, 'node_modules', 'eslint', 'bin', 'eslint.js')
         stylelint_path = os.path.join(
             parent_dir, 'node_modules', 'stylelint', 'bin', 'stylelint.js')
-        config_path_for_css_in_html = os.path.join(
-            parent_dir, 'oppia', '.stylelintrc')
-        config_path_for_oppia_css = os.path.join(
-            parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
-            'css', '.stylelintrc')
+        # config_path_for_css_in_html = os.path.join(
+        #     parent_dir, 'oppia', '.stylelintrc')
+        # config_path_for_oppia_css = os.path.join(
+        #     parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
+        #     'css', '.stylelintrc')
         if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
             print ''
             print 'ERROR    Please run start.sh first to install node-eslint '
