@@ -14,6 +14,8 @@
 
 """Controllers for the profile page."""
 
+import re
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -105,11 +107,8 @@ class PreferencesPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
-            'LANGUAGE_CODES_AND_NAMES': (
-                utils.get_all_language_codes_and_names()),
         })
-        self.render_template(
-            'pages/preferences/preferences.html', redirect_url_on_logout='/')
+        self.render_template('pages/preferences/preferences.html')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -251,7 +250,9 @@ class SignupPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         return_url = str(self.request.get('return_url', self.request.uri))
-
+        # Validating return_url for no external redirections.
+        if re.match('^/[^//]', return_url) is None:
+            return_url = '/'
         if user_services.has_fully_registered(self.user_id):
             self.redirect(return_url)
             return
@@ -275,6 +276,7 @@ class SignupHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         self.render_json({
+            'can_send_emails': feconf.CAN_SEND_EMAILS,
             'has_agreed_to_latest_terms': (
                 user_settings.last_agreed_to_terms and
                 user_settings.last_agreed_to_terms >=

@@ -44,6 +44,11 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             feconf.ROLE_ID_ADMIN)
         self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
 
+    def test_export_data(self):
+        user = user_models.UserSettingsModel.get_by_role(
+            feconf.ROLE_ID_ADMIN)[0]
+        self.assertEqual(user.__dict__, user.export_data(user.id))
+
 
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     """Tests for ExpUserLastPlaythroughModel class."""

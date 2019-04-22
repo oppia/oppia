@@ -36,6 +36,7 @@ from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
+from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
 from core.controllers import reader
@@ -202,7 +203,7 @@ URLS = MAPREDUCE_HANDLERS + [
         admin.AdminTopicsCsvFileDownloader),
 
     get_redirect_route(
-        r'/notifications_dashboard',
+        feconf.NOTIFICATIONS_DASHBOARD_URL,
         creator_dashboard.NotificationsDashboardPage),
     get_redirect_route(
         r'/notificationsdashboardhandler/data',
@@ -227,6 +228,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<skill_id>' % feconf.NEW_QUESTION_URL,
         question_editor.QuestionCreationHandler),
+    get_redirect_route(
+        r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
+        practice_sessions.PracticeSessionsPage),
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
@@ -269,7 +273,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
     get_redirect_route(
-        r'%s' % feconf.MERGE_SKILL_URL,
+        r'%s' % feconf.MERGE_SKILLS_URL,
         topics_and_skills_dashboard.MergeSkillHandler),
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
@@ -344,7 +348,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(r'/preferences', profile.PreferencesPage),
+    get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
@@ -520,6 +524,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler),
     get_redirect_route(
+        r'%s' % feconf.QUESTIONS_URL_PREFIX,
+        reader.QuestionPlayerHandler),
+    get_redirect_route(
         r'%s/exploration/<target_id>/<suggestion_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToExplorationActionHandler),
@@ -584,6 +591,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_STATUS_URL_PREFIX,
         topic_editor.TopicPublishHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_SEND_MAIL_URL_PREFIX,
+        topic_editor.TopicPublishSendMailHandler),
 
     get_redirect_route(
         r'%s/<skill_id>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
@@ -636,8 +646,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
-    get_redirect_route(
-        r'/exploration_editor_logout', editor.EditorLogoutHandler),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),

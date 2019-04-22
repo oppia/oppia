@@ -87,6 +87,7 @@ if os.path.isdir(oppia_tools_path):
     sys.path.insert(0, pil_path)
 
 THIRD_PARTY_LIBS = [
+    os.path.join(ROOT_PATH, 'third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join(ROOT_PATH, 'third_party', 'bleach-1.2.2'),
     os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-0.95'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.17.0'),
@@ -95,8 +96,9 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
     os.path.join(ROOT_PATH, 'third_party', 'requests-2.10.0'),
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.7.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.6.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.7.1'),
     os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.38'),
+    os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.8'),
 ]
 
 for lib_path in THIRD_PARTY_LIBS:

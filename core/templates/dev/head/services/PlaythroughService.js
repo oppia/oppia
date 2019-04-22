@@ -330,6 +330,6 @@ oppia.factory('PlaythroughService', [
             storePlaythrough(true);
           }
         }
-      }
+      },
     };
   }]);

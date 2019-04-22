@@ -1,0 +1,79 @@
+<div class="oppia-translated-content-header">Translated content</div>
+<div class="oppia-state-translation-editor-section oppia-editor-card-section">
+  <div ng-if="!translationEditorIsOpen">
+    <button class="btn oppia-translation-needs-update-button" ng-if="activeWrittenTranslation.needsUpdate">
+      <i class="material-icons md-18"
+         uib-tooltip="Translation needs update"
+         tooltip-placement="top">warning
+      </i>
+    </button>
+    <div class="protractor-test-edit-content"
+         ng-class="{'oppia-editable-section': isEditable()}"
+         ng-click="openTranslationEditor()">
+      <i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon"
+         title="Edit translation">&#xE254;
+      </i>
+      <div class="oppia-translated-content-display oppia-transition-200"
+           ng-class="{'oppia-prevent-selection': isEditable()}"
+           title="Translated Content">
+        <span  class="oppia-placeholder" ng-if="!activeWrittenTranslation || activeWrittenTranslation.getHtml() === ''">
+          No translation available. Click to add new!
+        </span>
+        <span ng-if="activeWrittenTranslation">
+          <angular-html-bind html-data="activeWrittenTranslation.getHtml()"
+                             class="oppia-rte-editor protractor-test-state-content-display">
+          </angular-html-bind>
+        </span>
+      </div>
+      <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
+      <div class="oppia-translation-editable-mask oppia-editable-section-mask">
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="translationEditorIsOpen">
+    <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html">
+    </schema-based-editor>
+    <div style="margin-top: 2px;">
+      <button type="button"
+              class="btn btn-success oppia-save-state-item-button pull-right"
+              ng-click="onSaveTranslationButtonClicked()">
+        Save
+      </button>
+      <button type="button" class="btn btn-default pull-right" ng-click="cancelEdit()">Cancel</button>
+      <div style="clear: both;"></div>
+    </div>
+  </div>
+</div>
+<style>
+  .oppia-translated-content-header {
+    background: #ccc;
+    height: 16px;
+    text-align: center;
+    font-size: 12px;
+    font-style: italic;
+  }
+  .oppia-editor-edit-icon {
+    position: absolute;
+    top: 10px;
+  }
+  .oppia-translation-needs-update-button {
+    border-radius: 14px;
+    color: yellow;
+    height: 28px;
+    left: 3px;
+    padding: 0 0 3px 0;
+    position: absolute;
+    width: 28px;
+  }
+  .oppia-translation-editable-mask {
+    background-color: #eee;
+  }
+  .oppia-translated-content-display {
+    max-width: 610px;
+    text-align: left;
+  }
+  .oppia-translation-editor {
+    min-height: 160px;
+  }
+</style>

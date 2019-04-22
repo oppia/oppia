@@ -16,6 +16,6 @@
  * @fileoverview Rules service for the interaction.
  */
 
-oppia.factory('continueRulesService', [function() {
+oppia.factory('ContinueRulesService', [function() {
   return {};
 }]);
