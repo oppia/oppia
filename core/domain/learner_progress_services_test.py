@@ -25,6 +25,7 @@ from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.platform import models
 from core.tests import test_utils
+from constants import constants
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -481,6 +482,20 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
+        # Check if an exploration summary status is not public.
+        exploration_ids = [self.EXP_ID_0, self.EXP_ID_1]
+        # Collect exploration summaries.
+        exploration_summaries = exp_services.get_exploration_summaries_matching_ids(
+            exploration_ids)
+        # Alter the status of self.EXP_ID_1.
+        exploration_summaries[1].status = constants.ACTIVITY_STATUS_PRIVATE
+        # self.EXP_ID_1 should not be put in filtered_completed_exp_summaries.
+        filtered_completed_exp_summaries, nonexistent_completed_exp_ids = \
+            learner_progress_services._get_filtered_completed_exp_summaries(
+                exploration_summaries, exploration_ids)
+        self.assertEqual(filtered_completed_exp_summaries, [exploration_summaries[0]])
+        self.assertEqual(nonexistent_completed_exp_ids, [exploration_summaries[1].id])
+
     def test_get_all_completed_collection_ids(self):
         self.assertEqual(
             learner_progress_services.get_all_completed_collection_ids(
@@ -499,6 +514,20 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_completed_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
+
+        # Check if a collection summary status is not public.
+        collection_ids = [self.COL_ID_0, self.COL_ID_1]
+        # Collect collection summaries.
+        collection_summaries = collection_services.get_collection_summaries_matching_ids(
+            collection_ids)
+        # Alter the status of self.COL_ID_1.
+        collection_summaries[1].status = constants.ACTIVITY_STATUS_PRIVATE
+        # self.COL_ID_1 should not be put in filtered_completed_col_summaries.
+        filtered_completed_col_summaries, nonexistent_completed_col_ids, _ =\
+            learner_progress_services._get_filtered_completed_collection_summaries(
+                self.user_id, collection_summaries, collection_ids)
+        self.assertEqual(filtered_completed_col_summaries, [collection_summaries[0]])
+        self.assertEqual(nonexistent_completed_col_ids, [collection_summaries[1].id])
 
     def test_get_all_incomplete_exp_ids(self):
         self.assertEqual(
@@ -521,6 +550,19 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
+        # Check if an exploration summary status is not public.
+        exploration_ids = [self.EXP_ID_0, self.EXP_ID_1]
+        # Collect exploration summaries.
+        exploration_summaries = exp_services.get_exploration_summaries_matching_ids(
+            exploration_ids)
+        # Alter the status of self.EXP_ID_1.
+        exploration_summaries[1].status = constants.ACTIVITY_STATUS_PRIVATE
+        # self.EXP_ID_1 should not be put in filtered_incomplete_exp_summaries.
+        filtered_incomplete_exp_summaries, nonexistent_incomplete_exp_ids = \
+            learner_progress_services._get_filtered_incomplete_exp_summaries(
+                exploration_summaries, exploration_ids)
+        self.assertEqual(filtered_incomplete_exp_summaries, [exploration_summaries[0]])
+        self.assertEqual(nonexistent_incomplete_exp_ids, [exploration_summaries[1].id])
 
     def test_get_all_incomplete_collection_ids(self):
         self.assertEqual(
@@ -540,6 +582,21 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
+
+        # Check if a collection summary status is not public.
+        collection_ids = [self.COL_ID_0, self.COL_ID_1]
+        # Collect collection summaries.
+        collection_summaries = collection_services.get_collection_summaries_matching_ids(
+            collection_ids)
+        # Alter the status of self.COL_ID_1.
+        collection_summaries[1].status = constants.ACTIVITY_STATUS_PRIVATE
+        # self.COL_ID_1 should not be put in filtered_incomplete_col_summaries.
+        filtered_incomplete_col_summaries, nonexistent_incomplete_col_ids =\
+            learner_progress_services._get_filtered_incomplete_collection_summaries(
+                collection_summaries, collection_ids)
+        self.assertEqual(filtered_incomplete_col_summaries, [collection_summaries[0]])
+        self.assertEqual(nonexistent_incomplete_col_ids, [collection_summaries[1].id])
+
 
     def test_get_ids_of_activities_in_learner_dashboard(self):
         # Add activities to the completed section.
@@ -579,6 +636,35 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             activity_ids.exploration_playlist_ids, [self.EXP_ID_3])
         self.assertEqual(
             activity_ids.collection_playlist_ids, [self.COL_ID_3])
+
+    def test_get_filtered_nonpublic_playlist_summaries(self):
+        # Check if an exploration summary playlist status is not public.
+        exploration_ids = [self.EXP_ID_0, self.EXP_ID_1]
+        # Collect exploration summaries.
+        exploration_summaries = exp_services.get_exploration_summaries_matching_ids(
+            exploration_ids)
+        # Alter the status of self.EXP_ID_1.
+        exploration_summaries[1].status = constants.ACTIVITY_STATUS_PRIVATE
+        # self.EXP_ID_1 should not be put in filtered_exp_playlist_summaries.
+        filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids = \
+            learner_progress_services._get_filtered_exp_playlist_summaries(
+                exploration_summaries, exploration_ids)
+        self.assertEqual(filtered_exp_playlist_summaries, [exploration_summaries[0]])
+        self.assertEqual(nonexistent_playlist_exp_ids, [exploration_summaries[1].id])
+
+        # Check if a collection summary playlist status is not public.
+        collection_ids = [self.COL_ID_0, self.COL_ID_1]
+        # Collect collection summaries.
+        collection_summaries = collection_services.get_collection_summaries_matching_ids(
+            collection_ids)
+        # Alter the status of self.COL_ID_1.
+        collection_summaries[1].status = constants.ACTIVITY_STATUS_PRIVATE
+        # self.COL_ID_1 should not be put in filtered_collection_playlist_summaries.
+        filtered_collection_playlist_summaries, nonexistent_playlist_collection_ids = \
+            learner_progress_services._get_filtered_collection_playlist_summaries(
+                collection_summaries, collection_ids)
+        self.assertEqual(filtered_collection_playlist_summaries, [collection_summaries[0]])
+        self.assertEqual(nonexistent_playlist_collection_ids, [collection_summaries[1].id])
 
     def test_get_activity_progress(self):
         # Add activities to the completed section.
