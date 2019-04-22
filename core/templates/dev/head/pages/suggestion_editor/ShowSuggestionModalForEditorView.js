@@ -29,7 +29,7 @@ oppia.controller('ShowSuggestionModalForEditorView', [
       unsavedChangesExist) {
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.suggestionEditorIsShown = false;
-    $scope.editButtonIsShown = true;
+    var editButtonIsShown = true;
     $scope.canEdit = EditabilityService.isEditable();
     $scope.commitMessage = '';
     $scope.reviewMessage = '';
@@ -61,7 +61,7 @@ oppia.controller('ShowSuggestionModalForEditorView', [
     $scope.commitMessage = description;
 
     $scope.isEditButtonShown = function() {
-      return $scope.editButtonIsShown;
+      return editButtonIsShown;
     };
 
     $scope.isSuggestionEditorIsShown = function() {
@@ -69,7 +69,7 @@ oppia.controller('ShowSuggestionModalForEditorView', [
     };
 
     $scope.isSaveButtonShown = function() {
-      return (!$scope.editButtonIsShown &&
+      return (!editButtonIsShown &&
         $scope.suggestionEditorIsShown);
     };
 
@@ -80,12 +80,12 @@ oppia.controller('ShowSuggestionModalForEditorView', [
     };
 
     $scope.editSuggestion = function() {
-      $scope.editButtonIsShown = false;
+      editButtonIsShown = false;
       $scope.suggestionEditorIsShown = true;
     };
 
     $scope.saveSuggestion = function() {
-      $scope.editButtonIsShown = true;
+      editButtonIsShown = true;
       $scope.suggestionEditorIsShown = false;
       $uibModalInstance.close({
         action: SuggestionModalService.ACTION_EDIT_SUGGESTION,

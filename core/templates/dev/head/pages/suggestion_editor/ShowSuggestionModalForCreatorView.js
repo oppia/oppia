@@ -55,7 +55,7 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     // Reference https://stackoverflow.com/q/12618342
     $scope.suggestionData = {newSuggestionHtml: newContent.html};
     $scope.suggestionEditorIsShown = false;
-    $scope.editButtonIsShown = true;
+    var editButtonIsShown = true;
     $scope.acceptSuggestion = function() {
       SuggestionModalService.acceptSuggestion(
         $uibModalInstance,
@@ -77,16 +77,16 @@ oppia.controller('ShowSuggestionModalForCreatorView', [
     };
     $scope.editSuggestion = function() {
       $scope.suggestionEditorIsShown = true;
-      $scope.editButtonIsShown = false;
+      editButtonIsShown = false;
     };
     $scope.cancel = function() {
       SuggestionModalService.cancelSuggestion($uibModalInstance);
     };
     $scope.isEditButtonShown = function() {
-      return ($scope.isNotHandled && $scope.editButtonIsShown);
+      return ($scope.isNotHandled && editButtonIsShown);
     };
     $scope.isSaveButtonShown = function() {
-      return ($scope.isNotHandled && !$scope.editButtonIsShown);
+      return ($scope.isNotHandled && !editButtonIsShown);
     };
     $scope.isSaveButtonDisabled = function() {
       return (
