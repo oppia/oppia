@@ -347,3 +347,16 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
+
+
+class UserSubscriptionsModelTests(test_utils.GenericTestBase):
+    """Tests for UserSubscriptionsModel."""
+    USER_ID = 'user_id'
+
+    def test_export_data(self):
+        user_data = user_models.UserSubscriptionsModel.export_data(self.USER_ID)
+        self.assertEqual(user_data['activities_ids'], [])
+        self.assertEqual(user_data['collection_ids'], [])
+        self.assertEqual(user_data['general_feedback_thread_ids'], [])
+        self.assertEqual(user_data['creator_ids'], [])
+        self.assertEqual(user_data['last_checked'], None)
