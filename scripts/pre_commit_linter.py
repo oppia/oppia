@@ -956,7 +956,7 @@ class LintChecksManager(object):
         """
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
-        self.parsed_js_files = self._validate_and_parse_js_files()
+        # self.parsed_js_files = self._validate_and_parse_js_files()
 
     def _validate_and_parse_js_files(self):
         """This function validates JavaScript files and returns the parsed
@@ -1016,50 +1016,50 @@ class LintChecksManager(object):
             print '         or node-stylelint and its dependencies.'
             sys.exit(1)
 
-        js_files_to_lint = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.js')]
+        # js_files_to_lint = [
+        #     filepath for filepath in self.all_filepaths if filepath.endswith(
+        #         '.js')]
         py_files_to_lint = [
             filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.py')]
-        html_files_to_lint_for_css = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.html')]
-        css_files_to_lint = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                'oppia.css')]
+        # html_files_to_lint_for_css = [
+        #     filepath for filepath in self.all_filepaths if filepath.endswith(
+        #         '.html')]
+        # css_files_to_lint = [
+        #     filepath for filepath in self.all_filepaths if filepath.endswith(
+        #         'oppia.css')]
 
-        css_in_html_result = multiprocessing.Queue()
-        css_in_html_stdout = multiprocessing.Queue()
+        # css_in_html_result = multiprocessing.Queue()
+        # css_in_html_stdout = multiprocessing.Queue()
 
+        # linting_processes = []
+        # linting_processes.append(multiprocessing.Process(
+        #     target=_lint_css_files, args=(
+        #         node_path,
+        #         stylelint_path,
+        #         config_path_for_css_in_html,
+        #         html_files_to_lint_for_css, css_in_html_stdout,
+        #         css_in_html_result, self.verbose_mode_enabled)))
+
+        # css_result = multiprocessing.Queue()
+        # css_stdout = multiprocessing.Queue()
+
+        # linting_processes.append(multiprocessing.Process(
+        #     target=_lint_css_files, args=(
+        #         node_path,
+        #         stylelint_path,
+        #         config_path_for_oppia_css,
+        #         css_files_to_lint, css_stdout,
+        #         css_result, self.verbose_mode_enabled)))
+
+        # js_result = multiprocessing.Queue()
+        # js_stdout = multiprocessing.Queue()
+
+        # linting_processes.append(multiprocessing.Process(
+        #     target=_lint_js_files, args=(
+        #         node_path, eslint_path, js_files_to_lint,
+        #         js_stdout, js_result, self.verbose_mode_enabled)))
         linting_processes = []
-        linting_processes.append(multiprocessing.Process(
-            target=_lint_css_files, args=(
-                node_path,
-                stylelint_path,
-                config_path_for_css_in_html,
-                html_files_to_lint_for_css, css_in_html_stdout,
-                css_in_html_result, self.verbose_mode_enabled)))
-
-        css_result = multiprocessing.Queue()
-        css_stdout = multiprocessing.Queue()
-
-        linting_processes.append(multiprocessing.Process(
-            target=_lint_css_files, args=(
-                node_path,
-                stylelint_path,
-                config_path_for_oppia_css,
-                css_files_to_lint, css_stdout,
-                css_result, self.verbose_mode_enabled)))
-
-        js_result = multiprocessing.Queue()
-        js_stdout = multiprocessing.Queue()
-
-        linting_processes.append(multiprocessing.Process(
-            target=_lint_js_files, args=(
-                node_path, eslint_path, js_files_to_lint,
-                js_stdout, js_result, self.verbose_mode_enabled)))
-
         py_result = multiprocessing.Queue()
 
         linting_processes.append(multiprocessing.Process(
@@ -1079,18 +1079,20 @@ class LintChecksManager(object):
         for process in linting_processes:
             process.join()
 
-        js_messages = []
-        while not js_stdout.empty():
-            js_messages.append(js_stdout.get())
+        # js_messages = []
+        # while not js_stdout.empty():
+        #     js_messages.append(js_stdout.get())
 
-        print ''
-        print '\n'.join(js_messages)
+        # print ''
+        # print '\n'.join(js_messages)
 
         summary_messages = []
 
-        result_queues = [
-            css_in_html_result, css_result,
-            js_result, py_result]
+        # result_queues = [
+        #     css_in_html_result, css_result,
+        #     js_result, py_result]
+
+        result_queues = [py_result]
 
         for result_queue in result_queues:
             while not result_queue.empty():
@@ -2185,35 +2187,36 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
-        js_component_messages = self._check_js_component_name_and_count()
-        directive_scope_messages = self._check_directive_scope()
-        sorted_dependencies_messages = (
-            self._check_sorted_dependencies())
-        controller_dependency_messages = (
-            self._match_line_breaks_in_controller_dependencies())
-        html_directive_name_messages = (
-            self._check_html_directive_name())
-        import_order_messages = self._check_import_order()
-        docstring_messages = self._check_docstrings()
-        comment_messages = self._check_comments()
-        # The html tags and attributes check has an additional
-        # debug mode which when enabled prints the tag_stack for each file.
-        html_tag_and_attribute_messages = (
-            self._check_html_tags_and_attributes())
-        html_linter_messages = self._lint_html_files()
-        pattern_messages = self._check_bad_patterns()
-        copyright_notice_messages = (
-            self._check_for_copyright_notice())
-        codeowner_messages = self._check_codeowner_file()
-        all_messages = (
-            js_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages +
-            html_directive_name_messages + import_order_messages +
-            docstring_messages + comment_messages +
-            html_tag_and_attribute_messages +
-            html_linter_messages + linter_messages + pattern_messages +
-            copyright_notice_messages + codeowner_messages)
-        return all_messages
+        # js_component_messages = self._check_js_component_name_and_count()
+        # directive_scope_messages = self._check_directive_scope()
+        # sorted_dependencies_messages = (
+        #     self._check_sorted_dependencies())
+        # controller_dependency_messages = (
+        #     self._match_line_breaks_in_controller_dependencies())
+        # html_directive_name_messages = (
+        #     self._check_html_directive_name())
+        # import_order_messages = self._check_import_order()
+        # docstring_messages = self._check_docstrings()
+        # comment_messages = self._check_comments()
+        # # The html tags and attributes check has an additional
+        # # debug mode which when enabled prints the tag_stack for each file.
+        # html_tag_and_attribute_messages = (
+        #     self._check_html_tags_and_attributes())
+        # html_linter_messages = self._lint_html_files()
+        # pattern_messages = self._check_bad_patterns()
+        # copyright_notice_messages = (
+        #     self._check_for_copyright_notice())
+        # codeowner_messages = self._check_codeowner_file()
+        # all_messages = (
+        #     js_component_messages + directive_scope_messages +
+        #     sorted_dependencies_messages + controller_dependency_messages +
+        #     html_directive_name_messages + import_order_messages +
+        #     docstring_messages + comment_messages +
+        #     html_tag_and_attribute_messages +
+        #     html_linter_messages + linter_messages + pattern_messages +
+        #     copyright_notice_messages + codeowner_messages)
+        # return all_messages
+        return linter_messages
 
 
 def _print_complete_summary_of_errors():
