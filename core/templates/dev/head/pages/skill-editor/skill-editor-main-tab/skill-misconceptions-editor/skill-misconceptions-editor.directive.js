@@ -25,7 +25,7 @@ angular.module('skillMisconceptionsEditorModule').directive(
         restrict: 'E',
         scope: {},
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          'core/templates/dev/head/pages/skill-editor/skill-editor-main-tab/' +
+          '/pages/skill-editor/skill-editor-main-tab/' +
           'skill-misconceptions-editor/' +
           'skill-misconceptions-editor.directive.html'),
         controller: [

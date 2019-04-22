@@ -29,7 +29,7 @@ angular.module('skillConceptCardEditorModule').directive(
         restrict: 'E',
         scope: {},
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          'core/templates/dev/head/pages/skill-editor/skill-editor-main-tab/' +
+          '/pages/skill-editor/skill-editor-main-tab/' +
           'skill-concept-card-editor/skill-concept-card-editor.directive.html'),
         controller: [
           '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
@@ -122,8 +122,7 @@ angular.module('skillConceptCardEditorModule').directive(
             $scope.deleteWorkedExample = function(index, evt) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  'core/templates/dev/head/pages/skill-editor/' +
-                  'skill-editor-templates/' +
+                  '/pages/skill-editor/skill-editor-templates/' +
                   'delete-worked-example-modal.directive.html'),
                 backdrop: 'static',
                 controller: [
