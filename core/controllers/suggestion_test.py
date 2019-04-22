@@ -231,6 +231,40 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(change_dict, suggestion_after_edit['change'])
         self.logout()
 
+    def test_edit_suggestion_of_not_exist(self):
+        suggestion = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id_2))['suggestions'][1]
+
+        # Create new suggestion content.
+        new_content_after_edit = state_domain.SubtitledHtml(
+            'content', 'new edit content html').to_dict()
+
+        suggestion_id = 'invalid'
+
+        # New change dict for the suggestion.
+        change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'State 3',
+            'old_value': self.new_content,
+            'new_value': new_content_after_edit
+        }
+
+        self.login(self.AUTHOR_EMAIL_2)
+        response = self.get_html_response('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Put suggestion after some change.
+        self.put_json(
+            ('/suggestionactionhandler/edit/' + suggestion_id), {
+                'action': 'edit',
+                'summary_message': 'summary message',
+                'change': change_dict
+                }, csrf_token, expected_status_int=500)
+        self.logout()
+
     def test_accept_suggestion(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 

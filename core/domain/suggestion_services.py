@@ -580,6 +580,10 @@ def check_can_edit_suggestion(user, suggestion_id):
     if suggestion.author_id == user_id:
         return True
 
+    if check_user_can_review_in_category(
+            user_id, suggestion.score_category):
+        return True
+
     if suggestion.target_type == 'exploration':
         activity_rights = rights_manager.get_exploration_rights(
             suggestion.target_id)
