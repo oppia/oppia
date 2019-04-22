@@ -1716,8 +1716,7 @@ class LintChecksManager(object):
             docstring_checker = docstrings_checker.ASTDocStringChecker()
             for filepath in files_to_check:
                 ast_file = ast.walk(
-                    ast.parse(FileCache.read(filepath).encode('utf-8',
-                                                              'ignore')))
+                    ast.parse(FileCache.read(filepath).encode('utf-8')))
                 func_defs = [n for n in ast_file if isinstance(
                     n, ast.FunctionDef)]
                 for func in func_defs:

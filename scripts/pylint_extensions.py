@@ -40,7 +40,11 @@ _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
 sys.path.insert(0, _FUTURE_PATH)
 
 # pylint: disable=wrong-import-position
+
+# The 'builtins' module should be imported after the 'Future' module is inserted
+# into Python's path.
 from builtins import range  # isort:skip
+
 # pylint: enable=wrong-import-position
 
 
