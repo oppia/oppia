@@ -94,6 +94,15 @@ class UserSettingsModel(base_models.BaseModel):
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
 
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Exports the data from UserSettingsModel into dictionary
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+        """
+        return UserSettingsModel.get(user_id).__dict__
+
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
         """Returns whether or not a given normalized_username is taken.
