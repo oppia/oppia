@@ -26,7 +26,7 @@ jobs:
       #     <<: *restore_cache
       - run:
           <<: *install_dependencies
-      - save_setup_cache:
+      - save_cache:
           key: setup-files-cache-{{ checksum "date" }}
           paths:
             - ../node_modules/
@@ -37,7 +37,7 @@ jobs:
     steps:
       - checkout
       - run: date +%F > date
-      - restore_setup_cache:
+      - restore_cache:
           <<: *restore_setup_cache
       - run:
           name: Run lint tests
@@ -55,7 +55,7 @@ jobs:
     steps:
       - checkout
       - run: date +%F > date
-      - restore_setup_cache:
+      - restore_cache:
           <<: *restore_setup_cache
       - run:
           name: Run frontend tests
@@ -73,7 +73,7 @@ jobs:
     steps:
       - checkout
       - run: date +%F > date
-      - restore_setup_cache:
+      - restore_cache:
           <<: *restore_setup_cache
       - run:
           name: Run backend tests
