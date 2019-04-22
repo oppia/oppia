@@ -702,7 +702,8 @@ def apply_change_list(exploration_id, change_list):
                         for param_change_dict in change.new_value]
                     state.update_param_changes(param_changes_obj)
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    state.update_content(state_domain.SubtitledHtml.from_dict(change.new_value))
+                    state.update_content(state_domain.SubtitledHtml.from_dict(
+                        change.new_value))
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_ID):
@@ -773,10 +774,10 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'param_specs':
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
-                    param_changes_obj = [
+                    param_changes = [
                         param_domain.ParamChange.from_dict(param_change_dict)
                         for param_change_dict in change.new_value]
-                    exploration.update_param_changes(param_changes_obj)
+                    exploration.update_param_changes(param_changes)
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':

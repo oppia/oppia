@@ -1866,7 +1866,8 @@ class ExplorationContentValidationJobForCKEditorTests(
             )
         }
 
-        state1.update_content(state_domain.SubtitledHtml.from_dict(content1_dict))
+        state1.update_content(state_domain.SubtitledHtml.from_dict(
+            content1_dict))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1911,10 +1912,13 @@ class ExplorationContentValidationJobForCKEditorTests(
                 '</oppia-noninteractive-collapsible>'
             )
         }
-        state1.update_content(state_domain.SubtitledHtml.from_dict(content1_dict))
-        state2.update_content(state_domain.SubtitledHtml.from_dict(content2_dict))
-        state3.update_content(state_domain.SubtitledHtml.from_dict(content3_dict))
-        
+        state1.update_content(state_domain.SubtitledHtml.from_dict(
+            content1_dict))
+        state2.update_content(state_domain.SubtitledHtml.from_dict(
+            content2_dict))
+        state3.update_content(state_domain.SubtitledHtml.from_dict(
+            content3_dict))
+
         default_outcome_dict1 = {
             'dest': 'State2',
             'feedback': {
@@ -2004,7 +2008,8 @@ class ExplorationContentValidationJobForCKEditorTests(
 
         state1 = exploration.states['State1']
 
-        state1.update_content(state_domain.SubtitledHtml.from_dict(content_dict))
+        state1.update_content(state_domain.SubtitledHtml.from_dict(
+            content_dict))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -2233,9 +2238,11 @@ class InteractionCustomizationArgsValidationJobTests(
                 '</oppia-noninteractive-image>'
             )
         }
-        state1.update_content(state_domain.SubtitledHtml.from_dict(content1_dict))
+        state1.update_content(state_domain.SubtitledHtml.from_dict(
+            content1_dict))
         state2.update_interaction_default_outcome(default_outcome_dict2)
-        state3.update_content(state_domain.SubtitledHtml.from_dict(content3_dict))
+        state3.update_content(state_domain.SubtitledHtml.from_dict(
+            content3_dict))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -2287,7 +2294,8 @@ class InteractionCustomizationArgsValidationJobTests(
 
         state1 = exploration.states['State1']
 
-        state1.update_content(state_domain.SubtitledHtml.from_dict(content_dict))
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 

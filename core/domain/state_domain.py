@@ -1361,22 +1361,24 @@ class State(object):
                 self.written_translations.add_content_id_for_translation(
                     content_id)
 
-    def update_content(self, content_obj):
+    def update_content(self, content):
         """Update the content of this state.
 
         Args:
-            content_obj: object. The SubtitledHtml object.
+            content: list. The list that represents the SubtitledHtml object
+            of content.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
-        self.content = content_obj
+        self.content = content
 
-    def update_param_changes(self, param_changes_obj):
+    def update_param_changes(self, param_changes):
         """Update the param_changes dict attribute.
 
         Args:
-            param_change_objs: list(obj). ParamChange domain object.
+            param_changes: list(ParamChange). Parameter changes associated with
+                this state.
         """
-        self.param_changes = param_changes_obj
+        self.param_changes = param_changes
 
     def update_interaction_id(self, interaction_id):
         """Update the interaction id attribute.
