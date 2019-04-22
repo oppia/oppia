@@ -21,6 +21,7 @@ import re
 import string
 import struct
 
+from constants import constants
 from core.domain import dependency_registry
 from core.domain import exp_services
 from core.domain import html_validation_service

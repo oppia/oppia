@@ -14,11 +14,11 @@
 
 """Tests for services relating to typed objects."""
 
+from constants import constants
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.tests import test_utils
 from extensions.objects.models import objects
-
 
 class ObjectRegistryUnitTests(test_utils.GenericTestBase):
     """Test the Registry class in obj_services."""
