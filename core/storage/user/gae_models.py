@@ -100,6 +100,9 @@ class UserSettingsModel(base_models.BaseModel):
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserSettingsModel.
         """
         return UserSettingsModel.get(user_id).__dict__
 
