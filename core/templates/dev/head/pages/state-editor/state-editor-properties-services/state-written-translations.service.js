@@ -16,10 +16,12 @@
  * @fileoverview A data service that stores the written translations.
  */
 
-oppia.factory('StateWrittenTranslationsService', [
-  'StatePropertyService', function(StatePropertyService) {
-    var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveWrittenTranslations';
-    return child;
-  }
-]);
+angular.module('stateEditorModule').factory(
+  'StateWrittenTranslationsService', [
+    'StatePropertyService', function(StatePropertyService) {
+      var child = Object.create(StatePropertyService);
+      child.setterMethodKey = 'saveWrittenTranslations';
+      return child;
+    }
+  ]
+);

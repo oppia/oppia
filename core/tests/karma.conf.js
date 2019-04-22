@@ -38,6 +38,7 @@ module.exports = function(config) {
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*.js',
+      'core/templates/dev/head/**/*\.directive.html',
       'core/templates/dev/head/**/*_directive.html',
       'extensions/**/*.js',
       {

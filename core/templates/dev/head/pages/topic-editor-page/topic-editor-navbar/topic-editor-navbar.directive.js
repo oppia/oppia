@@ -55,8 +55,9 @@ angular.module('topicEditorNavbarModule').directive('topicEditorNavbar', [
             if (!$scope.topicRights.canPublishTopic()) {
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic_editor/' +
-                  'topic_editor_send_mail_modal_directive.html'),
+                  'core/templates/dev/head/pages/topic-editor-page/' +
+                  'topic-editor-templates/' +
+                  'topic-editor-send-mail-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',

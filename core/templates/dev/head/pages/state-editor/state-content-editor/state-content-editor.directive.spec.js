@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the state content editor directive.
  */
 
-fdescribe('State content editor directive', function() {
+describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, citat, scitat;
   var mockExplorationData;
 
@@ -46,8 +46,7 @@ fdescribe('State content editor directive', function() {
     });
   });
 
-  beforeEach(inject(function($compile, $injector, $rootScope, $templateCache, _$controller_) {
-    $controller = _$controller_;
+  beforeEach(inject(function($compile, $injector, $rootScope, $templateCache) {
     shof = $injector.get('SubtitledHtmlObjectFactory');
     cls = $injector.get('ChangeListService');
     citat = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
@@ -223,20 +222,18 @@ fdescribe('State content editor directive', function() {
     outerScope.saveStateContent = jasmine.createSpy('saveStateContent');
     outerScope.showMarkAllAudioAsNeedingUpdateModalIfRequired = (
       jasmine.createSpy(''));
-    // var elem = angular.element(
-    //   '<state-content-editor ' +
-    //   'on-save-state-content="saveStateContent" ' +
-    //   'show-mark-all-audio-as-needing-update-modal-if-required=' +
-    //   '"showMarkAllAudioAsNeedingUpdateModalIfRequired">' +
-    //   '</state-content-editor>');
-    // var compiledElem = $compile(elem)(outerScope);
-    // outerScope.$digest();
-    // ctrlScope = compiledElem[0].getControllerScope();
-    // innerScope = $controller('stateEditorController', {$scope: ctrlScope})
-    ctrlScope = $controller('stateContentEditorController', {$scope: outerScope});
+    var elem = angular.element(
+      '<state-content-editor ' +
+      'on-save-state-content="saveStateContent" ' +
+      'show-mark-all-audio-as-needing-update-modal-if-required=' +
+      '"showMarkAllAudioAsNeedingUpdateModalIfRequired">' +
+      '</state-content-editor>');
+    var compiledElem = $compile(elem)(outerScope);
+    outerScope.$digest();
+    ctrlScope = compiledElem[0].getControllerScope();
   }));
 
-  fit('should start with the content editor not being open', function() {
+  it('should start with the content editor not being open', function() {
     expect(ctrlScope.contentEditorIsOpen).toBe(false);
   });
 

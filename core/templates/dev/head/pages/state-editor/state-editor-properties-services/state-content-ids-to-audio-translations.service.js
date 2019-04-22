@@ -17,10 +17,12 @@
  * to audio translations.
  */
 
-angular.module('stateEditorModule').factory('StateContentIdsToAudioTranslationsService', [
-  'StatePropertyService', function(StatePropertyService) {
-    var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveContentIdsToAudioTranslations';
-    return child;
-  }
-]);
+angular.module('stateEditorModule').factory(
+  'StateContentIdsToAudioTranslationsService', [
+    'StatePropertyService', function(StatePropertyService) {
+      var child = Object.create(StatePropertyService);
+      child.setterMethodKey = 'saveContentIdsToAudioTranslations';
+      return child;
+    }
+  ]
+);
