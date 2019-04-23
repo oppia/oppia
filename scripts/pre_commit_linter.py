@@ -933,7 +933,6 @@ def _lint_py_files(
     else:
         result.put('%s   %s Python files linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
-    print result
     print 'Python linting finished.'
 
 
