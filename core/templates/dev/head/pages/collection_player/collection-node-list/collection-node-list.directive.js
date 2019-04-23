@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2015 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,31 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for showing author/share footer
- * in collection player.
+ * @fileoverview Directive for creating a list of collection nodes which link to
+ * playing the exploration in each node.
  */
 
-oppia.directive('collectionFooter', [
+angular.module('collectionNodeListModule').directive('collectionNodeList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
-        twitterText: '@'
+        getCollectionId: '&collectionId',
+        getCollectionNodes: '&collectionNodes'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_player/' +
-        'collection_footer_directive.html'),
-      controller: [
-        '$scope',
-        function($scope) {
-          $scope.collectionId = GLOBALS.collectionId;
-
-          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-
-          $scope.getTwitterText = function() {
-            return $scope.twitterText;
-          };
-        }
-      ]
+        '/pages/collection_player/collection-node-list/' +
+        'collection-node-list.directive.html')
     };
   }]);

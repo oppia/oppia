@@ -13,20 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for creating a list of collection nodes which link to
- * playing the exploration in each node.
+ * @fileoverview Module for the learner's view of a collection.
  */
 
-oppia.directive('collectionNodeList', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+angular.module('collectionPlayerModule', [
+  'collectionFooterModule', 'collectionNodeListModule']);
+
+angular.module('collectionPlayerModule').constant(
+  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
+
+angular.module('collectionPlayerModule').animation('.oppia-collection-animate-slide', 
+  function() {
     return {
-      restrict: 'E',
-      scope: {
-        getCollectionId: '&collectionId',
-        getCollectionNodes: '&collectionNodes'
+      enter: function(element) {
+        element.hide().slideDown();
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_player/' +
-        'collection_node_list_directive.html')
+      leave: function(element) {
+        element.slideUp();
+      }
     };
-  }]);
+  }
+);
