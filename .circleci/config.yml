@@ -92,9 +92,10 @@ workflows:
   circleci_tests:
     jobs:
       - setup
-      - lint_tests:
-          requires:
-            - setup
+      # These lines are commented out because lint tests are being run on Travis CI.
+      # - lint_tests:
+      #     requires:
+      #       - setup
       - frontend_tests:
           requires:
             - setup
