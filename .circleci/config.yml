@@ -34,9 +34,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_setup_cache
+      - run:
+          <<: *install_dependencies
       - run:
           name: Run lint tests
           command: |
