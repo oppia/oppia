@@ -234,7 +234,9 @@ oppia.directive('conversationSkin', [
   function(UrlInterpolationService, UrlService, UserService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+         getQuestionPlayerConfig: '&questionPlayerConfig',
+      },
       link: function(scope) {
         var isIframed = UrlService.isIframed();
         scope.directiveTemplate = isIframed ?
@@ -306,6 +308,7 @@ oppia.directive('conversationSkin', [
           var TIME_PADDING_MSEC = 250;
           var TIME_SCROLL_MSEC = 600;
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
+          var questionPlayerConfig = $scope.getQuestionPlayerConfig();
 
           $scope.isLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
@@ -346,7 +349,7 @@ oppia.directive('conversationSkin', [
           $scope.isLearnAgainButton = function() {
             var conceptCardIsBeingShown = (
               $scope.displayedCard.getStateName() === null &&
-              !ExplorationPlayerStateService.isInPretestMode());
+              !ExplorationPlayerStateService.isInQuestionMode());
             if (conceptCardIsBeingShown) {
               return false;
             }
@@ -439,7 +442,7 @@ oppia.directive('conversationSkin', [
           $scope.isSupplementalNavShown = function() {
             if (
               $scope.displayedCard.getStateName() === null &&
-              !ExplorationPlayerStateService.isInPretestMode()) {
+              !ExplorationPlayerStateService.isInQuestionMode()) {
               return false;
             }
             var interaction = $scope.displayedCard.getInteraction();
@@ -522,15 +525,15 @@ oppia.directive('conversationSkin', [
           var _addNewCard = function(newCard) {
             PlayerTranscriptService.addNewCard(newCard);
 
+            console.log("Interaction HTML: " + newCard.getInteractionHtml());
             var totalNumCards = PlayerTranscriptService.getNumCards();
-
             var previousSupplementalCardIsNonempty = (
               totalNumCards > 1 &&
               isSupplementalCardNonempty(
                 PlayerTranscriptService.getCard(totalNumCards - 2)));
+
             var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
               PlayerTranscriptService.getLastCard());
-
             if (
               totalNumCards > 1 &&
               $scope.canWindowShowTwoCards() &&
@@ -616,8 +619,13 @@ oppia.directive('conversationSkin', [
             hasInteractedAtLeastOnce = false;
             $scope.recommendedExplorationSummaries = null;
             PlayerPositionService.init(_navigateToDisplayedCard);
+            if (questionPlayerConfig) {
+              ExplorationPlayerStateService.initializeQuestionPlayer(
+                questionPlayerConfig, _initializeDirectiveComponents);
+            } else {
             ExplorationPlayerStateService.initializePlayer(
               _initializeDirectiveComponents);
+           }
           };
 
           $rootScope.$on('playerStateChange', function(evt, newStateName) {
@@ -693,7 +701,7 @@ oppia.directive('conversationSkin', [
                   wasOldStateInitial, isFirstHit, isFinalQuestion, focusLabel) {
                 $scope.nextCard = nextCard;
                 if (!_editorPreviewMode &&
-                    !ExplorationPlayerStateService.isInPretestMode()) {
+                    !ExplorationPlayerStateService.isInQuestionMode()) {
                   var oldStateName =
                     PlayerPositionService.getCurrentStateName();
                   if (!remainOnCurrentCard) {
@@ -713,7 +721,7 @@ oppia.directive('conversationSkin', [
                     explorationActuallyStarted = true;
                   }
                 }
-                if (!ExplorationPlayerStateService.isInPretestMode()) {
+                if (!ExplorationPlayerStateService.isInQuestionMode()) {
                   $rootScope.$broadcast(
                     'playerStateChange', nextCard.getStateName());
                 }
@@ -901,7 +909,7 @@ oppia.directive('conversationSkin', [
             var currentIndex = PlayerPositionService.getDisplayedCardIndex();
             var conceptCardIsBeingShown = (
               $scope.displayedCard.getStateName() === null &&
-              !ExplorationPlayerStateService.isInPretestMode());
+              !ExplorationPlayerStateService.isInQuestionMode());
             if (conceptCardIsBeingShown &&
                 PlayerTranscriptService.isLastCard(currentIndex)) {
               $scope.returnToExplorationAfterConceptCard();
@@ -1021,9 +1029,11 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.initializePage();
-          LearnerViewRatingService.init(function(userRating) {
-            $scope.userRating = userRating;
-          });
+          if(!questionPlayerConfig) {
+            LearnerViewRatingService.init(function(userRating) {
+              $scope.userRating = userRating;
+            });
+          }
 
           $scope.collectionId = GLOBALS.collectionId;
           $scope.collectionTitle = GLOBALS.collectionTitle;

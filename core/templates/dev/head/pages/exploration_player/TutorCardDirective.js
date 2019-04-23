@@ -170,7 +170,7 @@ oppia.directive('tutorCard', [
           $scope.showAudioBar = function() {
             return (
               !$scope.isIframed &&
-              !ExplorationPlayerStateService.isInPretestMode());
+              !ExplorationPlayerStateService.isInQuestionMode());
           };
 
           $scope.isContentAudioTranslationAvailable = function() {

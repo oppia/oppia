@@ -17,8 +17,12 @@
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import dependency_registry
+from core.domain import interaction_registry
+from core.domain import obj_services
 from core.domain import topic_services
 import feconf
+import jinja2
 
 
 class PracticeSessionsPage(base.BaseHandler):
@@ -36,6 +40,29 @@ class PracticeSessionsPage(base.BaseHandler):
         if topic is None:
             raise self.PageNotFoundException(
                 Exception('The topic with the given name doesn\'t exist.'))
+
+        interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
+
+        interaction_dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
+        dependencies_html, additional_angular_modules = (
+            dependency_registry.Registry.get_deps_html_and_angular_modules(
+                interaction_dependency_ids))
+
+        interaction_templates = (
+            interaction_registry.Registry.get_interaction_html(
+                interaction_ids))
+
+        self.values.update(
+            {
+            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
+            'additional_angular_modules': additional_angular_modules,
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'interaction_templates': jinja2.utils.Markup(
+                interaction_templates),
+            'dependencies_html': jinja2.utils.Markup(dependencies_html)
+            })
 
         self.render_template('/pages/practice_session/practice_session.html')
 

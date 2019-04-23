@@ -5,9 +5,13 @@
       <div class="current-progress" style="width: <[currentProgress]>%"></div>
     </div>
   </div>
+  <div class="oppia-question-player-body">
+    <conversation-skin question-player-config="questionPlayerConfig"></conversation-skin>
+    <attribution-guide></attribution-guide>
+  </div>
 </div>
 
-<style>
+<style>  
     .oppia-question-player-container {
         margin: 0 auto;
         max-width: 800px;
@@ -19,6 +23,14 @@
         background: #FFF;background: #FFFFFF;
         height: 100px;
     }
+    .oppia-question-player-body {
+        margin: 34px 20px 0;
+    }
+
+    .oppia-question-player-body .conversation-skin-cards-container {
+        padding: 0;
+    }
+
     .oppia-question-player-header h3 {
         font-family: "Capriola", "Roboto", Arial, sans-serif;
         color: #015C53;

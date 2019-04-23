@@ -17,6 +17,13 @@
  *  like engine service.
  */
 
+ oppia.constant('EXPLORATION_MODE', {
+  EXPLORATION: 'exploration',
+  PRETEST: 'pretest',
+  QUESTION_PLAYER: 'question_player',
+  OTHER: 'other'
+});
+
 oppia.factory('ExplorationPlayerStateService', [
   '$log', '$q', 'ContextService', 'EditableExplorationBackendApiService',
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
@@ -24,8 +31,9 @@ oppia.factory('ExplorationPlayerStateService', [
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
   'PretestEngineService', 'PretestQuestionBackendApiService',
+  'QuestionPlayerBackendApiService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlService',
+  'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
   function(
       $log, $q, ContextService, EditableExplorationBackendApiService,
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
@@ -33,11 +41,13 @@ oppia.factory('ExplorationPlayerStateService', [
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
       PretestEngineService, PretestQuestionBackendApiService,
+      QuestionPlayerBackendApiService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
-      StatsReportingService, UrlService) {
+      StatsReportingService, UrlService, EXPLORATION_MODE) {
     var currentEngineService = null;
-    var inPretestMode = false;
+    var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
+    var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
     var version = GLOBALS.explorationVersion;
     var storyId = UrlService.getStoryIdInPlayer();
@@ -64,15 +74,25 @@ oppia.factory('ExplorationPlayerStateService', [
       PretestEngineService.init(pretestQuestionDicts, callback);
     };
 
+    var initializeQuestionPlayerServices = function(questionDicts, callback) {
+      PlayerCorrectnessFeedbackEnabledService.init(true);
+      PretestEngineService.init(questionDicts, callback);
+    };
+
     var setExplorationMode = function() {
-      inPretestMode = false;
+      explorationMode = EXPLORATION_MODE.EXPLORATION;
       currentEngineService = ExplorationEngineService;
     };
 
     var setPretestMode = function() {
-      inPretestMode = true;
+      explorationMode = EXPLORATION_MODE.PRETEST;
       currentEngineService = PretestEngineService;
     };
+
+    var setQuestionPlayerMode = function() {
+      explorationMode = EXPLORATION_MODE.QUESTION_PLAYER;
+      currentEngineService = PretestEngineService;
+    }
 
     var initExplorationPreviewPlayer = function(callback) {
       setExplorationMode();
@@ -93,7 +113,21 @@ oppia.factory('ExplorationPlayerStateService', [
       });
     };
 
+    var initQuestionPlayer = function(questionPlayerConfig, callback) {
+      console.log("Initializing question player");
+      console.log("Question Player Config: " + questionPlayerConfig);
+       QuestionPlayerBackendApiService.fetchQuestions(
+        questionPlayerConfig.skillList,
+        questionPlayerConfig.questionCount, true).then(function(questionData) {
+        console.log("Total questions: " + questionData.length);
+        initializeQuestionPlayerServices(questionData, callback);
+      }, function(error) {
+        console.log("Error while fetching questions: " + error);
+      });
+    }
+
     var initExplorationPlayer = function(callback) {
+      console.log("Initializing exploration player");
       var explorationDataPromise = version ?
         ReadOnlyExplorationBackendApiService.loadExploration(
           explorationId, version) :
@@ -130,11 +164,22 @@ oppia.factory('ExplorationPlayerStateService', [
           initExplorationPlayer(callback);
         }
       },
+      initializeQuestionPlayer: function(config, callback) {
+        PlayerTranscriptService.init();
+        initQuestionPlayer(config, callback);
+      },
       getCurrentEngineService: function() {
         return currentEngineService;
       },
       isInPretestMode: function() {
-        return inPretestMode;
+        return explorationMode == EXPLORATION_MODE.PRETEST;
+      },
+      isInQuestionMode: function() {
+        return explorationMode == EXPLORATION_MODE.PRETEST
+         || explorationMode == EXPLORATION_MODE.QUESTION_PLAYER;
+      },
+      isInQuestionPlayerMode: function() {
+        return explorationMode == EXPLORATION_MODE.QUESTION_PLAYER;
       },
       getPretestQuestionCount: function() {
         return PretestEngineService.getPretestQuestionCount();

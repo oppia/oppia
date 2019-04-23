@@ -21,6 +21,7 @@ oppia.constant('PAGE_CONTEXT', {
   EXPLORATION_EDITOR: 'editor',
   EXPLORATION_PLAYER: 'learner',
   QUESTION_EDITOR: 'question_editor',
+  QUESTION_PLAYER: 'question_player',
   OTHER: 'other'
 });
 
@@ -83,6 +84,9 @@ oppia.factory('ContextService', [
             } else if (pathnameArray[i] === 'question_editor') {
               pageContext = PAGE_CONTEXT.QUESTION_EDITOR;
               return PAGE_CONTEXT.QUESTION_EDITOR;
+            } else if (pathnameArray[i] == 'practice_session') {
+              pageContext = PAGE_CONTEXT.QUESTION_PLAYER;
+              return PAGE_CONTEXT.QUESTION_PLAYER;
             }
           }
 
@@ -117,6 +121,10 @@ oppia.factory('ContextService', [
             if (pathnameArray[i] === 'embed') {
               explorationId = pathnameArray[i + 2];
               return explorationId;
+            }
+            // Return an empty exploration id for question player.
+            if (this.getPageContext() == PAGE_CONTEXT.QUESTION_PLAYER) {
+              return -1;
             }
           }
 
@@ -153,6 +161,10 @@ oppia.factory('ContextService', [
         return (this.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR &&
             this.getEditorTabContext() === (
               EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
+      },
+
+      isInQuestionPlayerMode: function() {
+        return this.getPageContext() === PAGE_CONTEXT.QUESTION_PLAYER;
       },
 
       isInExplorationEditorPage: function() {
