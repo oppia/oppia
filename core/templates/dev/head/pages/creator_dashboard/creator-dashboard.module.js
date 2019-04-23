@@ -18,9 +18,11 @@
 
 angular.module('creatorDashboardModule', []);
 
-angular.module('creatorDashboardModule').constant('EXPLORATION_DROPDOWN_STATS', {
-  OPEN_FEEDBACK: 'open_feedback'
-});
+angular.module('creatorDashboardModule').constant(
+  'EXPLORATION_DROPDOWN_STATS', {
+    OPEN_FEEDBACK: 'open_feedback'
+  }
+);
 
 angular.module('creatorDashboardModule').constant('EXPLORATIONS_SORT_BY_KEYS', {
   TITLE: 'title',
@@ -30,20 +32,24 @@ angular.module('creatorDashboardModule').constant('EXPLORATIONS_SORT_BY_KEYS', {
   LAST_UPDATED: 'last_updated_msec'
 });
 
-angular.module('creatorDashboardModule').constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
-  TITLE: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE ',
-  RATING: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING',
-  NUM_VIEWS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TOTAL_PLAYS',
-  OPEN_FEEDBACK: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_OPEN_FEEDBACK',
-  LAST_UPDATED: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
-});
+angular.module('creatorDashboardModule').constant(
+  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
+    TITLE: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE ',
+    RATING: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING',
+    NUM_VIEWS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TOTAL_PLAYS',
+    OPEN_FEEDBACK: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_OPEN_FEEDBACK',
+    LAST_UPDATED: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
+  }
+);
 
 angular.module('creatorDashboardModule').constant('SUBSCRIPTION_SORT_BY_KEYS', {
   USERNAME: 'subscriber_username',
   IMPACT: 'subscriber_impact'
 });
 
-angular.module('creatorDashboardModule').constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
-  USERNAME: 'Username',
-  IMPACT: 'Impact'
-});
+angular.module('creatorDashboardModule').constant(
+  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
+    USERNAME: 'Username',
+    IMPACT: 'Impact'
+  }
+);

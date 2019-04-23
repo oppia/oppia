@@ -19,4 +19,5 @@
 angular.module('collectionPlayerModule').controller('CollectionLocalNav', [
   '$scope', function($scope) {
     $scope.canEdit = GLOBALS.canEdit;
-}]);
+  }
+]);

@@ -22,8 +22,8 @@ angular.module('collectionPlayerModule', [
 angular.module('collectionPlayerModule').constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
 
-angular.module('collectionPlayerModule').animation('.oppia-collection-animate-slide', 
-  function() {
+angular.module('collectionPlayerModule').animation(
+  '.oppia-collection-animate-slide', function() {
     return {
       enter: function(element) {
         element.hide().slideDown();
