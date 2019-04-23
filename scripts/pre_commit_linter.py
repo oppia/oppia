@@ -933,7 +933,7 @@ def _lint_py_files(
     else:
         result.put('%s   %s Python files linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
-
+    print result
     print 'Python linting finished.'
 
 
@@ -1076,8 +1076,24 @@ class LintChecksManager(object):
             process.daemon = False
             process.start()
 
-        for process in linting_processes:
-            process.join()
+        file_groups_to_lint = [
+            html_files_to_lint_for_css, css_files_to_lint,
+            js_files_to_lint, py_files_to_lint]
+        number_of_files_to_lint = sum(
+            len(file_group) for file_group in file_groups_to_lint)
+
+        timeout_multiplier = 2000
+        for file_group, process in zip(file_groups_to_lint, linting_processes):
+            # try..except block is needed to catch ZeroDivisionError
+            # when there are no CSS, HTML, JavaScript and Python files to lint.
+            try:
+                # Require timeout parameter to prevent against endless
+                # waiting for the linting function to return.
+                process.join(timeout=(
+                    timeout_multiplier * (
+                        len(file_group) / number_of_files_to_lint)))
+            except ZeroDivisionError:
+                break
 
         js_messages = []
         while not js_stdout.empty():
