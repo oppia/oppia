@@ -16,7 +16,7 @@
  * @fileoverview Service that handles routing for the skill editor page.
  */
 
-oppia.factory('SkillEditorRoutingService', [
+angular.module('skillEditorModule').factory('SkillEditorRoutingService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
   function(
       $interval, $location, $rootScope, $timeout, $window) {

@@ -27,8 +27,8 @@ angular.module('skillDescriptionEditorModule').directive(
         restrict: 'E',
         scope: {},
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/skill_editor/editor_tab/' +
-          'skill_description_editor_directive.html'),
+          '/pages/skill-editor/skill-editor-main-tab/' +
+          'skill-description-editor/skill-description-editor.directive.html'),
         controller: [
           '$scope', 'EVENT_SKILL_REINITIALIZED',
           function($scope, EVENT_SKILL_REINITIALIZED) {

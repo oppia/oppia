@@ -28,8 +28,9 @@ angular.module('workedExampleEditorModule').directive(
           getOnSaveFn: '&onSave',
         },
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/skill_editor/editor_tab' +
-          '/worked_example_editor_directive.html'),
+          '/pages/skill-editor/skill-editor-main-tab/' +
+          'skill-concept-card-editor/worked-example-editor/' +
+          'worked-example-editor.directive.html'),
         controller: [
           '$scope', 'SkillUpdateService', 'SkillEditorStateService',
           function($scope, SkillUpdateService, SkillEditorStateService) {
