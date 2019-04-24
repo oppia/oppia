@@ -21,14 +21,16 @@ oppia.directive('attributionGuide', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: true,
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/attribution_guide/' +
         'attribution_guide_directive.html'),
+      controllerAs: 'attribution-guide-ctrl',
       controller: [
         '$scope', 'BrowserCheckerService', 'UrlService', function(
             $scope, BrowserCheckerService, UrlService) {
-          $scope.isMobileDevice = BrowserCheckerService.isMobileDevice();
-          $scope.iframed = UrlService.isIframed();
+          this.isMobileDevice = BrowserCheckerService.isMobileDevice();
+          this.iframed = UrlService.isIframed();
         }
       ]
     };

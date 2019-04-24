@@ -20,8 +20,11 @@ oppia.directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: true,
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/create_button/create_activity_button_directive.html'),
+      controllerAs: 'create-activity-button-ctrl',
       controller: [
         '$scope', '$timeout', '$window', '$uibModal',
         'ExplorationCreationService', 'CollectionCreationService',
@@ -32,20 +35,20 @@ oppia.directive('createActivityButton', [
             ExplorationCreationService, CollectionCreationService,
             SiteAnalyticsService, UrlService, UserService,
             ALLOW_YAML_FILE_UPLOAD) {
-          $scope.creationInProgress = false;
-          $scope.allowYamlFileUpload = ALLOW_YAML_FILE_UPLOAD;
+          this.creationInProgress = false;
+          this.allowYamlFileUpload = ALLOW_YAML_FILE_UPLOAD;
 
-          $scope.canCreateCollections = null;
-          $scope.userIsLoggedIn = null;
+          this.canCreateCollections = null;
+          this.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.canCreateCollections = userInfo.canCreateCollections();
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            this.canCreateCollections = userInfo.canCreateCollections();
+            this.userIsLoggedIn = userInfo.isLoggedIn();
           });
 
-          $scope.showUploadExplorationModal = (
+          this.showUploadExplorationModal = (
             ExplorationCreationService.showUploadExplorationModal);
 
-          $scope.onRedirectToLogin = function(destinationUrl) {
+          this.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent(
               'createActivityButton');
             $timeout(function() {
@@ -54,16 +57,16 @@ oppia.directive('createActivityButton', [
             return false;
           };
 
-          $scope.initCreationProcess = function() {
+          this.initCreationProcess = function() {
             // Without this, the modal keeps reopening when the window is
             // resized.
-            if ($scope.creationInProgress) {
+            if (this.creationInProgress) {
               return;
             }
 
-            $scope.creationInProgress = true;
+            this.creationInProgress = true;
 
-            if (!$scope.canCreateCollections) {
+            if (!this.canCreateCollections) {
               ExplorationCreationService.createNewExploration();
             } else if (UrlService.getPathname() !== '/creator_dashboard') {
               $window.location.replace('/creator_dashboard?mode=create');
@@ -77,35 +80,35 @@ oppia.directive('createActivityButton', [
                   '$scope', '$uibModalInstance',
                   function($scope, $uibModalInstance) {
                     UserService.getUserInfoAsync().then(function(userInfo) {
-                      $scope.canCreateCollections = (
+                      this.canCreateCollections = (
                         userInfo.canCreateCollections());
                     });
 
-                    $scope.chooseExploration = function() {
+                    this.chooseExploration = function() {
                       ExplorationCreationService.createNewExploration();
                       $uibModalInstance.close();
                     };
 
-                    $scope.chooseCollection = function() {
+                    this.chooseCollection = function() {
                       CollectionCreationService.createNewCollection();
                       $uibModalInstance.close();
                     };
 
-                    $scope.cancel = function() {
+                    this.cancel = function() {
                       $uibModalInstance.dismiss('cancel');
                     };
 
-                    $scope.explorationImgUrl = (
+                    this.explorationImgUrl = (
                       UrlInterpolationService.getStaticImageUrl(
                         '/activity/exploration.svg'));
 
-                    $scope.collectionImgUrl = (
+                    this.collectionImgUrl = (
                       UrlInterpolationService.getStaticImageUrl(
                         '/activity/collection.svg'));
                   }],
                 windowClass: 'oppia-creation-modal'
               }).result.then(function() {}, function() {
-                $scope.creationInProgress = false;
+                this.creationInProgress = false;
               });
             }
           };
@@ -114,10 +117,10 @@ oppia.directive('createActivityButton', [
           // open the create modal immediately (or redirect to the exploration
           // editor if the create modal does not need to be shown).
           if (UrlService.getUrlParams().mode === 'create') {
-            if (!$scope.canCreateCollections) {
+            if (!this.canCreateCollections) {
               ExplorationCreationService.createNewExploration();
             } else {
-              $scope.initCreationProcess();
+              this.initCreationProcess();
             }
           }
         }

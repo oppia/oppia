@@ -19,16 +19,18 @@
 oppia.directive('alertMessage', [function() {
   return {
     restrict: 'E',
-    scope: {
+    scope: {},
+    bindToController: {
       getMessage: '&messageObject',
       getMessageIndex: '&messageIndex'
     },
     template: '<div class="oppia-alert-message"></div>',
+    controllerAs: 'alert-message-ctrl',
     controller: [
       '$scope', 'AlertsService', 'toastr',
       function($scope, AlertsService, toastr) {
-        $scope.AlertsService = AlertsService;
-        $scope.toastr = toastr;
+        this.AlertsService = AlertsService;
+        this.toastr = toastr;
       }
     ],
     link: function(scope: ICustomScope) {
