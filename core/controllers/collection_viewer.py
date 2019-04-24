@@ -49,7 +49,8 @@ class CollectionPage(base.BaseHandler):
             'meta_description': utils.capitalize_string(collection.objective)
         })
 
-        self.render_template('pages/collection_player/collection-player.mainpage.html')
+        self.render_template(
+            'pages/collection_player/collection-player.mainpage.html')
 
 
 class CollectionDataHandler(base.BaseHandler):
