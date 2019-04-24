@@ -91,7 +91,6 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
     'images/*', 'videos/*', 'i18n/*', '*_directive.html', '*.png', '*.json',
     '*.directive.html')
 
-
 HASH_BLOCK_SIZE = 2**20
 
 

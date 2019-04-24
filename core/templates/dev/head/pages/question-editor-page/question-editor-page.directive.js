@@ -16,7 +16,6 @@
  * @fileoverview Controller for the questions editor directive.
  */
 
-
 angular.module('questionEditorPageModule').directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
