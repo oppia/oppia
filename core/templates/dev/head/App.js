@@ -25,14 +25,13 @@ var oppia = angular.module(
     'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
     'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
     'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-    'libraryPageModule', 'skillEditorModule', 'splashPageModule',
-    'showSuggestionModalForCreatorViewModule',
+    'libraryPageModule', 'showSuggestionModalForCreatorViewModule',
     'showSuggestionModalForEditorViewModule',
     'showSuggestionModalForLearnerViewModule',
-    'showSuggestionModalForLocalViewModule', 'stateEditorModule',
-    'storyEditorModule', 'teachPageModule', 'thanksPageModule',
-    'topicsAndSkillsDashboardModule', 'topicEditorPageModule',
-    'topicViewerPageModule',
+    'showSuggestionModalForLocalViewModule', 'skillEditorModule',
+    'splashPageModule', 'stateEditorModule', 'storyEditorModule',
+    'teachPageModule', 'thanksPageModule', 'topicsAndSkillsDashboardModule',
+    'topicEditorPageModule', 'topicViewerPageModule',
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 

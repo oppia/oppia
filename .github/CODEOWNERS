@@ -70,7 +70,7 @@
 /core/templates/dev/head/pages/exploration_editor/preview_tab/ @aks681
 /core/templates/dev/head/pages/exploration_editor/settings_tab/ @DubeySandeep
 /core/templates/dev/head/pages/exploration_player/ @aks681
-/core/templates/dev/head/pages/state-editor/ @aks681
+/core/templates/dev/head/pages/state-editor-page/ @aks681
 /core/templates/dev/head/components/state/ @aks681
 
 
@@ -153,14 +153,14 @@
 /core/domain/skill*.py  @aks681
 /core/storage/skill/ @aks681
 /core/templates/dev/head/domain/skill/ @aks681
-/core/templates/dev/head/pages/skill-editor/ @aks681
+/core/templates/dev/head/pages/skill-editor-page/ @aks681
 
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py  @aks681
 /core/storage/story/ @aks681
 /core/templates/dev/head/domain/story/ @aks681
-/core/templates/dev/head/pages/story-editor/ @aks681
+/core/templates/dev/head/pages/story-editor-page/ @aks681
 
 # Topic project.
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
@@ -175,7 +175,7 @@
 # Topics and skills dashboard project.
 /core/controllers/topics_and_skills_dashboard.py @aks681
 /core/templates/dev/head/domain/topics_and_skills_dashboard/ @aks681
-/core/templates/dev/head/pages/topics-and-skills-dashboard/ @aks681
+/core/templates/dev/head/pages/topics-and-skills-dashboard-page/ @aks681
 
 
 # Infrastructure.
