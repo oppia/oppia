@@ -308,7 +308,6 @@ oppia.directive('conversationSkin', [
           var TIME_PADDING_MSEC = 250;
           var TIME_SCROLL_MSEC = 600;
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
-          var questionPlayerConfig = $scope.getQuestionPlayerConfig();
 
           $scope.isLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
@@ -328,6 +327,7 @@ oppia.directive('conversationSkin', [
           // Indicates whether the tutor card is displayed.
           var tutorCardIsDisplayedIfNarrow = true;
           $scope.explorationId = ExplorationEngineService.getExplorationId();
+          var questionPlayerConfig = $scope.getQuestionPlayerConfig();
           $scope.isInPreviewMode = ExplorationEngineService.isInPreviewMode();
           $scope.isIframed = UrlService.isIframed();
           $rootScope.loadingMessage = 'Loading';

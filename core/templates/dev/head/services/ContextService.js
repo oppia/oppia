@@ -108,7 +108,7 @@ oppia.factory('ContextService', [
       getExplorationId: function() {
         if (explorationId) {
           return explorationId;
-        } else {
+        } else if (!this.isInQuestionPlayerMode()) {
           // The pathname should be one of /explore/{exploration_id} or
           // /create/{exploration_id} or /embed/exploration/{exploration_id}.
           var pathnameArray = UrlService.getPathname().split('/');
@@ -121,10 +121,6 @@ oppia.factory('ContextService', [
             if (pathnameArray[i] === 'embed') {
               explorationId = pathnameArray[i + 2];
               return explorationId;
-            }
-            // Return an empty exploration id for question player.
-            if (this.getPageContext() == PAGE_CONTEXT.QUESTION_PLAYER) {
-              return -1;
             }
           }
 
