@@ -27,7 +27,7 @@ class ConfigServicesTests(test_utils.GenericTestBase):
         config_services.set_property('admin', 'promo_bar_enabled', True)
         self.assertTrue(config_domain.PROMO_BAR_ENABLED.value)
 
-    def test_can_not_set_config_property_when_config_property_name_is_invalid(
+    def test_can_not_set_config_property_with_invalid_config_property_name(
             self):
         with self.assertRaisesRegexp(
             Exception,
@@ -42,7 +42,8 @@ class ConfigServicesTests(test_utils.GenericTestBase):
         config_services.revert_property('admin', 'promo_bar_enabled')
         self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
 
-    def test_can_not_revert_config_property_when_config_property_name_is_invalid(self):  # pylint: disable=line-too-long
+    def test_can_not_revert_config_property_with_invalid_config_property_name(
+            self):
         with self.assertRaisesRegexp(
             Exception,
             'No config property with name new_config_property_name found.'):
