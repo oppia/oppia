@@ -256,10 +256,6 @@ def _get_refs():
 
 def _start_linter(files):
     """Starts the lint checks and returns the returncode of the task."""
-    if not os.getcwd().endswith('oppia'):
-        print ''
-        print 'ERROR    Please push your changes from the oppia root directory.'
-
     script = os.path.join('scripts', LINTER_SCRIPT).replace('/', '.')
     task = subprocess.Popen(
         [PYTHON_CMD, '-m', script, LINTER_FILE_FLAG] + files)
