@@ -22,6 +22,7 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
+install_node_module ajv-keywords 3.4.0
 install_node_module ajv 6.10.0
 install_node_module browserstack-local 1.3.3
 install_node_module dotenv 6.0.0
