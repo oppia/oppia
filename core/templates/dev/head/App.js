@@ -26,7 +26,7 @@ var oppia = angular.module(
     'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
     'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate', 'aboutPageModule',
     'creatorDashboardModule', 'donatePageModule', 'errorPageModule',
-    'collectionPlayerModule'
+    'collectionPlayerModule', 'EmailDashboardModule'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
