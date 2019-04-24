@@ -48,6 +48,21 @@ from builtins import range  # isort:skip
 # pylint: enable=wrong-import-position
 
 
+def read_from_node(node):
+    """Returns the data read from the ast node in unicode form.
+
+    Args:
+        node: astroid.scoped_nodes.Function. Node to access module content.
+
+    Returns:
+        unicode. The data read from the ast node.
+    """
+    file_content = [
+        utils.convert_to_unicode(line) for line in node.stream().readlines()]
+
+    return file_content
+
+
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):
     """Custom pylint checker which checks for explicit keyword arguments
     in any function call.
@@ -182,9 +197,7 @@ class HangingIndentChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        file_content = [
-            utils.convert_to_unicode(line) for line in
-            node.stream().readlines()]
+        file_content = read_from_node(node)
         file_length = len(file_content)
         exclude = False
         for line_num in range(file_length):
@@ -772,13 +785,11 @@ class BackslashContinuationChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        with node.stream() as stream:
-            file_content = [
-                utils.convert_to_unicode(line) for line in stream.readlines()]
-            for (line_num, line) in enumerate(file_content):
-                if line.rstrip('\r\n').endswith('\\'):
-                    self.add_message(
-                        'backslash-continuation', line=line_num + 1)
+        file_content = read_from_node(node)
+        for (line_num, line) in enumerate(file_content):
+            if line.rstrip('\r\n').endswith('\\'):
+                self.add_message(
+                    'backslash-continuation', line=line_num + 1)
 
 
 class FunctionArgsOrderChecker(checkers.BaseChecker):
@@ -911,9 +922,7 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
 
-        file_content = [
-            utils.convert_to_unicode(line) for line in
-            node.stream().readlines()]
+        file_content = read_from_node(node)
         file_length = len(file_content)
 
         if file_length == 1 and len(file_content[0]) == 1:

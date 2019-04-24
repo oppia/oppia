@@ -59,7 +59,6 @@ import ast
 import contextlib
 import fnmatch
 import glob
-import io
 import multiprocessing
 import os
 import re
@@ -68,8 +67,8 @@ import sys
 import threading
 import time
 
-import docstrings_checker  # pylint: disable=relative-import
-import python_utils  # pylint: disable=relative-import
+from . import docstrings_checker
+from . import python_utils
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
@@ -342,6 +341,7 @@ import isort  # isort:skip
 import pycodestyle  # isort:skip
 import esprima  # isort:skip
 from pylint import lint  # isort:skip
+import utils  # isort:skip
 
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
@@ -362,7 +362,20 @@ class FileCache(object):
 
     @classmethod
     def read(cls, filepath, mode='r'):
-        """Returns the data read from the file.
+        """Returns the data read from the file in unicode form.
+
+        Args:
+            filepath: str. The file path from which data is to be read.
+            mode: str. The mode in which the file is to be opened.
+
+        Returns:
+            unicode. The data read from the file.
+        """
+        return cls._get_data(filepath, mode)[0]
+
+    @classmethod
+    def read_as_str(cls, filepath, mode='r'):
+        """Returns the data read from the file in str form.
 
         Args:
             filepath: str. The file path from which data is to be read.
@@ -371,12 +384,27 @@ class FileCache(object):
         Returns:
             str. The data read from the file.
         """
-        return cls._get_data(filepath, mode)[0]
+        return utils.convert_to_str(cls._get_data(filepath, mode)[0])
 
     @classmethod
     def readlines(cls, filepath, mode='r'):
         """Returns the tuple containing data line by line as read from the
-        file.
+        file in unicode form.
+
+        Args:
+            filepath: str. The file path from which data is to be read.
+            mode: str. The mode in which the file is to be opened.
+
+        Returns:
+            tuple(unicode). The tuple containing data line by line as read from
+                the file.
+        """
+        return cls._get_data(filepath, mode)[1]
+
+    @classmethod
+    def readlines_as_str(cls, filepath, mode='r'):
+        """Returns the tuple containing data line by line as read from the
+        file in str form.
 
         Args:
             filepath: str. The file path from which data is to be read.
@@ -386,7 +414,7 @@ class FileCache(object):
             tuple(str). The tuple containing data line by line as read from the
                 file.
         """
-        return cls._get_data(filepath, mode)[1]
+        return utils.convert_to_str(cls._get_data(filepath, mode)[1])
 
     @classmethod
     def _get_cache_lock(cls, key):
@@ -423,7 +451,8 @@ class FileCache(object):
         if key not in cls._CACHE_DATA_DICT:
             with cls._get_cache_lock(key):
                 if key not in cls._CACHE_DATA_DICT:
-                    with io.open(filepath, mode, encoding='utf-8') as f:
+                    with python_utils.open_file(
+                        filepath, mode=mode, encoding='utf-8') as f:
                         lines = f.readlines()
                     cls._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return cls._CACHE_DATA_DICT[key]
@@ -505,7 +534,10 @@ def _get_changed_filepaths():
     staged_files = subprocess.check_output([
         'git', 'diff', '--cached', '--name-only',
         '--diff-filter=ACM']).splitlines()
-    return unstaged_files + staged_files
+    all_changed_filepaths = unstaged_files + staged_files
+    return [
+        utils.convert_to_unicode(filepath) for filepath in
+        all_changed_filepaths]
 
 
 def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
@@ -591,8 +623,6 @@ def _get_all_filepaths(input_path, input_filenames):
         all_filepaths = valid_filepaths
     else:
         all_filepaths = _get_changed_filepaths()
-        all_filepaths = [
-            filename.decode('utf-8') for filename in all_filepaths]
     all_filepaths = [
         filename for filename in all_filepaths if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
@@ -1716,7 +1746,7 @@ class LintChecksManager(object):
             docstring_checker = docstrings_checker.ASTDocStringChecker()
             for filepath in files_to_check:
                 ast_file = ast.walk(
-                    ast.parse(FileCache.read(filepath).encode('utf-8')))
+                    ast.parse(FileCache.read_as_str(filepath)))
                 func_defs = [n for n in ast_file if isinstance(
                     n, ast.FunctionDef)]
                 for func in func_defs:
