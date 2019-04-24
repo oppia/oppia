@@ -16,7 +16,7 @@
 
 """Pre-push hook that executes the Python/JS linters on all files that
 deviate from develop.
-(By providing the list of files to `scripts/pre_commit_linter.py`)
+(By providing the list of files to `scripts.pre_commit_linter`)
 To install the hook manually simply execute this script from the oppia root dir
 with the `--install` flag.
 To bypass the validation upon `git push` use the following command:
@@ -51,7 +51,7 @@ GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 SCRIPTS_DIR = os.path.join(OPPIA_DIR, 'scripts')
-LINTER_SCRIPT = 'pre_commit_linter.py'
+LINTER_SCRIPT = 'pre_commit_linter'
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
@@ -256,8 +256,9 @@ def _get_refs():
 
 def _start_linter(files):
     """Starts the lint checks and returns the returncode of the task."""
-    script = os.path.join(SCRIPTS_DIR, LINTER_SCRIPT)
-    task = subprocess.Popen([PYTHON_CMD, script, LINTER_FILE_FLAG] + files)
+    script = SCRIPTS_DIR[:-1] + '.' + LINTER_SCRIPT
+    task = subprocess.Popen(
+        [PYTHON_CMD, '-m', script, LINTER_FILE_FLAG] + files)
     task.communicate()
     return task.returncode
 

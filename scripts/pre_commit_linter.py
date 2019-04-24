@@ -36,16 +36,16 @@ IMPORTANT NOTES:
 CUSTOMIZATION OPTIONS
 =====================
 1.  To lint only files that have been touched in this commit
-        python scripts/pre_commit_linter.py
+        python -m scripts.pre_commit_linter
 
 2.  To lint all files in the folder or to lint just a specific file
-        python scripts/pre_commit_linter.py --path filepath
+        python -m scripts.pre_commit_linter --path filepath
 
 3.  To lint a specific list of files (*.js/*.py only). Separate files by spaces
-        python scripts/pre_commit_linter.py --files file_1 file_2 ... file_n
+        python -m scripts.pre_commit_linter --files file_1 file_2 ... file_n
 
 4.  To lint files in verbose mode
-        python scripts/pre_commit_linter.py --verbose
+        python -m scripts.pre_commit_linter --verbose
 
 Note that the root folder MUST be named 'oppia'.
  """
