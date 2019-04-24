@@ -11,6 +11,11 @@
 # - The dev workflow team will review the code quality to see if the e2e tests
 #   can be optimized further.
 
+# Angular Migration team
+/typings/ @ankita240796
+/tsconfig.json @ankita240796
+/globals.d.ts @ankita240796
+
 
 # Answer classification team.
 /core/controllers/classifier*.py @prasanna08
@@ -59,8 +64,21 @@
 
 
 # Dev workflow team.
+/.circleci/ @apb7
+/.eslintignore @apb7
+/.eslintrc @apb7
+/.htmllintrc @apb7
+/.gitattributes @apb7
+/.gitignore @apb7
+/.isort.cfg @apb7
+/.pylintrc @apb7
+/.stylelintrc @apb7
+/.travis.yml @apb7
 /core/templates/dev/head/css/.stylelintrc @apb7
+/tox.ini @apb7
 /scripts/ @apb7
+/Vagrantfile @apb7
+
 
 
 # Exploration project.
@@ -102,6 +120,15 @@
 /core/templates/dev/head/components/forms/ @DubeySandeep
 /core/templates/dev/head/services/SchemaDefaultValueService.js @DubeySandeep
 /core/templates/dev/head/services/SchemaUndefinedLastElementService.js @DubeySandeep
+
+
+# Google-app-engine configurations
+/appengine_config.py @seanlip
+/cron.yaml @seanlip
+/dispatch.yaml @seanlip
+/index.yaml @seanlip
+/queue.yaml @seanlip
+/main_taskqueue.py @seanlip
 
 
 # Global components and filters.
@@ -157,6 +184,7 @@
 /extensions/interactions/ @kevinlee12
 /extensions/objects/ @seanlip
 /extensions/value_generators/ @seanlip
+/extensions/__init__.py @kevinlee12
 
 
 # Lesson Analytics team.
@@ -254,6 +282,12 @@
 
 # Infrastructure.
 /core/controllers/cron*.py @seanlip
+/main_cron.py @seanlip
+/main_mail.py @aks681
+/main.py @seanlip @nithusha21
+/feconf.py @seanlip @nithusha21
+/constants*.py @seanlip @nithusha21
+/assets/constants.js @seanlip @nithusha21
 /core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/email*.py @aks681
@@ -266,6 +300,14 @@
 
 
 # Miscellaneous.
+/__init__.py @DubeySandeep
+/AUTHORS @seanlip
+/CHANGELOG @seanlip
+/CONTRIBUTORS @seanlip
+/LICENSE @seanlip
+/NOTICE @seanlip
+/core/__init__.py @DubeySandeep
+/core/controllers/__init__.py @DubeySandeep
 /core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @seanlip
 /core/templates/dev/head/pages/about/ @seanlip
@@ -273,6 +315,8 @@
 /core/templates/dev/head/pages/terms/ @seanlip
 /core/templates/dev/head/pages/tests/ @seanlip
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
+/schema_utils*.py @seanlip
+/utils*.py @aks681
 
 
 # Restricted pages.
@@ -286,6 +330,8 @@
 
 # QA team.
 /core/tests/ @apb7 @nithusha21
+/assets/ @nithusha21
+/data/ @nithusha21
 
 
 # Rich text editor team.
@@ -299,6 +345,7 @@
 /core/templates/dev/head/services/AutoplayedVideosService*.js @AllanYangZhou @bansalnitish
 /core/templates/dev/head/services/RteHelperService*.js @AllanYangZhou @bansalnitish
 /extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
+/assets/rich_text_components_definitions.js @AllanYangZhou @bansalnitish
 
 
 # Suggestion and feedback team.
@@ -345,6 +392,9 @@
 /core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
+/gulpfile.js @vojtechjelinek
+/jinja_utils*.py @vojtechjelinek
+/Makefile @vojtechjelinek
 
 
 # User’s profile page.

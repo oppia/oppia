@@ -263,9 +263,6 @@ CONFIG_FILE_PATHS = (
     'assets/constants.js',
     'assets/rich_text_components_definitions.js')
 
-CODEOWNER_DIR_PATHS = [
-    './core', './extensions', './scripts', './export', './.github']
-
 CODEOWNER_FILE_PATHS = ['./app.yaml', './manifest.json']
 
 if not os.getcwd().endswith('oppia'):
@@ -469,6 +466,25 @@ def _get_expression_from_node_if_one_exists(
     if component not in components_to_check:
         return
     return expression
+
+
+def _is_path_ignored(path_to_check):
+    """Checks whether the given path is ignored.
+
+    Args:
+        path_to_check: str. A path to a file or a dir.
+
+    Returns:
+        bool. Whether the given path is ignored by git.
+    """
+    if '.git/' in path_to_check:
+        return True
+
+    command = ['git', 'check-ignore', '-q', path_to_check]
+    if subprocess.call(command):
+        return False
+    else:
+        return True
 
 
 def _get_changed_filepaths():
@@ -2059,7 +2075,7 @@ class LintChecksManager(object):
                 stripped_line = line.strip()
                 if stripped_line and stripped_line[0] != '#':
                     if '@' not in line:
-                        print ('%s --> Pattern on line %s doesn\'t have'
+                        print ('%s --> Pattern on line %s doesn\'t have '
                                'codeowner' % (codeowner_filepath, line_num + 1))
                         failed = True
                     else:
@@ -2109,22 +2125,21 @@ class LintChecksManager(object):
                             '/', '', 1))
 
             # Checks that every dir/file is covered under CODEOWNERS.
-            for root, _, file_names in os.walk('.'):
+            for root, direcs, file_names in os.walk('.'):
+                path_ignored = False
+                if _is_path_ignored(root):
+                    path_ignored = True
+                for direc in direcs:
+                    if _is_path_ignored(direc):
+                        path_ignored = True
+                if path_ignored:
+                    continue
                 for file_name in file_names:
-                    # This bool checks if the file belongs to the root
-                    # oppia directory.
-                    is_root_file = False
-                    if os.path.join(root, file_name) in CODEOWNER_FILE_PATHS:
-                        is_root_file = True
-                    if (any(root.startswith(
-                            dir_path) for dir_path in CODEOWNER_DIR_PATHS)
-                            or is_root_file):
+                    file_path = os.path.join(root, file_name).replace(
+                        './', '', 1)
+                    path_ignored = _is_path_ignored(file_path)
+                    if not path_ignored:
                         match = False
-                        # Ignore .pyc and __init__.py files.
-                        if file_name.endswith(
-                                '.pyc') or file_name == '__init__.py':
-                            match = True
-                            continue
                         for path_to_match in path_patterns:
                             # The level of the file in the directory
                             # structure. For e.g. /core/controllers/
@@ -2152,16 +2167,14 @@ class LintChecksManager(object):
                             # the file name upto level 1 i.e. just the '/core'
                             # part of the file name since it is sufficient to
                             # be matched.
-                            if os.path.join(*((
-                                    os.path.join(root, file_name).replace(
-                                        './', '', 1)).split(
-                                            '/')[:level])) in glob.glob(
-                                                path_to_match):
+                            if os.path.join(*((file_path).split('/')[
+                                    :level])) in glob.glob(path_to_match):
                                 match = True
                                 break
                         if not match and self.verbose_mode_enabled:
-                            print ('WARNING! %s/%s is not covered under '
+                            print ('%s/%s is not covered under '
                                    'CODEOWNERS' % (root, file_name))
+                            failed = True
 
             if failed:
                 summary_message = '%s   CODEOWNERS file check failed' % (
