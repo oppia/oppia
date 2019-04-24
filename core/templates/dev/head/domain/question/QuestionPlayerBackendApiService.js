@@ -38,7 +38,6 @@ oppia.factory('QuestionPlayerBackendApiService', [
           question_count: questionCount.toString(),
           start_cursor: _startCursor
         });
-      console.log("Question data URL: " + questionDataUrl);
       $http.get(questionDataUrl).then(function(response) {
         var questionDicts = angular.copy(response.data.question_dicts);
         _startCursor = response.data.next_start_cursor;

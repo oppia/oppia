@@ -25,7 +25,7 @@
 });
 
 oppia.factory('ExplorationPlayerStateService', [
-  '$log', '$q', 'ContextService', 'EditableExplorationBackendApiService',
+  '$log', '$q', '$rootScope', 'ContextService', 'EditableExplorationBackendApiService',
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
   'ExplorationFeaturesService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
@@ -35,7 +35,7 @@ oppia.factory('ExplorationPlayerStateService', [
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
   function(
-      $log, $q, ContextService, EditableExplorationBackendApiService,
+      $log, $q, $rootScope, ContextService, EditableExplorationBackendApiService,
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
@@ -114,20 +114,16 @@ oppia.factory('ExplorationPlayerStateService', [
     };
 
     var initQuestionPlayer = function(questionPlayerConfig, callback) {
-      console.log("Initializing question player");
-      console.log("Question Player Config: " + questionPlayerConfig);
-       QuestionPlayerBackendApiService.fetchQuestions(
+      setQuestionPlayerMode();
+      QuestionPlayerBackendApiService.fetchQuestions(
         questionPlayerConfig.skillList,
         questionPlayerConfig.questionCount, true).then(function(questionData) {
-        console.log("Total questions: " + questionData.length);
+        $rootScope.$broadcast('totalQuestionsReceived', questionData.length);
         initializeQuestionPlayerServices(questionData, callback);
-      }, function(error) {
-        console.log("Error while fetching questions: " + error);
       });
     }
 
     var initExplorationPlayer = function(callback) {
-      console.log("Initializing exploration player");
       var explorationDataPromise = version ?
         ReadOnlyExplorationBackendApiService.loadExploration(
           explorationId, version) :

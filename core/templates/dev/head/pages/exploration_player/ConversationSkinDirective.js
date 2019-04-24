@@ -524,8 +524,6 @@ oppia.directive('conversationSkin', [
           };
           var _addNewCard = function(newCard) {
             PlayerTranscriptService.addNewCard(newCard);
-
-            console.log("Interaction HTML: " + newCard.getInteractionHtml());
             var totalNumCards = PlayerTranscriptService.getNumCards();
             var previousSupplementalCardIsNonempty = (
               totalNumCards > 1 &&
@@ -552,6 +550,9 @@ oppia.directive('conversationSkin', [
             } else {
               PlayerPositionService.setDisplayedCardIndex(totalNumCards - 1);
             }
+
+            $rootScope.$broadcast(
+              'currentQuestionChanged', PlayerPositionService.getDisplayedCardIndex());
 
             if ($scope.displayedCard.isTerminal()) {
               $scope.isRefresherExploration = false;

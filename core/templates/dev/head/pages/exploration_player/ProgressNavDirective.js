@@ -89,6 +89,7 @@ oppia.directive('progressNav', [
               PlayerPositionService.setDisplayedCardIndex(index);
               $rootScope.$broadcast('updateActiveStateIfInEditor',
                 PlayerPositionService.getCurrentStateName());
+              $rootScope.$broadcast('currentQuestionChanged', index);
             } else {
               throw Error('Target card index out of bounds.');
             }

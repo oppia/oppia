@@ -111,7 +111,6 @@ oppia.factory('PlayerTranscriptService', [
         return index === transcript.length - 1;
       },
       getLastCard: function() {
-        console.log("Transcript length: " + transcript.length);
         return this.getCard(transcript.length - 1);
       },
       getNumSubmitsForLastCard: function() {
