@@ -18,8 +18,7 @@
 
 oppia.directive('oppiaInteractiveDragAndDropSortInput', [
   'DragAndDropSortInputRulesService', 'HtmlEscaperService',
-  'UrlInterpolationService',
-  function(
+  'UrlInterpolationService', function(
       DragAndDropSortInputRulesService, HtmlEscaperService,
       UrlInterpolationService) {
     return {

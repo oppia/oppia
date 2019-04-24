@@ -22,8 +22,7 @@
 
 oppia.directive('oppiaInteractiveItemSelectionInput', [
   'HtmlEscaperService', 'ItemSelectionInputRulesService',
-  'UrlInterpolationService',
-  function(
+  'UrlInterpolationService', function(
       HtmlEscaperService, ItemSelectionInputRulesService,
       UrlInterpolationService) {
     return {
