@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for oppia email dashboard page.
+ * @fileoverview Module for oppia email dashboard page.
  */
 
 angular.module('EmailDashboardResultModule', []);
