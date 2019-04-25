@@ -361,4 +361,3 @@ class UtilsTests(test_utils.GenericTestBase):
                     """classmethods are not real functions so trying to memoize
                     them will raise a TypeError.
                     """
-                    cls.count += 1
