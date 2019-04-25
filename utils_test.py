@@ -255,7 +255,6 @@ class UtilsTests(test_utils.GenericTestBase):
         def count_calls(arg):
             """Counts calls made with given arg."""
             call_counter[arg] += 1
-            return arg
 
         unique_objs = (object(), object())
         self.assertEqual(call_counter[unique_objs[0]], 0)
@@ -274,19 +273,22 @@ class UtilsTests(test_utils.GenericTestBase):
         call_counter = collections.Counter()
 
         @utils.memoize
-        def count_calls(kwarg=0):
-            """Counts calls made with given kwarg."""
-            call_counter[kwarg] += 1
-            return kwarg
+        def count_calls(**kwargs):
+            """Counts calls made with given kwargs."""
+            hashable_kwargs = tuple(sorted(kwargs.iteritems()))
+            print(hashable_kwargs)
+            call_counter[hashable_kwargs] += 1
 
-        self.assertEqual(call_counter[0], 0)
-        self.assertEqual(call_counter[1], 0)
+        empty_kwargs = ()
+        nonempty_kwargs = (('kwarg', 0),)
+        self.assertEqual(call_counter[empty_kwargs], 0)
+        self.assertEqual(call_counter[nonempty_kwargs], 0)
 
         count_calls()
-        self.assertEqual(call_counter[0], 1)
-        self.assertEqual(call_counter[1], 0)
+        self.assertEqual(call_counter[empty_kwargs], 1)
+        self.assertEqual(call_counter[nonempty_kwargs], 0)
 
+        count_calls()
         count_calls(kwarg=0)
-        count_calls(kwarg=1)
-        self.assertEqual(call_counter[0], 1)
-        self.assertEqual(call_counter[1], 1)
+        self.assertEqual(call_counter[empty_kwargs], 1)
+        self.assertEqual(call_counter[nonempty_kwargs], 1)
