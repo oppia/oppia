@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helpers for manual lint checks."""
+"""Helpers for the scripts.pre_commit_linter module.
+
+Do not use this module anywhere else in the code base!
+"""
 
 import functools
 import inspect
@@ -64,7 +67,6 @@ def memoize(func):
         Returns:
             *. The result of factory(), or the last value to be associated to
             key.
-
         """
         if key in cache:
             return cache[key]
@@ -73,9 +75,9 @@ def memoize(func):
                 cache[key] = factory()
         return cache[key]
 
-    # In order to allow functions with default arguments to be identical to
-    # calls that explicitly supply them, we fetch those default values and use
-    # them to build up the actual set of kwargs that func will use.
+    # In order to allow calls to functions with default arguments to use the
+    # same hash as calls which explicitly supply them, we fetch those default
+    # values and use them to build the kwargs that func will actually see.
     arg_names, _, _, defaults = inspect.getargspec(func)
     defaults = defaults if defaults is not None else ()
     default_func_kwargs = dict(zip(arg_names[-len(defaults):], defaults))
