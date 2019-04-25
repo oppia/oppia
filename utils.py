@@ -723,12 +723,12 @@ def memoize(func):
             made exactly once.
     """
     key_locks = {}
-    lock_of_key_locks = threading.Lock()
+    lock_for_key_locks = threading.Lock()
     def threadsafe_access(key):
         """Returns a threading.Lock unique to the given key."""
         if key in key_locks:
             return key_locks[key]
-        with lock_of_key_locks:
+        with lock_for_key_locks:
             if key not in key_locks:
                 key_locks[key] = threading.Lock()
         return key_locks[key]
