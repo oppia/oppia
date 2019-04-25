@@ -52,7 +52,7 @@ var checkCommands = function(yargs, argv, numRequired) {
 checkCommands(yargs, argv, 1);
 
 gulp.task('build', function() {
-  childProcess.exec(['$PYTHON_CMD scripts/build.py']);
+  childProcess.exec('$PYTHON_CMD scripts/build.py');
 });
 
 gulp.slurped = false;
@@ -65,5 +65,3 @@ gulp.task('watch', function() {
     gulp.slurped = true;
   }
 });
-
-gulp.task('watch', ['watch']);

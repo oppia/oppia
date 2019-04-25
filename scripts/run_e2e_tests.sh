@@ -111,7 +111,6 @@ fi
 # the top of the file is run.
 trap cleanup EXIT
 
-
 # Argument passed to feconf.py to help choose production templates folder.
 FORCE_PROD_MODE=False
 RUN_ON_BROWSERSTACK=False
@@ -141,6 +140,13 @@ fi
 
 # Delete the modified feconf.py file(-i.bak)
 rm assets/constants.js.bak
+
+# Start a selenium server using chromedriver 2.46.
+# The 'detach' option continues the flow once the server is up and runnning.
+# The 'quiet' option prints only the necessary information about the server start-up
+# process.
+$NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.46
+$NODE_MODULE_DIR/.bin/webdriver-manager start --versions.chrome 2.46 --detach --quiet
 
 # Start a selenium process. The program sends thousands of lines of useless
 # info logs to stderr so we discard them.

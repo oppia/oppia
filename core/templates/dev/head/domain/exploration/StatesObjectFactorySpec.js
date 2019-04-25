@@ -19,12 +19,17 @@
 describe('States object factory', function() {
   beforeEach(module('oppia'));
 
+  var oldValueForNewStateTemplate = null;
+
   describe('StatesObjectFactory', function() {
     var scope, sof, ssof, statesDict, statesWithAudioDict, atof;
+
     beforeEach(inject(function($injector) {
       ssof = $injector.get('StatesObjectFactory');
       sof = $injector.get('StateObjectFactory');
       atof = $injector.get('AudioTranslationObjectFactory');
+
+      oldValueForNewStateTemplate = angular.copy(constants.NEW_STATE_TEMPLATE);
 
       constants.NEW_STATE_TEMPLATE = {
         classifier_model_id: null,
@@ -288,6 +293,10 @@ describe('States object factory', function() {
           }
         }
       };
+    }));
+
+    afterEach(inject(function() {
+      constants.NEW_STATE_TEMPLATE = angular.copy(oldValueForNewStateTemplate);
     }));
 
     it('should create a new state given a state name', function() {
