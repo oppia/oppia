@@ -305,3 +305,54 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter[0], 1)
         count_calls(kwarg=0)
         self.assertEqual(call_counter[0], 1)
+
+    def test_memoize_with_methods(self):
+        class CallCounter(object):
+            """Counts calls made to an instance."""
+            def __init__(self):
+                self.count = 0
+
+            @utils.memoize
+            def __call__(self):
+                self.count += 1
+
+        call_counter_a, call_counter_b = CallCounter(), CallCounter()
+        self.assertEqual(call_counter_a.count, 0)
+        self.assertEqual(call_counter_b.count, 0)
+
+        call_counter_a()
+        self.assertEqual(call_counter_a.count, 1)
+        self.assertEqual(call_counter_b.count, 0)
+
+        call_counter_a()
+        call_counter_b()
+        self.assertEqual(call_counter_a.count, 1)
+        self.assertEqual(call_counter_b.count, 1)
+
+    def test_memoize_with_classmethods(self):
+        class CallCounter(object):
+            """Counts calls made to the class."""
+            count = 0
+
+            @classmethod
+            @utils.memoize
+            def method_decorated_by_memoize_before_classmethod(cls):
+                cls.count += 1
+
+        call_counter_a, call_counter_b = CallCounter(), CallCounter()
+        self.assertEqual(CallCounter.count, 0)
+
+        call_counter_a.method_decorated_by_memoize_before_classmethod()
+        self.assertEqual(CallCounter.count, 1)
+
+        call_counter_a.method_decorated_by_memoize_before_classmethod()
+        call_counter_b.method_decorated_by_memoize_before_classmethod()
+        self.assertEqual(CallCounter.count, 1)
+
+        with self.assertRaisesRegexp(
+                TypeError, 'classmethod .* is not a Python function'):
+            class Foo(object):
+                @utils.memoize
+                @classmethod
+                def method_decorated_by_classmethod_before_memoize(cls):
+                    pass
