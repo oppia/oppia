@@ -35,7 +35,14 @@ def memoize(func):
     key_locks = {}
     lock_for_key_locks = threading.Lock()
     def threadsafe_access(key):
-        """Returns a threading.Lock unique to the given key."""
+        """Returns a threading.Lock unique to the given key.
+
+        Args:
+            key: *. A hashable value.
+
+        Returns:
+            threading.Lock. A lock unique to the given key.
+        """
         # Use double-checked locking to prevent race-conditions.
         if key not in key_locks:
             with lock_for_key_locks:
@@ -48,6 +55,15 @@ def memoize(func):
         """Returns and associates a factory-provided value to the given key if a
         value isn't associated to it yet. Otherwise, returns the pre-existing
         associated value.
+
+        Args:
+            key: *. A hashable value.
+            factory: callable. A value producer that takes no arguments.
+
+        Returns:
+            *. The result of factory(), or the last value to be associated to
+            key.
+
         """
         if key in cache:
             return cache[key]
@@ -56,6 +72,9 @@ def memoize(func):
                 cache[key] = factory()
         return cache[key]
 
+    # In order to allow functions with default arguments to be identical to
+    # calls that explicitly supply them, we fetch those default values and use
+    # them to build up the actual set of kwargs that func will use.
     arg_names, _, _, default_vals = inspect.getargspec(func)
     default_vals = default_vals if default_vals is not None else ()
     default_kwargs = dict(zip(arg_names[-len(default_vals):], default_vals))
@@ -64,6 +83,9 @@ def memoize(func):
     def memoized_func(*args, **kwargs):
         """The same func, but calls to it using the same argument values are
         made exactly once.
+
+        Returns:
+            The value of func(*args, **kwargs).
         """
         actual_kwargs = default_kwargs.copy()
         actual_kwargs.update(kwargs)
