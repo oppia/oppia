@@ -19,8 +19,8 @@
 import collections
 
 # pylint: disable=relative-import
-import linter_utils
 from core.tests import test_utils
+import linter_utils
 # pylint: enable=relative-import
 
 
