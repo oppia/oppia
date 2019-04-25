@@ -358,7 +358,7 @@ class UtilsTests(test_utils.GenericTestBase):
                 @utils.memoize
                 @classmethod
                 def method_decorated_by_classmethod_before_memoize(cls):
-                    """classmethod is not a real function so trying to memoize
-                    it will raise a TypeError.
+                    """classmethods are not real functions so trying to memoize
+                    them will raise a TypeError.
                     """
                     cls.count += 1
