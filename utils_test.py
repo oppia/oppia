@@ -351,7 +351,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(GoodCallCounter.count, 1)
 
         with self.assertRaisesRegexp(TypeError, 'not a Python function'):
-            class BadCallCounter(object):
+            class BadCallCounter(object):  # pylint: disable=unused-variable
                 """Counts calls made to the class."""
                 count = 0
 
