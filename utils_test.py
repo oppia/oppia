@@ -286,7 +286,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter[0], 1)
         self.assertEqual(call_counter[1], 0)
 
-        count_calls()
+        count_calls(kwarg=0)
         count_calls(kwarg=1)
         self.assertEqual(call_counter[0], 1)
         self.assertEqual(call_counter[1], 1)
