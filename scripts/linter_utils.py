@@ -94,4 +94,3 @@ def memoize(func):
         return get_from_cache(key, factory=lambda: func(*args, **kwargs))
 
     return memoized_func
-
