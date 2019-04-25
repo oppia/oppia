@@ -337,6 +337,7 @@ class UtilsTests(test_utils.GenericTestBase):
             @classmethod
             @utils.memoize
             def method_decorated_by_memoize_before_classmethod(cls):
+                """Decorators closer to def are applied before others."""
                 cls.count += 1
 
         call_counter_a, call_counter_b = CallCounter(), CallCounter()
@@ -349,10 +350,14 @@ class UtilsTests(test_utils.GenericTestBase):
         call_counter_b.method_decorated_by_memoize_before_classmethod()
         self.assertEqual(CallCounter.count, 1)
 
-        with self.assertRaisesRegexp(
-            TypeError, 'classmethod .* is not a Python function'):
-            class Foo(object):
+        with self.assertRaisesRegexp(TypeError,
+                                     'classmethod .* is not a Python function'):
+            class CallCounter(object):
+                """Counts calls made to the class."""
+                count = 0
+
                 @utils.memoize
                 @classmethod
                 def method_decorated_by_classmethod_before_memoize(cls):
+                    """Decorators closer to def are applied before others."""
                     pass
