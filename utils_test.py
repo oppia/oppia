@@ -291,3 +291,19 @@ class UtilsTests(test_utils.GenericTestBase):
         count_calls(kwarg=0)
         self.assertEqual(call_counter[empty_kwargs], 1)
         self.assertEqual(call_counter[nonempty_kwargs], 1)
+
+    def test_memoize_with_kwargs_using_default_values(self):
+        value_counter = collections.Counter()
+
+        @utils.memoize
+        def count_values_seen(value=0):
+            """Counts values from the given kwargs."""
+            value_counter[value] += 1
+
+        self.assertEqual(value_counter[0], 0)
+
+        count_values_seen()
+        count_values_seen(value=0)
+        # Even though the value of kwarg is 0 in both cases, they are still not
+        # the same call!!
+        self.assertEqual(value_counter[0], 2)
