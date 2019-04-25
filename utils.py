@@ -749,6 +749,7 @@ def memoize(func):
     arg_names, _, _, default_vals = inspect.getargspec(func)
     default_vals = default_vals if default_vals is not None else ()
     default_kwargs = dict(zip(arg_names[-len(default_vals):], default_vals))
+
     @functools.wraps(func)
     def memoized_func(*args, **kwargs):
         """The same func, but calls to it using the same arguments are made
