@@ -76,9 +76,9 @@ def memoize(func):
     # In order to allow functions with default arguments to be identical to
     # calls that explicitly supply them, we fetch those default values and use
     # them to build up the actual set of kwargs that func will use.
-    arg_names, _, _, default_vals = inspect.getargspec(func)
-    default_vals = default_vals if default_vals is not None else ()
-    default_kwargs = dict(zip(arg_names[-len(default_vals):], default_vals))
+    arg_names, _, _, defaults = inspect.getargspec(func)
+    defaults = defaults if defaults is not None else ()
+    default_func_kwargs = dict(zip(arg_names[-len(defaults):], defaults))
 
     @functools.wraps(func)
     def memoized_func(*args, **kwargs):
@@ -88,9 +88,9 @@ def memoize(func):
         Returns:
             The value of func(*args, **kwargs).
         """
-        actual_kwargs = default_kwargs.copy()
-        actual_kwargs.update(kwargs)
-        key = (tuple(args), tuple(sorted(actual_kwargs.iteritems())))
+        func_kwargs = default_func_kwargs.copy()
+        func_kwargs.update(kwargs)
+        key = (tuple(args), tuple(sorted(func_kwargs.iteritems())))
         return get_from_cache(key, factory=lambda: func(*args, **kwargs))
 
     return memoized_func
