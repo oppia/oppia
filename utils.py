@@ -743,6 +743,9 @@ def memoize(func):
 
     @functools.wraps(func)
     def memoized_func(*args, **kwargs):
+        """The same func, but calls to it using the same arguments are made
+        exactly once.
+        """
         key = tuple(args) + tuple(sorted(kwargs.iteritems()))
         return _lazy_get(key, factory=lambda: func(*args, **kwargs))
 

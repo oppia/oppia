@@ -252,9 +252,10 @@ class UtilsTests(test_utils.GenericTestBase):
         call_counter = collections.Counter()
 
         @utils.memoize
-        def count_calls(a):
-            call_counter[a] += 1
-            return a
+        def count_calls(arg):
+            """Counts calls made with given arg."""
+            call_counter[arg] += 1
+            return arg
 
         unique_objs = (object(), object())
         self.assertEqual(call_counter[unique_objs[0]], 0)
