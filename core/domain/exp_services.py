@@ -1415,7 +1415,7 @@ def revert_exploration(
     update_exploration_summary(exploration_id, None)
 
     stats_services.handle_stats_creation_for_new_exp_version(
-        exploration.id, exploration.version, exploration.states,
+        exploration.id, current_version + 1, exploration.states,
         exp_versions_diff=None, revert_to_version=revert_to_version)
 
     current_exploration = get_exploration_by_id(
