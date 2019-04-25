@@ -18,6 +18,7 @@ import StringIO
 import base64
 import collections
 import datetime
+import functools
 import hashlib
 import imghdr
 import json
@@ -25,6 +26,7 @@ import os
 import random
 import re
 import string
+import threading
 import time
 import unicodedata
 import urllib
@@ -703,3 +705,45 @@ def get_hashable_value(value):
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
     pass
+
+
+def memoize(func):
+    """Decorator which provides thread-safe, cached-access to the return values
+    of function calls.
+
+    Args:
+        func: callable.
+
+    Returns:
+        callable. The same func, but calls to it using the same arguments are
+            made exactly once.
+    """
+    _key_locks = {}
+    _lock_of_key_locks = threading.Lock()
+    def _threadsafe_access(key):
+        """Returns a threading.Lock unique to the given key."""
+        if key in _key_locks:
+            return _key_locks[key]
+        with _lock_of_key_locks:
+            if key not in _key_locks:
+                _key_locks[key] = threading.Lock()
+        return _key_locks[key]
+
+    _cache = {}
+    def _lazy_get(key, factory):
+        """Returns and associates a factory-provided value to the given key if a
+        value isn't associated to it yet. Otherwise, returns that value.
+        """
+        if key in _cache:
+            return _cache[key]
+        with _threadsafe_access(key):
+            if key not in _cache:
+                _cache[key] = factory()
+        return _cache[key]
+
+    @functools.wraps(func)
+    def memoized_func(*args, **kwargs):
+        key = tuple(args) + tuple(sorted(kwargs.iteritems()))
+        return _lazy_get(key, factory=lambda: func(*args, **kwargs))
+
+    return memoized_func

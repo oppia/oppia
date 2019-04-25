@@ -16,6 +16,7 @@
 
 """Unit tests for utils.py."""
 
+import collections
 import copy
 import datetime
 
@@ -246,3 +247,24 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_is_valid_language_code(self):
         self.assertTrue(utils.is_valid_language_code('en'))
         self.assertFalse(utils.is_valid_language_code('unknown'))
+
+    def test_memoize(self):
+        call_counter = collections.Counter()
+
+        @utils.memoize
+        def count_calls(a):
+            call_counter[a] += 1
+            return a
+
+        unique_objs = (object(), object())
+        self.assertEqual(call_counter[unique_objs[0]], 0)
+        self.assertEqual(call_counter[unique_objs[1]], 0)
+
+        count_calls(unique_objs[0])
+        self.assertEqual(call_counter[unique_objs[0]], 1)
+        self.assertEqual(call_counter[unique_objs[1]], 0)
+
+        count_calls(unique_objs[0])
+        count_calls(unique_objs[1])
+        self.assertEqual(call_counter[unique_objs[0]], 1)
+        self.assertEqual(call_counter[unique_objs[1]], 1)
