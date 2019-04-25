@@ -350,7 +350,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(CallCounter.count, 1)
 
         with self.assertRaisesRegexp(
-                TypeError, 'classmethod .* is not a Python function'):
+            TypeError, 'classmethod .* is not a Python function'):
             class Foo(object):
                 @utils.memoize
                 @classmethod
