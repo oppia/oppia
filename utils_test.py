@@ -269,3 +269,24 @@ class UtilsTests(test_utils.GenericTestBase):
         count_calls(unique_objs[1])
         self.assertEqual(call_counter[unique_objs[0]], 1)
         self.assertEqual(call_counter[unique_objs[1]], 1)
+
+    def test_memoize_with_kwargs(self):
+        call_counter = collections.Counter()
+
+        @utils.memoize
+        def count_calls(kwarg=0):
+            """Counts calls made with given kwarg."""
+            call_counter[kwarg] += 1
+            return kwarg
+
+        self.assertEqual(call_counter[0], 0)
+        self.assertEqual(call_counter[1], 0)
+
+        count_calls()
+        self.assertEqual(call_counter[0], 1)
+        self.assertEqual(call_counter[1], 0)
+
+        count_calls()
+        count_calls(kwarg=1)
+        self.assertEqual(call_counter[0], 1)
+        self.assertEqual(call_counter[1], 1)
