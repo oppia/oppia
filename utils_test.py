@@ -16,7 +16,6 @@
 
 """Unit tests for utils.py."""
 
-import collections
 import copy
 import datetime
 
