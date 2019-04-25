@@ -21,6 +21,7 @@ import datetime
 import functools
 import hashlib
 import imghdr
+import inspect
 import json
 import os
 import random
@@ -721,36 +722,41 @@ def memoize(func):
         callable. The same func, but calls to it using the same arguments are
             made exactly once.
     """
-    _key_locks = {}
-    _lock_of_key_locks = threading.Lock()
-    def _threadsafe_access(key):
+    key_locks = {}
+    lock_of_key_locks = threading.Lock()
+    def threadsafe_access(key):
         """Returns a threading.Lock unique to the given key."""
-        if key in _key_locks:
-            return _key_locks[key]
-        with _lock_of_key_locks:
-            if key not in _key_locks:
-                _key_locks[key] = threading.Lock()
-        return _key_locks[key]
+        if key in key_locks:
+            return key_locks[key]
+        with lock_of_key_locks:
+            if key not in key_locks:
+                key_locks[key] = threading.Lock()
+        return key_locks[key]
 
-    _cache = {}
-    def _lazy_get(key, factory):
+    cache = {}
+    def lazy_get(key, factory):
         """Returns and associates a factory-provided value to the given key if a
         value isn't associated to it yet. Otherwise, returns the pre-existing
         associated value.
         """
-        if key in _cache:
-            return _cache[key]
-        with _threadsafe_access(key):
-            if key not in _cache:
-                _cache[key] = factory()
-        return _cache[key]
+        if key in cache:
+            return cache[key]
+        with threadsafe_access(key):
+            if key not in cache:
+                cache[key] = factory()
+        return cache[key]
 
+    arg_names, _, _, default_vals = inspect.getargspec(func)
+    default_vals = default_vals if default_vals is not None else ()
+    default_kwargs = dict(zip(arg_names[-len(default_vals):], default_vals))
     @functools.wraps(func)
     def memoized_func(*args, **kwargs):
         """The same func, but calls to it using the same arguments are made
         exactly once.
         """
-        key = (tuple(args), tuple(sorted(kwargs.iteritems())))
-        return _lazy_get(key, factory=lambda: func(*args, **kwargs))
+        actual_kwargs = default_kwargs.copy()
+        actual_kwargs.update(kwargs)
+        key = (tuple(args), tuple(sorted(actual_kwargs.iteritems())))
+        return lazy_get(key, factory=lambda: func(*args, **kwargs))
 
     return memoized_func
