@@ -276,7 +276,6 @@ class UtilsTests(test_utils.GenericTestBase):
         def count_calls(**kwargs):
             """Counts calls made with given kwargs."""
             hashable_kwargs = tuple(sorted(kwargs.iteritems()))
-            print(hashable_kwargs)
             call_counter[hashable_kwargs] += 1
 
         empty_kwargs = ()
