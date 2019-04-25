@@ -734,7 +734,7 @@ def memoize(func):
         return key_locks[key]
 
     cache = {}
-    def lazy_get(key, factory):
+    def get_from_cache(key, factory):
         """Returns and associates a factory-provided value to the given key if a
         value isn't associated to it yet. Otherwise, returns the pre-existing
         associated value.
@@ -758,6 +758,6 @@ def memoize(func):
         actual_kwargs = default_kwargs.copy()
         actual_kwargs.update(kwargs)
         key = (tuple(args), tuple(sorted(actual_kwargs.iteritems())))
-        return lazy_get(key, factory=lambda: func(*args, **kwargs))
+        return get_from_cache(key, factory=lambda: func(*args, **kwargs))
 
     return memoized_func
