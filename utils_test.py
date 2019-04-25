@@ -330,34 +330,35 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter_b.count, 1)
 
     def test_memoize_with_classmethods(self):
-        class CallCounter(object):
+        class GoodCallCounter(object):
             """Counts calls made to the class."""
             count = 0
 
             @classmethod
             @utils.memoize
             def method_decorated_by_memoize_before_classmethod(cls):
-                """Decorators closer to def are applied before others."""
+                """memoize is called first so this def will work properly."""
                 cls.count += 1
 
-        call_counter_a, call_counter_b = CallCounter(), CallCounter()
-        self.assertEqual(CallCounter.count, 0)
+        call_counter_a, call_counter_b = GoodCallCounter(), GoodCallCounter()
+        self.assertEqual(GoodCallCounter.count, 0)
 
         call_counter_a.method_decorated_by_memoize_before_classmethod()
-        self.assertEqual(CallCounter.count, 1)
+        self.assertEqual(GoodCallCounter.count, 1)
 
         call_counter_a.method_decorated_by_memoize_before_classmethod()
         call_counter_b.method_decorated_by_memoize_before_classmethod()
-        self.assertEqual(CallCounter.count, 1)
+        self.assertEqual(GoodCallCounter.count, 1)
 
-        with self.assertRaisesRegexp(TypeError,
-                                     'classmethod .* is not a Python function'):
-            class CallCounter(object):
+        with self.assertRaisesRegexp(TypeError, 'not a Python function'):
+            class BadCallCounter(object):
                 """Counts calls made to the class."""
                 count = 0
 
                 @utils.memoize
                 @classmethod
                 def method_decorated_by_classmethod_before_memoize(cls):
-                    """Decorators closer to def are applied before others."""
-                    pass
+                    """classmethod is not a real function so trying to memoize
+                    it will raise a TypeError.
+                    """
+                    cls.count += 1
