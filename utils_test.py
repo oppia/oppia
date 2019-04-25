@@ -248,7 +248,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertTrue(utils.is_valid_language_code('en'))
         self.assertFalse(utils.is_valid_language_code('unknown'))
 
-    def test_memoize_using_args(self):
+    def test_memoize_with_args(self):
         call_counter = collections.Counter()
 
         @utils.memoize
