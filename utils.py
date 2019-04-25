@@ -752,8 +752,8 @@ def memoize(func):
 
     @functools.wraps(func)
     def memoized_func(*args, **kwargs):
-        """The same func, but calls to it using the same arguments are made
-        exactly once.
+        """The same func, but calls to it using the same argument values are
+        made exactly once.
         """
         actual_kwargs = default_kwargs.copy()
         actual_kwargs.update(kwargs)
