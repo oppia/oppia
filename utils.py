@@ -711,6 +711,9 @@ def memoize(func):
     """Decorator which provides thread-safe, cached-access to the return values
     of function calls.
 
+    NOTE: This function uses dicts to manage the cache. This means that all
+    values provided as arguments to func *must be hashable!*
+
     Args:
         func: callable.
 
@@ -732,7 +735,8 @@ def memoize(func):
     _cache = {}
     def _lazy_get(key, factory):
         """Returns and associates a factory-provided value to the given key if a
-        value isn't associated to it yet. Otherwise, returns that value.
+        value isn't associated to it yet. Otherwise, returns the pre-existing
+        associated value.
         """
         if key in _cache:
             return _cache[key]
