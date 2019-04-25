@@ -303,9 +303,9 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(value_counter[0], 0)
         count_values_seen()
         self.assertEqual(value_counter[0], 1)
-        count_values_seen(value=0)
         # Even though the value of kwarg is 0 in both cases, they are still not
         # the same call.
+        count_values_seen(value=0)
         self.assertEqual(value_counter[0], 2)
 
         count_values_seen()
