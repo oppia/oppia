@@ -140,3 +140,30 @@ class MemoizeTest(test_utils.GenericTestBase):
                     """classmethods are not real functions so trying to memoize
                     them will raise a TypeError.
                     """
+
+    def test_memoize_with_argument_values_in_different_orders(self):
+        call_counter = collections.Counter()
+
+        @linter_utils.memoize
+        def count_calls(a, b, c=0, d=1):
+            """Counts calls made with the given arguments."""
+            key = (a, b, c, d)
+            call_counter[key] += 1
+
+        self.assertEqual(call_counter[(5, 6, 0, 1)], 0)
+        self.assertEqual(call_counter[(6, 5, 0, 1)], 0)
+        count_calls(5, 6)
+        count_calls(6, 5)
+        self.assertEqual(call_counter[(5, 6, 0, 1)], 1)
+        self.assertEqual(call_counter[(6, 5, 0, 1)], 1)
+        count_calls(5, 6, c=0, d=1)
+        count_calls(6, 5, c=0, d=1)
+        self.assertEqual(call_counter[(5, 6, 0, 1)], 1)
+        self.assertEqual(call_counter[(6, 5, 0, 1)], 1)
+
+        self.assertEqual(call_counter[(5, 6, 2, 3)], 0)
+        count_calls(5, 6, c=2, d=3)
+        self.assertEqual(call_counter[(5, 6, 2, 3)], 1)
+        count_calls(5, 6, d=3, c=2)
+        self.assertEqual(call_counter[(5, 6, 3, 2)], 0)
+        self.assertEqual(call_counter[(5, 6, 2, 3)], 1)
