@@ -14,7 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for linter_utils.py."""
+"""Unit tests for linter_utils.py.
+
+Do not use these functions anywhere else in the code base.
+"""
 
 import collections
 
