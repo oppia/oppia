@@ -84,7 +84,7 @@
 # Exploration project.
 /core/controllers/editor*.py @DubeySandeep
 /core/controllers/reader*.py @aks681
-/core/controllers/resources*.py @seanlip
+/core/controllers/resources*.py @vojtechjelinek
 /core/domain/exp*.py @DubeySandeep
 /core/domain/fs*.py @aks681
 /core/domain/param_domain*.py @aks681
@@ -172,9 +172,9 @@
 
 
 # Interaction project.
-/core/domain/customization_args_util*.py @seanlip
-/core/domain/interaction_registry*.py @seanlip
-/core/domain/obj_services*.py @seanlip
+/core/domain/customization_args_util*.py @DubeySandeep
+/core/domain/interaction_registry*.py @aks681
+/core/domain/obj_services*.py @aks681
 /core/templates/dev/head/components/CodemirrorMergeviewDirective*.js @kevinlee12
 /core/templates/dev/head/domain/objects/ @kevinlee12
 /core/templates/dev/head/expressions/ @seanlip
@@ -182,7 +182,7 @@
 /extensions/dependencies/ @seanlip
 /extensions/domain*.py @seanlip
 /extensions/interactions/ @kevinlee12
-/extensions/objects/ @seanlip
+/extensions/objects/ @aks681
 /extensions/value_generators/ @seanlip
 /extensions/__init__.py @kevinlee12
 
@@ -296,7 +296,7 @@
 /core/platform/ @seanlip
 /core/templates/dev/head/App*.js @ankita240796
 /core/templates/dev/head/I18nFooter.js @seanlip
-/core/templates/dev/head/services/TranslationFileHashLoaderService.js @DubeySandeep
+/core/templates/dev/head/services/TranslationFileHashLoaderService.js @seanlip
 
 
 # Miscellaneous.
