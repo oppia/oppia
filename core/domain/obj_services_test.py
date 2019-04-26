@@ -48,28 +48,6 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
     are used in rules.
     """
 
-    def test_all_rule_input_fields_have_default_values(self):
-        """Checks that all rule input fields have a default value, and this
-        is provided in get_default_values().
-        """
-        interactions = interaction_registry.Registry.get_all_interactions()
-        object_default_vals = constants.DEFAULT_OBJECT_VALUES
-
-        for interaction in interactions:
-            for rule_name in interaction.rules_dict:
-                param_list = interaction.get_rule_param_list(rule_name)
-
-                for (_, param_obj_type) in param_list:
-                    param_obj_type_name = param_obj_type.__name__
-                    default_value = param_obj_type.default_value
-                    self.assertIsNotNone(
-                        default_value, msg=(
-                            'No default value specified for object class %s.' %
-                            param_obj_type_name))
-                    self.assertIn(param_obj_type_name, object_default_vals)
-                    self.assertEqual(
-                        default_value, object_default_vals[param_obj_type_name])
-
     def test_get_object_default_values_is_valid(self):
         """Checks that the default values provided by get_default_values()
         correspond to the ones defined in objects.py.
