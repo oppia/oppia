@@ -1,7 +1,6 @@
 var argv = require('yargs').argv;
-var prodEnv = (argv.prod_env === 'True');
 var generatedJs = 'third_party/generated/js/third_party.js';
-if (prodEnv) {
+if (argv.prodEnv) {
   generatedJs = (
     'third_party/generated/js/third_party.min.js');
 }
