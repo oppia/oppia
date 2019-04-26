@@ -1098,7 +1098,8 @@ textarea {
 
 .oppia-dashboard-aggregated-stats md-card {
   background: #fff;
-  margin: 0 7.5px 70px 7.5px;
+  margin: 8px 7.5px 70px 7.5px;
+  padding: 8px;
 }
 
 .oppia-dashboard-aggregated-stats .stats-card {
@@ -3320,7 +3321,6 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile .metrics,
 .oppia-activity-summary-tile-mobile .metrics {
-  height: 30px;
   margin: 5px 12px 0;
   padding: 0;
 }
