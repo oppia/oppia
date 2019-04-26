@@ -32,7 +32,6 @@ oppia.directive('questionPlayer', [
         '$scope', '$rootScope', 'QuestionPlayerBackendApiService',
         function(
             $scope, $rootScope, QuestionPlayerBackendApiService) {
-
           $scope.questionPlayerConfig = $scope.getQuestionPlayerConfig();
           $scope.currentQuestion = 0;
           $scope.totalQuestions = 0;
@@ -50,12 +49,12 @@ oppia.directive('questionPlayer', [
 
           var updateQuestionProgression = function() {
             if (getTotalQuestions() > 0) {
-              $scope.currentProgress = getCurrentQuestion() * 100 / getTotalQuestions();
+              $scope.currentProgress = (
+                getCurrentQuestion() * 100 / getTotalQuestions());
             } else {
               $scope.currentProgress = 0;
             }
-            console.log("Current Progress:" + $scope.currentProgress);
-          }
+          };
 
           var getCurrentQuestion = function() {
             return $scope.currentQuestion;
@@ -63,14 +62,12 @@ oppia.directive('questionPlayer', [
 
           var getTotalQuestions = function() {
             return $scope.totalQuestions;
-          }
-          
+          };
+
           $rootScope.$on('currentQuestionChanged', function(event, result) {
-            console.log("currentQuestion: " + angular.toJson(result, true));
             updateCurrentQuestion(result + 1);
           });
           $rootScope.$on('totalQuestionsReceived', function(event, result) {
-            console.log("TotalQuestions: " + angular.toJson(result, true));
             updateTotalQuestions(result);
           });
         }

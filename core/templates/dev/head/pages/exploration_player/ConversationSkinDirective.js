@@ -235,7 +235,7 @@ oppia.directive('conversationSkin', [
     return {
       restrict: 'E',
       scope: {
-         getQuestionPlayerConfig: '&questionPlayerConfig',
+        getQuestionPlayerConfig: '&questionPlayerConfig',
       },
       link: function(scope) {
         var isIframed = UrlService.isIframed();
@@ -552,7 +552,8 @@ oppia.directive('conversationSkin', [
             }
 
             $rootScope.$broadcast(
-              'currentQuestionChanged', PlayerPositionService.getDisplayedCardIndex());
+              'currentQuestionChanged',
+              PlayerPositionService.getDisplayedCardIndex());
 
             if ($scope.displayedCard.isTerminal()) {
               $scope.isRefresherExploration = false;
@@ -624,9 +625,9 @@ oppia.directive('conversationSkin', [
               ExplorationPlayerStateService.initializeQuestionPlayer(
                 questionPlayerConfig, _initializeDirectiveComponents);
             } else {
-            ExplorationPlayerStateService.initializePlayer(
-              _initializeDirectiveComponents);
-           }
+              ExplorationPlayerStateService.initializePlayer(
+                _initializeDirectiveComponents);
+            }
           };
 
           $rootScope.$on('playerStateChange', function(evt, newStateName) {
@@ -1030,7 +1031,7 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.initializePage();
-          if(!questionPlayerConfig) {
+          if (!questionPlayerConfig) {
             LearnerViewRatingService.init(function(userRating) {
               $scope.userRating = userRating;
             });
