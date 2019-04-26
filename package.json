@@ -52,6 +52,7 @@
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.2",
     "karma-jasmine": "^2.0.1",
+    "karma-json-fixtures-preprocessor": "^0.0.6",
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "postcss-syntax": "^0.36.2",
     "protractor": "^5.4.2",

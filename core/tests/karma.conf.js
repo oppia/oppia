@@ -9,8 +9,7 @@ if (prodEnv) {
 module.exports = function(config) {
   config.set({
     basePath: '../../',
-    // jasmine-jquery is used to load contents of external JSON files in tests.
-    frameworks: ['jasmine-jquery', 'jasmine'],
+    frameworks: ['jasmine'],
     files: [
       'core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
@@ -110,7 +109,6 @@ module.exports = function(config) {
       }
     },
     plugins: [
-      'karma-jasmine-jquery',
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-ng-html2js-preprocessor',
