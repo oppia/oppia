@@ -43,15 +43,10 @@ module.exports = function(config) {
       },
       'extensions/interactions/**/*_directive.html',
       'extensions/interactions/rule_templates.json',
+      'core/tests/data/*.json',
       {
         pattern: 'assets/i18n/**/*.json',
         watched: true,
-        served: true,
-        included: false
-      },
-      {
-        pattern: 'core/tests/data/**/*.json',
-        watched: false,
         served: true,
         included: false
       }
@@ -78,7 +73,8 @@ module.exports = function(config) {
       // list above.
       'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/**/*_directive.html': ['ng-html2js'],
-      'extensions/interactions/rule_templates.json': ['json_fixtures']
+      'extensions/interactions/rule_templates.json': ['json_fixtures'],
+      'core/tests/data/*.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
