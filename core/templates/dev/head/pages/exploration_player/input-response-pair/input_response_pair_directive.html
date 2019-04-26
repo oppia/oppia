@@ -1,0 +1,71 @@
+<div class="conversation-skin-learner-answer-container">
+  <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
+  <div ng-if="!data.isHint">
+    <div ng-if="getShortAnswerHtml()"
+         popover-placement="bottom" uib-popover-template="'<[getAnswerPopoverUrl()]>'"
+         popover-trigger="click" style="cursor: pointer;">
+      <angular-html-bind class="oppia-rte-viewer conversation-skin-learner-answer-content" html-data="getShortAnswerHtml()">
+      </angular-html-bind>
+    </div>
+    <div ng-if="!getShortAnswerHtml()">
+      <angular-html-bind class="oppia-rte-viewer conversation-skin-learner-answer-content" html-data="getAnswerHtml()">
+      </angular-html-bind>
+    </div>
+  </div>
+  <div ng-if="data.isHint">
+    <div class="oppia-rte-viewer conversation-skin-learner-answer-content">
+      <[data.learnerInput | translate]>
+    </div>
+  </div>
+</div>
+
+<div class="conversation-skin-oppia-feedback-container" ng-if="data.oppiaResponse !== ''">
+  <img class="conversation-skin-oppia-avatar img-circle" ng-src="<[oppiaAvatarImageUrl()]>" alt="">
+  <div ng-if="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()" class="protractor-test-input-response-loading-dots">
+    <div class="conversation-skin-feedback-dot-one"></div>
+    <div class="conversation-skin-feedback-dot-two"></div>
+    <div class="conversation-skin-feedback-dot-three"></div>
+  </div>
+  <span id="<[getInputResponsePairId()]>"></span>
+  <div>
+    <angular-html-bind ng-if="data.oppiaResponse !== null"
+                       html-data="data.oppiaResponse"
+                       class="oppia-rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
+                       ng-class="getFeedbackAudioHighlightClass()">
+    </angular-html-bind>
+  </div>
+</div>
+
+<style>
+  .conversation-skin-learner-answer-container,
+  .conversation-skin-oppia-feedback-container {
+    position: relative;
+    padding: 0 20px;
+  }
+
+  .conversation-skin-learner-answer-container {
+    text-align: right;
+  }
+
+  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+    border: 2px solid #094142;
+    height: 100px;
+    right: -98px;
+    top: -33px;
+    width: 100px;
+  }
+
+  .conversation-skin-learner-answer-container:after {
+    border: 7px solid;
+    border-color: rgb(236, 239, 241) transparent transparent rgb(236, 239, 241);
+    content: ' ';
+    height: 0;
+    position: absolute;
+    top: 11%;
+    width: 0;
+  }
+
+  .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-container:after {
+    border-color: rgba(236, 239, 241, 0.4) transparent transparent rgba(236, 239, 241, 0.4);
+  }
+</style>

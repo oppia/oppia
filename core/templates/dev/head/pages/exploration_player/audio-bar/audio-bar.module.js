@@ -13,22 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the Continue button in exploration player and
- * editor.
+ * @fileoverview Module for a set of audio controls for a specific
+ * audio translation in the learner view.
  */
 
-oppia.directive('continueButton', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        onClickContinueButton: '&',
-        isLearnAgainButton: '&',
-        focusLabel: '@'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/' +
-        'continue_button_directive.html')
-    };
-  }
-]);
+angular.module('audioBarModule', []);
