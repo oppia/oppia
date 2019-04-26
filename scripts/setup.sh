@@ -65,7 +65,7 @@ function maybeInstallDependencies {
     echo "  Running build task with concatenation and minification"
     echo ""
 
-    $PYTHON_CMD scripts/build.py --minify=True
+    $PYTHON_CMD scripts/build.py --minify
   fi
 }
 

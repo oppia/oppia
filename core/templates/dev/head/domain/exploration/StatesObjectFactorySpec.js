@@ -29,7 +29,7 @@ describe('States object factory', function() {
       sof = $injector.get('StateObjectFactory');
       atof = $injector.get('AudioTranslationObjectFactory');
 
-      oldValueForNewStateTemplate = angular.copy(constants.NEW_STATE_TEMPLATE);
+      oldValueForNewStateTemplate = constants.NEW_STATE_TEMPLATE;
 
       constants.NEW_STATE_TEMPLATE = {
         classifier_model_id: null,
@@ -296,7 +296,7 @@ describe('States object factory', function() {
     }));
 
     afterEach(inject(function() {
-      constants.NEW_STATE_TEMPLATE = angular.copy(oldValueForNewStateTemplate);
+      constants.NEW_STATE_TEMPLATE = oldValueForNewStateTemplate;
     }));
 
     it('should create a new state given a state name', function() {
