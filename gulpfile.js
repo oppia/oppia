@@ -58,10 +58,10 @@ gulp.task('build', function() {
 gulp.slurped = false;
 gulp.task('watch', function() {
   if (!gulp.slurped) {
-    gulp.watch('gulpfile.js', ['build']);
-    gulp.watch(thirdPartyCssFiles, ['build']);
-    gulp.watch(thirdPartyJsFiles, ['build']);
-    gulp.watch('manifest.json', ['build']);
+    gulp.watch('gulpfile.js', gulp.series('build'));
+    gulp.watch(thirdPartyCssFiles, gulp.series('build'));
+    gulp.watch(thirdPartyJsFiles, gulp.series('build'));
+    gulp.watch('manifest.json', gulp.series('build'));
     gulp.slurped = true;
   }
 });
