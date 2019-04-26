@@ -43,6 +43,7 @@ MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
     'css', 'third_party.min.css')
 
 FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
+WEBFONTS_RELATIVE_DIRECTORY_PATH = os.path.join('webfonts', '')
 
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('extensions', ''),
@@ -474,6 +475,8 @@ def build_third_party_libs(third_party_directory_path):
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
     FONTS_DIR = os.path.join(
         third_party_directory_path, FONTS_RELATIVE_DIRECTORY_PATH)
+    WEBFONTS_DIR = os.path.join(
+        third_party_directory_path, WEBFONTS_RELATIVE_DIRECTORY_PATH)
 
     dependency_filepaths = get_dependencies_filepaths()
     ensure_directory_exists(THIRD_PARTY_JS_FILEPATH)
@@ -488,6 +491,11 @@ def build_third_party_libs(third_party_directory_path):
     _execute_tasks(
         _generate_copy_tasks_for_fonts(
             dependency_filepaths['fonts'], FONTS_DIR))
+
+    ensure_directory_exists(WEBFONTS_DIR)
+    _execute_tasks(
+        _generate_copy_tasks_for_fonts(
+            dependency_filepaths['fonts'], WEBFONTS_DIR))
 
 
 def hash_should_be_inserted(filepath):
