@@ -25,7 +25,7 @@ describe('ItemSelectionInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject(['$injector', function($injector) {
     validatorService = $injector.get('ItemSelectionInputValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
@@ -113,7 +113,7 @@ describe('ItemSelectionInputValidationService', function() {
       false,
       null)
     ];
-  }));
+  }]));
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(

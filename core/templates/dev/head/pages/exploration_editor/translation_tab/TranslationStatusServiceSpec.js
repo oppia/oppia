@@ -61,7 +61,7 @@ describe('Translation status service', function() {
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject(['$injector', function($injector) {
       tss = $injector.get('TranslationStatusService');
       ess = $injector.get('ExplorationStatesService');
       ttams = $injector.get('TranslationTabActiveModeService');
@@ -275,7 +275,7 @@ describe('Translation status service', function() {
       ttams.activateVoiceoverMode();
       tls.setActiveLanguageCode('en');
       tss.refresh();
-    }));
+    }]));
 
     it('should return a correct list of state names for which audio needs ' +
       'update', function() {

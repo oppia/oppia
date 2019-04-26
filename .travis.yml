@@ -151,8 +151,8 @@ script:
 cache:
   # Cache Oppia's dependencies.
   directories:
-    - ../node_modules/
     - ../oppia_tools/
+    - node_modules/
     - third_party/
     - $HOME/.cache/pip
     - $HOME/.cache/TravisChrome/

@@ -44,9 +44,9 @@
           <li><a ng-keydown="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE})" class="oppia-navbar-tab-content protractor-test-about-link" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
           <li><a class="oppia-navbar-tab-content protractor-test-get-started-link " href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
           <li><a class="oppia-navbar-tab-content protractor-test-playbook-link " href="/teach#playbook" translate="I18N_TOPNAV_PARTICIPATION_PLAYBOOK"></a></li>
-          <li><a class="oppia-navbar-tab-content" href="https://medium.com/oppia-org" target="_blank"  translate="I18N_TOPNAV_BLOG">Blog</a></li>
-          <li><a class="oppia-navbar-tab-content" href="http://oppiafoundation.org"  target="_blank" translate="I18N_TOPNAV_OPPIA_FOUNDATION"></a></li>
-          <li><a ng-keydown="onMenuKeypress($event, 'aboutMenu', {tab: ACTION_CLOSE})" class="oppia-navbar-tab-content" href="https://oppiafoundation.org/volunteer" target="_blank" translate="I18N_TOPNAV_GET_INVOLVED"></a></li>
+          <li><a class="oppia-navbar-tab-content" href="https://medium.com/oppia-org" target="_blank" rel="noopener" translate="I18N_TOPNAV_BLOG">Blog</a></li>
+          <li><a class="oppia-navbar-tab-content" href="http://oppiafoundation.org"  target="_blank" rel="noopener" translate="I18N_TOPNAV_OPPIA_FOUNDATION"></a></li>
+          <li><a ng-keydown="onMenuKeypress($event, 'aboutMenu', {tab: ACTION_CLOSE})" class="oppia-navbar-tab-content" href="https://oppiafoundation.org/volunteer" target="_blank"  rel="noopener" translate="I18N_TOPNAV_GET_INVOLVED"></a></li>
         </ul>
       </li>
       <li ng-mouseover="blurNavigationLinks($event)" ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
@@ -145,12 +145,12 @@
           </a>
         </li>
         <li ng-if="isModerator">
-          <a ng-click="closeSubmenuIfNotMobile($event)" href="/moderator" target="_blank">
+          <a ng-click="closeSubmenuIfNotMobile($event)" href="/moderator" target="_blank" rel="noopener">
             <span translate="I18N_TOPNAV_MODERATOR_PAGE"></span>
           </a>
         </li>
         <li ng-if="isSuperAdmin">
-          <a class="protractor-test-admin-link" ng-click="closeSubmenuIfNotMobile($event)" href="/admin" target="_blank">
+          <a class="protractor-test-admin-link" ng-click="closeSubmenuIfNotMobile($event)" href="/admin" target="_blank" rel="noopener">
             <span translate="I18N_TOPNAV_ADMIN_PAGE"></span>
           </a>
         </li>

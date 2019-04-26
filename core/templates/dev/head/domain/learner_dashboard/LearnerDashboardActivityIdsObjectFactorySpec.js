@@ -21,7 +21,7 @@ describe('Learner dashboard activity ids object factory', function() {
   var learnerDashboardActivityIdsDict = null;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject(['$injector', function($injector) {
     LearnerDashboardActivityIdsObjectFactory = $injector.get(
       'LearnerDashboardActivityIdsObjectFactory');
     learnerDashboardActivityIdsDict = {
@@ -32,7 +32,7 @@ describe('Learner dashboard activity ids object factory', function() {
       exploration_playlist_ids: ['8', '9'],
       collection_playlist_ids: ['10', '11']
     };
-  }));
+  }]));
 
   it('should check if activity id is present among learner dashboard ' +
      ' activity ids', function() {

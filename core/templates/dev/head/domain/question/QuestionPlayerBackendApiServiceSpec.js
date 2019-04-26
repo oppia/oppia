@@ -23,7 +23,7 @@ describe('Question Player backend Api service', function() {
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(inject(['$injector', function($injector) {
     QuestionPlayerBackendApiService = $injector.get(
       'QuestionPlayerBackendApiService');
     $httpBackend = $injector.get('$httpBackend');
@@ -71,7 +71,7 @@ describe('Question Player backend Api service', function() {
       }],
       next_start_cursor: null
     };
-  }));
+  }]));
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();

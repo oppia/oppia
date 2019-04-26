@@ -22,13 +22,13 @@ describe('WrittenTranslation object factory', function() {
   describe('WrittenTranslationObjectFactory', function() {
     var wtof, writtenTranslation;
 
-    beforeEach(inject(function($injector) {
+    beforeEach(inject(['$injector', function($injector) {
       wtof = $injector.get('WrittenTranslationObjectFactory');
       writtenTranslation = wtof.createFromBackendDict({
         html: '<p>HTML</p>',
         needs_update: false
       });
-    }));
+    }]));
 
     it('should set and get html value correctly', function() {
       expect(writtenTranslation).toEqual(wtof.createFromBackendDict({

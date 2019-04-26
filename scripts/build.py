@@ -65,9 +65,8 @@ YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 NODE_FILE = os.path.join(
-    PARENT_DIR, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
-UGLIFY_FILE = os.path.join(
-    PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
+    PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
+UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc')

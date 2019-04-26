@@ -60,8 +60,6 @@ function maybeInstallDependencies {
     $PYTHON_CMD scripts/build.py
   fi
 
-  echo `ls -la ./node_modules`
-
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
     echo ""
     echo "  Running build task with concatenation and minification"
