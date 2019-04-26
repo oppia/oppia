@@ -634,7 +634,7 @@ class SuggestionListHandlerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SuggestionListHandlerTests, self).setUp()
 
-    def test_suggestion_list_handler_test(self):
+    def test_suggestion_list_handler(self):
         params = {
             'target_type': 'exploration',
             'target_id': 'exp_id'
@@ -646,7 +646,7 @@ class SuggestionListHandlerTests(test_utils.GenericTestBase):
                             'is_topic_manager': False}
         self.assertEqual(expected_response, response)
 
-    def test_invalid_suggestion_list_handler_test(self):
+    def test_invalid_suggestion_list_handler(self):
         response =  self.get_json('/suggestionlisthandler', {
                         'invalid_query' : 'random'
                     }, expected_status_int=500)
