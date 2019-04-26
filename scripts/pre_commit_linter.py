@@ -467,12 +467,12 @@ def _get_expression_from_node_if_one_exists(
 
 
 def _walk_with_gitignore(root, exclude_dirs):
-    """A walk function similar to os.walk but will would ignore the files and
+    """A walk function similar to os.walk but this would ignore the files and
     directories which is not tracked by git. Also, this will ignore the
     directories mentioned in exclude_dirs.
 
     Args:
-        root: str. The path from where the walk function should start walking.
+        root: str. The path from where the function should start walking.
         exclude_dirs: list(str). A list of dir path which should to be ignored.
 
     Yields:
@@ -496,7 +496,7 @@ def _walk_with_gitignore(root, exclude_dirs):
 
 
 def _is_path_ignored(path_to_check):
-    """Checks whether the given path is ignored.
+    """Checks whether the given path is ignored by git.
 
     Args:
         path_to_check: str. A path to a file or a dir.
@@ -2135,7 +2135,8 @@ class LintChecksManager(object):
                         # full path relative to root, but python glob module
                         # does not conform to this logic and literally matches
                         # the '/' character. Therefore the leading '/' has to
-                        # be removed for glob patterns to match correctly.
+                        # be changed to './' for glob patterns to match
+                        # correctly.
                         line_in_concern = line_in_concern.replace('/', './', 1)
                         if not glob.glob(line_in_concern):
                             print ('%s --> Pattern on line %s doesn\'t match '
