@@ -45,6 +45,17 @@
 /core/templates/dev/head/pages/collection_player/ @kevinlee12
 
 
+# Core documentation
+/AUTHORS @seanlip
+/CHANGELOG @seanlip
+/CONTRIBUTORS @seanlip
+/LICENSE @seanlip
+/NOTICE @seanlip
+/core/templates/dev/head/pages/about/ @seanlip
+/core/templates/dev/head/pages/privacy/ @seanlip
+/core/templates/dev/head/pages/terms/ @seanlip
+
+
 # Dashboard pages.
 /core/controllers/creator_dashboard*.py @nithusha21
 /core/controllers/email_dashboard*.py @nithusha21
@@ -78,7 +89,6 @@
 /tox.ini @apb7
 /scripts/ @apb7
 /Vagrantfile @apb7
-
 
 
 # Exploration project.
@@ -301,18 +311,10 @@
 
 # Miscellaneous.
 /__init__.py @DubeySandeep
-/AUTHORS @seanlip
-/CHANGELOG @seanlip
-/CONTRIBUTORS @seanlip
-/LICENSE @seanlip
-/NOTICE @seanlip
 /core/__init__.py @DubeySandeep
 /core/controllers/__init__.py @DubeySandeep
 /core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @seanlip
-/core/templates/dev/head/pages/about/ @seanlip
-/core/templates/dev/head/pages/privacy/ @seanlip
-/core/templates/dev/head/pages/terms/ @seanlip
 /core/templates/dev/head/pages/tests/ @seanlip
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
 /schema_utils*.py @seanlip

@@ -263,8 +263,6 @@ CONFIG_FILE_PATHS = (
     'assets/constants.js',
     'assets/rich_text_components_definitions.js')
 
-CODEOWNER_FILE_PATHS = ['./app.yaml', './manifest.json']
-
 if not os.getcwd().endswith('oppia'):
     print ''
     print 'ERROR    Please run this script from the oppia root directory.'
