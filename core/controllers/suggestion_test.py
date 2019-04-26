@@ -411,20 +411,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion.change.state_name, 'State 1')
         self.logout()
 
-    def test_suggestion_list_handler_test(self):
-        params = {
-            'target_type': 'exploration',
-            'target_id': 'exp_id'
-        }
-        list_operation_on_suggestions = self.get_json('/suggestionlisthandler', {
-                                            'params': params
-                                        })
-        expected_responce = {'additional_angular_modules': [],
-                            'suggestions': [], 'is_super_admin': False,
-                            'is_moderator': False, 'iframed': False, 'is_admin': False,
-                            'is_topic_manager': False}
-        self.assertEqual(expected_responce, list_operation_on_suggestions)
-
 
 class QuestionSuggestionTests(test_utils.GenericTestBase):
 
@@ -642,8 +628,25 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'skill_id': self.SKILL_ID
                 }, csrf_token=csrf_token, expected_status_int=400)
 
+
 class SuggestionListHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SuggestionListHandlerTests, self).setUp()
 
+    def test_suggestion_list_handler_test(self):
+        params = {
+            'target_type': 'exploration',
+            'target_id': 'exp_id'
+        }
+        response =  self.get_json('/suggestionlisthandler', params)
+        expected_response = {'additional_angular_modules': [],
+                            'suggestions': [], 'is_super_admin': False,
+                            'is_moderator': False, 'iframed': False, 'is_admin': False,
+                            'is_topic_manager': False}
+        self.assertEqual(expected_response, response)
+
+    def test_invalid_suggestion_list_handler_test(self):
+        response =  self.get_json('/suggestionlisthandler', {
+                        'invalid_query' : 'random'
+                    }, expected_status_int=500)
