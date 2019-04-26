@@ -473,19 +473,21 @@ def _walk_with_gitignore(root, exclude_dirs):
 
     Args:
         root: str. The path from where the function should start walking.
-        exclude_dirs: list(str). A list of dir path which should to be ignored.
+        exclude_dirs: list(str). A list of dir path which should be ignored.
 
     Yields:
-        str. list(str). A list of unignored files.
+        list(str). A list of unignored files.
     """
-    dirs, nondirs = [], []
+    dirs, file_paths = [], []
     for name in os.listdir(root):
         if os.path.isdir(os.path.join(root, name)):
             dirs.append(os.path.join(root, name))
         else:
-            nondirs.append(os.path.join(root, name))
+            file_paths.append(os.path.join(root, name))
 
-    yield [nondir for nondir in nondirs if not _is_path_ignored(nondir)]
+    yield [file_path for file_path in file_paths if not _is_path_ignored(
+        file_path)]
+
     for dir_path in dirs:
         # Adding "/" in the end of the dir path according to the git dir path
         # structure.
@@ -506,7 +508,7 @@ def _is_path_ignored(path_to_check):
     """
     command = ['git', 'check-ignore', '-q', path_to_check]
 
-    # The "git check-ignore <path>" command use to return 0 when the path is
+    # The "git check-ignore <path>" command use to returns 0 when the path is
     # ignored else it returns 1.
     if subprocess.call(command):
         return False
@@ -2162,7 +2164,7 @@ class LintChecksManager(object):
                         if file_path in glob.glob(file_pattern):
                             match = True
                             break
-                    if not match and self.verbose_mode_enabled:
+                    if not match:
                         print '%s is not covered under CODEOWNERS' % file_path
                         failed = True
 
