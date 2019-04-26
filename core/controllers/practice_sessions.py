@@ -54,15 +54,14 @@ class PracticeSessionsPage(base.BaseHandler):
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
 
-        self.values.update(
-            {
+        self.values.update({
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
-            })
+        })
 
         self.render_template('/pages/practice_session/practice_session.html')
 
