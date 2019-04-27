@@ -54,29 +54,27 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # Note: This is needed because the exp_summaries_dict is sometimes
         # different from the summaries in the datastore, especially when
         # new explorations are added.
-        if exp_summary_id not in exp_summaries_dict:
-            return
-
-        reference_exp_summary = exp_summaries_dict[exp_summary_id]
-        exp_summaries_items = exp_summaries_dict.iteritems()
-        for compared_exp_id, compared_exp_summary in exp_summaries_items:
-            if compared_exp_id != exp_summary_id:
-                similarity_score = (
-                    recommendations_services.get_item_similarity(
-                        reference_exp_summary.category,
-                        reference_exp_summary.language_code,
-                        reference_exp_summary.owner_ids,
-                        compared_exp_summary.category,
-                        compared_exp_summary.language_code,
-                        compared_exp_summary.exploration_model_last_updated,
-                        compared_exp_summary.owner_ids,
-                        compared_exp_summary.status))
-                if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
-                    yield (
-                        exp_summary_id, {
-                            'similarity_score': similarity_score,
-                            'exp_id': compared_exp_id
-                        })
+        if exp_summary_id in exp_summaries_dict:
+            reference_exp_summary = exp_summaries_dict[exp_summary_id]
+            exp_summaries_items = exp_summaries_dict.iteritems()
+            for compared_exp_id, compared_exp_summary in exp_summaries_items:
+                if compared_exp_id != exp_summary_id:
+                    similarity_score = (
+                        recommendations_services.get_item_similarity(
+                            reference_exp_summary.category,
+                            reference_exp_summary.language_code,
+                            reference_exp_summary.owner_ids,
+                            compared_exp_summary.category,
+                            compared_exp_summary.language_code,
+                            compared_exp_summary.exploration_model_last_updated,
+                            compared_exp_summary.owner_ids,
+                            compared_exp_summary.status))
+                    if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
+                        yield (
+                            exp_summary_id, {
+                                'similarity_score': similarity_score,
+                                'exp_id': compared_exp_id
+                            })
 
     @staticmethod
     def reduce(key, stringified_values):
