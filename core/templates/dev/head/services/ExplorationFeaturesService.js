@@ -23,6 +23,7 @@ oppia.factory('ExplorationFeaturesService', [function() {
     isImprovementsTabEnabled: false,
     isPlaythroughRecordingEnabled: false,
   };
+  var isInitialized = false;
 
   return {
     init: function(explorationData, featuresData) {
@@ -41,6 +42,7 @@ oppia.factory('ExplorationFeaturesService', [function() {
           }
         }
       }
+      isInitialized = true;
     },
     areParametersEnabled: function() {
       return settings.areParametersEnabled;
@@ -53,6 +55,9 @@ oppia.factory('ExplorationFeaturesService', [function() {
     },
     enableParameters: function() {
       settings.areParametersEnabled = true;
+    },
+    isInitialized: function() {
+      return isInitialized;
     },
   };
 }]);

@@ -41,6 +41,8 @@ oppia.directive('editorNavigation', [
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
           $scope.isImprovementsTabEnabled =
             ExplorationFeaturesService.isImprovementsTabEnabled;
+          $scope.isExplorationFeaturesServiceInitialized =
+            ExplorationFeaturesService.isInitialized;
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {

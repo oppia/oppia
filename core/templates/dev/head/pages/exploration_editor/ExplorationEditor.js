@@ -197,7 +197,8 @@ oppia.controller('ExplorationEditor', [
         if (!RouterService.isLocationSetToNonStateEditorTab() &&
             !explorationData.states.hasOwnProperty(
               RouterService.getCurrentStateFromLocationPath('gui'))) {
-          if (ThreadDataService.getOpenThreadsCount() > 0) {
+          if (!ExplorationFeaturesService.isImprovementsTabEnabled() &&
+              ThreadDataService.getOpenThreadsCount() > 0) {
             RouterService.navigateToFeedbackTab();
           } else {
             RouterService.navigateToMainTab();
@@ -251,6 +252,8 @@ oppia.controller('ExplorationEditor', [
             $scope.$broadcast('refreshStateEditor');
           });
         }
+
+        RouterService.sanitizeLocation();
       });
     };
 

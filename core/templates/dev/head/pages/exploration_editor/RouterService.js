@@ -40,8 +40,21 @@ oppia.factory('RouterService', [
 
     var activeTabName = TABS.MAIN.name;
 
-    var isImprovementsTabEnabled =
-      ExplorationFeaturesService.isImprovementsTabEnabled;
+    var isTabEnabled = function(tabName) {
+      if (!ExplorationFeaturesService.isInitialized()) {
+        return true;
+      }
+      var disabledTabs = ExplorationFeaturesService.isImprovementsTabEnabled() ?
+        [TABS.FEEDBACK.name] : [TABS.IMPROVEMENTS.name];
+      return !disabledTabs.includes(tabName);
+    };
+
+    var setActiveTab = function(tab) {
+      var targetTabName = (tab === undefined) ? activeTabName : tab.name;
+      if (isTabEnabled(targetTabName)) {
+        activeTabName = targetTabName;
+      }
+    };
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
@@ -63,7 +76,7 @@ oppia.factory('RouterService', [
       $rootScope.$broadcast('externalSave');
 
       if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
-        activeTabName = TABS.TRANSLATION.name;
+        setActiveTab(TABS.TRANSLATION);
         var waitForStatesToLoad = $interval(function() {
           if (ExplorationStatesService.isInitialized()) {
             $interval.cancel(waitForStatesToLoad);
@@ -75,30 +88,30 @@ oppia.factory('RouterService', [
           }
         }, 300);
       } else if (newPath.indexOf(TABS.PREVIEW.path) === 0) {
-        activeTabName = TABS.PREVIEW.name;
+        setActiveTab(TABS.PREVIEW);
         _doNavigationWithState(newPath, SLUG_PREVIEW);
       } else if (newPath === TABS.SETTINGS.path) {
-        activeTabName = TABS.SETTINGS.name;
+        setActiveTab(TABS.SETTINGS);
         $rootScope.$broadcast('refreshSettingsTab');
       } else if (newPath === TABS.STATS.path) {
-        activeTabName = TABS.STATS.name;
+        setActiveTab(TABS.STATS);
         $rootScope.$broadcast('refreshStatisticsTab');
-      } else if (newPath === TABS.IMPROVEMENTS.path &&
-                 isImprovementsTabEnabled()) {
-        activeTabName = TABS.IMPROVEMENTS.name;
+      } else if (newPath === TABS.IMPROVEMENTS.path) {
+        setActiveTab(TABS.IMPROVEMENTS);
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
         $rootScope.$broadcast('refreshVersionHistory', {
           forceRefresh: false
         });
-        activeTabName = TABS.HISTORY.name;
+        setActiveTab(TABS.HISTORY);
       } else if (newPath === TABS.FEEDBACK.path) {
-        activeTabName = TABS.FEEDBACK.name;
+        setActiveTab(TABS.FEEDBACK);
       } else if (newPath.indexOf('/gui/') === 0) {
-        activeTabName = TABS.MAIN.name;
+        setActiveTab(TABS.MAIN);
         _doNavigationWithState(newPath, SLUG_GUI);
       } else {
         if (ExplorationInitStateNameService.savedMemento) {
+          setActiveTab(TABS.MAIN);
           $location.path(
             '/gui/' + ExplorationInitStateNameService.savedMemento);
         }
@@ -173,8 +186,7 @@ oppia.factory('RouterService', [
           currentPath === TABS.TRANSLATION.path ||
           currentPath === TABS.PREVIEW.path ||
           currentPath === TABS.STATS.path ||
-          (isImprovementsTabEnabled() &&
-            currentPath === TABS.IMPROVEMENTS.path) ||
+          currentPath === TABS.IMPROVEMENTS.path ||
           currentPath === TABS.SETTINGS.path ||
           currentPath === TABS.HISTORY.path ||
           currentPath === TABS.FEEDBACK.path);
@@ -236,6 +248,11 @@ oppia.factory('RouterService', [
       navigateToFeedbackTab: function() {
         _savePendingChanges();
         $location.path(TABS.FEEDBACK.path);
+      },
+      sanitizeLocation: function() {
+        if (!isTabEnabled(activeTabName)) {
+          this.navigateToMainTab();
+        }
       },
     };
 
