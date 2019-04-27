@@ -13,16 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the correctness footer in the exploration player.
+ * @fileoverview Module for an input/response pair in the learner view.
  */
 
-oppia.directive('correctnessFooter', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/' +
-        'correctness_footer_directive.html')
-    };
-  }]);
+angular.module('inputResponsePairModule', []);

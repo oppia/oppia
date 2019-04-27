@@ -283,3 +283,4 @@ angular.module('audioBarModule').directive('audioBar', [
     };
   }
 ]);
+

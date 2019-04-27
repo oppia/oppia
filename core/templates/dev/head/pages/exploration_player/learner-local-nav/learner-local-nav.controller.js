@@ -16,10 +16,7 @@
  * @fileoverview Controller for the local navigation in the learner view.
  */
 
-oppia.constant(
-  'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
-
-oppia.controller('LearnerLocalNav', [
+angular.module('LearnerLocalNavModule').controller('LearnerLocalNav', [
   '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
   'ExplorationEngineService', 'ExplorationPlayerStateService',
   'FocusManagerService', 'ShowSuggestionModalForLearnerLocalViewService',

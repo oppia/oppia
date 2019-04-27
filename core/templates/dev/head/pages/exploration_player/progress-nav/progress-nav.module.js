@@ -13,16 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the correctness footer in the exploration player.
+ * @fileoverview Directive for navigation in the conversation skin.
  */
 
-oppia.directive('correctnessFooter', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/' +
-        'correctness_footer_directive.html')
-    };
-  }]);
+angular.module('progressNavModule', []);

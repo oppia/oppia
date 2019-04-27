@@ -26,14 +26,15 @@
 //
 // The state-name argument is optional. If it is not provided, the feedback is
 // assumed to apply to the exploration as a whole.
-oppia.directive('feedbackPopup', [
+
+angular.module('FeedbackPopupModule').directive('feedbackPopup', [
   'ExplorationEngineService', 'UrlInterpolationService',
   function(ExplorationEngineService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/feedback_popup_directive.html'),
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl('/pages/' +
+        'exploration_player/feedback-popup/feedback-popup.directive.html'),
       controller: [
         '$scope', '$element', '$filter', '$http', '$log', '$timeout',
         'AlertsService', 'BackgroundMaskService', 'FocusManagerService',

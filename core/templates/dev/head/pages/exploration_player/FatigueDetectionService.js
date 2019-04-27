@@ -42,7 +42,7 @@ oppia.factory('FatigueDetectionService', [
       displayTakeBreakMessage: function() {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/take_break_modal_directive.html'),
+            '/pages/exploration_player/take-break-modal.directive.html'),
           backdrop: 'static',
           resolve: {},
           controller: [

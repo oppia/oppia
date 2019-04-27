@@ -13,23 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the Continue button in exploration player and
- * editor.
+ * @fileoverview Module for the Tutor Card.
  */
 
-angular.module('continueButtonModule').directive('continueButton', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        onClickContinueButton: '&',
-        isLearnAgainButton: '&',
-        focusLabel: '@'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/continue-button/' +
-        'continue-button.directive.html')
-    };
-  }
-]);
-
+angular.module('tutorCardModule', []);

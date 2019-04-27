@@ -24,7 +24,8 @@ var oppia = angular.module(
     'angularAudioRecorder', 'dndLists', 'headroom', 'infinite-scroll',
     'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
     'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
-    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
+    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
+    'explorationPlayerModule'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
@@ -100,7 +101,7 @@ oppia.constant('SITE_NAME', 'Oppia.org');
 
 oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
 oppia.constant('FEEDBACK_POPOVER_PATH',
-  '/pages/exploration_player/feedback_popup_container_directive.html');
+  '/pages/exploration_player/feedback-popup-container.directive.html');
 
 oppia.constant('LOGOUT_URL', '/logout');
 

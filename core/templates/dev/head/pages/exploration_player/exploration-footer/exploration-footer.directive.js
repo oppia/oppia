@@ -17,15 +17,14 @@
  * in exploration player.
  */
 
-oppia.directive('explorationFooter', [
+angular.module('ExplorationFooterModule').directive('explorationFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
         twitterText: '@'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/exploration_footer_directive.html'),
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl('/pages/exploration_player/exploration-footer/exploration-footer.directive.html'),
       controller: [
         '$scope', '$http', '$log', 'ContextService',
         'ExplorationSummaryBackendApiService', 'UrlService',

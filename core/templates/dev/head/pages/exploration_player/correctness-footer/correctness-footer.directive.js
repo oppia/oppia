@@ -13,23 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the Continue button in exploration player and
- * editor.
+ * @fileoverview Directive for the correctness footer in the exploration player.
  */
 
-angular.module('continueButtonModule').directive('continueButton', [
+angular.module('CoorectnessFooterModule').directive('correctnessFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onClickContinueButton: '&',
-        isLearnAgainButton: '&',
-        focusLabel: '@'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/continue-button/' +
-        'continue-button.directive.html')
+        '/pages/exploration_player/correctness-footer/' +
+        'correctness-footer.directive.html')
     };
-  }
-]);
-
+  }]);

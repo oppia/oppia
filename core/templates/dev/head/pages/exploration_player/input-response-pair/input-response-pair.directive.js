@@ -16,7 +16,7 @@
  * @fileoverview Directive for an input/response pair in the learner view.
  */
 
-oppia.directive('inputResponsePair', [
+angular.module('inputResponsePairModule').directive('inputResponsePair', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -28,8 +28,8 @@ oppia.directive('inputResponsePair', [
         isLastPair: '&',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/' +
-        'input_response_pair_directive.html'),
+        '/pages/exploration_player/input-response-pair/' +
+        'input-response-pair.directive.html'),
       controller: [
         '$scope', 'ExplorationEngineService', 'PlayerTranscriptService',
         'ExplorationHtmlFormatterService', 'INTERACTION_SPECS',
@@ -46,8 +46,8 @@ oppia.directive('inputResponsePair', [
             ExplorationPlayerStateService) {
           $scope.getAnswerPopoverUrl = function() {
             return UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_player/' +
-              'answer_popup_container_directive.html');
+              '/pages/exploration_player/input-response-pair/' +
+              'answer-popup-container.directive.html');
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {

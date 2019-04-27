@@ -56,7 +56,7 @@ oppia.factory('ShowSuggestionModalForLearnerLocalViewService', [
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/' +
-            'learner_suggestion_submitted_modal_directive.html'),
+            'learner-suggestion-submitted-modal.directive.html'),
           backdrop: true,
           resolve: {},
           controller: [

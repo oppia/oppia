@@ -34,7 +34,7 @@ oppia.factory('HintAndSolutionModalService', [
       displayHintModal: function(index) {
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/hint_and_solution_modal_directive.html'),
+            '/pages/exploration_player/hint-and-solution-modal.directive.html'),
           backdrop: 'static',
           controller: [
             '$scope', '$rootScope', '$uibModalInstance',
@@ -64,7 +64,7 @@ oppia.factory('HintAndSolutionModalService', [
       displaySolutionModal: function() {
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/hint_and_solution_modal_directive.html'),
+            '/pages/exploration_player/hint-and-solution-modal.directive.html'),
           backdrop: 'static',
           controller: [
             '$scope', '$rootScope', '$uibModalInstance',

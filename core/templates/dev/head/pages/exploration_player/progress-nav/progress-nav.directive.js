@@ -16,7 +16,7 @@
  * @fileoverview Directive for navigation in the conversation skin.
  */
 
-oppia.directive('progressNav', [
+angular.module('progressNavModule').directive('progressNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -29,7 +29,7 @@ oppia.directive('progressNav', [
         isSubmitButtonDisabled: '&submitButtonIsDisabled'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/progress_nav_directive.html'),
+        '/pages/exploration_player/progress-nav/progress-nav.directive.html'),
       controller: [
         '$scope', '$rootScope', 'PlayerPositionService', 'UrlService',
         'PlayerTranscriptService', 'ExplorationEngineService',

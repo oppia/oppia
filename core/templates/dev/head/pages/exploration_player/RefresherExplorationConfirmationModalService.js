@@ -28,7 +28,7 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/' +
-            'refresher_exploration_confirmation_modal_directive.html'),
+            'refresher-exploration-confirmation-modal.directive.html'),
           backdrop: 'static',
           controller: [
             '$scope', '$uibModalInstance', '$window', '$timeout',
