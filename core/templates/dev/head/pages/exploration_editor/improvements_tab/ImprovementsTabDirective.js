@@ -36,15 +36,16 @@ oppia.directive('improvementsTab', [
               });
             });
           };
+          var isCardOpen = function(card) {
+            return card.isOpen();
+          };
 
           $scope.$on('refreshImprovementsTab', refreshCards);
           $scope.getCards = function() {
             return cards;
           };
           $scope.getOpenCardCount = function() {
-            return cards.filter(function(card) {
-              return card.isOpen();
-            }).length;
+            return cards.filter(isCardOpen).length;
           };
         }
       ],

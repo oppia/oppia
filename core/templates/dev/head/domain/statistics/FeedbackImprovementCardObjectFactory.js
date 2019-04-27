@@ -92,7 +92,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
           return Promise.all(feedbackThreads.map(function(thread) {
             return ThreadDataService.fetchMessages(thread.threadId);
           })).then(function() {
-            return ThreadDataService.data.feedbackThreads.map(createNew);
+            return feedbackThreads.map(createNew);
           });
         });
       },
