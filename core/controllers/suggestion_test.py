@@ -646,7 +646,7 @@ class SuggestionListHandlerTests(test_utils.GenericTestBase):
 
     def test_invalid_suggestion_list_handler(self):
         params = {
-            'invalid_query' : 'random'
+            'invalid_query': 'random'
         }
         self.get_json(
             '/suggestionlisthandler', params=params, expected_status_int=500)
