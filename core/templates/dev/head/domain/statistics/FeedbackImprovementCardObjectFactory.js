@@ -30,7 +30,9 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       this._feedbackThread = feedbackThread;
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
-        ImprovementActionButtonObjectFactory.createNew('Test', function() {}),
+        ImprovementActionButtonObjectFactory.createNew('Review', function() {
+          // TODO: Open modal.
+        }, 'btn-success'),
       ];
     };
 
@@ -40,11 +42,12 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      */
     FeedbackImprovementCard.prototype.isOpen = function() {
       return true;
+      // return this._feedbackThread.status === 'open';
     };
 
     /** @returns {string} - A concise summary of the card. */
     FeedbackImprovementCard.prototype.getTitle = function() {
-      return this._feedbackThread.subject;
+      return 'Feedback Thread: ' + this._feedbackThread.subject;
     };
 
     /** @returns {string} - The directive type used to render the card. */
@@ -84,7 +87,12 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       fetchCards: function() {
         var createNew = this.createNew;
         return ThreadDataService.fetchThreads().then(function() {
-          return ThreadDataService.data.feedbackThreads.map(createNew);
+          feedbackThreads = ThreadDataService.data.feedbackThreads;
+          return Promise.all(feedbackThreads.map(function(thread) {
+            return ThreadDataService.fetchMessages(thread.threadId);
+          })).then(function() {
+            return ThreadDataService.data.feedbackThreads.map(createNew);
+          })
         });
       },
     };

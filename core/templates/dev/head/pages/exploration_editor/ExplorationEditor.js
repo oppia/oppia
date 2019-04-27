@@ -223,6 +223,7 @@ oppia.controller('ExplorationEditor', [
         }
 
         $scope.$broadcast('refreshStatisticsTab');
+        $scope.$broadcast('refreshImprovementsTab');
         $scope.$broadcast('refreshVersionHistory', {
           forceRefresh: true
         });

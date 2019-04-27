@@ -9,11 +9,9 @@
   </div>
   <div>
     <md-card ng-repeat="card in getCards()" ng-if="card.isOpen()"
-             class="oppia-editor-card oppia-improvement-card md-default-theme">
-      <div>
-        <h2 style="margin-top: 0"><[card.getTitle()]></h2>
-        <hr>
-      </div>
+             class="oppia-editor-improvement-card md-default-theme">
+      <h2 style="margin-top: 0"><[card.getTitle() | truncate:80]></h2>
+      <hr>
       <div ng-switch="card.getDirectiveType()">
         <playthrough-improvement-card ng-switch-when="playthrough"
                                       data="card.getDirectiveData()">
@@ -22,6 +20,7 @@
                                    data="card.getDirectiveData()">
         </feedback-improvement-card>
       </div>
+      <hr style="margin-bottom: 32px">
       <div class="text-right">
         <button ng-repeat="actionButton in card.getActionButtons()"
                 ng-click="actionButton.execute()"

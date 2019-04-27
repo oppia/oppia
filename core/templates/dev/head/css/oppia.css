@@ -1445,6 +1445,15 @@ md-card.oppia-dashboard-tile {
   width: 36px;
 }
 
+.oppia-editor-improvement-card {
+  background: rgb(255,255,255);
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  max-width: 800px;
+  padding: 32px;
+}
+
 .oppia-editor-card {
   background: rgb(255,255,255);
   margin-left: auto;

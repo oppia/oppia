@@ -25,13 +25,41 @@ oppia.directive('feedbackImprovementCard', [
       controller: [
         '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
         function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
-          /*
+          var getMessages = function() {
+            return $scope.getData().messages.filter(function(msg) {
+              return $.trim(msg.text) !== '';
+            });
+          };
+          $scope.getMessageCount = function() {
+            return getMessages().length;
+          };
+          $scope.getContextText = function() {
+            var messageCount = getMessages().length;
+            if ($scope.getData().status === 'open') {
+              return (messageCount === 1) ? 'New Thread:' : 'Latest Message:';
+            } else {
+              return 'Last Message:';
+            }
+          }
+          $scope.getContextMessage = function() {
+            var messages = getMessages();
+            return messages[messages.length - 1];
+          };
+          $scope.getContextAuthor = function(author) {
+            var messages = getMessages();
+            var author = null;
+            if (messages.length > 1) {
+              author = messages[messages.length - 1].author_username;
+            } else {
+              author = $scope.getData().originalAuthorName;
+            }
+            return author ? ('by ' + author) : '(anonymously submitted)';
+          };
           $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
           $scope.getHumanReadableStatus = (
             ThreadStatusDisplayService.getHumanReadableStatus);
           $scope.getLocaleAbbreviatedDatetimeString = (
             DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
-          */
         }
       ],
     };
