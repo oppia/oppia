@@ -62,7 +62,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * the details of this feedback card. The associated directive is named:
      * FeedbackImprovementCardDirective.js.
      *
-     * @returns {{}}
+     * @returns {FeedbackThread}
      */
     FeedbackImprovementCard.prototype.getDirectiveData = function() {
       return this._feedbackThread;
