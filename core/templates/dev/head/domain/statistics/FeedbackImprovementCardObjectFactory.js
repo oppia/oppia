@@ -88,7 +88,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       fetchCards: function() {
         var createNew = this.createNew;
         return ThreadDataService.fetchThreads().then(function() {
-          feedbackThreads = ThreadDataService.data.feedbackThreads;
+          var feedbackThreads = ThreadDataService.data.feedbackThreads;
           return Promise.all(feedbackThreads.map(function(thread) {
             return ThreadDataService.fetchMessages(thread.threadId);
           })).then(function() {
