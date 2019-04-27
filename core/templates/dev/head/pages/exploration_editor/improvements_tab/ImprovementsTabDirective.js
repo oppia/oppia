@@ -36,8 +36,13 @@ oppia.directive('improvementsTab', [
               });
             });
           };
-          var isCardOpen = function(card) {
-            return card.isOpen();
+
+          var cardView = 'isOpen';
+          var cardViewFilters = {
+            /** @returns {boolean} */
+            isOpen: function(card) {
+              return card.isOpen();
+            },
           };
 
           $scope.$on('refreshImprovementsTab', refreshCards);
@@ -45,7 +50,7 @@ oppia.directive('improvementsTab', [
             return cards;
           };
           $scope.getOpenCardCount = function() {
-            return cards.filter(isCardOpen).length;
+            return cards.filter(cardViewFilters[cardView]).length;
           };
         }
       ],
