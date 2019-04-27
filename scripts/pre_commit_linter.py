@@ -298,7 +298,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
