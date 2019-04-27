@@ -473,14 +473,14 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         self.put_json('%s/topic/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX,
-                'random',
-                suggestion_to_accept['suggestion_id']), {
-                    'action': u'accept',
-                    'commit_message': u'commit message',
-                    'review_message': u'This looks good!',
-                    'skill_id': self.SKILL_ID
-                }, csrf_token=csrf_token, expected_status_int=404)
+            feconf.SUGGESTION_ACTION_URL_PREFIX,
+            'random',
+            suggestion_to_accept['suggestion_id']), {
+                'action': u'accept',
+                'commit_message': u'commit message',
+                'review_message': u'This looks good!',
+                'skill_id': self.SKILL_ID
+            }, csrf_token=csrf_token, expected_status_int=404)
 
     def test_query_question_suggestions(self):
         suggestions = self.get_json(
@@ -631,22 +631,22 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
 class SuggestionListHandlerTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(SuggestionListHandlerTests, self).setUp()
-
     def test_suggestion_list_handler(self):
         params = {
             'target_type': 'exploration',
             'target_id': 'exp_id'
         }
-        response =  self.get_json('/suggestionlisthandler', params)
+        response = self.get_json(
+            '/suggestionlisthandler', params=params)
         expected_response = {'additional_angular_modules': [],
-                            'suggestions': [], 'is_super_admin': False,
-                            'is_moderator': False, 'iframed': False, 'is_admin': False,
-                            'is_topic_manager': False}
+                             'suggestions': [], 'is_super_admin': False,
+                             'is_moderator': False, 'iframed': False,
+                             'is_admin': False, 'is_topic_manager': False}
         self.assertEqual(expected_response, response)
 
     def test_invalid_suggestion_list_handler(self):
-        response =  self.get_json('/suggestionlisthandler', {
-                        'invalid_query' : 'random'
-                    }, expected_status_int=500)
+        params = {
+            'invalid_query' : 'random'
+        }
+        self.get_json(
+            '/suggestionlisthandler', params=params, expected_status_int=500)
