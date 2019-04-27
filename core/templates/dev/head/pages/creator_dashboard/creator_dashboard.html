@@ -162,9 +162,9 @@
                   ng-change="setExplorationsSortingOptions(currentSortType)"
                   ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value | translate for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
           </select>
-          <span class="sort-order fa"
+          <span class="sort-order fas"
                 ng-click="setExplorationsSortingOptions(currentSortType)"
-                ng-class="isCurrentSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+                ng-class="isCurrentSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'">
           </span>
         </span>
       </div>
@@ -190,7 +190,7 @@
                 <p ng-if="key === 'NUM_VIEWS'" translate="I18N_DASHBOARD_TABLE_HEADING_PLAYS"></p>
                 <p ng-if="key === 'OPEN_FEEDBACK'" translate="I18N_DASHBOARD_TABLE_HEADING_OPEN_THREADS"></p>
                 <p ng-if="key === 'LAST_UPDATED'" translate="I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED"></p>
-                <span class="fa"
+                <span class="fas"
                       ng-if="currentSortType === value"
                       ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
                 </span>
@@ -353,9 +353,9 @@
                   ng-options="SUBSCRIPTION_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS"
                   style="width: 160px;">
           </select>
-          <span class="sort-order fa"
+          <span class="sort-order fas"
                 ng-click="setSubscriptionSortingOptions(currentSubscribersSortType)"
-                ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+                ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'">
           </span>
         </span>
       </div>

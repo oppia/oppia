@@ -178,9 +178,9 @@
                     ng-change="setExplorationsSortingOptions(currentExpSortType)"
                     ng-options="value['key'] as value['i18nId'] | translate for (key, value) in EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS">
             </select>
-            <span class="sort-order fa"
+            <span class="sort-order fas"
                   ng-click="setExplorationsSortingOptions(currentExpSortType)"
-                  ng-class="isCurrentExpSortDescending ? 'fa-long-arrow-down':'fa-long-arrow-up'">
+                  ng-class="isCurrentExpSortDescending ? 'fa-long-arrow-alt-down':'fa-long-arrow-alt-up'">
             </span>
           </span>
 
@@ -195,9 +195,9 @@
                     ng-options="value['key'] as value['i18nId'] | translate for (key, value) in SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS"
                     style="width: 160px;">
             </select>
-            <span class="sort-order fa"
+            <span class="sort-order fas"
                   ng-click="setSubscriptionSortingOptions(currentSubscribersSortType)"
-                  ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-down':'fa-long-arrow-up'">
+                  ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-alt-down':'fa-long-arrow-alt-up'">
             </span>
           </span>
 
@@ -212,9 +212,9 @@
                     ng-options="value['key'] as value['i18nId']| translate for (key, value) in FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS"
                     style="width: 160px;">
             </select>
-            <span class="sort-order fa"
+            <span class="sort-order fas"
                   ng-click="setFeedbackSortingOptions(currentFeedbackThreadsSortType)"
-                  ng-class="isCurrentFeedbackSortDescending ? 'fa-long-arrow-down':'fa-long-arrow-up'">
+                  ng-class="isCurrentFeedbackSortDescending ? 'fa-long-arrow-alt-down':'fa-long-arrow-alt-up'">
             </span>
           </span>
         </div>
