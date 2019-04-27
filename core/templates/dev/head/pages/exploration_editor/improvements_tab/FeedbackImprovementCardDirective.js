@@ -26,8 +26,8 @@ oppia.directive('feedbackImprovementCard', [
         '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
         function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
           var getMessages = function() {
-            return $scope.getData().messages.filter(function(msg) {
-              return $.trim(msg.text) !== '';
+            return $scope.getData().messages.filter(function(message) {
+              return $.trim(message.text) !== '';
             });
           };
           $scope.getContextText = function() {
