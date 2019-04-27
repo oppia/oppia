@@ -59,7 +59,7 @@ function cleanup {
 
   # The [Pp] is to avoid the grep finding the 'grep protractor/node_modules/webdriver-manager/selenium' process
   # as well. The awk command gets just the process ID from the grepped line.
-  kill `ps aux | grep [Pp]rotractor/node_modules/webdriver-manager/selenium | awk '{print $2}'`
+  kill `ps aux | grep node_modules/webdriver-manager/selenium | awk '{print $2}'`
 
   # Wait for the servers to go down; suppress "connection refused" error output
   # from nc since that is exactly what we are expecting to happen.
@@ -211,8 +211,6 @@ for j in "$@"; do
   esac
 done
 
-echo "RUNNING TESTS"
-
 # Run the end-to-end tests. The conditional is used to run protractor without
 # any sharding parameters if it is disabled. This helps with isolated tests.
 # Isolated tests do not work properly unless no sharding parameters are passed
@@ -231,5 +229,3 @@ else
     $NODE_MODULE_DIR/.bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
   fi
 fi
-
-echo "FINISHED"
