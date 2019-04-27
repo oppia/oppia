@@ -76,8 +76,6 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
 
     exploration_summary = exp_services.get_exploration_summary_by_id(
         exploration_id)
-    if not exploration_summary.ratings:
-        exploration_summary.ratings = feconf.get_empty_ratings()
     exploration_summary.ratings[str(new_rating)] += 1
     if old_rating:
         exploration_summary.ratings[str(old_rating)] -= 1
