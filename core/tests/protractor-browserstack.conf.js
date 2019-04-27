@@ -128,7 +128,7 @@ exports.config = {
     'browserstack.local': true,
     'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
     'browserstack.debug': true,
-    'browserstack.networkLogs': true,
+    'browserstack.networkLogs': false,
     'browserstack.appium_version': '1.7.2',
     device: process.env.DEVICE,
     os_version: process.env.OS_VERSION,
