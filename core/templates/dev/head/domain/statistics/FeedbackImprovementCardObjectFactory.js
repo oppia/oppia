@@ -22,7 +22,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
   '$uibModal', 'ImprovementActionButtonObjectFactory', 'ThreadDataService',
   'UrlInterpolationService', 'UserService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
   function(
-     $uibModal, ImprovementActionButtonObjectFactory, ThreadDataService,
+      $uibModal, ImprovementActionButtonObjectFactory, ThreadDataService,
       UrlInterpolationService, UserService, FEEDBACK_IMPROVEMENT_CARD_TYPE) {
     /** @constructor */
     var FeedbackImprovementCard = function(feedbackThread) {
