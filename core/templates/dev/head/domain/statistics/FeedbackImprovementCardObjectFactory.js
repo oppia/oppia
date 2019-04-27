@@ -19,15 +19,32 @@
 oppia.constant('FEEDBACK_IMPROVEMENT_CARD_TYPE', 'feedback');
 
 oppia.factory('FeedbackImprovementCardObjectFactory', [
-  'ImprovementActionButtonObjectFactory', 'ThreadDataService',
-  'FEEDBACK_IMPROVEMENT_CARD_TYPE',
+  '$uibModal', 'ImprovementActionButtonObjectFactory', 'ThreadDataService',
+  'UrlInterpolationService', 'UserService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
   function(
-      ImprovementActionButtonObjectFactory, ThreadDataService,
-      FEEDBACK_IMPROVEMENT_CARD_TYPE) {
+   $uibModal, ImprovementActionButtonObjectFactory, ThreadDataService,
+      UrlInterpolationService, UserService, FEEDBACK_IMPROVEMENT_CARD_TYPE) {
     /** @constructor */
     var FeedbackImprovementCard = function(feedbackThread) {
+      var card = this;
       var openReviewThreadModal = function() {
-        // TODO.
+        ThreadDataService.markThreadAsSeen(feedbackThread.threadId);
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/review_feedback_thread_modal_directive.html'),
+          resolve: {
+            activeThread: function() {
+              return card.getDirectiveData();
+            },
+            userIsLoggedIn: function() {
+              return UserService.getUserInfoAsync().then(function(userInfo) {
+                return userInfo.isLoggedIn();
+              });
+            },
+          },
+          controller: 'ReviewFeedbackThreadModalController',
+          backdrop: 'static',
+        });
       };
 
       /** @type {FeedbackThread} */
@@ -87,7 +104,10 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
        */
       fetchCards: function() {
         var createNew = this.createNew;
-        return ThreadDataService.fetchThreads().then(function() {
+        return Promise.all([
+          ThreadDataService.fetchThreads(),
+          ThreadDataService.fetchFeedbackStats(),
+        ]).then(function() {
           var feedbackThreads = ThreadDataService.data.feedbackThreads;
           return Promise.all(feedbackThreads.map(function(thread) {
             return ThreadDataService.fetchMessages(thread.threadId);
