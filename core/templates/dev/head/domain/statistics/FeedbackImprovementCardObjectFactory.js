@@ -79,7 +79,6 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
     return {
       /** @returns {FeedbackImprovementCard} */
       createNew: function(feedbackThread) {
-        // console.log(angular.toJson(feedbackThread));
         return new FeedbackImprovementCard(feedbackThread);
       },
       /**
