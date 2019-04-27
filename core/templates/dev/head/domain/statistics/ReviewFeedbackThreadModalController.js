@@ -17,18 +17,18 @@
  */
 
 oppia.controller('ReviewFeedbackThreadModalController', [
-  '$q', '$scope', '$uibModalInstance', 'activeThread', 'userIsLoggedIn',
-  'AlertsService', 'ChangeListService', 'DateTimeFormatService',
-  'EditabilityService', 'ExplorationDataService', 'ExplorationStatesService',
-  'ShowSuggestionModalForEditorViewService', 'StateObjectFactory',
-  'ThreadDataService', 'ThreadStatusDisplayService', 'UrlInterpolationService',
+  '$q', '$scope', '$uibModalInstance', 'AlertsService', 'ChangeListService',
+  'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
+  'ExplorationStatesService', 'ShowSuggestionModalForEditorViewService',
+  'StateObjectFactory', 'ThreadDataService', 'ThreadStatusDisplayService',
+  'UrlInterpolationService', 'activeThread', 'userIsLoggedIn',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-      $q, $scope, $uibModalInstance, activeThread, userIsLoggedIn,
-      AlertsService, ChangeListService, DateTimeFormatService,
-      EditabilityService, ExplorationDataService, ExplorationStatesService,
-      ShowSuggestionModalForEditorViewService, StateObjectFactory,
-      ThreadDataService, ThreadStatusDisplayService, UrlInterpolationService,
+      $q, $scope, $uibModalInstance, AlertsService, ChangeListService,
+      DateTimeFormatService, EditabilityService, ExplorationDataService,
+      ExplorationStatesService, ShowSuggestionModalForEditorViewService,
+      StateObjectFactory, ThreadDataService, ThreadStatusDisplayService,
+      UrlInterpolationService, activeThread, userIsLoggedIn,
       ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
     $scope.activeThread = activeThread;
     $scope.userIsLoggedIn = userIsLoggedIn;
