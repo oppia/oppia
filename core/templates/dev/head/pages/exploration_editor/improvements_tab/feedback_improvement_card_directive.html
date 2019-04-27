@@ -1,7 +1,7 @@
 <p>
   <strong><[getContextText()]></strong>
   <br>
-  <[getContextMessage().text]>
+  <[getContextMessage().text | truncate:280]>
 </p>
 <div style="float: left" ng-if="getThread().status !== 'open'">
   <span style="margin-left: 0" ng-class="getLabelClass(getThread().status)">
