@@ -84,7 +84,9 @@ oppia.factory('ThreadDataService', [
     };
 
     var _fetchMessages = function(threadId) {
-      $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(response) {
+      return $http.get(
+        _THREAD_HANDLER_PREFIX + threadId
+      ).then(function(response) {
         var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
         for (var i = 0; i < allThreads.length; i++) {
           if (allThreads[i].threadId === threadId) {
@@ -104,7 +106,7 @@ oppia.factory('ThreadDataService', [
         return _fetchMessages(threadId);
       },
       fetchFeedbackStats: function() {
-        return $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
+        $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
           _openThreadsCount = response.data.num_open_threads;
         });
       },
