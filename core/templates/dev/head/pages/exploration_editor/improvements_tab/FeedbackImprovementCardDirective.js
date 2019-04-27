@@ -25,14 +25,17 @@ oppia.directive('feedbackImprovementCard', [
       controller: [
         '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
         function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
+          var getThread = function() {
+            return $scope.getData();
+          };
           var getMessages = function() {
-            return $scope.getData().messages.filter(function(message) {
+            return getThread().messages.filter(function(message) {
               return $.trim(message.text) !== '';
             });
           };
           $scope.getContextText = function() {
             var messageCount = getMessages().length;
-            if ($scope.getData().status === 'open') {
+            if (getThread().status === 'open') {
               return (messageCount === 1) ? 'New Thread:' : 'Latest Message:';
             } else {
               return 'Last Message:';
@@ -48,7 +51,7 @@ oppia.directive('feedbackImprovementCard', [
             if (messages.length > 1) {
               author = messages[messages.length - 1].author_username;
             } else {
-              author = $scope.getData().originalAuthorName;
+              author = getThread().originalAuthorName;
             }
             return author ? ('by ' + author) : '(anonymously submitted)';
           };
