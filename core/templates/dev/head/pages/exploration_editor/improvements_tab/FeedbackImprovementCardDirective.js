@@ -17,7 +17,7 @@ oppia.directive('feedbackImprovementCard', [
     return {
       restrict: 'E',
       scope: {
-        getData: '&data',
+        getThread: '&data',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/improvements_tab/' +
@@ -26,7 +26,7 @@ oppia.directive('feedbackImprovementCard', [
         '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
         function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
           var getThread = function() {
-            return $scope.getData();
+            return $scope.getThread();
           };
           var getMessages = function() {
             return getThread().messages.filter(function(message) {

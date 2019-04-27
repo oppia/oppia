@@ -3,9 +3,9 @@
   <br>
   <[getContextMessage().text]>
 </p>
-<div style="float: left" ng-if="getData().status !== 'open'">
-  <span style="margin-left: 0" ng-class="getLabelClass(getData().status)">
-    <[getHumanReadableStatus(getData().status)]>
+<div style="float: left" ng-if="getThread().status !== 'open'">
+  <span style="margin-left: 0" ng-class="getLabelClass(getThread().status)">
+    <[getHumanReadableStatus(getThread().status)]>
   </span>
 </div>
 <div style="float: right">
