@@ -24,11 +24,11 @@ describe('Text Input Prediction Service', function() {
 
   describe('Test text prediction service', function() {
     var predictionService;
-    beforeEach(inject(['$injector', function($injector) {
+    beforeEach(inject(function($injector) {
       predictionService = $injector.get('TextInputPredictionService');
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
-    }]));
+    }));
     it('should predict the same as oppia-ml', function() {
       var classifierData =
         window.__fixtures__['core/tests/data/text_input_classifier_data'];

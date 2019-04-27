@@ -34,7 +34,7 @@ describe('Question object factory', function() {
     });
   });
 
-  beforeEach(inject(['$injector', function($injector) {
+  beforeEach(inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
@@ -116,7 +116,7 @@ describe('Question object factory', function() {
     };
     _sampleQuestion = QuestionObjectFactory.createFromBackendDict(
       _sampleQuestionBackendDict);
-  }]));
+  }));
 
   it('should correctly get various fields of the question', function() {
     expect(_sampleQuestion.getId()).toEqual('question_id');

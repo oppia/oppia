@@ -21,10 +21,10 @@ describe('Page title service', function() {
   var pts = null;
   var $document = null;
 
-  beforeEach(inject(['$injector', function($injector) {
+  beforeEach(inject(function($injector) {
     $document = $injector.get('$document');
     pts = $injector.get('PageTitleService');
-  }]));
+  }));
 
   it('should correctly set the page title', function() {
     pts.setPageTitle('First Title');

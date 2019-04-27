@@ -21,10 +21,10 @@ describe('CodeRepl prediction service', function() {
 
   describe('CodeRepl prediction service test', function() {
     var service, tokenizer;
-    beforeEach(inject(['$injector', function($injector) {
+    beforeEach(inject(function($injector) {
       service = $injector.get('CodeReplPredictionService');
       tokenizer = $injector.get('PythonProgramTokenizer');
-    }]));
+    }));
 
     it('should calculate correct jaccard index', function() {
       var multisetA = [1, 2];

@@ -23,7 +23,7 @@ describe('Url Service', function() {
   var mockLocation = null;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(['$injector', function($injector) {
+  beforeEach(inject(function($injector) {
     mockLocation = {
       href: 'http://' + pathname,
       pathname: pathname,
@@ -33,7 +33,7 @@ describe('Url Service', function() {
 
     UrlService = $injector.get('UrlService');
     spyOn(UrlService, 'getCurrentLocation').and.returnValue(mockLocation);
-  }]));
+  }));
 
   it('should return correct query value list for each query field', function() {
     expect(UrlService.getQueryFieldValuesAsList('field1')).toEqual([]);

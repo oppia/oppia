@@ -24,7 +24,7 @@ describe('States object factory', function() {
   describe('StatesObjectFactory', function() {
     var scope, sof, ssof, statesDict, statesWithAudioDict, atof;
 
-    beforeEach(inject(['$injector', function($injector) {
+    beforeEach(inject(function($injector) {
       ssof = $injector.get('StatesObjectFactory');
       sof = $injector.get('StateObjectFactory');
       atof = $injector.get('AudioTranslationObjectFactory');
@@ -293,7 +293,7 @@ describe('States object factory', function() {
           }
         }
       };
-    }]));
+    }));
 
     afterEach(inject(function() {
       constants.NEW_STATE_TEMPLATE = oldValueForNewStateTemplate;
