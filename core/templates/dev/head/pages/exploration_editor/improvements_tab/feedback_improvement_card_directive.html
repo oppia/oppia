@@ -3,14 +3,14 @@
   <br>
   <[getContextMessage().text]>
 </p>
-<div style='float: left'>
-  <span style='margin-left: 0' ng-class="getLabelClass(getData().status)"
+<div style="float: left">
+  <span style="margin-left: 0" ng-class="getLabelClass(getData().status)"
         ng-if="getData().status !== 'open'">
     <[getHumanReadableStatus(getData().status)]>
   </span>
 </div>
-<div style='float: right'>
+<div style="float: right">
   <[getContextAuthor()]>
   at <[getLocaleAbbreviatedDatetimeString(getContextMessage().created_on)]>
 </div>
-<div style="clear: both; height: 32px;"></div>
+<div style="clear: both;"></div>
