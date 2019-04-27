@@ -389,9 +389,9 @@ var ExplorationEditorMainTab = function() {
         cancelOutcomeDestButton.click();
       },
       addRule: function(interactionId, ruleName) {
-      // Additional parameters may be provided after ruleName.
+        // Additional parameters may be provided after ruleName.
 
-      // Add the rule.
+        // Add the rule.
         addAnswerButton.click();
 
         // Set the rule description.

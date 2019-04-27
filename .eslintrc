@@ -7,11 +7,17 @@
     "angular",
     "html"
   ],
+  "overrides": [{
+    "files": ["*Spec.js"],
+    "rules": {
+      "angular/di": "off"
+    }
+  }],
   "rules": {
     "angular/di": [
       "error",
       "array",
-      ],
+    ],
     "angular/di-order": "error",
     "angular/di-unused": "error",
     "angular/directive-restrict": [
