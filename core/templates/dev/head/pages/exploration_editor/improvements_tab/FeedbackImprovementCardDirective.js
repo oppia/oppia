@@ -44,13 +44,11 @@ oppia.directive('feedbackImprovementCard', [
           };
           $scope.getContextAuthor = function(author) {
             var messages = getMessages();
-            var author = null;
             if (messages.length > 1) {
-              author = messages[messages.length - 1].author_username;
+              return messages[messages.length - 1].author_username;
             } else {
-              author = $scope.getThread().originalAuthorName;
+              return $scope.getThread().originalAuthorName;
             }
-            return author ? ('by ' + author) : '(anonymously submitted)';
           };
           $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
           $scope.getHumanReadableStatus = (

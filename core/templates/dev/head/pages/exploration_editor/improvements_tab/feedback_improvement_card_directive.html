@@ -9,7 +9,12 @@
   </span>
 </div>
 <div style="float: right">
-  <[getContextAuthor()]>
+  <span ng-if="getContextAuthor() !== null">
+    by <strong><[getContextAuthor()]></strong>
+  </span>
+  <span ng-if="getContextAuthor() === null">
+    (anonymously submitted)
+  </span>
   at <[getLocaleAbbreviatedDatetimeString(getContextMessage().created_on)]>
 </div>
 <div style="clear: both"></div>
