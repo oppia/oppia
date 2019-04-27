@@ -21,7 +21,6 @@ import datetime
 from core.domain import event_services
 from core.domain import exp_services
 from core.platform import models
-import feconf
 
 (exp_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
