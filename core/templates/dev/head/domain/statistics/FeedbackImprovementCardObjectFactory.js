@@ -94,7 +94,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
             return ThreadDataService.fetchMessages(thread.threadId);
           })).then(function() {
             return ThreadDataService.data.feedbackThreads.map(createNew);
-          })
+          });
         });
       },
     };
