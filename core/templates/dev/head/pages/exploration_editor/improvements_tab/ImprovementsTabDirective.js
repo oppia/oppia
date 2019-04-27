@@ -37,10 +37,10 @@ oppia.directive('improvementsTab', [
             });
           };
 
-          var cardView = 'isOpen';
+          var cardView = 'open';
           var cardViewFilters = {
             /** @returns {boolean} */
-            isOpen: function(card) {
+            open: function(card) {
               return card.isOpen();
             },
           };
