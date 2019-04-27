@@ -1,5 +1,101 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.8.1 (26 April 2019)
+------------------------
+Improvements to editors and players
+* Fix #6285: Fixes issues while selecting an answer in the editor feedback tab. (#6532)
+* Fixed minor issue in story editor (#6529)
+* UI related to the written translation project.  (#6503)
+* Add send mail functionality for reviewing topics (#6501)
+* Fix #2125: Fix alignment of Exploration Graph legend in history tab. (#6402)
+* Fix #5802, #5590: Introduce Playthrough Improvements Cards (#6400)
+* Fix #6370: Fix Title and Goal label alignment (#6372)
+* Fix #5530: Update collection title after save and refresh (#6362)
+* Fix #6322: Add IsProperSubsetOf to item-selection interaction (#6350)
+
+New structures
+* Support question difficulty per skill (#6502)
+* Fix #6377: Create Practice Sessions Page Skeleton (#6381)
+* Question Player Backend API Service (#6373)
+
+Translations
+* Fix #5921: Adds e2e test for uploading audio in translation tab (#6340)
+* Fix #6248 : Prevent guest and unauthorized users from drag-and-drop audio in translation tab. (#6304)
+* Fix part of #5898: Aria model with test case (#6290)
+* Add written translation property in skillContents and subtopic. (#6241)
+* Fix part of #5898: Added Google Analytics for translation tab (#6166)
+* Add proper validation for written translations to allow translation in hinglish. (#6588)
+
+Infrastructural changes
+* Fix release info script: fix imports, and sort PRs in descending order (#6607)
+* Add removal of app.yaml version field to deploy script. (#6564)
+* Fix the backend issues with some new structure models (#6514)
+* Change the name of the schema_version field in story models. (#6420)
+* Make new model IDs only contain alphanumeric characters. (#6408)
+* Update release script to use SSH Git URL instead of HTTPS (#6382)
+* Fix #6294: Upgrade BeautifulSoup version from 4.6.0 to 4.7.1 (#6355)
+* Fix part of #6343: Update js files to remove typescript compile errors (#6344)
+
+Bug fixes
+* Fix broken interaction previews in the exploration editor (#6627)
+* Fix part of #6159: Fix revert exploration method (#6575)
+* Fix few translation tab related issues. (#6571)
+* Fix #6538: Adds a proper title for landing pages. (#6539)
+* Fix #6181:Removed the exception which occured during clearing search index (#6518)
+* Fix issues with New Structures (#6506)
+* Fix #6383: Added regex to validate return_url in signup page (#6498)
+* Fix #6426: Added regex check for exploration id & nodes now can be saved with null exploration ids. (#6470)
+* Fix #6461: Changing error status for missing csrf_token from 500 to 401. (#6463)
+* Fix #6452: Fix server errors (#6454)
+* Fix #4931: Fixes frozen editor tour (#6450)
+* Fix #4632: Fixes learn again-continue button (#6448)
+* Fix #6206: Fix enlargement of text in RTE (#6447)
+* Fix #6436: Adds removeDuplicatesInArray filter in exploration_player. (#6437)
+* Fix #6414: REQUIRE_PAYLOAD_CSRF_CHECK Flag Flipped in Error404Handler class. (#6435)
+* Remove unwanted validation check and related tests from exploration. (#6407)
+* Fix #6205 : Disabled the reject button, enabled only when some review is entered. (#6384)
+* Fix #6325 : modify style of active and inactive submenus on learner dashboard (#6358)
+* Fix #6199: Hint tabs failed to open when active hint deleted (#6243)
+* Fix #2306: Fixes signup issue when a new tab is opened (#6235)
+
+Code health
+* Fix #6494: Added check for style properties to have a space between the colon and the property value. (#6516)
+* Fix part of #6387: Email constant fix (#6467)
+* Fix part of issue #6316: Remove some scripts from base.html which were not needed in it. (#6466)
+* Fix part of #6343: Adds custom type definitions (#6430)
+* Fix part of #6387: Remove globals from library.html and preferences.html (#6415)
+* Fix part of #5002:  Removed iframed from GLOBALS (#6410)
+* Fix part of #5002: Remove logoutUrl from HTML (#6401)
+* Fix #6316: Refactor base.html (#6399)
+* Fix part of #5002: Moved SITE_FEEDBACK_FORM_URL from GLOBALS to constants.js. (#6365)
+* Fix part of #6254: Refactor for directives.js and filters.js (#6275)
+
+Development workflow
+* Fix #6534: make MR jobs runnable on localhost. (#6543)
+* Update pip and Skulpt installations for newer versions of Ubuntu (#6464)
+* Move lint tests to CircleCI from Travis (#6453)
+* Reorder CODEOWNERS to ensure that the most important rules are at the end. (#6438)
+* Add webhook links for Travis, CircleCI & Codecov (#6398)
+* Automate changelog generation in the release_info script (#6395)
+* Fix #6321: Added checks to validate patterns in CODEOWNERS file. (#6386)
+* Add option not to start browser window to start.sh (#6363)
+* Add issue template for server errors (#6308)
+* Add a script for updating indexes. Move gcloud functions into a separate module. (#6305)
+* Port back-end tests from Travis to CircleCI (#6234)
+* Fix #5426: Lint check to ensure that each Angular file contains exactly one service/directive/etc. inside it. (#6202)
+* Fix #6100 : Added verbose and non verbose mode in the pre submit check (#6146)
+
+Testing coverage
+* Fix part of #5134: Make test coverage of core.storage.exploration.gae_models 100% (#6540)
+* Fix part of #5134, more robust testing to schema_utils.py (#6432)
+* Fix part of #4057: Increase test coverage to 100% for HintObjectFactory.js and InteractionObjectFactory.js. (#6428)
+* Fix part of #5134: Make test coverage of core.controllers.collection_viewer 100% (#6427)
+* Add pending New Structures e2e tests (#6385)
+* Fix part of #5134 : Increasing the test coverage of subtopic_page_services.py from 64% to 100%. (#6360)
+* Fix part of #5134: Increased Coverage from 89% to 100% for core.domain.email_manager.py (#6306)
+* Add unit test for translation_tab/TranslationStatusService.js (#6261)
+
+
 v2.8.0 (30 March 2019)
 ------------------------
 New structures
