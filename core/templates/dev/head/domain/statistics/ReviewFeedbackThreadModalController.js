@@ -17,14 +17,14 @@
  */
 
 oppia.controller('ReviewFeedbackThreadModalController', [
-  'activeThread', 'userIsLoggedIn', '$q', '$scope', '$uibModalInstance',
+  '$q', '$scope', '$uibModalInstance', 'activeThread', 'userIsLoggedIn',
   'AlertsService', 'ChangeListService', 'DateTimeFormatService',
   'EditabilityService', 'ExplorationDataService', 'ExplorationStatesService',
   'ShowSuggestionModalForEditorViewService', 'StateObjectFactory',
   'ThreadDataService', 'ThreadStatusDisplayService', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-      activeThread, userIsLoggedIn, $q, $scope, $uibModalInstance,
+      $q, $scope, $uibModalInstance, activeThread, userIsLoggedIn,
       AlertsService, ChangeListService, DateTimeFormatService,
       EditabilityService, ExplorationDataService, ExplorationStatesService,
       ShowSuggestionModalForEditorViewService, StateObjectFactory,
