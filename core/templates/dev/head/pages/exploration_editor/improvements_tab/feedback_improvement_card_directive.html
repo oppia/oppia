@@ -1,6 +1,8 @@
 <p>
-  <strong><[getContextText()]></strong>
-  <br>
+  <strong ng-if="getContextText() !== null">
+    <[getContextText()]>
+    <br>
+  </strong>
   <[getContextMessage().text | truncate:280]>
 </p>
 <div style="float: left" ng-if="getThread().status !== 'open'">

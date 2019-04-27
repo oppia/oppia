@@ -31,11 +31,11 @@ oppia.directive('feedbackImprovementCard', [
             });
           };
           $scope.getContextText = function() {
+            var messageCount = getMessages().length;
             if ($scope.getThread().status === 'open') {
-              var messageCount = getMessages().length;
               return (messageCount === 1) ? 'New Thread:' : 'Latest Message:';
             } else {
-              return 'Last Message:';
+              return (messageCount === 1) ? null : 'Last Message:';
             }
           };
           $scope.getContextMessage = function() {
