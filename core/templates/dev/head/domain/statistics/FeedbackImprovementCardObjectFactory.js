@@ -26,7 +26,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       FEEDBACK_IMPROVEMENT_CARD_TYPE) {
     /** @constructor */
     var FeedbackImprovementCard = function(feedbackThread) {
-      var openThreadReviewModal = function() {
+      var openReviewThreadModal = function() {
         // TODO.
       };
 
@@ -35,7 +35,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Thread', openThreadReviewModal, 'btn-success'),
+          'Review Thread', openReviewThreadModal, 'btn-success'),
       ];
     };
 
