@@ -30,9 +30,6 @@ oppia.directive('feedbackImprovementCard', [
               return $.trim(msg.text) !== '';
             });
           };
-          $scope.getMessageCount = function() {
-            return getMessages().length;
-          };
           $scope.getContextText = function() {
             var messageCount = getMessages().length;
             if ($scope.getData().status === 'open') {
