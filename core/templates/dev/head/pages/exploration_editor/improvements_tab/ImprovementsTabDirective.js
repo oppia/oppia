@@ -49,8 +49,14 @@ oppia.directive('improvementsTab', [
           $scope.getCards = function() {
             return cards;
           };
+          $scope.getCardView = function() {
+            return cardView;
+          };
+          $scope.isCardInView = function(card) {
+            return cardViewFilters[cardView](card);
+          };
           $scope.getOpenCardCount = function() {
-            return cards.filter(cardViewFilters[cardView]).length;
+            return cards.filter(cardViewFilters.open).length;
           };
         }
       ],
