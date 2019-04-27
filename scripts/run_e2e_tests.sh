@@ -52,6 +52,8 @@
 # single test or test suite.
 
 function cleanup {
+  echo "CLEANING UP"
+
   # Send a kill signal to the dev server.
   kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'`
 
@@ -209,6 +211,8 @@ for j in "$@"; do
   esac
 done
 
+echo "RUNNING TESTS"
+
 # Run the end-to-end tests. The conditional is used to run protractor without
 # any sharding parameters if it is disabled. This helps with isolated tests.
 # Isolated tests do not work properly unless no sharding parameters are passed
@@ -227,3 +231,5 @@ else
     $NODE_MODULE_DIR/.bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
   fi
 fi
+
+echo "FINISHED"
