@@ -40,7 +40,7 @@ oppia.directive('feedbackImprovementCard', [
             } else {
               return 'Last Message:';
             }
-          }
+          };
           $scope.getContextMessage = function() {
             var messages = getMessages();
             return messages[messages.length - 1];
