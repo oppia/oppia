@@ -862,7 +862,12 @@ class WrittenTranslations(object):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
                         % language_code)
-                if not utils.is_valid_language_code(language_code):
+                # Currently, we assume written translations are used by the
+                # voice-artist to voiceover the translated text so written
+                # translations can be in supported audio/voiceover languages.
+                allowed_language_codes = [language['id'] for language in (
+                    constants.SUPPORTED_AUDIO_LANGUAGES)]
+                if language_code not in allowed_language_codes:
                     raise utils.ValidationError(
                         'Invalid language_code: %s' % language_code)
 
