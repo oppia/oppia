@@ -67,25 +67,25 @@ oppia.constant('FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS', {
 });
 
 oppia.controller('LearnerDashboard', [
-  '$scope', '$rootScope', '$q', '$window', '$http', '$uibModal',
-  'AlertsService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
-  'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
-  'LearnerDashboardBackendApiService', 'UrlInterpolationService',
-  'LEARNER_DASHBOARD_SECTION_I18N_IDS',
-  'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
-  'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
-  'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
-  'ShowSuggestionModalForLearnerViewService', 'UserService',
+  '$http', '$q', '$rootScope', '$scope', '$uibModal', '$window',
+  'AlertsService', 'DateTimeFormatService',
+  'FeedbackMessageSummaryObjectFactory', 'FeedbackThreadDisplayService',
+  'FeedbackThreadSummaryObjectFactory', 'LearnerDashboardBackendApiService',
+  'ShowSuggestionModalForLearnerViewService', 'UrlInterpolationService',
+  'UserService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
+  'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
+  'LEARNER_DASHBOARD_SECTION_I18N_IDS', 'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
+  'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
   function(
-      $scope, $rootScope, $q, $window, $http, $uibModal,
-      AlertsService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
-      SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
-      LearnerDashboardBackendApiService, UrlInterpolationService,
-      LEARNER_DASHBOARD_SECTION_I18N_IDS,
-      LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
-      DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
-      FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory,
-      ShowSuggestionModalForLearnerViewService, UserService) {
+      $http, $q, $rootScope, $scope, $uibModal, $window,
+      AlertsService, DateTimeFormatService,
+      FeedbackMessageSummaryObjectFactory, FeedbackThreadDisplayService,
+      FeedbackThreadSummaryObjectFactory, LearnerDashboardBackendApiService,
+      ShowSuggestionModalForLearnerViewService, UrlInterpolationService,
+      UserService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
+      FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
+      LEARNER_DASHBOARD_SECTION_I18N_IDS, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS,
+      SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS) {
     $scope.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
     $scope.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (
@@ -208,9 +208,9 @@ oppia.controller('LearnerDashboard', [
       text: ''
     };
 
-    $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
+    $scope.getLabelClass = FeedbackThreadDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (
-      ThreadStatusDisplayService.getHumanReadableStatus);
+      FeedbackThreadDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 

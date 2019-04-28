@@ -23,8 +23,8 @@ oppia.directive('feedbackImprovementCard', [
         '/pages/exploration_editor/improvements_tab/' +
         'feedback_improvement_card_directive.html'),
       controller: [
-        '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
-        function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
+        '$scope', 'DateTimeFormatService', 'FeedbackThreadDisplayService',
+        function($scope, DateTimeFormatService, FeedbackThreadDisplayService) {
           var getMessages = function() {
             return $scope.getThread().messages.filter(function(message) {
               return $.trim(message.text) !== '';
@@ -50,9 +50,9 @@ oppia.directive('feedbackImprovementCard', [
               return $scope.getThread().originalAuthorName;
             }
           };
-          $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
+          $scope.getLabelClass = FeedbackThreadDisplayService.getLabelClass;
           $scope.getHumanReadableStatus = (
-            ThreadStatusDisplayService.getHumanReadableStatus);
+            FeedbackThreadDisplayService.getHumanReadableStatus);
           $scope.getLocaleAbbreviatedDatetimeString = (
             DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
         }

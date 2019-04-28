@@ -20,25 +20,21 @@ oppia.controller('FeedbackTab', [
   '$log', '$q', '$rootScope', '$scope', '$uibModal',
   'AlertsService', 'ChangeListService', 'DateTimeFormatService',
   'ExplorationDataService', 'ExplorationStatesService',
-  'ShowSuggestionModalForEditorViewService',
-  'StateObjectFactory',
-  'ThreadDataService', 'ThreadStatusDisplayService',
-  'UrlInterpolationService', 'UserService',
-  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+  'FeedbackThreadDisplayService', 'ShowSuggestionModalForEditorViewService',
+  'StateObjectFactory', 'ThreadDataService', 'UrlInterpolationService',
+  'UserService', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
       $log, $q, $rootScope, $scope, $uibModal,
       AlertsService, ChangeListService, DateTimeFormatService,
       ExplorationDataService, ExplorationStatesService,
-      ShowSuggestionModalForEditorViewService,
-      StateObjectFactory,
-      ThreadDataService, ThreadStatusDisplayService,
-      UrlInterpolationService, UserService,
-      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
-    $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
+      FeedbackThreadDisplayService, ShowSuggestionModalForEditorViewService,
+      StateObjectFactory, ThreadDataService, UrlInterpolationService,
+      UserService, ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+    $scope.STATUS_CHOICES = FeedbackThreadDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
-    $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
+    $scope.getLabelClass = FeedbackThreadDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (
-      ThreadStatusDisplayService.getHumanReadableStatus);
+      FeedbackThreadDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 

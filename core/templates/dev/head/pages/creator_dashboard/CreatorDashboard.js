@@ -49,10 +49,10 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 oppia.controller('CreatorDashboard', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$uibModal', '$window',
   'AlertsService', 'CreatorDashboardBackendApiService', 'DateTimeFormatService',
-  'ExplorationCreationService', 'QuestionObjectFactory',
-  'RatingComputationService', 'ShowSuggestionModalForCreatorViewService',
-  'SuggestionObjectFactory', 'SuggestionThreadObjectFactory',
-  'ThreadStatusDisplayService', 'TopicsAndSkillsDashboardBackendApiService',
+  'ExplorationCreationService', 'FeedbackThreadDisplayService',
+  'QuestionObjectFactory', 'RatingComputationService',
+  'ShowSuggestionModalForCreatorViewService', 'SuggestionObjectFactory',
+  'SuggestionThreadObjectFactory', 'TopicsAndSkillsDashboardBackendApiService',
   'UrlInterpolationService', 'UserService', 'EXPLORATIONS_SORT_BY_KEYS',
   'EXPLORATION_DROPDOWN_STATS', 'FATAL_ERROR_CODES',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
@@ -60,10 +60,10 @@ oppia.controller('CreatorDashboard', [
   function(
       $http, $log, $q, $rootScope, $scope, $uibModal, $window,
       AlertsService, CreatorDashboardBackendApiService, DateTimeFormatService,
-      ExplorationCreationService, QuestionObjectFactory,
-      RatingComputationService, ShowSuggestionModalForCreatorViewService,
-      SuggestionObjectFactory, SuggestionThreadObjectFactory,
-      ThreadStatusDisplayService, TopicsAndSkillsDashboardBackendApiService,
+      ExplorationCreationService, FeedbackThreadDisplayService,
+      QuestionObjectFactory, RatingComputationService,
+      ShowSuggestionModalForCreatorViewService, SuggestionObjectFactory,
+      SuggestionThreadObjectFactory, TopicsAndSkillsDashboardBackendApiService,
       UrlInterpolationService, UserService, EXPLORATIONS_SORT_BY_KEYS,
       EXPLORATION_DROPDOWN_STATS, FATAL_ERROR_CODES,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS,
@@ -191,7 +191,7 @@ oppia.controller('CreatorDashboard', [
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
     $scope.enableQuestionSuggestions = constants.ENABLE_NEW_STRUCTURE_PLAYERS;
     $scope.getHumanReadableStatus = (
-      ThreadStatusDisplayService.getHumanReadableStatus);
+      FeedbackThreadDisplayService.getHumanReadableStatus);
 
     $scope.emptyDashboardImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/empty_dashboard.svg');
