@@ -17,6 +17,7 @@
 """Tests for the appengine search api wrapper."""
 
 import datetime
+import logging
 import time
 
 from core.platform.search import gae_search_services
@@ -469,12 +470,32 @@ class SearchQueryTests(test_utils.GenericTestBase):
     def test_search_when_query_string_is_invalid(self):
         # The search result would be ([], None) if query strings contain "NOT"
         # or a string with backslashes.
-        doc = {'id': 'doc1', 'NOT': 'abc', 'rank': 3, 'language_code': 'en'}
-        gae_search_services.add_documents_to_index([doc], 'index')
-        result = gae_search_services.search('NOT:abc', 'my_index')
-        self.assertEqual(result, ([], None))
-        result = gae_search_services.search(r'\k:abc', 'my_index')
-        self.assertEqual(result, ([], None))
+        observed_log_messages = []
+
+        def mock_logging_function(msg, *_):
+            observed_log_messages.append(msg)
+
+        with self.swap(logging, 'exception', mock_logging_function):
+            doc = {'id': 'doc1', 'NOT': 'abc', 'rank': 3, 'language_code': 'en'}
+            gae_search_services.add_documents_to_index([doc], 'index')
+            result = gae_search_services.search('NOT:abc', 'my_index')
+            self.assertEqual(result, ([], None))
+            result = gae_search_services.search(r'\k:abc', 'my_index')
+            self.assertEqual(result, ([], None))
+
+            self.assertEqual(len(observed_log_messages), 2)
+            self.assertEqual(
+                observed_log_messages[0],
+                (
+                    'Could not parse query string NOT:abc'
+                )
+            )
+            self.assertEqual(
+                observed_log_messages[1],
+                (
+                    r'Could not parse query string \k:abc'
+                )
+            )
 
     def test_respect_search_query(self):
         doc1 = search.Document(doc_id='doc1', rank=1, language='en', fields=[
@@ -608,7 +629,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         sort_expression = 'invalid_sort_symbol'
         with self.assertRaisesRegexp(
             ValueError,
-            'Fields in the sort expression must start with "\+"'
+            r'Fields in the sort expression must start with "\+"'
             ' or "-" to indicate sort direction. The field %s has no such '
             'indicator in expression "%s".'
             % (sort_expression, sort_expression)):
