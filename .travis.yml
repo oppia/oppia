@@ -116,7 +116,7 @@ script:
 # - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --exclude_load_tests; fi
 # - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
 # - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh; fi
-# TODO: run these e2e tests using --prod_env instead. (Currently, with prod_env, the build process seems to be causing errors on Travis.)
+# Run the e2e tests in the production environment (using --prod_env).
 - if [ "$RUN_E2E_TESTS_ACCESSIBILITY" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="additionalEditorAndPlayerFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_COLLECTIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="collections" --prod_env; fi
