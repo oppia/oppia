@@ -101,6 +101,23 @@ describe('Exploration translation', function() {
       general.checkForConsoleErrors([]);
     });
 
+  it('should correctly switch to different modes', function() {
+    users.login('common@translationTab.com');
+    creatorDashboardPage.get();
+    // Test using common exploration.
+    creatorDashboardPage.editExploration('tests');
+
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.expectToBeInVoiceoverMode();
+
+    explorationEditorTranslationTab.switchToTranslationMode();
+    explorationEditorTranslationTab.expectToBeInTranslationMode();
+
+    explorationEditorTranslationTab.switchToVoiceoverMode();
+    explorationEditorTranslationTab.expectToBeInVoiceoverMode();
+
+  });
+
   it('should have all the state contents', function() {
     users.login('common@translationTab.com');
     creatorDashboardPage.get();

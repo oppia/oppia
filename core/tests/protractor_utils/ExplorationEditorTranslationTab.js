@@ -183,6 +183,53 @@ var ExplorationEditorTranslationTab = function() {
     return nodeElement.element(by.css('.protractor-test-node-label'));
   };
 
+
+  var languageSelectorLabelElement = element(
+    by.css('.protractor-test-langauge-selector-label'));
+  var progressBarLabelElement = element(
+    by.css('.protractor-test-progress-info'));
+  var translationModeButton = element(
+    by.css('.protractor-test-translation-mode'));
+  var voiceoverModeButton = element(by.css('.protractor-test-voiceover-mode'));
+
+  this.switchToVoiceoverMode = function() {
+    waitFor.elementToBeClickable(
+      voiceoverModeButton,
+      'Translation Mode switch is taking too long to appear');
+    voiceoverModeButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.switchToTranslationMode = function() {
+    waitFor.elementToBeClickable(
+      translationModeButton,
+      'Translation Mode switch is taking too long to appear');
+    translationModeButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.expectToBeInTranslationMode = function() {
+    expect(languageSelectorLabelElement.getText()).toBe(
+      'Translate in language:');
+    expect(progressBarLabelElement.getText()).toBe(
+      'Exploration translation progress:');
+    expect(translationModeButton.getAttribute('class')).toMatch(
+      'oppia-active-mode');
+    expect(voiceoverModeButton.getAttribute('class')).not.toMatch(
+      'oppia-active-mode');
+  };
+
+  this.expectToBeInVoiceoverMode = function() {
+    expect(languageSelectorLabelElement.getText()).toBe(
+      'Voiceover in language:');
+    expect(progressBarLabelElement.getText()).toBe(
+      'Exploration voiceover progress:');
+    expect(translationModeButton.getAttribute('class')).not.toMatch(
+      'oppia-active-mode');
+    expect(voiceoverModeButton.getAttribute('class')).toMatch(
+      'oppia-active-mode');
+  };
+
   this.expectSaveUploadedAudioButtonToBeDisabled = function() {
     expect(saveUploadedAudioButton.getAttribute('disabled')).toBe('true');
   };

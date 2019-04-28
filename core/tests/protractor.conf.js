@@ -100,7 +100,7 @@ exports.config = {
     ],
 
     explorationTranslationTab: [
-      'protractor_desktop/explorationTranslationTab.js'
+      'protractor_desktop/ExplorationTranslationTab.js'
     ],
 
     extensions: [
