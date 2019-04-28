@@ -17,19 +17,15 @@
  */
 
 oppia.controller('ReviewFeedbackThreadModalController', [
-  '$q', '$scope', '$uibModalInstance', 'AlertsService', 'ChangeListService',
-  'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
-  'ExplorationStatesService', 'ShowSuggestionModalForEditorViewService',
-  'StateObjectFactory', 'ThreadDataService', 'ThreadStatusDisplayService',
-  'UrlInterpolationService', 'activeThread', 'userIsLoggedIn',
-  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+  '$scope', '$uibModalInstance', 'AlertsService', 'ChangeListService',
+  'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
+  'ShowSuggestionModalForEditorViewService', 'ThreadDataService',
+  'ThreadStatusDisplayService', 'activeThread', 'userIsLoggedIn',
   function(
-      $q, $scope, $uibModalInstance, AlertsService, ChangeListService,
-      DateTimeFormatService, EditabilityService, ExplorationDataService,
-      ExplorationStatesService, ShowSuggestionModalForEditorViewService,
-      StateObjectFactory, ThreadDataService, ThreadStatusDisplayService,
-      UrlInterpolationService, activeThread, userIsLoggedIn,
-      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+      $scope, $uibModalInstance, AlertsService, ChangeListService,
+      DateTimeFormatService, EditabilityService, ExplorationStatesService,
+      ShowSuggestionModalForEditorViewService, ThreadDataService,
+      ThreadStatusDisplayService, activeThread, userIsLoggedIn) {
     $scope.activeThread = activeThread;
     $scope.userIsLoggedIn = userIsLoggedIn;
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
