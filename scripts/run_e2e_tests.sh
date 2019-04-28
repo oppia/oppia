@@ -33,18 +33,11 @@
 #         build directory and use cache slugs.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (fit or fdescribe).
-#   --suite=suite_name Performs test for different suites.
-#   For performing a full test, no argument is required.
-#   For performing tests on accessibility, use --suite=accessibility
-#   For performing tests on collections, use --suite=collections
-#   For performing embedding tests, use --suite=embedding
-#   For performing tests on editor and player, use --suite=editorAndPlayer
-#   For performing tests on editorFeatures, use --suite=editorFeatures
-#   For performing tests on extensions, use --suite=extensions
-#   For performing tests on library, use --suite=library
-#   For performing tests on learnerDashboard, use --suite=learnerDashboard
-#   For performing tests on state editor, use --suite=stateEditor
-#   For performing users tests, use --suite=users
+#   --suite=suite_name Performs test for different suites, here suites are the
+#         name of the test files present in core/tests/protractor_desktop/ and
+#         core/test/protractor/ dirs. e.g. for the file
+#         core/tests/protractor/accessibility.js use --suite=accessibility.
+#         For performing a full test, no argument is required.
 #
 # The root folder MUST be named 'oppia'.
 #
