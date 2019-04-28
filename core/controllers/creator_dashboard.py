@@ -249,9 +249,11 @@ class CreatorDashboardHandler(base.BaseHandler):
         last_week_stats = (
             user_services.get_last_week_dashboard_stats(self.user_id))
         if last_week_stats:
-            datetime_of_stats = list(last_week_stats.keys())[0]
+            # 'last_week_stats' is a dict with only one key-value pair denoting
+            # last week dashboard stats of the user keyed by a datetime string.
+            datetime_of_stats = last_week_stats.keys()[0]
             last_week_stats_average_ratings = (
-                last_week_stats.get(datetime_of_stats).get('average_ratings'))
+                last_week_stats.values()[0].get('average_ratings'))
             if last_week_stats_average_ratings:
                 last_week_stats[datetime_of_stats]['average_ratings'] = (
                     _round_average_ratings(last_week_stats_average_ratings))

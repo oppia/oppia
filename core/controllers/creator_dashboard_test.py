@@ -691,6 +691,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
             self.assertEqual(len(response['topic_summary_dicts']), 1)
             self.assertTrue(isinstance(response['topic_summary_dicts'], list))
+            self.assertEqual(response['topic_summary_dicts'][0]['name'], 'Name')
+            self.assertEqual(
+                response['topic_summary_dicts'][0]['id'], 'topic_id')
         self.logout()
 
     def test_can_update_display_preference(self):
@@ -743,8 +746,11 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             'exploration_id', 1, self.owner_id, change_dict, '', None)
         suggestions = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['created_suggestions_list'][0]
-        self.assertEqual(suggestions['change']['state_name'], 'Introduction')
-        self.assertEqual(suggestions['change']['property_name'], 'content')
+        change_dict['old_value'] = {
+            'content_id': 'content',
+            'html': ''
+        }
+        self.assertEqual(suggestions['change'], change_dict)
         # Test to check if suggestions populate old value of the change.
         self.assertEqual(
             suggestions['change']['old_value']['content_id'], 'content')
@@ -861,7 +867,9 @@ class CreationButtonsTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token)[creator_dashboard.EXPLORATION_ID_KEY]
             explorations_list = self.get_json(
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
+            exploration = exp_services.get_exploration_by_id(exp_a_id)
             self.assertEqual(explorations_list[0]['id'], exp_a_id)
+            self.assertEqual(exploration.to_yaml(), self.SAMPLE_YAML_CONTENT)
             self.logout()
 
     def test_can_not_upload_exploration_when_server_does_not_allow_file_upload(

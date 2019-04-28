@@ -605,7 +605,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         # Fields in the sort expression need to start with '+' or '-'
         # to indicate sort direction. If no such indicator is there, it will
         # raise ValueError.
-        sort_expression = 'k'
+        sort_expression = 'invalid_sort_symbol'
         with self.assertRaisesRegexp(
             ValueError,
             'Fields in the sort expression must start with "\+"'
