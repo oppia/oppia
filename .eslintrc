@@ -8,6 +8,8 @@
     "html"
   ],
   "overrides": [{
+    // We exclude *Spec.js files from dependency injection format checks
+    // because they are test files and are never minified.
     "files": ["*Spec.js"],
     "rules": {
       "angular/di": "off"
