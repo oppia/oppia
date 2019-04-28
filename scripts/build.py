@@ -642,11 +642,8 @@ def get_file_hashes(directory_path):
     print('Computing hashes for files in %s'
           % os.path.join(os.getcwd(), directory_path))
 
-    for root, dirnames, filenames in os.walk(
+    for root, _, filenames in os.walk(
             os.path.join(os.getcwd(), directory_path)):
-        for directory in dirnames:
-            print('Computing hashes for files in %s'
-                  % os.path.join(root, directory))
         for filename in filenames:
             if should_file_be_built(filename) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
@@ -825,10 +822,8 @@ def generate_delete_tasks_to_remove_deleted_files(
     """
     print 'Scanning directory %s to remove deleted file' % staging_directory
     delete_tasks = collections.deque()
-    for root, dirnames, filenames in os.walk(
+    for root, _, filenames in os.walk(
             os.path.join(os.getcwd(), staging_directory)):
-        for directory in dirnames:
-            print 'Scanning %s' % os.path.join(root, directory)
         for filename in filenames:
             target_path = os.path.join(root, filename)
             # Ignore files with certain extensions.
