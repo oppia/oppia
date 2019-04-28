@@ -37,7 +37,7 @@ def get_args_of_function(function_node, args_to_ignore):
     Args:
         function_node: ast.FunctionDef. Represents a function.
         args_to_ignore: list(str). Ignore these arguments in a function
-        defination.
+        definition.
 
     Returns:
         list(str). The args for a function as listed in the function
@@ -52,7 +52,7 @@ def get_args_of_function(function_node, args_to_ignore):
             a.id for a in function_node.args.args if a.id not in args_to_ignore]
 
 
-def open_file(filename, mode='r', encoding='utf-8'):
+def open_file(filename, mode, encoding='utf-8'):
     """Open file and return a corresponding file object.
 
     Args:
@@ -65,6 +65,6 @@ def open_file(filename, mode='r', encoding='utf-8'):
     """
     import io
     try:
-        return io.open(filename, mode=mode, encoding=encoding)
+        return io.open(filename, mode, encoding=encoding)
     except:
         raise IOError('No such file found: %s' % filename)

@@ -452,7 +452,7 @@ class FileCache(object):
             with cls._get_cache_lock(key):
                 if key not in cls._CACHE_DATA_DICT:
                     with python_utils.open_file(
-                        filepath, mode=mode, encoding='utf-8') as f:
+                        filepath, mode, encoding='utf-8') as f:
                         lines = f.readlines()
                     cls._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return cls._CACHE_DATA_DICT[key]

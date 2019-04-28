@@ -48,6 +48,7 @@ FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 # caution, __file__ is here *OPPiA/.git/hooks* and not in *OPPIA/scripts*.
+LINTER_MODULE = 'scripts.pre_commit_linter'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 SCRIPTS_DIR = os.path.join(OPPIA_DIR, 'scripts')
@@ -256,9 +257,8 @@ def _get_refs():
 
 def _start_linter(files):
     """Starts the lint checks and returns the returncode of the task."""
-    script = os.path.join('scripts', LINTER_SCRIPT).replace('/', '.')
     task = subprocess.Popen(
-        [PYTHON_CMD, '-m', script, LINTER_FILE_FLAG] + files)
+        [PYTHON_CMD, '-m', LINTER_MODULE, LINTER_FILE_FLAG] + files)
     task.communicate()
     return task.returncode
 

@@ -45,11 +45,11 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(args_list, ['arg1', 'arg2'])
 
     def test_open_file(self):
-        with python_utils.open_file('scripts/python_utils.py') as f:
+        with python_utils.open_file('scripts/python_utils.py', 'r') as f:
             file_content = f.readlines()
             self.assertIsNotNone(file_content)
 
     def test_can_not_open_file(self):
         with self.assertRaisesRegexp(IOError, 'No such file found:'):
-            with python_utils.open_file('invalid_file.py') as f:
+            with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
