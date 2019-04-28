@@ -37,7 +37,7 @@ oppia.directive('improvementsTab', [
             });
           };
 
-          var cardView = 'all';
+          var cardView = 'open';
           var cardViewFilters = {
             /** @returns {boolean} */
             open: function(card) {
