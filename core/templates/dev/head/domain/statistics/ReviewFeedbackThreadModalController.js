@@ -42,6 +42,12 @@ oppia.controller('ReviewFeedbackThreadModalController', [
       text: ''
     };
 
+    $scope.getTitle = function() {
+      var threadType = (
+        activeThread.isSuggestionThread() ? 'Suggestion' : 'Feedback');
+      return threadType + ': ' + activeThread.subject;
+    };
+
     var _isSuggestionHandled = function() {
       return $scope.activeThread.isSuggestionHandled();
     };
