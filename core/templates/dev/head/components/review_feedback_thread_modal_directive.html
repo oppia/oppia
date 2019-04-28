@@ -1,7 +1,7 @@
 <div style="padding: 32px">
   <h3 style="float: left; width: 85%; margin-top: 0"><[getTitle()]></h3>
 
-  <div style="float: right; width: 15%">
+  <div class="text-right" style="float: right; width: 15%">
     <span ng-if="activeThread.stateName" class="label label-info">
       state: <[activeThread.stateName]>
     </span>
@@ -12,8 +12,9 @@
 
   <hr style="clear: both">
 
-  <ul style="list-style: none; padding: 0" ng-if="activeThread.messages">
-    <li ng-repeat="m in activeThread.messages|orderBy:'message_id'">
+  <ul class="thread-messages" ng-if="activeThread.messages">
+    <li ng-repeat="m in activeThread.messages|orderBy:'message_id'"
+        class="thread-message">
       <span ng-if="$index !== 0">#<[m.message_id]></span>
 
       <span ng-if="m.author_username">by <strong><[m.author_username]></strong></span>
@@ -42,7 +43,7 @@
     </li>
   </ul>
 
-  <hr>
+  <hr style="margin-top: 0">
 
   <div ng-if="userIsLoggedIn">
     <label for="tmpMessageText">
@@ -89,3 +90,22 @@
     <em ng-if="!userIsLoggedIn">To respond to a feedback thread, please log in.</em>
   </div>
 </div>
+
+<style>
+ul.thread-messages {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+li.thread-message {
+  padding-top: 1em;
+  padding-bottom: 2em;
+  border-bottom: 1px solid #eee;
+}
+li.thread-message:last-child {
+  border-bottom: 0;
+}
+li.thread-message:first-child {
+  padding-top: 0;
+}
+</style>
