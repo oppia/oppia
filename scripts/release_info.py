@@ -99,10 +99,11 @@ def get_extra_commits_in_new_release(base_commit, repo):
     Args:
         base_commit: str. The base commit common between current branch and the
             latest release.
+        repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Returns:
-        List of commits from the base commit to current commit, which haven't
-        been cherrypicked already.
+        list(github.Commit.Commit). List of commits from the base commit up to
+        the current commit, which haven't been cherrypicked already.
     """
     get_commits_cmd = GIT_CMD_GET_NEW_COMMITS % base_commit
     out = _run_cmd(get_commits_cmd).split('\n')
@@ -289,9 +290,9 @@ def _check_storage_models(current_release):
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = _get_current_branch()
-    #if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
-    #    raise Exception(
-    #        'This script should only be run from the latest release branch.')
+    if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
+        raise Exception(
+            'This script should only be run from the latest release branch.')
 
     parsed_args = _PARSER.parse_args()
     if parsed_args.personal_access_token is None:
@@ -329,7 +330,7 @@ def main():
     prs = get_prs_from_pr_numbers(pr_numbers, repo)
     categorized_pr_titles = get_changelog_categories(prs)
 
-    summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary_copy.md')
+    summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
     with open(summary_file, 'w') as out:
         out.write('## Collected release information\n')
 
