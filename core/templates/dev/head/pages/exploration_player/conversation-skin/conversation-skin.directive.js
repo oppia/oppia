@@ -29,10 +29,10 @@ angular.module('conversationSkinModule').directive('conversationSkin', [
         var isIframed = UrlService.isIframed();
         scope.directiveTemplate = isIframed ?
           UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/conversation-skin' +
+            '/pages/exploration_player/conversation-skin/' +
             'conversation-skin-embed.directive.html') :
           UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/conversation-skin' +
+            '/pages/exploration_player/conversation-skin/' +
             'conversation-skin.directive.html'); conversation-skin-embed.directive.html
       },
       template: '<div ng-include="directiveTemplate"></div>',

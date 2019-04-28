@@ -16,7 +16,7 @@
  * @fileoverview Module for exploration player page.
  */
 
-angular.module('explorationPlayerModule', ['audioBarModule'
+angular.module('explorationPlayerModule', ['audioBarModule',
   'continueButtonModule', 'conversationSkinModule', 'CoorectnessFooterModule',
   'ExplorationFooterModule', 'FeedbackPopupModule', 'inputResponsePairModule',
   'LearnerLocalNavModule', 'progressNavModule', 'supplementalCardModule',
