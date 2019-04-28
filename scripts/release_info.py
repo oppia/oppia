@@ -33,8 +33,7 @@ import github # isort:skip
 # pylint: enable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
-GIT_CMD_GET_TAGS = 'git tag'
-GIT_CMD_GET_LCA_WITH_DEVELOP = 'git merge-base develop %s'
+GIT_CMD_GET_NEW_COMMITS = 'git cherry %s -v'
 GIT_CMD_GET_LOGS_FORMAT_STRING = (
     'git log -z --no-color --pretty=format:%H{0}%aN{0}%aE{0}%B {1}..{2}')
 GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'
@@ -83,27 +82,39 @@ def _get_current_branch():
     return branch_name_line.split(' ')[2]
 
 
-def _get_current_version_tag():
+def _get_current_version_tag(repo):
     """Retrieves the most recent version tag.
 
+    Args:
+        repo: github.Repository.Repository. The PyGithub object for the repo.
+
     Returns:
-        (str): The most recent version tag.
+        github.Tag.Tag: The most recent version tag.
     """
-    tags = _run_cmd(GIT_CMD_GET_TAGS).splitlines()
-    return tags[-1]
+    return repo.get_tags()[0]
 
-
-def _get_base_commit_with_develop(reference):
-    """Retrieves the commit hash common between the develop branch and the
-    specified reference commit.
+def get_extra_commits_in_new_release(base_commit, repo):
+    """Gets extra commits in the new release.
 
     Args:
-        reference: str. Tag, Branch, or commit hash of reference commit.
+        base_commit: str. The base commit common between current branch and the
+            latest release.
 
     Returns:
-        (str): The common commit hash.
+        List of commits from the base commit to current commit, which haven't
+        been cherrypicked already.
     """
-    return _run_cmd(GIT_CMD_GET_LCA_WITH_DEVELOP % reference)
+    get_commits_cmd = GIT_CMD_GET_NEW_COMMITS % base_commit
+    out = _run_cmd(get_commits_cmd).split('\n')
+    commits = []
+    for line in out:
+        # Lines that start with a - are already cherrypicked. The commits of
+        # interest are on lines that start with +.
+        if line[0] == '+':
+            line = line[2:]
+            commit = repo.get_commit(line[:line.find(' ')])
+            commits.append(commit)
+    return commits
 
 
 def _gather_logs(start, stop='HEAD'):
@@ -156,18 +167,16 @@ def _extract_pr_numbers(logs):
     return pr_numbers
 
 
-def get_prs_from_pr_numbers(pr_numbers, personal_access_token):
+def get_prs_from_pr_numbers(pr_numbers, repo):
     """Returns a list of PRs corresponding to the numbers provided.
 
     Args:
         pr_numbers: list(int). List of PR numbers.
-        personal_access_token: str. The personal access token of the user.
+        repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Returns:
         list(github.PullRequest.PullRequest). The list of references to the PRs.
     """
-    g = github.Github(personal_access_token)
-    repo = g.get_organization('oppia').get_repo('oppia')
     pulls = [repo.get_pull(int(num)) for num in pr_numbers]
     return list(pulls)
 
@@ -280,33 +289,47 @@ def _check_storage_models(current_release):
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = _get_current_branch()
-    if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
-        raise Exception(
-            'This script should only be run from the latest release branch.')
+    #if not re.match(r'release-\d+\.\d+\.\d+$', branch_name):
+    #    raise Exception(
+    #        'This script should only be run from the latest release branch.')
 
     parsed_args = _PARSER.parse_args()
-    current_release = _get_current_version_tag()
-    base_commit = _get_base_commit_with_develop(current_release)
+    if parsed_args.personal_access_token is None:
+        print('No personal access token provided, please set up a personal '
+              'access token at https://github.com/settings/tokens and pass it '
+              'to the script using --personal_access_token=<token>')
+        return
+
+    personal_access_token = parsed_args.personal_access_token
+    g = github.Github(personal_access_token)
+    repo = g.get_organization('oppia').get_repo('oppia')
+
+    current_release = _get_current_version_tag(repo)
+    current_release_tag = current_release.name
+    base_commit = current_release.commit.sha
+    new_commits = get_extra_commits_in_new_release(base_commit, repo)
     new_release_logs = _gather_logs(base_commit)
+
+    for index, log in enumerate(new_release_logs):
+        is_cherrypicked = True
+        for commit in new_commits:
+            if log.sha1 == commit.sha:
+                is_cherrypicked = False
+                break
+        if is_cherrypicked:
+            del new_release_logs[index]
+
     past_logs = _gather_logs(FIRST_OPPIA_COMMIT, stop=base_commit)
     issue_links = _extract_issues(new_release_logs)
-    feconf_version_changes = _check_versions(current_release)
-    setup_changes = _check_setup_scripts(current_release)
-    storage_changes = _check_storage_models(current_release)
+    feconf_version_changes = _check_versions(current_release_tag)
+    setup_changes = _check_setup_scripts(current_release_tag)
+    storage_changes = _check_storage_models(current_release_tag)
 
-    if parsed_args.personal_access_token:
-        personal_access_token = parsed_args.personal_access_token
-        pr_numbers = _extract_pr_numbers(new_release_logs)
-        prs = get_prs_from_pr_numbers(pr_numbers, personal_access_token)
-        categorized_pr_titles = get_changelog_categories(prs)
-    else:
-        print('No personal access token provided, changelog will not be '
-              'printed. If you would like to have the changelog also printed'
-              ' by the script, set up a personal access token at '
-              'https://github.com/settings/tokens and pass it to the script '
-              'using --personal_access_token=<token>')
+    pr_numbers = _extract_pr_numbers(new_release_logs)
+    prs = get_prs_from_pr_numbers(pr_numbers, repo)
+    categorized_pr_titles = get_changelog_categories(prs)
 
-    summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary.md')
+    summary_file = os.path.join(os.getcwd(), os.pardir, 'release_summary_copy.md')
     with open(summary_file, 'w') as out:
         out.write('## Collected release information\n')
 
