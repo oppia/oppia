@@ -9,41 +9,45 @@
       <[getHumanReadableStatus(activeThread.status)]>
     </span>
   </div>
+</div>
 
-  <hr style="clear: both">
+<hr style="clear: both">
 
-  <ol class="thread-messages" ng-if="activeThread.messages">
-    <li ng-repeat="m in activeThread.messages|orderBy:'message_id'">
+<ol class="thread-messages" ng-if="activeThread.messages">
+  <li ng-repeat="m in activeThread.messages|orderBy:'message_id'">
+    <div style="float: left">
       <span ng-if="$index !== 0">#<[m.message_id]></span>
-
       <span ng-if="m.author_username">by <strong><[m.author_username]></strong></span>
       <span ng-if="!m.author_username">(anonymously submitted)</span>
+    </div>
 
-      <span class="text-right" style="float: right">
-        <[getLocaleAbbreviatedDatetimeString(m.created_on)]>
+    <div class="text-right" style="float: right; margin-left: 2ch">
+      <[getLocaleAbbreviatedDatetimeString(m.created_on)]>
+    </div>
+
+    <div ng-if="m.message_id !== 0" style="float: right; width: 28ch">
+      <span ng-if="m.updated_status">
+        <em>Status changed to '<[getHumanReadableStatus(m.updated_status)]>'</em>
       </span>
-
-      <div style="clear: both"><[m.text]></div>
-      <span ng-if="m.message_id !== 0">
-        <span ng-if="m.updated_status">
-          <em>Status changed to '<[getHumanReadableStatus(m.updated_status)]>'.</em>
-        </span>
-        <span ng-if="m.updated_subject">
-          <em>Subject changed to '<[m.updated_subject]>'.</em>
-        </span>
+      <span ng-if="m.updated_subject">
+        <em>Subject changed to '<[m.updated_subject]>'</em>
       </span>
+    </div>
 
-      <div ng-if="activeThread.isSuggestionThread() && $index == 0">
-        <button class="btn btn-<[getSuggestionButtonType()]> protractor-test-view-suggestion-btn"
-                ng-click="showSuggestionModal()">
-          View Suggestion
-        </button>
-      </div>
-    </li>
-  </ol>
+    <div style="clear: both"><[m.text]></div>
 
-  <hr style="margin-top: 0">
+    <div ng-if="activeThread.isSuggestionThread() && $index == 0">
+      <button class="btn btn-<[getSuggestionButtonType()]> protractor-test-view-suggestion-btn"
+              ng-click="showSuggestionModal()">
+              View Suggestion
+      </button>
+    </div>
+  </li>
+</ol>
 
+<hr style="margin-top: 0">
+
+<div style="padding: 0 32px 32px 32px">
   <div ng-if="userIsLoggedIn">
     <label for="tmpMessageText">
       Add new message
@@ -56,16 +60,17 @@
               ng-disabled="messageSendingInProgress">
     </textarea>
 
-    <div style="margin-top: 12px; position: relative">
+    <div style="margin-top: 12px">
       <div ng-show="EditabilityService.isEditable() && !activeThread.isSuggestionThread()"
-           style="float: left; position: absolute; bottom: 5px">
+           style="float: left">
         Change status (optional):
         <select ng-model="tmpMessage.status"
                 ng-options="choice.id as choice.text for choice in STATUS_CHOICES"
-                ng-disabled="messageSendingInProgress">
+                ng-disabled="messageSendingInProgress"
+                style="height: 34px; border-color: #ccc">
         </select>
-        <div ng-if="!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable')">
-          <span class="material-icons">&#xE88F;</span>
+        <div style="margin: 8px 0; color: red" ng-if="!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable')">
+          <span style="font-size: 19px" class="material-icons">error_outline</span>
           Please specify a reason for setting the status to "<[getHumanReadableStatus(tmpMessage.status)]>".
         </div>
       </div>
@@ -93,12 +98,12 @@
 <style>
 ol.thread-messages {
   list-style: none;
-  padding: 0;
+  padding: 0 32px;
   margin: 0;
 }
 ol.thread-messages li {
   padding-top: 1em;
-  padding-bottom: 2em;
+  padding-bottom: 1.5em;
   border-bottom: 1px solid #eee;
 }
 ol.thread-messages li:last-child {
