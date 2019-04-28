@@ -33,7 +33,7 @@ angular.module('conversationSkinModule').directive('conversationSkin', [
             'conversation-skin-embed.directive.html') :
           UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/conversation-skin/' +
-            'conversation-skin.directive.html'); conversation-skin-embed.directive.html
+            'conversation-skin.directive.html');
       },
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
