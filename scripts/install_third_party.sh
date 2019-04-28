@@ -142,13 +142,10 @@ function pip_install {
 }
 
 echo Checking if pylint is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/pylint-1.9.3" ]; then
+if [ ! -d "$TOOLS_DIR/pylint-1.9.4" ]; then
   echo Installing Pylint
 
-  pip_install pylint==1.9.3 --target="$TOOLS_DIR/pylint-1.9.3"
-  # Add __init__.py file so that pylint dependency backports are resolved
-  # correctly.
-  touch $TOOLS_DIR/pylint-1.9.3/backports/__init__.py
+  pip_install pylint==1.9.4 --target="$TOOLS_DIR/pylint-1.9.4"
 fi
 
 echo Checking if pylint-quotes is installed in $TOOLS_DIR
@@ -182,12 +179,12 @@ fi
 
 # Install pycodestyle.
 echo Checking if pycodestyle is installed in third_party
-if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
+if [ ! -d "$TOOLS_DIR/pycodestyle-2.5.0" ]; then
   echo Installing pycodestyle
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o pycodestyle-2.3.1.tar.gz -L https://pypi.python.org/packages/e1/88/0e2cbf412bd849ea6f1af1f97882add46a374f4ba1d2aea39353609150ad/pycodestyle-2.3.1.tar.gz
-  tar xzf pycodestyle-2.3.1.tar.gz -C $TOOLS_DIR
-  rm pycodestyle-2.3.1.tar.gz
+  curl -o pycodestyle-2.5.0.tar.gz -L https://files.pythonhosted.org/packages/1c/d1/41294da5915f4cae7f4b388cea6c2cd0d6cd53039788635f6875dfe8c72f/pycodestyle-2.5.0.tar.gz
+  tar xzf pycodestyle-2.5.0.tar.gz -C $TOOLS_DIR
+  rm pycodestyle-2.5.0.tar.gz
 fi
 
 # Install esprima.

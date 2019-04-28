@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,18 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the mark_all_audio_as_needing_update modal.
+ * @fileoverview Service to set the title of the page.
  */
 
-oppia.controller('MarkAllAudioAsNeedingUpdateController', [
-  '$scope', '$uibModalInstance',
-  function($scope, $uibModalInstance) {
-    $scope.flagAll = function() {
-      $uibModalInstance.close();
-    };
+oppia.factory('PageTitleService', ['$document', function($document) {
+  var _setPageTitle = function(title) {
+    $document[0].title = title;
+  };
 
-    $scope.cancel = function() {
-      $uibModalInstance.dismiss('cancel');
-    };
-  }
-]);
+  return {
+    setPageTitle: function(title) {
+      _setPageTitle(title);
+    }
+  };
+}]);

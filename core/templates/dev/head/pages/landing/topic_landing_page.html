@@ -1,9 +1,5 @@
 {% extends 'pages/base.html' %}
 
-{% block maintitle %}
-  Fractions
-{% endblock maintitle %}
-
 {% block content %}
   <div ng-controller="TopicLandingPage">
     <div class="oppia-landing-section text-center" style="background-color: #afd2eb">
@@ -489,7 +485,8 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/pages/landing/TopicLandingPage.js"></script>
-  <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
   <script src="/templates/dev/head/filters/CapitalizeFilter.js"></script>
+  <script src="/templates/dev/head/pages/landing/TopicLandingPage.js"></script>
+  <script src="/templates/dev/head/services/PageTitleService.js"></script>
+  <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
 {% endblock footer_js %}

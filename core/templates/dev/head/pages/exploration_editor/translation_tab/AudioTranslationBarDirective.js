@@ -74,7 +74,7 @@ oppia.directive('audioTranslationBar', [
             $filter, $rootScope, $scope, $timeout, $uibModal,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
-            IdGenerationService , SiteAnalyticsService,
+            IdGenerationService, SiteAnalyticsService,
             StateContentIdsToAudioTranslationsService,
             StateEditorService, TranslationLanguageService,
             recorderService, TranslationTabActiveContentIdService,
@@ -96,6 +96,13 @@ oppia.directive('audioTranslationBar', [
           $scope.checkingMicrophonePermission = false;
           $scope.audioTimerIsShown = true;
           $scope.audioIsCurrentlyBeingSaved = false;
+          document.body.onkeyup = function(e) {
+            if (e.keyCode === 82 && !$scope.isAudioAvailable) {
+              // 82 belongs to the keycode for 'R'
+              // Used as shortcut key for recording
+              toggleStartAndStopRecording();
+            }
+          };
 
           var saveContentIdsToAudioTranslationChanges = function() {
             StateContentIdsToAudioTranslationsService.saveDisplayedValue();
@@ -243,6 +250,17 @@ oppia.directive('audioTranslationBar', [
               $scope.initAudioBar();
             });
           };
+          var toggleStartAndStopRecording = function() {
+            if ($scope.isAudioAvailable) {
+              return;
+            }
+
+            if (!$scope.recorder.status.isRecording && !$scope.audioBlob) {
+              $scope.checkAndStartRecording();
+            } else {
+              $scope.recorder.stopRecord();
+            }
+          };
 
           $scope.$on('externalSave', function() {
             if ($scope.recorder && $scope.recorder.status.isPlaying) {
@@ -257,6 +275,9 @@ oppia.directive('audioTranslationBar', [
           });
 
           $scope.$on('activeContentIdChanged', function() {
+            $scope.initAudioBar();
+          });
+          $scope.$on('activeLanguageChanged', function() {
             $scope.initAudioBar();
           });
 

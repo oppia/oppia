@@ -30,15 +30,19 @@ describe('WrittenTranslation object factory', function() {
       });
     }));
 
-    it('should set and get html value correctly',
-      function() {
-        expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
-          html: '<p>HTML</p>',
-          needs_update: false
-        }));
-        writtenTranslation.markAsNeedingUpdate();
-        expect(writtenTranslation.getHtml()).toEqual('<p>HTML</p>');
-      });
+    it('should set and get html value correctly', function() {
+      expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+        html: '<p>HTML</p>',
+        needs_update: false
+      }));
+      expect(writtenTranslation.getHtml()).toEqual('<p>HTML</p>');
+      writtenTranslation.setHtml('<p>New HTML</p>');
+      expect(writtenTranslation.getHtml()).toEqual('<p>New HTML</p>');
+      expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+        html: '<p>New HTML</p>',
+        needs_update: false
+      }));
+    });
 
     it('should correctly mark written translation as needing update',
       function() {

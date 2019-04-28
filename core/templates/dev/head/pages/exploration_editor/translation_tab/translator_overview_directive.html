@@ -1,24 +1,59 @@
 <div class="oppia-translator-overview">
-  <div id="tutorialTranslationLanguage">
-    <span style="font-size: 16px;">
-      <strong>Translation in language:</strong>
-    </span>
-    <select id="audioTranslationLanguageCodeField" class="oppia-translation-language-selector protractor-test-translation-language-selector" ng-change="changeTranslationLanguage()" ng-model="languageCode"
-            ng-options="language.id as language.description for language in languageCodesAndDescriptions">
-    </select>
+  <div class="oppia-language-selector-section">
+    <div id="tutorialTranslationLanguage">
+      <span style="font-size: 16px;">
+        <strong>
+          <span ng-if="inVoiceoverMode"><[VOICEOVER_MODE]> </span>
+          <span ng-if="inTranslationMode"><[TRANSLATION_MODE]></span> in language:
+        </strong>
+      </span>
+      <select id="audioTranslationLanguageCodeField" class="oppia-translation-language-selector protractor-test-translation-language-selector" ng-change="changeTranslationLanguage()" ng-model="languageCode"
+              ng-options="language.id as language.description for language in languageCodesAndDescriptions">
+      </select>
+    </div>
+    <div ng-if="canShowTabModeSwitcher()" class="oppia-mode-change-section">
+      <i class="oppia-new-mode-feature-text">New!</i>
+      <label class="oppia-mode-change-label">Mode: </label>
+      <button class="oppia-translation-tab-mode-changer oppia-translation-mode"
+              uib-tooltip="Translation mode" tooltip-placement="bottom"
+              ng-class="{'oppia-active-mode' : inTranslationMode}"
+              ng-click="changeActiveMode(TRANSLATION_MODE)">
+        <i class="material-icons md-18">translate</i>
+      </button>
+      <button class="oppia-translation-tab-mode-changer oppia-voiceover-mode"
+              uib-tooltip="Voiceover mode" tooltip-placement="bottom"
+              ng-class="{'oppia-active-mode' : inVoiceoverMode}"
+              ng-click="changeActiveMode(VOICEOVER_MODE)">
+        <i class="material-icons md-18">record_voice_over</i>
+      </button>
+      <img ng-if="canShowModeSwitchHelperImage()" class="oppia-mode-switcher-guide" ng-src="<[getStaticImageUrl('/icons/translation_tab_mode_switch.png')]>" alt="">
+    </div>
   </div>
   <div class="oppia-translation-progress">
     <div class="oppia-progress-info">
-      <strong>Exploration translation progress:</strong>
+      <strong>Exploration <[inVoiceoverMode ? 'voiceover' : 'translation']> progress:</strong>
     </div>
     <div class="progress oppia-translation-progess-bar">
       <div class="progress-bar progress-bar-success" role="progressbar" ng-style="getTranslationProgressStyle()"></div>
     </div>
-    <span class="oppia-numerical-progress-status protractor-test-translation-numerical-status">(<[numberOfRequiredAudio - numberOfAudioNotAvailable]>/<[numberOfRequiredAudio]>)</span>
+    <span aria-label="<[getTranslationProgressAriaLabel()]>" role="status" class="oppia-numerical-progress-status protractor-test-translation-numerical-status">(<[numberOfRequiredAudio - numberOfAudioNotAvailable]>/<[numberOfRequiredAudio]>)</span>
   </div>
 </div>
 
 <style>
+  .oppia-mode-switcher-guide {
+    position: absolute;
+    right: 25px;
+    top: 30px;
+  }
+  .oppia-new-mode-feature-text {
+    bottom: 16px;
+    color: red;
+    font-size: 12px;
+    left: -8px;
+    position: absolute;
+    transform: rotate(-30deg);
+  }
   .oppia-translator-overview {
     height: 45px;
     margin: 0 auto;
@@ -48,10 +83,40 @@
     border-radius: 8px;
     padding: 2px;
   }
+  .oppia-language-selector-section {
+    margin: 0 auto;
+  }
   .oppia-numerical-progress-status {
     font-size: 12px;
     padding-left: 2px;
     padding-top: 2px;
+  }
+  .oppia-translation-mode {
+    border-radius: 15px 0 0 15px;
+  }
+  .oppia-voiceover-mode {
+    border-radius: 0 15px 15px 0;
+  }
+  .oppia-translation-tab-mode-changer {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: inset -1px -2px 5px 0px grey;
+    height: 25px;
+    width: 50px;
+  }
+  .oppia-mode-change-section {
+    display: flex;
+    position: absolute;
+    right: -20px;
+    top: 65px;
+    width: 200px;
+  }
+  .oppia-active-mode {
+    box-shadow: inset 3px 2px 5px 0px grey;
+    color: #1a73e8;
+  }
+  .oppia-mode-change-label {
+    margin: 3px 8px;
   }
   /* Firefox rules */
   @-moz-document url-prefix() {
