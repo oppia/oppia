@@ -66,7 +66,9 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
 
     /** @returns {string} - A concise summary of the card. */
     FeedbackImprovementCard.prototype.getTitle = function() {
-      return 'Feedback Thread: ' + this._feedbackThread.subject;
+      var threadType = this._feedbackThread.isSuggestionThread() ?
+        'Suggestion Thread' : 'Feedback Thread';
+      return threadType + ': ' + this._feedbackThread.subject;
     };
 
     /** @returns {string} - The directive type used to render the card. */
