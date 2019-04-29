@@ -1167,7 +1167,7 @@ def compile_typescript_files(project_dir):
             to be compiled.
     """
     print 'Compiling ts files...'
-    cmd = ['../node_modules/typescript/bin/tsc', '--project', project_dir]
+    cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
     subprocess.check_call(cmd)
 
 
@@ -1180,13 +1180,13 @@ def compile_typescript_files_continuously(project_dir):
             to be compiled.
     """
     kill_cmd = (
-        'kill `ps aux | grep "[.]./node_modules/typescript/bin/tsc --project . '
+        'kill `ps aux | grep "node_modules/typescript/bin/tsc --project . '
         '--watch" | awk \'{print $2}\'`'
     )
     subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
     print 'Compiling ts files in watch mode...'
     cmd = [
-        '../node_modules/typescript/bin/tsc', '--project', project_dir,
+        './node_modules/typescript/bin/tsc', '--project', project_dir,
         '--watch']
 
     with open('tsc_output_log.txt', 'w') as out:
