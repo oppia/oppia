@@ -106,7 +106,6 @@ class TopicEditorQuestionHandler(base.BaseHandler):
         """Handles GET requests."""
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
-        start_cursor = self.request.get('cursor')
         topic = topic_services.get_topic_by_id(topic_id)
         skill_ids = topic.get_all_skill_ids()
 

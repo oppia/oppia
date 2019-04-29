@@ -246,10 +246,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_all_question_ids_and_skill_descriptions(cls, skill_ids):
-        """Fetches question ids and skill descriptions linked to a list of 
+        """Fetches question ids and skill descriptions linked to a list of
         skill ids.
 
-        Args: 
+        Args:
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
 
@@ -257,8 +257,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             list(str), list(list(str)). The id of questions which are linked
                 to skill ids in the list, the corresponding skill descriptions.
         """
-        question_skill_link_models = cls.query(cls.skill_id.IN(skill_ids)
-            ).order(-cls.last_updated, cls.key)
+        question_skill_link_models = cls.query(cls.skill_id.IN(skill_ids))
+            .order(-cls.last_updated, cls.key)
 
         question_ids = []
         skill_ids = []
@@ -270,8 +270,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 skill_ids[-1].append(model.skill_id)
 
         skill_descriptions = [
-            [skill_models.SkillModel.get(skill_id).description 
-                for skill_id in skills_for_the_same_question]
+            [skill_models.SkillModel.get(skill_id).description
+             for skill_id in skills_for_the_same_question]
             for skills_for_the_same_question in skill_ids
         ]
         return question_ids, skill_descriptions
