@@ -296,20 +296,20 @@ def _install_hook():
 
 
 def does_diff_include_ts_files(files_to_lint):
-    """Returns true if diff includes JS files.
+    """Returns true if diff includes TS files.
 
     Args:
         files_to_lint: list(str). List of files to be linted.
 
     Returns:
-        bool. Status of JS files in diff.
+        bool. Status of TS files in diff.
     """
 
-    js_files_to_check = [
+    ts_files_to_check = [
         filename for filename in files_to_lint if
         filename.endswith('.ts')]
 
-    return bool(js_files_to_check)
+    return bool(ts_files_to_check)
 
 
 def main():
