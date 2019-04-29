@@ -183,6 +183,86 @@ var ExplorationEditorTranslationTab = function() {
     return nodeElement.element(by.css('.protractor-test-node-label'));
   };
 
+
+  var languageSelectorLabelElement = element(
+    by.css('.protractor-test-language-selector-label'));
+  var progressBarLabelElement = element(
+    by.css('.protractor-test-progress-info'));
+  var translationModeButton = element(
+    by.css('.protractor-test-translation-mode'));
+  var voiceoverModeButton = element(by.css('.protractor-test-voiceover-mode'));
+
+  var saveTranslationButton = element(
+    by.css('protractor-test-save-translation'));
+  var editTranslation = element(
+    by.css('.protractor-test-edit-translation'));
+  var translationDisplay = element(
+    by.css('.protractor-test-translation-display'));
+
+  this.setTranslation = function(richTextInstructions) {
+    waitFor.elementToBeClickable(
+      editTranslation,
+      'editTranslation taking too long to appear to set content');
+    editTranslation.click();
+    var stateTranslationEditorTag = element(
+      by.tagName('state-translation-editor'));
+    var stateTranslationEditor = stateTranslationEditorTag.element(
+      by.css('.protractor-test-state-translation-editor'));
+    waitFor.visibilityOf(
+      stateTranslationEditor,
+      'stateTranslationEditor taking too long to appear to set content');
+    var richTextEditor = forms.RichTextEditor(stateTranslationEditor);
+    richTextEditor.clear();
+    richTextInstructions(richTextEditor);
+    expect(saveTranslationButton.isDisplayed()).toBe(true);
+    saveTranslationButton.click();
+    waitFor.invisibilityOf(
+      saveTranslationButton,
+      'State translation editor takes too long to disappear');
+  };
+
+  this.expectTranslationToMatch = function(richTextInstructions) {
+    forms.expectRichText(translationDisplay).toMatch(richTextInstructions);
+  };
+
+  this.switchToVoiceoverMode = function() {
+    waitFor.elementToBeClickable(
+      voiceoverModeButton,
+      'Translation Mode switch is taking too long to appear');
+    voiceoverModeButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.switchToTranslationMode = function() {
+    waitFor.elementToBeClickable(
+      translationModeButton,
+      'Translation Mode switch is taking too long to appear');
+    translationModeButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.expectToBeInTranslationMode = function() {
+    expect(languageSelectorLabelElement.getText()).toBe(
+      'Translate in language:');
+    expect(progressBarLabelElement.getText()).toBe(
+      'Exploration translation progress:');
+    expect(translationModeButton.getAttribute('class')).toMatch(
+      'oppia-active-mode');
+    expect(voiceoverModeButton.getAttribute('class')).not.toMatch(
+      'oppia-active-mode');
+  };
+
+  this.expectToBeInVoiceoverMode = function() {
+    expect(languageSelectorLabelElement.getText()).toBe(
+      'Voiceover in language:');
+    expect(progressBarLabelElement.getText()).toBe(
+      'Exploration voiceover progress:');
+    expect(translationModeButton.getAttribute('class')).not.toMatch(
+      'oppia-active-mode');
+    expect(voiceoverModeButton.getAttribute('class')).toMatch(
+      'oppia-active-mode');
+  };
+
   this.expectSaveUploadedAudioButtonToBeDisabled = function() {
     expect(saveUploadedAudioButton.getAttribute('disabled')).toBe('true');
   };
