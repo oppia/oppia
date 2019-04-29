@@ -95,14 +95,15 @@
     </div>
   </div>
   <div ng-if="!userIsLoggedIn">
-    <em>To respond to a feedback thread, please log in.</em>
-    <div class="text-right">
+    <em style="float: left; padding: 6px 0">To respond to a feedback thread, please log in.</em>
+    <div style="float: right">
       <button ng-click="close()" ng-disabled="messageSendingInProgress"
               class="btn btn-default protractor-test-oppia-feedback-response-close-btn"
               style="margin-right: 0">
         Close
       </button>
     </div>
+    <div style="clear: both"></div>
   </div>
 </div>
 
