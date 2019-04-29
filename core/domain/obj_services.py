@@ -44,8 +44,9 @@ class Registry(object):
 
             ancestor_names = [
                 base_class.__name__ for base_class in inspect.getmro(clazz)]
-            if 'BaseObject' in ancestor_names:
-                cls.objects_dict[clazz.__name__] = clazz
+
+            assert 'BaseObject' in ancestor_names
+            cls.objects_dict[clazz.__name__] = clazz
 
     @classmethod
     def get_all_object_classes(cls):
