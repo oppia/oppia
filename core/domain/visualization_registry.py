@@ -57,7 +57,7 @@ class Registry(object):
                 'OppiaVisualization%sDirective.js' % (visualization_class))
             js_directives += (
                 utils.get_file_contents(os.path.join(
-                    feconf.VISUALIZATIONS_DIR, filename)))
+                    feconf.VISUALIZATIONS_DIR_FOR_JS, filename)))
 
         return '<script>%s</script>\n' % (js_directives)
 
