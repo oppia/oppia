@@ -28,7 +28,6 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
     var FeedbackImprovementCard = function(feedbackThread) {
       var card = this;
       var openReviewThreadModal = function() {
-        ThreadDataService.markThreadAsSeen(feedbackThread.threadId);
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/review_feedback_thread_modal_directive.html'),
@@ -38,7 +37,11 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
             },
             userIsLoggedIn: function() {
               return UserService.getUserInfoAsync().then(function(userInfo) {
-                return userInfo.isLoggedIn();
+                var isUserLoggedIn = userInfo.isLoggedIn();
+                if (isUserLoggedIn) {
+                  ThreadDataService.markThreadAsSeen(feedbackThread.threadId);
+                }
+                return isUserLoggedIn;
               });
             },
           },

@@ -26,14 +26,21 @@ oppia.directive('improvementsTab', [
         '/pages/exploration_editor/improvements_tab/' +
         'improvements_tab_directive.html'),
       controller: [
-        '$scope', 'ImprovementCardService',
-        function($scope, ImprovementCardService) {
+        '$q', '$scope', 'ImprovementCardService', 'UserService',
+        'FEEDBACK_IMPROVEMENT_CARD_TYPE',
+        function(
+            $q, $scope, ImprovementCardService, UserService,
+            FEEDBACK_IMPROVEMENT_CARD_TYPE) {
           var cards = [];
           var refreshCards = function() {
-            ImprovementCardService.fetchCards().then(function(freshCards) {
-              $scope.$apply(function() {
-                cards = freshCards;
-              });
+            $q.all([
+              UserService.getUserInfoAsync(),
+              ImprovementCardService.fetchCards(),
+            ]).then(function(results) {
+              var userInfo = results[0];
+              var freshCards = results[1];
+              cardView = userInfo.isLoggedIn() ? 'open' : 'open_feedback';
+              cards = freshCards;
             });
           };
 
@@ -45,6 +52,11 @@ oppia.directive('improvementsTab', [
             },
             all: function() {
               return true;
+            },
+            open_feedback: function(card) {
+              return (
+                card.isOpen() &&
+                card.getDirectiveType() === FEEDBACK_IMPROVEMENT_CARD_TYPE);
             },
           };
 
@@ -59,7 +71,11 @@ oppia.directive('improvementsTab', [
             return cardViewFilters[cardView](card);
           };
           $scope.getOpenCardCount = function() {
-            return cards.filter(cardViewFilters.open).length;
+            if (cardView.startsWith('open')) {
+              return cards.filter(cardViewFilters[cardView]).length;
+            } else {
+              return cards.filter(cardViewFilters.open).length;
+            }
           };
         }
       ],
