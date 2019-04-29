@@ -109,7 +109,7 @@ oppia.factory('SkillEditorStateService', [
       },
 
       fetchQuestionSummaries: function(skillId, resetHistory) {
-        EditableTopicBackendApiService.fetchQuestions(skillId).then(
+        EditableSkillBackendApiService.fetchQuestions(skillId).then(
           function(returnObject) {
             _setQuestionSummaries(returnObject.questionSummaries);
           }
