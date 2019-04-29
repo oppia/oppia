@@ -126,11 +126,15 @@ def _get_remote_name():
     if not remote_num:
         raise Exception(
             'Error: Please set upstream for the lint checks to run '
-            'efficiently. Go through the step 3 here to set your '
-            'upstream -> https://github.com/oppia/oppia/wiki/'
-            'Contributing-code-to-Oppia#setting-things-up\n'
-            'To learn more about it, go through this link -> '
-            'https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches\n')
+            'efficiently. To do that follow these steps:\n'
+            '1. Run the command \'git remote\'\n'
+            '2a. If upstream is listed in the command output, then run the '
+            'command \'git remote set-url upstream '
+            'https://github.com/oppia/oppia.git\'\n'
+            '2b. If upstream is not listed in the command output, then run the '
+            'command \'git remote add upstream '
+            'https://github.com/oppia/oppia.git\'\n'
+        )
     elif remote_num > 1:
         print ('Warning: Please keep only one remote branch for oppia:develop '
                'to run the lint checks efficiently.\n')
