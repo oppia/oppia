@@ -154,53 +154,50 @@ describe('Editable question backend API service', function() {
 
   it('should use the rejection handler if the question to update ' +
      'doesn\'t exist', function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      // Loading a question the first time should fetch it from the backend.
-      $httpBackend.expect('PUT', '/question_editor_handler/data/1').respond(
-        404, 'Question with given id doesn\'t exist.');
+    // Loading a question the first time should fetch it from the backend.
+    $httpBackend.expect('PUT', '/question_editor_handler/data/1').respond(
+      404, 'Question with given id doesn\'t exist.');
 
-      EditableQuestionBackendApiService.updateQuestion(
-        '1', '1', 'Update an invalid question.', []
-      ).then(successHandler, failHandler);
-      $httpBackend.flush();
+    EditableQuestionBackendApiService.updateQuestion(
+      '1', '1', 'Update an invalid question.', []
+    ).then(successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'Question with given id doesn\'t exist.');
-    }
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Question with given id doesn\'t exist.');
+  });
 
   it('should add question skill link if skill exists', function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('POST', '/manage_question_skill_link/0/1').respond();
-      EditableQuestionBackendApiService.addQuestionSkillLink('0', '1').then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+    $httpBackend.expect('POST', '/manage_question_skill_link/0/1').respond();
+    EditableQuestionBackendApiService.addQuestionSkillLink('0', '1').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
 
   it('should fail to add question skill link if skill does not exist',
     function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('POST', '/manage_question_skill_link/0/1').respond(
-        404, 'The skill with the given id doesn\'t exist.');
+    $httpBackend.expect('POST', '/manage_question_skill_link/0/1').respond(
+      404, 'The skill with the given id doesn\'t exist.');
 
-      EditableQuestionBackendApiService.addQuestionSkillLink('0', '1').then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+    EditableQuestionBackendApiService.addQuestionSkillLink('0', '1').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'The skill with the given id doesn\'t exist.');
-    }
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'The skill with the given id doesn\'t exist.');
+  });
 });
