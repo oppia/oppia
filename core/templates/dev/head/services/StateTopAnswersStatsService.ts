@@ -41,7 +41,7 @@ oppia.factory('StateTopAnswersStatsService', [
      * @param {string} stateName
      */
     var refreshAddressedInfo = function(stateName) {
-      if (stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
+      if (!stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
         return;
       }
 
