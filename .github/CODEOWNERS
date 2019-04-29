@@ -14,7 +14,6 @@
 # Angular Migration team
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
-/globals.d.ts @ankita240796
 
 
 # Answer classification team.
@@ -297,7 +296,7 @@
 /main.py @seanlip @nithusha21
 /feconf.py @seanlip @nithusha21
 /constants*.py @seanlip @nithusha21
-/assets/constants.ts @seanlip @nithusha21
+/assets/constants.js @seanlip @nithusha21
 /core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/email*.py @aks681
@@ -347,7 +346,7 @@
 /core/templates/dev/head/services/AutoplayedVideosService*.ts @AllanYangZhou @bansalnitish
 /core/templates/dev/head/services/RteHelperService*.ts @AllanYangZhou @bansalnitish
 /extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
-/assets/rich_text_components_definitions.ts @AllanYangZhou @bansalnitish
+/assets/rich_text_components_definitions.js @AllanYangZhou @bansalnitish
 
 
 # Suggestion and feedback team.
@@ -394,7 +393,7 @@
 /core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
-/gulpfile.ts @vojtechjelinek
+/gulpfile.js @vojtechjelinek
 /jinja_utils*.py @vojtechjelinek
 
 
