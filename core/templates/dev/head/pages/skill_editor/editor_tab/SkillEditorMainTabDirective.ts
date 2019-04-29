@@ -16,12 +16,12 @@
  * @fileoverview Controller for the main tab of the skill editor.
  */
 
-require('pages/skill_editor/editor_tab/SkillDescriptionEditorDirective.js');
-require('pages/skill_editor/editor_tab/SkillConceptCardEditorDirective.js');
-require('pages/skill_editor/editor_tab/SkillMisconceptionsEditorDirective.js');
+require('pages/skill_editor/editor_tab/SkillDescriptionEditorDirective.ts');
+require('pages/skill_editor/editor_tab/SkillConceptCardEditorDirective.ts');
+require('pages/skill_editor/editor_tab/SkillMisconceptionsEditorDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/skill_editor/SkillEditorStateService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/skill_editor/SkillEditorStateService.ts');
 
 oppia.directive('skillEditorMainTab', [
   'SkillEditorStateService', 'UrlInterpolationService',

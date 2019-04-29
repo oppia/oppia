@@ -17,7 +17,7 @@
  * story node domain objects.
  */
 
-require('pages/story_editor/StoryEditor.js');
+require('pages/story_editor/StoryEditor.ts');
 
 oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
   function(NODE_ID_PREFIX) {

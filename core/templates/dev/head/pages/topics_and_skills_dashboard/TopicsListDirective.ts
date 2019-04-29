@@ -16,9 +16,9 @@
  * @fileoverview Controller for the topics list viewer.
  */
 
-require('domain/topic/EditableTopicBackendApiService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('services/AlertsService.js');
+require('domain/topic/EditableTopicBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
 
 oppia.directive('topicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {

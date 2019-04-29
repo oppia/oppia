@@ -16,7 +16,7 @@
  * @fileoverview Service to send changes to a story to the backend.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.constant(
   'EDITABLE_STORY_DATA_URL_TEMPLATE',

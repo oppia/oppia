@@ -16,30 +16,30 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-require('domain/collection/GuestCollectionProgressService.js');
-require('domain/exploration/EditableExplorationBackendApiService.js');
-require('domain/exploration/ExplorationObjectFactory.js');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.js');
-require('domain/state_card/StateCardObjectFactory.js');
-require('domain/utilities/LanguageUtilService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('expressions/ExpressionInterpolationService.js');
-require('pages/exploration_player/AnswerClassificationService.js');
-require('pages/exploration_player/AudioPreloaderService.js');
-require('pages/exploration_player/AudioTranslationLanguageService.js');
-require('pages/exploration_player/ImagePreloaderService.js');
-require('pages/exploration_player/LearnerParamsService.js');
-require('pages/exploration_player/NumberAttemptsService.js');
-require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.js');
-require('pages/exploration_player/PlayerTranscriptService.js');
-require('pages/exploration_player/StateClassifierMappingService.js');
-require('pages/exploration_player/StatsReportingService.js');
-require('services/AlertsService.js');
-require('services/ContextService.js');
-require('services/ExplorationHtmlFormatterService.js');
-require('services/UserService.js');
-require('services/contextual/WindowDimensionsService.js');
-require('services/stateful/FocusManagerService.js');
+require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/ExplorationObjectFactory.ts');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/state_card/StateCardObjectFactory.ts');
+require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('expressions/ExpressionInterpolationService.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require('pages/exploration_player/AudioPreloaderService.ts');
+require('pages/exploration_player/AudioTranslationLanguageService.ts');
+require('pages/exploration_player/ImagePreloaderService.ts');
+require('pages/exploration_player/LearnerParamsService.ts');
+require('pages/exploration_player/NumberAttemptsService.ts');
+require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('pages/exploration_player/StateClassifierMappingService.ts');
+require('pages/exploration_player/StatsReportingService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/UserService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/stateful/FocusManagerService.ts');
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 

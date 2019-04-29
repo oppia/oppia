@@ -17,7 +17,7 @@
  * is in production mode.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('adminProdModeActivitiesTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

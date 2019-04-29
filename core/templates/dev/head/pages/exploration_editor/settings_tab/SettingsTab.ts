@@ -16,27 +16,27 @@
  * @fileoverview Controllers for the exploration settings tab.
  */
 
-require('domain/exploration/EditableExplorationBackendApiService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/ChangeListService.js');
-require('pages/exploration_editor/ExplorationAutomaticTextToSpeechService.js');
-require('pages/exploration_editor/ExplorationCategoryService.js');
-require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.js');
-require('pages/exploration_editor/ExplorationDataService.js');
-require('pages/exploration_editor/ExplorationEditor.js');
-require('pages/exploration_editor/ExplorationInitStateNameService.js');
-require('pages/exploration_editor/ExplorationLanguageCodeService.js');
-require('pages/exploration_editor/ExplorationObjectiveService.js');
-require('pages/exploration_editor/ExplorationParamChangesService.js');
-require('pages/exploration_editor/ExplorationParamSpecsService.js');
-require('pages/exploration_editor/ExplorationRightsService.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/ExplorationTagsService.js');
-require('pages/exploration_editor/ExplorationTitleService.js');
-require('pages/exploration_editor/ExplorationWarningsService.js');
-require('pages/exploration_editor/UserEmailPreferencesService.js');
-require('services/AlertsService.js');
-require('services/ExplorationFeaturesService.js');
+require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationAutomaticTextToSpeechService.ts');
+require('pages/exploration_editor/ExplorationCategoryService.ts');
+require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationEditor.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationLanguageCodeService.ts');
+require('pages/exploration_editor/ExplorationObjectiveService.ts');
+require('pages/exploration_editor/ExplorationParamChangesService.ts');
+require('pages/exploration_editor/ExplorationParamSpecsService.ts');
+require('pages/exploration_editor/ExplorationRightsService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/ExplorationTagsService.ts');
+require('pages/exploration_editor/ExplorationTitleService.ts');
+require('pages/exploration_editor/ExplorationWarningsService.ts');
+require('pages/exploration_editor/UserEmailPreferencesService.ts');
+require('services/AlertsService.ts');
+require('services/ExplorationFeaturesService.ts');
 
 oppia.controller('SettingsTab', [
   '$http', '$rootScope', '$scope', '$uibModal', '$window', 'AlertsService',

@@ -16,14 +16,14 @@
  * @fileoverview Utility service for the pretests for an exploration.
  */
 
-require('domain/question/QuestionObjectFactory.js');
-require('domain/state_card/StateCardObjectFactory.js');
-require('expressions/ExpressionInterpolationService.js');
-require('pages/exploration_player/AnswerClassificationService.js');
-require('services/AlertsService.js');
-require('services/ContextService.js');
-require('services/ExplorationHtmlFormatterService.js');
-require('services/stateful/FocusManagerService.js');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/state_card/StateCardObjectFactory.ts');
+require('expressions/ExpressionInterpolationService.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/stateful/FocusManagerService.ts');
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 

@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-require('pages/exploration_editor/ParameterMetadataService.js');
+require('pages/exploration_editor/ParameterMetadataService.ts');
 
 oppia.factory('ParamMetadataObjectFactory', [
   'PARAM_ACTION_GET', 'PARAM_ACTION_SET',

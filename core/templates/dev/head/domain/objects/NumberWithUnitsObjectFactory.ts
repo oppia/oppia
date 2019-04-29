@@ -17,8 +17,8 @@
  * domain objects.
  */
 
-require('domain/objects/FractionObjectFactory.js');
-require('domain/objects/UnitsObjectFactory.js');
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/objects/UnitsObjectFactory.ts');
 
 oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
   INVALID_VALUE:

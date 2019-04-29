@@ -17,7 +17,7 @@
  * exploration.
  */
 
-require('pages/exploration_editor/ExplorationPropertyService.js');
+require('pages/exploration_editor/ExplorationPropertyService.ts');
 
 oppia.factory('ExplorationCorrectnessFeedbackService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {

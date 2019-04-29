@@ -16,7 +16,7 @@
  * @fileoverview Utility service for saving data locally on the client machine.
  */
 
-require('domain/exploration/ExplorationDraftObjectFactory.js');
+require('domain/exploration/ExplorationDraftObjectFactory.ts');
 
 // Service for saving exploration draft changes to local storage.
 //

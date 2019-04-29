@@ -16,8 +16,8 @@
  * @fileoverview Directive for the miscellaneous tab in the admin panel.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/admin/AdminTaskManagerService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/admin/AdminTaskManagerService.ts');
 
 oppia.directive('adminMiscTab', [
   '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',

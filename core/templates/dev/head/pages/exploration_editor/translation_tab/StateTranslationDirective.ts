@@ -15,22 +15,22 @@
 /**
  * @fileoverview Directive containing the exploration material to be translated.
  */
-require('components/state/ResponseHeaderDirective.js');
-require('pages/exploration_editor/translation_tab/AudioTranslationBarDirective.js');
-require('pages/exploration_editor/translation_tab/StateTranslationEditorDirective.js');
+require('components/state/ResponseHeaderDirective.ts');
+require('pages/exploration_editor/translation_tab/AudioTranslationBarDirective.ts');
+require('pages/exploration_editor/translation_tab/StateTranslationEditorDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('filters/ConvertToPlainTextFilter.js');
-require('filters/ParameterizeRuleDescriptionFilter.js');
-require('filters/TruncateFilter.js');
-require('filters/WrapTextWithEllipsisFilter.js');
-require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.js');
-require('pages/exploration_editor/ExplorationInitStateNameService.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/RouterService.js');
-require('pages/exploration_editor/translation_tab/TranslationStatusService.js');
-require('pages/exploration_editor/translation_tab/TranslationTabActiveContentIdService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/ConvertToPlainTextFilter.ts');
+require('filters/ParameterizeRuleDescriptionFilter.ts');
+require('filters/TruncateFilter.ts');
+require('filters/WrapTextWithEllipsisFilter.ts');
+require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
+require('pages/exploration_editor/translation_tab/TranslationTabActiveContentIdService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
 
 oppia.directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {

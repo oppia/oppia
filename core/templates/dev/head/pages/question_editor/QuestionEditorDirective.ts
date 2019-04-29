@@ -16,19 +16,19 @@
  * @fileoverview Controller for the questions editor directive.
  */
 
-require('pages/state_editor/StateEditorDirective.js');
+require('pages/state_editor/StateEditorDirective.ts');
 
-require('components/QuestionCreationService.js');
-require('domain/question/EditableQuestionBackendApiService.js');
-require('domain/question/QuestionObjectFactory.js');
-require('domain/question/QuestionUpdateService.js');
-require('pages/exploration_editor/editor_tab/ResponsesService.js');
-require('pages/exploration_editor/editor_tab/SolutionValidityService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('pages/topic_editor/TopicEditorStateService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('services/AlertsService.js');
-require('services/EditabilityService.js');
+require('components/QuestionCreationService.ts');
+require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/question/QuestionUpdateService.ts');
+require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/topic_editor/TopicEditorStateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 

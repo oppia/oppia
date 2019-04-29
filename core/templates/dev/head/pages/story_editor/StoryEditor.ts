@@ -16,63 +16,63 @@
  * @fileoverview Primary controller for the story editor page.
  */
 
-require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.js');
-require('components/forms/ConvertHtmlToUnicodeFilter.js');
-require('components/forms/ConvertUnicodeToHtmlFilter.js');
-require('components/forms/validators/IsAtLeastFilter.js');
-require('components/forms/validators/IsAtMostFilter.js');
-require('components/forms/validators/IsFloatFilter.js');
-require('components/forms/validators/IsIntegerFilter.js');
-require('components/forms/validators/IsNonemptyFilter.js');
-require('components/forms/ApplyValidationDirective.js');
-require('components/forms/RequireIsFloatDirective.js');
-require('directives/AngularHtmlBindDirective.js');
-require('directives/MathjaxBindDirective.js');
+require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
+require('components/forms/ConvertHtmlToUnicodeFilter.ts');
+require('components/forms/ConvertUnicodeToHtmlFilter.ts');
+require('components/forms/validators/IsAtLeastFilter.ts');
+require('components/forms/validators/IsAtMostFilter.ts');
+require('components/forms/validators/IsFloatFilter.ts');
+require('components/forms/validators/IsIntegerFilter.ts');
+require('components/forms/validators/IsNonemptyFilter.ts');
+require('components/forms/ApplyValidationDirective.ts');
+require('components/forms/RequireIsFloatDirective.ts');
+require('directives/AngularHtmlBindDirective.ts');
+require('directives/MathjaxBindDirective.ts');
 
-require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedDictEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedIntEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedListEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js');
-require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js');
-require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.js');
-require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js');
-require('components/forms/schema_viewers/SchemaBasedListViewerDirective.js');
-require('components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js');
-require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js');
-require('components/forms/schema_viewers/SchemaBasedViewerDirective.js');
+require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
 
-require('services/HtmlEscaperService.js');
-require('services/IdGenerationService.js');
-require('services/RteHelperService.js');
-require('services/SchemaDefaultValueService.js');
-require('services/SchemaUndefinedLastElementService.js');
-require('services/NestedDirectivesRecursionTimeoutPreventionService.js');
-require('services/GenerateContentIdService.js');
-require('components/loading/LoadingDotsDirective.js');
+require('services/HtmlEscaperService.ts');
+require('services/IdGenerationService.ts');
+require('services/RteHelperService.ts');
+require('services/SchemaDefaultValueService.ts');
+require('services/SchemaUndefinedLastElementService.ts');
+require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
+require('services/GenerateContentIdService.ts');
+require('components/loading/LoadingDotsDirective.ts');
 
-require('domain/editor/undo_redo/ChangeObjectFactory.js');
-require('domain/editor/undo_redo/UndoRedoService.js');
-require('domain/editor/undo_redo/QuestionUndoRedoService.js');
-require('domain/editor/undo_redo/BaseUndoRedoService.js');
-require('domain/story/EditableStoryBackendApiService.js');
-require('domain/story/StoryObjectFactory.js');
-require('domain/story/StoryContentsObjectFactory.js');
-require('domain/story/StoryNodeObjectFactory.js');
-require('domain/story/StoryUpdateService.js');
+require('domain/editor/undo_redo/ChangeObjectFactory.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
+require('domain/editor/undo_redo/BaseUndoRedoService.ts');
+require('domain/story/EditableStoryBackendApiService.ts');
+require('domain/story/StoryObjectFactory.ts');
+require('domain/story/StoryContentsObjectFactory.ts');
+require('domain/story/StoryNodeObjectFactory.ts');
+require('domain/story/StoryUpdateService.ts');
 
-require('pages/story_editor/StoryEditorNavbarBreadcrumbDirective.js');
-require('pages/story_editor/StoryEditorNavbarDirective.js');
-require('pages/story_editor/main_editor/StoryEditorDirective.js');
+require('pages/story_editor/StoryEditorNavbarBreadcrumbDirective.ts');
+require('pages/story_editor/StoryEditorNavbarDirective.ts');
+require('pages/story_editor/main_editor/StoryEditorDirective.ts');
 
-require('domain/editor/undo_redo/UndoRedoService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/story_editor/StoryEditorStateService.js');
-require('services/contextual/UrlService.js');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/story_editor/StoryEditorStateService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.constant('NODE_ID_PREFIX', 'node_');
 

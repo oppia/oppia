@@ -17,10 +17,10 @@
  * exploration editor.
  */
 
-require('pages/exploration_editor/improvements_tab/PlaythroughImprovementCardDirective.js');
+require('pages/exploration_editor/improvements_tab/PlaythroughImprovementCardDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('services/ImprovementCardService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/ImprovementCardService.ts');
 
 oppia.directive('improvementsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

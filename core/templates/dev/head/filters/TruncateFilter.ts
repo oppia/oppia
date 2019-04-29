@@ -16,7 +16,7 @@
  * @fileoverview Truncate filter for Oppia.
  */
 
-require('filters/ConvertToPlainTextFilter.js');
+require('filters/ConvertToPlainTextFilter.ts');
 
 // Filter that truncates long descriptors.
 oppia.filter('truncate', ['$filter', function($filter) {

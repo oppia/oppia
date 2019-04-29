@@ -17,22 +17,22 @@
  * the training data editor of an answer group.
  */
 
-require('pages/exploration_editor/editor_tab/TestInteractionPanelDirective.js');
+require('pages/exploration_editor/editor_tab/TestInteractionPanelDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/AngularNameService.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/editor_tab/ResponsesService.js');
-require('pages/exploration_editor/editor_tab/TrainingDataService.js');
-require('pages/exploration_editor/editor_tab/TrainingModalService.js');
-require('pages/exploration_player/AnswerClassificationService.js');
-require('pages/exploration_player/CurrentInteractionService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('pages/state_editor/state_properties/StatePropertyService.js');
-require('services/AlertsService.js');
-require('services/ContextService.js');
-require('services/ExplorationHtmlFormatterService.js');
-require('services/stateful/FocusManagerService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/AngularNameService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require('pages/exploration_editor/editor_tab/TrainingDataService.ts');
+require('pages/exploration_editor/editor_tab/TrainingModalService.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require('pages/exploration_player/CurrentInteractionService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/stateful/FocusManagerService.ts');
 
 oppia.factory('TrainingDataEditorPanelService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',

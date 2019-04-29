@@ -17,9 +17,9 @@
  * exploration.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_player/ExplorationEngineService.js');
-require('services/contextual/UrlService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.factory('RefresherExplorationConfirmationModalService', [
   '$uibModal', 'ExplorationEngineService', 'UrlInterpolationService',

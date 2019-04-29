@@ -17,7 +17,7 @@
  * editor.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('continueButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {

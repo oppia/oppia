@@ -18,11 +18,11 @@
  * across all answer groups.
  */
 
-require('domain/exploration/RuleObjectFactory.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/GraphDataService.js');
-require('pages/exploration_editor/editor_tab/ResponsesService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
+require('domain/exploration/RuleObjectFactory.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/GraphDataService.ts');
+require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
 
 oppia.factory('TrainingDataService', [
   '$http', '$rootScope', 'ExplorationStatesService', 'GraphDataService',

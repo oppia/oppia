@@ -16,17 +16,17 @@
  * @fileoverview Controller for the exploration editor feedback tab.
  */
 
-require('domain/state/StateObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/ChangeListService.js');
-require('pages/exploration_editor/ExplorationDataService.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/feedback_tab/ThreadDataService.js');
-require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js');
-require('pages/suggestion_editor/ShowSuggestionModalForEditorViewService.js');
-require('services/AlertsService.js');
-require('services/DateTimeFormatService.js');
-require('services/UserService.js');
+require('domain/state/StateObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
+require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
+require('pages/suggestion_editor/ShowSuggestionModalForEditorViewService.ts');
+require('services/AlertsService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/UserService.ts');
 
 oppia.controller('FeedbackTab', [
   '$log', '$q', '$rootScope', '$scope', '$uibModal',

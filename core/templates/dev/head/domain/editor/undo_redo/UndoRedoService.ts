@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('domain/editor/undo_redo/BaseUndoRedoService.js');
+require('domain/editor/undo_redo/BaseUndoRedoService.ts');
 
 oppia.factory('UndoRedoService', [
   'BaseUndoRedoService', function(BaseUndoRedoService) {

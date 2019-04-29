@@ -16,7 +16,7 @@
  * @fileoverview Service for the learner view transcript.
  */
 
-require('domain/state_card/StateCardObjectFactory.js');
+require('domain/state_card/StateCardObjectFactory.ts');
 
 // A service that maintains the transcript of the playthrough (i.e., what cards
 // are shown, what answers have been given, etc. Note that this service does

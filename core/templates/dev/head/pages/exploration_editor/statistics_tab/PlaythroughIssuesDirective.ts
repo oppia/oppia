@@ -16,12 +16,12 @@
  * @fileoverview Directive for visualizing issues.
  */
 
-require('pages/exploration_editor/statistics_tab/EarlyQuitIssueDirective.js');
-require('pages/exploration_editor/statistics_tab/MultipleIncorrectIssueDirective.js');
-require('pages/exploration_editor/statistics_tab/CyclicTransitionsIssueDirective.js');
+require('pages/exploration_editor/statistics_tab/EarlyQuitIssueDirective.ts');
+require('pages/exploration_editor/statistics_tab/MultipleIncorrectIssueDirective.ts');
+require('pages/exploration_editor/statistics_tab/CyclicTransitionsIssueDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('services/PlaythroughIssuesService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/PlaythroughIssuesService.ts');
 
 oppia.directive('playthroughIssues', [
   'UrlInterpolationService', function(UrlInterpolationService) {

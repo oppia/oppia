@@ -17,9 +17,9 @@
  * modal.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('services/AlertsService.js');
-require('services/SiteAnalyticsService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/SiteAnalyticsService.ts');
 
 oppia.factory('ExplorationCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window',

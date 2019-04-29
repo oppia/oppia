@@ -16,11 +16,11 @@
  * @fileoverview Controller for landing page.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('filters/CapitalizeFilter.js');
-require('pages/landing/TopicLandingPage.js');
-require('services/PageTitleService.js');
-require('services/SiteAnalyticsService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/CapitalizeFilter.ts');
+require('pages/landing/TopicLandingPage.ts');
+require('services/PageTitleService.ts');
+require('services/SiteAnalyticsService.ts');
 
 // Note: This oppia constant needs to be keep in sync with
 // AVAILABLE_LANDING_PAGES constant defined in feconf.py file.

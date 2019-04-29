@@ -17,13 +17,13 @@
  * footer.
  */
 
-require('components/profile_link/ProfileLinkImageDirective.js');
-require('components/share/SharingLinksDirective.js');
+require('components/profile_link/ProfileLinkImageDirective.ts');
+require('components/share/SharingLinksDirective.ts');
 
-require('components/RatingComputationService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('services/ContextService.js');
-require('services/DateTimeFormatService.js');
+require('components/RatingComputationService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/ContextService.ts');
+require('services/DateTimeFormatService.ts');
 
 oppia.controller('LearnerViewInfo', [
   '$http', '$log', '$scope', '$uibModal', 'ContextService',

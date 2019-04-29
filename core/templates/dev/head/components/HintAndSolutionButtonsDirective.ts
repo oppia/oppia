@@ -16,15 +16,15 @@
  * @fileoverview Directive for hint and solution buttons.
  */
 
-require('pages/exploration_player/ExplorationPlayerStateService.js');
-require('pages/exploration_player/HintsAndSolutionManagerService.js');
-require('pages/exploration_player/HintAndSolutionModalService.js');
-require('pages/exploration_player/PlayerConstants.js');
-require('pages/exploration_player/PlayerPositionService.js');
-require('pages/exploration_player/PlayerTranscriptService.js');
-require('pages/exploration_player/StatsReportingService.js');
-require('services/ContextService.js');
-require('services/contextual/DeviceInfoService.js');
+require('pages/exploration_player/ExplorationPlayerStateService.ts');
+require('pages/exploration_player/HintsAndSolutionManagerService.ts');
+require('pages/exploration_player/HintAndSolutionModalService.ts');
+require('pages/exploration_player/PlayerConstants.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('pages/exploration_player/StatsReportingService.ts');
+require('services/ContextService.ts');
+require('services/contextual/DeviceInfoService.ts');
 
 oppia.directive('hintAndSolutionButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -16,12 +16,12 @@
  * @fileoverview Primary controller for the collection editor page.
  */
 
-require('pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.js');
-require('pages/collection_editor/CollectionEditorNavbarDirective.js');
-require('pages/collection_editor/editor_tab/CollectionEditorTabDirective.js');
-require('pages/collection_editor/history_tab/CollectionHistoryTabDirective.js');
-require('pages/collection_editor/settings_tab/CollectionSettingsTabDirective.js');
-require('pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.js');
+require('pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.ts');
+require('pages/collection_editor/CollectionEditorNavbarDirective.ts');
+require('pages/collection_editor/editor_tab/CollectionEditorTabDirective.ts');
+require('pages/collection_editor/history_tab/CollectionHistoryTabDirective.ts');
+require('pages/collection_editor/settings_tab/CollectionSettingsTabDirective.ts');
+require('pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.ts');
 
 // TODO(bhenning): These constants should be provided by the backend.
 oppia.constant(

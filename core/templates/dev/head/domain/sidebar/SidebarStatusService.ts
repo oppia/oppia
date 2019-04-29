@@ -17,7 +17,7 @@
  * hamburger-menu sidebar.
  */
 
-require('services/contextual/WindowDimensionsService.js');
+require('services/contextual/WindowDimensionsService.ts');
 
 oppia.factory('SidebarStatusService', [
   'WindowDimensionsService', function(WindowDimensionsService) {

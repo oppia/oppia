@@ -16,12 +16,12 @@
  * @fileoverview Directive for the Create Exploration/Collection button.
  */
 
-require('../CollectionCreationService.js');
-require('../ExplorationCreationService.js');
-require('domain/utilities/BrowserCheckerService.js');
-require('services/contextual/UrlService.js');
-require('services/SiteAnalyticsService.js');
-require('services/UserService.js');
+require('../CollectionCreationService.ts');
+require('../ExplorationCreationService.ts');
+require('domain/utilities/BrowserCheckerService.ts');
+require('services/contextual/UrlService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/UserService.ts');
 
 oppia.directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {

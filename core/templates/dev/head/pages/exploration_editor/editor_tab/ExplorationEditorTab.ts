@@ -16,21 +16,21 @@
  * @fileoverview Controller for the Editor tab in the exploration editor page.
  */
 
-require('pages/exploration_editor/editor_tab/StateNameEditorDirective.js');
-require('pages/exploration_editor/editor_tab/StateParamChangesEditorDirective.js');
-require('pages/state_editor/StateEditorDirective.js');
+require('pages/exploration_editor/editor_tab/StateNameEditorDirective.ts');
+require('pages/exploration_editor/editor_tab/StateParamChangesEditorDirective.ts');
+require('pages/state_editor/StateEditorDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.js');
-require('pages/exploration_editor/ExplorationInitStateNameService.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/ExplorationWarningsService.js');
-require('pages/exploration_editor/GraphDataService.js');
-require('pages/exploration_editor/RouterService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('services/AlertsService.js');
-require('services/ContextService.js');
-require('services/ExplorationFeaturesService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/ExplorationWarningsService.ts');
+require('pages/exploration_editor/GraphDataService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationFeaturesService.ts');
 
 oppia.controller('ExplorationEditorTab', [
   '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',

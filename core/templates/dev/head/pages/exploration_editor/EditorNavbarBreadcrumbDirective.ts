@@ -17,10 +17,10 @@
  * in editor navbar.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/ExplorationTitleService.js');
-require('pages/exploration_editor/RouterService.js');
-require('services/stateful/FocusManagerService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationTitleService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('services/stateful/FocusManagerService.ts');
 
 oppia.directive('editorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {

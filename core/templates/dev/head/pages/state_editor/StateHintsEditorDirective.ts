@@ -17,18 +17,18 @@
  * editor.
  */
 
-require('components/state/HintEditorDirective.js');
-require('components/state/ResponseHeaderDirective.js');
+require('components/state/HintEditorDirective.ts');
+require('components/state/ResponseHeaderDirective.ts');
 
-require('domain/exploration/HintObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('pages/state_editor/state_properties/StateHintsService.js');
-require('pages/state_editor/state_properties/StateInteractionIdService.js');
-require('pages/state_editor/state_properties/StateSolutionService.js');
-require('services/AlertsService.js');
-require('services/EditabilityService.js');
-require('services/GenerateContentIdService.js');
+require('domain/exploration/HintObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateHintsService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+require('pages/state_editor/state_properties/StateSolutionService.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
+require('services/GenerateContentIdService.ts');
 
 oppia.directive('stateHintsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

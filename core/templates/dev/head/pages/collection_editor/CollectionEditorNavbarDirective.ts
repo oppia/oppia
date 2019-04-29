@@ -16,18 +16,18 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
-require('components/forms/Select2DropdownDirective.js');
-require('components/loading/LoadingDotsDirective.js');
+require('components/forms/Select2DropdownDirective.ts');
+require('components/loading/LoadingDotsDirective.ts');
 
-require('domain/collection/CollectionRightsBackendApiService.js');
-require('domain/collection/CollectionUpdateService.js');
-require('domain/collection/CollectionValidationService.js');
-require('domain/collection/EditableCollectionBackendApiService.js');
-require('domain/editor/undo_redo/UndoRedoService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/collection_editor/CollectionEditorStateService.js');
-require('pages/exploration_editor/RouterService.js');
-require('services/AlertsService.js');
+require('domain/collection/CollectionRightsBackendApiService.ts');
+require('domain/collection/CollectionUpdateService.ts');
+require('domain/collection/CollectionValidationService.ts');
+require('domain/collection/EditableCollectionBackendApiService.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('services/AlertsService.ts');
 
 oppia.directive('collectionEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {

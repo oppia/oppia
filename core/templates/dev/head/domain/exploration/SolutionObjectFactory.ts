@@ -17,12 +17,12 @@
  * domain objects.
  */
 
-require('domain/exploration/SubtitledHtmlObjectFactory.js');
-require('domain/objects/FractionObjectFactory.js');
-require('domain/objects/NumberWithUnitsObjectFactory.js');
-require('filters/ConvertToPlainTextFilter.js');
-require('services/ExplorationHtmlFormatterService.js');
-require('services/HtmlEscaperService.js');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('filters/ConvertToPlainTextFilter.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/HtmlEscaperService.ts');
 
 oppia.factory('SolutionObjectFactory', [
   '$filter', 'ExplorationHtmlFormatterService', 'FractionObjectFactory',

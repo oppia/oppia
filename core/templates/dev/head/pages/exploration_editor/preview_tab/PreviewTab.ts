@@ -17,24 +17,24 @@
  * editor page.
  */
 
-require('domain/exploration/EditableExplorationBackendApiService.js');
-require('domain/exploration/ParamChangeObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/ExplorationCategoryService.js');
-require('pages/exploration_editor/ExplorationDataService.js');
-require('pages/exploration_editor/ExplorationInitStateNameService.js');
-require('pages/exploration_editor/ExplorationParamChangesService.js');
-require('pages/exploration_editor/ExplorationParamSpecsService.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/ExplorationTitleService.js');
-require('pages/exploration_editor/ParameterMetadataService.js');
-require('pages/exploration_player/ExplorationEngineService.js');
-require('pages/exploration_player/LearnerParamsService.js');
-require('pages/exploration_player/NumberAttemptsService.js');
-require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('services/ContextService.js');
-require('services/ExplorationFeaturesService.js');
+require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/ParamChangeObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationCategoryService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationParamChangesService.ts');
+require('pages/exploration_editor/ExplorationParamSpecsService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/ExplorationTitleService.ts');
+require('pages/exploration_editor/ParameterMetadataService.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/LearnerParamsService.ts');
+require('pages/exploration_player/NumberAttemptsService.ts');
+require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationFeaturesService.ts');
 
 oppia.controller('PreviewTab', [
   '$q', '$scope', '$timeout', '$uibModal', 'ContextService',

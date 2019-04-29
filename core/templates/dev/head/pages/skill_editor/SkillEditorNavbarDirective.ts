@@ -16,12 +16,12 @@
  * @fileoverview Directive for the navbar of the skill editor.
  */
 
-require('components/loading/LoadingDotsDirective.js');
+require('components/loading/LoadingDotsDirective.ts');
 
-require('domain/editor/undo_redo/UndoRedoService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/skill_editor/SkillEditorStateService.js');
-require('services/AlertsService.js');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/skill_editor/SkillEditorStateService.ts');
+require('services/AlertsService.ts');
 
 oppia.directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {

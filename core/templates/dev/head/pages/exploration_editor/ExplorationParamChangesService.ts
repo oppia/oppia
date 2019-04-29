@@ -17,7 +17,7 @@
  * changes to parameters.
  */
 
-require('pages/exploration_editor/ExplorationPropertyService.js');
+require('pages/exploration_editor/ExplorationPropertyService.ts');
 
 oppia.factory('ExplorationParamChangesService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {

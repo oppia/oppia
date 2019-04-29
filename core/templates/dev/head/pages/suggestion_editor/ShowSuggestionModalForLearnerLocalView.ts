@@ -17,10 +17,10 @@
  */
 
 
-require('pages/exploration_player/ExplorationEngineService.js');
-require('pages/exploration_player/PlayerPositionService.js');
-require('pages/exploration_player/PlayerTranscriptService.js');
-require('pages/suggestion_editor/SuggestionModalService.js');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('pages/suggestion_editor/SuggestionModalService.ts');
 
 oppia.controller('ShowSuggestionModalForLearnerLocalView', [
   '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',

@@ -16,7 +16,7 @@
  * @fileoverview Services for mapping state names to classifier details.
  */
 
-require('domain/classifier/ClassifierObjectFactory.js');
+require('domain/classifier/ClassifierObjectFactory.ts');
 
 oppia.factory('StateClassifierMappingService', [
   'ClassifierObjectFactory', function(ClassifierObjectFactory) {

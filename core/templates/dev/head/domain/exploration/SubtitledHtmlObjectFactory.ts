@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-require('domain/exploration/AudioTranslationObjectFactory.js');
+require('domain/exploration/AudioTranslationObjectFactory.ts');
 
 oppia.factory('SubtitledHtmlObjectFactory', [
   'AudioTranslationObjectFactory',

@@ -16,11 +16,11 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
-require('components/StateGraphLayoutService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('filters/TruncateFilter.js');
-require('pages/exploration_editor/ExplorationWarningsService.js');
-require('pages/exploration_editor/translation_tab/TranslationStatusService.js');
+require('components/StateGraphLayoutService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/TruncateFilter.ts');
+require('pages/exploration_editor/ExplorationWarningsService.ts');
+require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
 
 /* eslint-disable angular/directive-restrict */
 oppia.directive('stateGraphVisualization', [

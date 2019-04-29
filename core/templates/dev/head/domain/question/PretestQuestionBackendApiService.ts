@@ -16,7 +16,7 @@
  * @fileoverview Service to receive questions as pretests for an exploration.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.constant(
   'PRETEST_QUESTIONS_URL_TEMPLATE',

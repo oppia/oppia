@@ -16,11 +16,11 @@
  * @fileoverview Service to preload image into AssetsBackendApiService's cache.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_player/ExtractImageFilenamesFromStateService.js');
-require('services/AssetsBackendApiService.js');
-require('services/ComputeGraphService.js');
-require('services/ContextService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/ExtractImageFilenamesFromStateService.ts');
+require('services/AssetsBackendApiService.ts');
+require('services/ComputeGraphService.ts');
+require('services/ContextService.ts');
 
 oppia.factory('ImagePreloaderService', [
   '$q', '$uibModal', 'AssetsBackendApiService', 'ComputeGraphService',

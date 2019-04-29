@@ -17,7 +17,7 @@
  * collection domain objects.
  */
 
-require('domain/collection/CollectionNodeObjectFactory.js');
+require('domain/collection/CollectionNodeObjectFactory.ts');
 
 oppia.factory('CollectionObjectFactory', [
   'CollectionNodeObjectFactory',

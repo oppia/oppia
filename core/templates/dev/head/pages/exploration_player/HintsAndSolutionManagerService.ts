@@ -16,7 +16,7 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
-require('pages/exploration_player/PlayerConstants.js');
+require('pages/exploration_player/PlayerConstants.ts');
 
 oppia.factory('HintsAndSolutionManagerService', [
   '$rootScope', '$timeout',

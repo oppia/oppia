@@ -16,10 +16,10 @@
  * @fileoverview Directive for the stories list.
  */
 
-require('components/summary_tile/StorySummaryTileDirective.js');
+require('components/summary_tile/StorySummaryTileDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('services/contextual/WindowDimensionsService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/contextual/WindowDimensionsService.ts');
 
 oppia.directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {

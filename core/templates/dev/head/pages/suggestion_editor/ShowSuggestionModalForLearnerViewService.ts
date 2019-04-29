@@ -16,7 +16,7 @@
  * @fileoverview Service to display suggestion modal in learner view.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.factory('ShowSuggestionModalForLearnerViewService', [
   '$rootScope', '$uibModal', 'UrlInterpolationService',

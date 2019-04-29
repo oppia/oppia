@@ -16,12 +16,12 @@
  * @fileoverview Controller for the main tab of the collection editor.
  */
 
-require('pages/collection_editor/editor_tab/CollectionNodeCreatorDirective.js');
-require('pages/collection_editor/editor_tab/CollectionNodeEditorDirective.js');
+require('pages/collection_editor/editor_tab/CollectionNodeCreatorDirective.ts');
+require('pages/collection_editor/editor_tab/CollectionNodeEditorDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/collection_editor/CollectionEditorStateService.js');
-require('pages/collection_editor/editor_tab/CollectionLinearizerService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
 
 oppia.directive('collectionEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

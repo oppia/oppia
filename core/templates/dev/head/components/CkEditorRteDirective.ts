@@ -16,8 +16,8 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
-require('services/ContextService.js');
-require('services/RteHelperService.js');
+require('services/ContextService.ts');
+require('services/RteHelperService.ts');
 
 oppia.directive('ckEditorRte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
@@ -89,11 +89,11 @@ oppia.directive('ckEditorRte', [
         // Add external plugins.
         CKEDITOR.plugins.addExternal(
           'sharedspace',
-          '/third_party/static/ckeditor-sharedspace-4.9.2/', 'plugin.js');
+          '/third_party/static/ckeditor-sharedspace-4.9.2/', 'plugin.ts');
         // Pre plugin is not available for 4.9.2 version of CKEditor. This is
         // a self created plugin (other plugins are provided by CKEditor).
         CKEDITOR.plugins.addExternal(
-          'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
+          'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.ts');
 
         var startupFocusEnabled = true;
         if (

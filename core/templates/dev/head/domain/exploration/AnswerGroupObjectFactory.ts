@@ -17,8 +17,8 @@
  * domain objects.
  */
 
-require('domain/exploration/OutcomeObjectFactory.js');
-require('domain/exploration/RuleObjectFactory.js');
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('domain/exploration/RuleObjectFactory.ts');
 
 oppia.factory('AnswerGroupObjectFactory', [
   'OutcomeObjectFactory', 'RuleObjectFactory',

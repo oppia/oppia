@@ -18,8 +18,8 @@
  * with base class as ExplorationPropertyService.
  */
 
-require('pages/exploration_editor/ChangeListService.js');
-require('services/AlertsService.js');
+require('pages/exploration_editor/ChangeListService.ts');
+require('services/AlertsService.ts');
 
 oppia.factory('ExplorationPropertyService', [
   '$log', '$rootScope', 'AlertsService', 'ChangeListService',

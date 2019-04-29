@@ -18,14 +18,14 @@
  * adding a new exploration.
  */
 
-require('components/forms/Select2DropdownDirective.js');
+require('components/forms/Select2DropdownDirective.ts');
 
-require('domain/collection/CollectionUpdateService.js');
-require('domain/collection/CollectionValidationService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/collection_editor/CollectionEditor.js');
-require('pages/collection_editor/CollectionEditorStateService.js');;
-require('services/AlertsService.js');
+require('domain/collection/CollectionUpdateService.ts');
+require('domain/collection/CollectionValidationService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection_editor/CollectionEditor.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');;
+require('services/AlertsService.ts');
 
 oppia.directive('collectionDetailsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

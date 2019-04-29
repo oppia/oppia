@@ -16,17 +16,17 @@
  * @fileoverview Directive for the concept card editor.
  */
 
-require('components/SummaryListHeaderDirective.js');
-require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
-require('directives/AngularHtmlBindDirective.js');
-require('pages/skill_editor/editor_tab/WorkedExampleEditorDirective.js');
+require('components/SummaryListHeaderDirective.ts');
+require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require('directives/AngularHtmlBindDirective.ts');
+require('pages/skill_editor/editor_tab/WorkedExampleEditorDirective.ts');
 
-require('domain/exploration/SubtitledHtmlObjectFactory.js');
-require('domain/skill/SkillUpdateService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('filters/FormatRtePreviewFilter.js');
-require('pages/skill_editor/SkillEditorStateService.js');
-require('services/GenerateContentIdService.js');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/skill/SkillUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/FormatRtePreviewFilter.ts');
+require('pages/skill_editor/SkillEditorStateService.ts');
+require('services/GenerateContentIdService.ts');
 
 oppia.directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',

@@ -16,7 +16,7 @@
  * @fileoverview Service for all tutorials to be run only for the first time.
  */
 
-require('pages/exploration_editor/EditorFirstTimeEventsService.js');
+require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
 
 oppia.factory('StateTutorialFirstTimeService', [
   '$http', '$rootScope', 'EditorFirstTimeEventsService',

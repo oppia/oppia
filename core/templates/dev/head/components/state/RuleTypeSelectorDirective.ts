@@ -16,9 +16,9 @@
  * @fileoverview Directive for the rule type selector.
  */
 
-require('filters/ReplaceInputsWithEllipsesFilter.js');
-require('filters/TruncateAtFirstEllipsisFilter.js');
-require('pages/state_editor/state_properties/StatePropertyService.js');
+require('filters/ReplaceInputsWithEllipsesFilter.ts');
+require('filters/TruncateAtFirstEllipsisFilter.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
 
 oppia.directive('ruleTypeSelector', [function() {
   return {

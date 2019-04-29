@@ -17,18 +17,18 @@
  * @fileoverview Controller for the questions tab.
  */
 
-require('pages/questions_list/QuestionsListDirective.js');
+require('pages/questions_list/QuestionsListDirective.ts');
 
-require('components/QuestionCreationService.js');
-require('domain/editor/undo_redo/UndoRedoService.js');
-require('domain/question/EditableQuestionBackendApiService.js');
-require('domain/question/QuestionObjectFactory.js');
-require('domain/skill/EditableSkillBackendApiService.js');
-require('domain/skill/MisconceptionObjectFactory.js');
-require('pages/skill_editor/SkillEditorStateService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('services/AlertsService.js');
-require('services/contextual/UrlService.js');
+require('components/QuestionCreationService.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/skill/MisconceptionObjectFactory.ts');
+require('pages/skill_editor/SkillEditorStateService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

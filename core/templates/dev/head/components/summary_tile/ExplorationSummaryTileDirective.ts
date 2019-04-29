@@ -16,17 +16,17 @@
  * @fileoverview Component for an exploration summary tile.
  */
 
-require('components/summary_tile/CircularImageDirective.js');
-require('domain/learner_dashboard/LearnerDashboardIconsDirective.js');
-require('filters/TruncateAndCapitalizeFilter.js');
-require('filters/TruncateFilter.js');
+require('components/summary_tile/CircularImageDirective.ts');
+require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
+require('filters/TruncateAndCapitalizeFilter.ts');
+require('filters/TruncateFilter.ts');
 
-require('components/RatingComputationService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('services/DateTimeFormatService.js');
-require('services/UserService.js');
-require('services/contextual/UrlService.js');
-require('services/contextual/WindowDimensionsService.js');
+require('components/RatingComputationService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/UserService.ts');
+require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
 
 oppia.directive('explorationSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {

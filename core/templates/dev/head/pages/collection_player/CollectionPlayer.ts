@@ -17,21 +17,21 @@
  */
 
 //vvv this block of requires should be removed vvv
-require('pages/collection_player/CollectionNodeListDirective.js');
+require('pages/collection_player/CollectionNodeListDirective.ts');
 //^^^ this block of requires should be removed ^^^
 
-require('components/attribution_guide/AttributionGuideDirective.js');
-require('components/background/BackgroundBannerDirective.js');
-require('components/summary_tile/ExplorationSummaryTileDirective.js');
-require('pages/collection_player/CollectionFooterDirective.js');
-require('pages/collection_player/CollectionLocalNav.js');
+require('components/attribution_guide/AttributionGuideDirective.ts');
+require('components/background/BackgroundBannerDirective.ts');
+require('components/summary_tile/ExplorationSummaryTileDirective.ts');
+require('pages/collection_player/CollectionFooterDirective.ts');
+require('pages/collection_player/CollectionLocalNav.ts');
 
-require('domain/collection/CollectionObjectFactory.js');
-require('domain/collection/CollectionPlaythroughObjectFactory.js');
-require('domain/collection/GuestCollectionProgressService.js');
-require('domain/collection/ReadOnlyCollectionBackendApiService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('services/AlertsService.js');
+require('domain/collection/CollectionObjectFactory.ts');
+require('domain/collection/CollectionPlaythroughObjectFactory.ts');
+require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
 
 oppia.constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');

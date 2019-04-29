@@ -16,13 +16,13 @@
  * @fileoverview Directives for the outcome destination editor.
  */
 
-require('../StateGraphLayoutService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/EditorFirstTimeEventsService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('services/EditabilityService.js');
-require('services/UserService.js');
-require('services/stateful/FocusManagerService.js');
+require('../StateGraphLayoutService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/EditabilityService.ts');
+require('services/UserService.ts');
+require('services/stateful/FocusManagerService.ts');
 
 oppia.directive('outcomeDestinationEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

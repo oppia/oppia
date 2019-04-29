@@ -17,7 +17,7 @@
  * story domain objects.
  */
 
-require('domain/story/StoryContentsObjectFactory.js');
+require('domain/story/StoryContentsObjectFactory.ts');
 
 oppia.factory('StoryObjectFactory', ['StoryContentsObjectFactory',
   function(StoryContentsObjectFactory) {

@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-require('domain/exploration/ParamTypeObjectFactory.js');
+require('domain/exploration/ParamTypeObjectFactory.ts');
 
 oppia.factory('ParamSpecObjectFactory', [
   'ParamTypeObjectFactory',

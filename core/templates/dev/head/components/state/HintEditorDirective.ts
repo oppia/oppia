@@ -16,12 +16,12 @@
  * @fileoverview Directive for the hint editor.
  */
 
-require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
-require('directives/AngularHtmlBindDirective.js');
+require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require('directives/AngularHtmlBindDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/state_editor/state_properties/StatePropertyService.js');
-require('services/EditabilityService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/EditabilityService.ts');
 
 oppia.directive('hintEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

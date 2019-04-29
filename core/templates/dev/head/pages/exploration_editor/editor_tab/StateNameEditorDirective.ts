@@ -17,13 +17,13 @@
  * editor.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('filters/NormalizeWhitespaceFilter.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/RouterService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('services/EditabilityService.js');
-require('services/stateful/FocusManagerService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/NormalizeWhitespaceFilter.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/EditabilityService.ts');
+require('services/stateful/FocusManagerService.ts');
 
 oppia.directive('stateNameEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

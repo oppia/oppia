@@ -16,9 +16,9 @@
  * @fileoverview Directive for a schema-based editor for unicode strings.
  */
 
-require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('services/contextual/DeviceInfoService.js');
+require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/contextual/DeviceInfoService.ts');
 
 oppia.directive('schemaBasedUnicodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -18,7 +18,7 @@
 
 //this is intentional since normalizeWhitespace is use from /extensions
 try {
-  require('services/UtilsService.js');
+  require('services/UtilsService.ts');
 } catch (e) {
 
 }

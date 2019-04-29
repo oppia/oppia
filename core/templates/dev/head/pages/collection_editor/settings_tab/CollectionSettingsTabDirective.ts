@@ -16,10 +16,10 @@
  * @fileoverview Controller for the settings tab of the collection editor.
  */
 
-require('pages/collection_editor/settings_tab/CollectionDetailsEditorDirective.js');
-require('pages/collection_editor/settings_tab/CollectionPermissionsCardDirective.js');
+require('pages/collection_editor/settings_tab/CollectionDetailsEditorDirective.ts');
+require('pages/collection_editor/settings_tab/CollectionPermissionsCardDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('collectionSettingsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -16,12 +16,12 @@
  * @fileoverview Controller for the skills list viewer.
  */
 
-require('pages/topics_and_skills_dashboard/SelectTopicsDirective.js');
+require('pages/topics_and_skills_dashboard/SelectTopicsDirective.ts');
 
-require('domain/skill/EditableSkillBackendApiService.js');
-require('domain/topic/EditableTopicBackendApiService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('services/AlertsService.js');
+require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/topic/EditableTopicBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
 
 oppia.directive('skillsList', [
   '$http', 'AlertsService', 'UrlInterpolationService',

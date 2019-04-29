@@ -16,7 +16,7 @@
  * @fileoverview Directive for the header of items in a list.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('summaryListHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {

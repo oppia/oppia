@@ -17,7 +17,7 @@
  * question domain objects.
  */
 
-require('domain/state/StateObjectFactory.js');
+require('domain/state/StateObjectFactory.ts');
 
 oppia.factory('QuestionObjectFactory', [
   'StateObjectFactory', 'INTERACTION_SPECS',

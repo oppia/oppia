@@ -18,14 +18,14 @@
  * the editor pages).
  */
 
-require('domain/sidebar/SidebarStatusService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('services/DebouncerService.js');
-require('services/NavigationService.js');
-require('services/SiteAnalyticsService.js');
-require('services/UserService.js');
-require('services/contextual/DeviceInfoService.js');
-require('services/contextual/WindowDimensionsService.js');
+require('domain/sidebar/SidebarStatusService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/DebouncerService.ts');
+require('services/NavigationService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/UserService.ts');
+require('services/contextual/DeviceInfoService.ts');
+require('services/contextual/WindowDimensionsService.ts');
 
 oppia.directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -16,11 +16,11 @@
  * @fileoverview Service for computing parameter metadata.
  */
 
-require('domain/exploration/ParamMetadataObjectFactory.js');
-require('expressions/ExpressionInterpolationService.js');
-require('pages/exploration_editor/ExplorationParamChangesService.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/GraphDataService.js');
+require('domain/exploration/ParamMetadataObjectFactory.ts');
+require('expressions/ExpressionInterpolationService.ts');
+require('pages/exploration_editor/ExplorationParamChangesService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/GraphDataService.ts');
 
 oppia.constant('PARAM_ACTION_GET', 'get');
 

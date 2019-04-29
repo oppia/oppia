@@ -17,7 +17,7 @@
  * domain objects given a list of backend state dictionaries.
  */
 
-require('domain/state/StateObjectFactory.js');
+require('domain/state/StateObjectFactory.ts');
 
 oppia.factory('StatesObjectFactory', [
   'StateObjectFactory', 'INTERACTION_SPECS',

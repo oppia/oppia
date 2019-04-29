@@ -17,7 +17,7 @@
    suggestion domain objects.
  */
 
-require('domain/question/QuestionObjectFactory.js');
+require('domain/question/QuestionObjectFactory.ts');
 
 oppia.factory('QuestionSuggestionObjectFactory', [
   'QuestionObjectFactory', function(QuestionObjectFactory) {

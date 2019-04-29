@@ -16,7 +16,7 @@
  * @fileoverview Directive for displaying summary rating information.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('ratingDisplay', [
   'UrlInterpolationService', function(UrlInterpolationService) {

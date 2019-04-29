@@ -15,9 +15,9 @@
 /**
  * @fileoverview Service for fetching issues and playthroughs from the backend.
  */
-require('domain/statistics/PlaythroughObjectFactory.js');
-require('domain/statistics/PlaythroughIssueObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/statistics/PlaythroughObjectFactory.ts');
+require('domain/statistics/PlaythroughIssueObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.constant(
   'FETCH_ISSUES_URL', '/issuesdatahandler/<exploration_id>');

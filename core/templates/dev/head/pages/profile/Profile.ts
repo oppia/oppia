@@ -16,12 +16,12 @@
  * @fileoverview Data and controllers for the Oppia profile page.
  */
 
-require('components/background/BackgroundBannerDirective.js');
-require('components/summary_tile/ExplorationSummaryTileDirective.js');
+require('components/background/BackgroundBannerDirective.ts');
+require('components/summary_tile/ExplorationSummaryTileDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('services/UserService.js');
-require('services/DateTimeFormatService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/UserService.ts');
+require('services/DateTimeFormatService.ts');
 
 oppia.controller('Profile', [
   '$http', '$log', '$rootScope', '$scope', '$window', 'DateTimeFormatService',

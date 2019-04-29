@@ -16,7 +16,7 @@
  * @fileoverview Service to get changes in human readable form.
  */
 
-require('services/UtilsService.js');
+require('services/UtilsService.ts');
 
 oppia.factory('ChangesInHumanReadableFormService', [
   'UtilsService', function(UtilsService) {

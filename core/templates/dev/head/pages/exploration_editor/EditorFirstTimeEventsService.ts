@@ -18,7 +18,7 @@
  * is opened for the first time for an exploration.
  */
 
-require('services/SiteAnalyticsService.js');
+require('services/SiteAnalyticsService.ts');
 
 oppia.factory('EditorFirstTimeEventsService', [
   'SiteAnalyticsService',

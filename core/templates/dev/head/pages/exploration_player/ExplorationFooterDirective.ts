@@ -17,13 +17,13 @@
  * in exploration player.
  */
 
-require('components/HintAndSolutionButtonsDirective.js');
+require('components/HintAndSolutionButtonsDirective.ts');
 
-require('domain/summary/ExplorationSummaryBackendApiService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('services/ContextService.js');
-require('services/contextual/UrlService.js');
-require('services/contextual/WindowDimensionsService.js');
+require('domain/summary/ExplorationSummaryBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/ContextService.ts');
+require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
 
 oppia.directive('explorationFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {

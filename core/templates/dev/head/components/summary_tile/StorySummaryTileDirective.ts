@@ -16,7 +16,7 @@
  * @fileoverview Component for a canonical story tile.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('storySummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {

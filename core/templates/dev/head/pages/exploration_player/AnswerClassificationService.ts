@@ -16,10 +16,10 @@
  * @fileoverview Classification service for answer groups.
  */
 
-require('domain/classifier/AnswerClassificationResultObjectFactory.js');
-require('pages/exploration_player/PredictionAlgorithmRegistryService.js');
-require('pages/exploration_player/StateClassifierMappingService.js');
-require('services/AlertsService.js');
+require('domain/classifier/AnswerClassificationResultObjectFactory.ts');
+require('pages/exploration_player/PredictionAlgorithmRegistryService.ts');
+require('pages/exploration_player/StateClassifierMappingService.ts');
+require('services/AlertsService.ts');
 
 // TODO(bhenning): Find a better place for these constants.
 

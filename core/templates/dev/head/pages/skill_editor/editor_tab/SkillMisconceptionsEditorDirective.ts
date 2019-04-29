@@ -16,13 +16,13 @@
  * @fileoverview Directive for the skill misconceptions editor.
  */
 
-require('components/SummaryListHeaderDirective.js');
-require('pages/skill_editor/editor_tab/MisconceptionEditorDirective.js');
+require('components/SummaryListHeaderDirective.ts');
+require('pages/skill_editor/editor_tab/MisconceptionEditorDirective.ts');
 
-require('domain/skill/MisconceptionObjectFactory.js');
-require('domain/skill/SkillUpdateService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/skill_editor/SkillEditorStateService.js');
+require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/SkillUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/skill_editor/SkillEditorStateService.ts');
 
 oppia.directive('skillMisconceptionsEditor', [
   'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',

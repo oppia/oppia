@@ -17,9 +17,9 @@
  * tab of the exploration editor.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js');
-require('services/DateTimeFormatService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
+require('services/DateTimeFormatService.ts');
 
 oppia.directive('threadTable', [
   'UrlInterpolationService', function(UrlInterpolationService) {

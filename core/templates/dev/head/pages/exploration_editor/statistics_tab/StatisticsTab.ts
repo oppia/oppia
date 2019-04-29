@@ -17,19 +17,19 @@
  * exploration editor.
  */
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.js');
-require('domain/exploration/StatesObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('filters/CamelCaseToHyphensFilter.js');
-require('pages/exploration_editor/ExplorationDataService.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/RouterService.js');
-require('pages/exploration_editor/statistics_tab/StateImprovementSuggestionService.js');
-require('services/AlertsService.js');
-require('services/ComputeGraphService.js');
-require('services/DateTimeFormatService.js');
-require('services/ExplorationFeaturesService.js');
-require('services/StateRulesStatsService.js');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/StatesObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/CamelCaseToHyphensFilter.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration_editor/statistics_tab/StateImprovementSuggestionService.ts');
+require('services/AlertsService.ts');
+require('services/ComputeGraphService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/StateRulesStatsService.ts');
 
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 

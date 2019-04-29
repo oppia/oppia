@@ -17,16 +17,16 @@
  * both the exploration settings tab and the state editor page).
  */
 
-require('components/forms/Select2DropdownDirective.js');
-require('pages/exploration_editor/ValueGeneratorEditorDirective.js');
+require('components/forms/Select2DropdownDirective.ts');
+require('pages/exploration_editor/ValueGeneratorEditorDirective.ts');
 
-require('domain/exploration/ParamChangeObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/ExplorationParamSpecsService.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('services/AlertsService.js');
-require('services/EditabilityService.js');
+require('domain/exploration/ParamChangeObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationParamSpecsService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
 
 oppia.directive('paramChangesEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

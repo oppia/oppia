@@ -16,11 +16,11 @@
  * @fileoverview Controllers for the exploration history tab.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/ExplorationDataService.js');
-require('pages/exploration_editor/history_tab/CompareVersionsService.js');
-require('pages/exploration_editor/history_tab/VersionTreeService.js');
-require('services/DateTimeFormatService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/history_tab/CompareVersionsService.ts');
+require('pages/exploration_editor/history_tab/VersionTreeService.ts');
+require('services/DateTimeFormatService.ts');
 
 oppia.controller('HistoryTab', [
   '$http', '$log', '$rootScope', '$scope',

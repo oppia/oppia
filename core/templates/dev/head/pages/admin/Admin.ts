@@ -17,40 +17,40 @@
  */
 
 //vvv this block of requires should be removed vvv
-require('directives/FocusOnDirective.js');
-require('components/forms/validators/IsAtLeastFilter.js');
-require('components/forms/validators/IsAtMostFilter.js');
-require('components/forms/validators/IsFloatFilter.js');
-require('components/forms/validators/IsIntegerFilter.js');
-require('components/forms/validators/IsNonemptyFilter.js');
-require('components/forms/ApplyValidationDirective.js');
-require('components/forms/ObjectEditorDirective.js');
-require('components/forms/RequireIsFloatDirective.js');
-require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedDictEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedIntEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedListEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js');
+require('directives/FocusOnDirective.ts');
+require('components/forms/validators/IsAtLeastFilter.ts');
+require('components/forms/validators/IsAtMostFilter.ts');
+require('components/forms/validators/IsFloatFilter.ts');
+require('components/forms/validators/IsIntegerFilter.ts');
+require('components/forms/validators/IsNonemptyFilter.ts');
+require('components/forms/ApplyValidationDirective.ts');
+require('components/forms/ObjectEditorDirective.ts');
+require('components/forms/RequireIsFloatDirective.ts');
+require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
 //^^^ this block of requires should be removed ^^^
 
-require('pages/admin/AdminNavbarDirective.js');
-require('pages/admin/activities_tab/AdminDevModeActivitiesTabDirective.js');
-require('pages/admin/activities_tab/AdminProdModeActivitiesTabDirective.js');
-require('pages/admin/config_tab/AdminConfigTabDirective.js');
-require('pages/admin/jobs_tab/AdminJobsTabDirective.js');
-require('pages/admin/misc_tab/AdminMiscTabDirective.js');
-require('pages/admin/roles_tab/AdminRolesTabDirective.js');
+require('pages/admin/AdminNavbarDirective.ts');
+require('pages/admin/activities_tab/AdminDevModeActivitiesTabDirective.ts');
+require('pages/admin/activities_tab/AdminProdModeActivitiesTabDirective.ts');
+require('pages/admin/config_tab/AdminConfigTabDirective.ts');
+require('pages/admin/jobs_tab/AdminJobsTabDirective.ts');
+require('pages/admin/misc_tab/AdminMiscTabDirective.ts');
+require('pages/admin/roles_tab/AdminRolesTabDirective.ts');
 
-require('domain/objects/NumberWithUnitsObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/admin/AdminRouterService.js');
-require('services/UtilsService.js');
+require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/admin/AdminRouterService.ts');
+require('services/UtilsService.ts');
 
 oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
 oppia.constant('ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');

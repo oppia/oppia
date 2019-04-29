@@ -17,22 +17,22 @@
  *  like engine service.
  */
 
-require('domain/exploration/EditableExplorationBackendApiService.js');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.js');
-require('domain/question/PretestQuestionBackendApiService.js');
-require('pages/exploration_player/ExplorationEngineService.js');
-require('pages/exploration_player/NumberAttemptsService.js');
-require('pages/exploration_player/PlayerPositionService.js');
-require('pages/exploration_player/PlayerTranscriptService.js');
-require('pages/exploration_player/PretestEngineService.js');
-require('pages/exploration_player/StateClassifierMappingService.js');
-require('pages/exploration_player/StatsReportingService.js');
-require('services/ContextService.js');
-require('services/ExplorationFeaturesBackendApiService.js');
-require('services/ExplorationFeaturesService.js');
-require('services/PlaythroughIssuesService.js');
-require('services/PlaythroughService.js');
-require('services/contextual/UrlService.js');
+require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/question/PretestQuestionBackendApiService.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/NumberAttemptsService.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('pages/exploration_player/PretestEngineService.ts');
+require('pages/exploration_player/StateClassifierMappingService.ts');
+require('pages/exploration_player/StatsReportingService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationFeaturesBackendApiService.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/PlaythroughIssuesService.ts');
+require('services/PlaythroughService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.factory('ExplorationPlayerStateService', [
   '$log', '$q', 'ContextService', 'EditableExplorationBackendApiService',

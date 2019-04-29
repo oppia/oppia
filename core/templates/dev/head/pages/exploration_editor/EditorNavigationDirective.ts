@@ -17,17 +17,17 @@
  * in editor.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/ExplorationRightsService.js');
-require('pages/exploration_editor/ExplorationWarningsService.js');
-require('pages/exploration_editor/RouterService.js');
-require('pages/exploration_editor/StateTutorialFirstTimeService.js');
-require('pages/exploration_editor/feedback_tab/ThreadDataService.js');
-require('services/ContextService.js');
-require('services/ExplorationFeaturesService.js');
-require('services/SiteAnalyticsService.js');
-require('services/UserService.js');
-require('services/contextual/WindowDimensionsService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationRightsService.ts');
+require('pages/exploration_editor/ExplorationWarningsService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
+require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/UserService.ts');
+require('services/contextual/WindowDimensionsService.ts');
 
 oppia.directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {

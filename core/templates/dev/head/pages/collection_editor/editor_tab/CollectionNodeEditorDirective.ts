@@ -18,11 +18,11 @@
  * and also delete the collection node represented by this directive.
  */
 
-require('domain/collection/CollectionUpdateService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/collection_editor/CollectionEditorStateService.js');
-require('pages/collection_editor/editor_tab/CollectionLinearizerService.js');
-require('services/AlertsService.js');
+require('domain/collection/CollectionUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
+require('services/AlertsService.ts');
 
 oppia.directive('collectionNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

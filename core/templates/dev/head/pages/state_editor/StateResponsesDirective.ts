@@ -15,35 +15,35 @@
 /**
  * @fileoverview Directive for managing the state responses in the state editor.
  */
-require('components/state/AnswerGroupEditorDirective.js');
-require('components/state/ResponseHeaderDirective.js');
+require('components/state/AnswerGroupEditorDirective.ts');
+require('components/state/ResponseHeaderDirective.ts');
 
-require('domain/exploration/AnswerGroupObjectFactory.js');
-require('domain/exploration/HintObjectFactory.js');
-require('domain/exploration/OutcomeObjectFactory.js');
-require('domain/exploration/RuleObjectFactory.js');
-require('domain/exploration/SubtitledHtmlObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('filters/CamelCaseToHyphensFilter.js');
-require('filters/ConvertToPlainTextFilter.js');
-require('filters/ParameterizeRuleDescriptionFilter.js');
-require('filters/TruncateFilter.js');
-require('filters/WrapTextWithEllipsisFilter.js');
-require('pages/exploration_editor/EditorFirstTimeEventsService.js');
-require('pages/exploration_editor/editor_tab/InteractionDetailsCacheService.js');
-require('pages/exploration_editor/editor_tab/ResponsesService.js');
-require('pages/state_editor/state_properties/StateContentService.js');
-require('pages/state_editor/state_properties/StateCustomizationArgsService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('pages/state_editor/state_properties/StateHintsService.js');
-require('pages/state_editor/state_properties/StateInteractionIdService.js');
-require('pages/state_editor/state_properties/StateSolutionService.js');
-require('services/AlertsService.js');
-require('services/ContextService.js');
-require('services/EditabilityService.js');
-require('services/ExplorationHtmlFormatterService.js');
-require('services/GenerateContentIdService.js');
-require('services/HtmlEscaperService.js');
+require('domain/exploration/AnswerGroupObjectFactory.ts');
+require('domain/exploration/HintObjectFactory.ts');
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('domain/exploration/RuleObjectFactory.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/CamelCaseToHyphensFilter.ts');
+require('filters/ConvertToPlainTextFilter.ts');
+require('filters/ParameterizeRuleDescriptionFilter.ts');
+require('filters/TruncateFilter.ts');
+require('filters/WrapTextWithEllipsisFilter.ts');
+require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
+require('pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require('pages/state_editor/state_properties/StateContentService.ts');
+require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateHintsService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+require('pages/state_editor/state_properties/StateSolutionService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/EditabilityService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/GenerateContentIdService.ts');
+require('services/HtmlEscaperService.ts');
 
 oppia.directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {

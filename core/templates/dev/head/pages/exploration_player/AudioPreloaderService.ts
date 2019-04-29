@@ -16,12 +16,12 @@
  * @fileoverview Service to preload audio into AssetsBackendApiService's cache.
  */
 
-require('domain/utilities/LanguageUtilService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_player/AudioTranslationLanguageService.js');
-require('services/AssetsBackendApiService.js');
-require('services/ComputeGraphService.js');
-require('services/ContextService.js');
+require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/AudioTranslationLanguageService.ts');
+require('services/AssetsBackendApiService.ts');
+require('services/ComputeGraphService.ts');
+require('services/ContextService.ts');
 
 oppia.factory('AudioPreloaderService', [
   '$uibModal', 'AssetsBackendApiService', 'AudioTranslationLanguageService',

@@ -17,7 +17,7 @@
  * the specification of the parameters.
  */
 
-require('pages/exploration_editor/ExplorationPropertyService.js');
+require('pages/exploration_editor/ExplorationPropertyService.ts');
 
 oppia.factory('ExplorationParamSpecsService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {

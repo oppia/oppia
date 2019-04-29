@@ -17,9 +17,9 @@
  * in collection player.
  */
 
-require('components/share/SharingLinksDirective.js');
+require('components/share/SharingLinksDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('collectionFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {

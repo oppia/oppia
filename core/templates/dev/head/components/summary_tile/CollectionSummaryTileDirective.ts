@@ -16,12 +16,12 @@
  * @fileoverview Summary tile for collections.
  */
 
-require('domain/learner_dashboard/LearnerDashboardIconsDirective.js');
-require('filters/TruncateAndCapitalizeFilter.js');
+require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
+require('filters/TruncateAndCapitalizeFilter.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('services/DateTimeFormatService.js');
-require('services/UserService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/UserService.ts');
 
 oppia.constant(
   'COLLECTION_VIEWER_URL', '/collection/<collection_id>');

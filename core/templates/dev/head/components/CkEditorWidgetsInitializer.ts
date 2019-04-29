@@ -17,8 +17,8 @@
  * text components.
  */
 
-require('services/HtmlEscaperService.js');
-require('services/RteHelperService.js');
+require('services/HtmlEscaperService.ts');
+require('services/RteHelperService.ts');
 
 oppia.run([
   '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',

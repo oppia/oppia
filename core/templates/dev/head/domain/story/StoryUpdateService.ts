@@ -19,8 +19,8 @@
  * undo/redo service.
  */
 
-require('domain/editor/undo_redo/ChangeObjectFactory.js');
-require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/editor/undo_redo/ChangeObjectFactory.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
 
 // These should match the constants defined in core.domain.story_domain.
 oppia.constant('CMD_ADD_STORY_NODE', 'add_story_node');

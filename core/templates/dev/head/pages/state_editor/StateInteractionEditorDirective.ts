@@ -17,22 +17,22 @@
  * editor.
  */
 
-require('directives/AngularHtmlBindDirective.js');
+require('directives/AngularHtmlBindDirective.ts');
 
-require('domain/exploration/SubtitledHtmlObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/EditorFirstTimeEventsService.js');
-require('pages/exploration_editor/editor_tab/InteractionDetailsCacheService.js');
-require('pages/state_editor/state_properties/StateContentService.js');
-require('pages/state_editor/state_properties/StateCustomizationArgsService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('pages/state_editor/state_properties/StateHintsService.js');
-require('pages/state_editor/state_properties/StateInteractionIdService.js');
-require('pages/state_editor/state_properties/StateSolutionService.js');
-require('services/AlertsService.js');
-require('services/EditabilityService.js');
-require('services/ExplorationHtmlFormatterService.js');
-require('services/HtmlEscaperService.js');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
+require('pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+require('pages/state_editor/state_properties/StateContentService.ts');
+require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateHintsService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+require('pages/state_editor/state_properties/StateSolutionService.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/HtmlEscaperService.ts');
 
 oppia.directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

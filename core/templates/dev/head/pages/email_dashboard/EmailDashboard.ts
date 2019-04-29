@@ -16,8 +16,8 @@
  * @fileoverview Controller for oppia email dashboard page.
  */
 
-require('pages/email_dashboard/EmailDashboardDataService.js');
-require('services/UserService.js');
+require('pages/email_dashboard/EmailDashboardDataService.ts');
+require('services/UserService.ts');
 
 oppia.controller('EmailDashboard', [
   '$rootScope', '$scope', 'EmailDashboardDataService', 'UserService',

@@ -17,26 +17,26 @@
  * state editor.
  */
 
-require('components/state/ResponseHeaderDirective.js');
-require('components/state/SolutionEditorDirective.js');
+require('components/state/ResponseHeaderDirective.ts');
+require('components/state/SolutionEditorDirective.ts');
 
-require('domain/exploration/SolutionObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('filters/ConvertToPlainTextFilter.js');
-require('pages/exploration_editor/editor_tab/ResponsesService.js');
-require('pages/exploration_editor/editor_tab/SolutionValidityService.js');
-require('pages/exploration_editor/editor_tab/SolutionVerificationService.js');
-require('pages/exploration_player/CurrentInteractionService.js');
-require('pages/state_editor/state_properties/StateCustomizationArgsService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('pages/state_editor/state_properties/StateHintsService.js');
-require('pages/state_editor/state_properties/StateInteractionIdService.js');
-require('pages/state_editor/state_properties/StateSolutionService.js');
-require('services/AlertsService.js');
-require('services/ContextService.js');
-require('services/EditabilityService.js');
-require('services/ExplorationHtmlFormatterService.js');
-require('services/GenerateContentIdService.js');
+require('domain/exploration/SolutionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/ConvertToPlainTextFilter.ts');
+require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
+require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
+require('pages/exploration_player/CurrentInteractionService.ts');
+require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateHintsService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+require('pages/state_editor/state_properties/StateSolutionService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/EditabilityService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/GenerateContentIdService.ts');
 
 oppia.directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

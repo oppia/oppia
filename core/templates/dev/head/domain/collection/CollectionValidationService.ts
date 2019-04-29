@@ -19,7 +19,7 @@
  * in collection_domain.Collection and subsequent domain objects.
  */
 
-require('pages/collection_editor/editor_tab/CollectionLinearizerService.js');
+require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
 
 oppia.factory('CollectionValidationService', [
   'CollectionLinearizerService',

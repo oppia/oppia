@@ -17,8 +17,8 @@
  * about explorations from the backend.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_player/PlayerConstants.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/PlayerConstants.ts');
 
 oppia.factory('ReadOnlyExplorationBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',

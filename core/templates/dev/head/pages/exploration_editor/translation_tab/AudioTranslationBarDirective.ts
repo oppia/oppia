@@ -16,18 +16,18 @@
  * @fileoverview Directive for the audio translation bar.
  */
 
-require('filters/FormatTimerFilter.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/translation_tab/TranslationLanguageService.js');
-require('pages/exploration_editor/translation_tab/TranslationTabActiveContentIdService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('pages/state_editor/state_properties/StatePropertyService.js');
-require('services/AlertsService.js');
-require('services/AssetsBackendApiService.js');
-require('services/AudioPlayerService.js');
-require('services/ContextService.js');
-require('services/EditabilityService.js');
-require('services/IdGenerationService.js');
+require('filters/FormatTimerFilter.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
+require('pages/exploration_editor/translation_tab/TranslationTabActiveContentIdService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/AlertsService.ts');
+require('services/AssetsBackendApiService.ts');
+require('services/AudioPlayerService.ts');
+require('services/ContextService.ts');
+require('services/EditabilityService.ts');
+require('services/IdGenerationService.ts');
 
 // Constant for audio recording time limit.
 oppia.constant('RECORDING_TIME_LIMIT', 300);

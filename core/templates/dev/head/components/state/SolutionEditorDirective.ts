@@ -16,17 +16,17 @@
  * @fileoverview Directive for the solution editor.
  */
 
-require('components/state/SolutionExplanationEditorDirective.js');
-require('directives/AngularHtmlBindDirective.js');
+require('components/state/SolutionExplanationEditorDirective.ts');
+require('directives/AngularHtmlBindDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
-require('domain/exploration/SolutionObjectFactory.js');
-require('pages/exploration_editor/editor_tab/SolutionVerificationService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('pages/state_editor/state_properties/StatePropertyService.js');
-require('services/AlertsService.js');
-require('services/ContextService.js');
-require('services/ExplorationHtmlFormatterService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('domain/exploration/SolutionObjectFactory.ts');
+require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
 
 oppia.directive('solutionEditor', [
   '$uibModal', 'AlertsService', 'ContextService',

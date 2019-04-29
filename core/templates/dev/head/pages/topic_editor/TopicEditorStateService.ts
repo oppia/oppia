@@ -18,14 +18,14 @@
  * retrieving the topic, saving it, and listening for changes.
  */
 
-require('domain/editor/undo_redo/UndoRedoService.js');
-require('domain/story/EditableStoryBackendApiService.js');
-require('domain/topic/EditableTopicBackendApiService.js');
-require('domain/topic/SubtopicPageObjectFactory.js');
-require('domain/topic/TopicObjectFactory.js');
-require('domain/topic/TopicRightsBackendApiService.js');
-require('domain/topic/TopicRightsObjectFactory.js');
-require('services/AlertsService.js');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/story/EditableStoryBackendApiService.ts');
+require('domain/topic/EditableTopicBackendApiService.ts');
+require('domain/topic/SubtopicPageObjectFactory.ts');
+require('domain/topic/TopicObjectFactory.ts');
+require('domain/topic/TopicRightsBackendApiService.ts');
+require('domain/topic/TopicRightsObjectFactory.ts');
+require('services/AlertsService.ts');
 
 oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
 oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');

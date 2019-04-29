@@ -17,15 +17,15 @@
  *  backend.
  */
 
-require('domain/collection/GuestCollectionProgressService.js');
-require('domain/exploration/AnswerGroupObjectFactory.js');
-require('domain/exploration/AudioTranslationObjectFactory.js');
-require('domain/exploration/HintObjectFactory.js');
-require('domain/exploration/OutcomeObjectFactory.js');
-require('domain/exploration/ParamSpecObjectFactory.js');
-require('domain/exploration/WrittenTranslationObjectFactory.js');
-require('domain/objects/FractionObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/exploration/AnswerGroupObjectFactory.ts');
+require('domain/exploration/AudioTranslationObjectFactory.ts');
+require('domain/exploration/HintObjectFactory.ts');
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('domain/exploration/ParamSpecObjectFactory.ts');
+require('domain/exploration/WrittenTranslationObjectFactory.ts');
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.constant(
   'EDITABLE_QUESTION_DATA_URL_TEMPLATE',

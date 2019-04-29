@@ -16,8 +16,8 @@
  * @fileoverview Directive for the navbar breadcrumb of the topic viewer.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('services/contextual/UrlService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.directive('topicViewerNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {

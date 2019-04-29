@@ -17,21 +17,21 @@
  * @fileoverview Controller for the questions list.
  */
 
-require('directives/AngularHtmlBindDirective.js');
-require('pages/question_editor/QuestionEditorDirective.js');
+require('directives/AngularHtmlBindDirective.ts');
+require('pages/question_editor/QuestionEditorDirective.ts');
 
-require('components/QuestionCreationService.js');
-require('domain/editor/undo_redo/UndoRedoService.js');
-require('domain/question/EditableQuestionBackendApiService.js');
-require('domain/question/QuestionObjectFactory.js');
-require('domain/skill/EditableSkillBackendApiService.js');
-require('domain/skill/MisconceptionObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('filters/TruncateFilter.js');
-require('pages/topic_editor/TopicEditorStateService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('services/AlertsService.js');
-require('services/contextual/UrlService.js');
+require('components/QuestionCreationService.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/TruncateFilter.ts');
+require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {

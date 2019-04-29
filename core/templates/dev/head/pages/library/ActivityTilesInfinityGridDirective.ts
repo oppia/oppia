@@ -16,9 +16,9 @@
  * @fileoverview Directive for an infinitely-scrollable view of activity tiles
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('services/SearchService.js');
-require('services/contextual/WindowDimensionsService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/SearchService.ts');
+require('services/contextual/WindowDimensionsService.ts');
 
 oppia.directive('activityTilesInfinityGrid', [
   'UrlInterpolationService', function(UrlInterpolationService) {

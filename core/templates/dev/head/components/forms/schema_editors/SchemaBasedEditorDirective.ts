@@ -16,17 +16,17 @@
  * @fileoverview Directive for general schema-based editors.
  */
 
-require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedDictEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedIntEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedListEditorDirective.js');
-require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js');
+require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
 
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('schemaBasedEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -19,9 +19,9 @@
  * undo/redo service.
  */
 
-require('domain/collection/CollectionNodeObjectFactory.js');
-require('domain/editor/undo_redo/ChangeObjectFactory.js');
-require('domain/editor/undo_redo/UndoRedoService.js');
+require('domain/collection/CollectionNodeObjectFactory.ts');
+require('domain/editor/undo_redo/ChangeObjectFactory.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
 
 // These should match the constants defined in core.domain.collection_domain.
 // TODO(bhenning): The values of these constants should be provided by the

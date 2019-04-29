@@ -16,28 +16,28 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
-require('components/share/SharingLinksDirective.js');
+require('components/share/SharingLinksDirective.ts');
 
-require('domain/exploration/StatesObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/AutosaveInfoModalsService.js');
-require('pages/exploration_editor/ChangeListService.js');
-require('pages/exploration_editor/ExplorationCategoryService.js');
-require('pages/exploration_editor/ExplorationDataService.js');
-require('pages/exploration_editor/ExplorationDiffService.js');
-require('pages/exploration_editor/ExplorationInitStateNameService.js');
-require('pages/exploration_editor/ExplorationLanguageCodeService.js');
-require('pages/exploration_editor/ExplorationObjectiveService.js');
-require('pages/exploration_editor/ExplorationRightsService.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/exploration_editor/ExplorationTagsService.js');
-require('pages/exploration_editor/ExplorationTitleService.js');
-require('pages/exploration_editor/ExplorationWarningsService.js');
-require('pages/exploration_editor/RouterService.js');
-require('services/AlertsService.js');
-require('services/ContextService.js');
-require('services/SiteAnalyticsService.js');
-require('services/stateful/FocusManagerService.js');
+require('domain/exploration/StatesObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/AutosaveInfoModalsService.ts');
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationCategoryService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationDiffService.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationLanguageCodeService.ts');
+require('pages/exploration_editor/ExplorationObjectiveService.ts');
+require('pages/exploration_editor/ExplorationRightsService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/ExplorationTagsService.ts');
+require('pages/exploration_editor/ExplorationTitleService.ts');
+require('pages/exploration_editor/ExplorationWarningsService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/stateful/FocusManagerService.ts');
 
 oppia.factory('ExplorationSaveService', [
   '$log', '$q', '$rootScope', '$timeout', '$uibModal',

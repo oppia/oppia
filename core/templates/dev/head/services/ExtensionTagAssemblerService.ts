@@ -17,7 +17,7 @@
  * the learner and editor views.
  */
 
-require('filters/CamelCaseToHyphensFilter.js');
+require('filters/CamelCaseToHyphensFilter.ts');
 
 // Service for assembling extension tags (for interactions).
 oppia.factory('ExtensionTagAssemblerService', [

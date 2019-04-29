@@ -12,44 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('I18nFooter.js');
-require('directives/FocusOnDirective.js');
+require('I18nFooter.ts');
+require('directives/FocusOnDirective.ts');
 
-require('pages/Base.js');
+require('pages/Base.ts');
 
-require('services/AlertsService.js');
-require('services/ContextService.js');
-require('services/NavigationService.js');
-require('services/UtilsService.js');
-require('services/DebouncerService.js');
-require('services/DateTimeFormatService.js');
-require('services/IdGenerationService.js');
-require('services/HtmlEscaperService.js');
-require('services/TranslationFileHashLoaderService.js');
-require('services/RteHelperService.js');
-require('services/StateRulesStatsService.js');
-require('services/ConstructTranslationIdsService.js');
-require('services/UserService.js');
-require('services/PromoBarService.js');
-require('services/contextual/DeviceInfoService.js');
-require('services/contextual/UrlService.js');
-require('services/contextual/WindowDimensionsService.js');
-require('services/stateful/BackgroundMaskService.js');
-require('services/stateful/FocusManagerService.js');
-require('services/SiteAnalyticsService.js');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/NavigationService.ts');
+require('services/UtilsService.ts');
+require('services/DebouncerService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/IdGenerationService.ts');
+require('services/HtmlEscaperService.ts');
+require('services/TranslationFileHashLoaderService.ts');
+require('services/RteHelperService.ts');
+require('services/StateRulesStatsService.ts');
+require('services/ConstructTranslationIdsService.ts');
+require('services/UserService.ts');
+require('services/PromoBarService.ts');
+require('services/contextual/DeviceInfoService.ts');
+require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/stateful/BackgroundMaskService.ts');
+require('services/stateful/FocusManagerService.ts');
+require('services/SiteAnalyticsService.ts');
 
-require('components/alerts/AlertMessageDirective.js');
-require('components/create_button/CreateActivityButtonDirective.js');
+require('components/alerts/AlertMessageDirective.ts');
+require('components/create_button/CreateActivityButtonDirective.ts');
 
-require('components/forms/ObjectEditorDirective.js');
-require('components/promo/PromoBarDirective.js');
-require('components/side_navigation_bar/SideNavigationBarDirective.js');
-require('components/social_buttons/SocialButtonsDirective.js');
-require('components/top_navigation_bar/TopNavigationBarDirective.js');
+require('components/forms/ObjectEditorDirective.ts');
+require('components/promo/PromoBarDirective.ts');
+require('components/side_navigation_bar/SideNavigationBarDirective.ts');
+require('components/social_buttons/SocialButtonsDirective.ts');
+require('components/top_navigation_bar/TopNavigationBarDirective.ts');
 
-require('domain/sidebar/SidebarStatusService.js');
-require('domain/user/UserInfoObjectFactory.js');
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/sidebar/SidebarStatusService.ts');
+require('domain/user/UserInfoObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
 
 /**

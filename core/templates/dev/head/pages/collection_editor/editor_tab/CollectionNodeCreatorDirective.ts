@@ -16,17 +16,17 @@
  * @fileoverview Directive for creating a new collection node.
  */
 
-require('domain/collection/CollectionNodeObjectFactory.js');
-require('domain/collection/CollectionUpdateService.js');
-require('domain/collection/SearchExplorationsBackendApiService.js');
-require('domain/summary/ExplorationSummaryBackendApiService.js');
-require('domain/utilities/UrlInterpolationService.js');
-require('filters/NormalizeWhitespaceFilter.js');
-require('pages/collection_editor/CollectionEditorStateService.js');
-require('pages/collection_editor/editor_tab/CollectionLinearizerService.js');
-require('services/AlertsService.js');
-require('services/SiteAnalyticsService.js');
-require('services/ValidatorsService.js');
+require('domain/collection/CollectionNodeObjectFactory.ts');
+require('domain/collection/CollectionUpdateService.ts');
+require('domain/collection/SearchExplorationsBackendApiService.ts');
+require('domain/summary/ExplorationSummaryBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/NormalizeWhitespaceFilter.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
+require('services/AlertsService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/ValidatorsService.ts');
 
 oppia.directive('collectionNodeCreator', [
   'UrlInterpolationService', function(UrlInterpolationService) {

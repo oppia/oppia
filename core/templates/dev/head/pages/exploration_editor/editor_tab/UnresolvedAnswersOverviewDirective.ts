@@ -16,14 +16,14 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/ExplorationRightsService.js');
-require('pages/exploration_editor/ExplorationStatesService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('pages/state_editor/state_properties/StatePropertyService.js');
-require('services/EditabilityService.js');
-require('services/ImprovementsService.js');
-require('services/StateTopAnswersStatsService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationRightsService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/EditabilityService.ts');
+require('services/ImprovementsService.ts');
+require('services/StateTopAnswersStatsService.ts');
 
 oppia.directive('unresolvedAnswersOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {

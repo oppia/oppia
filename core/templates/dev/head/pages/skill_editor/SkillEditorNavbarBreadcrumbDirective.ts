@@ -16,8 +16,8 @@
  * @fileoverview Controller for the navbar breadcrumb of the skill editor.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/skill_editor/SkillEditorStateService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/skill_editor/SkillEditorStateService.ts');
 
 oppia.directive('skillEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {

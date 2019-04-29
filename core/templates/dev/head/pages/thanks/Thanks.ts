@@ -16,8 +16,8 @@
  * @fileoverview Controllers for the 'thanks' page.
  */
 
-require('components/background/BackgroundBannerDirective.js');
-require('domain/utilities/UrlInterpolationService.js');
+require('components/background/BackgroundBannerDirective.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.controller('Thanks', [
   '$scope', 'UrlInterpolationService',

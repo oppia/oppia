@@ -16,11 +16,11 @@
  * @fileoverview Directive for the rule editor.
  */
 
-require('domain/utilities/UrlInterpolationService.js');
-require('pages/exploration_editor/editor_tab/ResponsesService.js');
-require('pages/state_editor/state_properties/StateEditorService.js');
-require('pages/state_editor/state_properties/StatePropertyService.js');
-require('services/ValidatorsService.js');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/ValidatorsService.ts');
 
 // This directive controls an editor for selecting the type and input parameters
 // to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call

@@ -17,7 +17,7 @@
  * in the translation tab is currently active.
  */
 
-require('domain/utilities/LanguageUtilService.js');
+require('domain/utilities/LanguageUtilService.ts');
 
 oppia.factory('TranslationLanguageService', [
   '$log', '$rootScope', 'LanguageUtilService',
