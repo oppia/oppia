@@ -29,10 +29,11 @@
 oppia.factory('LearnerActionRenderService', [
   '$sce', 'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
   'ACTION_TYPE_EXPLORATION_START', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  'FractionObjectFactory',
   function(
       $sce, ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
       ACTION_TYPE_EXPLORATION_START,
-      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS, FractionObjectFactory) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
       var htmlString =
         '<span class="oppia-issues-learner-action">' + actionIndex +
@@ -66,13 +67,17 @@ oppia.factory('LearnerActionRenderService', [
      * @param {int} timeSpentInStateSecs.
      * @param {string} currentStateName.
      * @param {int} actionIndex.
+     * @param {string} interactionId.
      * @returns {string}
      */
     var renderAnswerSubmitActionHTML = function(
         answer, destStateName, timeSpentInStateSecs, currentStateName,
-        actionIndex) {
+        actionIndex, interactionId) {
       var htmlString;
       if (currentStateName === destStateName) {
+        if (interactionId === 'FractionInput') {
+          answer = FractionObjectFactory.fromDict(answer).toString();
+        }
         htmlString =
           '<span class="oppia-issues-learner-action">' + actionIndex +
           '. Submitted answer "' + answer + '" in card "' + currentStateName +
@@ -144,7 +149,7 @@ oppia.factory('LearnerActionRenderService', [
           return renderAnswerSubmitActionHTML(
             custArgs.submitted_answer.value, custArgs.dest_state_name.value,
             custArgs.time_spent_state_in_msecs.value, custArgs.state_name.value,
-            actionIndex);
+            actionIndex, interactionId);
         }
       }
     };
