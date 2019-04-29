@@ -42,6 +42,9 @@ jobs:
           <<: *restore_cache
       - run:
           name: Run lint tests
+          # All the python scripts should behave as modules -- the
+          # pre_commit_linter needs to import other Python files and that is
+          # only possible if we treat it as a module.
           command: |
             bash scripts/install_third_party.sh
             python scripts/third_party_size_check.py

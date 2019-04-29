@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +22,7 @@ import io
 import sys
 
 from core.tests import test_utils
-
+from core.tests.data import unicode_and_str_handler
 from . import python_utils
 
 
@@ -53,3 +55,9 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(IOError, 'No such file found:'):
             with python_utils.open_file('invalid_file.py', 'r') as f:
                 f.readlines()
+
+    def test_unicode_and_str_chars_in_file(self):
+        self.assertIsInstance(unicode_and_str_handler.SOME_STR_TEXT, unicode)
+        self.assertIsInstance(
+            unicode_and_str_handler.SOME_UNICODE_TEXT, unicode)
+        self.assertIsInstance(unicode_and_str_handler.SOME_BINARY_TEXT, str)

@@ -79,9 +79,7 @@ sys.path.insert(0, _FUTURE_PATH)
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
-from builtins import object  # isort:skip
-from builtins import range  # isort:skip
-from builtins import str  # isort:skip
+import builtins  # isort:skip
 from future import standard_library  # isort:skip
 import html.parser  # isort:skip
 
@@ -355,7 +353,7 @@ _MESSAGE_TYPE_FAILED = 'FAILED'
 _TARGET_STDOUT = python_utils.import_string_io()
 
 
-class FileCache(object):
+class FileCache(builtins.object):
     """Provides thread-safe access to cached file content."""
 
     _CACHE_DATA_DICT = {}
@@ -376,19 +374,6 @@ class FileCache(object):
         return cls._get_data(filepath, mode)[0]
 
     @classmethod
-    def read_as_str(cls, filepath, mode='r'):
-        """Returns the data read from the file in str form.
-
-        Args:
-            filepath: str. The file path from which data is to be read.
-            mode: str. The mode in which the file is to be opened.
-
-        Returns:
-            str. The data read from the file.
-        """
-        return utils.convert_to_str(cls._get_data(filepath, mode)[0])
-
-    @classmethod
     def readlines(cls, filepath, mode='r'):
         """Returns the tuple containing data line by line as read from the
         file in unicode form.
@@ -402,21 +387,6 @@ class FileCache(object):
                 the file.
         """
         return cls._get_data(filepath, mode)[1]
-
-    @classmethod
-    def readlines_as_str(cls, filepath, mode='r'):
-        """Returns the tuple containing data line by line as read from the
-        file in str form.
-
-        Args:
-            filepath: str. The file path from which data is to be read.
-            mode: str. The mode in which the file is to be opened.
-
-        Returns:
-            tuple(str). The tuple containing data line by line as read from the
-                file.
-        """
-        return utils.convert_to_str(cls._get_data(filepath, mode)[1])
 
     @classmethod
     def _get_cache_lock(cls, key):
@@ -996,7 +966,7 @@ def _lint_py_files(
     print('Python linting finished.')
 
 
-class LintChecksManager(object):
+class LintChecksManager(builtins.object):
     """Manages all the linting functions.
 
     Attributes:
@@ -1235,7 +1205,7 @@ class LintChecksManager(object):
                     # The first argument of the expression is the
                     # name of the directive.
                     if arguments[0].type == 'Literal':
-                        directive_name = str(arguments[0].value)
+                        directive_name = builtins.str(arguments[0].value)
                     arguments = arguments[1:]
                     for argument in arguments:
                         # Check the type of an argument.
@@ -1444,7 +1414,7 @@ class LintChecksManager(object):
                     # Separate the arguments of the expression.
                     arguments = expression.arguments
                     if arguments[0].type == 'Literal':
-                        property_value = str(arguments[0].value)
+                        property_value = builtins.str(arguments[0].value)
                     arguments = arguments[1:]
                     for argument in arguments:
                         if argument.type != 'ArrayExpression':
@@ -1457,11 +1427,12 @@ class LintChecksManager(object):
                         elements = argument.elements
                         for element in elements:
                             if element.type == 'Literal':
-                                literal_args.append(str(element.value))
+                                literal_args.append(builtins.str(element.value))
                             elif element.type == 'FunctionExpression':
                                 func_args = element.params
                                 for func_arg in func_args:
-                                    function_args.append(str(func_arg.name))
+                                    function_args.append(
+                                        builtins.str(func_arg.name))
                         for arg in function_args:
                             if arg.startswith('$'):
                                 dollar_imports.append(arg)
@@ -1703,7 +1674,7 @@ class LintChecksManager(object):
             for filepath in files_to_check:
                 file_content = FileCache.readlines(filepath)
                 file_length = len(file_content)
-                for line_num in range(file_length):
+                for line_num in builtins.range(file_length):
                     line = file_content[line_num].strip()
                     prev_line = ''
 
@@ -1793,7 +1764,7 @@ class LintChecksManager(object):
             docstring_checker = docstrings_checker.ASTDocStringChecker()
             for filepath in files_to_check:
                 ast_file = ast.walk(
-                    ast.parse(FileCache.read_as_str(filepath)))
+                    ast.parse(utils.convert_to_str(FileCache.read(filepath))))
                 func_defs = [n for n in ast_file if isinstance(
                     n, ast.FunctionDef)]
                 for func in func_defs:
@@ -1839,7 +1810,7 @@ class LintChecksManager(object):
             for filepath in files_to_check:
                 file_content = FileCache.readlines(filepath)
                 file_length = len(file_content)
-                for line_num in range(file_length):
+                for line_num in builtins.range(file_length):
                     line = file_content[line_num].strip()
                     next_line = ''
                     previous_line = ''
