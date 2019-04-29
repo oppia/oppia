@@ -104,15 +104,15 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             question_id_3, 'skill_2', 0.2)
 
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, skill_descriptions = (
             question_services.get_question_summaries_and_skill_descriptions(
-                5, ['skill_1', 'skill_2', 'skill_3'], ''))
+                ['skill_1', 'skill_2', 'skill_3']))
 
         with self.assertRaisesRegexp(
             Exception, 'Querying linked question summaries for more than 3 '
             'skills at a time is not supported currently.'):
             question_services.get_question_summaries_and_skill_descriptions(
-                5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], '')
+                ['skill_1', 'skill_2', 'skill_3', 'skill_4'])
         question_ids = [summary.id for summary in question_summaries]
         skill_descriptions = [
             description for description in skill_descriptions
@@ -129,13 +129,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             if (
                     question_ids[index] == self.question_id or
                     question_ids[index] == question_id_2):
-                self.assertEqual('Skill Description 1', description)
+                self.assertEqual(['Skill Description 1'], description)
             else:
-                self.assertEqual('Skill Description 2', description)
+                self.assertEqual(['Skill Description 2'], description)
 
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, skill_descriptions = (
             question_services.get_question_summaries_and_skill_descriptions(
-                5, ['skill_1', 'skill_3'], ''))
+                ['skill_1', 'skill_3']))
         question_ids = [summary.id for summary in question_summaries]
         self.assertEqual(len(question_ids), 2)
         self.assertItemsEqual(

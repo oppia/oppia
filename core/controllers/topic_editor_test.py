@@ -95,28 +95,18 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.ADMIN_EMAIL)
-            with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
-                json_response = self.get_json(
-                    '%s/%s?cursor=' % (
-                        feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-                    ))
-                question_summary_dicts = json_response['question_summary_dicts']
-                self.assertEqual(len(question_summary_dicts), 1)
-                next_start_cursor = json_response['next_start_cursor']
-                json_response = self.get_json(
-                    '%s/%s?cursor=%s' % (
-                        feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id,
-                        next_start_cursor
-                    ))
-                question_summary_dicts_2 = (
-                    json_response['question_summary_dicts'])
-                self.assertEqual(len(question_summary_dicts_2), 1)
-                self.assertEqual(
-                    question_summary_dicts[0]['skill_description'],
-                    'Skill Description')
-                self.assertNotEqual(
-                    question_summary_dicts[0]['summary']['id'],
-                    question_summary_dicts_2[0]['summary']['id'])
+            json_response = self.get_json(
+                '%s/%s?cursor=' % (
+                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
+                ))
+            question_summary_dicts = json_response['question_summary_dicts']
+            self.assertEqual(len(question_summary_dicts), 3)
+            self.assertEqual(
+                question_summary_dicts[0]['skill_description'],
+                ['Skill Description'])
+            self.assertNotEqual(
+                question_summary_dicts[0]['summary']['id'],
+                question_summary_dicts[1]['summary']['id'])
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
