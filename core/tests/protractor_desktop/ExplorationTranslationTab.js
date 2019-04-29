@@ -115,8 +115,32 @@ describe('Exploration translation', function() {
 
     explorationEditorTranslationTab.switchToVoiceoverMode();
     explorationEditorTranslationTab.expectToBeInVoiceoverMode();
-
   });
+
+  it('should correctly set translation for active content', function() {
+    users.login('common@translationTab.com');
+    creatorDashboardPage.get();
+    // Test using common exploration.
+    creatorDashboardPage.editExploration('tests');
+
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.exitTutorial();
+    explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
+    explorationEditorTranslationTab.expectContentTabContentToMatch(
+      'This is first card.');
+    explorationEditorTranslationTab.setTranslation(forms.toRichText(
+      'Ye pehla panna hain.'));
+    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+      'YYe pehla panna hain.'));
+    explorationEditorTranslationTab.navigateToFeedbackTab();
+    explorationEditorTranslationTab.setTranslation(forms.toRichText(
+      'Yah hindi main vishleshad hain.'));
+    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+      'Yah hindi main vishleshad hain.'));
+    users.logout();
+    general.checkForConsoleErrors([]);
+  });
+
 
   it('should have all the state contents', function() {
     users.login('common@translationTab.com');
