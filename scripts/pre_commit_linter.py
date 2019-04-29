@@ -959,7 +959,7 @@ class LintChecksManager(object):
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         # Set path for node.
-        node_path = os.path.join(os.pardir, 'oppia_tools/node-6.9.1')
+        node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
         os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
         self.compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
