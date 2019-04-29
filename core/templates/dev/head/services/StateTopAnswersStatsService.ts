@@ -117,7 +117,7 @@ oppia.factory('StateTopAnswersStatsService', [
               AnswerStatsObjectFactory.createFromBackendDict),
             unresolvedAnswers: [],
             interactionId: (
-              ExplorationStatesService.getState(stateName).interaction.id),
+              stateTopAnswersStatsBackendDict.interaction_ids[stateName]),
           };
           // Still need to manually refresh the addressed information.
           refreshAddressedInfo(stateName);

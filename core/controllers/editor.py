@@ -787,14 +787,15 @@ class StateAnswerStatisticsHandler(EditorHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
-            current_exploration = (
-                exp_services.get_exploration_by_id(exploration_id))
+            states = exp_services.get_exploration_by_id(exploration_id).states
         except:
             raise self.PageNotFoundException
 
         self.render_json({
             'answers': stats_services.get_top_state_answer_stats_multi(
-                exploration_id, current_exploration.states)
+                exploration_id, states),
+            'interaction_ids': {
+                state.name: state.interaction.id for state in states},
         })
 
 
