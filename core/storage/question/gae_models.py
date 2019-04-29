@@ -257,8 +257,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             list(str), list(list(str)). The id of questions which are linked
                 to skill ids in the list, the corresponding skill descriptions.
         """
-        question_skill_link_models = cls.query(cls.skill_id.IN(skill_ids))
-            .order(-cls.last_updated, cls.key)
+        question_skill_link_models = cls.query(
+            cls.skill_id.IN(skill_ids)).order(-cls.last_updated, cls.key)
 
         question_ids = []
         skill_ids = []
