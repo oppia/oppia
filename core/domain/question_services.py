@@ -322,7 +322,8 @@ def update_skill_ids_of_questions(
         new_question_skill_link_models)
 
 
-def get_question_summaries_and_skill_descriptions(skill_ids):
+def get_question_summaries_and_skill_descriptions(
+        question_count, skill_ids, start_cursor):
     """Returns the list of question summaries linked to all the skills given by
     skill_ids.
 
@@ -340,17 +341,17 @@ def get_question_summaries_and_skill_descriptions(skill_ids):
             linked to the given skill ids.
     """
     if len(skill_ids) == 0:
-        return [], []
+        return [], [], None
 
     if len(skill_ids) > 3:
         raise Exception(
             'Querying linked question summaries for more than 3 skills at a '
             'time is not supported currently.')
-    question_ids, skill_descriptions = (
+    question_ids, skill_descriptions, next_cursor = (
         question_models.QuestionSkillLinkModel.get_all_question_ids_and_skill_descriptions( #pylint: disable=line-too-long
-            skill_ids))
+            question_count, skill_ids, start_cursor))
     question_summaries = get_question_summaries_by_ids(question_ids)
-    return question_summaries, skill_descriptions
+    return question_summaries, skill_descriptions, next_cursor
 
 
 def get_questions_by_ids(question_ids):

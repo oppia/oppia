@@ -85,9 +85,11 @@ oppia.factory('EditableSkillBackendApiService', [
       $http.get(questionsDataUrl).then(function(response) {
         var questionSummaries = angular.copy(
           response.data.question_summary_dicts);
+        var nextCursor = response.data.next_start_cursor;
         if (successCallback) {
           successCallback({
             questionSummaries: questionSummaries,
+            nextCursor: nextCursor
           });
         }
       }, function(errorResponse) {

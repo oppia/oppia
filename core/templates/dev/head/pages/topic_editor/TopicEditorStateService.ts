@@ -58,6 +58,7 @@ oppia.factory('TopicEditorStateService', [
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
     var _questionSummaries = [];
+    var _nextCursorForQuestions = '';
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -112,8 +113,12 @@ oppia.factory('TopicEditorStateService', [
       $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
     var _setQuestionSummaries = function(questionSummaries) {
-      _questionSummaries = angular.copy(questionSummaries);
+      _questionSummaries = _questionSummaries.concat(
+        angular.copy(questionSummaries));
       $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
+    };
+    var _setNextQuestionsCursor = function(nextCursor) {
+      _nextCursorForQuestions = nextCursor;
     };
 
     return {
@@ -135,9 +140,11 @@ oppia.factory('TopicEditorStateService', [
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
               });
-            EditableTopicBackendApiService.fetchQuestions(topicId).then(
+            EditableTopicBackendApiService.fetchQuestions(
+              topicId, _nextCursorForQuestions).then(
               function(returnObject) {
                 _setQuestionSummaries(returnObject.questionSummaries);
+                _setNextQuestionsCursor(returnObject.nextCursor);
               }
             );
           },
@@ -190,8 +197,9 @@ oppia.factory('TopicEditorStateService', [
       },
 
       isLastQuestionBatch: function(index) {
-        return (index + 1) * constants.NUM_QUESTIONS_PER_PAGE >=
-          _questionSummaries.length;
+        return (
+          _nextCursorForQuestions === null &&
+          (index + 1) * 10 >= _questionSummaries.length);
       },
 
       /**
@@ -219,16 +227,23 @@ oppia.factory('TopicEditorStateService', [
       },
 
       fetchQuestionSummaries: function(topicId, resetHistory) {
-        EditableTopicBackendApiService.fetchQuestions(topicId).then(
+        if (resetHistory) {
+          _questionSummaries = [];
+          _nextCursorForQuestions = '';
+        }
+        EditableTopicBackendApiService.fetchQuestions(
+          topicId, _nextCursorForQuestions).then(
           function(returnObject) {
             _setQuestionSummaries(returnObject.questionSummaries);
+            _setNextQuestionsCursor(returnObject.nextCursor);
           }
         );
       },
 
-      getQuestionSummaries: function(index) {
+      getQuestionSummaries: function(index, fetchMore) {
         var num = constants.NUM_QUESTIONS_PER_PAGE;
-        if (_questionSummaries.length === 0) {
+        if ((index + 1)*num > _questionSummaries.length 
+            && _nextCursorForQuestions !== null && fetchMore) {
           return null;
         } else {
           return _questionSummaries.slice(index * num, (index + 1) * num);

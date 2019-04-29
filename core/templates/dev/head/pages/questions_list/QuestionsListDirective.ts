@@ -52,7 +52,7 @@ oppia.directive('questionsList', [
             $scope.questionEditorIsShown = false;
             $scope.question = null;
             $scope.questionSummaries =
-              $scope.getQuestionSummaries($scope.currentPage);
+              $scope.getQuestionSummaries($scope.currentPage, false);
             $scope.truncatedQuestionSummaries = [];
             if ($scope.questionSummaries) {
               $scope.truncatedQuestionSummaries =
@@ -82,12 +82,19 @@ oppia.directive('questionsList', [
           $scope.goToNextPage = function() {
             $scope.currentPage++;
             var questionSummaries =
-              $scope.getQuestionSummaries($scope.currentPage);
+              $scope.getQuestionSummaries($scope.currentPage, true);
             if (questionSummaries === null) {
               $scope.fetchQuestionSummaries($scope.entityId, false);
             } else {
               $scope.questionSummaries = questionSummaries;
             }
+          };
+
+          $scope.goToPreviousPage = function() {
+            $scope.currentPage--;
+            $scope.questionSummaries =
+              $scope.getQuestionSummaries($scope.currentPage, false);
+            console.log($scope.questionSummaries);
           };
 
           $scope.getSkillDescription = function(skillDescriptions) {
@@ -96,12 +103,6 @@ oppia.directive('questionsList', [
               skillDescription = skillDescription.concat(description, ', ');
             });
             return skillDescription.substring(0, skillDescription.length - 2);
-          };
-
-          $scope.goToPreviousPage = function() {
-            $scope.currentPage--;
-            $scope.questionSummaries =
-              $scope.getQuestionSummaries($scope.currentPage);
           };
 
           $scope.saveAndPublishQuestion = function() {
@@ -121,6 +122,7 @@ oppia.directive('questionsList', [
                       response, $scope.skillIds[i]);
                   }
                 }
+              }).then(function() {
                 $scope.fetchQuestionSummaries($scope.entityId, true);
                 $scope.questionIsBeingSaved = false;
                 $scope.currentPage = 0;
@@ -170,6 +172,9 @@ oppia.directive('questionsList', [
                 function($scope, $uibModalInstance) {
                   $scope.selectedSkillIds = [];
                   $scope.skillSummaries = allSkillSummaries;
+                  $scope.skillSummaries.forEach(function(summary) {
+                    summary.isSelected = false;
+                  });
 
                   $scope.selectOrDeselectSkill = function(skillId, index) {
                     if (!$scope.skillSummaries[index].isSelected) {

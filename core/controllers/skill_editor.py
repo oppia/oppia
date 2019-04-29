@@ -156,9 +156,11 @@ class SkillEditorQuestionHandler(base.BaseHandler):
             raise self.PageNotFoundException
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
-        question_summaries, skill_descriptions = (
+        start_cursor = self.request.get('cursor')
+
+        question_summaries, skill_descriptions, next_start_cursor = (
             question_services.get_question_summaries_and_skill_descriptions(
-                [skill_id])
+                constants.NUM_QUESTIONS_PER_PAGE, [skill_id], start_cursor)
         )
         return_dicts = []
         for index, summary in enumerate(question_summaries):
@@ -169,6 +171,7 @@ class SkillEditorQuestionHandler(base.BaseHandler):
 
         self.values.update({
             'question_summary_dicts': return_dicts,
+            'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
 
