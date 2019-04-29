@@ -1016,9 +1016,9 @@ class LintChecksManager(object):
         no_implicit_use_strict = 'true'
         skip_lib_check = 'true'
         target = 'es5'
-        type_roots = '../node_modules/@types'
+        type_roots = './node_modules/@types'
         cmd = (
-            '../node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+            './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
             '-lib %s -noImplicitUseStrict %s -skipLibCheck '
             '%s -target %s -typeRoots %s %s typings/*') % (
                 self.compiled_js_dir, allow_js, lib, no_implicit_use_strict,
