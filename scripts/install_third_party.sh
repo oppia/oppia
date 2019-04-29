@@ -22,11 +22,10 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
-install_node_module ajv 5.0.0
-install_node_module babel-eslint 10.0.1
+install_node_module ajv 6.10.0
 install_node_module browserstack-local 1.3.3
 install_node_module dotenv 6.0.0
-install_node_module eslint 4.19.0
+install_node_module eslint 5.0.0
 install_node_module eslint-plugin-angular 0.12.0
 install_node_module eslint-plugin-html 4.0.1
 install_node_module gulp 3.9.0
@@ -43,6 +42,7 @@ install_node_module stylelint 9.2.1
 install_node_module stylelint-config-standard 18.2.0
 install_node_module through2 2.0.0
 install_node_module typescript 3.3.3
+install_node_module @typescript-eslint/parser 1.4.2
 install_node_module @types/angular 1.6.54
 install_node_module @types/angular-animate 1.5.10
 install_node_module @types/angular-mocks 1.7.0
@@ -184,12 +184,12 @@ fi
 
 # Install pycodestyle.
 echo Checking if pycodestyle is installed in third_party
-if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
+if [ ! -d "$TOOLS_DIR/pycodestyle-2.5.0" ]; then
   echo Installing pycodestyle
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o pycodestyle-2.3.1.tar.gz -L https://pypi.python.org/packages/e1/88/0e2cbf412bd849ea6f1af1f97882add46a374f4ba1d2aea39353609150ad/pycodestyle-2.3.1.tar.gz
-  tar xzf pycodestyle-2.3.1.tar.gz -C $TOOLS_DIR
-  rm pycodestyle-2.3.1.tar.gz
+  curl -o pycodestyle-2.5.0.tar.gz -L https://files.pythonhosted.org/packages/1c/d1/41294da5915f4cae7f4b388cea6c2cd0d6cd53039788635f6875dfe8c72f/pycodestyle-2.5.0.tar.gz
+  tar xzf pycodestyle-2.5.0.tar.gz -C $TOOLS_DIR
+  rm pycodestyle-2.5.0.tar.gz
 fi
 
 # Install esprima.
