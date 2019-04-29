@@ -11,9 +11,9 @@
   </div>
 </div>
 
-<hr style="clear: both; margin-bottom: 0.5em">
+<hr style="clear: both; margin: 1em 0 0.5em 0">
 
-<ol class="thread-messages" ng-if="activeThread.messages">
+<ol ng-if="activeThread.messages" class="thread-messages" style="padding: 0 32px">
   <li ng-repeat="m in activeThread.messages | orderBy:'message_id'">
     <div style="float: left">
       <span ng-if="$index !== 0">#<[m.message_id]></span>
@@ -76,7 +76,7 @@
     </div>
 
     <div class="text-right" style="float: right">
-      <button ng-click="close()" ng-disabled="messageSendingInProgress"
+      <button ng-click="close()" ng-if="activeThread.messages" ng-disabled="messageSendingInProgress"
               class="btn btn-default protractor-test-oppia-feedback-response-send-btn"
               style="margin-right: 0">
         Close
@@ -100,7 +100,6 @@
 <style>
 ol.thread-messages {
   list-style: none;
-  padding: 0 32px;
   margin: 0;
 }
 ol.thread-messages li {
