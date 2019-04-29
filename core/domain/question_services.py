@@ -340,7 +340,7 @@ def get_question_summaries_and_skill_descriptions(skill_ids):
             linked to the given skill ids.
     """
     if len(skill_ids) == 0:
-        return [], [], None
+        return [], []
 
     if len(skill_ids) > 3:
         raise Exception(
