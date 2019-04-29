@@ -85,6 +85,10 @@ for arg in "$@"; do
   fi
 done
 
+# Compile typescript files
+echo "Compiling typescript..."
+$NODE_MODULE_DIR/typescript/bin/tsc --project .
+
 $PYTHON_CMD scripts/backend_tests.py $@
 
 for arg in "$@"; do

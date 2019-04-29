@@ -255,7 +255,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #  Required:
             #    * A python file called {InteractionName}.py.
             #    * An html file called {InteractionName}.html.
-            #    * A directory name 'directives' containing JS and HTML files
+            #    * A directory name 'directives' containing TS and HTML files
             #      for directives
             #    * A directory named 'static' containing at least a .png file.
             #  Optional:
@@ -275,7 +275,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir,
-                    '%sPredictionService.js' % interaction_id)))
+                    '%sPredictionService.ts' % interaction_id)))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -283,7 +283,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir,
-                    '%sPredictionServiceSpec.js' % interaction_id)))
+                    '%sPredictionServiceSpec.ts' % interaction_id)))
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -307,13 +307,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # The directives directory should contain the following files:
             #  Required:
-            #    * A JS file called
-            #    OppiaInteractive{InteractionName}Directive.js.
-            #    * A JS file called OppiaResponse{InteractionName}Directive.js.
-            #    * A JS file called
-            #    OppiaShortResponse{InteractionName}Directive.js.
-            #    * A JS file called {InteractionName}RulesService.js.
-            #    * A JS file called {InteractionName}ValidationService.js.
+            #    * A TS file called
+            #    OppiaInteractive{InteractionName}Directive.ts.
+            #    * A TS file called OppiaResponse{InteractionName}Directive.ts.
+            #    * A TS file called
+            #    OppiaShortResponse{InteractionName}Directive.ts.
+            #    * A TS file called {InteractionName}RulesService.ts.
+            #    * A TS file called {InteractionName}ValidationService.ts.
             #    * A HTML file called
             #      {InteractionName}_interaction_directive.html.
             #    * A HTML file called
@@ -321,24 +321,24 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #    * A HTML file called
             #      {InteractionName}_short_response_directive.html.
             #  Optional:
-            #    * A JS file called {InteractionName}ValidationServiceSpecs.js.
-            #    * A JS file called {InteractionName}RulesServiceSpecs.js.
+            #    * A TS file called {InteractionName}ValidationServiceSpecs.ts.
+            #    * A TS file called {InteractionName}RulesServiceSpecs.ts.
 
             snakecase_interaction_id = (
                 utils.camelcase_to_snakecase(interaction_id))
 
-            interaction_directive_js_file = os.path.join(
-                directives_dir, 'OppiaInteractive%sDirective.js' % (
+            interaction_directive_ts_file = os.path.join(
+                directives_dir, 'OppiaInteractive%sDirective.ts' % (
                     interaction_id))
-            response_directive_js_file = os.path.join(
-                directives_dir, 'OppiaResponse%sDirective.js' % interaction_id)
-            short_response_directive_js_file = os.path.join(
-                directives_dir, 'OppiaShortResponse%sDirective.js' % (
+            response_directive_ts_file = os.path.join(
+                directives_dir, 'OppiaResponse%sDirective.ts' % interaction_id)
+            short_response_directive_ts_file = os.path.join(
+                directives_dir, 'OppiaShortResponse%sDirective.ts' % (
                     interaction_id))
-            rules_service_js_file = os.path.join(
-                directives_dir, '%sRulesService.js' % interaction_id)
-            validation_service_js_file = os.path.join(
-                directives_dir, '%sValidationService.js' % interaction_id)
+            rules_service_ts_file = os.path.join(
+                directives_dir, '%sRulesService.ts' % interaction_id)
+            validation_service_ts_file = os.path.join(
+                directives_dir, '%sValidationService.ts' % interaction_id)
             interaction_directive_html = os.path.join(
                 directives_dir,
                 '%s_interaction_directive.html' % snakecase_interaction_id)
@@ -349,11 +349,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 directives_dir,
                 '%s_short_response_directive.html' % snakecase_interaction_id)
 
-            self.assertTrue(os.path.isfile(interaction_directive_js_file))
-            self.assertTrue(os.path.isfile(response_directive_js_file))
-            self.assertTrue(os.path.isfile(short_response_directive_js_file))
-            self.assertTrue(os.path.isfile(rules_service_js_file))
-            self.assertTrue(os.path.isfile(validation_service_js_file))
+            self.assertTrue(os.path.isfile(interaction_directive_ts_file))
+            self.assertTrue(os.path.isfile(response_directive_ts_file))
+            self.assertTrue(os.path.isfile(short_response_directive_ts_file))
+            self.assertTrue(os.path.isfile(rules_service_ts_file))
+            self.assertTrue(os.path.isfile(validation_service_ts_file))
             self.assertTrue(os.path.isfile(interaction_directive_html))
             self.assertTrue(os.path.isfile(response_directive_html))
             self.assertTrue(os.path.isfile(short_response_directive_html))
@@ -371,34 +371,34 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
                 self.assertEqual(int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
-            interaction_directive_js_file_content = utils.get_file_contents(
-                interaction_directive_js_file)
-            response_directive_js_file_content = utils.get_file_contents(
-                response_directive_js_file)
-            short_response_directive_js_file_content = utils.get_file_contents(
-                short_response_directive_js_file)
+            interaction_directive_ts_file_content = utils.get_file_contents(
+                interaction_directive_ts_file)
+            response_directive_ts_file_content = utils.get_file_contents(
+                response_directive_ts_file)
+            short_response_directive_ts_file_content = utils.get_file_contents(
+                short_response_directive_ts_file)
             html_file_content = utils.get_file_contents(html_file)
-            rules_service_js_file_content = utils.get_file_contents(
-                rules_service_js_file)
-            validation_service_js_file_content = utils.get_file_contents(
-                validation_service_js_file)
+            rules_service_ts_file_content = utils.get_file_contents(
+                rules_service_ts_file)
+            validation_service_ts_file_content = utils.get_file_contents(
+                validation_service_ts_file)
 
             self.assertIn(
                 'oppiaInteractive%s' % interaction_id,
-                interaction_directive_js_file_content)
+                interaction_directive_ts_file_content)
             self.assertIn(
                 'oppiaResponse%s' % interaction_id,
-                response_directive_js_file_content)
+                response_directive_ts_file_content)
             self.assertIn(
                 'oppiaShortResponse%s' % interaction_id,
-                short_response_directive_js_file_content)
+                short_response_directive_ts_file_content)
             self.assertIn(
                 '%sRulesService' % (
                     interaction_id[0] + interaction_id[1:]),
-                rules_service_js_file_content)
+                rules_service_ts_file_content)
             self.assertIn(
                 '%sValidationService' % interaction_id,
-                validation_service_js_file_content)
+                validation_service_ts_file_content)
 
             # Check that the html template includes js script for the
             # interaction.
@@ -428,18 +428,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     interaction_id, interaction_id),
                 html_file_content)
 
-            self.assertNotIn('<script>', interaction_directive_js_file_content)
-            self.assertNotIn('</script>', interaction_directive_js_file_content)
-            self.assertNotIn('<script>', response_directive_js_file_content)
-            self.assertNotIn('</script>', response_directive_js_file_content)
+            self.assertNotIn('<script>', interaction_directive_ts_file_content)
+            self.assertNotIn('</script>', interaction_directive_ts_file_content)
+            self.assertNotIn('<script>', response_directive_ts_file_content)
+            self.assertNotIn('</script>', response_directive_ts_file_content)
             self.assertNotIn(
-                '<script>', short_response_directive_js_file_content)
+                '<script>', short_response_directive_ts_file_content)
             self.assertNotIn(
-                '</script>', short_response_directive_js_file_content)
-            self.assertNotIn('<script>', rules_service_js_file_content)
-            self.assertNotIn('</script>', rules_service_js_file_content)
-            self.assertNotIn('<script>', validation_service_js_file_content)
-            self.assertNotIn('</script>', validation_service_js_file_content)
+                '</script>', short_response_directive_ts_file_content)
+            self.assertNotIn('<script>', rules_service_ts_file_content)
+            self.assertNotIn('</script>', rules_service_ts_file_content)
+            self.assertNotIn('<script>', validation_service_ts_file_content)
+            self.assertNotIn('</script>', validation_service_ts_file_content)
 
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)

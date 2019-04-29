@@ -22,11 +22,10 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
-install_node_module ajv 5.0.0
-install_node_module babel-eslint 10.0.1
+install_node_module ajv 6.10.0
 install_node_module browserstack-local 1.3.3
 install_node_module dotenv 6.0.0
-install_node_module eslint 4.19.0
+install_node_module eslint 5.0.0
 install_node_module eslint-plugin-angular 0.12.0
 install_node_module eslint-plugin-html 4.0.1
 install_node_module gulp 3.9.0
@@ -43,6 +42,7 @@ install_node_module stylelint 9.2.1
 install_node_module stylelint-config-standard 18.2.0
 install_node_module through2 2.0.0
 install_node_module typescript 3.3.3
+install_node_module @typescript-eslint/parser 1.4.2
 install_node_module @types/angular 1.6.54
 install_node_module @types/angular-animate 1.5.10
 install_node_module @types/angular-mocks 1.7.0

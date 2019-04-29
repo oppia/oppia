@@ -23,6 +23,7 @@ rm -rf third_party
 rm -rf build
 rm -rf backend_prod_files
 rm -f .coverage
+rm -rf local_compiled_js
 rm -f .viminfo
 
 echo Temporary and installed files deleted.
