@@ -43,8 +43,9 @@ oppia.factory('EditableQuestionBackendApiService', [
         question_dict: questionDict
       };
       $http.post(questionCreationUrl, postData).then(function(response) {
+        var questionId = response.data.question_id;
         if (successCallback) {
-          successCallback();
+          successCallback(questionId);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -101,10 +102,28 @@ oppia.factory('EditableQuestionBackendApiService', [
       });
     };
 
+    var _addQuestionSkillLink = function(
+        questionId, skillId, successCallback, errorCallback) {
+      var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
+        QUESTION_SKILL_LINK_URL_TEMPLATE, {
+          question_id: questionId,
+          skill_id: skillId
+      });
+      $http.post(addQuestionSkillLinkUrl).then(function(response) {
+        if (successCallback) {
+          successCallback();
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      }); 
+    };
+
     return {
-      createQuestion: function(skillId, questionDict) {
+      createQuestion: function(skillIds, questionDict) {
         return $q(function(resolve, reject) {
-          _createQuestion(skillId, questionDict, resolve, reject);
+          _createQuestion(skillIds, questionDict, resolve, reject);
         });
       },
 
@@ -130,6 +149,13 @@ oppia.factory('EditableQuestionBackendApiService', [
           _updateQuestion(
             questionId, questionVersion, commitMessage, changeList,
             resolve, reject);
+        });
+      },
+
+      addQuestionSkillLink: function(
+          questionId, skillId) {
+        return $q(function(resolve, reject) {
+          _addQuestionSkillLink(questionId, skillId, resolve, reject);
         });
       }
     };

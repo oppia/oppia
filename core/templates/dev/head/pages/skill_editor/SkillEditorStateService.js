@@ -40,7 +40,6 @@ oppia.factory('SkillEditorStateService', [
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
     var _questionSummaries = [];
-    var _nextCursorForQuestions = '';
 
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
@@ -67,11 +66,8 @@ oppia.factory('SkillEditorStateService', [
     };
 
     var _setQuestionSummaries = function(questionSummaries) {
-      _questionSummaries.push(angular.copy(questionSummaries));
+      _questionSummaries = angular.copy(questionSummaries);
       $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
-    };
-    var _setNextQuestionsCursor = function(nextCursor) {
-      _nextCursorForQuestions = nextCursor;
     };
 
     return {
@@ -81,11 +77,9 @@ oppia.factory('SkillEditorStateService', [
           skillId).then(
           function(newBackendSkillObject) {
             _updateSkill(newBackendSkillObject);
-            EditableSkillBackendApiService.fetchQuestions(
-              skillId, _nextCursorForQuestions).then(
+            EditableSkillBackendApiService.fetchQuestions(skillId).then(
               function(returnObject) {
                 _setQuestionSummaries(returnObject.questionSummaries);
-                _setNextQuestionsCursor(returnObject.nextCursor);
               }
             );
             _skillIsBeingLoaded = false;
@@ -110,30 +104,26 @@ oppia.factory('SkillEditorStateService', [
       },
 
       isLastQuestionBatch: function(index) {
-        return (
-          _nextCursorForQuestions === null &&
-          index === _questionSummaries.length - 1);
+        return (index + 1) * constants.NUM_QUESTIONS_PER_PAGE
+                >= _questionSummaries.length;
       },
 
       fetchQuestionSummaries: function(skillId, resetHistory) {
-        if (resetHistory) {
-          _questionSummaries = [];
-          _nextCursorForQuestions = '';
-        }
-        EditableSkillBackendApiService.fetchQuestions(
-          skillId, _nextCursorForQuestions).then(
+        EditableTopicBackendApiService.fetchQuestions(skillId).then(
           function(returnObject) {
             _setQuestionSummaries(returnObject.questionSummaries);
-            _setNextQuestionsCursor(returnObject.nextCursor);
           }
         );
       },
 
       getQuestionSummaries: function(index) {
-        if (index >= _questionSummaries.length) {
+        var num = constants.NUM_QUESTIONS_PER_PAGE;
+        if (_questionSummaries.length == 0) {
           return null;
         }
-        return _questionSummaries[index];
+        else {
+          return _questionSummaries.slice(index * num, (index + 1) * num);
+        }
       },
 
       hasLoadedSkill: function() {

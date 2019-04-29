@@ -110,9 +110,9 @@ class TopicEditorQuestionHandler(base.BaseHandler):
         topic = topic_services.get_topic_by_id(topic_id)
         skill_ids = topic.get_all_skill_ids()
 
-        question_summaries, skill_descriptions, next_start_cursor = (
+        question_summaries, skill_descriptions = (
             question_services.get_question_summaries_and_skill_descriptions(
-                constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
+                skill_ids)
         )
         return_dicts = []
         for index, summary in enumerate(question_summaries):
@@ -123,7 +123,6 @@ class TopicEditorQuestionHandler(base.BaseHandler):
 
         self.values.update({
             'question_summary_dicts': return_dicts,
-            'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
 

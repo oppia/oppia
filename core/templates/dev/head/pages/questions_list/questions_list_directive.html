@@ -26,7 +26,7 @@
       ng-click="editQuestion(question.summary)">
     <td> <[getQuestionIndex($index)]> </td>
     <td> <[truncatedQuestionSummaries[$index]]> </td>
-    <td ng-if="!getSkill()">{{question.skill_description}}</td>
+    <td ng-if="!getSkill()"><[getSkillDescription(question.skill_description)]></td>
   </tr>
 </table>
 <h4 ng-if="questionSummaries.length === 0" style="color: gray;">

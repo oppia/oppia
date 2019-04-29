@@ -58,7 +58,6 @@ oppia.factory('TopicEditorStateService', [
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
     var _questionSummaries = [];
-    var _nextCursorForQuestions = '';
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -113,11 +112,8 @@ oppia.factory('TopicEditorStateService', [
       $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
     var _setQuestionSummaries = function(questionSummaries) {
-      _questionSummaries.push(angular.copy(questionSummaries));
+      _questionSummaries = angular.copy(questionSummaries);
       $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
-    };
-    var _setNextQuestionsCursor = function(nextCursor) {
-      _nextCursorForQuestions = nextCursor;
     };
 
     return {
@@ -139,11 +135,9 @@ oppia.factory('TopicEditorStateService', [
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
               });
-            EditableTopicBackendApiService.fetchQuestions(
-              topicId, _nextCursorForQuestions).then(
+            EditableTopicBackendApiService.fetchQuestions(topicId).then(
               function(returnObject) {
                 _setQuestionSummaries(returnObject.questionSummaries);
-                _setNextQuestionsCursor(returnObject.nextCursor);
               }
             );
           },
@@ -196,9 +190,8 @@ oppia.factory('TopicEditorStateService', [
       },
 
       isLastQuestionBatch: function(index) {
-        return (
-          _nextCursorForQuestions === null &&
-          index === _questionSummaries.length - 1);
+        return (index + 1) * constants.NUM_QUESTIONS_PER_PAGE
+                >= _questionSummaries.length;
       },
 
       /**
@@ -226,24 +219,21 @@ oppia.factory('TopicEditorStateService', [
       },
 
       fetchQuestionSummaries: function(topicId, resetHistory) {
-        if (resetHistory) {
-          _questionSummaries = [];
-          _nextCursorForQuestions = '';
-        }
-        EditableTopicBackendApiService.fetchQuestions(
-          topicId, _nextCursorForQuestions).then(
+        EditableTopicBackendApiService.fetchQuestions(topicId).then(
           function(returnObject) {
             _setQuestionSummaries(returnObject.questionSummaries);
-            _setNextQuestionsCursor(returnObject.nextCursor);
           }
         );
       },
 
       getQuestionSummaries: function(index) {
-        if (index >= _questionSummaries.length) {
+        var num = constants.NUM_QUESTIONS_PER_PAGE;
+        if (_questionSummaries.length == 0) {
           return null;
         }
-        return _questionSummaries[index];
+        else {
+          return _questionSummaries.slice(index * num, (index + 1) * num);
+        }
       },
 
       /**

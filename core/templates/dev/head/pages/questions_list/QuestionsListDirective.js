@@ -90,6 +90,14 @@ oppia.directive('questionsList', [
             }
           };
 
+          $scope.getSkillDescription = function(skillDescriptions) {
+            var skillDescription = '';
+            skillDescriptions.forEach(function(description) {
+              skillDescription = skillDescription.concat(description, ', ');
+            });
+            return skillDescription.substring(0, skillDescription.length - 2);
+          }
+
           $scope.goToPreviousPage = function() {
             $scope.currentPage--;
             $scope.questionSummaries =
@@ -105,8 +113,14 @@ oppia.directive('questionsList', [
             }
             if (!$scope.questionIsBeingUpdated) {
               EditableQuestionBackendApiService.createQuestion(
-                $scope.skillId, $scope.question.toBackendDict(true)
-              ).then(function() {
+                $scope.skillIds[0], $scope.question.toBackendDict(true)
+              ).then(function(response) {
+                if ($scope.skillIds.length > 0) {
+                  for (var i = 1; i < $scope.skillIds.length; i++) {
+                    EditableQuestionBackendApiService.addQuestionSkillLink(
+                      response, $scope.skillIds[i])
+                  }
+                }
                 $scope.fetchQuestionSummaries($scope.entityId, true);
                 $scope.questionIsBeingSaved = false;
                 $scope.currentPage = 0;
@@ -154,19 +168,22 @@ oppia.directive('questionsList', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
-                  $scope.selectedSkillId = null;
+                  $scope.selectedSkillIds = [];
                   $scope.skillSummaries = allSkillSummaries;
 
-                  $scope.selectOrDeselectSkill = function(skillId) {
-                    if (skillId === $scope.selectedSkillId) {
-                      $scope.selectedSkillId = null;
+                  $scope.selectOrDeselectSkill = function(skillId, index) {
+                    if (!$scope.skillSummaries[index].isSelected) {
+                      $scope.selectedSkillIds.push(skillId);
+                      $scope.skillSummaries[index].isSelected = true;
                     } else {
-                      $scope.selectedSkillId = skillId;
+                      var idIndex = $scope.selectedSkillIds.indexOf(skillId);
+                      $scope.selectedSkillIds.splice(idIndex, 1);
+                      $scope.skillSummaries[index].isSelected = false;
                     }
                   };
 
                   $scope.done = function() {
-                    $uibModalInstance.close($scope.selectedSkillId);
+                    $uibModalInstance.close($scope.selectedSkillIds);
                   };
 
                   $scope.cancel = function() {
@@ -180,20 +197,24 @@ oppia.directive('questionsList', [
               ]
             });
 
-            modalInstance.result.then(function(skillId) {
-              $scope.skillId = skillId;
-              EditableSkillBackendApiService.fetchSkill(
-                skillId).then(
-                function(skillDict) {
-                  $scope.misconceptions = skillDict.misconceptions.map(function(
-                      misconceptionsBackendDict) {
-                    return MisconceptionObjectFactory.createFromBackendDict(
-                      misconceptionsBackendDict);
+            modalInstance.result.then(function(skillIds) {
+              $scope.skillIds = skillIds;
+              for (var i = 0; i < skillIds.length; i++) {
+                EditableSkillBackendApiService.fetchSkill(
+                  skillIds[i]).then(
+                  function(skillDict) {
+                    $scope.misconceptions += skillDict.misconceptions.map(function(
+                        misconceptionsBackendDict) {
+                      return MisconceptionObjectFactory.createFromBackendDict(
+                        misconceptionsBackendDict);
+                    });
+                  }, function(error) {
+                    AlertsService.addWarning();
                   });
+                }
+                if (AlertsService.warnings.length === 0) {
                   $scope.initializeNewQuestionCreation();
-                }, function(error) {
-                  AlertsService.addWarning();
-                });
+                }
             });
           };
 
