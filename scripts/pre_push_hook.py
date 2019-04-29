@@ -127,7 +127,7 @@ def _get_remote_name():
         raise Exception(
             'Error: Please set upstream for the lint checks to run '
             'efficiently. To do that follow these steps:\n'
-            '1. Run the command \'git remote\'\n'
+            '1. Run the command \'git remote -v\'\n'
             '2a. If upstream is listed in the command output, then run the '
             'command \'git remote set-url upstream '
             'https://github.com/oppia/oppia.git\'\n'
