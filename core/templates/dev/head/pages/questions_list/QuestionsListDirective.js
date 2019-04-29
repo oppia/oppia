@@ -205,13 +205,13 @@ oppia.directive('questionsList', [
                   function(skillDict) {
                     $scope.misconceptions += skillDict.misconceptions
                       .map(function(misconceptionsBackendDict) {
-                      return MisconceptionObjectFactory.createFromBackendDict(
-                        misconceptionsBackendDict);
-                    });
+                        return MisconceptionObjectFactory
+                          .createFromBackendDict(misconceptionsBackendDict);
+                      });
                   }, function(error) {
                     AlertsService.addWarning();
                   });
-                }
+              }
               if (AlertsService.warnings.length === 0) {
                 $scope.initializeNewQuestionCreation();
               }
