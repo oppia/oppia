@@ -791,13 +791,15 @@ class StateAnswerStatisticsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        top_state_stats = stats_services.get_top_state_answer_stats_multi(
-            exploration_id, states)
-        top_states = [states[state_name] for state_name in top_state_stats]
+        top_state_answer_stats = (
+            stats_services.get_top_state_answer_stats_multi(
+                exploration_id, states))
+        top_states = [
+            states[state_name] for state_name in top_state_answer_stats]
         self.render_json({
-            'answers': top_state_stats,
+            'answers': top_state_answer_stats,
             'interaction_ids': {
-                state.name: state.interaction.id for state in top_state_stats},
+                state.name: state.interaction.id for state in top_states},
         })
 
 
