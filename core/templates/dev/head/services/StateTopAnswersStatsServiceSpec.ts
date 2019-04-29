@@ -82,7 +82,7 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     it('is true after call to .init', function() {
-      this.stass.init({answers: {}});
+      this.stass.init({answers: {}, interaction_ids: {}});
 
       expect(this.stass.isInitialized()).toBe(true);
     });
@@ -97,7 +97,8 @@ describe('StateTopAnswersStatsService', function() {
             {answer: 'adios', frequency: 4},
             {answer: 'que?', frequency: 2},
           ]
-        }
+        },
+        interaction_ids: {Hola: 'TextInput'},
       });
 
       var stateStats = this.stass.getStateStats('Hola');
@@ -114,7 +115,8 @@ describe('StateTopAnswersStatsService', function() {
             {answer: 'adios', frequency: 4},
             {answer: 'que?', frequency: 2},
           ]
-        }
+        },
+        interaction_ids: {Hola: 'TextInput'},
       });
 
       expect(this.stass.getStateStats('Hola')).toEqual([
@@ -141,7 +143,7 @@ describe('StateTopAnswersStatsService', function() {
         spyOn(this.ess, 'registerOnStateInteractionSavedCallback')
       ];
 
-      this.stass.init({answers: {}});
+      this.stass.init({answers: {}, interaction_ids: {}});
 
       expectedRegistrationFunctions.forEach(function(registrationFunction) {
         expect(registrationFunction).toHaveBeenCalled();
@@ -156,9 +158,9 @@ describe('StateTopAnswersStatsService', function() {
         spyOn(this.ess, 'registerOnStateInteractionSavedCallback')
       ];
 
-      this.stass.init({answers: {}});
+      this.stass.init({answers: {}, interaction_ids: {}});
       // Second call should not add more callbacks.
-      this.stass.init({answers: {}});
+      this.stass.init({answers: {}, interaction_ids: {}});
 
       expectedRegistrationFunctions.forEach(function(registrationFunction) {
         expect(registrationFunction.calls.count()).toEqual(1);
@@ -173,19 +175,28 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     it('is true when the state contains answers', function() {
-      this.stass.init({answers: {Hola: [{answer: 'hola', frequency: 3}]}});
+      this.stass.init({
+        answers: {Hola: [{answer: 'hola', frequency: 3}]},
+        interaction_ids: {Hola: 'TextInput'},
+      });
 
       expect(this.stass.hasStateStats('Hola')).toBe(true);
     });
 
     it('is true even when the state contains no answers', function() {
-      this.stass.init({answers: {Hola: []}});
+      this.stass.init({
+        answers: {Hola: []},
+        interaction_ids: {Hola: 'TextInput'},
+      });
 
       expect(this.stass.hasStateStats('Hola')).toBe(true);
     });
 
     it('is false when the state does not exist', function() {
-      this.stass.init({answers: {Hola: [{answer: 'hola', frequency: 3}]}});
+      this.stass.init({
+        answers: {Hola: [{answer: 'hola', frequency: 3}]},
+        interaction_ids: {Hola: 'TextInput'},
+      });
 
       expect(this.stass.hasStateStats('Me Llamo')).toBe(false);
     });
@@ -193,7 +204,10 @@ describe('StateTopAnswersStatsService', function() {
 
   describe('.getStateNamesWithStats', function() {
     it('only returns state names that have stats', function() {
-      this.stass.init({answers: {Hola: [{answer: 'hola', frequency: 3}]}});
+      this.stass.init({
+        answers: {Hola: [{answer: 'hola', frequency: 3}]},
+        interaction_ids: {Hola: 'TextInput'},
+      });
 
       expect(this.stass.getStateNamesWithStats()).toEqual(['Hola']);
     });
@@ -213,7 +227,8 @@ describe('StateTopAnswersStatsService', function() {
             {answer: 'adios', frequency: 4},
             {answer: 'que?', frequency: 2},
           ]
-        }
+        },
+        interaction_ids: {Hola: 'TextInput'},
       });
     });
 
