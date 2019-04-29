@@ -108,7 +108,7 @@ oppia.factory('EditableQuestionBackendApiService', [
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
           question_id: questionId,
           skill_id: skillId
-      });
+        });
       $http.post(addQuestionSkillLinkUrl).then(function(response) {
         if (successCallback) {
           successCallback();
@@ -117,7 +117,7 @@ oppia.factory('EditableQuestionBackendApiService', [
         if (errorCallback) {
           errorCallback(errorResponse.data);
         }
-      }); 
+      });
     };
 
     return {

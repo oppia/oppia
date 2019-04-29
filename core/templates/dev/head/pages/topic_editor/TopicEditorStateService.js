@@ -190,8 +190,8 @@ oppia.factory('TopicEditorStateService', [
       },
 
       isLastQuestionBatch: function(index) {
-        return (index + 1) * constants.NUM_QUESTIONS_PER_PAGE
-                >= _questionSummaries.length;
+        return (index + 1) * constants.NUM_QUESTIONS_PER_PAGE >=
+          _questionSummaries.length;
       },
 
       /**
@@ -228,10 +228,9 @@ oppia.factory('TopicEditorStateService', [
 
       getQuestionSummaries: function(index) {
         var num = constants.NUM_QUESTIONS_PER_PAGE;
-        if (_questionSummaries.length == 0) {
+        if (_questionSummaries.length === 0) {
           return null;
-        }
-        else {
+        } else {
           return _questionSummaries.slice(index * num, (index + 1) * num);
         }
       },

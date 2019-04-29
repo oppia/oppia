@@ -96,7 +96,7 @@ oppia.directive('questionsList', [
               skillDescription = skillDescription.concat(description, ', ');
             });
             return skillDescription.substring(0, skillDescription.length - 2);
-          }
+          };
 
           $scope.goToPreviousPage = function() {
             $scope.currentPage--;
@@ -118,7 +118,7 @@ oppia.directive('questionsList', [
                 if ($scope.skillIds.length > 0) {
                   for (var i = 1; i < $scope.skillIds.length; i++) {
                     EditableQuestionBackendApiService.addQuestionSkillLink(
-                      response, $scope.skillIds[i])
+                      response, $scope.skillIds[i]);
                   }
                 }
                 $scope.fetchQuestionSummaries($scope.entityId, true);
@@ -203,8 +203,8 @@ oppia.directive('questionsList', [
                 EditableSkillBackendApiService.fetchSkill(
                   skillIds[i]).then(
                   function(skillDict) {
-                    $scope.misconceptions += skillDict.misconceptions.map(function(
-                        misconceptionsBackendDict) {
+                    $scope.misconceptions += skillDict.misconceptions
+                      .map(function(misconceptionsBackendDict) {
                       return MisconceptionObjectFactory.createFromBackendDict(
                         misconceptionsBackendDict);
                     });
@@ -212,9 +212,9 @@ oppia.directive('questionsList', [
                     AlertsService.addWarning();
                   });
                 }
-                if (AlertsService.warnings.length === 0) {
-                  $scope.initializeNewQuestionCreation();
-                }
+              if (AlertsService.warnings.length === 0) {
+                $scope.initializeNewQuestionCreation();
+              }
             });
           };
 
