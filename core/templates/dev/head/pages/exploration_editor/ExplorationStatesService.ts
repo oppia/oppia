@@ -35,7 +35,7 @@ oppia.factory('ExplorationStatesService', [
     var stateAddedCallbacks = [];
     var stateDeletedCallbacks = [];
     var stateRenamedCallbacks = [];
-    var stateAnswerGroupsSavedCallbacks = [];
+    var stateInteractionSavedCallbacks = [];
 
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -289,7 +289,7 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionId: function(stateName, newInteractionId) {
         saveStateProperty(stateName, 'widget_id', newInteractionId);
-        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+        stateInteractionSavedCallbacks.forEach(function(callback) {
           callback(stateName);
         });
       },
@@ -300,7 +300,7 @@ oppia.factory('ExplorationStatesService', [
           stateName, newCustomizationArgs) {
         saveStateProperty(
           stateName, 'widget_customization_args', newCustomizationArgs);
-        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+        stateInteractionSavedCallbacks.forEach(function(callback) {
           callback(stateName);
         });
       },
@@ -309,7 +309,7 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
-        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+        stateInteractionSavedCallbacks.forEach(function(callback) {
           callback(stateName);
         });
       },
@@ -320,7 +320,7 @@ oppia.factory('ExplorationStatesService', [
       saveConfirmedUnclassifiedAnswers: function(stateName, newAnswers) {
         saveStateProperty(
           stateName, 'confirmed_unclassified_answers', newAnswers);
-        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+        stateInteractionSavedCallbacks.forEach(function(callback) {
           callback(stateName);
         });
       },
@@ -329,7 +329,7 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
         saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
-        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+        stateInteractionSavedCallbacks.forEach(function(callback) {
           callback(stateName);
         });
       },
@@ -344,7 +344,7 @@ oppia.factory('ExplorationStatesService', [
       },
       saveSolution: function(stateName, newSolution) {
         saveStateProperty(stateName, 'solution', newSolution);
-        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+        stateInteractionSavedCallbacks.forEach(function(callback) {
           callback(stateName);
         });
       },
@@ -492,7 +492,7 @@ oppia.factory('ExplorationStatesService', [
         stateRenamedCallbacks.push(callback);
       },
       registerOnStateInteractionSavedCallback: function(callback) {
-        stateAnswerGroupsSavedCallbacks.push(callback);
+        stateInteractionSavedCallbacks.push(callback);
       }
     };
   }
