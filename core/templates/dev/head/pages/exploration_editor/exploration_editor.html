@@ -11,8 +11,6 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
-      '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
     GLOBALS.can_publish = JSON.parse('{{can_publish|js_string}}');
     GLOBALS.can_translate = JSON.parse('{{can_translate|js_string}}');
@@ -284,7 +282,7 @@
   <script src="/templates/dev/head/pages/exploration_editor/ParameterMetadataService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/RouterService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/ValueGeneratorEditorDirective.js"></script>
-  <script src="/templates/dev/head/pages/exploration_editor/MarkAllAudioAsNeedingUpdateController.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/MarkAllAudioAndTranslationsAsNeedingUpdateController.js"></script>
 
   <script src="/templates/dev/head/pages/exploration_editor/editor_tab/AnswerGroupsCacheService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/editor_tab/ExplorationGraph.js"></script>
@@ -311,6 +309,8 @@
 
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/TranslationStatusService.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/TranslationTabActiveContentIdService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/translation_tab/TranslationTabActiveModeService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/translation_tab/StateTranslationEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/exploration_editor/translation_tab/AudioTranslationBarDirective.js"></script>
 
   <script src="/templates/dev/head/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
@@ -356,6 +356,7 @@
   <script src="/templates/dev/head/pages/state_editor/state_properties/StateHintsService.js"></script>
   <script src="/templates/dev/head/pages/state_editor/state_properties/StateSolutionService.js"></script>
   <script src="/templates/dev/head/pages/state_editor/state_properties/StateContentIdsToAudioTranslationsService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateWrittenTranslationsService.js"></script>
 
   <script src="/templates/dev/head/components/CkEditorRteDirective.js"></script>
   <script src="/templates/dev/head/components/CkEditorWidgetsInitializer.js"></script>

@@ -102,10 +102,10 @@ md-input-group.md-default-theme label {
 }
 
 .md-button.oppia-learner-reload-image-button {
-  background:#ffffff;
+  background: #ffffff;
   border: 2px solid;
-  border-color:#0D48A1;
-  color:  #0D48A1;
+  border-color: #0D48A1;
+  color: #0D48A1;
   padding-bottom: 12px;
   padding-left: 20px;
   padding-right: 20px;
@@ -187,6 +187,9 @@ body {
   width: 100%;
 }
 
+.oppia-search-bar-dropdown-menu {
+  width: 170px;
+}
 .oppia-skip-to-content {
   left: -10000px;
   padding: 6px;
@@ -346,6 +349,15 @@ p {
   text-align: left;
   word-spacing: 0;
   word-wrap: break-word;
+}
+
+/* The properties should be in sync with the p tag so that we have consistent
+   spacing between the list, above the first bullet (point) and at the end of last
+   bullet (point). Line height has a value 1.846 and not 1.2 because all p tags
+   have value 1.846 and it comes from third party due to narrower css there.*/
+ul, ol {
+  line-height: 1.846;
+  margin-bottom: 18px;
 }
 
 p:last-child {
@@ -1947,16 +1959,16 @@ pre.oppia-pre-wrapped-text {
   -webkit-transform: rotate(-10deg);
 
   background-color: yellow;
-  border:1px solid black;
+  border: 1px solid black;
   color: firebrick;
   cursor: pointer;
   font-size: 20px;
   font-weight: bold;
-  height:22px;
+  height: 22px;
   line-height: 22px;
   text-align: center;
   transform: rotate(-10deg);
-  width:22px;
+  width: 22px;
 }
 
 .oppia-rule-details-header {
@@ -2532,7 +2544,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-modal-information-card .modal-dialog .modal-content md-card {
-  border-radius:0;
+  border-radius: 0;
   margin: 0;
   padding: 0;
 }
