@@ -16,6 +16,8 @@
  * @fileoverview Tests for the form builders.
  */
 
+
+
 describe('HTML to text', function() {
   beforeEach(module('oppia'));
 

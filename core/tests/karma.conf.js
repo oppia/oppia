@@ -33,10 +33,9 @@ module.exports = function(config) {
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
-      'core/templates/dev/head/dist/*.bundle.js',
       'core/templates/dev/head/**/*_directive.html',
-      'core/templates/dev/head/**/*Spec.js',
-      'extensions/**/*.js',
+      'core/templates/dev/head/components/RatingComputationServiceSpec.js',
+      //'extensions/**/*.js',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
@@ -71,6 +70,8 @@ module.exports = function(config) {
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
+      'core/templates/dev/head/*Spec.js': ['webpack'],
+      'core/templates/dev/head/**/*Spec.js': ['webpack'],
       'core/templates/dev/head/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
       'extensions/!(*Spec).js': ['coverage'],
@@ -133,6 +134,13 @@ module.exports = function(config) {
     },
     jsonFixturesPreprocessor: {
       variableName: '__fixtures__'
+    },
+
+    webpack: {
+      mode: 'development',
+      resolve: {
+          modules: ['core/templates/dev/head'],
+      },
     }
   });
 };

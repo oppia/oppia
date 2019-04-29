@@ -16,10 +16,12 @@
  * @fileoverview Tests that average ratings are being computed correctly.
  */
 
+require('components/RatingComputationService.js');
+
 describe('Rating computation service', function() {
   var RatingComputationService;
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(inject(function($injector) {
     RatingComputationService = $injector.get('RatingComputationService');
   }));
