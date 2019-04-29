@@ -184,10 +184,9 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     it('is true even when the state contains no answers', function() {
-      this.stass.init({
-        answers: {Hola: []},
-        interaction_ids: {Hola: 'TextInput'},
-      });
+      this.stass.init(
+        {answers: {Hola: []}, interaction_ids: {Hola: 'TextInput'}}
+      );
 
       expect(this.stass.hasStateStats('Hola')).toBe(true);
     });
