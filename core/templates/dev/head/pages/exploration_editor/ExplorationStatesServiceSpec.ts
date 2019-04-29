@@ -148,7 +148,7 @@ describe('ExplorationStatesService', function() {
       });
     });
 
-    describe('.registerOnStateAnswerGroupsSaved', function() {
+    describe('.registerOnStateInteractionSaved', function() {
       beforeEach(function() {
         spyOn(this.cls, 'editStateProperty');
       });
@@ -156,7 +156,7 @@ describe('ExplorationStatesService', function() {
       it('callsback when answer groups of a state are saved', function() {
         var callbackSpy = jasmine.createSpy('callback');
 
-        this.ess.registerOnStateAnswerGroupsSavedCallback(callbackSpy);
+        this.ess.registerOnStateInteractionSavedCallback(callbackSpy);
         this.ess.saveInteractionAnswerGroups('Hola', []);
 
         expect(callbackSpy).toHaveBeenCalledWith('Hola');

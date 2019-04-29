@@ -19,12 +19,10 @@
 
 oppia.factory('StateTopAnswersStatsService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsObjectFactory', 'ContextService',
-  'ExplorationStatesService',
+  'AnswerStatsObjectFactory', 'ContextService', 'ExplorationStatesService',
   function(
       $injector, AngularNameService, AnswerClassificationService,
-      AnswerStatsObjectFactory, ContextService,
-      ExplorationStatesService) {
+      AnswerStatsObjectFactory, ContextService, ExplorationStatesService) {
     /**
      * @typedef AnswerStatsCache
      * @property {AnswerStats[]} allAnswers
@@ -43,15 +41,24 @@ oppia.factory('StateTopAnswersStatsService', [
      * @param {string} stateName
      */
     var refreshAddressedInfo = function(stateName) {
+      if (stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
+        return;
+      }
+
       var explorationId = ContextService.getExplorationId();
       var state = ExplorationStatesService.getState(stateName);
+      var stateStats = stateTopAnswersStatsCache[stateName];
+
+      if (stateStats.interactionId !== state.interaction.id) {
+        delete stateTopAnswersStatsCache[stateName];
+        return;
+      }
+
       var interactionRulesService = $injector.get(
         AngularNameService.getNameOfInteractionRulesService(
           state.interaction.id));
-      var allAnswersCacheEntry =
-        stateTopAnswersStatsCache[stateName].allAnswers;
-      var unresolvedAnswersCacheEntry =
-        stateTopAnswersStatsCache[stateName].unresolvedAnswers;
+      var allAnswersCacheEntry = stateStats.allAnswers;
+      var unresolvedAnswersCacheEntry = stateStats.unresolvedAnswers;
 
       // Clear the unresolvedAnswers array since many answers may now have
       // different "addressed" values.
@@ -87,7 +94,7 @@ oppia.factory('StateTopAnswersStatsService', [
       delete stateTopAnswersStatsCache[oldStateName];
     };
 
-    var onStateAnswerGroupsSaved = function(stateName) {
+    var onStateInteractionSaved = function(stateName) {
       refreshAddressedInfo(stateName);
     };
 
@@ -108,7 +115,9 @@ oppia.factory('StateTopAnswersStatsService', [
           stateTopAnswersStatsCache[stateName] = {
             allAnswers: stateTopAnswersStatsBackendDict.answers[stateName].map(
               AnswerStatsObjectFactory.createFromBackendDict),
-            unresolvedAnswers: []
+            unresolvedAnswers: [],
+            interactionId: (
+              ExplorationStatesService.getState(stateName).interaction.id),
           };
           // Still need to manually refresh the addressed information.
           refreshAddressedInfo(stateName);
@@ -116,8 +125,8 @@ oppia.factory('StateTopAnswersStatsService', [
         ExplorationStatesService.registerOnStateAddedCallback(onStateAdded);
         ExplorationStatesService.registerOnStateDeletedCallback(onStateDeleted);
         ExplorationStatesService.registerOnStateRenamedCallback(onStateRenamed);
-        ExplorationStatesService.registerOnStateAnswerGroupsSavedCallback(
-          onStateAnswerGroupsSaved);
+        ExplorationStatesService.registerOnStateInteractionSavedCallback(
+          onStateInteractionSaved);
         isInitialized = true;
       },
 

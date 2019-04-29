@@ -289,6 +289,9 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionId: function(stateName, newInteractionId) {
         saveStateProperty(stateName, 'widget_id', newInteractionId);
+        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+          callback(stateName);
+        });
       },
       getInteractionCustomizationArgsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'widget_customization_args');
@@ -297,6 +300,9 @@ oppia.factory('ExplorationStatesService', [
           stateName, newCustomizationArgs) {
         saveStateProperty(
           stateName, 'widget_customization_args', newCustomizationArgs);
+        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+          callback(stateName);
+        });
       },
       getInteractionAnswerGroupsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'answer_groups');
@@ -314,12 +320,18 @@ oppia.factory('ExplorationStatesService', [
       saveConfirmedUnclassifiedAnswers: function(stateName, newAnswers) {
         saveStateProperty(
           stateName, 'confirmed_unclassified_answers', newAnswers);
+        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+          callback(stateName);
+        });
       },
       getInteractionDefaultOutcomeMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'default_outcome');
       },
       saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
         saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
+        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+          callback(stateName);
+        });
       },
       getHintsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'hints');
@@ -332,6 +344,9 @@ oppia.factory('ExplorationStatesService', [
       },
       saveSolution: function(stateName, newSolution) {
         saveStateProperty(stateName, 'solution', newSolution);
+        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+          callback(stateName);
+        });
       },
       getContentIdsToAudioTranslationsMemento: function(stateName) {
         return getStatePropertyMemento(
@@ -476,7 +491,7 @@ oppia.factory('ExplorationStatesService', [
       registerOnStateRenamedCallback: function(callback) {
         stateRenamedCallbacks.push(callback);
       },
-      registerOnStateAnswerGroupsSavedCallback: function(callback) {
+      registerOnStateInteractionSavedCallback: function(callback) {
         stateAnswerGroupsSavedCallbacks.push(callback);
       }
     };

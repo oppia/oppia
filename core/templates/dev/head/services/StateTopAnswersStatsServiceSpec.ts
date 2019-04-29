@@ -138,7 +138,7 @@ describe('StateTopAnswersStatsService', function() {
         spyOn(this.ess, 'registerOnStateAddedCallback'),
         spyOn(this.ess, 'registerOnStateDeletedCallback'),
         spyOn(this.ess, 'registerOnStateRenamedCallback'),
-        spyOn(this.ess, 'registerOnStateAnswerGroupsSavedCallback')
+        spyOn(this.ess, 'registerOnStateInteractionSavedCallback')
       ];
 
       this.stass.init({answers: {}});
@@ -153,7 +153,7 @@ describe('StateTopAnswersStatsService', function() {
         spyOn(this.ess, 'registerOnStateAddedCallback'),
         spyOn(this.ess, 'registerOnStateDeletedCallback'),
         spyOn(this.ess, 'registerOnStateRenamedCallback'),
-        spyOn(this.ess, 'registerOnStateAnswerGroupsSavedCallback')
+        spyOn(this.ess, 'registerOnStateInteractionSavedCallback')
       ];
 
       this.stass.init({answers: {}});
@@ -318,6 +318,20 @@ describe('StateTopAnswersStatsService', function() {
 
         expect(this.stass.getUnresolvedStateStats('Hola'))
           .toContain(joC({answer: 'hola'}));
+      });
+
+      it('deletes stats when interaction changes', function() {
+        expect(this.stass.hasStateStats('Hola')).toBe(true);
+
+        this.ess.saveInteractionId('Hola', 'FractionInput');
+        this.ess.saveInteractionCustomizationArgs('Hola', {
+          requireSimplestForm: false,
+          allowImproperFraction: true,
+          allowNonzeroIntegerPart: true,
+          customPlaceholder: '',
+        });
+
+        expect(this.stass.hasStateStats('Hola')).toBe(false);
       });
     });
   });
