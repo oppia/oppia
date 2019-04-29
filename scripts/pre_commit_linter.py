@@ -62,8 +62,10 @@ import glob
 import multiprocessing
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 
@@ -248,7 +250,7 @@ EXCLUDED_PATHS = (
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4')
+    '*.mp3', '*.mp4', 'typings/*', 'local_compiled_js/*')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
@@ -258,8 +260,8 @@ GENERATED_FILE_PATHS = (
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
     'core/tests/protractor.conf.js',
-    'core/tests/karma.conf.js',
-    'core/templates/dev/head/mathjaxConfig.js',
+    'core/tests/karma.conf.ts',
+    'core/templates/dev/head/mathjaxConfig.ts',
     'assets/constants.js',
     'assets/rich_text_components_definitions.js')
 
@@ -293,7 +295,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
@@ -862,7 +864,7 @@ def _lint_css_files(
     print 'CSS linting finished.'
 
 
-def _lint_js_files(
+def _lint_js_and_ts_files(
         node_path, eslint_path, files_to_lint, stdout, result,
         verbose_mode_enabled):
     """Prints a list of lint errors in the given list of JavaScript files.
@@ -878,16 +880,16 @@ def _lint_js_files(
     start_time = time.time()
     num_files_with_errors = 0
 
-    num_js_files = len(files_to_lint)
+    num_js_and_ts_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
         print 'There are no JavaScript files to lint.'
         return
 
-    print 'Total js files: ', num_js_files
+    print 'Total js and ts files: ', num_js_and_ts_files
     eslint_cmd_args = [node_path, eslint_path, '--quiet']
     result_list = []
-    print 'Linting JS files.'
+    print 'Linting JS and TS files.'
     for _, filepath in enumerate(files_to_lint):
         if verbose_mode_enabled:
             print 'Linting: ', filepath
@@ -909,13 +911,15 @@ def _lint_js_files(
     if num_files_with_errors:
         for error in result_list:
             result.put(error)
-        result.put('%s    %s JavaScript files' % (
+        result.put('%s    %s JavaScript and Typescript files' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
-        result.put('%s   %s JavaScript files linted (%.1f secs)' % (
-            _MESSAGE_TYPE_SUCCESS, num_js_files, time.time() - start_time))
+        result.put(
+            '%s   %s JavaScript and Typescript files linted (%.1f secs)' % (
+                _MESSAGE_TYPE_SUCCESS, num_js_and_ts_files,
+                time.time() - start_time))
 
-    print 'Js linting finished.'
+    print 'Js and Ts linting finished.'
 
 
 def _lint_py_files(
@@ -999,34 +1003,76 @@ class LintChecksManager(object):
             all_filepaths: list(str). The list of filepaths to be linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
+        # Set path for node.
+        node_path = os.path.join(os.pardir, 'oppia_tools/node-6.9.1')
+        os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
+
+        self.compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
-        self.parsed_js_files = self._validate_and_parse_js_files()
+        self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
 
-    def _validate_and_parse_js_files(self):
-        """This function validates JavaScript files and returns the parsed
-        contents as a Python dictionary.
+    def _validate_and_parse_js_and_ts_files(self):
+        """This function validates JavaScript and Typescript files and
+        returns the parsed contents as a Python dictionary.
         """
 
         # Select JS files which need to be checked.
         files_to_check = [
             filepath for filepath in self.all_filepaths if (
-                filepath.endswith('.js'))
+                filepath.endswith(('.js', '.ts')))
             and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
                         EXCLUDED_PATHS)]
-        parsed_js_files = dict()
+        parsed_js_and_ts_files = dict()
         if not files_to_check:
-            return parsed_js_files
+            return parsed_js_and_ts_files
         if not self.verbose_mode_enabled:
-            print 'Validating and parsing JS files ...'
+            print 'Validating and parsing JS and TS files ...'
         for filepath in files_to_check:
             if self.verbose_mode_enabled:
                 print 'Validating and parsing %s file ...' % filepath
             file_content = FileCache.read(filepath).decode('utf-8')
 
-            # Use esprima to parse a JS file.
-            parsed_js_files[filepath] = esprima.parseScript(file_content)
-        return parsed_js_files
+            try:
+                # Use esprima to parse a JS or TS file.
+                parsed_js_and_ts_files[filepath] = esprima.parseScript(
+                    file_content)
+            except Exception as e:
+                # Compile typescript file which has syntax not valid for JS
+                # file.
+                if filepath.endswith('.js'):
+                    raise Exception(e)
+                compiled_js_filepath = self._compile_ts_file(filepath)
+                file_content = FileCache.read(compiled_js_filepath).decode(
+                    'utf-8')
+                parsed_js_and_ts_files[filepath] = esprima.parseScript(
+                    file_content)
+
+        shutil.rmtree(self.compiled_js_dir)
+
+        return parsed_js_and_ts_files
+
+    def _compile_ts_file(self, filepath):
+        """Compiles a typescript file and returns the path for compiled
+        js file.
+        """
+        allow_js = 'true'
+        lib = 'es2017,dom'
+        no_implicit_use_strict = 'true'
+        skip_lib_check = 'true'
+        target = 'es5'
+        type_roots = '../node_modules/@types'
+        cmd = (
+            '../node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+            '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+            '%s -target %s -typeRoots %s %s typings/*') % (
+                self.compiled_js_dir, allow_js, lib, no_implicit_use_strict,
+                skip_lib_check, target, type_roots, filepath)
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        compiled_js_filepath = os.path.join(
+            self.compiled_js_dir, os.path.basename(filepath).replace(
+                '.ts', '.js'))
+        return compiled_js_filepath
 
     def _lint_all_files(self):
         """This function is used to check if node-eslint dependencies are
@@ -1061,9 +1107,9 @@ class LintChecksManager(object):
             print '         or node-stylelint and its dependencies.'
             sys.exit(1)
 
-        js_files_to_lint = [
+        js_and_ts_files_to_lint = [
             filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.js')]
+                ('.js', '.ts'))]
         py_files_to_lint = [
             filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.py')]
@@ -1097,13 +1143,13 @@ class LintChecksManager(object):
                 css_files_to_lint, css_stdout,
                 css_result, self.verbose_mode_enabled)))
 
-        js_result = multiprocessing.Queue()
-        js_stdout = multiprocessing.Queue()
+        js_and_ts_result = multiprocessing.Queue()
+        js_and_ts_stdout = multiprocessing.Queue()
 
         linting_processes.append(multiprocessing.Process(
-            target=_lint_js_files, args=(
-                node_path, eslint_path, js_files_to_lint,
-                js_stdout, js_result, self.verbose_mode_enabled)))
+            target=_lint_js_and_ts_files, args=(
+                node_path, eslint_path, js_and_ts_files_to_lint,
+                js_and_ts_stdout, js_and_ts_result, self.verbose_mode_enabled)))
 
         py_result = multiprocessing.Queue()
 
@@ -1124,18 +1170,18 @@ class LintChecksManager(object):
         for process in linting_processes:
             process.join()
 
-        js_messages = []
-        while not js_stdout.empty():
-            js_messages.append(js_stdout.get())
+        js_and_ts_messages = []
+        while not js_and_ts_stdout.empty():
+            js_and_ts_messages.append(js_and_ts_stdout.get())
 
         print ''
-        print '\n'.join(js_messages)
+        print '\n'.join(js_and_ts_messages)
 
         summary_messages = []
 
         result_queues = [
             css_in_html_result, css_result,
-            js_result, py_result]
+            js_and_ts_result, py_result]
 
         for result_queue in result_queues:
             while not result_queue.empty():
@@ -1154,18 +1200,18 @@ class LintChecksManager(object):
         if self.verbose_mode_enabled:
             print 'Starting directive scope check'
             print '----------------------------------------'
-        # Select JS files which need to be checked.
+        # Select JS and TS files which need to be checked.
         files_to_check = [
-            filepath for filepath in self.all_filepaths if
-            filepath.endswith('.js') and not
-            any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS)]
+            filepath for filepath in self.all_filepaths if (
+                filepath.endswith(('.js', '.ts')))
+            and not any(fnmatch.fnmatch(filepath, pattern) for pattern in
+                        EXCLUDED_PATHS)]
         failed = False
         summary_messages = []
         components_to_check = ['directive']
 
         for filepath in files_to_check:
-            parsed_script = self.parsed_js_files[filepath]
+            parsed_script = self.parsed_js_and_ts_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
                 parsed_nodes = parsed_script.body
@@ -1270,8 +1316,8 @@ class LintChecksManager(object):
             print ''
             return summary_messages
 
-    def _check_js_component_name_and_count(self):
-        """This function ensures that all JS files have exactly
+    def _check_js_and_ts_component_name_and_count(self):
+        """This function ensures that all JS/TS files have exactly
         one component and and that the name of the component
         matches the filename.
         """
@@ -1283,7 +1329,8 @@ class LintChecksManager(object):
             filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS)
-            and filepath.endswith('.js') and not filepath.endswith('App.js')]
+            and filepath.endswith(('.js', '.ts')) and (
+                not filepath.endswith('App.ts'))]
         failed = False
         summary_messages = []
         component_name = ''
@@ -1292,7 +1339,7 @@ class LintChecksManager(object):
             component_num = 0
             # Filename without its path and extension.
             exact_filename = filepath.split('/')[-1][:-3]
-            parsed_script = self.parsed_js_files[filepath]
+            parsed_script = self.parsed_js_and_ts_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
                 parsed_nodes = parsed_script.body
@@ -1343,13 +1390,13 @@ class LintChecksManager(object):
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
                 summary_message = (
-                    '%s  Js component name and count check failed' %
+                    '%s  JS and TS Component name and count check failed' %
                     (_MESSAGE_TYPE_FAILED))
                 print summary_message
                 summary_messages.append(summary_message)
             else:
                 summary_message = (
-                    '%s  Js component name and count check passed' %
+                    '%s  JS and TS Component name and count check passed' %
                     (_MESSAGE_TYPE_SUCCESS))
                 print summary_message
                 summary_messages.append(summary_message)
@@ -1368,7 +1415,7 @@ class LintChecksManager(object):
             print '----------------------------------------'
         files_to_check = [
             filepath for filepath in self.all_filepaths if
-            filepath.endswith('.js') and not
+            filepath.endswith(('.js', '.ts')) and not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
                 EXCLUDED_PATHS)]
         components_to_check = ['controller', 'directive', 'factory']
@@ -1376,7 +1423,7 @@ class LintChecksManager(object):
         summary_messages = []
 
         for filepath in files_to_check:
-            parsed_script = self.parsed_js_files[filepath]
+            parsed_script = self.parsed_js_and_ts_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 parsed_nodes = parsed_script.body
                 for parsed_node in parsed_nodes:
@@ -1465,7 +1512,7 @@ class LintChecksManager(object):
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS) and filepath.endswith('.js')]
+                EXCLUDED_PATHS) and filepath.endswith(('.js', '.ts'))]
         failed = False
         summary_messages = []
 
@@ -1527,7 +1574,7 @@ class LintChecksManager(object):
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
             any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS) and filepath.endswith('.js')]
+                EXCLUDED_PATHS) and filepath.endswith(('.js', '.ts'))]
         failed = False
         summary_messages = []
         # For RegExp explanation, please see https://regex101.com/r/gU7oT6/37.
@@ -1977,7 +2024,7 @@ class LintChecksManager(object):
                         print ''
                         total_error_count += 1
 
-                if filepath.endswith('.js'):
+                if filepath.endswith(('.js', '.ts')):
                     for regexp in BAD_PATTERNS_JS_REGEXP:
                         if _check_bad_pattern_in_file(
                                 filepath, file_content, regexp):
@@ -2033,10 +2080,11 @@ class LintChecksManager(object):
         if self.verbose_mode_enabled:
             print 'Starting copyright notice check'
             print '----------------------------------------'
-        js_files_to_check = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.js') and (not filepath.endswith(GENERATED_FILE_PATHS)) and (
-                    not filepath.endswith(CONFIG_FILE_PATHS))]
+        js_and_ts_files_to_check = [
+            filepath for filepath in self.all_filepaths if filepath.endswith((
+                '.js', '.ts')) and (
+                    not filepath.endswith(GENERATED_FILE_PATHS)) and (
+                        not filepath.endswith(CONFIG_FILE_PATHS))]
         py_files_to_check = [
             filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.py') and (not filepath.endswith('__init__.py'))]
@@ -2044,7 +2092,7 @@ class LintChecksManager(object):
             filepath for filepath in self.all_filepaths if filepath.endswith(
                 '.sh')]
         all_files_to_check = (
-            js_files_to_check + py_files_to_check + sh_files_to_check)
+            js_and_ts_files_to_check + py_files_to_check + sh_files_to_check)
         regexp_to_check = (
             r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.')
 
@@ -2190,7 +2238,8 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
-        js_component_messages = self._check_js_component_name_and_count()
+        js_and_ts_component_messages = (
+            self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
@@ -2211,7 +2260,7 @@ class LintChecksManager(object):
             self._check_for_copyright_notice())
         codeowner_messages = self._check_codeowner_file()
         all_messages = (
-            js_component_messages + directive_scope_messages +
+            js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
             html_directive_name_messages + import_order_messages +
             docstring_messages + comment_messages +
