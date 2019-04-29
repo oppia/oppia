@@ -11,7 +11,7 @@
   </div>
 </div>
 
-<hr style="clear: both">
+<hr style="clear: both; margin-bottom: 0.5em">
 
 <ol class="thread-messages" ng-if="activeThread.messages">
   <li ng-repeat="m in activeThread.messages | orderBy:'message_id'">
@@ -34,7 +34,7 @@
       </span>
     </div>
 
-    <p style="clear: both"><[m.text]></p>
+    <p style="clear: both; text-indent: 4ch"><[m.text]></p>
 
     <div ng-if="activeThread.isSuggestionThread() && $index == 0">
       <button ng-click="showSuggestionModal()"
@@ -104,8 +104,8 @@ ol.thread-messages {
   margin: 0;
 }
 ol.thread-messages li {
-  padding-top: 1em;
-  padding-bottom: 1.5em;
+  padding-top: 0.5em;
+  padding-bottom: 1em;
   border-bottom: 1px solid #eee;
 }
 ol.thread-messages li:last-child {
