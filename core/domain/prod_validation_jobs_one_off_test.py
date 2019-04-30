@@ -34,11 +34,13 @@ gae_search_services = models.Registry.import_search_services()
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
+(user_models,) = (models.Registry.import_models([models.NAMES.user]))
 
-class ProdValidationJobTests(test_utils.GenericTestBase):
+
+class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ProdValidationJobTests, self).setUp()
+        super(UserSubscriptionsModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(USER_EMAIL, USER_NAME)
@@ -81,6 +83,12 @@ class ProdValidationJobTests(test_utils.GenericTestBase):
                 self.user_id, collection.id)
         self.process_and_flush_pending_tasks()
 
+        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
+            user_models.UserSubscriptionsModel:
+                prod_validation_jobs_one_off.UserSubscriptionsModelValidator,
+        }
+
+
     def test_standard_operation(self):
         job = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
         job_id = (
@@ -92,7 +100,7 @@ class ProdValidationJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         actual_output = job.get_output(job_id)
         expected_output = [
-            u'[u\'fully-validated UserSubscriptionModels\', 2]']
+            u'[u\'fully-validated UserSubscriptionsModel\', 2]']
         self.assertEqual(actual_output, expected_output)
 
     def test_external_id_relationship_failure(self):
@@ -109,10 +117,10 @@ class ProdValidationJobTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for general_feedback_thread_ids '
-                'field check of UserSubscriptionModel\', '
+                'field check of UserSubscriptionsModel\', '
                 '[u"Model id 110211048197157141232: based on '
                 'field general_feedback_thread_ids having value '
                 'nonexist_thread_id, expect model GeneralFeedbackThreadModel '
                 'with id nonexist_thread_id but it doesn\'t exist"]]'),
-            u'[u\'fully-validated UserSubscriptionModels\', 1]']
+            u'[u\'fully-validated UserSubscriptionsModel\', 1]']
         self.assertEqual(sorted(actual_output), sorted(expected_output))

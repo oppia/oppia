@@ -15,7 +15,6 @@
 # limitations under the License.
 
 """One-off jobs for validating prod models."""
-
 from core import jobs
 from core.platform import models
 
@@ -30,6 +29,9 @@ class BaseModelValidator(object):
     """Base class for validating models."""
 
     errors = {}
+    # external_models is a map that's keyed by field name. Each value consists
+    # of the model class and a list of (external_key, external_model) tuples.
+    external_models = {}
 
     @classmethod
     def _external_id_relationships(cls):
@@ -40,12 +42,52 @@ class BaseModelValidator(object):
             model to validate, and whose values are the corresponding model
             classes.
         """
-        raise NotImplementedError
+        return {}
+
+    @classmethod
+    def _custom_external_id_relationship(cls, item):  # pylint: disable=unused-argument
+        """Define custom external relationships.
+
+        Sometimes we need more complicated logic to determine which external
+        model to fetch. Two example use cases are:
+        1) the field name follows some convention e.g. {exp_id}.{exp_version}
+        2) the field name has to be extracted from a structured field
+
+        Args:
+            item: ndb.Model. Entity to validate.
+
+        Returns:
+            A list of tuples, each consists of a field name (for debug output),
+            the external model class, and a list of keys to fetch. The only
+            requirement of the field names is that they should be unique from
+            the external fields and from each other.
+        """
+        return []
 
     @classmethod
     def _validate_external_id_relationships(cls, item):
         """Check whether the external id properties on the model correspond
         to valid instances.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        for field_name, (model_class, model_id_model_tuples) in (
+                cls.external_models.iteritems()):
+            for model_id, model in model_id_model_tuples:
+                if model is None or model.deleted:
+                    cls.errors['%s field check' % field_name] = (
+                        'Model id %s: based on field %s having'
+                        ' value %s, expect model %s with id %s but it doesn\'t'
+                        ' exist' % (
+                            item.id, field_name, model_id,
+                            str(model_class.__name__), model_id))
+
+    @classmethod
+    def _fetch_external_models(cls, item):
+        """Fetch external models based on _external_id_relationships.
+
+        This should be called before we call other _validate methods.
 
         Args:
             item: ndb.Model. Entity to validate.
@@ -58,22 +100,37 @@ class BaseModelValidator(object):
                 multiple_models_keys_to_fetch[field_name] = (
                     model_class, [field_value] if isinstance(field_value, str)
                     else field_value)
+        for field_name_debug, model_class, keys_to_fetch in (
+                cls._custom_external_id_relationship(item)):
+            multiple_models_keys_to_fetch[field_name_debug] = (
+                model_class, keys_to_fetch)
         fetched_model_instances = (
             datastore_services.fetch_multiple_entities_by_ids_and_models(
                 multiple_models_keys_to_fetch.values()))
-
-        for (field_name, keys_to_fetch), model_class_models in zip(
+        for (field_name, (model_class, field_values)), external_models in zip(
                 multiple_models_keys_to_fetch.iteritems(),
                 fetched_model_instances):
-            model_class, model_ids = keys_to_fetch
-            for model_id, model in zip(model_ids, model_class_models):
-                if model is None or model.deleted:
-                    cls.errors['%s field check' % field_name] = (
-                        'Model id %s: based on field %s having'
-                        ' value %s, expect model %s with id %s but it doesn\'t'
-                        ' exist' % (
-                            item.id, field_name, model_id,
-                            str(model_class.__name__), model_id))
+            cls.external_models[field_name] = (
+                model_class, zip(field_values, external_models))
+
+    @classmethod
+    def validate(cls, item):
+        """Run _fetch_external_models and all _validate functions.
+
+        The order of running _validate is not guaranteed.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        cls.errors.clear()
+        cls.external_models.clear()
+        cls._fetch_external_models(item)
+
+        validate_fns = (
+            getattr(cls, func) for func in dir(cls)
+            if callable(getattr(cls, func)) and func.startswith('_validate'))
+        for fn in validate_fns:
+            fn(item)
 
 
 class UserSubscriptionsModelValidator(BaseModelValidator):
@@ -90,16 +147,54 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
             'id': user_models.UserSettingsModel,
         }
 
+
+class ExplorationModelValidator(BaseModelValidator):
+    """Class for validating ExplorationModel."""
+
     @classmethod
-    def validate(cls, item):
-        """Validates a UserSubscriptionsModel entity.
+    def _external_id_relationships(cls):
+        return {}
 
-        Args:
-            item: UserSubscriptionsModel. Entity to validate.
-        """
-        cls.errors.clear()
+    @classmethod
+    def _custom_external_id_relationship(cls, item):
+        state_id_mapping_model_ids = [
+            '%s.%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        return [
+            (
+                'state_id_mapping_model', exp_models.StateIdMappingModel,
+                state_id_mapping_model_ids),
+        ]
 
-        cls._validate_external_id_relationships(item)
+    @classmethod
+    def _validate_state_name(cls, item):
+        """Validate the state names match the StateIdMappingModel."""
+        _, state_id_mapping_model_tuples = (
+            cls.external_models['state_id_mapping_model'])
+        state_id_mapping_model = state_id_mapping_model_tuples[0][1]
+        if state_id_mapping_model:
+            if (
+                    len(state_id_mapping_model.state_names_to_ids) !=
+                    len(item.states)):
+                cls.errors['exploration state check'] = (
+                    'Model id %s: Corresponding StateIdMappingModel %s has '
+                    '%d states but model has %d' % (
+                        item.id, state_id_mapping_model.id,
+                        len(state_id_mapping_model.state_names_to_ids),
+                        len(item.states)))
+            for state_name, _ in (
+                    state_id_mapping_model.state_names_to_ids.iteritems()):
+                if state_name not in item.states:
+                    cls.errors['exploration state check'] = (
+                        'Model id %s: Corresponding StateIdMappingModel %s has '
+                        'state name %s but model doesn\'t' %
+                        (item.id, state_id_mapping_model.id, state_name))
+
+
+MODEL_TO_VALIDATOR_MAPPING = {
+    user_models.UserSubscriptionsModel: UserSubscriptionsModelValidator,
+    exp_models.ExplorationModel: ExplorationModelValidator,
+}
 
 
 class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -107,26 +202,26 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserSubscriptionsModel]
+        return MODEL_TO_VALIDATOR_MAPPING.keys()
 
     @staticmethod
     def map(model_instance):
         if not model_instance.deleted:
-            # Check if model_instance is a UserSubscriptionsModel here because
-            # we will add more model classes to iterate over in the future.
-            # TODO(sshou) remove this comment after we add other classes.
-            if isinstance(model_instance, user_models.UserSubscriptionsModel):
-                validate_user_subs_model = UserSubscriptionsModelValidator()
-                validate_user_subs_model.validate(model_instance)
-                if len(validate_user_subs_model.errors) > 0:
+            if type(model_instance) in MODEL_TO_VALIDATOR_MAPPING:  # pylint: disable=unidiomatic-typecheck
+                model_name = model_instance.__class__.__name__
+                validator_cls = MODEL_TO_VALIDATOR_MAPPING[type(model_instance)]
+                validator = validator_cls()
+                validator.validate(model_instance)
+                if len(validator.errors) > 0:
                     for error_key, error_val in (
-                            validate_user_subs_model.errors.iteritems()):
+                            validator.errors.iteritems()):
                         yield (
-                            'failed validation check for %s of '
-                            'UserSubscriptionModel' % error_key, error_val)
+                            'failed validation check for %s of %s' % (
+                                error_key, model_name),
+                            error_val)
                 else:
                     yield (
-                        'fully-validated UserSubscriptionModels', 1)
+                        'fully-validated %s' % model_name, 1)
 
     @staticmethod
     def reduce(key, values):
