@@ -20,23 +20,22 @@ oppia.constant('FEEDBACK_IMPROVEMENT_CARD_TYPE', 'feedback');
 
 oppia.factory('FeedbackImprovementCardObjectFactory', [
   '$uibModal', 'ChangeListService', 'ExplorationStatesService',
-  'ImprovementActionButtonObjectFactory',
-  'ThreadDataService',
+  'ImprovementActionButtonObjectFactory', 'ThreadDataService',
   'UrlInterpolationService', 'UserService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
   function(
       $uibModal, ChangeListService, ExplorationStatesService,
-      ImprovementActionButtonObjectFactory,
-      ThreadDataService,
+      ImprovementActionButtonObjectFactory, ThreadDataService,
       UrlInterpolationService, UserService, FEEDBACK_IMPROVEMENT_CARD_TYPE) {
     /** @constructor */
     var FeedbackImprovementCard = function(feedbackThread) {
+      var thisCard = this;
       var showReviewThreadModal = function() {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/review_feedback_thread_modal_directive.html'),
           resolve: {
             activeThread: function() {
-              return feedbackThread;
+              return thisCard._feedbackThread;
             },
             isUserLoggedIn: function() {
               return UserService.getUserInfoAsync().then(function(userInfo) {
