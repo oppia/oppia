@@ -21,17 +21,32 @@ oppia.constant('SUGGESTION_IMPROVEMENT_CARD_TYPE', 'suggestion');
 oppia.factory('SuggestionImprovementCardObjectFactory', [
   '$uibModal', 'ChangeListService', 'ExplorationStatesService',
   'ImprovementActionButtonObjectFactory',
-  'ThreadDataService',
-  'UrlInterpolationService', 'UserService', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
+  'ShowSuggestionModalForEditorViewService', 'ThreadDataService',
+  'SUGGESTION_IMPROVEMENT_CARD_TYPE',
   function(
       $uibModal, ChangeListService, ExplorationStatesService,
       ImprovementActionButtonObjectFactory,
-      ThreadDataService,
-      UrlInterpolationService, UserService, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
+      ShowSuggestionModalForEditorViewService, ThreadDataService,
+      SUGGESTION_IMPROVEMENT_CARD_TYPE) {
     /** @constructor */
     var SuggestionImprovementCard = function(suggestionThread) {
       var card = this;
       var showSuggestionModal = function() {
+        ShowSuggestionModalForEditorViewService.showSuggestionModal(
+          suggestionThread.suggestion.suggestionType, {
+            activeThread: suggestionThread,
+            isSuggestionHandled: function() {
+              return suggestionThread.isSuggestionHandled();
+            },
+            hasUnsavedChanges: function() {
+              return ChangeListService.getChangeList().length > 0;
+            },
+            isSuggestionValid: function() {
+              return ExplorationStatesService.hasState(
+                suggestionThread.getSuggestionStateName());
+            }
+          }
+        );
       };
 
       /** @type {SuggestionThread} */

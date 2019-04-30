@@ -17,15 +17,13 @@
  */
 
 oppia.controller('ReviewFeedbackThreadModalController', [
-  '$scope', '$uibModalInstance', 'AlertsService', 'ChangeListService',
-  'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
-  'FeedbackThreadDisplayService', 'ShowSuggestionModalForEditorViewService',
-  'ThreadDataService', 'activeThread', 'userIsLoggedIn',
+  '$scope', '$uibModalInstance', 'AlertsService', 'DateTimeFormatService',
+  'EditabilityService', 'FeedbackThreadDisplayService', 'ThreadDataService',
+  'activeThread', 'userIsLoggedIn',
   function(
-      $scope, $uibModalInstance, AlertsService, ChangeListService,
-      DateTimeFormatService, EditabilityService, ExplorationStatesService,
-      FeedbackThreadDisplayService, ShowSuggestionModalForEditorViewService,
-      ThreadDataService, activeThread, userIsLoggedIn) {
+      $scope, $uibModalInstance, AlertsService, DateTimeFormatService,
+      EditabilityService, FeedbackThreadDisplayService, ThreadDataService,
+      activeThread, userIsLoggedIn) {
     $scope.activeThread = activeThread;
     $scope.userIsLoggedIn = userIsLoggedIn;
     $scope.STATUS_CHOICES = FeedbackThreadDisplayService.STATUS_CHOICES;
@@ -39,47 +37,14 @@ oppia.controller('ReviewFeedbackThreadModalController', [
     // Initial load of the thread list on page load.
     $scope.tmpMessage = {
       status: $scope.activeThread.status,
-      text: ''
+      text: '',
     };
 
     $scope.getTitle = function() {
-      var threadType = (
-        activeThread.isSuggestionThread() ? 'Suggestion' : 'Feedback');
-      return threadType + ': ' + activeThread.subject;
-    };
-
-    var _isSuggestionHandled = function() {
-      return $scope.activeThread.isSuggestionHandled();
-    };
-
-    var _isSuggestionValid = function() {
-      return ExplorationStatesService.hasState(
-        $scope.activeThread.getSuggestionStateName());
-    };
-
-    var _hasUnsavedChanges = function() {
-      return (ChangeListService.getChangeList().length > 0);
-    };
-
-    $scope.getSuggestionButtonType = function() {
-      return (!_isSuggestionHandled() && _isSuggestionValid() &&
-              !_hasUnsavedChanges() ? 'primary' : 'default');
+      return 'Feedback: ' + activeThread.subject;
     };
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
-    $scope.showSuggestionModal = function() {
-      ShowSuggestionModalForEditorViewService.showSuggestionModal(
-        $scope.activeThread.suggestion.suggestionType,
-        {
-          activeThread: $scope.activeThread,
-          setActiveThread: $scope.setActiveThread,
-          isSuggestionHandled: _isSuggestionHandled,
-          hasUnsavedChanges: _hasUnsavedChanges,
-          isSuggestionValid: _isSuggestionValid
-        }
-      );
-    };
-
     $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
       if (threadId === null) {
         AlertsService.addWarning('Cannot add message to thread with ID: null.');
