@@ -148,7 +148,8 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
 
     /** @returns {string} - A concise summary of the card. */
     SuggestionImprovementCard.prototype.getTitle = function() {
-      return 'Suggestion for: ' + this._suggestion.getSuggestionStateName();
+      return (
+        'Suggestion for "' + this._suggestion.getSuggestionStateName() + '"');
     };
 
     /** @returns {string} - The directive type used to render the card. */
