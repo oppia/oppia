@@ -27,15 +27,7 @@ module.exports = function(config) {
       'third_party/static/angular-recorder-1.4.1/dist' +
       '/angular-audio-recorder.min.js',
       generatedJs,
-<<<<<<< HEAD:core/tests/karma.conf.js
-      // The module files have to be loaded before App.js since it depends
-      // on the other modules.
-      'core/templates/dev/head/**/*.module.js',
-
-      'core/templates/dev/head/*.js',
-=======
       'local_compiled_js/core/templates/dev/head/*.js',
->>>>>>> ba1b79a13a2663a933770c97e2bbdef5f80940e4:core/tests/karma.conf.ts
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
@@ -71,19 +63,10 @@ module.exports = function(config) {
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
-<<<<<<< HEAD:core/tests/karma.conf.js
-      'core/templates/dev/head/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/!(*\.spec).js': ['coverage'],
-      'core/templates/dev/head/**/!(*\.spec).js': ['coverage'],
-      'extensions/!(*Spec).js': ['coverage'],
-      'extensions/**/!(*Spec).js': ['coverage'],
-=======
       'local_compiled_js/core/templates/dev/head/!(*Spec).js': ['coverage'],
       'local_compiled_js/core/templates/dev/head/**/!(*Spec).js': ['coverage'],
       'local_compiled_js/extensions/!(*Spec).js': ['coverage'],
       'local_compiled_js/extensions/**/!(*Spec).js': ['coverage'],
->>>>>>> ba1b79a13a2663a933770c97e2bbdef5f80940e4:core/tests/karma.conf.ts
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
