@@ -31,7 +31,7 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
     /** @constructor */
     var SuggestionImprovementCard = function(suggestionThread) {
       var card = this;
-      var showSuggestionModal = {
+      var showSuggestionModal = function() {
       };
 
       /** @type {SuggestionThread} */
