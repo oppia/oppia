@@ -236,9 +236,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                     self.skill_id
                 ), {}, csrf_token=csrf_token)
-            question_summaries, skill_descriptions = (
+            question_summaries, skill_descriptions, _ = (
                 question_services.get_question_summaries_and_skill_descriptions(
-                    [self.skill_id]))
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(
                 question_summaries[0].id, self.question_id)
@@ -256,9 +256,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                     self.skill_id
                 ), {}, csrf_token=csrf_token)
-            question_summaries, skill_descriptions = (
+            question_summaries, skill_descriptions, _ = (
                 question_services.get_question_summaries_and_skill_descriptions(
-                    [self.skill_id]))
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(question_summaries[0].id, self.question_id)
             self.assertEqual(skill_descriptions[0], ['Skill Description'])
@@ -296,9 +296,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                     self.skill_id
                 ))
-            question_summaries, skill_descriptions = (
+            question_summaries, skill_descriptions, _ = (
                 question_services.get_question_summaries_and_skill_descriptions(
-                    [self.skill_id]))
+                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(
                 question_summaries[0].id, self.question_id_2)
@@ -318,9 +318,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                     self.skill_id
                 ))
-            question_summaries, skill_descriptions = (
+            question_summaries, skill_descriptions, _ = (
                 question_services.get_question_summaries_and_skill_descriptions(
-                    [self.skill_id]))
+                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(
                 question_summaries[0].id, self.question_id_2)

@@ -94,7 +94,6 @@ oppia.directive('questionsList', [
             $scope.currentPage--;
             $scope.questionSummaries =
               $scope.getQuestionSummaries($scope.currentPage, false);
-            console.log($scope.questionSummaries);
           };
 
           $scope.getSkillDescription = function(skillDescriptions) {
@@ -158,6 +157,7 @@ oppia.directive('questionsList', [
 
           $scope.createQuestion = function() {
             if ($scope.getSkill()) {
+              $scope.skillIds = [$scope.getSkill().getId()];
               $scope.initializeNewQuestionCreation();
               return;
             }

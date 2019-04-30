@@ -85,7 +85,7 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
 
     def test_get(self):
         # Create 5 questions linked to the same skill.
-        for i in range(0, 3): #pylint: disable=unused-variable
+        for i in range(0, 6): #pylint: disable=unused-variable
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
@@ -95,24 +95,28 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.ADMIN_EMAIL)
-            json_response = self.get_json(
-                '%s/%s?cursor=' % (
-                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-                ))
-            question_summary_dicts = json_response['question_summary_dicts']
-            self.assertEqual(len(question_summary_dicts), 3)
-            self.assertEqual(
-                question_summary_dicts[0]['skill_description'],
-                ['Skill Description'])
-            self.assertNotEqual(
-                question_summary_dicts[0]['summary']['id'],
-                question_summary_dicts[1]['summary']['id'])
-            self.logout()
-
-            self.login(self.TOPIC_MANAGER_EMAIL)
-            self.get_json(
-                '%s/%s?cursor=' % (
-                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id))
+            with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
+                json_response = self.get_json(
+                    '%s/%s?cursor=' % (
+                        feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
+                    ))
+                question_summary_dicts = json_response['question_summary_dicts']
+                self.assertEqual(len(question_summary_dicts), 3)
+                next_start_cursor = json_response['next_start_cursor']
+                json_response = self.get_json(
+                    '%s/%s?cursor=%s' % (
+                        feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id,
+                        next_start_cursor
+                    ))
+                question_summary_dicts_2 = (
+                    json_response['question_summary_dicts'])
+                self.assertEqual(len(question_summary_dicts_2), 3)
+                self.assertEqual(
+                    question_summary_dicts[0]['skill_description'],
+                    ['Skill Description'])
+                self.assertNotEqual(
+                    question_summary_dicts[0]['summary']['id'],
+                    question_summary_dicts_2[0]['summary']['id'])
             self.logout()
 
             topic_services.assign_role(
@@ -125,7 +129,7 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
                     feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
                 ))
             question_summary_dicts = json_response['question_summary_dicts']
-            self.assertEqual(len(question_summary_dicts), 3)
+            self.assertEqual(len(question_summary_dicts), 6)
             self.logout()
 
             self.login(self.NEW_USER_EMAIL)

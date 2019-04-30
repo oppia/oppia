@@ -461,9 +461,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_post_accept['status'],
             suggestion_models.STATUS_ACCEPTED)
-        questions, skill_descriptions = (
+        questions, skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
-                [self.SKILL_ID]))
+                1, [self.SKILL_ID], ''))
         self.assertEqual(len(questions), 1)
         self.assertEqual(questions[0].creator_id, self.author_id)
         self.assertEqual(skill_descriptions[0], [self.SKILL_DESCRIPTION])
