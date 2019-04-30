@@ -32,7 +32,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
     var _showEditStateContentSuggestionModal = function(
         activeThread, setActiveThread, isSuggestionHandled, hasUnsavedChanges,
         isSuggestionValid) {
-      $uibModal.open({
+      return $uibModal.open({
         templateUrl: _templateUrl,
         backdrop: true,
         size: 'lg',
@@ -102,13 +102,15 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
     return {
       showSuggestionModal: function(suggestionType, extraParams) {
         if (suggestionType === 'edit_exploration_state_content') {
-          _showEditStateContentSuggestionModal(
+          return _showEditStateContentSuggestionModal(
             extraParams.activeThread,
             extraParams.setActiveThread,
             extraParams.isSuggestionHandled,
             extraParams.hasUnsavedChanges,
             extraParams.isSuggestionValid
           );
+        } else {
+          return Promise.reject('Not an exploration state suggestion');
         }
       }
     };
