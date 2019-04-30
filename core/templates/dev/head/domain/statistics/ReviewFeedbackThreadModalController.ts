@@ -19,13 +19,13 @@
 oppia.controller('ReviewFeedbackThreadModalController', [
   '$scope', '$uibModalInstance', 'AlertsService', 'DateTimeFormatService',
   'EditabilityService', 'FeedbackThreadDisplayService', 'ThreadDataService',
-  'activeThread', 'userIsLoggedIn',
+  'activeThread', 'isUserLoggedIn',
   function(
       $scope, $uibModalInstance, AlertsService, DateTimeFormatService,
       EditabilityService, FeedbackThreadDisplayService, ThreadDataService,
-      activeThread, userIsLoggedIn) {
+      activeThread, isUserLoggedIn) {
     $scope.activeThread = activeThread;
-    $scope.userIsLoggedIn = userIsLoggedIn;
+    $scope.isUserLoggedIn = isUserLoggedIn;
     $scope.STATUS_CHOICES = FeedbackThreadDisplayService.STATUS_CHOICES;
     $scope.getLabelClass = FeedbackThreadDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (

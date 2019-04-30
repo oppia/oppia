@@ -48,7 +48,7 @@
 <hr style="margin-top: 0">
 
 <div style="padding: 0 32px 32px 32px">
-  <div ng-if="userIsLoggedIn">
+  <div ng-if="isUserLoggedIn">
     <label for="tmpMessageText">
       Add new message
       <span ng-if="EditabilityService.isEditable() && !activeThread.isSuggestionThread()">
@@ -94,7 +94,7 @@
       <div style="clear: both"></div>
     </div>
   </div>
-  <div ng-if="!userIsLoggedIn">
+  <div ng-if="!isUserLoggedIn">
     <em style="float: left; padding: 6px 0">To respond to a feedback thread, please log in.</em>
     <div style="float: right">
       <button ng-click="close()" ng-disabled="messageSendingInProgress"
