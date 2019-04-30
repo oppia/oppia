@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-oppia.directive('feedbackImprovementCard', [
+oppia.directive('suggestionImprovementCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -21,7 +21,7 @@ oppia.directive('feedbackImprovementCard', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/improvements_tab/' +
-        'feedback_improvement_card_directive.html'),
+        'suggestion_improvement_card_directive.html'),
       controller: [
         '$scope', 'DateTimeFormatService', 'FeedbackThreadDisplayService',
         function($scope, DateTimeFormatService, FeedbackThreadDisplayService) {

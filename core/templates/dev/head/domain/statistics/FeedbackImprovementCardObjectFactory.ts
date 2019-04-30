@@ -19,15 +19,19 @@
 oppia.constant('FEEDBACK_IMPROVEMENT_CARD_TYPE', 'feedback');
 
 oppia.factory('FeedbackImprovementCardObjectFactory', [
-  '$uibModal', 'ImprovementActionButtonObjectFactory', 'ThreadDataService',
+  '$uibModal', 'ChangeListService', 'ExplorationStatesService',
+  'ImprovementActionButtonObjectFactory',
+  'ThreadDataService',
   'UrlInterpolationService', 'UserService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
   function(
-      $uibModal, ImprovementActionButtonObjectFactory, ThreadDataService,
+      $uibModal, ChangeListService, ExplorationStatesService,
+      ImprovementActionButtonObjectFactory,
+      ThreadDataService,
       UrlInterpolationService, UserService, FEEDBACK_IMPROVEMENT_CARD_TYPE) {
     /** @constructor */
     var FeedbackImprovementCard = function(feedbackThread) {
       var card = this;
-      var openReviewThreadModal = function() {
+      var showReviewThreadModal = function() {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/review_feedback_thread_modal_directive.html'),
@@ -55,7 +59,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Thread', openReviewThreadModal, 'btn-success'),
+          'Review Thread', showReviewThreadModal, 'btn-success'),
       ];
     };
 
@@ -64,14 +68,13 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      *    open, i.e., still relevant and actionable.
      */
     FeedbackImprovementCard.prototype.isOpen = function() {
-      return this._feedbackThread.status === 'open';
+      return this._feedbackThread.status === 'open' &&
+        this._feedbackThread.status !== 'review';
     };
 
     /** @returns {string} - A concise summary of the card. */
     FeedbackImprovementCard.prototype.getTitle = function() {
-      var threadType = this._feedbackThread.isSuggestionThread() ?
-        'Suggestion Thread' : 'Feedback Thread';
-      return threadType + ': ' + this._feedbackThread.subject;
+      return 'Feedback: ' + this._feedbackThread.subject;
     };
 
     /** @returns {string} - The directive type used to render the card. */
@@ -113,11 +116,11 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
           ThreadDataService.fetchThreads(),
           ThreadDataService.fetchFeedbackStats(),
         ]).then(function() {
-          var feedbackThreads = ThreadDataService.data.feedbackThreads;
-          return Promise.all(feedbackThreads.map(function(thread) {
+          var threads = ThreadDataService.data.feedbackThreads;
+          return Promise.all(threads.map(function(thread) {
             return ThreadDataService.fetchMessages(thread.threadId);
           })).then(function() {
-            return feedbackThreads.map(createNew);
+            return threads.map(createNew);
           });
         });
       },

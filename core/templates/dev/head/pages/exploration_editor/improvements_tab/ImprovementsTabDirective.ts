@@ -39,7 +39,7 @@ oppia.directive('improvementsTab', [
             ]).then(function(results) {
               var userInfo = results[0];
               var freshCards = results[1];
-              cardView = userInfo.isLoggedIn() ? 'open' : 'open_feedback';
+              // cardView = userInfo.isLoggedIn() ? 'open' : 'open_feedback';
               cards = freshCards;
             });
           };

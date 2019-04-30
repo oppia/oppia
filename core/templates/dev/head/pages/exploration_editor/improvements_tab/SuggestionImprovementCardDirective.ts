@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-oppia.directive('feedbackImprovementCard', [
+oppia.directive('suggestionImprovementCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -21,10 +21,10 @@ oppia.directive('feedbackImprovementCard', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/improvements_tab/' +
-        'feedback_improvement_card_directive.html'),
+        'suggestion_improvement_card_directive.html'),
       controller: [
-        '$scope', 'DateTimeFormatService', 'FeedbackThreadDisplayService',
-        function($scope, DateTimeFormatService, FeedbackThreadDisplayService) {
+        '$scope', 'DateTimeFormatService', 'SuggestionThreadDisplayService',
+        function($scope, DateTimeFormatService, SuggestionThreadDisplayService) {
           var getMessages = function() {
             return $scope.getThread().messages.filter(function(message) {
               return $.trim(message.text) !== '';
@@ -56,9 +56,9 @@ oppia.directive('feedbackImprovementCard', [
               };
             }
           };
-          $scope.getLabelClass = FeedbackThreadDisplayService.getLabelClass;
+          $scope.getLabelClass = SuggestionThreadDisplayService.getLabelClass;
           $scope.getHumanReadableStatus = (
-            FeedbackThreadDisplayService.getHumanReadableStatus);
+            SuggestionThreadDisplayService.getHumanReadableStatus);
           $scope.getLocaleAbbreviatedDatetimeString = (
             DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
         }
