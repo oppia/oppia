@@ -298,7 +298,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 ))
             question_summaries, skill_descriptions, _ = (
                 question_services.get_question_summaries_and_skill_descriptions(
-                     5, [self.skill_id], ''))
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(
                 question_summaries[0].id, self.question_id_2)
@@ -320,7 +320,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 ))
             question_summaries, skill_descriptions, _ = (
                 question_services.get_question_summaries_and_skill_descriptions(
-                     5, [self.skill_id], ''))
+                    5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(
                 question_summaries[0].id, self.question_id_2)
