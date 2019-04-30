@@ -119,12 +119,12 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       var thisCard = this;
       var enableShowSuggestionButton = function() {
         $timeout(function() {
-          thisCard._isShowSuggestionButtonDisabled = true;
+          thisCard._isShowSuggestionButtonDisabled = false;
         });
       };
       var disableShowSuggestionButton = function() {
         $timeout(function() {
-          thisCard._isShowSuggestionButtonDisabled = false;
+          thisCard._isShowSuggestionButtonDisabled = true;
         });
       };
       var showSuggestionModal = function() {
