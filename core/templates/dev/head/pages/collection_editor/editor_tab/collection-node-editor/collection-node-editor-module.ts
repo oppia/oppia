@@ -13,16 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the settings tab of the collection editor.
+ * @fileoverview Module for displaying and editing a collection node. This
+ * directive allows creators to shift nodes to left or right
+ * and also delete the collection node represented by this directive.
  */
 
-oppia.directive('collectionSettingsTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/settings_tab/' +
-        'collection_settings_tab_directive.html'),
-      controller: [function() {}]
-    };
-  }]);
+angular.module('collectionNodeEditorModule', []);

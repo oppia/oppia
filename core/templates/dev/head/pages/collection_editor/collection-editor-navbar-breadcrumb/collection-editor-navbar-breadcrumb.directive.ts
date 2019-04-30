@@ -22,14 +22,15 @@
 // support both displaying the current title of the collection (or untitled if
 // it does not yet have one) or setting a new title in the case of an untitled
 // collection.
-oppia.directive('collectionEditorNavbarBreadcrumb', [
+
+angular.module('collectionEditorNavbarBreadcrumbModule').directive('collectionEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/' +
-        'collection_editor_navbar_breadcrumb_directive.html'),
+        '/pages/collection_editor/collection-editor-navbar-breadcrumb' +
+        'collection-editor-navbar-breadcrumb-directive.html'),
       controller: [
         '$scope', 'RouterService', 'CollectionEditorStateService',
         'FocusManagerService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',

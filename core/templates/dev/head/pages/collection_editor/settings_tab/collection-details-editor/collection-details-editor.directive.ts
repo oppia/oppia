@@ -18,13 +18,13 @@
  * adding a new exploration.
  */
 
-oppia.directive('collectionDetailsEditor', [
+angular.module('collectionDetailsEditorModule').directive('collectionDetailsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/settings_tab/' +
-        'collection_details_editor_directive.html'),
+        '/pages/collection_editor/settings_tab/collection-details-editor' +
+        'collection-details-editor-directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
         'CollectionValidationService', 'AlertsService', 'ALL_CATEGORIES',

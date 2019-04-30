@@ -16,12 +16,13 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
-oppia.directive('collectionEditorNavbar', [
+angular.module('collectionEditorNavbarModule').directive('collectionEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/collection_editor_navbar_directive.html'),
+        '/pages/collection_editor/collection-editor-navbar/' +
+        'collection-editor-navbar-directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'RouterService',
         'UndoRedoService', 'CollectionEditorStateService',
@@ -114,7 +115,7 @@ oppia.directive('collectionEditorNavbar', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/collection_editor/' +
-                'collection_editor_save_modal_directive.html'),
+                'collection-editor-save-modal.directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -146,7 +147,7 @@ oppia.directive('collectionEditorNavbar', [
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/collection_editor/' +
-                  'collection_editor_pre_publish_modal_directive.html'),
+                  'collection-editor-pre-publish-modal.directive.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance', 'CollectionEditorStateService',

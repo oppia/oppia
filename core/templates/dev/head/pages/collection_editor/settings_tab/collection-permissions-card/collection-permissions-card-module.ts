@@ -13,16 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the statistics tab of the collection editor.
+ * @fileoverview Module for displaying the collection's owner name and
+ * permissions.
  */
 
-oppia.directive('collectionStatisticsTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/statistics_tab/' +
-        'collection_statistics_tab_directive.html'),
-      controller: [function() {}]
-    };
-  }]);
+angular.module('collectionPermissionsCardModule', []);

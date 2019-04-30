@@ -13,16 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the history tab of the collection editor.
+ * @fileoverview Module for the settings tab of the collection editor.
  */
 
-oppia.directive('collectionHistoryTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/history_tab/' +
-        'collection_history_tab_directive.html'),
-      controller: [function() {}]
-    };
-  }]);
+angular.module('collectionSettingsTabModule', []);

@@ -16,13 +16,13 @@
  * @fileoverview Directive for creating a new collection node.
  */
 
-oppia.directive('collectionNodeCreator', [
+angular.module('collectionNodeCreatorModule').directive('collectionNodeCreator', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/editor_tab/' +
-        'collection_node_creator_directive.html'),
+        '/pages/collection_editor/editor_tab/collection-node-creator/' +
+        'collection-node-creator-directive.html'),
       controller: [
         '$scope', '$http', '$window', '$filter', 'AlertsService',
         'ValidatorsService', 'CollectionEditorStateService',

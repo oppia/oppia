@@ -18,7 +18,7 @@
  * and also delete the collection node represented by this directive.
  */
 
-oppia.directive('collectionNodeEditor', [
+angular.module('collectionNodeEditorModule').directive('collectionNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -27,8 +27,8 @@ oppia.directive('collectionNodeEditor', [
         getLinearIndex: '&linearIndex'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/editor_tab/' +
-        'collection_node_editor_directive.html'),
+        '/pages/collection_editor/editor_tab/collection-node-editor' +
+        'collection-node-editor-directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
         'CollectionUpdateService', 'AlertsService',

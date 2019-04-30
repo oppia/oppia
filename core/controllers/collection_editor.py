@@ -69,7 +69,8 @@ class CollectionEditorPage(CollectionEditorHandler):
             'title': collection.title,
         })
 
-        self.render_template('pages/collection_editor/collection_editor.html')
+        self.render_template('pages/collection_editor/' +
+            'collection-editor.mainpage.html')
 
 
 class EditableCollectionDataHandler(CollectionEditorHandler):

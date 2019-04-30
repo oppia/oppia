@@ -16,14 +16,14 @@
  * @fileoverview Controller for the main tab of the collection editor.
  */
 
-oppia.directive('collectionEditorTab', [
+angular.module('collectionEditorTabModule').directive('collectionEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/editor_tab/' +
-        'collection_editor_tab_directive.html'),
+        'collection-editor-tab-directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
         function(

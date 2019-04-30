@@ -13,25 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying the collection's owner name and
- * permissions.
+ * @fileoverview Controller for the settings tab of the collection editor.
  */
 
-oppia.directive('collectionPermissionsCard', [
+angular.module('collectionSettingsTabModule').directive('collectionSettingsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/settings_tab/' +
-        'collection_permissions_card_directive.html'),
-      controller: [
-        '$scope', 'CollectionEditorStateService',
-        function($scope, CollectionEditorStateService) {
-          $scope.collectionRights =
-            CollectionEditorStateService.getCollectionRights();
-          $scope.hasPageLoaded =
-            CollectionEditorStateService.hasLoadedCollection;
-        }
-      ]
+        'collection-settings-tab-directive.html'),
+      controller: [function() {}]
     };
   }]);
