@@ -129,10 +129,9 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
        * playthrough issues associated to the current exploration.
        */
       fetchCards: function() {
+        var createNew = this.createNew;
         return PlaythroughIssuesService.getIssues().then(function(issues) {
-          return issues.map(function(issue) {
-            return new PlaythroughImprovementCard(issue);
-          });
+          return issues.map(createNew);
         });
       },
     };
