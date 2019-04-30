@@ -31,7 +31,6 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       ShowSuggestionModalForEditorViewService, ThreadDataService,
       UrlInterpolationService, UserService, FEEDBACK_IMPROVEMENT_CARD_TYPE,
       SUGGESTION_IMPROVEMENT_CARD_TYPE) {
-
     /**
      * @constructor
      * @param {FeedbackThreadObjectFactory} - feedback
