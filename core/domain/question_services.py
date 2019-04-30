@@ -328,17 +328,21 @@ def get_question_summaries_and_skill_descriptions(
     skill_ids.
 
     Args:
+        question_count: int. The number of question summaries to return.
         skill_ids: list(str). The ids of skills for which the linked questions
             are to be retrieved.
+        start_cursor: str. The starting point from which the batch of
+            questions are to be returned. This value should be urlsafe.
 
     Raises:
         Exception. Querying linked question summaries for more than 3 skills at
         a time is not supported currently.
 
     Returns:
-        list(QuestionSummary), list(str). The list of question
-            summaries and the corresponding linked skill descriptions which are
-            linked to the given skill ids.
+        list(QuestionSummary), list(str), str|None. The list of question
+            linked to the given skill ids and the next cursor value to be used
+            for the next batch of questions (or None if no more pages are left).
+            The returned next cursor value is urlsafe.
     """
     if len(skill_ids) == 0:
         return [], [], None
