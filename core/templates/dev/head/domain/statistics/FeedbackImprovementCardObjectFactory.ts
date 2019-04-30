@@ -123,7 +123,6 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
         });
       };
       var showSuggestionModal = function() {
-        console.log('whoo?');
         setIsButtonDisabled(true);
         ShowSuggestionModalForEditorViewService.showSuggestionModal(
           suggestionThread.suggestion.suggestionType, {
@@ -139,8 +138,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
                 suggestionThread.getSuggestionStateName());
             },
           }
-        ).result.catch(function() {
-          console.log('whoo!');
+        ).result['catch'](function() {
           setIsButtonDisabled(false);
         });
       };
