@@ -32,17 +32,17 @@
 
 oppia.factory('ImprovementCardService', [
   'FeedbackImprovementCardObjectFactory',
-  'SuggestionImprovementCardObjectFactory',
   'PlaythroughImprovementCardObjectFactory',
+  'SuggestionImprovementCardObjectFactory',
   function(
       FeedbackImprovementCardObjectFactory,
-      SuggestionImprovementCardObjectFactory,
-      PlaythroughImprovementCardObjectFactory) {
+      PlaythroughImprovementCardObjectFactory,
+      SuggestionImprovementCardObjectFactory) {
     /** @type {Object[]} */
     var improvementCardObjectFactoryRegistry = Object.freeze([
       FeedbackImprovementCardObjectFactory,
-      SuggestionImprovementCardObjectFactory,
       PlaythroughImprovementCardObjectFactory,
+      SuggestionImprovementCardObjectFactory,
     ]);
 
     return {

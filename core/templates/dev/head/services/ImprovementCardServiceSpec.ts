@@ -23,15 +23,15 @@ describe('ImprovementCardService', function() {
 
     this.FeedbackImprovementCardObjectFactory =
       $injector.get('FeedbackImprovementCardObjectFactory');
-    this.SuggestionImprovementCardObjectFactory =
-      $injector.get('SuggestionImprovementCardObjectFactory');
     this.PlaythroughImprovementCardObjectFactory =
       $injector.get('PlaythroughImprovementCardObjectFactory');
+    this.SuggestionImprovementCardObjectFactory =
+      $injector.get('SuggestionImprovementCardObjectFactory');
 
     this.expectedFactories = [
       this.FeedbackImprovementCardObjectFactory,
-      this.SuggestionImprovementCardObjectFactory,
       this.PlaythroughImprovementCardObjectFactory,
+      this.SuggestionImprovementCardObjectFactory,
     ];
   }));
 
