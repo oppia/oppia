@@ -34,6 +34,16 @@ oppia.directive('improvementsTab', [
           var cards = [];
           var refreshCards = function() {
             ImprovementCardService.fetchCards().then(function(freshCards) {
+              var oldIndexes = {};
+              cards.forEach(function(card, index) {
+                oldIndexes[card.getKey()] = index;
+              });
+              var indexOf = function(card) {
+                return oldIndexes[card.getKey()] || cards.length;
+              };
+              freshCards.sort(function(leftHandCard, rightHandCard) {
+                return indexOf(leftHandCard) - indexOf(rightHandCard);
+              });
               $timeout(function() {
                 cards = freshCards;
               });
