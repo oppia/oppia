@@ -49,6 +49,14 @@ oppia.factory('ThreadDataService', [
     // Number of open threads that need action
     var openThreadsCount = 0;
 
+    var compareBy = function(propertyName) {
+      return function(lhs, rhs) {
+        var lhsProp = lhs[propertyName];
+        var rhsProp = rhs[propertyName];
+        return (lhsProp === rhsProp) ? 0 : (lhsProp < rhsProp) ? -1 : 1;
+      };
+    };
+
     var fetchThreads = function(successCallback = function() {}) {
       var threadsPromise = $http.get(THREAD_LIST_HANDLER_URL);
       var suggestionsPromise = $http.get(SUGGESTION_LIST_HANDLER_URL, {
@@ -79,19 +87,12 @@ oppia.factory('ThreadDataService', [
         });
 
         data.suggestionThreads = [];
+        suggestionThreadBackendDicts.sort(compareBy('thread_id'));
+        suggestionBackendDicts.sort(compareBy('suggestion_id'));
         for (var i = 0; i < suggestionThreadBackendDicts.length; ++i) {
-          // NOTE: Backend returns the dicts sorted by their thread id.
-          var suggestionThreadBackendDict = suggestionThreadBackendDicts[i];
-          var suggestionBackendDict = suggestionBackendDicts[i];
-          if (suggestionThreadBackendDict.thread_id !==
-              suggestionBackendDict.suggestion_id) {
-            $log.error('Suggestion data was not sorted by the backend');
-            continue;
-          }
-
           var suggestionThread =
             SuggestionThreadObjectFactory.createFromBackendDicts(
-              suggestionThreadBackendDict, suggestionBackendDict);
+              suggestionThreadBackendDicts[i], suggestionBackendDicts[i]);
           threadMap[suggestionThread.threadId] = suggestionThread;
           data.suggestionThreads.push(suggestionThread);
         }
