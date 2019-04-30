@@ -30,9 +30,10 @@ describe('Text Input Prediction Service', function() {
       $scope = $rootScope.$new();
     }));
     it('should predict the same as oppia-ml', function() {
-      jasmine.getJSONFixtures().fixturesPath = 'base/core/tests/data';
-      var classifierData = getJSONFixture('text_input_classifier_data.json');
-      var trainingData = getJSONFixture('text_classifier_results.json');
+      var classifierData =
+        window.__fixtures__['core/tests/data/text_input_classifier_data'];
+      var trainingData =
+        window.__fixtures__['core/tests/data/text_classifier_results'];
       var correctPredictions = 0, totalAnswers = 0;
       var predictedAnswerGroup = null;
 
@@ -55,11 +56,10 @@ describe('Text Input Prediction Service', function() {
       // These answers are taken from the text_input_training_data.json
       // in Oppia-ml. Never test classifiers using training data unless it
       // is only the functionality that you want to test (like in this case).
-
-      jasmine.getJSONFixtures().fixturesPath = 'base/core/tests/data';
-
-      var classifierData = getJSONFixture('text_input_classifier_data.json');
-      var trainingData = getJSONFixture('text_input_training_data.json');
+      var classifierData =
+        window.__fixtures__['core/tests/data/text_input_classifier_data'];
+      var trainingData =
+        window.__fixtures__['core/tests/data/text_input_training_data'];
       var correctPredictions = 0, totalAnswers = 0;
 
       // To keep things simple, we will calculate accuracy score

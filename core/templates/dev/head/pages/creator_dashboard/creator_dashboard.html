@@ -361,7 +361,7 @@
       </div>
       <md-card class="oppia-subscription-card protractor-test-subscription-card"
                ng-repeat="subscriber in subscribersList | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending">
-        <a class="oppia-subscription-profile-link" href="/profile/<[subscriber.subscriber_username]>" target="_blank">
+        <a class="oppia-subscription-profile-link" href="/profile/<[subscriber.subscriber_username]>" target="_blank" rel="noopener">
           <img ng-src="<[subscriber.subscriber_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
           <span class="oppia-subscription-card-summary">
             <div style="margin-bottom: 5px; font-size: 17.5px;">

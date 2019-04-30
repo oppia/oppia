@@ -28,7 +28,7 @@ import browsermobproxy
 from selenium import webdriver
 
 CHROMEDRIVER_PATH = os.path.join(
-    '..', 'node_modules', 'protractor', 'node_modules', 'webdriver-manager',
+    'node_modules', 'protractor', 'node_modules', 'webdriver-manager',
     'selenium', 'chromedriver_2.22')
 
 BROWSERMOB_PROXY_PATH = os.path.join(
