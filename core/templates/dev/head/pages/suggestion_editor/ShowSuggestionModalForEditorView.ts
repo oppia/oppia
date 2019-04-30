@@ -20,13 +20,13 @@
 oppia.controller('ShowSuggestionModalForEditorView', [
   '$log', '$scope', '$uibModalInstance', 'EditabilityService',
   'SuggestionModalService', 'currentContent', 'description',
-  'newContent', 'suggestionIsHandled', 'suggestionIsValid', 'suggestionStatus',
-  'unsavedChangesExist', 'resolveSuggestion',
+  'newContent', 'resolveSuggestion', 'suggestionIsHandled', 'suggestionIsValid',
+  'suggestionStatus', 'unsavedChangesExist',
   function(
       $log, $scope, $uibModalInstance, EditabilityService,
       SuggestionModalService, currentContent, description,
-      newContent, suggestionIsHandled, suggestionIsValid, suggestionStatus,
-      unsavedChangesExist, resolveSuggestion) {
+      newContent, resolveSuggestion, suggestionIsHandled, suggestionIsValid,
+      suggestionStatus, unsavedChangesExist) {
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canEdit = EditabilityService.isEditable();
     $scope.commitMessage = '';
