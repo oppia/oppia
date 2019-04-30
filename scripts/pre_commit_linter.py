@@ -959,6 +959,9 @@ class LintChecksManager(object):
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         # Set path for node.
+        # The path for node is set since the lint test fail on circleci
+        # if node path is missing because the typescript files cannot
+        # be compiled.
         node_path = os.path.join(os.pardir, 'oppia_tools/node-6.9.1')
         os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
