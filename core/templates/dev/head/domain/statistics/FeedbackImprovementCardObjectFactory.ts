@@ -83,6 +83,10 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       return 'Feedback: ' + this._feedbackThread.subject;
     };
 
+    FeedbackThreadImprovementCard.prototype.getKey = function() {
+      return this._feedbackThread.threadId;
+    };
+
     /** @returns {string} - The directive type used to render the card. */
     FeedbackThreadImprovementCard.prototype.getDirectiveType = function() {
       return FEEDBACK_IMPROVEMENT_CARD_TYPE;
@@ -111,27 +115,27 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * @constructor
      * @param {Suggestion} - suggestion
      */
-    var SuggestionImprovementCard = function(suggestion) {
+    var SuggestionImprovementCard = function(suggestionThread) {
       var showSuggestionModal = function() {
         ShowSuggestionModalForEditorViewService.showSuggestionModal(
-          suggestion.suggestion.suggestionType, {
-            activeThread: suggestion,
+          suggestionThread.suggestion.suggestionType, {
+            activeThread: suggestionThread,
             hasUnsavedChanges: function() {
               return ChangeListService.getChangeList().length > 0;
             },
             isSuggestionHandled: function() {
-              return suggestion.isSuggestionHandled();
+              return suggestionThread.isSuggestionHandled();
             },
             isSuggestionValid: function() {
               return ExplorationStatesService.hasState(
-                suggestion.getSuggestionStateName());
+                suggestionThread.getSuggestionStateName());
             },
           }
         );
       };
 
       /** @type {Suggestion} */
-      this._suggestion = suggestion;
+      this._suggestionThread = suggestionThread;
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
@@ -144,13 +148,17 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      *    open, i.e., still relevant and actionable.
      */
     SuggestionImprovementCard.prototype.isOpen = function() {
-      return this._suggestion.status !== 'review';
+      return this._suggestionThread.status === 'open';
     };
 
     /** @returns {string} - A concise summary of the card. */
     SuggestionImprovementCard.prototype.getTitle = function() {
       return (
-        'Suggestion for "' + this._suggestion.getSuggestionStateName() + '"');
+        'Suggestion for "' + this._suggestionThread.getSuggestionStateName() + '"');
+    };
+
+    SuggestionImprovementCard.prototype.getKey = function() {
+      return this._suggestionThread.threadId;
     };
 
     /** @returns {string} - The directive type used to render the card. */
@@ -166,7 +174,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * @returns {Suggestion}
      */
     SuggestionImprovementCard.prototype.getDirectiveData = function() {
-      return this._suggestion;
+      return this._suggestionThread;
     };
 
     /**

@@ -58,6 +58,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
         });
       };
 
+      /** @type {string} */
+      this._key = issue.issueType;
       /** @type {boolean} */
       this._isDiscarded = false;
       /** @type {string} */
@@ -87,6 +89,10 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
     /** @returns {string} - A simple summary of the Playthrough Issue */
     PlaythroughImprovementCard.prototype.getTitle = function() {
       return this._title;
+    };
+
+    PlaythroughImprovementCard.prototype.getKey = function() {
+      return this._key;
     };
 
     /**
