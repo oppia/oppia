@@ -70,8 +70,8 @@ oppia.factory('SkillEditorStateService', [
       _questionSummaries.push(angular.copy(questionSummaries));
       $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
     };
-    var _setNextQuestionsCursor = function(nextCursor) {	
-      _nextCursorForQuestions = nextCursor;	
+    var _setNextQuestionsCursor = function(nextCursor) {
+      _nextCursorForQuestions = nextCursor;
     };
 
     return {

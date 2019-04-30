@@ -242,8 +242,8 @@ oppia.factory('TopicEditorStateService', [
 
       getQuestionSummaries: function(index, fetchMore) {
         var num = constants.NUM_QUESTIONS_PER_PAGE;
-        if ((index + 1)*num > _questionSummaries.length 
-            && _nextCursorForQuestions !== null && fetchMore) {
+        if ((index + 1) * num > _questionSummaries.length &&
+            _nextCursorForQuestions !== null && fetchMore) {
           return null;
         } else {
           return _questionSummaries.slice(index * num, (index + 1) * num);
