@@ -57,6 +57,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
           },
           controller: 'ReviewFeedbackThreadModalController',
           backdrop: 'static',
+          size: 'lg',
         });
       };
 
@@ -115,16 +116,16 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
         ShowSuggestionModalForEditorViewService.showSuggestionModal(
           suggestion.suggestion.suggestionType, {
             activeThread: suggestion,
-            isSuggestionHandled: function() {
-              return suggestion.isSuggestionHandled();
-            },
             hasUnsavedChanges: function() {
               return ChangeListService.getChangeList().length > 0;
+            },
+            isSuggestionHandled: function() {
+              return suggestion.isSuggestionHandled();
             },
             isSuggestionValid: function() {
               return ExplorationStatesService.hasState(
                 suggestion.getSuggestionStateName());
-            }
+            },
           }
         );
       };

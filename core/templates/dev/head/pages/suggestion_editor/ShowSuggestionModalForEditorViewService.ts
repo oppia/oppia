@@ -17,13 +17,12 @@
  */
 
 oppia.factory('ShowSuggestionModalForEditorViewService', [
-  '$log', '$rootScope', '$uibModal',
-  'ExplorationDataService', 'ExplorationStatesService',
-  'StateObjectFactory', 'SuggestionModalService',
+  '$log', '$rootScope', '$uibModal', 'ExplorationDataService',
+  'ExplorationStatesService', 'StateObjectFactory', 'SuggestionModalService',
   'ThreadDataService', 'UrlInterpolationService',
-  function($log, $rootScope, $uibModal,
-      ExplorationDataService, ExplorationStatesService,
-      StateObjectFactory, SuggestionModalService,
+  function(
+      $log, $rootScope, $uibModal, ExplorationDataService,
+      ExplorationStatesService, StateObjectFactory, SuggestionModalService,
       ThreadDataService, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
@@ -31,8 +30,8 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
     );
 
     var _showEditStateContentSuggestionModal = function(
-        activeThread, setActiveThread, isSuggestionHandled,
-        hasUnsavedChanges, isSuggestionValid) {
+        activeThread, setActiveThread, isSuggestionHandled, hasUnsavedChanges,
+        isSuggestionValid) {
       $uibModal.open({
         templateUrl: _templateUrl,
         backdrop: true,
@@ -60,42 +59,44 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
           },
           newContent: function() {
             return activeThread.getReplacementHtmlFromSuggestion();
-          }
+          },
         },
-        controller: 'ShowSuggestionModalForEditorView'
+        controller: 'ShowSuggestionModalForEditorView',
       }).result.then(function(result) {
         ThreadDataService.resolveSuggestion(
           activeThread.threadId, result.action, result.commitMessage,
-          result.reviewMessage, result.audioUpdateRequired, function() {
-            ThreadDataService.fetchThreads(function() {
-              setActiveThread(activeThread.threadId);
-            });
-            // Immediately update editor to reflect accepted suggestion.
-            if (
-              result.action === SuggestionModalService.ACTION_ACCEPT_SUGGESTION
-            ) {
-              var suggestion = activeThread.getSuggestion();
-
-              var stateName = suggestion.stateName;
-              var stateDict = ExplorationDataService.data.states[stateName];
-              var state = StateObjectFactory.createFromBackendDict(
-                stateName, stateDict);
-              state.content.setHtml(
-                activeThread.getReplacementHtmlFromSuggestion());
-              if (result.audioUpdateRequired) {
-                state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
-                  state.content.getContentId());
-              }
-              ExplorationDataService.data.version += 1;
-              ExplorationStatesService.setState(stateName, state);
-              $rootScope.$broadcast('refreshVersionHistory', {
-                forceRefresh: true
-              });
-              $rootScope.$broadcast('refreshStateEditor');
+          result.reviewMessage, result.audioUpdateRequired
+        ).then(
+          ThreadDataService.fetchThreads
+        ).then(function() {
+          if (setActiveThread) {
+            setActiveThread(activeThread.threadId);
+          }
+          // Immediately update editor to reflect accepted suggestion.
+          if (result.action ===
+              SuggestionModalService.ACTION_ACCEPT_SUGGESTION) {
+            var suggestion = activeThread.getSuggestion();
+            var stateName = suggestion.stateName;
+            var stateDict = ExplorationDataService.data.states[stateName];
+            var state = (
+              StateObjectFactory.createFromBackendDict(stateName, stateDict));
+            state.content.setHtml(
+              activeThread.getReplacementHtmlFromSuggestion());
+            if (result.audioUpdateRequired) {
+              state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
+                state.content.getContentId());
             }
-          }, function() {
-            $log.error('Error resolving suggestion');
-          });
+            ExplorationDataService.data.version += 1;
+            ExplorationStatesService.setState(stateName, state);
+            $rootScope.$broadcast('refreshVersionHistory', {
+              forceRefresh: true
+            });
+            $rootScope.$broadcast('refreshStateEditor');
+            $rootScope.$broadcast('refreshImprovementsTab');
+          }
+        }, function() {
+          $log.error('Error resolving suggestion');
+        });
       });
     };
 

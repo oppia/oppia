@@ -81,7 +81,9 @@ oppia.factory('ThreadDataService', [
             }
           }
         }
-        successCallback();
+        if (successCallback) {
+          successCallback();
+        }
       });
     };
 
@@ -203,7 +205,7 @@ oppia.factory('ThreadDataService', [
           payload.commit_message = commitMsg;
         }
         _openThreadsCount -= 1;
-        $http.put(
+        return $http.put(
           _SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(
           onSuccess, function() {
             _openThreadsCount += 1;
