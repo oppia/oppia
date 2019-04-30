@@ -149,10 +149,9 @@ oppia.factory('ThreadDataService', [
           threadId, newMessage, newStatus, successCallback, errorCallback) {
         var thread = threadMap[threadId];
         var oldStatus = thread.status;
-        var updatedStatus = (newStatus === oldStatus) ? null : newStatus;
 
-        $http.post(THREAD_HANDLER_PREFIX + threadId, {
-          updated_status: updatedStatus,
+        return $http.post(THREAD_HANDLER_PREFIX + threadId, {
+          updated_status: (newStatus === oldStatus) ? null : newStatus,
           updated_subject: null,
           text: newMessage,
         }).then(function() {

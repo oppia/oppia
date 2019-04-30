@@ -20,13 +20,13 @@ oppia.constant('FEEDBACK_IMPROVEMENT_CARD_TYPE', 'feedback');
 oppia.constant('SUGGESTION_IMPROVEMENT_CARD_TYPE', 'suggestion');
 
 oppia.factory('FeedbackImprovementCardObjectFactory', [
-  '$uibModal', 'ChangeListService', 'ExplorationStatesService',
+  '$timeout', '$uibModal', 'ChangeListService', 'ExplorationStatesService',
   'ImprovementActionButtonObjectFactory',
   'ShowSuggestionModalForEditorViewService', 'ThreadDataService',
   'UrlInterpolationService', 'UserService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
   'SUGGESTION_IMPROVEMENT_CARD_TYPE',
   function(
-      $uibModal, ChangeListService, ExplorationStatesService,
+      $timeout, $uibModal, ChangeListService, ExplorationStatesService,
       ImprovementActionButtonObjectFactory,
       ShowSuggestionModalForEditorViewService, ThreadDataService,
       UrlInterpolationService, UserService, FEEDBACK_IMPROVEMENT_CARD_TYPE,
@@ -116,7 +116,15 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * @param {Suggestion} - suggestion
      */
     var SuggestionImprovementCard = function(suggestionThread) {
+      var thisCard = this;
+      var setIsButtonDisabled = function(isDisabled) {
+        $timeout(function() {
+          thisCard._isButtonDisabled = isDisabled;
+        });
+      };
       var showSuggestionModal = function() {
+        console.log('whoo?');
+        setIsButtonDisabled(true);
         ShowSuggestionModalForEditorViewService.showSuggestionModal(
           suggestionThread.suggestion.suggestionType, {
             activeThread: suggestionThread,
@@ -131,15 +139,22 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
                 suggestionThread.getSuggestionStateName());
             },
           }
-        );
+        ).result.catch(function() {
+          console.log('whoo!');
+          setIsButtonDisabled(false);
+        });
       };
 
+      /** @type {boolean} */
+      this._isButtonDisabled = false;
       /** @type {Suggestion} */
       this._suggestionThread = suggestionThread;
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Review Suggestion', showSuggestionModal, 'btn-success'),
+          'Review Suggestion', showSuggestionModal, 'btn-success', function() {
+            return thisCard._isButtonDisabled;
+          }),
       ];
     };
 

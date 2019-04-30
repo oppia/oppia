@@ -21,12 +21,12 @@ oppia.controller('ShowSuggestionModalForEditorView', [
   '$log', '$scope', '$uibModalInstance', 'EditabilityService',
   'SuggestionModalService', 'currentContent', 'description',
   'newContent', 'suggestionIsHandled', 'suggestionIsValid', 'suggestionStatus',
-  'unsavedChangesExist',
+  'unsavedChangesExist', 'resolveSuggestion',
   function(
       $log, $scope, $uibModalInstance, EditabilityService,
       SuggestionModalService, currentContent, description,
       newContent, suggestionIsHandled, suggestionIsValid, suggestionStatus,
-      unsavedChangesExist) {
+      unsavedChangesExist, resolveSuggestion) {
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canEdit = EditabilityService.isEditable();
     $scope.commitMessage = '';
@@ -54,33 +54,33 @@ oppia.controller('ShowSuggestionModalForEditorView', [
     $scope.newContent = newContent;
 
     $scope.acceptSuggestion = function() {
-      SuggestionModalService.acceptSuggestion(
-        $uibModalInstance,
-        {
-          action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-          commitMessage: $scope.commitMessage,
-          reviewMessage: $scope.reviewMessage,
-          // TODO(sll): If audio files exist for the content being
-          // replaced, implement functionality in the modal for the
-          // exploration creator to indicate whether this change
-          // requires the corresponding audio subtitles to be updated.
-          // For now, we default to assuming that the changes are
-          // sufficiently small as to warrant no updates.
-          audioUpdateRequired: false
-        });
+      var params = {
+        action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+        commitMessage: $scope.commitMessage,
+        reviewMessage: $scope.reviewMessage,
+        // TODO(sll): If audio files exist for the content being
+        // replaced, implement functionality in the modal for the
+        // exploration creator to indicate whether this change
+        // requires the corresponding audio subtitles to be updated.
+        // For now, we default to assuming that the changes are
+        // sufficiently small as to warrant no updates.
+        audioUpdateRequired: false
+      };
+      resolveSuggestion(params);
+      $uibModalInstance.close();
     };
 
     $scope.rejectSuggestion = function() {
-      SuggestionModalService.rejectSuggestion(
-        $uibModalInstance,
-        {
-          action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
-          reviewMessage: $scope.reviewMessage
-        });
+      var params = {
+        action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+        reviewMessage: $scope.reviewMessage
+      };
+      resolveSuggestion(params);
+      $uibModalInstance.close();
     };
 
     $scope.cancelReview = function() {
-      SuggestionModalService.cancelSuggestion($uibModalInstance);
+      $uibModalInstance.dismiss('cancel');
     };
   }
 ]);

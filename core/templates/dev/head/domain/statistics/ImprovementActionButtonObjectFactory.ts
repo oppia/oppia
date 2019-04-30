@@ -24,11 +24,17 @@ oppia.factory('ImprovementActionButtonObjectFactory', [function() {
    * @param {callback} actionFunc - Function to run when the button is clicked.
    * @param {string} [cssClass=btn-default] - The CSS class to render the button
    *    with.
+   * @param {callback} isDisabled - Function predicate which returns whether the
+   *    button is clickable.
    */
-  var ImprovementActionButton = function(text, actionFunc, cssClass) {
+  var ImprovementActionButton = function(
+      text, actionFunc, cssClass, isDisabled) {
     this._text = text;
     this._actionFunc = actionFunc;
     this._cssClass = cssClass || 'btn-default';
+    this._isDisabled = isDisabled || function() {
+      return false;
+    };
   };
 
   /** @returns {string} - The text of the action (text rendered in button). */
@@ -46,6 +52,10 @@ oppia.factory('ImprovementActionButtonObjectFactory', [function() {
     return this._cssClass;
   };
 
+  ImprovementActionButton.prototype.isDisabled = function() {
+    return this._isDisabled();
+  };
+
   return {
     /**
      * @returns {ImprovementActionButton}
@@ -55,8 +65,9 @@ oppia.factory('ImprovementActionButtonObjectFactory', [function() {
      * @param {string} [cssClass=btn-default] - The CSS class to render the
      *    button with.
      */
-    createNew: function(text, actionFunc, cssClass) {
-      return new ImprovementActionButton(text, actionFunc, cssClass);
+    createNew: function(text, actionFunc, cssClass, isDisabled) {
+      return new ImprovementActionButton(
+        text, actionFunc, cssClass, isDisabled);
     },
   };
 }]);
