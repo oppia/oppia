@@ -7,11 +7,19 @@
     "angular",
     "html"
   ],
+  "overrides": [{
+    // We exclude test files from dependency injection format checks because
+    // they are never minified.
+    "files": ["*Spec.js", "*Spec.ts"],
+    "rules": {
+      "angular/di": "off"
+    }
+  }],
   "rules": {
     "angular/di": [
       "error",
       "array",
-      ],
+    ],
     "angular/di-order": "error",
     "angular/di-unused": "error",
     "angular/directive-restrict": [

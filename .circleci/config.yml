@@ -30,7 +30,7 @@ jobs:
       - save_cache:
           key: setup-files-cache-{{ checksum "date" }}
           paths:
-            - ../node_modules/
+            - node_modules/
             - ../oppia_tools/
 
   lint_tests:
