@@ -26,7 +26,8 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
       ThreadDataService, UrlInterpolationService) {
     var _showEditStateContentSuggestionModal = function(
         activeThread, setActiveThread, isSuggestionHandled, hasUnsavedChanges,
-        isSuggestionValid) {
+        isSuggestionValid, onResolveSuggestionSuccess,
+        onResolveSuggestionFailure) {
       var resolveSuggestion = function(result) {
         ThreadDataService.resolveSuggestion(
           activeThread.threadId, result.action, result.commitMessage,
@@ -59,8 +60,14 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
             });
             $rootScope.$broadcast('refreshStateEditor');
           }
+          if (onResolveSuggestionSuccess) {
+            onResolveSuggestionSuccess();
+          }
           $rootScope.$broadcast('refreshImprovementsTab');
         }, function() {
+          if (onResolveSuggestionFailure) {
+            onResolveSuggestionFailure();
+          }
           $log.error('Error resolving suggestion');
         });
       };
@@ -111,7 +118,9 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
             extraParams.setActiveThread,
             extraParams.isSuggestionHandled,
             extraParams.hasUnsavedChanges,
-            extraParams.isSuggestionValid
+            extraParams.isSuggestionValid,
+            extraParams.onResolveSuggestionSuccess,
+            extraParams.onResolveSuggestionFailure
           );
         }
       }

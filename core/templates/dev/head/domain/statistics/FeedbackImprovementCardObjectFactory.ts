@@ -117,13 +117,18 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      */
     var SuggestionImprovementCard = function(suggestionThread) {
       var thisCard = this;
-      var setIsButtonDisabled = function(isDisabled) {
+      var enableShowSuggestionButton = function() {
         $timeout(function() {
-          thisCard._isButtonDisabled = isDisabled;
+          thisCard._isShowSuggestionButtonDisabled = true;
+        });
+      };
+      var disableShowSuggestionButton = function() {
+        $timeout(function() {
+          thisCard._isShowSuggestionButtonDisabled = false;
         });
       };
       var showSuggestionModal = function() {
-        setIsButtonDisabled(true);
+        disableShowSuggestionButton();
         ShowSuggestionModalForEditorViewService.showSuggestionModal(
           suggestionThread.suggestion.suggestionType, {
             activeThread: suggestionThread,
@@ -137,21 +142,30 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
               return ExplorationStatesService.hasState(
                 suggestionThread.getSuggestionStateName());
             },
+            onResolveSuggestionSuccess: enableShowSuggestionButton,
+            onResolveSuggestionFailure: enableShowSuggestionButton,
           }
-        ).result['catch'](function() {
-          setIsButtonDisabled(false);
-        });
+        ).result.then(
+          function() {
+            // On $uibModalInstance.close(), the suggestion is being resolved by
+            // the backend, so we will wait for the onResolveSuggestion handlers
+            // above to enable the button.
+          }, function() {
+            // On $uibModalInstance.dismiss(), we need to re-enable the button
+            // so the creator can interact with it again.
+            enableShowSuggestionButton();
+          });
       };
 
       /** @type {boolean} */
-      this._isButtonDisabled = false;
+      this._isShowSuggestionButtonDisabled = false;
       /** @type {Suggestion} */
       this._suggestionThread = suggestionThread;
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
           'Review Suggestion', showSuggestionModal, 'btn-success', function() {
-            return thisCard._isButtonDisabled;
+            return thisCard._isShowSuggestionButtonDisabled;
           }),
       ];
     };
