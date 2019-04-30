@@ -33,14 +33,14 @@ oppia.directive('questionsList', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/questions_list/questions_list_directive.html'),
       controller: [
-        '$scope', '$filter', '$http', '$q', '$uibModal', '$window',
+        '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
         'AlertsService', 'QuestionCreationService', 'UrlService',
         'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
         'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
         'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
         function(
-            $scope, $filter, $http, $q, $uibModal, $window,
+            $scope, $filter, $http, $q, $timeout, $uibModal, $window,
             AlertsService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
             EditableSkillBackendApiService, MisconceptionObjectFactory,
@@ -122,9 +122,11 @@ oppia.directive('questionsList', [
                   }
                 }
               }).then(function() {
-                $scope.fetchQuestionSummaries($scope.entityId, true);
-                $scope.questionIsBeingSaved = false;
-                $scope.currentPage = 0;
+                $timeout(function() {
+                  $scope.fetchQuestionSummaries($scope.entityId, true);
+                  $scope.questionIsBeingSaved = false;
+                  $scope.currentPage = 0;
+                }, 1000);
               });
             } else {
               if (QuestionUndoRedoService.hasChanges()) {
