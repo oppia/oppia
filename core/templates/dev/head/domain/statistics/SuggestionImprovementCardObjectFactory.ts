@@ -86,8 +86,8 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
         return new SuggestionImprovementCard(suggestionThread);
       },
       /**
-       * @returns {Promise<SuggestionImprovementCard[]>} - The list of suggestion
-       *    threads associated to the current exploration.
+       * @returns {Promise<SuggestionImprovementCard[]>} - The list of
+       *    suggestion threads associated to the current exploration.
        */
       fetchCards: function() {
         var createNew = this.createNew;
