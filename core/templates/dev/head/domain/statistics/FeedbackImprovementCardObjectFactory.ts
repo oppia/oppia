@@ -17,16 +17,25 @@
  */
 
 oppia.constant('FEEDBACK_IMPROVEMENT_CARD_TYPE', 'feedback');
+oppia.constant('SUGGESTION_IMPROVEMENT_CARD_TYPE', 'suggestion');
 
 oppia.factory('FeedbackImprovementCardObjectFactory', [
   '$uibModal', 'ChangeListService', 'ExplorationStatesService',
-  'ImprovementActionButtonObjectFactory', 'ThreadDataService',
+  'ImprovementActionButtonObjectFactory',
+  'ShowSuggestionModalForEditorViewService', 'ThreadDataService',
   'UrlInterpolationService', 'UserService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
+  'SUGGESTION_IMPROVEMENT_CARD_TYPE',
   function(
       $uibModal, ChangeListService, ExplorationStatesService,
-      ImprovementActionButtonObjectFactory, ThreadDataService,
-      UrlInterpolationService, UserService, FEEDBACK_IMPROVEMENT_CARD_TYPE) {
-    /** @constructor */
+      ImprovementActionButtonObjectFactory,
+      ShowSuggestionModalForEditorViewService, ThreadDataService,
+      UrlInterpolationService, UserService, FEEDBACK_IMPROVEMENT_CARD_TYPE,
+      SUGGESTION_IMPROVEMENT_CARD_TYPE) {
+
+    /**
+     * @constructor
+     * @param {FeedbackThreadObjectFactory} - feedback
+     */
     var FeedbackImprovementCard = function(feedbackThread) {
       var thisCard = this;
       var showReviewThreadModal = function() {
@@ -66,7 +75,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      *    open, i.e., still relevant and actionable.
      */
     FeedbackImprovementCard.prototype.isOpen = function() {
-      return this._feedbackThread.status === 'open';
+      return this._feedback.status === 'open';
     };
 
     /** @returns {string} - A concise summary of the card. */
@@ -98,10 +107,83 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       return this._actionButtons;
     };
 
+    /**
+     * @constructor
+     * @param {SuggestionObjectFactory} - suggestion
+     */
+    var SuggestionImprovementCard = function(suggestion) {
+      var showSuggestionModal = function() {
+        ShowSuggestionModalForEditorViewService.showSuggestionModal(
+          suggestion.suggestion.suggestionType, {
+            activeThread: suggestion,
+            isSuggestionHandled: function() {
+              return suggestion.isSuggestionHandled();
+            },
+            hasUnsavedChanges: function() {
+              return ChangeListService.getChangeList().length > 0;
+            },
+            isSuggestionValid: function() {
+              return ExplorationStatesService.hasState(
+                suggestion.getSuggestionStateName());
+            }
+          }
+        );
+      };
+
+      /** @type {SuggestionThread} */
+      this._suggestion = suggestion;
+      /** @type {ImprovementActionButton[]} */
+      this._actionButtons = [
+        ImprovementActionButtonObjectFactory.createNew(
+          'Review Suggestion', showSuggestionModal, 'btn-success'),
+      ];
+    };
+
+    /**
+     * @returns {boolean} - Whether the improvement which this card suggests is
+     *    open, i.e., still relevant and actionable.
+     */
+    SuggestionImprovementCard.prototype.isOpen = function() {
+      return this._suggestion.status !== 'review';
+    };
+
+    /** @returns {string} - A concise summary of the card. */
+    SuggestionImprovementCard.prototype.getTitle = function() {
+      return 'Suggestion';
+    };
+
+    /** @returns {string} - The directive type used to render the card. */
+    SuggestionImprovementCard.prototype.getDirectiveType = function() {
+      return SUGGESTION_IMPROVEMENT_CARD_TYPE;
+    };
+
+    /**
+     * Provides the data necessary for the associated card directive to render
+     * the details of this suggestion card. The associated directive is named:
+     * SuggestionImprovementCardDirective.js.
+     *
+     * @returns {SuggestionThread}
+     */
+    SuggestionImprovementCard.prototype.getDirectiveData = function() {
+      return this._suggestion;
+    };
+
+    /**
+     * @returns {ImprovementActionButton[]} - The list of action buttons
+     *    displayed on the card.
+     */
+    SuggestionImprovementCard.prototype.getActionButtons = function() {
+      return this._actionButtons;
+    };
+
     return {
       /** @returns {FeedbackImprovementCard} */
-      createNew: function(feedbackThread) {
-        return new FeedbackImprovementCard(feedbackThread);
+      createNew: function(feedback) {
+        if (feedback.isSuggestionThread()) {
+          return new SuggestionImprovementCard(feedback);
+        } else {
+          return new FeedbackImprovementCard(feedback);
+        }
       },
       /**
        * @returns {Promise<FeedbackImprovementCard[]>} - The list of feedback
@@ -113,11 +195,13 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
           ThreadDataService.fetchThreads(),
           ThreadDataService.fetchFeedbackStats(),
         ]).then(function() {
-          var threads = ThreadDataService.data.feedbackThreads;
-          return Promise.all(threads.map(function(thread) {
+          var allFeedback = [].concat(
+            ThreadDataService.data.feedbackThreads,
+            ThreadDataService.data.suggestionThreads);
+          return Promise.all(allFeedback.map(function(thread) {
             return ThreadDataService.fetchMessages(thread.threadId);
           })).then(function() {
-            return threads.map(createNew);
+            return allFeedback.map(createNew);
           });
         });
       },

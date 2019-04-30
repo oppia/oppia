@@ -27,7 +27,7 @@ oppia.directive('suggestionImprovementCard', [
         function($scope, DateTimeFormatService, FeedbackThreadDisplayService) {
           var getMessages = function() {
             return $scope.getThread().messages.filter(function(message) {
-              return message.text.replace(/\s/g, '') !== '';
+              return $.trim(message.text) !== '';
             });
           };
           $scope.getContextText = function() {
