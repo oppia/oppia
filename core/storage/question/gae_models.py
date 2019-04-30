@@ -259,9 +259,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Returns:
             list(str), list(list(str)). The id of questions which are linked
-                to skill ids in the list, the corresponding skill descriptions 
-                and the next cursor value to be used for the next page 
-                (or None if no more pages are left). The returned next cursor 
+                to skill ids in the list, the corresponding skill descriptions
+                and the next cursor value to be used for the next page
+                (or None if no more pages are left). The returned next cursor
                 value is urlsafe.
         """
         if not start_cursor == '':
