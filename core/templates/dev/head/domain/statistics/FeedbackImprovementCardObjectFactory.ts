@@ -33,9 +33,9 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       SUGGESTION_IMPROVEMENT_CARD_TYPE) {
     /**
      * @constructor
-     * @param {FeedbackThreadObjectFactory} - feedback
+     * @param {FeedbackThread} - feedback
      */
-    var FeedbackImprovementCard = function(feedbackThread) {
+    var FeedbackThreadImprovementCard = function(feedbackThread) {
       var thisCard = this;
       var showReviewThreadModal = function() {
         $uibModal.open({
@@ -73,17 +73,17 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * @returns {boolean} - Whether the improvement which this card suggests is
      *    open, i.e., still relevant and actionable.
      */
-    FeedbackImprovementCard.prototype.isOpen = function() {
+    FeedbackThreadImprovementCard.prototype.isOpen = function() {
       return this._feedback.status === 'open';
     };
 
     /** @returns {string} - A concise summary of the card. */
-    FeedbackImprovementCard.prototype.getTitle = function() {
+    FeedbackThreadImprovementCard.prototype.getTitle = function() {
       return 'Feedback: ' + this._feedbackThread.subject;
     };
 
     /** @returns {string} - The directive type used to render the card. */
-    FeedbackImprovementCard.prototype.getDirectiveType = function() {
+    FeedbackThreadImprovementCard.prototype.getDirectiveType = function() {
       return FEEDBACK_IMPROVEMENT_CARD_TYPE;
     };
 
@@ -94,7 +94,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      *
      * @returns {FeedbackThread}
      */
-    FeedbackImprovementCard.prototype.getDirectiveData = function() {
+    FeedbackThreadImprovementCard.prototype.getDirectiveData = function() {
       return this._feedbackThread;
     };
 
@@ -102,13 +102,13 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * @returns {ImprovementActionButton[]} - The list of action buttons
      *    displayed on the card.
      */
-    FeedbackImprovementCard.prototype.getActionButtons = function() {
+    FeedbackThreadImprovementCard.prototype.getActionButtons = function() {
       return this._actionButtons;
     };
 
     /**
      * @constructor
-     * @param {SuggestionObjectFactory} - suggestion
+     * @param {Suggestion} - suggestion
      */
     var SuggestionImprovementCard = function(suggestion) {
       var showSuggestionModal = function() {
@@ -129,7 +129,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
         );
       };
 
-      /** @type {SuggestionThread} */
+      /** @type {Suggestion} */
       this._suggestion = suggestion;
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
@@ -148,7 +148,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
 
     /** @returns {string} - A concise summary of the card. */
     SuggestionImprovementCard.prototype.getTitle = function() {
-      return 'Suggestion';
+      return 'Suggestion for: ' + this._suggestion.getSuggestionStateName();
     };
 
     /** @returns {string} - The directive type used to render the card. */
@@ -161,7 +161,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * the details of this suggestion card. The associated directive is named:
      * SuggestionImprovementCardDirective.js.
      *
-     * @returns {SuggestionThread}
+     * @returns {Suggestion}
      */
     SuggestionImprovementCard.prototype.getDirectiveData = function() {
       return this._suggestion;
@@ -176,17 +176,17 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
     };
 
     return {
-      /** @returns {FeedbackImprovementCard} */
+      /** @returns {Object} */
       createNew: function(feedback) {
         if (feedback.isSuggestionThread()) {
           return new SuggestionImprovementCard(feedback);
         } else {
-          return new FeedbackImprovementCard(feedback);
+          return new FeedbackThreadImprovementCard(feedback);
         }
       },
       /**
-       * @returns {Promise<FeedbackImprovementCard[]>} - The list of feedback
-       *    threads associated to the current exploration.
+       * @returns {Promise<Object[]>} - The list of feedback cards associated to
+       *    the current exploration.
        */
       fetchCards: function() {
         var createNew = this.createNew;
