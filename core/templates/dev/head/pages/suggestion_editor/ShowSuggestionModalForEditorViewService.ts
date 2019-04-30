@@ -66,12 +66,12 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
         ThreadDataService.resolveSuggestion(
           activeThread.threadId, result.action, result.commitMessage,
           result.reviewMessage, result.audioUpdateRequired
-        ).then(
-          ThreadDataService.fetchThreads
         ).then(function() {
-          if (setActiveThread) {
-            setActiveThread(activeThread.threadId);
-          }
+          ThreadDataService.fetchThreads().then(function() {
+            if (setActiveThread) {
+              setActiveThread(activeThread.threadId);
+            }
+          });
           // Immediately update editor to reflect accepted suggestion.
           if (result.action ===
               SuggestionModalService.ACTION_ACCEPT_SUGGESTION) {
@@ -92,7 +92,6 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
               forceRefresh: true
             });
             $rootScope.$broadcast('refreshStateEditor');
-            $rootScope.$broadcast('refreshImprovementsTab');
           }
         }, function() {
           $log.error('Error resolving suggestion');
