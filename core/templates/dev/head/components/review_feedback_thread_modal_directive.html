@@ -35,13 +35,6 @@
     </div>
 
     <p style="clear: both; text-indent: 4ch"><[m.text]></p>
-
-    <div ng-if="activeThread.isSuggestionThread() && $index == 0">
-      <button ng-click="showSuggestionModal()"
-              class="btn btn-<[getSuggestionButtonType()]> protractor-test-view-suggestion-btn">
-        View Suggestion
-      </button>
-    </div>
   </li>
 </ol>
 
@@ -51,9 +44,7 @@
   <div ng-if="isUserLoggedIn">
     <label for="tmpMessageText">
       Add new message
-      <span ng-if="EditabilityService.isEditable() && !activeThread.isSuggestionThread()">
-        (and/or change status)
-      </span>
+      <span ng-if="EditabilityService.isEditable()">(and/or change status)</span>
     </label>
     <textarea ng-model="tmpMessage.text" ng-disabled="messageSendingInProgress"
               class="form-control protractor-test-feedback-response-textarea"
@@ -61,8 +52,7 @@
     </textarea>
 
     <div style="margin-top: 12px">
-      <div ng-show="EditabilityService.isEditable() && !activeThread.isSuggestionThread()"
-           style="float: left">
+      <div ng-show="EditabilityService.isEditable()" style="float: left">
         Change status (optional):
         <select ng-model="tmpMessage.status"
                 ng-options="choice.id as choice.text for choice in STATUS_CHOICES"

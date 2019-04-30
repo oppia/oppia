@@ -30,7 +30,6 @@ oppia.factory('SuggestionImprovementCardObjectFactory', [
       SUGGESTION_IMPROVEMENT_CARD_TYPE) {
     /** @constructor */
     var SuggestionImprovementCard = function(suggestionThread) {
-      var card = this;
       var showSuggestionModal = function() {
         ShowSuggestionModalForEditorViewService.showSuggestionModal(
           suggestionThread.suggestion.suggestionType, {
