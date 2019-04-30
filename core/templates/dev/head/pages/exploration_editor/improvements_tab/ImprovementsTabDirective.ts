@@ -26,20 +26,14 @@ oppia.directive('improvementsTab', [
         '/pages/exploration_editor/improvements_tab/' +
         'improvements_tab_directive.html'),
       controller: [
-        '$q', '$scope', 'ImprovementCardService', 'UserService',
-        'FEEDBACK_IMPROVEMENT_CARD_TYPE',
+        '$q', '$scope', 'ImprovementCardService',
+        'FEEDBACK_IMPROVEMENT_CARD_TYPE', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
         function(
-            $q, $scope, ImprovementCardService, UserService,
-            FEEDBACK_IMPROVEMENT_CARD_TYPE) {
+            $q, $scope, ImprovementCardService,
+            FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
           var cards = [];
           var refreshCards = function() {
-            $q.all([
-              UserService.getUserInfoAsync(),
-              ImprovementCardService.fetchCards(),
-            ]).then(function(results) {
-              var userInfo = results[0];
-              var freshCards = results[1];
-              // cardView = userInfo.isLoggedIn() ? 'open' : 'open_feedback';
+            ImprovementCardService.fetchCards().then(function(freshCards) {
               cards = freshCards;
             });
           };
@@ -56,7 +50,8 @@ oppia.directive('improvementsTab', [
             open_feedback: function(card) {
               return (
                 card.isOpen() &&
-                card.getDirectiveType() === FEEDBACK_IMPROVEMENT_CARD_TYPE);
+                card.getDirectiveType() === FEEDBACK_IMPROVEMENT_CARD_TYPE ||
+                card.getDirectiveType() === SUGGESTION_IMPROVEMENT_CARD_TYPE);
             },
           };
 

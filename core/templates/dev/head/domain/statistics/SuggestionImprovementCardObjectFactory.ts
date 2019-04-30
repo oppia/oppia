@@ -12,57 +12,97 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-oppia.directive('suggestionImprovementCard', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+/**
+ * @fileoverview Factory for creating Suggestion Cards in the Improvements Tab.
+ */
+
+oppia.constant('SUGGESTION_IMPROVEMENT_CARD_TYPE', 'suggestion');
+
+oppia.factory('SuggestionImprovementCardObjectFactory', [
+  '$uibModal', 'ChangeListService', 'ExplorationStatesService',
+  'ImprovementActionButtonObjectFactory',
+  'ThreadDataService',
+  'UrlInterpolationService', 'UserService', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
+  function(
+      $uibModal, ChangeListService, ExplorationStatesService,
+      ImprovementActionButtonObjectFactory,
+      ThreadDataService,
+      UrlInterpolationService, UserService, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
+    /** @constructor */
+    var SuggestionImprovementCard = function(suggestionThread) {
+      var card = this;
+      var showSuggestionModal = {
+      };
+
+      /** @type {SuggestionThread} */
+      this._suggestionThread = suggestionThread;
+      /** @type {ImprovementActionButton[]} */
+      this._actionButtons = [
+        ImprovementActionButtonObjectFactory.createNew(
+          'Review Suggestion', showSuggestionModal, 'btn-success'),
+      ];
+    };
+
+    /**
+     * @returns {boolean} - Whether the improvement which this card suggests is
+     *    open, i.e., still relevant and actionable.
+     */
+    SuggestionImprovementCard.prototype.isOpen = function() {
+      return this._suggestionThread.status !== 'review';
+    };
+
+    /** @returns {string} - A concise summary of the card. */
+    SuggestionImprovementCard.prototype.getTitle = function() {
+      return 'Suggestion';
+    };
+
+    /** @returns {string} - The directive type used to render the card. */
+    SuggestionImprovementCard.prototype.getDirectiveType = function() {
+      return SUGGESTION_IMPROVEMENT_CARD_TYPE;
+    };
+
+    /**
+     * Provides the data necessary for the associated card directive to render
+     * the details of this suggestion card. The associated directive is named:
+     * SuggestionImprovementCardDirective.js.
+     *
+     * @returns {SuggestionThread}
+     */
+    SuggestionImprovementCard.prototype.getDirectiveData = function() {
+      return this._suggestionThread;
+    };
+
+    /**
+     * @returns {ImprovementActionButton[]} - The list of action buttons
+     *    displayed on the card.
+     */
+    SuggestionImprovementCard.prototype.getActionButtons = function() {
+      return this._actionButtons;
+    };
+
     return {
-      restrict: 'E',
-      scope: {
-        getThread: '&data',
+      /** @returns {SuggestionImprovementCard} */
+      createNew: function(suggestionThread) {
+        return new SuggestionImprovementCard(suggestionThread);
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/improvements_tab/' +
-        'suggestion_improvement_card_directive.html'),
-      controller: [
-        '$scope', 'DateTimeFormatService', 'FeedbackThreadDisplayService',
-        function($scope, DateTimeFormatService, FeedbackThreadDisplayService) {
-          var getMessages = function() {
-            return $scope.getThread().messages.filter(function(message) {
-              return $.trim(message.text) !== '';
-            });
-          };
-          $scope.getContextText = function() {
-            var messageCount = getMessages().length;
-            if ($scope.getThread().status === 'open') {
-              if (messageCount === 0) {
-                return null;
-              } else if (messageCount === 1) {
-                return 'New Thread:';
-              } else {
-                return 'Lateset Message:';
-              }
-            } else {
-              return (messageCount === 1) ? null : 'Last Message:';
-            }
-          };
-          $scope.getContextMessage = function() {
-            var messages = getMessages();
-            if (messages.length > 0) {
-              return messages[messages.length - 1];
-            } else {
-              return {
-                text: $scope.getThread().subject,
-                author_username: $scope.getThread().originalAuthorName,
-                created_on: $scope.getThread().lastUpdated,
-              };
-            }
-          };
-          $scope.getLabelClass = FeedbackThreadDisplayService.getLabelClass;
-          $scope.getHumanReadableStatus = (
-            FeedbackThreadDisplayService.getHumanReadableStatus);
-          $scope.getLocaleAbbreviatedDatetimeString = (
-            DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
-        }
-      ],
+      /**
+       * @returns {Promise<SuggestionImprovementCard[]>} - The list of suggestion
+       *    threads associated to the current exploration.
+       */
+      fetchCards: function() {
+        var createNew = this.createNew;
+        return Promise.all([
+          ThreadDataService.fetchThreads(),
+          ThreadDataService.fetchFeedbackStats(),
+        ]).then(function() {
+          var threads = ThreadDataService.data.suggestionThreads;
+          return Promise.all(threads.map(function(thread) {
+            return ThreadDataService.fetchMessages(thread.threadId);
+          })).then(function() {
+            return threads.map(createNew);
+          });
+        });
+      },
     };
   }
 ]);

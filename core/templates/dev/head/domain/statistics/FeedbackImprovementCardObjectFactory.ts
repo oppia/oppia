@@ -68,8 +68,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      *    open, i.e., still relevant and actionable.
      */
     FeedbackImprovementCard.prototype.isOpen = function() {
-      return this._feedbackThread.status === 'open' &&
-        this._feedbackThread.status !== 'review';
+      return this._feedbackThread.status === 'open';
     };
 
     /** @returns {string} - A concise summary of the card. */

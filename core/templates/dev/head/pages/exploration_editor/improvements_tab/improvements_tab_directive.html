@@ -13,12 +13,15 @@
       <h2 style="margin-top: 0"><[card.getTitle() | truncate:80]></h2>
       <hr>
       <div ng-switch="card.getDirectiveType()">
-        <playthrough-improvement-card ng-switch-when="playthrough"
-                                      data="card.getDirectiveData()">
-        </playthrough-improvement-card>
         <feedback-improvement-card ng-switch-when="feedback"
                                    data="card.getDirectiveData()">
         </feedback-improvement-card>
+        <suggestion-improvement-card ng-switch-when="suggestion"
+                                   data="card.getDirectiveData()">
+        </suggestion-improvement-card>
+        <playthrough-improvement-card ng-switch-when="playthrough"
+                                      data="card.getDirectiveData()">
+        </playthrough-improvement-card>
       </div>
       <hr>
       <div class="text-right">
