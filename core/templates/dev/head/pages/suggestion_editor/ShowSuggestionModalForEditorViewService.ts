@@ -75,9 +75,8 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
                   var suggestion = activeThread.getSuggestion();
                   var stateName = suggestion.stateName;
                   var stateDict = ExplorationDataService.data.states[stateName];
-                  var state = (
-                    StateObjectFactory.createFromBackendDict(stateName, stateDict)
-                  );
+                  var state = StateObjectFactory.createFromBackendDict(
+                    stateName, stateDict);
                   state.content.setHtml(
                     activeThread.getReplacementHtmlFromSuggestion());
                   if (result.audioUpdateRequired) {
