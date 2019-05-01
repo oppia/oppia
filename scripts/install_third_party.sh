@@ -22,48 +22,7 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
-install_node_module ajv 6.10.0
-install_node_module browserstack-local 1.3.3
-install_node_module dotenv 6.0.0
-install_node_module eslint 5.0.0
-install_node_module eslint-plugin-angular 0.12.0
-install_node_module eslint-plugin-html 4.0.1
-install_node_module gulp 3.9.0
-install_node_module gulp-clean-css 2.0.2
-install_node_module gulp-concat 2.6.0
-install_node_module gulp-sourcemaps 1.6.0
-install_node_module gulp-uglify 2.0.1
-install_node_module gulp-util 3.0.7
-install_node_module htmllint 0.7.2
-install_node_module htmllint-cli 0.0.7
-install_node_module @mapbox/stylelint-processor-arbitrary-tags 0.2.0
-install_node_module postcss-syntax 0.10.0
-install_node_module stylelint 9.2.1
-install_node_module stylelint-config-standard 18.2.0
-install_node_module through2 2.0.0
-install_node_module typescript 3.3.3
-install_node_module @typescript-eslint/parser 1.4.2
-install_node_module @types/angular 1.6.54
-install_node_module @types/angular-animate 1.5.10
-install_node_module @types/angular-mocks 1.7.0
-install_node_module @types/ckeditor 4.9.2
-install_node_module @types/d3 3.5.40
-install_node_module @types/google.visualization 0.0.46
-install_node_module @types/jasmine 3.3.8
-install_node_module @types/jasmine-jquery 1.5.33
-install_node_module @types/jasminewd2 2.0.6
-install_node_module @types/jquery 3.3.29
-install_node_module @types/jqueryui 1.12.1
-install_node_module @types/leaflet 1.4.0
-install_node_module @types/mathjax 0.0.35
-install_node_module @types/mathjs 5.0.0
-install_node_module @types/mousetrap 1.6.1
-install_node_module @types/node 6.14.3
-install_node_module @types/select2 4.0.48
-install_node_module @types/q 1.5.1
-install_node_module @types/selenium-webdriver 2.53.43
-install_node_module uglify-js 3.3.11
-install_node_module yargs 3.29.0
+$NPM_INSTALL --only=dev
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires

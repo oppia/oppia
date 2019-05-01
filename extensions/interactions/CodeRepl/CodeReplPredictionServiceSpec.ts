@@ -88,12 +88,13 @@ describe('CodeRepl prediction service', function() {
     });
 
     it('should predict correct answer group for the answers', function() {
-      jasmine.getJSONFixtures().fixturesPath = 'base/core/tests/data';
-      var classifierData = getJSONFixture('code_classifier_data.json');
+      var classifierData = window.__fixtures__[
+        'core/tests/data/code_classifier_data'];
 
       // Test algorithm agains first test set. This test set contains
       // example which can be successfully classified by KNN classifier.
-      var testData = getJSONFixture('code_classifier_test_knn.json');
+      var testData = window.__fixtures__[
+        'core/tests/data/code_classifier_test_knn'];
       var predictedAnswerGroup = null;
       for (var i = 0; i < testData.length; i++) {
         for (var j = 0; j < testData[i].answers.length; j++) {
@@ -106,7 +107,8 @@ describe('CodeRepl prediction service', function() {
 
       // Test algorithm against first test set. This test set contains
       // examples for which KNN fails but SVM succeeds.
-      var testData = getJSONFixture('code_classifier_test_svm.json');
+      var testData = window.__fixtures__[
+        'core/tests/data/code_classifier_test_svm'];
       var predictedAnswerGroup = null;
       for (var i = 0; i < testData.length; i++) {
         for (var j = 0; j < testData[i].answers.length; j++) {
@@ -124,10 +126,10 @@ describe('CodeRepl prediction service', function() {
     });
 
     it('should not have accuracy less than 85', function() {
-      jasmine.getJSONFixtures().fixturesPath = 'base/core/tests/data';
-
-      var classifierData = getJSONFixture('code_classifier_data.json');
-      var trainingData = getJSONFixture('code_classifier_accuracy_test.json');
+      var classifierData = window.__fixtures__[
+        'core/tests/data/code_classifier_data'];
+      var trainingData = window.__fixtures__[
+        'core/tests/data/code_classifier_accuracy_test'];
       var correctPredictions = 0, totalAnswers = 0;
 
       // To keep things simple, we will calculate accuracy score
