@@ -18,7 +18,8 @@
  */
 
 oppia.directive('improvementsTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UserService', 'UrlInterpolationService',
+  function(UserService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -32,40 +33,52 @@ oppia.directive('improvementsTab', [
             $q, $scope, $timeout, ImprovementCardService,
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
           var cards = [];
-          var refreshCards = function() {
-            var oldIndices = {};
-            cards.forEach(function(card, index) {
-              oldIndices[card.getKey()] = index;
-            });
-            // Returns old index of the card.
-            var indexOf = function(card) {
-              return oldIndices[card.getKey()] || -1;
-            };
-            ImprovementCardService.fetchCards().then(function(freshCards) {
-              // Sort the cards by their old index. New cards will be placed
-              // arbitrarily at the front of the array.
-              freshCards.sort(function(leftHandCard, rightHandCard) {
-                return indexOf(leftHandCard) - indexOf(rightHandCard);
-              });
-              $timeout(function() {
-                cards = freshCards;
-              });
-            });
-          };
-
-          var cardView = 'all';
+          var cardView = 'none';
           var cardViewFilters = {
             open: function(card) {
               return card.isOpen();
             },
             open_feedback: function(card) {
               return this.open(card) && (
-                card.getDirectiveType() === SUGGESTION_IMPROVEMENT_CARD_TYPE ||
-                card.getDirectiveType() === FEEDBACK_IMPROVEMENT_CARD_TYPE);
+                card.getDirectiveType() === FEEDBACK_IMPROVEMENT_CARD_TYPE ||
+                card.getDirectiveType() === SUGGESTION_IMPROVEMENT_CARD_TYPE);
             },
             all: function() {
               return true;
             },
+            none: function() {
+              return false;
+            },
+          };
+
+          var refreshCards = function() {
+            var oldIndices = {};
+            cards.forEach(function(card, index) {
+              oldIndices[card.getKey()] = index;
+            });
+            var oldIndexOf = function(card) {
+              return oldIndices[card.getKey()] || -1;
+            };
+            var isUserLoggedInPromise = UserService.getUserInfoAsync().then(
+              function(userInfo) {
+                return userInfo.isLoggedIn();
+              }, function() {
+                return false;
+              });
+            var cardsPromise = ImprovementCardService.fetchCards();
+            $q.all([isUserLoggedInPromise, cardsPromise]).then(function(res) {
+              var isUserLoggedIn = res[0];
+              var freshCards = res[1];
+              // Sort the cards by their old index. New cards will be placed
+              // arbitrarily at the front of the array.
+              freshCards.sort(function(leftHandCard, rightHandCard) {
+                return oldIndexOf(leftHandCard) - oldIndexOf(rightHandCard);
+              });
+              $timeout(function() {
+                cards = freshCards;
+                cardView = isUserLoggedIn ? 'open' : 'open_feedback';
+              });
+            });
           };
 
           $scope.$on('refreshImprovementsTab', refreshCards);

@@ -142,7 +142,9 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
               return ExplorationStatesService.hasState(
                 suggestionThread.getSuggestionStateName());
             },
-            onResolveSuggestionSuccess: enableShowSuggestionButton,
+            onResolveSuggestionSuccess: function() {
+              // Wait for 'refreshImprovementsTab' broadcast to take effect.
+            },
             onResolveSuggestionFailure: enableShowSuggestionButton,
           }
         ).result.then(
