@@ -267,6 +267,8 @@
 #
 #     https://help.github.com/en/articles/about-code-owners
 #
+# On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
+# in scripts/pre_commit_linter.py in sync with the modifications.
 /core/domain/dependency_registry*.py @seanlip
 /core/domain/html*.py @seanlip
 /core/domain/rights_manager*.py @seanlip

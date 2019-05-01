@@ -270,9 +270,15 @@ CODEOWNER_DIR_PATHS = [
 
 CODEOWNER_FILE_PATHS = ['./app.yaml', './manifest.json']
 
+# This list needs to be in sync with the important patterns in the CODEOWNERS
+# file.
 CODEOWNER_IMPORTANT_PATHS = [
     '/.github/CODEOWNERS',
+    '/core/domain/dependency_registry*.py',
     '/core/domain/html*.py',
+    '/core/domain/rights_manager*.py',
+    '/core/domain/role_services*.py',
+    '/core/domain/user*.py',
     '/core/storage/',
     '/export/',
     '/manifest.json',
@@ -2238,16 +2244,15 @@ class LintChecksManager(object):
             # This condition checks that all the values in the boolean list are
             # True. This ensures that the last 'n' lines of the CODEOWNERS file
             # matches with the 'n'-element list of important CODEOWNER paths.
-            if not all(important_path_match_bool_list):
-                for index, bool_value in enumerate(
-                        important_path_match_bool_list):
-                    if not bool_value:
-                        print ('%s --> Please ensure that the rule \'%s\' lies '
-                               'towards the bottom of the CODEOWNERS file since'
-                               ' it is an important rule.' % (
-                                   codeowner_filepath,
-                                   CODEOWNER_IMPORTANT_PATHS[index]))
-                failed = True
+            for index, bool_value in enumerate(
+                    important_path_match_bool_list):
+                if not bool_value:
+                    print ('%s --> Please ensure that the rule \'%s\' lies '
+                           'towards the bottom of the CODEOWNERS file since'
+                           ' it is an important rule.' % (
+                               codeowner_filepath,
+                               CODEOWNER_IMPORTANT_PATHS[index]))
+                    failed = True
 
             if failed:
                 summary_message = '%s   CODEOWNERS file check failed' % (
