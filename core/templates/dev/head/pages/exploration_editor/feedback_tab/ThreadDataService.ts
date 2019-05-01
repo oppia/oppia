@@ -44,7 +44,7 @@ oppia.factory('ThreadDataService', [
     };
 
     // Helper to remember which thread objects are associated to an id.
-    var threadMap = {};
+    var threadsById = {};
 
     // Number of open threads that need action
     var openThreadsCount = 0;
@@ -71,13 +71,13 @@ oppia.factory('ThreadDataService', [
         var suggestionThreadBackendDicts = threadsData.suggestion_thread_dicts;
         var suggestionBackendDicts = suggestionsData.suggestions;
 
-        threadMap = {};
+        threadsById = {};
 
         data.feedbackThreads = [];
         feedbackThreadBackendDicts.forEach(function(backendDict) {
           var feedbackThread =
             FeedbackThreadObjectFactory.createFromBackendDict(backendDict);
-          threadMap[feedbackThread.threadId] = feedbackThread;
+          threadsById[feedbackThread.threadId] = feedbackThread;
           data.feedbackThreads.push(feedbackThread);
         });
 
@@ -91,24 +91,21 @@ oppia.factory('ThreadDataService', [
           // Error-handling for any missing data. Both dicts are sorted by id,
           // so we check here that each pair of dicts refers to the same id,
           // otherwise, we skip to another pair after logging an error.
-          if (suggestionBackendDict !== undefined &&
-              suggestionThreadBackendDict === undefined) {
+          var hasSuggestionObject = (suggestionBackendDict !== undefined);
+          var hasSuggestionThread = (suggestionThreadBackendDict !== undefined);
+          if (hasSuggestionObject && !hasSuggestionThread) {
             $log.error(
               'Suggestion Object with id "' +
               suggestionBackendDict.suggestion_id + '" has no associated ' +
               'Suggestion Thread in the backend.');
             break;
-          } else if (
-              suggestionBackendDict === undefined &&
-              suggestionThreadBackendDict !== undefined) {
+          } else if (!hasSuggestionObject && hasSuggestionThread) {
             $log.error(
               'Suggestion Thread with id "' +
               suggestionThreadBackendDict.thread_id + '" has no associated ' +
               'Suggestion Object in the backend.');
             break;
-          } else if (
-              suggestionBackendDict !== undefined &&
-              suggestionThreadBackendDict !== undefined) {
+          } else if (hasSuggestionObject && hasSuggestionThread) {
             var suggestionId = suggestionBackendDict.suggestion_id;
             var threadId = suggestionThreadBackendDict.thread_id;
 
@@ -134,7 +131,7 @@ oppia.factory('ThreadDataService', [
           var suggestionThread =
             SuggestionThreadObjectFactory.createFromBackendDicts(
               suggestionThreadBackendDict, suggestionBackendDict);
-          threadMap[suggestionThread.threadId] = suggestionThread;
+          threadsById[suggestionThread.threadId] = suggestionThread;
           data.suggestionThreads.push(suggestionThread);
         }
 
@@ -146,7 +143,7 @@ oppia.factory('ThreadDataService', [
 
     var fetchMessages = function(threadId) {
       return $http.get(THREAD_HANDLER_PREFIX + threadId).then(function(res) {
-        threadMap[threadId].setMessages(res.data.messages);
+        threadsById[threadId].setMessages(res.data.messages);
       });
     };
 
@@ -188,7 +185,7 @@ oppia.factory('ThreadDataService', [
       },
       addNewMessage: function(
           threadId, newMessage, newStatus, successCallback, errorCallback) {
-        var thread = threadMap[threadId];
+        var thread = threadsById[threadId];
         var oldStatus = thread.status;
 
         return $http.post(THREAD_HANDLER_PREFIX + threadId, {
