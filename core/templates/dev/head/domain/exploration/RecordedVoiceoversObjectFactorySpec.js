@@ -98,9 +98,9 @@ describe('RecordedVoiceovers object factory', function() {
     }
   };
 
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     vof = $injector.get('VoiceoverObjectFactory');
     rvof = $injector.get('RecordedVoiceoversObjectFactory');
     rv = rvof.createFromBackendDict(rvDict);

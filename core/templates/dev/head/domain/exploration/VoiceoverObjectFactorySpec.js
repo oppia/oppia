@@ -17,13 +17,13 @@
  */
 
 describe('Voiceover object factory', function() {
-  beforeEach(module('oppia'));
+  beforeEach(angular.mock.module('oppia'));
 
   var scope = null;
   var vof = null;
   var voiceover = null;
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     vof = $injector.get('VoiceoverObjectFactory');
     voiceover = vof.createFromBackendDict({
       filename: 'a.mp3',

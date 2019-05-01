@@ -124,7 +124,10 @@ oppia.factory('RecordedVoiceoversObjectFactory', [
       };
     };
 
-    RecordedVoiceovers.createFromBackendDict = function(
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    RecordedVoiceovers['createFromBackendDict'] = function(
+    /* eslint-enable dot-notation */
         recordedVoiceoversDict) {
       var voiceoversMapping = {};
       var voiceoversMappingDict = recordedVoiceoversDict.voiceovers_mapping;
@@ -142,7 +145,10 @@ oppia.factory('RecordedVoiceoversObjectFactory', [
       return new RecordedVoiceovers(voiceoversMapping);
     };
 
-    RecordedVoiceovers.createEmpty = function() {
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    RecordedVoiceovers['createEmpty'] = function() {
+    /* eslint-enable dot-notation */
       return new RecordedVoiceovers({});
     };
 

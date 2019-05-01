@@ -22,7 +22,7 @@ describe('States object factory', function() {
   var oldValueForNewStateTemplate = null;
 
   describe('StatesObjectFactory', function() {
-    var scope, sof, ssof, statesDict, statesWithAudioDict, atof;
+    var scope, sof, ssof, statesDict, statesWithAudioDict, vof;
 
     beforeEach(angular.mock.inject(function($injector) {
       ssof = $injector.get('StatesObjectFactory');
