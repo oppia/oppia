@@ -113,7 +113,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
 
     /**
      * @constructor
-     * @param {Suggestion} - suggestion
+     * @param {SuggestionThread} - suggestion
      */
     var SuggestionThreadImprovementCard = function(suggestionThread) {
       var thisCard = this;
@@ -182,7 +182,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
 
       /** @type {boolean} */
       this._isShowSuggestionButtonDisabled = false;
-      /** @type {Suggestion} */
+      /** @type {SuggestionThread} */
       this._suggestionThread = suggestionThread;
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
@@ -224,7 +224,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * the details of this suggestion card. The associated directive is named:
      * SuggestionThreadImprovementCardDirective.js.
      *
-     * @returns {Suggestion}
+     * @returns {SuggestionThread}
      */
     SuggestionThreadImprovementCard.prototype.getDirectiveData = function() {
       return this._suggestionThread;
