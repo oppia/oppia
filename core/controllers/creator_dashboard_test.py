@@ -265,7 +265,12 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self.assertEqual(user_model.average_ratings, 3)
 
         def _mock_get_last_week_dashboard_stats(user_id):
-            return {'date1': 'stats1', 'date2': 'stats2'}
+            """Mocks 'get_last_week_dashboard_stats()' to return more than one
+            key-value pair.
+            """
+            return {
+                'date1': {user_id: 'stats1'}, 'date2': {user_id: 'stats2'}
+            }
 
         # 'last_week_stats' is None if 'get_last_week_dashboard_stats()' returns
         # more than one key-value pair.

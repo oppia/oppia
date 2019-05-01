@@ -252,11 +252,11 @@ class CreatorDashboardHandler(base.BaseHandler):
             user_services.get_last_week_dashboard_stats(self.user_id))
 
         if last_week_stats and len(last_week_stats.keys()) != 1:
-                logging.error(
-                    '\'last_week_stats\' should contain only one key-value pair'
-                    ' denoting last week dashboard stats of the user keyed by a'
-                    ' datetime string.')
-                last_week_stats = None
+            logging.error(
+                '\'last_week_stats\' should contain only one key-value pair'
+                ' denoting last week dashboard stats of the user keyed by a'
+                ' datetime string.')
+            last_week_stats = None
 
         if last_week_stats:
             # 'last_week_stats' is a dict with only one key-value pair denoting
