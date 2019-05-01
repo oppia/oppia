@@ -26,10 +26,10 @@ oppia.directive('improvementsTab', [
         '/pages/exploration_editor/improvements_tab/' +
         'improvements_tab_directive.html'),
       controller: [
-        '$q', '$scope', '$timeout', 'ImprovementCardService',
+        '$scope', '$timeout', 'ImprovementCardService', 'UserService',
         'FEEDBACK_IMPROVEMENT_CARD_TYPE', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
         function(
-            $q, $scope, $timeout, ImprovementCardService,
+            $scope, $timeout, ImprovementCardService, UserService,
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
           var cards = [];
           var cardView = 'none';
@@ -38,7 +38,7 @@ oppia.directive('improvementsTab', [
               return card.isOpen();
             },
             open_feedback: function(card) {
-              return this.open(card) && (
+              return card.isOpen() && (
                 card.getDirectiveType() === FEEDBACK_IMPROVEMENT_CARD_TYPE ||
                 card.getDirectiveType() === SUGGESTION_IMPROVEMENT_CARD_TYPE);
             },
@@ -51,14 +51,14 @@ oppia.directive('improvementsTab', [
           };
 
           var refreshCards = function() {
-            var oldIndices = {};
-            cards.forEach(function(card, index) {
-              oldIndices[card.getKey()] = index;
-            });
-            var oldIndexOf = function(card) {
-              return oldIndices[card.getKey()] || -1;
-            };
             ImprovementCardService.fetchCards().then(function(freshCards) {
+              var oldIndices = {};
+              cards.forEach(function(card, index) {
+                oldIndices[card.getKey()] = index;
+              });
+              var oldIndexOf = function(card) {
+                return oldIndices[card.getKey()] || -1;
+              };
               // Sort the cards by their old index. New cards will be placed
               // arbitrarily at the front of the array.
               freshCards.sort(function(leftHandCard, rightHandCard) {
@@ -66,10 +66,15 @@ oppia.directive('improvementsTab', [
               });
               $timeout(function() {
                 cards = freshCards;
-                cardView = GLOBALS.userIsLoggedIn ? 'open' : 'open_feedback';
               });
             });
           };
+
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            $timeout(function() {
+              cardView = userInfo.isLoggedIn() ? 'open' : 'open_feedback';
+            });
+          });
 
           $scope.$on('refreshImprovementsTab', refreshCards);
           $scope.getCards = function() {
