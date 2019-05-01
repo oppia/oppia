@@ -70,11 +70,6 @@ oppia.factory('ThreadDataService', [
         var feedbackThreadBackendDicts = threadsData.feedback_thread_dicts;
         var suggestionThreadBackendDicts = threadsData.suggestion_thread_dicts;
         var suggestionBackendDicts = suggestionsData.suggestions;
-        if (suggestionThreadBackendDicts.length !==
-            suggestionBackendDicts.length) {
-          $log.error('Number of suggestion threads doesn\'t match number of ' +
-                     'suggestion objects!');
-        }
 
         threadMap = {};
 
@@ -87,12 +82,58 @@ oppia.factory('ThreadDataService', [
         });
 
         data.suggestionThreads = [];
-        suggestionThreadBackendDicts.sort(compareBy('thread_id'));
         suggestionBackendDicts.sort(compareBy('suggestion_id'));
+        suggestionThreadBackendDicts.sort(compareBy('thread_id'));
         for (var i = 0; i < suggestionThreadBackendDicts.length; ++i) {
+          var suggestionBackendDict = suggestionBackendDicts[i];
+          var suggestionThreadBackendDict = suggestionThreadBackendDicts[i];
+
+          // Error-handling for any missing data. Both dicts are sorted by id,
+          // so we check here that each pair of dicts refers to the same id,
+          // otherwise, we skip to another pair after logging an error.
+          if (suggestionBackendDict !== undefined &&
+              suggestionThreadBackendDict === undefined) {
+            $log.error(
+              'Suggestion Object with id "' +
+              suggestionBackendDict.suggestion_id + '" has no associated ' +
+              'Suggestion Thread in the backend.');
+            break;
+          } else if (
+              suggestionBackendDict === undefined &&
+              suggestionThreadBackendDict !== undefined) {
+            $log.error(
+              'Suggestion Thread with id "' +
+              suggestionThreadBackendDict.thread_id + '" has no associated ' +
+              'Suggestion Object in the backend.');
+            break;
+          } else if (
+              suggestionBackendDict !== undefined &&
+              suggestionThreadBackendDict !== undefined) {
+            var suggestionId = suggestionBackendDict.suggestion_id;
+            var threadId = suggestionThreadBackendDict.thread_id;
+
+            if (suggestionId !== threadId) {
+              if (suggestionId < threadId) {
+                $log.error(
+                  'Suggestion Object with id "' + suggestionId + '" has no ' +
+                  'associated Suggestion Thread in the backend.');
+                suggestionBackendDicts.splice(i, 1);
+              } else {
+                $log.error(
+                  'Suggestion Thread with id "' + threadId + '" has no ' +
+                  'associated Suggestion Object in the backend.');
+                suggestionThreadBackendDicts.splice(i, 1);
+              }
+              // Try again after removing the mismatched element since there
+              // still might be valid suggestion data available.
+              --i;
+              continue;
+            }
+          }
+
           var suggestionThread =
             SuggestionThreadObjectFactory.createFromBackendDicts(
-              suggestionThreadBackendDicts[i], suggestionBackendDicts[i]);
+              suggestionThreadBackendDict, suggestionBackendDict);
           threadMap[suggestionThread.threadId] = suggestionThread;
           data.suggestionThreads.push(suggestionThread);
         }

@@ -115,7 +115,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * @constructor
      * @param {Suggestion} - suggestion
      */
-    var SuggestionImprovementCard = function(suggestionThread) {
+    var SuggestionThreadImprovementCard = function(suggestionThread) {
       var thisCard = this;
       var enableShowSuggestionButton = function() {
         $timeout(function() {
@@ -152,9 +152,32 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
             // above to enable the button.
           }, function() {
             // On $uibModalInstance.dismiss(), we need to re-enable the button
-            // so the creator can interact with it again.
+            // so that the creator can interact with it again.
             enableShowSuggestionButton();
           });
+      };
+      var showReviewThreadModal = function() {
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/review_suggestion_thread_modal_directive.html'),
+          resolve: {
+            activeThread: function() {
+              return thisCard._suggestionThread;
+            },
+            isUserLoggedIn: function() {
+              return UserService.getUserInfoAsync().then(function(userInfo) {
+                var isUserLoggedIn = userInfo.isLoggedIn();
+                if (isUserLoggedIn) {
+                  ThreadDataService.markThreadAsSeen(suggestionThread.threadId);
+                }
+                return isUserLoggedIn;
+              });
+            },
+          },
+          controller: 'ReviewSuggestionThreadModalController',
+          backdrop: 'static',
+          size: 'lg',
+        });
       };
 
       /** @type {boolean} */
@@ -163,6 +186,8 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       this._suggestionThread = suggestionThread;
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
+        ImprovementActionButtonObjectFactory.createNew(
+          'Review Thread', showReviewThreadModal, 'btn-success'),
         ImprovementActionButtonObjectFactory.createNew(
           'Review Suggestion', showSuggestionModal, 'btn-success', function() {
             return thisCard._isShowSuggestionButtonDisabled;
@@ -174,34 +199,34 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * @returns {boolean} - Whether the improvement which this card suggests is
      *    open, i.e., still relevant and actionable.
      */
-    SuggestionImprovementCard.prototype.isOpen = function() {
+    SuggestionThreadImprovementCard.prototype.isOpen = function() {
       return this._suggestionThread.status === 'open';
     };
 
     /** @returns {string} - A concise summary of the card. */
-    SuggestionImprovementCard.prototype.getTitle = function() {
+    SuggestionThreadImprovementCard.prototype.getTitle = function() {
       return (
-        'Suggestion for "' + this._suggestionThread.getSuggestionStateName() +
-        '"');
+        'Suggestion for the "' +
+        this._suggestionThread.getSuggestionStateName() + '" Card');
     };
 
-    SuggestionImprovementCard.prototype.getKey = function() {
+    SuggestionThreadImprovementCard.prototype.getKey = function() {
       return this._suggestionThread.threadId;
     };
 
     /** @returns {string} - The directive type used to render the card. */
-    SuggestionImprovementCard.prototype.getDirectiveType = function() {
+    SuggestionThreadImprovementCard.prototype.getDirectiveType = function() {
       return SUGGESTION_IMPROVEMENT_CARD_TYPE;
     };
 
     /**
      * Provides the data necessary for the associated card directive to render
      * the details of this suggestion card. The associated directive is named:
-     * SuggestionImprovementCardDirective.js.
+     * SuggestionThreadImprovementCardDirective.js.
      *
      * @returns {Suggestion}
      */
-    SuggestionImprovementCard.prototype.getDirectiveData = function() {
+    SuggestionThreadImprovementCard.prototype.getDirectiveData = function() {
       return this._suggestionThread;
     };
 
@@ -209,7 +234,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
      * @returns {ImprovementActionButton[]} - The list of action buttons
      *    displayed on the card.
      */
-    SuggestionImprovementCard.prototype.getActionButtons = function() {
+    SuggestionThreadImprovementCard.prototype.getActionButtons = function() {
       return this._actionButtons;
     };
 
@@ -217,7 +242,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
       /** @returns {Object} */
       createNew: function(feedback) {
         if (feedback.isSuggestionThread()) {
-          return new SuggestionImprovementCard(feedback);
+          return new SuggestionThreadImprovementCard(feedback);
         } else {
           return new FeedbackThreadImprovementCard(feedback);
         }
@@ -228,10 +253,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
        */
       fetchCards: function() {
         var createNew = this.createNew;
-        return Promise.all([
-          ThreadDataService.fetchThreads(),
-          ThreadDataService.fetchFeedbackStats(),
-        ]).then(function() {
+        return ThreadDataService.fetchThreads().then(function() {
           var allFeedback = [].concat(
             ThreadDataService.data.feedbackThreads,
             ThreadDataService.data.suggestionThreads);

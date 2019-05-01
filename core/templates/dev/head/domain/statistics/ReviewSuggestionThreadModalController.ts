@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the review_feedback_thread_modal_directive.
+ * @fileoverview Controller for the review_suggestion_thread_modal_directive.
  */
 
-oppia.controller('ReviewFeedbackThreadModalController', [
+oppia.controller('ReviewSuggestionThreadModalController', [
   '$scope', '$uibModalInstance', 'AlertsService', 'DateTimeFormatService',
   'EditabilityService', 'FeedbackThreadDisplayService', 'ThreadDataService',
   'activeThread', 'isUserLoggedIn',
@@ -24,7 +24,7 @@ oppia.controller('ReviewFeedbackThreadModalController', [
       $scope, $uibModalInstance, AlertsService, DateTimeFormatService,
       EditabilityService, FeedbackThreadDisplayService, ThreadDataService,
       activeThread, isUserLoggedIn) {
-    $scope.activeThread = activeThread;
+    $scope.thread = activeThread;
     $scope.isUserLoggedIn = isUserLoggedIn;
     $scope.STATUS_CHOICES = FeedbackThreadDisplayService.STATUS_CHOICES;
     $scope.getLabelClass = FeedbackThreadDisplayService.getLabelClass;
@@ -36,12 +36,14 @@ oppia.controller('ReviewFeedbackThreadModalController', [
 
     // Initial load of the thread list on page load.
     $scope.tmpMessage = {
-      status: $scope.activeThread.status,
+      status: $scope.thread.status,
       text: '',
     };
 
     $scope.getTitle = function() {
-      return 'Feedback Thread: ' + activeThread.subject;
+      return (
+        'Suggestion for the "' + $scope.thread.getSuggestionStateName() +
+        '" Card');
     };
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
@@ -56,7 +58,7 @@ oppia.controller('ReviewFeedbackThreadModalController', [
       }
       $scope.messageSendingInProgress = true;
       ThreadDataService.addNewMessage(threadId, tmpText, tmpStatus, function() {
-        $scope.tmpMessage.status = $scope.activeThread.status;
+        $scope.tmpMessage.status = $scope.thread.status;
         $scope.messageSendingInProgress = false;
       }, function() {
         $scope.messageSendingInProgress = false;
