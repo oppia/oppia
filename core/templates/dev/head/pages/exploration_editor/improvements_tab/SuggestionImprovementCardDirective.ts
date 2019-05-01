@@ -32,7 +32,7 @@ oppia.directive('suggestionImprovementCard', [
           };
           $scope.getContextText = function() {
             var messageCount = getMessages().length;
-            if ($scope.getThread().status !== 'review') {
+            if ($scope.getThread().status !== 'open') {
               if (messageCount === 0) {
                 return null;
               } else if (messageCount === 1) {
