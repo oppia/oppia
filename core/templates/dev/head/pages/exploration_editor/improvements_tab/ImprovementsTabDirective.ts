@@ -33,6 +33,9 @@ oppia.directive('improvementsTab', [
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
           var cardView = null;
           var cardViewFilters = {
+            all: function(card) {
+              return true;
+            },
             open: function(card) {
               return card.isOpen();
             },
@@ -55,7 +58,7 @@ oppia.directive('improvementsTab', [
               ImprovementCardService.sortByRelativeOrder(freshCards, cards);
               return $timeout(function() {
                 cards = freshCards;
-                cardView = cardView || 'open';
+                cardView = 'all'; // cardView || 'open';
               });
             });
           };
