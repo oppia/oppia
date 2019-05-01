@@ -32,69 +32,58 @@ oppia.directive('improvementsTab', [
             $scope, $timeout, ImprovementCardService, UserService,
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
           var cards = [];
-          var cardView = 'none';
-          var cardViewFilters = {
-            open: function(card) {
-              return card.isOpen();
-            },
-            open_feedback: function(card) {
-              return card.isOpen() && (
-                card.getDirectiveType() === FEEDBACK_IMPROVEMENT_CARD_TYPE ||
-                card.getDirectiveType() === SUGGESTION_IMPROVEMENT_CARD_TYPE);
-            },
-            all: function() {
-              return true;
-            },
-            none: function() {
-              return false;
-            },
-          };
-
           var refreshCards = function() {
-            ImprovementCardService.fetchCards().then(function(freshCards) {
-              var oldIndices = {};
-              cards.forEach(function(card, index) {
-                oldIndices[card.getKey()] = index;
-              });
-              var oldIndexOf = function(card) {
-                var oldIndex = oldIndices[card.getKey()];
-                return (oldIndex !== undefined) ? oldIndex : -1;
-              };
-              // Sort the cards by their old index. New cards will be placed
-              // arbitrarily at the front of the array.
-              freshCards.sort(function(leftHandCard, rightHandCard) {
-                return oldIndexOf(leftHandCard) - oldIndexOf(rightHandCard);
-              });
-              $timeout(function() {
+            var freshCardsPromise = ImprovementCardService.fetchCards();
+            return freshCardsPromise.then(function(freshCards) {
+              ImprovementCardService.sortByRelativeOrder(freshCards, cards);
+              return $timeout(function() {
                 cards = freshCards;
               });
             });
           };
 
-          refreshCards();
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $timeout(function() {
-              cardView = userInfo.isLoggedIn() ? 'open' : 'open_feedback';
+          var isUserLoggedIn = null;
+          var fetchIsUserLoggedIn = function() {
+            return UserService.getUserInfoAsync().then(function(userInfo) {
+              return $timeout(function() {
+                isUserLoggedIn = userInfo.isLoggedIn();
+              });
             });
-          });
+          };
 
-          $scope.$on('refreshImprovementsTab', refreshCards);
+          var cardView = null;
+          var isUserAllowedToViewCard = function(card) {
+            return (isUserLoggedIn ||
+              // Guests are only allowed to view feedback threads.
+              card.getDirectiveType() === FEEDBACK_IMPROVEMENT_CARD_TYPE ||
+              card.getDirectiveType() === SUGGESTION_IMPROVEMENT_CARD_TYPE);
+          };
+          var cardViewFilters = {
+            open: function(card) {
+              return isUserAllowedToViewCard(card) && card.isOpen();
+            },
+            resolved: function(card) {
+              return isUserAllowedToViewCard(card) && !card.isOpen();
+            },
+          };
+
           $scope.getCards = function() {
             return cards;
           };
-          $scope.getCardView = function() {
-            return cardView;
-          };
           $scope.isCardInView = function(card) {
-            return cardViewFilters[cardView](card);
+            return cardView !== null && cardViewFilters[cardView](card);
           };
           $scope.getOpenCardCount = function() {
-            if (cardView.startsWith('open')) {
-              return cards.filter(cardViewFilters[cardView]).length;
-            } else {
-              return cards.filter(cardViewFilters.open).length;
-            }
+            return cards.filter(cardViewFilters.open).length;
           };
+
+          // Finally, initialize the directive.
+          fetchIsUserLoggedIn().then(refreshCards).then(function() {
+            $timeout(function() {
+              cardView = 'open';
+              $scope.$on('refreshImprovementsTab', refreshCards);
+            });
+          });
         }
       ],
     };

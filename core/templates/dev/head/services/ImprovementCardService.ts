@@ -49,6 +49,30 @@ oppia.factory('ImprovementCardService', [
       },
 
       /**
+       * Sort cards so that they have the same relative order. Any cards lacking
+       * an order will be placed arbitrarily at the front.
+       *
+       * Cards compare as equal if their getKey() function return the same
+       * value.
+       *
+       * @param {Object[]} cardsToSort
+       * @param {Object[]} cardsWithOrder
+       */
+      sortByRelativeOrder: function(cardsToSort, cardsWithOrder) {
+        var orderedCardIndices = {};
+        cardsWithOrder.forEach(function(card, index) {
+          orderedCardIndices[card.getKey()] = index;
+        });
+        var indexOf = function(card) {
+          var index = orderedCardIndices[card.getKey()];
+          return (index !== undefined) ? index : -1;
+        };
+        cardsToSort.sort(function(leftHandCard, rightHandCard) {
+          return indexOf(leftHandCard) - indexOf(rightHandCard);
+        });
+      },
+
+      /**
        * @returns {Promise<Object[]>} - A list of improvement cards related to
        * the current exploration.
        *
