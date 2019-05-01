@@ -29,7 +29,7 @@ module.exports = function(config) {
       generatedJs,
       // The module files have to be loaded before App.js since it depends
       // on the other modules.
-      'core/templates/dev/head/**/*.module.js',
+      'local_compiled_js/core/templates/dev/head/**/*.module.js',
       'local_compiled_js/core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
@@ -68,8 +68,8 @@ module.exports = function(config) {
     preprocessors: {
       'local_compiled_js/core/templates/dev/head/!(*Spec).js': ['coverage'],
       'local_compiled_js/core/templates/dev/head/**/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/!(*\.spec).js': ['coverage'],
-      'core/templates/dev/head/**/!(*\.spec).js': ['coverage'],
+      'local_compiled_js/core/templates/dev/head/!(*\.spec).js': ['coverage'],
+      'local_compiled_js/core/templates/dev/head/**/!(*\.spec).js': ['coverage'],
       'local_compiled_js/extensions/!(*Spec).js': ['coverage'],
       'local_compiled_js/extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
