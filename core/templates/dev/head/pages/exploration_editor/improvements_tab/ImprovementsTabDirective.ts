@@ -31,6 +31,23 @@ oppia.directive('improvementsTab', [
         function(
             $scope, $timeout, ImprovementCardService, UserService,
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
+          var cardView = null;
+          var cardViewFilters = {
+            open: function(card) {
+              return card.isOpen();
+            },
+            resolved: function(card) {
+              return !card.isOpen();
+            },
+          };
+
+          var isUserLoggedIn = null;
+          var fetchIsUserLoggedIn = function() {
+            return UserService.getUserInfoAsync().then(function(userInfo) {
+              isUserLoggedIn = userInfo.isLoggedIn();
+            });
+          };
+
           var cards = [];
           var refreshCards = function() {
             var freshCardsPromise = ImprovementCardService.fetchCards();
@@ -38,33 +55,9 @@ oppia.directive('improvementsTab', [
               ImprovementCardService.sortByRelativeOrder(freshCards, cards);
               return $timeout(function() {
                 cards = freshCards;
+                cardView = cardView || 'open';
               });
             });
-          };
-
-          var isUserLoggedIn = null;
-          var fetchIsUserLoggedIn = function() {
-            return UserService.getUserInfoAsync().then(function(userInfo) {
-              return $timeout(function() {
-                isUserLoggedIn = userInfo.isLoggedIn();
-              });
-            });
-          };
-
-          var cardView = null;
-          var isUserAllowedToViewCard = function(card) {
-            return (isUserLoggedIn ||
-              // Guests are only allowed to view feedback threads.
-              card.getDirectiveType() === FEEDBACK_IMPROVEMENT_CARD_TYPE ||
-              card.getDirectiveType() === SUGGESTION_IMPROVEMENT_CARD_TYPE);
-          };
-          var cardViewFilters = {
-            open: function(card) {
-              return isUserAllowedToViewCard(card) && card.isOpen();
-            },
-            resolved: function(card) {
-              return isUserAllowedToViewCard(card) && !card.isOpen();
-            },
           };
 
           $scope.getCards = function() {
@@ -73,16 +66,21 @@ oppia.directive('improvementsTab', [
           $scope.isCardInView = function(card) {
             return cardView !== null && cardViewFilters[cardView](card);
           };
+          $scope.isUserAllowedToViewCard = function(card) {
+            return (isUserLoggedIn ||
+              // Guests are only allowed to view feedback threads.
+              card.getDirectiveType() === FEEDBACK_IMPROVEMENT_CARD_TYPE ||
+              card.getDirectiveType() === SUGGESTION_IMPROVEMENT_CARD_TYPE);
+          };
           $scope.getOpenCardCount = function() {
-            return cards.filter(cardViewFilters.open).length;
+            return cards.filter(function(card) {
+              return $scope.isUserAllowedToViewCard(card) && card.isOpen();
+            }).length;
           };
 
-          // Finally, initialize the directive.
+          // Now we can initialize the directive.
           fetchIsUserLoggedIn().then(refreshCards).then(function() {
-            $timeout(function() {
-              cardView = 'open';
-              $scope.$on('refreshImprovementsTab', refreshCards);
-            });
+            $scope.$on('refreshImprovementsTab', refreshCards);
           });
         }
       ],

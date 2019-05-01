@@ -8,7 +8,8 @@
     </md-card>
   </div>
   <div>
-    <md-card ng-repeat="card in getCards()" ng-if="isCardInView(card)"
+    <md-card ng-repeat="card in getCards()"
+             ng-if="isUserAllowedToViewCard(card) && isCardInView(card)"
              class="oppia-editor-improvement-card md-default-theme">
       <h2 style="margin-top: 0"><[card.getTitle() | truncate:80]></h2>
       <hr>
