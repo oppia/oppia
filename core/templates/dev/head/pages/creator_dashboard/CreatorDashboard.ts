@@ -49,7 +49,7 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 oppia.controller('CreatorDashboard', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$uibModal', '$window',
   'AlertsService', 'CreatorDashboardBackendApiService', 'DateTimeFormatService',
-  'ExplorationCreationService', 'FeedbackThreadDisplayService',
+  'ExplorationCreationService', 'FeedbackDisplayService',
   'QuestionObjectFactory', 'RatingComputationService',
   'ShowSuggestionModalForCreatorViewService', 'SuggestionObjectFactory',
   'SuggestionThreadObjectFactory', 'TopicsAndSkillsDashboardBackendApiService',
@@ -60,7 +60,7 @@ oppia.controller('CreatorDashboard', [
   function(
       $http, $log, $q, $rootScope, $scope, $uibModal, $window,
       AlertsService, CreatorDashboardBackendApiService, DateTimeFormatService,
-      ExplorationCreationService, FeedbackThreadDisplayService,
+      ExplorationCreationService, FeedbackDisplayService,
       QuestionObjectFactory, RatingComputationService,
       ShowSuggestionModalForCreatorViewService, SuggestionObjectFactory,
       SuggestionThreadObjectFactory, TopicsAndSkillsDashboardBackendApiService,
@@ -191,7 +191,7 @@ oppia.controller('CreatorDashboard', [
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
     $scope.enableQuestionSuggestions = constants.ENABLE_NEW_STRUCTURE_PLAYERS;
     $scope.getHumanReadableStatus = (
-      FeedbackThreadDisplayService.getHumanReadableStatus);
+      FeedbackDisplayService.getHumanReadableStatus);
 
     $scope.emptyDashboardImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/empty_dashboard.svg');

@@ -20,21 +20,21 @@ oppia.controller('FeedbackTab', [
   '$log', '$q', '$rootScope', '$scope', '$uibModal',
   'AlertsService', 'ChangeListService', 'DateTimeFormatService',
   'ExplorationDataService', 'ExplorationStatesService',
-  'FeedbackThreadDisplayService', 'ShowSuggestionModalForEditorViewService',
+  'FeedbackDisplayService', 'ShowSuggestionModalForEditorViewService',
   'StateObjectFactory', 'ThreadDataService', 'UrlInterpolationService',
   'UserService', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
       $log, $q, $rootScope, $scope, $uibModal,
       AlertsService, ChangeListService, DateTimeFormatService,
       ExplorationDataService, ExplorationStatesService,
-      FeedbackThreadDisplayService, ShowSuggestionModalForEditorViewService,
+      FeedbackDisplayService, ShowSuggestionModalForEditorViewService,
       StateObjectFactory, ThreadDataService, UrlInterpolationService,
       UserService, ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
-    $scope.STATUS_CHOICES = FeedbackThreadDisplayService.STATUS_CHOICES;
+    $scope.STATUS_CHOICES = FeedbackDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
-    $scope.getLabelClass = FeedbackThreadDisplayService.getLabelClass;
+    $scope.getLabelClass = FeedbackDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (
-      FeedbackThreadDisplayService.getHumanReadableStatus);
+      FeedbackDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 

@@ -18,18 +18,18 @@
 
 oppia.controller('ReviewSuggestionThreadModalController', [
   '$scope', '$uibModalInstance', 'AlertsService', 'DateTimeFormatService',
-  'EditabilityService', 'FeedbackThreadDisplayService', 'ThreadDataService',
+  'EditabilityService', 'FeedbackDisplayService', 'ThreadDataService',
   'activeThread', 'isUserLoggedIn',
   function(
       $scope, $uibModalInstance, AlertsService, DateTimeFormatService,
-      EditabilityService, FeedbackThreadDisplayService, ThreadDataService,
+      EditabilityService, FeedbackDisplayService, ThreadDataService,
       activeThread, isUserLoggedIn) {
     $scope.thread = activeThread;
     $scope.isUserLoggedIn = isUserLoggedIn;
-    $scope.STATUS_CHOICES = FeedbackThreadDisplayService.STATUS_CHOICES;
-    $scope.getLabelClass = FeedbackThreadDisplayService.getLabelClass;
+    $scope.STATUS_CHOICES = FeedbackDisplayService.STATUS_CHOICES;
+    $scope.getLabelClass = FeedbackDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (
-      FeedbackThreadDisplayService.getHumanReadableStatus);
+      FeedbackDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
     $scope.EditabilityService = EditabilityService;

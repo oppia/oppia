@@ -69,7 +69,7 @@ oppia.constant('FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS', {
 oppia.controller('LearnerDashboard', [
   '$http', '$q', '$rootScope', '$scope', '$uibModal', '$window',
   'AlertsService', 'DateTimeFormatService',
-  'FeedbackMessageSummaryObjectFactory', 'FeedbackThreadDisplayService',
+  'FeedbackMessageSummaryObjectFactory', 'FeedbackDisplayService',
   'FeedbackThreadSummaryObjectFactory', 'LearnerDashboardBackendApiService',
   'ShowSuggestionModalForLearnerViewService', 'UrlInterpolationService',
   'UserService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
@@ -79,7 +79,7 @@ oppia.controller('LearnerDashboard', [
   function(
       $http, $q, $rootScope, $scope, $uibModal, $window,
       AlertsService, DateTimeFormatService,
-      FeedbackMessageSummaryObjectFactory, FeedbackThreadDisplayService,
+      FeedbackMessageSummaryObjectFactory, FeedbackDisplayService,
       FeedbackThreadSummaryObjectFactory, LearnerDashboardBackendApiService,
       ShowSuggestionModalForLearnerViewService, UrlInterpolationService,
       UserService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
@@ -208,9 +208,9 @@ oppia.controller('LearnerDashboard', [
       text: ''
     };
 
-    $scope.getLabelClass = FeedbackThreadDisplayService.getLabelClass;
+    $scope.getLabelClass = FeedbackDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (
-      FeedbackThreadDisplayService.getHumanReadableStatus);
+      FeedbackDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
