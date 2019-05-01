@@ -33,14 +33,17 @@ oppia.directive('improvementsTab', [
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
           var cards = [];
           var refreshCards = function() {
+            var oldIndices = {};
+            cards.forEach(function(card, index) {
+              oldIndices[card.getKey()] = index;
+            });
+            // Returns old index of the card.
+            var indexOf = function(card) {
+              return oldIndices[card.getKey()] || -1;
+            };
             ImprovementCardService.fetchCards().then(function(freshCards) {
-              var oldIndexes = {};
-              cards.forEach(function(card, index) {
-                oldIndexes[card.getKey()] = index;
-              });
-              var indexOf = function(card) {
-                return oldIndexes[card.getKey()] || cards.length;
-              };
+              // Sort the cards by their old index. New cards will be placed
+              // arbitrarily at the front of the array.
               freshCards.sort(function(leftHandCard, rightHandCard) {
                 return indexOf(leftHandCard) - indexOf(rightHandCard);
               });
@@ -52,9 +55,13 @@ oppia.directive('improvementsTab', [
 
           var cardView = 'all';
           var cardViewFilters = {
-            /** @returns {boolean} */
             open: function(card) {
               return card.isOpen();
+            },
+            open_feedback: function(card) {
+              return this.open(card) && (
+                card.getDirectiveType() === SUGGESTION_IMPROVEMENT_CARD_TYPE ||
+                card.getDirectiveType() === FEEDBACK_IMPROVEMENT_CARD_TYPE);
             },
             all: function() {
               return true;
