@@ -71,6 +71,7 @@ oppia.directive('improvementsTab', [
             });
           };
 
+          refreshCards();
           UserService.getUserInfoAsync().then(function(userInfo) {
             $timeout(function() {
               cardView = userInfo.isLoggedIn() ? 'open' : 'open_feedback';

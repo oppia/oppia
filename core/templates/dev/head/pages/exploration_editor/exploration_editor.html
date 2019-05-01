@@ -88,7 +88,8 @@
         {% include 'pages/exploration_editor/statistics_tab/statistics_tab.html' %}
       </div>
 
-      <improvements-tab ng-show="getActiveTabName() === 'improvements'">
+      <improvements-tab ng-if="isExplorationFeaturesServiceInitialized() && isImprovementsTabEnabled()"
+                        ng-show="getActiveTabName() === 'improvements'">
       </improvements-tab>
 
       <div ng-show="getActiveTabName() === 'settings'">
@@ -99,7 +100,8 @@
         {% include 'pages/exploration_editor/history_tab/history_tab.html' %}
       </div>
 
-      <div ng-show="getActiveTabName() === 'feedback'">
+      <div ng-if="isExplorationFeaturesServiceInitialized() && !isImprovementsTabEnabled()"
+           ng-show="getActiveTabName() === 'feedback'">
         {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
       </div>
     </div>

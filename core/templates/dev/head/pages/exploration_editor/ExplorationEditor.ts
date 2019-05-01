@@ -99,6 +99,11 @@ oppia.controller('ExplorationEditor', [
         !$scope.areExplorationWarningsVisible);
     };
 
+    $scope.isImprovementsTabEnabled =
+      ExplorationFeaturesService.isImprovementsTabEnabled;
+    $scope.isExplorationFeaturesServiceInitialized =
+      ExplorationFeaturesService.isInitialized;
+
     $scope.$on('refreshGraph', function() {
       GraphDataService.recompute();
       ExplorationWarningsService.updateWarnings();
