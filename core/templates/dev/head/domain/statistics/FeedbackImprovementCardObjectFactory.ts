@@ -80,7 +80,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
 
     /** @returns {string} - A concise summary of the card. */
     FeedbackThreadImprovementCard.prototype.getTitle = function() {
-      return 'Feedback: ' + this._feedbackThread.subject;
+      return 'Feedback Thread: ' + this._feedbackThread.subject;
     };
 
     FeedbackThreadImprovementCard.prototype.getKey = function() {

@@ -4,41 +4,61 @@
 
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-suggestion-review-panel-container" style="float: left;">
-      <strong>Current:</strong>
-      <div class="oppia-suggestion-review-panel">
-        <angular-html-bind ng-if="currentContent" html-data="currentContent">
-        </angular-html-bind>
-        <div ng-if="!currentContent" style="color: red;">Oops! This state no longer exists!</div>
-      </div>
+    <div class="oppia-suggestion-review-panel-container" style="float: left; padding-left: 0">
+      <strong class="oppia-suggestion-review-panel-name">Current:</strong>
+      <md-card>
+        <div class="oppia-suggestion-review-panel">
+          <angular-html-bind ng-if="currentContent" html-data="currentContent">
+          </angular-html-bind>
+          <div ng-if="!currentContent" style="color: red;">
+            Oops! This state no longer exists!
+          </div>
+        </div>
+      </md-card>
     </div>
-    <div class="oppia-suggestion-review-panel-container" style="float: right;">
-      <strong>Suggested:</strong>
-      <div class="oppia-suggestion-review-panel">
-        <angular-html-bind html-data="newContent">
-        </angular-html-bind>
-      </div>
+    <div class="oppia-suggestion-review-panel-container" style="float: right; padding-right: 0">
+      <strong class="oppia-suggestion-review-panel-name">Suggested:</strong>
+      <md-card>
+        <div class="oppia-suggestion-review-panel">
+          <angular-html-bind html-data="newContent">
+          </angular-html-bind>
+        </div>
+      </md-card>
     </div>
+    <div style="clear: both"></div>
   </section>
-  <div ng-show="canAccept" style="margin-top: 20px; margin-left: 10px;">
-    Review message (required if rejecting):
-    <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
-  </div>
-  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
-    Brief Description of Changes (required if accepting):
-    <input class="protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage" style="width: 100%">
+  <div ng-show="canAccept" style="with: 100%; margin: 10px 20px">
+    <div>
+      <strong>Review message (required if rejecting):</strong>
+      <input class="form-control protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
+    </div>
+    <div style="margin-top: 20px">
+      <strong>Brief Description of Changes (required if accepting):</strong>
+      <input class="form-control protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage" style="width: 100%">
+    </div>
   </div>
 </div>
 
 <div class="modal-footer">
-  <div ng-show="errorMessage" class="oppia-suggestion-review-error">
-    <[ errorMessage ]>
+  <div class="text-left" style="float: left; padding: 6px 0">
+    <span ng-show="errorMessage" class="oppia-suggestion-review-error">
+      <[ errorMessage ]>
+    </span>
   </div>
-  <button class="btn btn-default" ng-click="cancelReview()">Close</button>
-  <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
-    <button class="btn btn-danger protractor-test-exploration-reject-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject || reviewMessage.length == 0">Reject</button>
-  </span>
-  <span uib-tooltip="Enter commit message before accepting" tooltip-placement="bottom" tooltip-enable="commitMessage.length == 0">
-    <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
-  </span>
+  <div class="text-left" style="float: right">
+    <span uib-tooltip="Enter commit message before accepting" tooltip-placement="bottom" tooltip-enable="commitMessage.length == 0">
+      <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" style="margin: 0 8px 0 0"
+              ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">
+        Accept
+      </button>
+    </span>
+    <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
+      <button class="btn btn-danger protractor-test-exploration-reject-suggestion-btn" style="margin: 0 8px 0 0"
+              ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject || reviewMessage.length == 0">
+        Reject
+      </button>
+    </span>
+    <button class="btn btn-default" ng-click="cancelReview()">Close</button>
+  </div>
+  <div style="clear: both"></div>
 </div>

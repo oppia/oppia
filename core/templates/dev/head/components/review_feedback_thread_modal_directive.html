@@ -67,17 +67,17 @@
       </div>
 
       <div class="text-right" style="float: right">
-        <button ng-click="close()" ng-disabled="messageSendingInProgress"
-                class="btn btn-default protractor-test-oppia-feedback-response-close-btn"
-                style="margin-right: 0">
-          Close
-        </button>
         <button ng-click="addNewMessage(activeThread.threadId, tmpMessage.text, tmpMessage.status)"
                 ng-disabled="messageSendingInProgress || (!tmpMessage.text && activeThread.status === tmpMessage.status) || (!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable'))"
                 class="btn btn-success protractor-test-oppia-feedback-response-send-btn"
                 style="margin-left: 8px">
           <span ng-if="messageSendingInProgress">Sending...</span>
           <span ng-if="!messageSendingInProgress">Send</span>
+        </button>
+        <button ng-click="close()" ng-disabled="messageSendingInProgress"
+                class="btn btn-default protractor-test-oppia-feedback-response-close-btn"
+                style="margin-right: 0">
+          Close
         </button>
       </div>
 
