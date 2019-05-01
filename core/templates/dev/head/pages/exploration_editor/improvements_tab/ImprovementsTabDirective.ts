@@ -31,9 +31,11 @@ oppia.directive('improvementsTab', [
         function(
             $scope, $timeout, ImprovementCardService, UserService,
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
+          var DEFAULT_CARD_VIEW = 'all';
+
           var cardView = null;
           var cardViewFilters = {
-            every: function(card) {
+            all: function(card) {
               return true;
             },
             open: function(card) {
@@ -58,7 +60,7 @@ oppia.directive('improvementsTab', [
               ImprovementCardService.sortByRelativeOrder(freshCards, cards);
               return $timeout(function() {
                 cards = freshCards;
-                cardView = cardView || 'every';
+                cardView = cardView || DEFAULT_CARD_VIEW;
               });
             });
           };
