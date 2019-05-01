@@ -14,7 +14,7 @@
 </div>
 
 <div class="modal-body">
-  <ol ng-if="activeThread.messages" class="thread-messages" style="padding: 0 32px">
+  <ol ng-if="activeThread.messages" class="thread-messages" style="padding: 0 10px">
     <li ng-repeat="m in activeThread.messages | orderBy:'message_id'">
       <div style="float: left">
         <span ng-if="$index !== 0">#<[m.message_id]></span>
