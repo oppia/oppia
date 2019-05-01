@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for displaying and editing a collection node. This
- * directive allows creators to shift nodes to left or right
- * and also delete the collection node represented by this directive.
+ * @fileoverview Module for the statistics tab of the collection editor.
  */
 
-angular.module('collectionNodeEditorModule', []);
+angular.module('collectionStatisticsTabModule', []);

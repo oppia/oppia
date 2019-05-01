@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the main tab of the collection editor.
+ * @fileoverview Module for displaying the collection's owner name and
+ * permissions.
  */
 
-angular.module('collectionEditorTabModule', []);
+angular.module('collectionPermissionsCardModule', []);

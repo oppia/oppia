@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 // TODO(bhenning): These constants should be provided by the backend.
 
-angular.module('CollectionEditorModule', [
+angular.module('collectionEditorModule', [
   'collectionHistoryTabModule', 'collectionDetailsEditorModule',
   'collectionPermissionsCardModule', 'collectionSettingsTabModule',
   'collectionEditorNavbarBreadcrumbModule', 'collectionEditorTabModule',
@@ -26,20 +26,20 @@ angular.module('CollectionEditorModule', [
   'collectionStatisticsTabModule', 'collectionEditorNavbarModule'
 ]);
 
-angular.module('CollectionEditorModule').constant(
+angular.module('collectionEditorModule').constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
 
-angular.module('CollectionEditorModule').constant(
+angular.module('collectionEditorModule').constant(
   'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
   '/collection_editor_handler/data/<collection_id>');
 
-angular.module('CollectionEditorModule').constant(
+angular.module('collectionEditorModule').constant(
   'COLLECTION_RIGHTS_URL_TEMPLATE',
   '/collection_editor_handler/rights/<collection_id>');
 
-angular.module('CollectionEditorModule').constant(
+angular.module('collectionEditorModule').constant(
   'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
 
-angular.module('CollectionEditorModule').constant(
+angular.module('collectionEditorModule').constant(
   'SEARCH_EXPLORATION_URL_TEMPLATE',
   '/exploration/metadata_search?q=<query>');

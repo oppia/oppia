@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for displaying and editing a collection details.
- * Edit options include: changing the title, objective, and category, and also
- * adding a new exploration.
+ * @fileoverview Module for the main tab of the collection editor.
  */
 
-angular.module('collectionDetailsEditorModule', []);
+angular.module('collectionEditorTabModule', []);
