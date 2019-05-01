@@ -61,8 +61,16 @@ else:
     FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
+
+VALUE_GENERATORS_DIR_FOR_JS = os.path.join(
+    'local_compiled_js', 'extensions', 'value_generators')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
-VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
+
+VISUALIZATIONS_DIR = os.path.join(
+    'extensions', 'visualizations')
+VISUALIZATIONS_DIR_FOR_JS = os.path.join(
+    'local_compiled_js', 'extensions', 'visualizations')
+
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'objects', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
@@ -150,7 +158,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATES_SCHEMA_VERSION = 27
+CURRENT_STATE_SCHEMA_VERSION = 27
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible

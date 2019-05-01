@@ -46,9 +46,9 @@ describe('Embedding', function() {
     explorationEditorMainTab.setInteraction('NumericInput');
     explorationEditorMainTab.addResponse(
       'NumericInput', null, 'correct but why', true, 'Equals', 6);
-    explorationEditorMainTab.addResponse('NumericInput', forms.toRichText(
-      'Describe solution!!')
-      , null, false, 'IsLessThanOrEqualTo', 0);
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('Describe solution!!'),
+      null, false, 'IsLessThanOrEqualTo', 0);
     var defaultResponseEditor = explorationEditorMainTab
       .getResponseEditor('default');
     defaultResponseEditor.setDestination(
@@ -60,12 +60,15 @@ describe('Embedding', function() {
       forms.toRichText('Right! Why do you think it is 6?'));
     explorationEditorMainTab.setInteraction(
       'TextInput', 'Type your answer here.', 5);
-    explorationEditorMainTab.addResponse('TextInput', forms.toRichText(
-      'Yes, 3! = 3 x 2 x 1. That\'s 3 x 2 = 6 ways.')
-      , 'END', true, 'Contains', 'permutation');
-    explorationEditorMainTab.addResponse('TextInput', forms.toRichText(
-      'Yes, 3 factorial, or 3 x 2 x 1. That\'s 3 x 2 = 6 ways.')
-      , 'END', false, 'Contains', 'factorial');
+    explorationEditorMainTab.addResponse(
+      'TextInput',
+      forms.toRichText('Yes, 3! = 3 x 2 x 1. That\'s 3 x 2 = 6 ways.'),
+      'END', true, 'Contains', 'permutation');
+    explorationEditorMainTab.addResponse(
+      'TextInput',
+      forms.toRichText(
+        'Yes, 3 factorial, or 3 x 2 x 1. That\'s 3 x 2 = 6 ways.'),
+      'END', false, 'Contains', 'factorial');
     explorationEditorMainTab.getResponseEditor('default').setFeedback(
       forms.toRichText('Figure out what the answer for 4 balls is!'));
 

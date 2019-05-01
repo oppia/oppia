@@ -52,18 +52,16 @@ var checkCommands = function(yargs, argv, numRequired) {
 checkCommands(yargs, argv, 1);
 
 gulp.task('build', function() {
-  childProcess.exec(['$PYTHON_CMD scripts/build.py']);
+  childProcess.exec('$PYTHON_CMD scripts/build.py');
 });
 
 gulp.slurped = false;
 gulp.task('watch', function() {
   if (!gulp.slurped) {
-    gulp.watch('gulpfile.js', ['build']);
-    gulp.watch(thirdPartyCssFiles, ['build']);
-    gulp.watch(thirdPartyJsFiles, ['build']);
-    gulp.watch('manifest.json', ['build']);
+    gulp.watch('gulpfile.js', gulp.series('build'));
+    gulp.watch(thirdPartyCssFiles, gulp.series('build'));
+    gulp.watch(thirdPartyJsFiles, gulp.series('build'));
+    gulp.watch('manifest.json', gulp.series('build'));
     gulp.slurped = true;
   }
 });
-
-gulp.task('watch', ['watch']);
