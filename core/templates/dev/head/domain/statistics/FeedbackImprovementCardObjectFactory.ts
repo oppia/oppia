@@ -22,14 +22,14 @@ oppia.constant('SUGGESTION_IMPROVEMENT_CARD_TYPE', 'suggestion');
 oppia.factory('FeedbackImprovementCardObjectFactory', [
   '$timeout', '$uibModal', 'ChangeListService', 'ExplorationStatesService',
   'ImprovementActionButtonObjectFactory',
-  'ShowSuggestionModalForEditorViewService', 'UserService', 'ThreadDataService',
-  'UrlInterpolationService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
+  'ShowSuggestionModalForEditorViewService', 'ThreadDataService',
+  'UrlInterpolationService', 'UserService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
   'SUGGESTION_IMPROVEMENT_CARD_TYPE',
   function(
       $timeout, $uibModal, ChangeListService, ExplorationStatesService,
       ImprovementActionButtonObjectFactory,
-      ShowSuggestionModalForEditorViewService, UserService, ThreadDataService,
-      UrlInterpolationService, FEEDBACK_IMPROVEMENT_CARD_TYPE,
+      ShowSuggestionModalForEditorViewService, ThreadDataService,
+      UrlInterpolationService, UserService, FEEDBACK_IMPROVEMENT_CARD_TYPE,
       SUGGESTION_IMPROVEMENT_CARD_TYPE) {
     /**
      * @constructor
