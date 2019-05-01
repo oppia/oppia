@@ -32,7 +32,7 @@ oppia.directive('improvementsTab', [
             $q, $scope, $timeout, ImprovementCardService, UserService,
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
           var cards = [];
-          var cardView = 'all';
+          var cardView = 'none';
           var cardViewFilters = {
             open: function(card) {
               return card.isOpen();
@@ -75,7 +75,7 @@ oppia.directive('improvementsTab', [
               });
               $timeout(function() {
                 cards = freshCards;
-                // cardView = isUserLoggedIn ? 'open' : 'open_feedback';
+                cardView = isUserLoggedIn ? 'open' : 'open_feedback';
               });
             });
           };
