@@ -1,5 +1,5 @@
 <strong ng-if="getContextText() !== null"><[getContextText()]><br></strong>
-<p style="text-indent: 4ch"><[getContextMessage().text | truncate:280]></p>
+<p><[getContextMessage().text | truncate:280]></p>
 
 <div ng-if="getThread().status !== 'open'" style="float: left">
   <span ng-class="getLabelClass(getThread().status)" style="margin-left: 0">
