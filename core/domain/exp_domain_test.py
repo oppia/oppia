@@ -833,7 +833,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
     def test_correct_states_schema_conversion_methods_exist(self):
         """Test that the right states schema conversion methods exist."""
         current_states_schema_version = (
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         for version_num in range(current_states_schema_version):
             self.assertTrue(hasattr(
                 exp_domain.Exploration,

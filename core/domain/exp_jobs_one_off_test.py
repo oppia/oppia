@@ -934,7 +934,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         yaml_before_migration = exploration.to_yaml()
 
         # Start migration job on sample exploration.
@@ -946,7 +946,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         updated_exp = exp_services.get_exploration_by_id(self.VALID_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         after_converted_yaml = updated_exp.to_yaml()
         self.assertEqual(after_converted_yaml, yaml_before_migration)
 
@@ -967,7 +967,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         # Ensure the states structure within the exploration was changed.
         self.assertNotEqual(

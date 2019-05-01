@@ -50,7 +50,7 @@ class QuestionCreationHandler(base.BaseHandler):
             raise self.InvalidInputException
 
         question_dict['question_state_data_schema_version'] = (
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
         try:
             question = question_domain.Question.from_dict(question_dict)
