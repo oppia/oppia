@@ -89,10 +89,10 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-           json_response = self.get_json(
-            '%s/%s' % (
-                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
-                'public_topic_name'),
+            self.get_json(
+                '%s/%s' % (
+                    feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                    'public_topic_name'),
                 expected_status_int=404)
 
     def test_any_user_can_access_practice_sessions_data(self):
@@ -110,7 +110,8 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
                 '%s/%s' % (
-                    feconf.PRACTICE_SESSION_DATA_URL_PREFIX, 'private_topic_name'),
+                    feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                    'private_topic_name'),
                 expected_status_int=404)
 
     def test_get_fails_when_topic_doesnt_exist(self):
