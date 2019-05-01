@@ -203,7 +203,7 @@ var SkillEditorPage = function() {
   };
 
   this.expectWorkedExampleSummariesToMatch = function(examples) {
-    for (index in examples) {
+    for (var index in examples) {
       expect(workedExampleSummary(index).getText()).toMatch(examples[index]);
     }
   };
