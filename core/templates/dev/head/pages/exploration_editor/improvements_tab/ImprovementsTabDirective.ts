@@ -57,7 +57,8 @@ oppia.directive('improvementsTab', [
                 oldIndices[card.getKey()] = index;
               });
               var oldIndexOf = function(card) {
-                return oldIndices[card.getKey()] || -1;
+                var oldIndex = oldIndices[card.getKey()];
+                return (oldIndex !== undefined) ? oldIndex : -1;
               };
               // Sort the cards by their old index. New cards will be placed
               // arbitrarily at the front of the array.

@@ -22,13 +22,13 @@ oppia.constant('SUGGESTION_IMPROVEMENT_CARD_TYPE', 'suggestion');
 oppia.factory('FeedbackImprovementCardObjectFactory', [
   '$timeout', '$uibModal', 'ChangeListService', 'ExplorationStatesService',
   'ImprovementActionButtonObjectFactory',
-  'ShowSuggestionModalForEditorViewService', 'ThreadDataService',
+  'ShowSuggestionModalForEditorViewService', 'UserService', 'ThreadDataService',
   'UrlInterpolationService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
   'SUGGESTION_IMPROVEMENT_CARD_TYPE',
   function(
       $timeout, $uibModal, ChangeListService, ExplorationStatesService,
       ImprovementActionButtonObjectFactory,
-      ShowSuggestionModalForEditorViewService, ThreadDataService,
+      ShowSuggestionModalForEditorViewService, UserService, ThreadDataService,
       UrlInterpolationService, FEEDBACK_IMPROVEMENT_CARD_TYPE,
       SUGGESTION_IMPROVEMENT_CARD_TYPE) {
     /**
@@ -46,7 +46,9 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
               return thisCard._feedbackThread;
             },
             isUserLoggedIn: function() {
-              return GLOBALS.userIsLoggedIn;
+              return UserService.getUserInfoAsync().then(function(userInfo) {
+                return userInfo.isLoggedIn();
+              });
             },
           },
           controller: 'ReviewFeedbackThreadModalController',
@@ -161,7 +163,9 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
               return thisCard._suggestionThread;
             },
             isUserLoggedIn: function() {
-              return GLOBALS.userIsLoggedIn;
+              return UserService.getUserInfoAsync().then(function(userInfo) {
+                return userInfo.isLoggedIn();
+              });
             },
           },
           controller: 'ReviewSuggestionThreadModalController',
