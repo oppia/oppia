@@ -26,10 +26,10 @@ oppia.directive('improvementsTab', [
         '/pages/exploration_editor/improvements_tab/' +
         'improvements_tab_directive.html'),
       controller: [
-        '$q', '$scope', '$timeout', 'ImprovementCardService', 'UserService',
+        '$q', '$scope', '$timeout', 'ImprovementCardService',
         'FEEDBACK_IMPROVEMENT_CARD_TYPE', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
         function(
-            $q, $scope, $timeout, ImprovementCardService, UserService,
+            $q, $scope, $timeout, ImprovementCardService,
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
           var cards = [];
           var cardView = 'none';
@@ -58,16 +58,7 @@ oppia.directive('improvementsTab', [
             var oldIndexOf = function(card) {
               return oldIndices[card.getKey()] || -1;
             };
-            var isUserLoggedInPromise = UserService.getUserInfoAsync().then(
-              function(userInfo) {
-                return userInfo.isLoggedIn();
-              }, function() {
-                return false;
-              });
-            var cardsPromise = ImprovementCardService.fetchCards();
-            $q.all([isUserLoggedInPromise, cardsPromise]).then(function(res) {
-              var isUserLoggedIn = res[0];
-              var freshCards = res[1];
+            ImprovementCardService.fetchCards().then(function(freshCards) {
               // Sort the cards by their old index. New cards will be placed
               // arbitrarily at the front of the array.
               freshCards.sort(function(leftHandCard, rightHandCard) {
@@ -75,7 +66,7 @@ oppia.directive('improvementsTab', [
               });
               $timeout(function() {
                 cards = freshCards;
-                cardView = isUserLoggedIn ? 'open' : 'open_feedback';
+                cardView = GLOBALS.userIsLoggedIn ? 'open' : 'open_feedback';
               });
             });
           };

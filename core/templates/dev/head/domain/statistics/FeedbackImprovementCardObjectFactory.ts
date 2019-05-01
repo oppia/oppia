@@ -23,13 +23,13 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
   '$timeout', '$uibModal', 'ChangeListService', 'ExplorationStatesService',
   'ImprovementActionButtonObjectFactory',
   'ShowSuggestionModalForEditorViewService', 'ThreadDataService',
-  'UrlInterpolationService', 'UserService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
+  'UrlInterpolationService', 'FEEDBACK_IMPROVEMENT_CARD_TYPE',
   'SUGGESTION_IMPROVEMENT_CARD_TYPE',
   function(
       $timeout, $uibModal, ChangeListService, ExplorationStatesService,
       ImprovementActionButtonObjectFactory,
       ShowSuggestionModalForEditorViewService, ThreadDataService,
-      UrlInterpolationService, UserService, FEEDBACK_IMPROVEMENT_CARD_TYPE,
+      UrlInterpolationService, FEEDBACK_IMPROVEMENT_CARD_TYPE,
       SUGGESTION_IMPROVEMENT_CARD_TYPE) {
     /**
      * @constructor
@@ -46,13 +46,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
               return thisCard._feedbackThread;
             },
             isUserLoggedIn: function() {
-              return UserService.getUserInfoAsync().then(function(userInfo) {
-                var isUserLoggedIn = userInfo.isLoggedIn();
-                if (isUserLoggedIn) {
-                  ThreadDataService.markThreadAsSeen(feedbackThread.threadId);
-                }
-                return isUserLoggedIn;
-              });
+              return GLOBALS.userIsLoggedIn;
             },
           },
           controller: 'ReviewFeedbackThreadModalController',
@@ -167,13 +161,7 @@ oppia.factory('FeedbackImprovementCardObjectFactory', [
               return thisCard._suggestionThread;
             },
             isUserLoggedIn: function() {
-              return UserService.getUserInfoAsync().then(function(userInfo) {
-                var isUserLoggedIn = userInfo.isLoggedIn();
-                if (isUserLoggedIn) {
-                  ThreadDataService.markThreadAsSeen(suggestionThread.threadId);
-                }
-                return isUserLoggedIn;
-              });
+              return GLOBALS.userIsLoggedIn;
             },
           },
           controller: 'ReviewSuggestionThreadModalController',

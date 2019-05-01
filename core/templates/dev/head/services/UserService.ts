@@ -30,9 +30,7 @@ oppia.factory('UserService', [
         if (userInfo) {
           return $q.resolve(userInfo);
         }
-        return $http.get(
-          '/userinfohandler'
-        ).then(function(response) {
+        return $http.get('/userinfohandler').then(function(response) {
           userInfo = UserInfoObjectFactory.createFromBackendDict(response.data);
           return userInfo;
         });
