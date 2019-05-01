@@ -33,7 +33,7 @@ oppia.directive('improvementsTab', [
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
           var cardView = null;
           var cardViewFilters = {
-            all: function(card) {
+            every: function(card) {
               return true;
             },
             open: function(card) {
@@ -58,7 +58,7 @@ oppia.directive('improvementsTab', [
               ImprovementCardService.sortByRelativeOrder(freshCards, cards);
               return $timeout(function() {
                 cards = freshCards;
-                cardView = 'all'; // cardView || 'open';
+                cardView = cardView || 'every';
               });
             });
           };
@@ -81,7 +81,7 @@ oppia.directive('improvementsTab', [
             }).length;
           };
 
-          // Now we can initialize the directive.
+          // Now we are ready to initialize the directive.
           fetchIsUserLoggedIn().then(refreshCards).then(function() {
             $scope.$on('refreshImprovementsTab', refreshCards);
           });
