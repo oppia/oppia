@@ -32,6 +32,12 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
             '<a href="http://www.google.com">Hello</a>',
             '<a href="http://www.google.com">Hello</a>'
         ), (
+            '<a href="http://www.google.com" target="_blank">Hello</a>',
+            '<a href="http://www.google.com" target="_blank">Hello</a>'
+        ), (
+            '<a href="http://www.google.com" title="Hello">Hello</a>',
+            '<a href="http://www.google.com" title="Hello">Hello</a>'
+        ), (
             'Just some text 12345',
             'Just some text 12345'
         ), (
