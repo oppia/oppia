@@ -68,9 +68,8 @@ YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 NODE_FILE = os.path.join(
-    PARENT_DIR, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
-UGLIFY_FILE = os.path.join(
-    PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
+    PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
+UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
@@ -669,11 +668,8 @@ def get_file_hashes(directory_path):
     print('Computing hashes for files in %s'
           % os.path.join(os.getcwd(), directory_path))
 
-    for root, dirnames, filenames in os.walk(
+    for root, _, filenames in os.walk(
             os.path.join(os.getcwd(), directory_path)):
-        for directory in dirnames:
-            print('Computing hashes for files in %s'
-                  % os.path.join(root, directory))
         for filename in filenames:
             filepath = os.path.join(root, filename)
             if should_file_be_built(filepath) and not any(
@@ -853,10 +849,8 @@ def generate_delete_tasks_to_remove_deleted_files(
     """
     print 'Scanning directory %s to remove deleted file' % staging_directory
     delete_tasks = collections.deque()
-    for root, dirnames, filenames in os.walk(
+    for root, _, filenames in os.walk(
             os.path.join(os.getcwd(), staging_directory)):
-        for directory in dirnames:
-            print 'Scanning %s' % os.path.join(root, directory)
         for filename in filenames:
             target_path = os.path.join(root, filename)
             # Ignore files with certain extensions.
@@ -1174,7 +1168,7 @@ def compile_typescript_files(project_dir):
             to be compiled.
     """
     print 'Compiling ts files...'
-    cmd = ['../node_modules/typescript/bin/tsc', '--project', project_dir]
+    cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
     subprocess.check_call(cmd)
 
 
@@ -1187,13 +1181,13 @@ def compile_typescript_files_continuously(project_dir):
             to be compiled.
     """
     kill_cmd = (
-        'kill `ps aux | grep "[.]./node_modules/typescript/bin/tsc --project . '
+        'kill `ps aux | grep "node_modules/typescript/bin/tsc --project . '
         '--watch" | awk \'{print $2}\'`'
     )
     subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
     print 'Compiling ts files in watch mode...'
     cmd = [
-        '../node_modules/typescript/bin/tsc', '--project', project_dir,
+        './node_modules/typescript/bin/tsc', '--project', project_dir,
         '--watch']
 
     with open('tsc_output_log.txt', 'w') as out:

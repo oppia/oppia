@@ -121,7 +121,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
             'question_id', question_state_data,
-            feconf.CURRENT_STATES_SCHEMA_VERSION, 'en', 1)
+            feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1)
 
     def test_to_and_from_dict(self):
         """Test to verify to_dict and from_dict methods
@@ -133,7 +133,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'id': 'col1.random',
             'question_state_data': default_question_state_data.to_dict(),
             'question_state_data_schema_version': (
-                feconf.CURRENT_STATES_SCHEMA_VERSION),
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
             'language_code': 'en',
             'version': 1
         }
