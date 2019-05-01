@@ -2726,10 +2726,6 @@ md-card.preview-conversation-skin-supplemental-card {
   margin: 0;
 }
 
-.oppia-suggestion-review-panel-container md-card {
-  height: 300px;
-}
-
 .oppia-suggestion-review-panel-name {
   height: 20px;
   display: block;
