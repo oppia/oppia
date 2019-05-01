@@ -408,7 +408,7 @@ title: Title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATES_SCHEMA_VERSION)
+    feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
 blurb: ''
@@ -463,7 +463,7 @@ tags: []
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATES_SCHEMA_VERSION)
+    feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     def _get_unicode_test_string(self, suffix):
         """Returns a string that contains unicode characters and ends with the
@@ -1497,7 +1497,7 @@ tags: []
         """
         question = question_domain.Question(
             question_id, question_state_data,
-            feconf.CURRENT_STATES_SCHEMA_VERSION, language_code, 0)
+            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0)
         question_services.add_question(owner_id, question)
         return question
 

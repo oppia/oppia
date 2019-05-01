@@ -152,13 +152,11 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 # this version number must be changed.
 CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 
-# NOTE TO DEVELOPERS: This should be in sync with the constant with the same
-# name in constants.js.
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATES_SCHEMA_VERSION = 28
+CURRENT_STATE_SCHEMA_VERSION = 27
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
