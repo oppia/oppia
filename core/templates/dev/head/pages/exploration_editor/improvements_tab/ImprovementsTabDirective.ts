@@ -18,8 +18,7 @@
  */
 
 oppia.directive('improvementsTab', [
-  'UserService', 'UrlInterpolationService',
-  function(UserService, UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -27,10 +26,10 @@ oppia.directive('improvementsTab', [
         '/pages/exploration_editor/improvements_tab/' +
         'improvements_tab_directive.html'),
       controller: [
-        '$q', '$scope', '$timeout', 'ImprovementCardService',
+        '$q', '$scope', '$timeout', 'ImprovementCardService', 'UserService',
         'FEEDBACK_IMPROVEMENT_CARD_TYPE', 'SUGGESTION_IMPROVEMENT_CARD_TYPE',
         function(
-            $q, $scope, $timeout, ImprovementCardService,
+            $q, $scope, $timeout, ImprovementCardService, UserService,
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
           var cards = [];
           var cardView = 'all';
