@@ -49,6 +49,7 @@ oppia.factory('ThreadDataService', [
     // Number of open threads that need action
     var openThreadsCount = 0;
 
+    // Helper which creates a function which compares two objects by a property.
     var compareBy = function(propertyName) {
       return function(lhs, rhs) {
         var lhsProp = lhs[propertyName];
@@ -69,7 +70,7 @@ oppia.factory('ThreadDataService', [
 
         var feedbackThreadBackendDicts = threadsData.feedback_thread_dicts;
         var suggestionThreadBackendDicts = threadsData.suggestion_thread_dicts;
-        var suggestionBackendDicts = suggestionsData.suggestions;
+        var suggestionObjectBackendDicts = suggestionsData.suggestions;
 
         threadsById = {};
 
@@ -82,22 +83,23 @@ oppia.factory('ThreadDataService', [
         });
 
         data.suggestionThreads = [];
-        suggestionBackendDicts.sort(compareBy('suggestion_id'));
+        suggestionObjectBackendDicts.sort(compareBy('suggestion_id'));
         suggestionThreadBackendDicts.sort(compareBy('thread_id'));
         for (var i = 0; i < suggestionThreadBackendDicts.length; ++i) {
-          var suggestionBackendDict = suggestionBackendDicts[i];
+          var suggestionObjectBackendDict = suggestionObjectBackendDicts[i];
           var suggestionThreadBackendDict = suggestionThreadBackendDicts[i];
 
           // Error-handling for any missing data. Both dicts are sorted by id,
           // so we check here that each pair of dicts refers to the same id,
           // otherwise, we skip to another pair after logging an error.
-          var hasSuggestionObject = (suggestionBackendDict !== undefined);
+          var hasSuggestionObject = (suggestionObjectBackendDict !== undefined);
           var hasSuggestionThread = (suggestionThreadBackendDict !== undefined);
+
           if (hasSuggestionObject && !hasSuggestionThread) {
             $log.error(
               'Suggestion Object with id "' +
-              suggestionBackendDict.suggestion_id + '" has no associated ' +
-              'Suggestion Thread in the backend.');
+              suggestionObjectBackendDict.suggestion_id + '" has no ' +
+              'associated Suggestion Thread in the backend.');
             break;
           } else if (!hasSuggestionObject && hasSuggestionThread) {
             $log.error(
@@ -106,7 +108,7 @@ oppia.factory('ThreadDataService', [
               'Suggestion Object in the backend.');
             break;
           } else if (hasSuggestionObject && hasSuggestionThread) {
-            var suggestionId = suggestionBackendDict.suggestion_id;
+            var suggestionId = suggestionObjectBackendDict.suggestion_id;
             var threadId = suggestionThreadBackendDict.thread_id;
 
             if (suggestionId !== threadId) {
@@ -114,7 +116,7 @@ oppia.factory('ThreadDataService', [
                 $log.error(
                   'Suggestion Object with id "' + suggestionId + '" has no ' +
                   'associated Suggestion Thread in the backend.');
-                suggestionBackendDicts.splice(i, 1);
+                suggestionObjectBackendDicts.splice(i, 1);
               } else {
                 $log.error(
                   'Suggestion Thread with id "' + threadId + '" has no ' +
@@ -122,15 +124,16 @@ oppia.factory('ThreadDataService', [
                 suggestionThreadBackendDicts.splice(i, 1);
               }
               // Try again after removing the mismatched element since there
-              // still might be valid suggestion data available.
+              // still might be valid suggestion data left.
               --i;
               continue;
             }
           }
+          // Error handling done; the dicts are safe to use.
 
           var suggestionThread =
             SuggestionThreadObjectFactory.createFromBackendDicts(
-              suggestionThreadBackendDict, suggestionBackendDict);
+              suggestionThreadBackendDict, suggestionObjectBackendDict);
           threadsById[suggestionThread.threadId] = suggestionThread;
           data.suggestionThreads.push(suggestionThread);
         }
@@ -184,7 +187,7 @@ oppia.factory('ThreadDataService', [
         });
       },
       addNewMessage: function(
-          threadId, newMessage, newStatus, successCallback, errorCallback) {
+          threadId, newMessage, newStatus, onSuccess, onFailure) {
         var thread = threadsById[threadId];
         var oldStatus = thread.status;
 
@@ -201,12 +204,12 @@ oppia.factory('ThreadDataService', [
           }
           fetchMessages(threadId);
 
-          if (successCallback) {
-            successCallback();
+          if (onSuccess) {
+            onSuccess();
           }
         }, function() {
-          if (errorCallback) {
-            errorCallback();
+          if (onFailure) {
+            onFailure();
           }
         });
       },
