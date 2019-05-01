@@ -104,11 +104,6 @@ class ConfigProperty(object):
     - whitelisted_email_senders.
     """
 
-    def refresh_default_value(self, default_value):
-        """Refreshes the configuration property to the default value."""
-
-        pass
-
     def __init__(self, name, schema, description, default_value):
         if Registry.get_config_property(name):
             raise Exception('Property with name %s already exists' % name)
