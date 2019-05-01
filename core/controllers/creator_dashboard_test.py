@@ -263,6 +263,17 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
         self.assertEqual(user_model.num_ratings, 1)
         self.assertEqual(user_model.average_ratings, 3)
+
+        def _mock_get_last_week_dashboard_stats(user_id):
+            return {'date1': 'stats1', 'date2': 'stats2'}
+
+        # 'last_week_stats' is None if 'get_last_week_dashboard_stats()' returns
+        # more than one key-value pair.
+        with self.swap(
+            user_services, 'get_last_week_dashboard_stats',
+            _mock_get_last_week_dashboard_stats):
+            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+            self.assertIsNone(response['last_week_stats'])
         self.logout()
 
     def test_multiple_plays_and_ratings_for_single_exploration(self):
@@ -679,7 +690,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['subscribers_list']), 0)
 
-    def test_get_topic_summary_dicts(self):
+    def test_get_topic_summary_dicts_with_new_structure_players_enabled(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
@@ -694,6 +705,14 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(response['topic_summary_dicts'][0]['name'], 'Name')
             self.assertEqual(
                 response['topic_summary_dicts'][0]['id'], 'topic_id')
+        self.logout()
+
+    def test_get_no_topic_summary_dicts_with_new_structure_players_disabled(
+            self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+            self.assertIsNone(response.get('topic_summary_dicts'))
         self.logout()
 
     def test_can_update_display_preference(self):
