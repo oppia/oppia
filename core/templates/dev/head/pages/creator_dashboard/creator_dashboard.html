@@ -10,8 +10,6 @@
     GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = JSON.parse(
       '{{DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
-    GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
-      '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
     GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
       '{{DEFAULT_OBJECT_VALUES|js_string}}');
   </script>
@@ -363,7 +361,7 @@
       </div>
       <md-card class="oppia-subscription-card protractor-test-subscription-card"
                ng-repeat="subscriber in subscribersList | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending">
-        <a class="oppia-subscription-profile-link" href="/profile/<[subscriber.subscriber_username]>" target="_blank">
+        <a class="oppia-subscription-profile-link" href="/profile/<[subscriber.subscriber_username]>" target="_blank" rel="noopener">
           <img ng-src="<[subscriber.subscriber_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
           <span class="oppia-subscription-card-summary">
             <div style="margin-bottom: 5px; font-size: 17.5px;">
@@ -1075,6 +1073,7 @@
   <script src="/templates/dev/head/pages/state_editor/state_properties/StateHintsService.js"></script>
   <script src="/templates/dev/head/pages/state_editor/state_properties/StateSolutionService.js"></script>
   <script src="/templates/dev/head/pages/state_editor/state_properties/StateContentIdsToAudioTranslationsService.js"></script>
+  <script src="/templates/dev/head/pages/state_editor/state_properties/StateWrittenTranslationsService.js"></script>
 
   <script src="/templates/dev/head/components/state/AnswerGroupEditorDirective.js"></script>
   <script src="/templates/dev/head/components/state/HintEditorDirective.js"></script>
