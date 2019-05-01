@@ -430,6 +430,24 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
                 self.skill_id)
             self.logout()
 
+    def test_get_with_invalid_question_id_returns_404_status(self):
+        def _mock_get_question_by_id(unused_question_id, **unused_kwargs):
+            """Mocks '_get_question_by_id'. Returns None."""
+            return None
+
+        new_structure_editors_swap = self.swap(
+            constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True)
+        question_services_swap = self.swap(
+            question_services, 'get_question_by_id', _mock_get_question_by_id)
+
+        with new_structure_editors_swap, question_services_swap:
+            self.login(self.EDITOR_EMAIL)
+            self.get_json(
+                '%s/%s' % (
+                    feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
+                    self.question_id), expected_status_int=404)
+
+            self.logout()
 
     def test_delete_with_new_structures_disabled_returns_404_status(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
