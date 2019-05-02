@@ -27,11 +27,11 @@ oppia.constant(
   'RESOLVE_ISSUE_URL', '/resolveissuehandler/<exploration_id>');
 
 oppia.factory('PlaythroughIssuesBackendApiService', [
-  '$http', '$q', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',
+  '$http', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',
   'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
   'RESOLVE_ISSUE_URL',
   function(
-      $http, $q, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
+      $http, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
       UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
       RESOLVE_ISSUE_URL) {
     /** @type {PlaythroughIssue[]} */
@@ -61,7 +61,7 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
     return {
       fetchIssues: function(explorationId, explorationVersion) {
         if (cachedIssues !== null) {
-          return $q.resolve(cachedIssues);
+          return Promise.resolve(cachedIssues);
         } else {
           return $http.get(getFullIssuesUrl(explorationId), {
             params: {exp_version: explorationVersion},
@@ -86,7 +86,7 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
           return angular.equals(issue, issueToResolve);
         });
         if (issueIndex === -1) {
-          return $q.reject(
+          return Promise.reject(
             new Error('Attempting to resolve an issue which does not exist'));
         }
         return $http.post(getFullResolveIssueUrl(expId), {
