@@ -129,4 +129,5 @@ module.exports = function(config) {
     jsonFixturesPreprocessor: {
       variableName: '__fixtures__'
     }
-});
+  });
+};
