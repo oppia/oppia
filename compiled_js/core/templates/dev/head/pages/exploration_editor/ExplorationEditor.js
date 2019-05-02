@@ -102,7 +102,7 @@ oppia.controller('ExplorationEditor', [
                 $scope.currentUserIsModerator = explorationData.is_moderator;
                 $scope.currentUser = explorationData.user;
                 $scope.currentVersion = explorationData.version;
-                ExplorationRightsService.init(explorationData.rights.owner_names, explorationData.rights.editor_names, explorationData.rights.translator_names, explorationData.rights.viewer_names, explorationData.rights.status, explorationData.rights.cloned_from, explorationData.rights.community_owned, explorationData.rights.viewable_if_private);
+                ExplorationRightsService.init(explorationData.rights.owner_names, explorationData.rights.editor_names, explorationData.rights.voice_artist_names, explorationData.rights.viewer_names, explorationData.rights.status, explorationData.rights.cloned_from, explorationData.rights.community_owned, explorationData.rights.viewable_if_private);
                 UserEmailPreferencesService.init(explorationData.email_preferences.mute_feedback_notifications, explorationData.email_preferences.mute_suggestion_notifications);
                 if (GLOBALS.can_edit) {
                     EditabilityService.markEditable();

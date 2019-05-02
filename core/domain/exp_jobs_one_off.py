@@ -724,7 +724,7 @@ class InteractionCustomizationArgsValidationJob(
 class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):   
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExpRightsModel]
+        return [exp_models.ExplorationRightsModel]
 
     @staticmethod
     def map(item):
