@@ -17,7 +17,7 @@
  * feedback is enabled or not.
  */
 
-oppia.factory('PlayerCorrectnessFeedbackEnabledService', [function() {
+angular.module('explorationPlayerModule').factory('PlayerCorrectnessFeedbackEnabledService', [function() {
   var _correctnessFeedbackIsEnabled = false;
 
   var _init = function(correctnessFeedbackIsEnabled) {

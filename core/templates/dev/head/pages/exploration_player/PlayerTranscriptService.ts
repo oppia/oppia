@@ -20,7 +20,7 @@
 // are shown, what answers have been given, etc. Note that this service does
 // not maintain the currently-active card -- it's more like a log of what the
 // learner has 'discovered' so far.
-oppia.factory('PlayerTranscriptService', [
+angular.module('explorationPlayerModule').factory('PlayerTranscriptService', [
   '$log', 'StateCardObjectFactory', function($log, StateCardObjectFactory) {
     // Each element of this array represents a 'StateCard' domain object.
     //

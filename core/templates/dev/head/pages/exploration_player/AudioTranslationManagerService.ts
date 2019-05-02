@@ -17,7 +17,7 @@
  * being played or paused.
  */
 
-oppia.factory('AudioTranslationManagerService', [
+angular.module('explorationPlayerModule').factory('AudioTranslationManagerService', [
   function() {
     // Audio translations for the main content of a card at the top.
     var _contentAudioTranslations = null;

@@ -17,7 +17,7 @@
  * exploration.
  */
 
-oppia.factory('ExplorationRecommendationsService', [
+angular.module('explorationPlayerModule').factory('ExplorationRecommendationsService', [
   '$http', 'ContextService', 'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT',
   'PAGE_CONTEXT',
   function(

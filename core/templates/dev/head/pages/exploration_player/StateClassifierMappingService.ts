@@ -16,7 +16,7 @@
  * @fileoverview Services for mapping state names to classifier details.
  */
 
-oppia.factory('StateClassifierMappingService', [
+angular.module('explorationPlayerModule').factory('StateClassifierMappingService', [
   'ClassifierObjectFactory', function(ClassifierObjectFactory) {
     var stateClassifierMapping = null;
 

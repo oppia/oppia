@@ -17,7 +17,7 @@
  * used for audio translations.
  */
 
-oppia.factory('AudioTranslationLanguageService', [
+angular.module('explorationPlayerModule').factory('AudioTranslationLanguageService', [
   'BrowserCheckerService', 'LanguageUtilService',
   function(
       BrowserCheckerService, LanguageUtilService) {

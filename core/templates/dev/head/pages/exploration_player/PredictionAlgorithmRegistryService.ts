@@ -16,7 +16,7 @@
  * @fileoverview Service for mapping algorithmId to PredictionAlgorithmService.
  */
 
-oppia.factory('PredictionAlgorithmRegistryService', [
+angular.module('explorationPlayerModule').factory('PredictionAlgorithmRegistryService', [
   '$injector', function($injector) {
     /**
      * This mapping needs to be updated whenever a new prediction service needs

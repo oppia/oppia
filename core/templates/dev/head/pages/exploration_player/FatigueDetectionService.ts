@@ -16,7 +16,7 @@
  * @fileoverview Service for detecting spamming behavior from the learner.
  */
 
-oppia.factory('FatigueDetectionService', [
+angular.module('explorationPlayerModule').factory('FatigueDetectionService', [
   '$uibModal', 'UrlInterpolationService',
   function($uibModal, UrlInterpolationService) {
     // 4 submissions in under 10 seconds triggers modal.

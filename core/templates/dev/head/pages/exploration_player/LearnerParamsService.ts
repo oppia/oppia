@@ -17,7 +17,7 @@
  * learner.
  */
 
-oppia.factory('LearnerParamsService', [function() {
+angular.module('explorationPlayerModule').factory('LearnerParamsService', [function() {
   var _paramDict = {};
 
   return {

@@ -17,7 +17,7 @@
  * exploration.
  */
 
-oppia.factory('RefresherExplorationConfirmationModalService', [
+angular.module('explorationPlayerModule').factory('RefresherExplorationConfirmationModalService', [
   '$uibModal', 'ExplorationEngineService', 'UrlInterpolationService',
   'UrlService',
   function($uibModal, ExplorationEngineService, UrlInterpolationService,

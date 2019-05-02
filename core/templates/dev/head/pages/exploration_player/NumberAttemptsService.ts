@@ -17,7 +17,7 @@
  * within a card.
  */
 
-oppia.factory('NumberAttemptsService', [
+angular.module('explorationPlayerModule').factory('NumberAttemptsService', [
   function() {
     var numberAttempts = 0;
 

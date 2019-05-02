@@ -16,7 +16,7 @@
  * @fileoverview Service to extract image filenames in a State.
  */
 
-oppia.factory('ExtractImageFilenamesFromStateService', [
+angular.module('explorationPlayerModule').factory('ExtractImageFilenamesFromStateService', [
   'HtmlEscaperService', function(HtmlEscaperService) {
     var INTERACTION_TYPE_MULTIPLE_CHOICE = 'MultipleChoiceInput';
     var INTERACTION_TYPE_ITEM_SELECTION = 'ItemSelectionInput';

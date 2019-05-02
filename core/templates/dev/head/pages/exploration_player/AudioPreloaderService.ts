@@ -16,7 +16,7 @@
  * @fileoverview Service to preload audio into AssetsBackendApiService's cache.
  */
 
-oppia.factory('AudioPreloaderService', [
+angular.module('explorationPlayerModule').factory('AudioPreloaderService', [
   '$uibModal', 'AssetsBackendApiService', 'AudioTranslationLanguageService',
   'ComputeGraphService', 'ContextService',
   'LanguageUtilService', 'UrlInterpolationService',

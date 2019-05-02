@@ -16,7 +16,7 @@
  * @fileoverview Services for stats reporting.
  */
 
-oppia.constant('STATS_EVENT_TYPES', {
+angular.module('explorationPlayerModule').constant('STATS_EVENT_TYPES', {
   EVENT_TYPE_START_EXPLORATION: 'start',
   EVENT_TYPE_ACTUAL_START_EXPLORATION: 'actual_start',
   EVENT_TYPE_COMPLETE_EXPLORATION: 'complete',
@@ -27,7 +27,7 @@ oppia.constant('STATS_EVENT_TYPES', {
   EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP: 'leave_for_refresher_exp',
 });
 
-oppia.constant('STATS_REPORTING_URLS', {
+angular.module('explorationPlayerModule').constant('STATS_REPORTING_URLS', {
   ANSWER_SUBMITTED: '/explorehandler/answer_submitted_event/<exploration_id>',
   EXPLORATION_COMPLETED: (
     '/explorehandler/exploration_complete_event/<exploration_id>'),
@@ -45,7 +45,7 @@ oppia.constant('STATS_REPORTING_URLS', {
   STATS_EVENTS: '/explorehandler/stats_events/<exploration_id>'
 });
 
-oppia.factory('StatsReportingService', [
+angular.module('explorationPlayerModule').factory('StatsReportingService', [
   '$http', '$interval', 'ContextService', 'MessengerService',
   'PlaythroughService', 'SiteAnalyticsService', 'StopwatchObjectFactory',
   'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',

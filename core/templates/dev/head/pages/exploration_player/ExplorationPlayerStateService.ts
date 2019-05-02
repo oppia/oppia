@@ -17,7 +17,7 @@
  *  like engine service.
  */
 
-oppia.factory('ExplorationPlayerStateService', [
+angular.module('explorationPlayerModule').factory('ExplorationPlayerStateService', [
   '$log', '$q', 'ContextService', 'EditableExplorationBackendApiService',
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
   'ExplorationFeaturesService', 'NumberAttemptsService',

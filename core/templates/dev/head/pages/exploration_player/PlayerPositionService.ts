@@ -16,7 +16,7 @@
  * @fileoverview Service for keeping track of the learner's position.
  */
 
-oppia.factory('PlayerPositionService', [
+angular.module('explorationPlayerModule').factory('PlayerPositionService', [
   'PlayerTranscriptService', function(PlayerTranscriptService) {
     var displayedCardIndex = null;
     var onChangeCallback = null;

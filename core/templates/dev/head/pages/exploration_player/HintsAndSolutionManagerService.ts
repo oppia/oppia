@@ -16,7 +16,7 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
-oppia.factory('HintsAndSolutionManagerService', [
+angular.module('explorationPlayerModule').factory('HintsAndSolutionManagerService', [
   '$rootScope', '$timeout',
   'DELAY_FOR_HINT_FEEDBACK_MSEC', 'EVENT_NEW_CARD_AVAILABLE',
   'HINT_REQUEST_STRING_I18N_IDS', 'WAIT_FOR_FIRST_HINT_MSEC',

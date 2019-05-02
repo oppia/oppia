@@ -16,7 +16,7 @@
  * @fileoverview Service to preload image into AssetsBackendApiService's cache.
  */
 
-oppia.factory('ImagePreloaderService', [
+angular.module('explorationPlayerModule').factory('ImagePreloaderService', [
   '$q', '$uibModal', 'AssetsBackendApiService', 'ComputeGraphService',
   'ContextService', 'ExtractImageFilenamesFromStateService',
   'UrlInterpolationService',

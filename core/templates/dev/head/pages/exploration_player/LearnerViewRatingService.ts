@@ -16,7 +16,7 @@
  * @fileoverview Service for the rating functionality in the learner view.
  */
 
-oppia.factory('LearnerViewRatingService', [
+angular.module('explorationPlayerModule').factory('LearnerViewRatingService', [
   '$http', '$rootScope', 'ExplorationEngineService',
   function($http, $rootScope, ExplorationEngineService) {
     var explorationId = ExplorationEngineService.getExplorationId();

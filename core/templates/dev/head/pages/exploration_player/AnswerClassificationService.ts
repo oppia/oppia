@@ -20,12 +20,12 @@
 
 // NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
 // the corresponding classification constants defined in core.domain.exp_domain.
-oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit');
-oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match');
-oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier');
-oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
+angular.module('explorationPlayerModule').constant('EXPLICIT_CLASSIFICATION', 'explicit');
+angular.module('explorationPlayerModule').constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match');
+angular.module('explorationPlayerModule').constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier');
+angular.module('explorationPlayerModule').constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
 
-oppia.factory('AnswerClassificationService', [
+angular.module('explorationPlayerModule').factory('AnswerClassificationService', [
   'AlertsService', 'AnswerClassificationResultObjectFactory',
   'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'ENABLE_ML_CLASSIFIERS',

@@ -19,7 +19,7 @@
  * answer submission process.
  */
 
-oppia.factory('CurrentInteractionService', [
+angular.module('explorationPlayerModule').factory('CurrentInteractionService', [
   function() {
     var _submitAnswerFn = null;
     var _onSubmitFn = null;

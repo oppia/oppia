@@ -16,9 +16,9 @@
  * @fileoverview Utility service for the pretests for an exploration.
  */
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+angular.module('explorationPlayerModule').constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
-oppia.factory('PretestEngineService', [
+angular.module('explorationPlayerModule').factory('PretestEngineService', [
   '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'FocusManagerService',

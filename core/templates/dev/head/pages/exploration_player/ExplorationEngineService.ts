@@ -16,7 +16,7 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+angular.module('explorationPlayerModule').constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 // A service that provides a number of utility functions for JS used by
 // the player skin.
@@ -24,7 +24,7 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
-oppia.factory('ExplorationEngineService', [
+angular.module('explorationPlayerModule').factory('ExplorationEngineService', [
   '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
   'EditableExplorationBackendApiService', 'ExplorationHtmlFormatterService',
