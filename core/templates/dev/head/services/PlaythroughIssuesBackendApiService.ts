@@ -64,9 +64,7 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
           return Promise.resolve(cachedIssues);
         } else {
           return $http.get(getFullIssuesUrl(explorationId), {
-            params: {
-              exp_version: explorationVersion
-            }
+            params: {exp_version: explorationVersion},
           }).then(function(response) {
             var unresolvedIssueBackendDicts = response.data;
             cachedIssues = unresolvedIssueBackendDicts.map(
@@ -84,21 +82,18 @@ oppia.factory('PlaythroughIssuesBackendApiService', [
           });
       },
       resolveIssue: function(issueToResolve, expId, expVersion) {
+        var issueIndex = cachedIssues.findIndex(function(issue) {
+          return angular.equals(issue, issueToResolve);
+        });
+        if (issueIndex === -1) {
+          return Promise.reject(
+            new Error('Attempting to resolve an issue which does not exist'));
+        }
         return $http.post(getFullResolveIssueUrl(expId), {
           exp_issue_dict: issueToResolve.toBackendDict(),
           exp_version: expVersion
         }).then(function() {
-          var issueIndex = cachedIssues.findIndex(function(issue) {
-            return angular.equals(issue, issueToResolve);
-          });
-          if (issueIndex === -1) {
-            var invalidIssueError = new Error(
-              'An issue which was not fetched from the backend has been ' +
-              'resolved');
-            return Promise.reject(invalidIssueError);
-          } else {
-            cachedIssues.splice(issueIndex, 1);
-          }
+          cachedIssues.splice(issueIndex, 1);
         });
       },
     };

@@ -19,11 +19,11 @@
 oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
-  '$uibModal', 'ImprovementActionButtonObjectFactory',
+  '$rootScope', '$uibModal', 'ImprovementActionButtonObjectFactory',
   'PlaythroughIssuesService', 'UrlInterpolationService',
   'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
   function(
-      $uibModal, ImprovementActionButtonObjectFactory,
+      $rootScope, $uibModal, ImprovementActionButtonObjectFactory,
       PlaythroughIssuesService, UrlInterpolationService,
       PLAYTHROUGH_IMPROVEMENT_CARD_TYPE) {
     /**
@@ -33,30 +33,29 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
     var PlaythroughImprovementCard = function(issue) {
       var thisCard = this;
       var discardThisCard = function() {
+        thisCard._isDiscardButtonDisabled = true;
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/confirmation_modal_directive.html'),
           backdrop: true,
           controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.confirmationMessage =
-                'Are you sure you want to discard this card?';
+                'Are you sure you want to discard this issue?';
               $scope.confirmationButtonText = 'Discard';
               $scope.confirmationButtonClass = 'btn-danger';
-              $scope.action = function() {
-                $uibModalInstance.close();
-              };
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
+              $scope.action = $uibModalInstance.close;
+              $scope.cancel = $uibModalInstance.dismiss;
             }
           ]
-        }).result.then(function() {
-          // When Discard button is pressed...
-          PlaythroughIssuesService.resolveIssue(issue);
-          thisCard._isDiscarded = true;
-        }, function() {
+        }).result.then(function() {  // When Discard button is pressed...
+          PlaythroughIssuesService.resolveIssue(issue).then(function() {
+            // Force improvements tab to recreate all cards. Since this one will
+            // have been deleted by resolveIssue, it will not reappear.
+            $rootScope.$broadcast('refreshImprovementsTab');
+          });
+        }, function() {  // When Cancel button is pressed...
+          thisCard._isDiscardButtonDisabled = false;
         });
       };
 
@@ -64,13 +63,17 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       this._key = issue.issueType;
       /** @type {boolean} */
       this._isDiscarded = false;
+      /** @type {boolean} */
+      this._isDiscardButtonDisabled = false;
       /** @type {string} */
       this._title =
         PlaythroughIssuesService.renderIssueStatement(issue);
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Discard', discardThisCard, 'btn-danger'),
+          'Discard', discardThisCard, 'btn-danger', function() {
+            return thisCard._isDiscardButtonDisabled;
+          }),
       ];
       /** @type {{suggestions: string[], playthroughIds: string[]}} */
       this._directiveData = {
