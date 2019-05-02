@@ -31,7 +31,7 @@ oppia.directive('improvementsTab', [
         function(
             $scope, $timeout, ImprovementCardService, UserService,
             FEEDBACK_IMPROVEMENT_CARD_TYPE, SUGGESTION_IMPROVEMENT_CARD_TYPE) {
-          var DEFAULT_CARD_VIEW = 'all';
+          var DEFAULT_CARD_VIEW = 'open';
 
           var cardView = null;
           var cardViewFilters = {
