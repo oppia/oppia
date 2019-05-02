@@ -32,16 +32,6 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
      */
     var PlaythroughImprovementCard = function(issue) {
       var thisCard = this;
-
-      var onDiscardFulfilled = function() {
-        return PlaythroughIssuesService.resolveIssue(issue).then(function() {
-          thisCard._isDiscarded = true;
-        });
-      };
-      var onDiscardRejected = function(reason) {
-        thisCard._isDiscardButtonDisabled = false;
-        return Promise.reject(reason);
-      };
       var discardThisCard = function() {
         thisCard._isDiscardButtonDisabled = true;
         return $uibModal.open({
@@ -57,7 +47,15 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
               $scope.action = $uibModalInstance.close;
               $scope.cancel = $uibModalInstance.dismiss;
             }
-          ]}).result.then(onDiscardFulfilled, onDiscardRejected);
+          ]}).result.then(function() {
+            return PlaythroughIssuesService.resolveIssue(issue).then(
+              function() {
+                thisCard._isDiscarded = true;
+              });
+          }, function(rejectionReason) {
+            thisCard._isDiscardButtonDisabled = false;
+            return Promise.reject(rejectionReason);
+          });
       };
 
       /** @type {string} */
