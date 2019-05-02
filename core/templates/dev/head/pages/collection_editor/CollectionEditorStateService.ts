@@ -18,10 +18,10 @@
  * retrieving the collection, saving it, and listening for changes.
  */
 
-oppia.constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
-oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
+angular.module('collectionEditorModule').constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
+angular.module('collectionEditorModule').constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
 
-oppia.factory('CollectionEditorStateService', [
+angular.module('collectionEditorModule').factory('CollectionEditorStateService', [
   '$rootScope', 'AlertsService', 'CollectionObjectFactory',
   'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
   'EditableCollectionBackendApiService', 'UndoRedoService',

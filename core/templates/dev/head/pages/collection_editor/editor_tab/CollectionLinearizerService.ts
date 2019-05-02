@@ -18,7 +18,7 @@
  * retrieving the collection, saving it, and listening for changes.
  */
 
-oppia.factory('CollectionLinearizerService', [
+angular.module('collectionEditorModule').factory('CollectionLinearizerService', [
   'CollectionUpdateService',
   function(CollectionUpdateService) {
     var _getNextExplorationId = function(collection, completedExpIds) {
