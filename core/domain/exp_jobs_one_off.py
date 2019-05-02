@@ -720,3 +720,34 @@ class InteractionCustomizationArgsValidationJob(
         # Combine all values from multiple lists into a single list
         # for that error type.
         yield (key, list(set().union(*final_values)))
+
+class TranslationToVoiceArtistOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExpRightsModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+        
+        if item.translator_ids:
+            yield (item.id, translator_ids)
+
+    @staticmethod
+    def reduce(exp_id, translator_ids):
+        exp_rights_model = exp_models.ExpRightsModel.get_by_id(exp_id)
+        if exp_rights_model is None:
+            return
+        
+        exp_rights_model.voice_artist_ids = translator_ids
+        exp_rights_model.put()
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
+        if exp_summary_model is None:
+            return
+
+        exp_summary_model.voice_artist_ids = translator_ids
+        exp_summary_model.put()

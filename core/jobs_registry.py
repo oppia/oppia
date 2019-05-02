@@ -52,6 +52,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.CopyToNewDirectoryJob,
     exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob,
+    exp_jobs_one_off.TranslationToVoiceArtistOneOffJob,
     prod_validation_jobs_one_off.ProdValidationAuditOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
