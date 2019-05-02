@@ -31,8 +31,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
      * @param {PlaythroughIssue} issue - The issue this card is referring to.
      */
     var PlaythroughImprovementCard = function(issue) {
-      var that = this;
-      var discardThis = function() {
+      var thisCard = this;
+      var discardThisCard = function() {
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/confirmation_modal_directive.html'),
@@ -53,8 +53,10 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
             }
           ]
         }).result.then(function() {
+          // When Discard button is pressed...
           PlaythroughIssuesService.resolveIssue(issue);
-          that._isDiscarded = true;
+          thisCard._isDiscarded = true;
+        }, function() {
         });
       };
 
@@ -68,7 +70,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       /** @type {ImprovementActionButton[]} */
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
-          'Discard', discardThis, 'btn-danger'),
+          'Discard', discardThisCard, 'btn-danger'),
       ];
       /** @type {{suggestions: string[], playthroughIds: string[]}} */
       this._directiveData = {

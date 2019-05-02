@@ -1130,7 +1130,8 @@ class PlaythroughModel(base_models.BaseModel):
         Args:
             playthrough_ids: list(str). List of playthrough IDs to be deleted.
         """
-        instances = cls.get_multi(playthrough_ids)
+        instances = [
+            inst for inst in cls.get_multi(playthrough_ids) if inst is not None]
         cls.delete_multi(instances)
 
 
