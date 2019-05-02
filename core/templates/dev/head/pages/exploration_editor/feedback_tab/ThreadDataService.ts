@@ -87,27 +87,14 @@ oppia.factory('ThreadDataService', [
         suggestionThreadBackendDicts.sort(compareBy('thread_id'));
         for (var i = 0; i < suggestionThreadBackendDicts.length; ++i) {
           var suggestionObjectBackendDict = suggestionObjectBackendDicts[i];
+          var hasSuggestionObject = (suggestionObjectBackendDict !== undefined);
           var suggestionThreadBackendDict = suggestionThreadBackendDicts[i];
+          var hasSuggestionThread = (suggestionThreadBackendDict !== undefined);
 
           // Error-handling for any missing data. Both dicts are sorted by id,
           // so we check here that each pair of dicts refers to the same id,
           // otherwise, we skip to another pair after logging an error.
-          var hasSuggestionObject = (suggestionObjectBackendDict !== undefined);
-          var hasSuggestionThread = (suggestionThreadBackendDict !== undefined);
-
-          if (hasSuggestionObject && !hasSuggestionThread) {
-            $log.error(
-              'Suggestion Object with id "' +
-              suggestionObjectBackendDict.suggestion_id + '" has no ' +
-              'associated Suggestion Thread in the backend.');
-            break;
-          } else if (!hasSuggestionObject && hasSuggestionThread) {
-            $log.error(
-              'Suggestion Thread with id "' +
-              suggestionThreadBackendDict.thread_id + '" has no associated ' +
-              'Suggestion Object in the backend.');
-            break;
-          } else if (hasSuggestionObject && hasSuggestionThread) {
+          if (hasSuggestionObject && hasSuggestionThread) {
             var suggestionId = suggestionObjectBackendDict.suggestion_id;
             var threadId = suggestionThreadBackendDict.thread_id;
 
@@ -123,11 +110,23 @@ oppia.factory('ThreadDataService', [
                   'associated Suggestion Object in the backend.');
                 suggestionThreadBackendDicts.splice(i, 1);
               }
-              // Try again after removing the mismatched element since there
-              // still might be valid suggestion data left.
+              // Try again after removing the mismatched element; there still
+              // might be real pairs left in the arrays.
               --i;
               continue;
             }
+          } else if (hasSuggestionObject && !hasSuggestionThread) {
+            $log.error(
+              'Suggestion Object with id "' +
+              suggestionObjectBackendDict.suggestion_id + '" has no ' +
+              'associated Suggestion Thread in the backend.');
+            continue;
+          } else if (!hasSuggestionObject && hasSuggestionThread) {
+            $log.error(
+              'Suggestion Thread with id "' +
+              suggestionThreadBackendDict.thread_id + '" has no associated ' +
+              'Suggestion Object in the backend.');
+            continue;
           }
           // Error handling done; the dicts are safe to use.
 
@@ -167,22 +166,20 @@ oppia.factory('ThreadDataService', [
         return openThreadsCount;
       },
       createNewThread: function(newSubject, newText, successCallback) {
-        $http.post(THREAD_LIST_HANDLER_URL, {
+        return $http.post(THREAD_LIST_HANDLER_URL, {
           state_name: null,
           subject: newSubject,
           text: newText,
         }).then(function() {
           openThreadsCount += 1;
-          fetchThreads();
-          if (successCallback) {
-            successCallback();
-          }
-        }, function() {
+          return fetchThreads();
+        }).then(successCallback, function(rejectionReason) {
           AlertsService.addWarning('Error creating new thread.');
+          return $q.reject(rejectionReason);
         });
       },
       markThreadAsSeen: function(threadId) {
-        $http.post(FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
+        return $http.post(FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
           thread_id: threadId
         });
       },
@@ -202,37 +199,20 @@ oppia.factory('ThreadDataService', [
           } else if (newStatus === THREAD_STATUS_OPEN) {
             openThreadsCount += 1;
           }
-          fetchMessages(threadId);
-
-          if (onSuccess) {
-            onSuccess();
-          }
-        }, function() {
-          if (onFailure) {
-            onFailure();
-          }
-        });
+          return fetchMessages(threadId);
+        }).then(onSuccess, onFailure);
       },
       resolveSuggestion: function(
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
           onSuccess, onFailure) {
-        if (action !== ACTION_ACCEPT_SUGGESTION) {
-          commitMsg = null;
-        }
         return $http.put(SUGGESTION_ACTION_HANDLER_URL + threadId, {
           action: action,
           review_message: reviewMsg,
-          commit_message: commitMsg,
+          commit_message: (
+            action === ACTION_ACCEPT_SUGGESTION) ? commitMsg : null,
         }).then(function() {
           openThreadsCount -= 1;
-          if (onSuccess) {
-            onSuccess();
-          }
-        }, function() {
-          if (onFailure) {
-            onFailure();
-          }
-        });
+        }).then(onSuccess, onFailure);
       }
     };
   }
