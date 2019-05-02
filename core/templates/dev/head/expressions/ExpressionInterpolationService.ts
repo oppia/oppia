@@ -18,7 +18,7 @@
 
 require('components/forms/ConvertHtmlToUnicodeFilter.ts');
 require('expressions/ExpressionEvaluatorService.ts');
-require('expressions/ExpressionParserService.ts');
+require('expressions/ExpressionParserService.js');
 require('expressions/ExpressionSyntaxTreeService.ts');
 require('services/HtmlEscaperService.ts');
 

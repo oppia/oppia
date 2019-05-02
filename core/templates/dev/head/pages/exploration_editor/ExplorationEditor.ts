@@ -84,7 +84,7 @@ require('filters/UnderscoresToCamelCaseFilter.ts');
 require('filters/WrapTextWithEllipsisFilter.ts');
 require('pages/exploration_editor/MarkAllAudioAndTranslationsAsNeedingUpdateController.ts');
 require('pages/exploration_editor/statistics_tab/BarChartDirective.ts');
-require('pages/suggestion_editor/ShowSuggestionModalForEditorView.js') ;
+require('pages/suggestion_editor/ShowSuggestionModalForEditorView.ts');
 //^^^ this block of requires should be removed ^^^
 
 require('components/VersionDiffVisualizationDirective.ts');

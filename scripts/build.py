@@ -1251,10 +1251,10 @@ def build():
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
-    if not options.enable_watcher:
-        compile_typescript_files('.')
-    else:
-        compile_typescript_files_continuously('.')
+    #if not options.enable_watcher:
+        #compile_typescript_files('.')
+    #else:
+        #compile_typescript_files_continuously('.')
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.

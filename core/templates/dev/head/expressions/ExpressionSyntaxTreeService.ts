@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('expressions/ExpressionParserService.ts');
+require('expressions/ExpressionParserService.js');
 
 oppia.factory('ExpressionSyntaxTreeService', [
   '$log', 'ExpressionParserService', 'PARAMETER_TYPES',

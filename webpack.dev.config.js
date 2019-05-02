@@ -25,6 +25,14 @@ module.exports = {
   },
   entry: commonWebpackConfig.entries,
   plugins: commonWebpackConfig.plugins,
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+      }
+    ]
+  },
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'core/templates/dev/head/dist')

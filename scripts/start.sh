@@ -73,7 +73,7 @@ for arg in "$@"; do
   if [ "$arg" == "--save_datastore" ]; then
     CLEAR_DATASTORE_ARG=""
   fi
-  if [ "$arg" == "--enable_console" ]; then
+  if [ "$arg" == "--enable_console" ]; then	
     ENABLE_CONSOLE_ARG="--enable_console=true"
   fi
   # Used to emulate running Oppia in a production environment.
