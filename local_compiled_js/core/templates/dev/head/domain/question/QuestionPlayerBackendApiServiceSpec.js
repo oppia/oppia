@@ -21,7 +21,7 @@ describe('Question Player backend Api service', function () {
     var $rootScope = null;
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-    beforeEach(inject(function ($injector) {
+    beforeEach(angular.mock.inject(function ($injector) {
         QuestionPlayerBackendApiService = $injector.get('QuestionPlayerBackendApiService');
         $httpBackend = $injector.get('$httpBackend');
         $rootScope = $injector.get('$rootScope');

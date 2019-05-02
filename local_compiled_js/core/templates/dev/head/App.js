@@ -87,9 +87,9 @@ oppia.constant('LOGOUT_URL', '/logout');
 // page visited.
 oppia.constant('ENABLE_PROMO_BAR', true);
 oppia.config([
-    '$compileProvider', '$httpProvider', '$interpolateProvider',
-    '$locationProvider', '$cookiesProvider',
-    function ($compileProvider, $httpProvider, $interpolateProvider, $locationProvider, $cookiesProvider) {
+    '$compileProvider', '$cookiesProvider', '$httpProvider',
+    '$interpolateProvider', '$locationProvider',
+    function ($compileProvider, $cookiesProvider, $httpProvider, $interpolateProvider, $locationProvider) {
         // This improves performance by disabling debug data. For more details,
         // see https://code.angularjs.org/1.5.5/docs/guide/production
         $compileProvider.debugInfoEnabled(false);

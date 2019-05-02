@@ -16,12 +16,14 @@
  */
 describe('States object factory', function () {
     beforeEach(angular.mock.module('oppia'));
+    var oldValueForNewStateTemplate = null;
     describe('StatesObjectFactory', function () {
         var scope, sof, ssof, statesDict, statesWithAudioDict, atof;
         beforeEach(angular.mock.inject(function ($injector) {
             ssof = $injector.get('StatesObjectFactory');
             sof = $injector.get('StateObjectFactory');
             atof = $injector.get('AudioTranslationObjectFactory');
+            oldValueForNewStateTemplate = constants.NEW_STATE_TEMPLATE;
             constants.NEW_STATE_TEMPLATE = {
                 classifier_model_id: null,
                 content: {
@@ -286,6 +288,9 @@ describe('States object factory', function () {
                     }
                 }
             };
+        }));
+        afterEach(inject(function () {
+            constants.NEW_STATE_TEMPLATE = oldValueForNewStateTemplate;
         }));
         it('should create a new state given a state name', function () {
             var newStates = ssof.createFromBackendDict(statesDict);

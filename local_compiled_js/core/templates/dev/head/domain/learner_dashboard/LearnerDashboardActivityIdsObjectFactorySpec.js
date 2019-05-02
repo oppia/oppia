@@ -16,18 +16,19 @@
  */
 describe('Learner dashboard activity ids object factory', function () {
     var LearnerDashboardActivityIdsObjectFactory = null;
+    var learnerDashboardActivityIdsDict = null;
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.inject(function ($injector) {
         LearnerDashboardActivityIdsObjectFactory = $injector.get('LearnerDashboardActivityIdsObjectFactory');
+        learnerDashboardActivityIdsDict = {
+            incomplete_exploration_ids: ['0', '1'],
+            incomplete_collection_ids: ['2', '3'],
+            completed_exploration_ids: ['4', '5'],
+            completed_collection_ids: ['6', '7'],
+            exploration_playlist_ids: ['8', '9'],
+            collection_playlist_ids: ['10', '11']
+        };
     }));
-    var learnerDashboardActivityIdsDict = {
-        incomplete_exploration_ids: ['0', '1'],
-        incomplete_collection_ids: ['2', '3'],
-        completed_exploration_ids: ['4', '5'],
-        completed_collection_ids: ['6', '7'],
-        exploration_playlist_ids: ['8', '9'],
-        collection_playlist_ids: ['10', '11']
-    };
     it('should check if activity id is present among learner dashboard ' +
         ' activity ids', function () {
         var learnerDashboardActivityIds = (LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(learnerDashboardActivityIdsDict));
@@ -55,16 +56,16 @@ describe('Learner dashboard activity ids object factory', function () {
     it('should remove exploration from learner playlist', function () {
         var learnerDashboardActivityIds = (LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(learnerDashboardActivityIdsDict));
         learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist('9');
-        expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(['8', '12', '13']);
+        expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(['8']);
         learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist('8');
-        expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(['12', '13']);
+        expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual([]);
     });
     it('should remove collection from learner playlist', function () {
         var learnerDashboardActivityIds = (LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(learnerDashboardActivityIdsDict));
         learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist('11');
-        expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(['10', '12', '13']);
+        expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(['10']);
         learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist('10');
-        expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(['12', '13']);
+        expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual([]);
     });
     it('should fetch the learner dashboard activity ids domain object from the ' +
         ' backend summary dict', function () {
