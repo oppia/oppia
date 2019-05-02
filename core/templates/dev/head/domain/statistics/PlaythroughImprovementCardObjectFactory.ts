@@ -47,16 +47,16 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
               $scope.action = $uibModalInstance.close;
               $scope.cancel = $uibModalInstance.dismiss;
             }
-          ]}).result.then(
+          ],
+        }).result.then(function() {
+          return PlaythroughIssuesService.resolveIssue(issue).then(
             function() {
-              return PlaythroughIssuesService.resolveIssue(issue).then(
-                function() {
-                  thisCard._isDiscarded = true;
-                });
-            }, function(rejectionReason) {
-              thisCard._isDiscardButtonDisabled = false;
-              return Promise.reject(rejectionReason);
+              thisCard._isDiscarded = true;
             });
+        }, function(rejectionReason) {
+          thisCard._isDiscardButtonDisabled = false;
+          return Promise.reject(rejectionReason);
+        });
       };
 
       /** @type {string} */
