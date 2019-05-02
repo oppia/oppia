@@ -148,43 +148,42 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     describe('Discard Action Button', function() {
       beforeEach(angular.mock.inject(function($injector) {
         this.$uibModal = $injector.get('$uibModal');
+        this.resolveIssue = spyOn(this.PlaythroughIssuesService, 'resolveIssue')
+          .and.returnValue(Promise.resolve());
       }));
 
       it('marks the card as resolved after confirmation', function(done) {
         var card = this.card;
         var issue = this.issue;
-        var discardActionButton = card.getActionButtons()[0];
-        var resolveIssueSpy =
-          spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.stub();
-
-        spyOn(this.$uibModal, 'open').and.returnValue({
-          result: Promise.resolve(), // Returned when confirm button is pressed.
-        });
+        var resolveIssueSpy = this.resolveIssueSpy;
+        spyOn(this.$uibModal, 'open')
+          .and.returnValue({result: Promise.resolve('closed')});
 
         expect(card.isOpen()).toBe(true);
-        discardActionButton.execute().then(function() {
+        var discardActionButton = card.getActionButtons()[0];
+        var executeDonePromise = discardActionButton.execute();
+
+        executeDonePromise.then(function() {
           expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
           expect(card.isOpen()).toBe(false);
           done();
         }, function() {
-          done.fail('dismiss button unexpectedly failed.');
+          done.fail('Card should have been discarded, but was left alone');
         });
       });
 
       it('keeps the card after cancel', function(done) {
         var card = this.card;
-        var issue = this.issue;
-        var discardActionButton = card.getActionButtons()[0];
-        var resolveIssueSpy =
-          spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.stub();
-
-        spyOn(this.$uibModal, 'open').and.returnValue({
-          result: Promise.reject(), // Returned when cancel button is pressed.
-        });
+        var resolveIssueSpy = this.resolveIssueSpy;
+        spyOn(this.$uibModal, 'open')
+          .and.returnValue({result: Promise.reject('dismissed')});
 
         expect(card.isOpen()).toBe(true);
-        discardActionButton.execute().then(function() {
-          done.fail('dismiss button unexpectedly succeeded.');
+        var discardActionButton = card.getActionButtons()[0];
+        var executeDonePromise = discardActionButton.execute();
+
+        executeDonePromise.then(function() {
+          done.fail('Card should have been left alone, but was discarded');
         }, function() {
           expect(resolveIssueSpy).not.toHaveBeenCalled();
           expect(card.isOpen()).toBe(true);

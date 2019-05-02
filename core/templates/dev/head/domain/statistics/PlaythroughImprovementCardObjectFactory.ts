@@ -50,6 +50,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
           ]
         }).result.then(function() { // When Discard button is pressed...
           PlaythroughIssuesService.resolveIssue(issue).then(function() {
+            thisCard._isDiscarded = true;
             // Force improvements tab to recreate all cards. Since this one will
             // have been deleted by resolveIssue, it will not reappear.
             $rootScope.$broadcast('refreshImprovementsTab');
