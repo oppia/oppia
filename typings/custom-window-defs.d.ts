@@ -1,3 +1,5 @@
+// Any property defined on window needs to be added here if is not
+// present on the type of window.
 interface Window {
     BlobBuilder?: any;
     CodeMirror?: any;

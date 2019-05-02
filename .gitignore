@@ -6,12 +6,15 @@ gae_runtime/*
 third_party/*
 assets/hashes.js
 backend_prod_files/*
+local_compiled_js/*
 core/templates/prod/*
 core/tests/.browserstack.env
+node_modules/*
 .coverage*
 .viminfo
 .vscode/*
 libpeerconnection.log
+tsc_output_log.txt
 uploads/*
 venv/
 *.db

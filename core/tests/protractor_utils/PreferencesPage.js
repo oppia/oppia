@@ -26,7 +26,9 @@ var PreferencesPage = function() {
   var feedbackMessageEmailsCheckbox = element(
     by.css('.protractor-test-feedback-message-email-checkbox'));
   var languageOptionsList = element.all(by.css('.select2-results'));
+  var navBar = element(by.css('.oppia-navbar-dropdown-toggle'));
   var pageHeader = element(by.css('.protractor-test-preferences-title'));
+  var preferencesLink = element(by.css('.protractor-test-preferences-link'));
   var preferredAudioLanguageSelector = element(
     by.css('.protractor-test-preferred-audio-language-selector'));
   var selectedAudioLanguageElement = preferredAudioLanguageSelector.element(
@@ -34,6 +36,13 @@ var PreferencesPage = function() {
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
   var systemLanguageSelector = element.all(
     by.css('.protractor-test-system-language-selector')).first();
+  var userBioElement = element(by.css('.protractor-test-user-bio'));
+
+  this.editUserBio = function(bio) {
+    userBioElement.sendKeys(bio);
+    navBar.click();
+    preferencesLink.click();
+  };
 
   this.get = function() {
     browser.get(USER_PREFERENCES_URL);
@@ -68,6 +77,13 @@ var PreferencesPage = function() {
         });
       });
     correctOptions.first().click();
+  };
+
+  this.setUserBio = function(bio) {
+    userBioElement.clear();
+    userBioElement.sendKeys(bio);
+    navBar.click();
+    preferencesLink.click();
   };
 
   this.isFeedbackEmailsCheckboxSelected = function() {
@@ -112,6 +128,10 @@ var PreferencesPage = function() {
 
   this.expectSubscriptionCountToEqual = function(value) {
     expect(subscriptions.count()).toEqual(value);
+  };
+
+  this.expectUserBioToBe = function(bio) {
+    expect(userBioElement.getAttribute('value')).toMatch(bio);
   };
 };
 

@@ -187,6 +187,9 @@ body {
   width: 100%;
 }
 
+.oppia-search-bar-dropdown-menu {
+  width: 170px;
+}
 .oppia-skip-to-content {
   left: -10000px;
   padding: 6px;
@@ -346,6 +349,15 @@ p {
   text-align: left;
   word-spacing: 0;
   word-wrap: break-word;
+}
+
+/* The properties should be in sync with the p tag so that we have consistent
+   spacing between the list, above the first bullet (point) and at the end of last
+   bullet (point). Line height has a value 1.846 and not 1.2 because all p tags
+   have value 1.846 and it comes from third party due to narrower css there.*/
+ul, ol {
+  line-height: 1.846;
+  margin-bottom: 18px;
 }
 
 p:last-child {
