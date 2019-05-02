@@ -148,22 +148,23 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     describe('Discard Action Button', function() {
       beforeEach(angular.mock.inject(function($injector) {
         this.$uibModal = $injector.get('$uibModal');
-        this.resolveIssue = spyOn(this.PlaythroughIssuesService, 'resolveIssue')
-          .and.returnValue(Promise.resolve());
       }));
 
       it('marks the card as resolved after confirmation', function(done) {
-        var card = this.card;
         var issue = this.issue;
-        var resolveIssueSpy = this.resolveIssueSpy;
-        spyOn(this.$uibModal, 'open')
-          .and.returnValue({result: Promise.resolve('closed')});
+        var resolveIssueSpy =
+          spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.returnValue(
+            Promise.resolve()
+          );
+        spyOn(this.$uibModal, 'open').and.returnValue({
+          result: Promise.resolve('closed')
+        });
 
+        var card = this.card;
         expect(card.isOpen()).toBe(true);
-        var discardActionButton = card.getActionButtons()[0];
-        var executeDonePromise = discardActionButton.execute();
 
-        executeDonePromise.then(function() {
+        var discardActionButton = card.getActionButtons()[0];
+        discardActionButton.execute().then(function() {
           expect(resolveIssueSpy).toHaveBeenCalledWith(issue);
           expect(card.isOpen()).toBe(false);
           done();
@@ -173,16 +174,19 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
       });
 
       it('keeps the card after cancel', function(done) {
+        var resolveIssueSpy =
+          spyOn(this.PlaythroughIssuesService, 'resolveIssue').and.returnValue(
+            Promise.resolve()
+          );
+        spyOn(this.$uibModal, 'open').and.returnValue({
+          result: Promise.reject('dismissed')
+        });
+
         var card = this.card;
-        var resolveIssueSpy = this.resolveIssueSpy;
-        spyOn(this.$uibModal, 'open')
-          .and.returnValue({result: Promise.reject('dismissed')});
-
         expect(card.isOpen()).toBe(true);
-        var discardActionButton = card.getActionButtons()[0];
-        var executeDonePromise = discardActionButton.execute();
 
-        executeDonePromise.then(function() {
+        var discardActionButton = card.getActionButtons()[0];
+        discardActionButton.execute().then(function() {
           done.fail('Card should have been left alone, but was discarded');
         }, function() {
           expect(resolveIssueSpy).not.toHaveBeenCalled();

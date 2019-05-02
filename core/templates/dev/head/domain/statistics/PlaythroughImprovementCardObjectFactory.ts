@@ -19,11 +19,11 @@
 oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
-  '$rootScope', '$uibModal', 'ImprovementActionButtonObjectFactory',
+  '$uibModal', 'ImprovementActionButtonObjectFactory',
   'PlaythroughIssuesService', 'UrlInterpolationService',
   'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
   function(
-      $rootScope, $uibModal, ImprovementActionButtonObjectFactory,
+      $uibModal, ImprovementActionButtonObjectFactory,
       PlaythroughIssuesService, UrlInterpolationService,
       PLAYTHROUGH_IMPROVEMENT_CARD_TYPE) {
     /**
@@ -32,6 +32,16 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
      */
     var PlaythroughImprovementCard = function(issue) {
       var thisCard = this;
+
+      var onDiscardFulfilled = function() {
+        return PlaythroughIssuesService.resolveIssue(issue).then(function() {
+          thisCard._isDiscarded = true;
+        });
+      };
+      var onDiscardRejected = function(reason) {
+        thisCard._isDiscardButtonDisabled = false;
+        return Promise.reject(reason);
+      };
       var discardThisCard = function() {
         thisCard._isDiscardButtonDisabled = true;
         return $uibModal.open({
@@ -47,17 +57,7 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
               $scope.action = $uibModalInstance.close;
               $scope.cancel = $uibModalInstance.dismiss;
             }
-          ]
-        }).result.then(function() { // When Discard button is pressed...
-          PlaythroughIssuesService.resolveIssue(issue).then(function() {
-            thisCard._isDiscarded = true;
-            // Force improvements tab to recreate all cards. Since this one will
-            // have been deleted by resolveIssue, it will not reappear.
-            $rootScope.$broadcast('refreshImprovementsTab');
-          });
-        }, function() { // When Cancel button is pressed...
-          thisCard._isDiscardButtonDisabled = false;
-        });
+          ]}).result.then(onDiscardFulfilled, onDiscardRejected);
       };
 
       /** @type {string} */
