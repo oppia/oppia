@@ -16,25 +16,24 @@
  * @fileoverview Controller for the Tutor Card.
  */
 
-angular.module('tutorCardModule')
-  .animation('.conversation-skin-responses-animate-slide', function() {
-    return {
-      removeClass: function(element, className, done) {
-        if (className !== 'ng-hide') {
-          done();
-          return;
-        }
-        element.hide().slideDown(400, done);
-      },
-      addClass: function(element, className, done) {
-        if (className !== 'ng-hide') {
-          done();
-          return;
-        }
-        element.slideUp(400, done);
+angular.module('tutorCardModule').animation('.conversation-skin-responses-animate-slide', function() {
+  return {
+    removeClass: function(element, className, done) {
+      if (className !== 'ng-hide') {
+        done();
+        return;
       }
-    };
-  });
+      element.hide().slideDown(400, <(this: HTMLElement) => void>done);
+    },
+    addClass: function(element, className, done) {
+      if (className !== 'ng-hide') {
+        done();
+        return;
+      }
+      element.slideUp(400, <(this: HTMLElement) => void>done);
+    }
+  };
+});
 
 angular.module('tutorCardModule').directive('tutorCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -47,8 +46,8 @@ angular.module('tutorCardModule').directive('tutorCard', [
         startCardChangeAnimation: '=',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/tutor-card/' +
-        'tutor-card.directive.html'),
+        '/pages/exploration_player/' +
+        'tutor_card_directive.html'),
       controller: [
         '$scope', '$timeout', '$rootScope', '$anchorScroll', '$location',
         'ExplorationEngineService', 'UrlService',
@@ -222,3 +221,4 @@ angular.module('tutorCardModule').directive('tutorCard', [
     };
   }
 ]);
+
