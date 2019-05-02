@@ -48,13 +48,13 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
               $scope.cancel = $uibModalInstance.dismiss;
             }
           ]
-        }).result.then(function() {  // When Discard button is pressed...
+        }).result.then(function() { // When Discard button is pressed...
           PlaythroughIssuesService.resolveIssue(issue).then(function() {
             // Force improvements tab to recreate all cards. Since this one will
             // have been deleted by resolveIssue, it will not reappear.
             $rootScope.$broadcast('refreshImprovementsTab');
           });
-        }, function() {  // When Cancel button is pressed...
+        }, function() { // When Cancel button is pressed...
           thisCard._isDiscardButtonDisabled = false;
         });
       };
