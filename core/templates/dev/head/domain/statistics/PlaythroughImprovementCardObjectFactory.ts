@@ -49,10 +49,9 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
             }
           ],
         }).result.then(function() {
-          return PlaythroughIssuesService.resolveIssue(issue).then(
-            function() {
-              thisCard._isDiscarded = true;
-            });
+          return PlaythroughIssuesService.resolveIssue(issue).then(function() {
+            thisCard._isDiscarded = true;
+          });
         }, function(rejectionReason) {
           thisCard._isDiscardButtonDisabled = false;
           return Promise.reject(rejectionReason);
