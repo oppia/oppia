@@ -2296,3 +2296,26 @@ class InteractionCustomizationArgsValidationJobTests(
             self,
             exp_jobs_one_off.InteractionCustomizationArgsValidationJob)
 
+'''class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        exp_jobs_one_off.TranslationToVoiceArtistOneOffJob]
+
+    EXP_ID = 'exp_id'
+
+    USERNAME_A = 'usernamea'
+    USERNAME_B = 'usernameb'
+    EMAIL_A = 'emaila@example.com'
+    EMAIL_B = 'emailb@example.com'
+
+    def setUp(self):
+        super(ExplorationContributorsSummaryOneOffJobTests, self).setUp()
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        self.signup(self.EMAIL_B, self.USERNAME_B)
+
+        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
+
+    def test_action_is_performed_when_translation_ids_list_exists(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id, title='Exploration Title 1')'''
+        
