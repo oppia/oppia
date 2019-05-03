@@ -54,7 +54,7 @@ def memoize(func):
             return key_locks[key]
 
     cache = {}
-    lock_for_cache = threading.Lock()
+    threadsafe_cache_access = threading.Lock()
     def get_from_cache(key, factory):
         """Returns and associates a factory-provided value to the given key if a
         value isn't associated to it yet. Otherwise, returns the pre-existing
@@ -84,10 +84,10 @@ def memoize(func):
                     t = threading.Thread(target=producer)
                     t.start()
                     t.join()
-                    with lock_for_cache:
+                    with threadsafe_cache_access:
                         cache[key] = value_container[0]
                     return value_container[0]
-        with lock_for_cache:
+        with threadsafe_cache_access:
             return cache[key]
 
     # In order to allow calls to functions with default arguments to use the
