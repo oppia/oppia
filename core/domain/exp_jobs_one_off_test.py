@@ -2296,9 +2296,9 @@ class InteractionCustomizationArgsValidationJobTests(
             self,
             exp_jobs_one_off.InteractionCustomizationArgsValidationJob)
 
-'''class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
+class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
-        exp_jobs_one_off.TranslationToVoiceArtistOneOffJob]
+        exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob]
 
     EXP_ID = 'exp_id'
 
@@ -2308,14 +2308,51 @@ class InteractionCustomizationArgsValidationJobTests(
     EMAIL_B = 'emailb@example.com'
 
     def setUp(self):
-        super(ExplorationContributorsSummaryOneOffJobTests, self).setUp()
+        super(TranslatorToVoiceArtistOneOffJobTests, self).setUp()
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.signup(self.EMAIL_B, self.USERNAME_B)
 
         self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
         self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
 
-    def test_action_is_performed_when_translation_ids_list_exists(self):
+    def test_action_is_performed_when_translator_ids_exists(self):
+        """Test translator_ids are migrated to voice_artist_ids successfully"""
         exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.user_a_id, title='Exploration Title 1')'''
+            self.EXP_ID, self.user_a_id, title='Exploration Title 1')
+
+        rights_manager.create_new_exploration_rights(
+            exploration.id, self.user_a_id)
+        exp_rights_model = exp_models.ExplorationRightsModel.get(
+            exploration.id)
+        exp_rights_model.translator_ids = [self.user_b_id]
+        commit_message = 'Assign a translator for test'
+        commit_cmds = [{
+        'cmd': 'change_role',
+        'assignee_ids': self.user_b_id,
+        'new_role': 'translator'
+        }]
+        exp_rights_model.commit(self.user_a_id, commit_message, commit_cmds)
+
+        job_id = (
+            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.create_new())
+        exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        exp_rights_model_2 = exp_models.ExplorationRightsModel.get(
+            exploration.id)
+        self.assertEqual([], exp_rights_model_2.translator_ids)
+        self.assertEqual([self.user_b_id], exp_rights_model_2.voice_artist_ids)
         
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        exp_id = '100'
+        self.save_new_valid_exploration(exp_id, self.user_a_id)
+        exp_services.delete_exploration(self.user_a_id, exp_id)
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
+            check_error=True,
+            error_type=base_models.BaseModel.EntityNotFoundError,
+            error_msg='Entity for class ExpSummaryModel with id 100 not found',
+            function_to_be_called=exp_services.get_exploration_summary_by_id,
+            exp_id=exp_id)
