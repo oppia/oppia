@@ -1014,7 +1014,7 @@ class LintChecksManager(object):
             try:
                 # Use esprima to parse a JS or TS file.
                 parsed_js_and_ts_files[filepath] = esprima.parseScript(
-                    file_content, comment = True)
+                    file_content, comment=True)
             except Exception as e:
                 # Compile typescript file which has syntax not valid for JS
                 # file.
