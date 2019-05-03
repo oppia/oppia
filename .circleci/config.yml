@@ -38,8 +38,6 @@ jobs:
     steps:
       - checkout
       - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
       - run:
           name: Run lint tests
           command: |
@@ -94,12 +92,12 @@ workflows:
       - lint_tests:
           requires:
             - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - backend_tests:
-          requires:
-            - setup
+#      - frontend_tests:
+#          requires:
+#            - setup
+#      - backend_tests:
+#          requires:
+#            - setup
 notify:
   webhooks:
     # A list of hook hashes, containing the url field
