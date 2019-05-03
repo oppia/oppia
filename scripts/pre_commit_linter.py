@@ -383,8 +383,8 @@ class FileCache(object):
                 second element.
         """
         with open(filepath, mode) as f:
-            lines = tuple(f)
-        return ('\n'.join(lines), lines)
+            lines = f.readlines()
+        return (''.join(lines), tuple(lines))
 
 
 def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
