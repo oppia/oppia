@@ -75,16 +75,16 @@ def memoize(func):
         if key not in cache:
             with threadsafe_access(key):
                 if key not in cache:
-                    value = []
+                    container = [None]
                     def producer():
-                        """Assigns the factory's result to value."""
-                        value.push(factory())
+                        """Places factory result into the container."""
+                        container[0] = factory()
                     t = threading.Thread(target=producer)
                     t.start()
                     t.join()
                     with lock_for_cache:
-                        cache[key] = value[0]
-                    return value
+                        cache[key] = container[0]
+                    return container[0]
         with lock_for_cache:
             return cache[key]
 
