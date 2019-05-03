@@ -70,8 +70,8 @@ import threading
 import time
 
 # pylint: disable=relative-import
-import linter_utils
 import docstrings_checker
+import linter_utils
 # pylint: enable=relative-import
 
 # pylint: enable=wrong-import-order
