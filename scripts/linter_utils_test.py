@@ -27,12 +27,14 @@ import linter_utils
 class MemoizeTest(test_utils.GenericTestBase):
     """Tests for the memoize function."""
 
-    def test_memoize_returns_value(self):
+    def test_memoize_always_returns_value(self):
         @linter_utils.memoize
         def return_one():
             """Returns the integer 1."""
             return 1
 
+        self.assertEqual(return_one(), 1)
+        self.assertEqual(return_one(), 1)
         self.assertEqual(return_one(), 1)
 
     def test_memoize_with_args(self):
