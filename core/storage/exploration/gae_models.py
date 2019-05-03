@@ -171,6 +171,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to voiceover this exploration.
     voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 

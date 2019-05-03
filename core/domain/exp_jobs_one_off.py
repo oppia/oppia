@@ -728,20 +728,31 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
+        print("item", item)
         if item.deleted:
             return
         
-        if item.translator_ids:
-            yield (item.id, translator_ids)
+        if len(item.translator_ids) > 0:
+            yield (item.id, item.translator_ids)
 
     @staticmethod
     def reduce(exp_id, translator_ids):
-        exp_rights_model = exp_models.ExpRightsModel.get_by_id(exp_id)
+        print(type(translator_ids))
+        exp_rights_model = exp_models.ExplorationRightsModel.get_by_id(exp_id)
         if exp_rights_model is None:
             return
         
-        exp_rights_model.voice_artist_ids = translator_ids
-        exp_rights_model.put()
+        for translator_id in translator_ids:
+            exp_rights_model.voice_artist_ids = translator_ids
+            exp_rights_model.translator_ids = []
+            commit_message = 'Migrate from translator to voice artist'
+            commit_cmds = [{
+            'cmd': 'change_role',
+            'assignee_id': translator_id,
+            'old_role': 'translator',
+            'new_role': 'voice artist'
+            }]
+            exp_rights_model.commit('Admin', commit_message, commit_cmds)
 
         exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
         if exp_summary_model is None:
