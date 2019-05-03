@@ -2115,13 +2115,16 @@ class LintChecksManager(object):
             codeowner_filepath = '.github/CODEOWNERS'
             failed = False
             summary_messages = []
-            path_lines = []
             # Checks whether every pattern in the CODEOWNERS file matches at
             # least one dir/file.
             path_patterns = []
+            critical_file_section_found = False
+            imp_rules_in_critical_section = []
             for line_num, line in enumerate(FileCache.readlines(
                     codeowner_filepath)):
                 stripped_line = line.strip()
+                if '# Critical files' in line:
+                    critical_file_section_found = True
                 if stripped_line and stripped_line[0] != '#':
                     if '@' not in line:
                         print ('%s --> Pattern on line %s doesn\'t have'
@@ -2132,7 +2135,9 @@ class LintChecksManager(object):
                         line_in_concern = line.split('@')[0].strip()
                         # This is being populated for the important rules
                         # check.
-                        path_lines.append(line_in_concern)
+                        if critical_file_section_found:
+                            imp_rules_in_critical_section.append(
+                                line_in_concern)
                         # Adjustments to the dir paths in CODEOWNERS syntax
                         # for glob-style patterns to match correctly.
                         if line_in_concern.endswith('/'):
@@ -2234,31 +2239,45 @@ class LintChecksManager(object):
             # Checks that the most important rules/patterns are at the bottom
             # of the CODEOWNERS file.
 
-            # This list is populated by the boolean values resulted from
-            # matching the last lines of the CODEOWNERS file with the list of
-            # the important CODEOWNERS paths.
-            important_path_match_bool_list = ([
-                imp_path in path_lines[-1 * len(
-                    CODEOWNER_IMPORTANT_PATHS):]
-                for imp_path in CODEOWNER_IMPORTANT_PATHS])
-            # This condition checks that all the values in the boolean list are
-            # True. This ensures that the last 'n' lines of the CODEOWNERS file
-            # matches with the 'n'-element list of important CODEOWNER paths.
-            for index, bool_value in enumerate(
-                    important_path_match_bool_list):
-                if not bool_value:
-                    print ('%s --> Please ensure that the rule \'%s\' lies '
-                           'towards the bottom of the CODEOWNERS file since'
-                           ' it is an important rule.' % (
-                               codeowner_filepath,
-                               CODEOWNER_IMPORTANT_PATHS[index]))
-                    failed = True
+            # The following condition checks for extra rules in the critical
+            # files section in the .github/CODEOWNERS file.
+            if len(imp_rules_in_critical_section) > len(
+                    CODEOWNER_IMPORTANT_PATHS):
+                important_path_match_bool_list = ([
+                    imp_path in CODEOWNER_IMPORTANT_PATHS
+                    for imp_path in imp_rules_in_critical_section])
+                for index, bool_value in enumerate(
+                        important_path_match_bool_list):
+                    if not bool_value:
+                        print ('%s --> The rule \'%s\' is not an important '
+                               'rule. Please place it before the critical '
+                               'files section.' % (
+                                   codeowner_filepath,
+                                   imp_rules_in_critical_section[index]))
+                        failed = True
+            else:
+                important_path_match_bool_list = ([
+                    imp_path in imp_rules_in_critical_section
+                    for imp_path in CODEOWNER_IMPORTANT_PATHS])
+                # This condition checks that all the values in the boolean list
+                # are True. This ensures that the critical files of the
+                # CODEOWNERS file matches with the CODEOWNER_IMPORTANT_PATHS.
+                for index, bool_value in enumerate(
+                        important_path_match_bool_list):
+                    if not bool_value:
+                        print ('%s --> Please ensure that the rule \'%s\' lies '
+                               'towards the bottom of the CODEOWNERS file under'
+                               ' the critical files section since it is an '
+                               'important rule.' % (
+                                   codeowner_filepath,
+                                   CODEOWNER_IMPORTANT_PATHS[index]))
+                        failed = True
 
             if failed:
                 summary_message = '%s   CODEOWNERS file check failed' % (
                     _MESSAGE_TYPE_FAILED)
             else:
-                summary_message = '%s  CODEOWNERS file check passed' % (
+                summary_message = '%s   CODEOWNERS file check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
 
             summary_messages.append(summary_message)
