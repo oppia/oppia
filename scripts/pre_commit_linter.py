@@ -66,7 +66,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import threading
 import time
 
 # pylint: disable=relative-import
@@ -967,7 +966,7 @@ class LintChecksManager(object):
         for filepath in files_to_check:
             if self.verbose_mode_enabled:
                 print 'Validating and parsing %s file ...' % filepath
-            file_content = FileCache.read(filepath).decode('utf-8')
+            file_content = FileCache.read(filepath).decode(encoding='utf-8')
 
             try:
                 # Use esprima to parse a JS or TS file.
@@ -980,7 +979,7 @@ class LintChecksManager(object):
                     raise Exception(e)
                 compiled_js_filepath = self._compile_ts_file(filepath)
                 file_content = FileCache.read(compiled_js_filepath).decode(
-                    'utf-8')
+                    encoding='utf-8')
                 parsed_js_and_ts_files[filepath] = esprima.parseScript(
                     file_content)
 
