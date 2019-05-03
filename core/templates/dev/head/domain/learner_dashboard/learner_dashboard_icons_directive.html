@@ -19,7 +19,7 @@
    ng-if="belongsToLearnerPlaylist()"
    ng-click="removeFromLearnerPlaylist(getActivityId(), getActivityTitle(), getActivityType())"
    aria-hidden="true"
-   tooltip-enable="<[playlistTooltipIsEnabled]>"
+   tooltip-enable="{{playlistTooltipIsEnabled}}"
    ng-mouseleave="enablePlaylistTooltip()"
    uib-tooltip="{{'I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate}}"
    tooltip-placement="left">
