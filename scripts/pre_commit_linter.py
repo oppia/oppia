@@ -59,6 +59,7 @@ import ast
 import contextlib
 import fnmatch
 import glob
+import itertools
 import multiprocessing
 import os
 import re
@@ -592,6 +593,32 @@ class TagMismatchException(Exception):
     pass
 
 
+def stringify_func_call(func, *args, **kwargs):
+    """Creates a pretty-printed str of a function invocation."""
+    stringified_kwargs = ('%s=%s' for key, value in kwargs)
+    stringified_values = itertools.chain(args, stringified_kwargs)
+    return '%s(%s)' % (func.__name__, ', '.join(stringified_values))
+
+
+def print_exceptions_then_fail(method):
+    """Captures unexpected exceptions from methods and prints them before
+    setting the caller's failed property to True.
+    """
+    def exception_catcher(self, *args, **kwargs):
+        """Tries to return the method invocation or prints a caught
+        exception.
+        """
+        try:
+            return method(self, *args, **kwargs)
+        except Exception as e:
+            self.failed = True
+            print('%s has failed on instance %s due to: %r' % (
+                stringify_func_call(method, *args, **kwargs),
+                self.debug_str(),
+                e))
+    return exception_catcher
+
+
 class CustomHTMLParser(HTMLParser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
@@ -610,6 +637,11 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             'hr', 'img', 'input', 'link', 'meta',
             'param', 'source', 'track', 'wbr']
 
+    def debug_str(self):
+        return 'CustomHTMLParser(filepath=%s, file_lines=%s)' % (
+            self.filepath, self.file_lines)
+
+    @print_exceptions_then_fail
     def handle_starttag(self, tag, attrs):
         """Handle start tag of a HTML line."""
         line_number, column_number = self.getpos()
@@ -689,6 +721,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                 print ''
                 self.failed = True
 
+    @print_exceptions_then_fail
     def handle_endtag(self, tag):
         """Handle end tag of a HTML line."""
         line_number, _ = self.getpos()
