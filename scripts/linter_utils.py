@@ -77,7 +77,7 @@ def memoize(func):
                 if key not in cache:
                     # We need to use a container because variable assignment
                     # doesn't work without the `nonlocal` keyword.
-                    value_container = (None,)
+                    value_container = [None]
                     def producer():
                         """Places factory result into the value_container."""
                         value_container[0] = factory()
