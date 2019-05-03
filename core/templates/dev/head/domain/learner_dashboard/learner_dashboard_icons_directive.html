@@ -7,13 +7,13 @@
    uib-tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left">
 </i>
-<div ng-show="canActivityBeAddedToLearnerPlaylist(getActivityId()) && isContainerNarrow()" class="btn-group dropdown oppia-learner-dashboard-icon" uib-dropdown>
-  <ul style="left:-150px;top:0" class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+<div uib-dropdown ng-show="canActivityBeAddedToLearnerPlaylist(getActivityId()) && isContainerNarrow()" class="btn-group dropdown oppia-learner-dashboard-icon">
+  <ul uib-dropdown-menu style="left:-150px;top:0" class="dropdown-menu" role="menu" aria-labelledby="single-button">
     <li role="menuitem" ng-click="addToLearnerPlaylist(getActivityId(), getActivityType())">
       <a><['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]></a>
     </li>
   </ul>
-  <i class="fa fa-ellipsis-v dropdown-toggle" uib-dropdown-toggle></i>
+  <i uib-dropdown-toggle class="fa fa-ellipsis-v dropdown-toggle"></i>
 </div>
 <i class="oppia-learner-dashboard-icon fa fa-clock-o"
    ng-if="belongsToLearnerPlaylist()"
