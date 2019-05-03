@@ -649,10 +649,11 @@ var CodeMirrorChecker = function(elem) {
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
           compareDict);
       } else {
-        for (var lineNumber in compareDict) {
-          if (compareDict[lineNumber].checked !== true) {
+        for (var dictLineNumber in compareDict) {
+          if (compareDict[dictLineNumber].checked !== true) {
             throw Error('Expected line ' + lineNumber + ': \'' +
-              compareDict[lineNumber].text + '\' to be found in CodeMirror');
+              compareDict[dictLineNumber].text + '\' to be found in CodeMirror'
+            );
           }
         }
       }

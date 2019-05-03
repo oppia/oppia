@@ -17,8 +17,12 @@
 """Tests for the config property registry."""
 
 from core.domain import config_domain
+from core.platform import models
 from core.tests import test_utils
+import feconf
 import schema_utils_test
+
+(config_models,) = models.Registry.import_models([models.NAMES.config])
 
 
 class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
@@ -29,3 +33,18 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
             schema = config_domain.Registry.get_config_property(
                 property_name).schema
             schema_utils_test.validate_schema(schema)
+
+    def test_get_exception_creating_new_config_property_with_existing_name(
+            self):
+        with self.assertRaisesRegexp(
+            Exception, 'Property with name promo_bar_enabled already exists'):
+            config_domain.ConfigProperty(
+                'promo_bar_enabled', 'schema', 'description', 'default_value')
+
+    def test_config_property_with_new_config_property_model(self):
+        config_model = config_models.ConfigPropertyModel(
+            id='config_model', value='new_value')
+        config_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
+        retrieved_model = config_domain.ConfigProperty(
+            'config_model', config_domain.BOOL_SCHEMA, 'description', False)
+        self.assertEqual(retrieved_model.value, 'new_value')
