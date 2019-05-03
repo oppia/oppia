@@ -370,10 +370,9 @@ oppia.controller('LearnerDashboard', [
         },
         sort: function(e, ui) {
           /* eslint-disable quote-props */
-          // Reset the position of the window on scrolling. This keeps the mouse
-          // position and elements in sync.
+          // Making top : 0px to avoid irregular change in position.
           ui.helper.css(
-            {'top': ui.position.top + $(window).scrollTop() + 'px'});
+            {'top': '0 px'});
           /* eslint-enable quote-props */
         },
         update: function(e, ui) {
