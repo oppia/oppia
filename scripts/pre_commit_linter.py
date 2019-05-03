@@ -1879,7 +1879,9 @@ class LintChecksManager(object):
                 parser.feed(file_content)
 
                 if len(parser.tag_stack) != 0:
-                    raise TagMismatchException('Error in file %s\n' % filepath)
+                    raise TagMismatchException(
+                        'Error in file %s\n tag stack not empty: %s' % (
+                            filepath, parser.tag_stack))
 
                 if parser.failed:
                     failed = True
