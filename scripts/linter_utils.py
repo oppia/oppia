@@ -17,6 +17,7 @@
 Do not use this module anywhere else in the code base!
 """
 
+import collections
 import functools
 import inspect
 import threading
@@ -36,7 +37,9 @@ def memoize(func):
         callable. The same func, but calls to it using the same arguments are
             made exactly once.
     """
-    key_locks = {}
+    # We use key-locks so that they don't interfere with each other while trying
+    # to update the cache.
+    key_locks = collections.defaultdict(threading.Lock)
     lock_for_key_locks = threading.Lock()
     def threadsafe_access(key):
         """Returns a threading.Lock unique to the given key.
@@ -47,18 +50,19 @@ def memoize(func):
         Returns:
             threading.Lock. A lock unique to the given key.
         """
-        # Use double-checked locking to prevent race-conditions.
-        if key not in key_locks:
-            with lock_for_key_locks:
-                if key not in key_locks:
-                    key_locks[key] = threading.Lock()
-        return key_locks[key]
+        with lock_for_key_locks:
+            return key_locks[key]
 
     cache = {}
+    lock_for_cache = threading.Lock()
     def get_from_cache(key, factory):
         """Returns and associates a factory-provided value to the given key if a
         value isn't associated to it yet. Otherwise, returns the pre-existing
         associated value.
+
+        The factory is run on a thread to take advantage of concurrency. We do
+        this because linter operations which we want to memoize are IO-bound
+        (file reading) and would thus benefit greatly from threading.
 
         Args:
             key: *. A hashable value.
@@ -68,12 +72,21 @@ def memoize(func):
             *. The result of factory(), or the last value to be associated to
             key.
         """
-        if key in cache:
+        if key not in cache:
+            with threadsafe_access(key):
+                if key not in cache:
+                    value = None
+                    def producer():
+                        """Assigns the factory's result to value."""
+                        value = factory()
+                    t = threading.Thread(target=producer)
+                    t.start()
+                    t.join()
+                    with lock_for_cache:
+                        cache[key] = value
+                    return value
+        with lock_for_cache:
             return cache[key]
-        with threadsafe_access(key):
-            if key not in cache:
-                cache[key] = factory()
-        return cache[key]
 
     # In order to allow calls to functions with default arguments to use the
     # same hash as calls which explicitly supply them, we fetch those default
