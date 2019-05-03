@@ -29,7 +29,7 @@
                    dnd-effect-allowed="move"
                    dnd-disable-if="isSkillDeleted(skillSummary)">
             <a ng-if="!isSkillDeleted(skillSummary)"
-               ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
+               ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
               <[skillSummary.getDescription()]>
             </a>
             <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
@@ -58,7 +58,7 @@
                dnd-dragstart="startMoveSkill(null, skillSummary)"
                dnd-disable-if="isSkillDeleted(skillSummary)">
         <a ng-if="!isSkillDeleted(skillSummary)"
-           ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
+           ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
           <[skillSummary.getDescription()]>
         </a>
         <span class="fa fa-trash delete-icon" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></span>
