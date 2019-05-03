@@ -77,16 +77,16 @@ def memoize(func):
                 if key not in cache:
                     # We need to use a container because variable assignment
                     # doesn't work without the `nonlocal` keyword.
-                    container = [None]
+                    value_container = [None]
                     def producer():
-                        """Places factory result into the container."""
-                        container[0] = factory()
+                        """Places factory result into the value_container."""
+                        value_container[0] = factory()
                     t = threading.Thread(target=producer)
                     t.start()
                     t.join()
                     with lock_for_cache:
-                        cache[key] = container[0]
-                    return container[0]
+                        cache[key] = value_container[0]
+                    return value_container[0]
         with lock_for_cache:
             return cache[key]
 
