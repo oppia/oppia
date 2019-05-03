@@ -30,6 +30,7 @@ class MemoizeTest(test_utils.GenericTestBase):
     def test_memoize_returns_value(self):
         @linter_utils.memoize
         def return_one():
+            """Returns the integer 1."""
             return 1
 
         self.assertEqual(return_one(), 1)
