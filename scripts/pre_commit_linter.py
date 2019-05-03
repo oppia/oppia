@@ -59,7 +59,6 @@ import ast
 import contextlib
 import fnmatch
 import glob
-import itertools
 import multiprocessing
 import os
 import re
