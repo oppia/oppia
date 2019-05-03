@@ -595,8 +595,8 @@ class TagMismatchException(Exception):
 
 def stringify_func_call(func, *args, **kwargs):
     """Creates a pretty-printed str of a function invocation."""
-    stringified_kwargs = ('%s=%s' for key, value in kwargs)
-    stringified_values = itertools.chain(args, stringified_kwargs)
+    stringified_kwargs = ('%s=%r' for key, value in kwargs)
+    stringified_values = itertools.chain(map(repr, args), stringified_kwargs)
     return '%s(%s)' % (func.__name__, ', '.join(stringified_values))
 
 
