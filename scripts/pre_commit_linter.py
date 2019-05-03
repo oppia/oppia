@@ -638,6 +638,7 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             'param', 'source', 'track', 'wbr']
 
     def debug_str(self):
+        """Returns a pretty-printed representation of self."""
         return 'CustomHTMLParser(filepath=%s, file_lines=%s)' % (
             self.filepath, self.file_lines)
 
