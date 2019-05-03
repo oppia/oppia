@@ -75,6 +75,8 @@ def memoize(func):
         if key not in cache:
             with threadsafe_access(key):
                 if key not in cache:
+                    # We need to use a container because variable assignment
+                    # doesn't work without the `nonlocal` keyword.
                     container = [None]
                     def producer():
                         """Places factory result into the container."""
