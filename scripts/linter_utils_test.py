@@ -27,6 +27,13 @@ import linter_utils
 class MemoizeTest(test_utils.GenericTestBase):
     """Tests for the memoize function."""
 
+    def test_memoize_returns_value(self):
+        @linter_utils.memoize
+        def return_one():
+            return 1
+
+        self.assertEqual(return_one(), 1)
+
     def test_memoize_with_args(self):
         call_counter = collections.Counter()
 
