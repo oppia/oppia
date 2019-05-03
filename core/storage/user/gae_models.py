@@ -313,16 +313,18 @@ class UserSubscriptionsModel(base_models.BaseModel):
         """Export UserSubscriptionsModel data."""
         user_model = UserSubscriptionsModel.get(user_id, strict=False)
 
-        if not user_model:
+        if user_model is None:
             user_model = UserSubscriptionsModel(id=user_id)
 
-        user_data = dict()
-        user_data['activities_ids'] = user_model.activity_ids
-        user_data['collection_ids'] = user_model.collection_ids
-        user_data['general_feedback_thread_ids'] = (
-            user_model.general_feedback_thread_ids)
-        user_data['creator_ids'] = user_model.creator_ids
-        user_data['last_checked'] = user_model.last_checked
+        user_data = {
+            'activity_ids': user_model.activity_ids,
+            'collection_ids': user_model.collection_ids,
+            'general_feedback_thread_ids': (
+                user_model.general_feedback_thread_ids),
+            'creator_ids': user_model.creator_ids,
+            'last_checked': user_model.last_checked
+        }
+
         return user_data
 
 

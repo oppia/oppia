@@ -356,12 +356,44 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
 
 class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     """Tests for UserSubscriptionsModel."""
-    USER_ID = 'user_id'
+    USER_ID_1 = 'user_id_1'
+    USER_ID_2 = 'user_id_2'
+    TEST_VALUE = '1'
 
-    def test_export_data(self):
-        user_data = user_models.UserSubscriptionsModel.export_data(self.USER_ID)
-        self.assertEqual(user_data['activities_ids'], [])
-        self.assertEqual(user_data['collection_ids'], [])
-        self.assertEqual(user_data['general_feedback_thread_ids'], [])
-        self.assertEqual(user_data['creator_ids'], [])
-        self.assertEqual(user_data['last_checked'], None)
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserSubscriptionsModelTests, self).setUp()
+        user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
+
+        user_model_2 = user_models.UserSubscriptionsModel(id=self.USER_ID_2)
+        user_model_2.creator_ids.append(self.TEST_VALUE)
+        user_model_2.collection_ids.append(self.TEST_VALUE)
+        user_model_2.activity_ids.append(self.TEST_VALUE)
+        user_model_2.general_feedback_thread_ids.append(self.TEST_VALUE)
+        user_models.UserSubscriptionsModel.put(user_model_2)
+
+    def test_export_data_trivial(self):
+        """Test if empty user data is properly exported."""
+        user_data = (
+            user_models.UserSubscriptionsModel.export_data(self.USER_ID_1))
+        test_data = {
+            'creator_ids': [],
+            'collection_ids': [],
+            'activity_ids': [],
+            'general_feedback_thread_ids': [],
+            'last_checked': None
+        }
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_nontrivial(self):
+        """Test if nonempty user data is properly exported."""
+        user_data = (
+            user_models.UserSubscriptionsModel.export_data(self.USER_ID_2))
+        test_data = {
+            'creator_ids': [self.TEST_VALUE],
+            'collection_ids': [self.TEST_VALUE],
+            'activity_ids': [self.TEST_VALUE],
+            'general_feedback_thread_ids': [self.TEST_VALUE],
+            'last_checked': None
+        }
+        self.assertEqual(user_data, test_data)
