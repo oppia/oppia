@@ -16,8 +16,6 @@
  * @fileoverview Page object for the exploration editor's translation tab, for
  * use in Protractor tests.
  */
-var general = require('./general.js');
-var path = require('path');
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorTranslationTab = function() {
@@ -25,9 +23,6 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-tab-dismiss-welcome-modal'));
   var translationWelcomeModal = element(
     by.css('.protractor-test-translation-tab-welcome-modal'));
-
-  var saveUploadedAudioButton = element(
-    by.css('.protractor-test-save-uploaded-audio-button'));
 
   this.exitTutorial = function() {
     // If the translation welcome modal shows up, exit it.
@@ -120,10 +115,6 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-solution-tab'));
 
   var contentTabText = element(by.css('.protractor-test-content-text'));
-  var audioOverFiveMinutesErrorMessageElement = element(by.className(
-    'oppia-audio-file-upload-field-error-message'));
-  var uploadAudioButton = element.all(
-    by.className('protractor-test-upload-audio-button')).last();
 
   var feedbackList = element.all(
     by.css('li.protractor-test-translation-feedback'));
@@ -150,6 +141,7 @@ var ExplorationEditorTranslationTab = function() {
 
   var translationTabContentAccessibility = element(
     by.css('.protractor-test-accessibility-translation-content'));
+
   var translationTabFeedbackAccessibility = element(
     by.css('.protractor-test-accessibility-translation-feedback'));
 
@@ -171,53 +163,6 @@ var ExplorationEditorTranslationTab = function() {
   var _selectLanguage = function(language) {
     element(by.css('.protractor-test-translation-language-selector')).
       element(by.cssContainingText('option', language)).click();
-  };
-
-  var audioUploadInputElem = element(by.className(
-    'protractor-test-upload-audio'));
-  var translationGraph = element(by.css('.protractor-test-translation-graph'));
-  var stateBackgroundNodes = translationGraph.all(by.css(
-    '.protractor-test-node-background'));
-  var stateNodes = translationGraph.all(by.css('.protractor-test-node'));
-  var stateNodeLabel = function(nodeElement) {
-    return nodeElement.element(by.css('.protractor-test-node-label'));
-  };
-
-  this.expectSaveUploadedAudioButtonToBeDisabled = function() {
-    expect(saveUploadedAudioButton.getAttribute('disabled')).toBe('true');
-  };
-
-
-  this.uploadAudio = function(relativePathOfAudioToUpload) {
-    var audioAbsolutePath = path.resolve(
-      __dirname, relativePathOfAudioToUpload);
-    audioUploadInputElem.sendKeys(audioAbsolutePath);
-    waitFor.elementToBeClickable(
-      saveUploadedAudioButton, 'Save button is not clickable');
-    saveUploadedAudioButton.click();
-    waitFor.invisibilityOf(saveUploadedAudioButton,
-      'Upload Audio modal takes too long to disappear');
-  };
-
-  this.expectWrongFileType = function(relativePathOfAudioToUpload) {
-    var audioAbsolutePath = path.resolve(
-      __dirname, relativePathOfAudioToUpload);
-    audioUploadInputElem.sendKeys(audioAbsolutePath);
-    expect(element(by.css('div.error-message')).getText())
-      .toContain('This file is not recognized as an audio file.');
-  };
-
-  this.expectAudioOverFiveMinutes = function(relativePathOfAudioToUpload) {
-    var audioAbsolutePath = path.resolve(
-      __dirname, relativePathOfAudioToUpload);
-    audioUploadInputElem.sendKeys(audioAbsolutePath);
-    waitFor.elementToBeClickable(
-      saveUploadedAudioButton, 'Save button is not clickable');
-    saveUploadedAudioButton.click();
-    waitFor.visibilityOf(audioOverFiveMinutesErrorMessageElement,
-      'Error element is not visible');
-    expect(audioOverFiveMinutesErrorMessageElement.getText()).toContain(
-      'Audio files must be under 300 seconds in length.');
   };
 
   this.expectContentTabContentToMatch = function(content) {
@@ -314,55 +259,6 @@ var ExplorationEditorTranslationTab = function() {
   this.expectFeedbackTabToBeActive = function() {
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
     ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
-  };
-
-  this.openUploadAudioModal = function() {
-    waitFor.elementToBeClickable(
-      uploadAudioButton, 'Upload Audio button is not clickable');
-    uploadAudioButton.click();
-  };
-
-
-  // NOTE: if the state is not visible in the state graph this function will
-  // fail.
-  this.moveToState = function(targetName) {
-    general.scrollToTop();
-    stateNodes.map(function(stateElement) {
-      return stateNodeLabel(stateElement).getText();
-    }).then(function(listOfNames) {
-      var matched = false;
-      for (var i = 0; i < listOfNames.length; i++) {
-        if (listOfNames[i] === targetName) {
-          stateNodes.get(i).click();
-          matched = true;
-        }
-      }
-      if (!matched) {
-        throw Error(
-          'State ' + targetName + ' not found by editorTranslationTab.' +
-          'moveToState.');
-      }
-    });
-  };
-
-  this.expectCorrectStatusColor = function(stateName, expectedColor) {
-    stateNodes.map(function(stateElement) {
-      return stateNodeLabel(stateElement).getText();
-    }).then(function(listOfNames) {
-      var matched = false;
-      for (var i = 0; i < listOfNames.length; i++) {
-        if (listOfNames[i] === stateName) {
-          expect(stateBackgroundNodes.get(i).getCssValue('fill')).toBe(
-            expectedColor);
-          matched = true;
-        }
-      }
-      if (!matched) {
-        throw Error(
-          'State ' + targetName +
-          ' not found by editorTranslationTab.expectCorrectStatusColor.');
-      }
-    });
   };
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;

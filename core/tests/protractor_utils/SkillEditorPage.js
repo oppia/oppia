@@ -141,6 +141,7 @@ var SkillEditorPage = function() {
       closeSaveModalButton,
       'Close save modal button takes too long to be clickable');
     closeSaveModalButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.editConceptCard = function(explanation) {

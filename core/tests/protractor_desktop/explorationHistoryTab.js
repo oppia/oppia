@@ -233,6 +233,26 @@ describe('Exploration history', function() {
         highlighted: false
       },
       41: {
+        text: 'written_translations:',
+        highlighted: false
+      },
+      42: {
+        text: '  translations_mapping:',
+        highlighted: false
+      },
+      43: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      44: {
+        text: '    default_outcome: {}',
+        highlighted: true
+      },
+      45: {
+        text: '    feedback_1: {}',
+        highlighted: true
+      },
+      46: {
         text: ' ',
         highlighted: false
       }
@@ -338,6 +358,22 @@ describe('Exploration history', function() {
         highlighted: false
       },
       25: {
+        text: 'written_translations:',
+        highlighted: false
+      },
+      26: {
+        text: '  translations_mapping:',
+        highlighted: false
+      },
+      27: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      28: {
+        text: '    default_outcome: {}',
+        highlighted: true
+      },
+      29: {
         text: ' ',
         highlighted: false
       }
@@ -370,6 +406,10 @@ describe('Exploration history', function() {
       '  id: Continue\n' +
       '  solution: null\n' +
       'param_changes: []\n' +
+      'written_translations:\n' +
+      '  translations_mapping:\n' +
+      '    content: {}\n' +
+      '    default_outcome: {}\n' +
       ' ';
 
     var expectedHistoryStates = [{
