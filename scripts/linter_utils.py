@@ -78,6 +78,7 @@ def memoize(func):
                     value = None
                     def producer():
                         """Assigns the factory's result to value."""
+                        nonlocal value
                         value = factory()
                     t = threading.Thread(target=producer)
                     t.start()
