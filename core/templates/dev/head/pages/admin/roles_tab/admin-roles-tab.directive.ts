@@ -16,7 +16,7 @@
  * @fileoverview Directive for the Roles tab in the admin panel.
  */
 
-oppia.directive('adminRolesTab', [
+angular.module('adminRolesTabModule').directive('adminRolesTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_ROLE_HANDLER_URL',
   function(
@@ -28,7 +28,7 @@ oppia.directive('adminRolesTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/roles_tab/roles_tab_directive.html'),
+        '/pages/admin/roles_tab/roles-tab.directive.html'),
       controller: ['$scope', function($scope) {
         $scope.UPDATABLE_ROLES = GLOBALS.UPDATABLE_ROLES;
         $scope.VIEWABLE_ROLES = GLOBALS.VIEWABLE_ROLES;

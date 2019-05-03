@@ -13,18 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia admin page.
+ * @fileoverview controllers for the Oppia admin page.
  */
 
-oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
-oppia.constant('ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
-oppia.constant('PROFILE_URL_TEMPLATE', '/profile/<username>');
-oppia.constant(
-  'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
-oppia.constant(
-  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
-
-oppia.controller('Admin', [
+angular.module('adminModule').controller('Admin', [
   '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',
   function($http, $location, $scope, AdminRouterService, DEV_MODE) {
     $scope.userEmail = GLOBALS.USER_EMAIL;

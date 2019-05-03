@@ -16,7 +16,7 @@
  * @fileoverview Directive for the miscellaneous tab in the admin panel.
  */
 
-oppia.directive('adminMiscTab', [
+angular.module('adminMiscTabModule').directive('adminMiscTab', [
   '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL', 'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
   function(
@@ -29,7 +29,7 @@ oppia.directive('adminMiscTab', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/misc_tab/' +
-        'admin_misc_tab_directive.html'),
+        'admin-misc-tab.directive.html'),
       controller: ['$scope', function($scope) {
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');

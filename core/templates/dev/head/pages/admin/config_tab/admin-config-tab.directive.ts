@@ -16,7 +16,7 @@
  * @fileoverview Directive for the configuration tab in the admin panel.
  */
 
-oppia.directive('adminConfigTab', [
+angular.module('adminConfigTabModule').directive('adminConfigTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL', function($http, AdminTaskManagerService,
       UrlInterpolationService, ADMIN_HANDLER_URL) {
@@ -27,7 +27,7 @@ oppia.directive('adminConfigTab', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/config_tab/' +
-        'admin_config_tab_directive.html'),
+        'admin-config-tab.directive.html'),
       controller: ['$scope', function($scope) {
         $scope.configProperties = {};
 

@@ -16,7 +16,7 @@
  * @fileoverview Directive for displaying Role graph.
  */
 
-oppia.directive('roleGraph', [
+angular.module('roleGraphModule').directive('roleGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -34,7 +34,7 @@ oppia.directive('roleGraph', [
         graphDataLoaded: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/roles_tab/role_graph_directive.html'),
+        '/pages/admin/roles_tab/roles-graph/role-graph.directive.html'),
       controller: [
         '$scope', '$element', '$timeout', '$filter', 'StateGraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',

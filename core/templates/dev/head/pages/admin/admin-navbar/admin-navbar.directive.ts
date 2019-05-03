@@ -16,7 +16,7 @@
  * @fileoverview Directive for the navigation bar in the admin panel.
  */
 
-oppia.directive('adminNavbar', [
+angular.module('adminNavbarModule').directive('adminNavbar', [
   'AdminRouterService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
   'LOGOUT_URL', 'PROFILE_URL_TEMPLATE',
   function(
@@ -28,8 +28,8 @@ oppia.directive('adminNavbar', [
         getUserEmail: '&userEmail'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/' +
-        'admin_navbar_directive.html'),
+        '/pages/admin/admin-navbar/' +
+        'admin-navbar.directive.html'),
       controller: ['$scope', 'UserService', function($scope, UserService) {
         $scope.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
         $scope.showTab = AdminRouterService.showTab;

@@ -16,7 +16,7 @@
  * @fileoverview Directive for the jobs tab in the admin panel.
  */
 
-oppia.directive('adminJobsTab', [
+angular.module('adminJobsTabModule').directive('adminJobsTab', [
   '$http', '$timeout', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
   function(
@@ -29,7 +29,7 @@ oppia.directive('adminJobsTab', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/jobs_tab/' +
-        'admin_jobs_tab_directive.html'),
+        'admin-jobs-tab.directive.html'),
       controller: ['$scope', function($scope) {
         $scope.HUMAN_READABLE_CURRENT_TIME = (
           GLOBALS.HUMAN_READABLE_CURRENT_TIME);
