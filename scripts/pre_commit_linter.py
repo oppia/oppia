@@ -69,7 +69,10 @@ import tempfile
 import threading
 import time
 
-import docstrings_checker  # pylint: disable=relative-import
+# pylint: disable=relative-import
+import linter_utils
+import docstrings_checker
+# pylint: enable=relative-import
 
 # pylint: enable=wrong-import-order
 
@@ -336,10 +339,6 @@ _TARGET_STDOUT = StringIO.StringIO()
 class FileCache(object):
     """Provides thread-safe access to cached file content."""
 
-    _CACHE_DATA_DICT = {}
-    _CACHE_LOCK_DICT = {}
-    _CACHE_LOCK_DICT_LOCK = threading.Lock()
-
     @classmethod
     def read(cls, filepath, mode='r'):
         """Returns the data read from the file.
@@ -369,23 +368,7 @@ class FileCache(object):
         return cls._get_data(filepath, mode)[1]
 
     @classmethod
-    def _get_cache_lock(cls, key):
-        """Returns the cache lock corresponding to the given key.
-
-        Args:
-            key: str. The key corresponding to which the cache lock is to be
-                found.
-
-        Returns:
-            str. The cache lock corresponding to the given key.
-        """
-        if key not in cls._CACHE_LOCK_DICT:
-            with cls._CACHE_LOCK_DICT_LOCK:
-                if key not in cls._CACHE_LOCK_DICT:
-                    cls._CACHE_LOCK_DICT[key] = threading.Lock()
-        return cls._CACHE_LOCK_DICT[key]
-
-    @classmethod
+    @linter_utils.memoize
     def _get_data(cls, filepath, mode):
         """Returns the collected data from the file corresponding to the given
         filepath.
@@ -399,14 +382,9 @@ class FileCache(object):
                 as first element and tuple containing the text line by line as
                 second element.
         """
-        key = (filepath, mode)
-        if key not in cls._CACHE_DATA_DICT:
-            with cls._get_cache_lock(key):
-                if key not in cls._CACHE_DATA_DICT:
-                    with open(filepath, mode) as f:
-                        lines = f.readlines()
-                    cls._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
-        return cls._CACHE_DATA_DICT[key]
+        with open(filepath, mode) as f:
+            lines = tuple(f)
+        return ('\n'.join(lines), lines)
 
 
 def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
