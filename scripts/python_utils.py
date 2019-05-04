@@ -25,9 +25,9 @@ def import_string_io():
         StringIO.StringIO or io.StringIO. The StringIO object.
     """
     try:
-        from StringIO import StringIO
+        from StringIO import StringIO  # pylint: disable=import-only-modules
     except ImportError:
-        from io import StringIO
+        from io import StringIO  # pylint: disable=import-only-modules
     return StringIO()
 
 
