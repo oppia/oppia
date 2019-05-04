@@ -103,25 +103,25 @@ jobs:
             rm google-chrome.deb
             bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="additionalEditorAndPlayerFeatures" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="collections" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="coreEditorAndPlayerFeatures" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="collections" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="coreEditorAndPlayerFeatures" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="explorationFeedbackTab --prod_env
-            bash scripts/run_e2e_tests.sh --suite="explorationHistoryTab" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="explorationHistoryTab" --prod_env
             #  bash scripts/run_e2e_tests.sh --suite="explorationStatisticsTab" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="explorationTranslationTab" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="explorationTranslationTab" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="learnerDashboard" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="learner" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="library" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="navigation" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="preferences" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="profileMenu" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="publication" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="skillEditorPage" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="topicsAndSkillsDashboard" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="navigation" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="preferences" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="profileMenu" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="publication" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="skillEditorPage" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="topicsAndSkillsDashboard" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="users" --prod_env
 
 
