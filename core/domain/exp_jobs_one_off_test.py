@@ -2316,7 +2316,7 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
         self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
 
     def test_action_is_performed_when_translator_ids_exists(self):
-        """Test translator_ids are migrated to voice_artist_ids successfully"""
+        """Test translator_ids are migrated to voice_artist_ids successfully."""
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.user_a_id, title='Exploration Title 1')
 

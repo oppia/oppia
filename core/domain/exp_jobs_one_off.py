@@ -721,7 +721,8 @@ class InteractionCustomizationArgsValidationJob(
         # for that error type.
         yield (key, list(set().union(*final_values)))
 
-class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):   
+class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for migrating translator_ids to voice_artist_ids."""
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationRightsModel]
