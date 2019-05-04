@@ -760,5 +760,5 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield('SUCCESS', item.id)
 
     @staticmethod
-    def reduce(key, value):
-        yield (key, value)
+    def reduce(key, values):
+        yield (key, len(values))

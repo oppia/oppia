@@ -2339,6 +2339,11 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
+        actual_output = (
+            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.get_output(job_id))
+        expected_output = ['[u\'SUCCESS\', 1]']
+        self.assertEqual(actual_output, expected_output)
+
         exp_rights_model_2 = exp_models.ExplorationRightsModel.get(
             exploration.id)
         self.assertEqual([], exp_rights_model_2.translator_ids)
@@ -2351,9 +2356,4 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.user_a_id, exp_id)
 
         run_job_for_deleted_exp(
-            self, exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
-            check_error=True,
-            error_type=base_models.BaseModel.EntityNotFoundError,
-            error_msg='Entity for class ExpSummaryModel with id 100 not found',
-            function_to_be_called=exp_services.get_exploration_summary_by_id,
-            exp_id=exp_id)
+            self, exp_jobs_one_off.ExpSummariesContributorsOneOffJob)
