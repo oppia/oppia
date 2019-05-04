@@ -31,12 +31,12 @@ module.exports = function(config) {
       // on the other modules.
       'local_compiled_js/core/templates/dev/head/**/*.module.js',
 
-      'core/templates/dev/head/**/*\.directive.html',
       'local_compiled_js/core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'local_compiled_js/core/templates/dev/head/**/*.js',
+      'core/templates/dev/head/**/*\.directive.html',
       'core/templates/dev/head/**/*_directive.html',
       'local_compiled_js/extensions/**/*.js',
       {

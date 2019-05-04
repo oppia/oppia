@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,20 @@
  * @fileoverview Data and controllers for the Oppia contributors' library page.
  */
 
-angular.module('libraryPageModule').controller('Library', [
+oppia.constant('LIBRARY_PAGE_MODES', {
+  GROUP: 'group',
+  INDEX: 'index',
+  SEARCH: 'search'
+});
+
+oppia.constant('LIBRARY_PATHS_TO_MODES', {
+  '/library': 'index',
+  '/library/top_rated': 'group',
+  '/library/recently_published': 'group',
+  '/search/find': 'search'
+});
+
+oppia.controller('Library', [
   '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'ConstructTranslationIdsService',
   'LearnerDashboardActivityIdsObjectFactory',
@@ -199,7 +212,7 @@ angular.module('libraryPageModule').controller('Library', [
       // The following determines whether to enable left scroll after resize.
       for (var i = 0; i < $scope.libraryGroups.length; i++) {
         var carouselJQuerySelector = (
-          '.oppia-library-carousel-tiles:eq(n)'.replace('n', i));
+          '.oppia-library-carousel-tiles:eq(n)'.replace('n', <string><any>i));
         var carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft();
         var index = Math.ceil(carouselScrollPositionPx / LIBRARY_TILE_WIDTH_PX);
         $scope.leftmostCardIndices[i] = index;
