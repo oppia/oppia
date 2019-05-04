@@ -20,7 +20,7 @@ Unless the strings are explicitly wrapped with b'', they would denote unicode,
 otherwise str.
 """
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # This will be read as unicode.
 SOME_STR_TEXT = 'example text'

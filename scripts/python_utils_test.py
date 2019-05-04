@@ -57,7 +57,26 @@ class PythonUtilsTests(test_utils.GenericTestBase):
                 f.readlines()
 
     def test_unicode_and_str_chars_in_file(self):
-        self.assertIsInstance(unicode_and_str_handler.SOME_STR_TEXT, unicode)
-        self.assertIsInstance(
-            unicode_and_str_handler.SOME_UNICODE_TEXT, unicode)
-        self.assertIsInstance(unicode_and_str_handler.SOME_BINARY_TEXT, str)
+        if sys.version[0] == '2':
+            self.assertIsInstance(
+                unicode_and_str_handler.SOME_STR_TEXT, unicode)
+        else:
+            self.assertIsInstance(
+                unicode_and_str_handler.SOME_STR_TEXT, str)
+        if sys.version[0] == '2':
+            self.assertIsInstance(
+                unicode_and_str_handler.SOME_UNICODE_TEXT, unicode)
+        else:
+            self.assertIsInstance(
+                unicode_and_str_handler.SOME_UNICODE_TEXT, str)
+        self.assertIsInstance(unicode_and_str_handler.SOME_BINARY_TEXT, bytes)
+        if sys.version[0] == '2':
+            with python_utils.open_file(
+                'core/tests/data/unicode_and_str_handler.py', 'r') as f:
+                file_content = f.read()
+                self.assertIsInstance(file_content, unicode)
+        else:
+            with python_utils.open_file(
+                'core/tests/data/unicode_and_str_handler.py', 'r') as f:
+                file_content = f.read()
+                self.assertIsInstance(file_content, str)

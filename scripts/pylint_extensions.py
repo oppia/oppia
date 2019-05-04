@@ -17,8 +17,8 @@
 """Implements additional custom Pylint checkers to be used as part of
 presubmit checks.
 """
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import re
@@ -43,7 +43,7 @@ sys.path.insert(0, _FUTURE_PATH)
 
 # The 'builtins' module should be imported after the 'Future' module is inserted
 # into Python's path.
-from builtins import range  # isort:skip
+import builtins  # isort:skip
 
 # pylint: enable=wrong-import-position
 
@@ -200,7 +200,7 @@ class HangingIndentChecker(checkers.BaseChecker):
         file_content = read_from_node(node)
         file_length = len(file_content)
         exclude = False
-        for line_num in range(file_length):
+        for line_num in builtins.range(file_length):
             line = file_content[line_num].lstrip().rstrip()
             if line.startswith('"""') and not line.endswith('"""'):
                 exclude = True
@@ -210,7 +210,7 @@ class HangingIndentChecker(checkers.BaseChecker):
                 continue
             line_length = len(line)
             bracket_count = 0
-            for char_num in range(line_length):
+            for char_num in builtins.range(line_length):
                 char = line[char_num]
                 if char == '(':
                     if bracket_count == 0:

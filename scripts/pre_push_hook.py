@@ -52,7 +52,6 @@ LINTER_MODULE = 'scripts.pre_commit_linter'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 SCRIPTS_DIR = os.path.join(OPPIA_DIR, 'scripts')
-LINTER_SCRIPT = 'pre_commit_linter'
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests.sh'
