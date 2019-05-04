@@ -2208,12 +2208,8 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
-<<<<<<< HEAD
-        # js_component_messages = self._check_js_component_name_and_count()
-=======
-        js_and_ts_component_messages = (
-            self._check_js_and_ts_component_name_and_count())
->>>>>>> develop
+        # js_and_ts_component_messages = (
+        #     self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
@@ -2234,12 +2230,8 @@ class LintChecksManager(object):
             self._check_for_copyright_notice())
         codeowner_messages = self._check_codeowner_file()
         all_messages = (
-<<<<<<< HEAD
-            # js_component_messages +.
+            # js_and_ts_component_messages +
             directive_scope_messages +
-=======
-            js_and_ts_component_messages + directive_scope_messages +
->>>>>>> develop
             sorted_dependencies_messages + controller_dependency_messages +
             html_directive_name_messages + import_order_messages +
             docstring_messages + comment_messages +
