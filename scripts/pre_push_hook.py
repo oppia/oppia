@@ -314,7 +314,8 @@ def does_diff_include_js_and_ts_files(files_to_lint):
 
     extra_js_files = []
     for filename in js_files_to_check:
-        if filename not in build.JS_FILEPATHS_NOT_TO_BUILD:
+        if filename.startswith(('core', 'extensions')) and (
+                filename not in build.JS_FILEPATHS_NOT_TO_BUILD):
             extra_js_files.append(filename)
 
     if len(extra_js_files):
