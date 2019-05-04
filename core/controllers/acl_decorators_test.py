@@ -918,8 +918,8 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
 
-        # Checking voice artist cannot voiceover private exploration which he/she
-        # is not assigned for.
+        # Checking voice artist cannot voiceover private exploration which
+        # he/she is not assigned for.
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_2, expected_status_int=401)
