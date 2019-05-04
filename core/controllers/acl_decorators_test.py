@@ -835,7 +835,8 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.signup(self.banned_user_email, self.banned_username)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(self.VOICE_ARTIST_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.banned_username])
@@ -856,7 +857,8 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, self.published_exp_id_1, self.voice_artist_id, self.role)
+            self.owner, self.published_exp_id_1, self.voice_artist_id,
+            self.role)
         rights_manager.assign_role_for_exploration(
             self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
 
@@ -909,7 +911,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
 
-    def test_voice_artist_can_only_voiceover_assigned_private_exploration(self):
+    def test_voice_artist_can_only_voiceover_assigned_private_exploration(self): # pylint: disable=line-too-long
         self.login(self.VOICE_ARTIST_EMAIL)
         # Checking voice artist can voiceover assigned private exploration.
         with self.swap(self, 'testapp', self.mock_testapp):

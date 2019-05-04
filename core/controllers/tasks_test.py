@@ -127,9 +127,9 @@ class TasksTests(test_utils.GenericTestBase):
 
         class MockActivityRights(object):
             def __init__(
-                    self, exploration_id, owner_ids, editor_ids, voice_artist_ids,
-                    viewer_ids, community_owned=False, cloned_from=None,
-                    status=True, viewable_if_private=False,
+                    self, exploration_id, owner_ids, editor_ids,
+                    voice_artist_ids, viewer_ids, community_owned=False,
+                    cloned_from=None, status=True, viewable_if_private=False,
                     first_published_msec=None):
                 # User B ID hardcoded into owner_ids to get email_manager
                 # to send email to user B to test functionality.

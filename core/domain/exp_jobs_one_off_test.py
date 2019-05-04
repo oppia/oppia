@@ -2327,9 +2327,9 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
         exp_rights_model.translator_ids = [self.user_b_id]
         commit_message = 'Assign a translator for test'
         commit_cmds = [{
-        'cmd': 'change_role',
-        'assignee_ids': self.user_b_id,
-        'new_role': 'translator'
+            'cmd': 'change_role',
+            'assignee_ids': self.user_b_id,
+            'new_role': 'translator'
         }]
         exp_rights_model.commit(self.user_a_id, commit_message, commit_cmds)
 
@@ -2342,7 +2342,7 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
             exploration.id)
         self.assertEqual([], exp_rights_model_2.translator_ids)
         self.assertEqual([self.user_b_id], exp_rights_model_2.voice_artist_ids)
-        
+
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         exp_id = '100'

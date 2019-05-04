@@ -81,9 +81,9 @@ class ActivityRights(object):
         """Validates an ActivityRights object.
 
         Raises:
-          utils.ValidationError: if any of the owners, editors, voice artists and
-          viewers lists overlap, or if a community-owned exploration has owners,
-          editors, voice artists or viewers specified.
+          utils.ValidationError: if any of the owners, editors, voice artists
+          and viewers lists overlap, or if a community-owned exploration has
+          owners, editors, voice artists or viewers specified.
         """
         if self.community_owned:
             if (self.owner_ids or self.editor_ids or self.voice_artist_ids or

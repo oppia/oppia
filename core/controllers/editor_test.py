@@ -59,7 +59,8 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(self.VOICE_ARTIST_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])

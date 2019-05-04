@@ -1275,10 +1275,10 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         exploration.objective, exploration.language_code,
         exploration.tags, ratings, scaled_average_rating, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.voice_artist_ids, exp_rights.viewer_ids,
-        contributor_ids, contributors_summary, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated,
-        first_published_msec)
+        exp_rights.editor_ids, exp_rights.voice_artist_ids,
+        exp_rights.viewer_ids, contributor_ids, contributors_summary,
+        exploration.version, exploration_model_created_on,
+        exploration_model_last_updated, first_published_msec)
 
     return exp_summary
 

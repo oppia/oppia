@@ -3178,8 +3178,8 @@ class ExplorationSummary(object):
                 this exploration.
             editor_ids: list(str). List of the users ids who have access to
                 edit this exploration.
-            voice_artist_ids: list(str). List of the users ids who have access to
-                voiceover this exploration.
+            voice_artist_ids: list(str). List of the users ids who have access
+                to voiceover this exploration.
             viewer_ids: list(str). List of the users ids who have access to
                 view this exploration.
             contributor_ids: list(str). List of the users ids of the user who

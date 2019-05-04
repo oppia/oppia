@@ -38,12 +38,14 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(self.VOICE_ARTIST_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
-        user_services.create_new_user(self.voice_artist_id, self.VOICE_ARTIST_EMAIL)
+        user_services.create_new_user(
+            self.voice_artist_id, self.VOICE_ARTIST_EMAIL)
         user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
