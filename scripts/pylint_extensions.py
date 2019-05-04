@@ -17,15 +17,50 @@
 """Implements additional custom Pylint checkers to be used as part of
 presubmit checks.
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
+import os
 import re
+import sys
+
 import astroid
-import docstrings_checker  # pylint: disable=relative-import
+import utils
 
 from pylint import checkers
 from pylint import interfaces
 from pylint.checkers import typecheck
 from pylint.checkers import utils as checker_utils
+
+from . import docstrings_checker
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_FUTURE_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'future-0.17.1')
+
+sys.path.insert(0, _FUTURE_PATH)
+
+# pylint: disable=wrong-import-position
+
+# The 'builtins' module should be imported after the 'Future' module is inserted
+# into Python's path.
+from builtins import range  # isort:skip
+
+# pylint: enable=wrong-import-position
+
+
+def read_from_node(node):
+    """Returns the data read from the ast node in unicode form.
+
+    Args:
+        node: astroid.scoped_nodes.Function. Node to access module content.
+
+    Returns:
+        unicode. The data read from the ast node.
+    """
+    file_content = [
+        utils.convert_to_unicode(line) for line in node.stream().readlines()]
+
+    return file_content
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):
@@ -162,10 +197,10 @@ class HangingIndentChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        file_content = node.stream().readlines()
+        file_content = read_from_node(node)
         file_length = len(file_content)
         exclude = False
-        for line_num in xrange(file_length):
+        for line_num in range(file_length):
             line = file_content[line_num].lstrip().rstrip()
             if line.startswith('"""') and not line.endswith('"""'):
                 exclude = True
@@ -175,7 +210,7 @@ class HangingIndentChecker(checkers.BaseChecker):
                 continue
             line_length = len(line)
             bracket_count = 0
-            for char_num in xrange(line_length):
+            for char_num in range(line_length):
                 char = line[char_num]
                 if char == '(':
                     if bracket_count == 0:
@@ -750,12 +785,11 @@ class BackslashContinuationChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        with node.stream() as stream:
-            file_content = stream.readlines()
-            for (line_num, line) in enumerate(file_content):
-                if line.rstrip('\r\n').endswith('\\'):
-                    self.add_message(
-                        'backslash-continuation', line=line_num + 1)
+        file_content = read_from_node(node)
+        for (line_num, line) in enumerate(file_content):
+            if line.rstrip('\r\n').endswith('\\'):
+                self.add_message(
+                    'backslash-continuation', line=line_num + 1)
 
 
 class FunctionArgsOrderChecker(checkers.BaseChecker):
@@ -888,7 +922,7 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
 
-        file_content = node.stream().readlines()
+        file_content = read_from_node(node)
         file_length = len(file_content)
 
         if file_length == 1 and len(file_content[0]) == 1:

@@ -21,6 +21,8 @@ import os
 import re
 import sys
 
+from . import python_utils
+
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 sys.path.insert(0, _PYLINT_PATH)
@@ -221,8 +223,7 @@ class ASTDocStringChecker(object):
         """
         # Ignore self and cls args.
         args_to_ignore = ['self', 'cls']
-        return [a.id for a in function_node.args.args if a.id not in
-                args_to_ignore]
+        return python_utils.get_args_of_function(function_node, args_to_ignore)
 
     @classmethod
     def build_regex_from_args(cls, function_args):

@@ -17,7 +17,7 @@
 """Unit tests for scripts/docstrings_checker."""
 
 import unittest
-import docstrings_checker # pylint: disable=relative-import
+from . import docstrings_checker
 
 
 class ASTDocstringsCheckerTest(unittest.TestCase):
