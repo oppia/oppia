@@ -69,7 +69,8 @@ module.exports = function(config) {
     },
     preprocessors: {
       'local_compiled_js/core/templates/dev/head/!(*\.spec).js': ['coverage'],
-      'local_compiled_js/core/templates/dev/head/**/!(*\.spec).js': ['coverage'],
+      'local_compiled_js/core/templates/dev/head/**/!(*\.spec).js': [
+        'coverage'],
       'local_compiled_js/core/templates/dev/head/!(*Spec).js': ['coverage'],
       'local_compiled_js/core/templates/dev/head/**/!(*Spec).js': ['coverage'],
       'local_compiled_js/extensions/!(*Spec).js': ['coverage'],
