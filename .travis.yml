@@ -116,7 +116,7 @@ script:
 # - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --exclude_load_tests; fi
 # - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
 # - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh; fi
-# Run e2e tests in production mode.
+# Run the e2e tests in the production environment (using --prod_env).
 - if [ "$RUN_E2E_TESTS_ACCESSIBILITY" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="additionalEditorAndPlayerFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_COLLECTIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="collections" --prod_env; fi
@@ -151,8 +151,8 @@ script:
 cache:
   # Cache Oppia's dependencies.
   directories:
-    - ../node_modules/
     - ../oppia_tools/
+    - node_modules/
     - third_party/
     - $HOME/.cache/pip
     - $HOME/.cache/TravisChrome/
