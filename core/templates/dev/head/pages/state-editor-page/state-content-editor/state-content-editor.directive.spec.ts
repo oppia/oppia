@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the state content editor directive.
  */
 
-fdescribe('State content editor directive', function() {
+describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, citat, scitat;
   var mockExplorationData;
 
@@ -212,8 +212,8 @@ fdescribe('State content editor directive', function() {
       });
 
       var templateHtml = $templateCache.get(
-        '/pages/exploration_editor/editor_tab/' +
-        'state_content_editor_directive.html');
+        '/pages/state-editor-page/state-content-editor/' +
+        'state-content-editor.directive.html');
       $compile(templateHtml, $rootScope);
       $rootScope.$digest();
 

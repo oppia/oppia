@@ -178,8 +178,8 @@ describe('State Interaction controller', function() {
       });
 
       var templateHtml = $templateCache.get(
-        '/pages/exploration_editor/editor_tab/' +
-        'state_interaction_editor_directive.html');
+        'core/templates/dev/head/pages/state-editor-page/' +
+        'state-interaction-editor/state-interaction-editor.directive.html');
       $compile(templateHtml, $rootScope);
       $rootScope.$digest();
 
