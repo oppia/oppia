@@ -37,8 +37,11 @@ import shutil
 import subprocess
 import sys
 
-# pylint: enable=wrong-import-order
+# pylint: disable=relative-import
+import build
+# pylint: enable=relative-import
 
+# pylint: enable=wrong-import-order
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -295,21 +298,40 @@ def _install_hook():
         print 'Copied file to .git/hooks directory'
 
 
-def does_diff_include_js_files(files_to_lint):
-    """Returns true if diff includes JS files.
+def does_diff_include_js_and_ts_files(files_to_lint):
+    """Returns true if diff includes JS and TS files.
 
     Args:
         files_to_lint: list(str). List of files to be linted.
 
     Returns:
-        bool. Status of JS files in diff.
+        bool. Status of JS and TS files in diff.
     """
 
     js_files_to_check = [
         filename for filename in files_to_lint if
         filename.endswith('.js')]
 
-    return bool(js_files_to_check)
+    extra_js_files = []
+    for filename in js_files_to_check:
+        if filename not in build.JS_FILEPATHS_NOT_TO_BUILD:
+            extra_js_files.append(filename)
+
+    if len(extra_js_files):
+        err_msg = (
+            'Push aborted since you have extra js files in your repo. '
+            'If you want them to be present as js files, add them to the list '
+            'JS_FILEPATHS_NOT_TO_BUILD in build.py else rename them to .ts')
+        print err_msg
+        sys.exit(1)
+
+    ts_files_to_check = [
+        filename for filename in files_to_lint if
+        filename.endswith('.ts')]
+
+    all_files_to_check = js_files_to_check + ts_files_to_check
+
+    return bool(all_files_to_check)
 
 
 def main():
@@ -344,7 +366,7 @@ def main():
                     print 'Push failed, please correct the linting issues above'
                     sys.exit(1)
             frontend_status = 0
-            if does_diff_include_js_files(files_to_lint):
+            if does_diff_include_js_and_ts_files(files_to_lint):
                 frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'
