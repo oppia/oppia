@@ -1166,6 +1166,8 @@ def compile_typescript_files(project_dir):
         project_dir: str. The project directory which contains the ts files
             to be compiled.
     """
+    if os.path.isdir('local_compiled_js'):
+        shutil.rmtree('local_compiled_js')
     print 'Compiling ts files...'
     cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
     subprocess.check_call(cmd)
@@ -1184,6 +1186,8 @@ def compile_typescript_files_continuously(project_dir):
         '--watch" | awk \'{print $2}\'`'
     )
     subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
+    if os.path.isdir('local_compiled_js'):
+        shutil.rmtree('local_compiled_js')
     print 'Compiling ts files in watch mode...'
     cmd = [
         './node_modules/typescript/bin/tsc', '--project', project_dir,
