@@ -121,8 +121,8 @@ jobs:
             bash scripts/run_e2e_tests.sh --suite="skillEditorPage" --prod_env
             bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env
             bash scripts/run_e2e_tests.sh --suite="topicsAndSkillsDashboard" --prod_env
-            # bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="users" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="users" --prod_env
 
 
 workflows:
