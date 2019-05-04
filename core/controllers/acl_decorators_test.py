@@ -911,7 +911,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
 
-    def test_voice_artist_can_only_voiceover_assigned_private_exploration(self): # pylint: disable=line-too-long
+    def test_voice_artist_can_only_voiceover_assigned_private_exploration(self):
         self.login(self.VOICE_ARTIST_EMAIL)
         # Checking voice artist can voiceover assigned private exploration.
         with self.swap(self, 'testapp', self.mock_testapp):
