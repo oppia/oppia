@@ -721,6 +721,7 @@ class InteractionCustomizationArgsValidationJob(
         # for that error type.
         yield (key, list(set().union(*final_values)))
 
+
 class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for migrating translator_ids to voice_artist_ids."""
     @classmethod

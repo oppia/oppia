@@ -2296,6 +2296,7 @@ class InteractionCustomizationArgsValidationJobTests(
             self,
             exp_jobs_one_off.InteractionCustomizationArgsValidationJob)
 
+
 class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
         exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob]
