@@ -19,12 +19,12 @@
 // TODO(Allan): Implement ability to edit suggestions before applying.
 angular.module('showSuggestionModalForEditorViewModule').controller(
   'ShowSuggestionModalForEditorView', [
-    '$log', '$scope', '$uibModalInstance', 'EditabilityService',
+    '$scope', '$uibModalInstance', 'EditabilityService',
     'SuggestionModalService', 'currentContent', 'description',
     'newContent', 'suggestionIsHandled', 'suggestionIsValid',
     'suggestionStatus', 'unsavedChangesExist',
     function(
-        $log, $scope, $uibModalInstance, EditabilityService,
+        $scope, $uibModalInstance, EditabilityService,
         SuggestionModalService, currentContent, description,
         newContent, suggestionIsHandled, suggestionIsValid, suggestionStatus,
         unsavedChangesExist) {

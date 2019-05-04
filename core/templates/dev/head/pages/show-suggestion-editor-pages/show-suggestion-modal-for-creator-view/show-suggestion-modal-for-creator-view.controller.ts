@@ -18,12 +18,12 @@
 
 angular.module('showSuggestionModalForCreatorViewModule').controller(
   'ShowSuggestionModalForCreatorView', [
-    '$log', '$scope', '$uibModalInstance', 'SuggestionModalService',
+    '$scope', '$uibModalInstance', 'SuggestionModalService',
     'canReviewActiveThread', 'description', 'newContent',
     'oldContent', 'stateName', 'suggestionIsHandled', 'suggestionStatus',
     'suggestionType',
     function(
-        $log, $scope, $uibModalInstance, SuggestionModalService,
+        $scope, $uibModalInstance, SuggestionModalService,
         canReviewActiveThread, description, newContent,
         oldContent, stateName, suggestionIsHandled, suggestionStatus,
         suggestionType
