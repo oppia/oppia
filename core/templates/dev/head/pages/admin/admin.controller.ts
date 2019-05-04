@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview controllers for the Oppia admin page.
+ * @fileoverview Controllers for the Oppia admin page.
  */
 
 angular.module('adminModule').controller('Admin', [
