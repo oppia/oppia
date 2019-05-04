@@ -82,12 +82,12 @@
 /core/templates/dev/head/components/alerts/ @ankita240796
 /core/templates/dev/head/components/attribution_guide/ @ankita240796
 /core/templates/dev/head/components/background/ @ankita240796
-/core/templates/dev/head/components/embed_modal/ @ankita240796
+/core/templates/dev/head/components/button-directives/exploration-embed-modal/ @ankita240796
 /core/templates/dev/head/components/loading/ @ankita240796
 /core/templates/dev/head/components/profile_link/ @ankita240796
 /core/templates/dev/head/components/promo/ @ankita240796
 /core/templates/dev/head/components/share/ @ankita240796
-/core/templates/dev/head/components/social_buttons/ @ankita240796
+/core/templates/dev/head/components/button-directives/social-buttons/ @ankita240796
 /core/templates/dev/head/components/summary_tile/ @ankita240796
 
 
@@ -134,7 +134,7 @@
 
 # Navigation bar project.
 /core/templates/dev/head/domain/sidebar/ @nithusha21
-/core/templates/dev/head/components/create_button/ @nithusha21
+/core/templates/dev/head/components/button-directives/create-button/ @nithusha21
 /core/templates/dev/head/components/side_navigation_bar/ @nithusha21
 /core/templates/dev/head/components/top_navigation_bar/ @nithusha21
 

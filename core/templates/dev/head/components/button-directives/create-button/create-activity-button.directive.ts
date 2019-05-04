@@ -16,12 +16,13 @@
  * @fileoverview Directive for the Create Exploration/Collection button.
  */
 
-oppia.directive('createActivityButton', [
+angular.module('createActivityButtonModule').directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/create_button/create_activity_button_directive.html'),
+        '/components/button-directives/create-button/' +
+        'create-activity-button.directive.html'),
       controller: [
         '$scope', '$timeout', '$window', '$uibModal',
         'ExplorationCreationService', 'CollectionCreationService',

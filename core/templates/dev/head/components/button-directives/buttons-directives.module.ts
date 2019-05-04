@@ -13,19 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the social buttons displayed in footer.
+ * @fileoverview Module for the buttons used by pages.
  */
 
-oppia.directive('socialButtons', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/social_buttons/' +
-        'social_buttons_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-      }]
-    };
-  }]);
+angular.module('buttonsDirectivesModule', ['createActivityButtonModule',
+    'explorationEmbedButtonModule', 'hintAndSolutionButtonsModule',
+    'socialButtonsModule'
+]);
