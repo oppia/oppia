@@ -7,7 +7,7 @@
     "rootDir": ".",
     "skipLibCheck": true,
     "target": "es5",
-    "typeRoots": ["../node_modules/@types"],
+    "typeRoots": ["./node_modules/@types"],
   },
   "files": ["assets/constants.js", "assets/rich_text_components_definitions.js", "core/tests/karma-globals.ts", "core/tests/karma.conf.ts"],
   "include": ["core", "extensions", "typings"],
