@@ -2340,7 +2340,9 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.get_output(job_id))
+            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.get_output(
+                job_id)
+            )
         expected_output = ['[u\'SUCCESS\', 1]']
         self.assertEqual(actual_output, expected_output)
 

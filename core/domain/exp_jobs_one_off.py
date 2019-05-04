@@ -735,13 +735,8 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         translator_ids = item.translator_ids
         if len(translator_ids) > 0:
-            exp_rights_model = exp_models.ExplorationRightsModel.get_by_id(
-                item.id)
-            if exp_rights_model is None:
-                return
-
-            exp_rights_model.voice_artist_ids = translator_ids
-            exp_rights_model.translator_ids = []
+            item.voice_artist_ids = translator_ids
+            item.translator_ids = []
             commit_message = 'Migrate from translator to voice artist'
             commit_cmds = [{
                 'cmd': 'change_role',
@@ -749,7 +744,7 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'old_role': 'translator',
                 'new_role': 'voice artist'
             }]
-            exp_rights_model.commit('Admin', commit_message, commit_cmds)
+            item.commit('Admin', commit_message, commit_cmds)
 
             exp_summary_model = exp_models.ExpSummaryModel.get_by_id(item.id)
             if exp_summary_model is None:
