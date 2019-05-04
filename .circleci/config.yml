@@ -86,6 +86,44 @@ jobs:
             sudo pip install codecov
             codecov
           when: on_success
+  e2e_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run:
+          name: E2E Tests
+          command: |
+            sudo apt-get install lsb-release libappindicator3-1
+            curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_67.0.3396.99-1_amd64.deb
+            sudo dpkg -i google-chrome.deb
+            sudo sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
+            rm google-chrome.deb
+            bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="additionalEditorAndPlayerFeatures" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="collections" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="coreEditorAndPlayerFeatures" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="explorationFeedbackTab --prod_env
+            bash scripts/run_e2e_tests.sh --suite="explorationHistoryTab" --prod_env
+            #  bash scripts/run_e2e_tests.sh --suite="explorationStatisticsTab" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="explorationTranslationTab" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="learnerDashboard" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="learner" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="library" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="navigation" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="preferences" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="profileMenu" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="publication" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="skillEditorPage" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="topicsAndSkillsDashboard" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="users" --prod_env
+
 
 workflows:
   version: 2
@@ -96,10 +134,13 @@ workflows:
       # - lint_tests:
       #     requires:
       #       - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - backend_tests:
+      #- frontend_tests:
+      #    requires:
+      #      - setup
+      #- backend_tests:
+      #    requires:
+      #      - setup
+      - e2e_tests:
           requires:
             - setup
 notify:
