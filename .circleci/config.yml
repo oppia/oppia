@@ -104,8 +104,8 @@ jobs:
             # bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="additionalEditorAndPlayerFeatures" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="collections" --prod_env
-            bash scripts/run_e2e_tests.sh --suite="coreEditorAndPlayerFeatures" --prod_env
-            # bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env
+            # bash scripts/run_e2e_tests.sh --suite="coreEditorAndPlayerFeatures" --prod_env
+            bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env
             # bash scripts/run_e2e_tests.sh --suite="explorationFeedbackTab --prod_env
             # bash scripts/run_e2e_tests.sh --suite="explorationHistoryTab" --prod_env
             #  bash scripts/run_e2e_tests.sh --suite="explorationStatisticsTab" --prod_env
