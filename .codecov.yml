@@ -1,6 +1,6 @@
 coverage:
   status:
-    oppia:
+    project:
       default:
         # basic
         target: auto
