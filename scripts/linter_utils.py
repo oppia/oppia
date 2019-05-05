@@ -73,18 +73,17 @@ def memoize(func):
             *. The result of factory(), or the last value to be associated to
             key.
         """
-        if key not in cache:
-            with threadsafe_access(key):
-                if key not in cache:
-                    # We need to use a container because variable assignment
-                    # doesn't work without the `nonlocal` keyword.
-                    q = Queue.Queue()
-                    threading.Thread(target=lambda: q.put(factory())).start()
-                    value = q.get()
-                    q.task_done()
-                    with threadsafe_cache_access:
-                        cache[key] = value
-                    return value
+        with threadsafe_access(key):
+            if key not in cache:
+                # We need to use a container because variable assignment
+                # doesn't work without the `nonlocal` keyword.
+                q = Queue.Queue()
+                threading.Thread(target=lambda: q.put(factory())).start()
+                value = q.get()
+                q.task_done()
+                with threadsafe_cache_access:
+                    cache[key] = value
+                return value
         with threadsafe_cache_access:
             return cache[key]
 
