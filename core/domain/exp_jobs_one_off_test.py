@@ -2234,7 +2234,8 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
             actual_output = exp_jobs_one_off.ImagesAuditJob.get_output(
                 job_id)
             expected_output = [
-                '[u\'exp_id0\', [u"Missing Images: [\'def.png\', \'ghi.png\']"]]'
+                '[u\'exp_id0\', [u"Missing Images: [\'def.png\', '
+                '\'ghi.png\']"]]'
             ]
             self.assertEqual(len(actual_output), 1)
             self.assertEqual(actual_output[0], expected_output[0])
