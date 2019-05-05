@@ -1,0 +1,14 @@
+coverage:
+  status:
+    oppia:
+      default:
+        # basic
+        target: auto
+        threshold: null
+        base: pr
+        # advanced
+        branches: null
+        if_no_uploads: error
+        if_not_found: success
+        if_ci_failed: error
+        only_pulls: true
