@@ -2234,9 +2234,7 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
             actual_output = exp_jobs_one_off.ImagesAuditJob.get_output(
                 job_id)
             expected_output = [
-                '[u\'Image(s) not found in external folder\', '
-                '[u\'Image def.png not found for exploration: exp_id0\', '
-                'u\'Image ghi.png not found for exploration: exp_id0\']]'
+                '[u\'exp_id0\', [u"Missing Images: [\'def.png\', \'ghi.png\']"]]'
             ]
             self.assertEqual(len(actual_output), 1)
             self.assertEqual(actual_output[0], expected_output[0])
@@ -2258,8 +2256,7 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
             actual_output = exp_jobs_one_off.ImagesAuditJob.get_output(
                 job_id)
             expected_output = [
-                '[u\'All images verified for an exploration\', '
-                '[u\'All images verified for exploration: exp_id0\']]'
+                '[u\'All images verified for an exploration\', 1]'
             ]
             self.assertEqual(len(actual_output), 1)
             self.assertEqual(actual_output[0], expected_output[0])

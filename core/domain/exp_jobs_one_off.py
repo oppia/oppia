@@ -50,7 +50,6 @@ FILE_REFERENCES_NON_EXISTENT_EXP_KEY = 'File references nonexistent exp'
 FILE_REFERENCES_DELETED_EXP_KEY = 'File references deleted exp'
 FILE_DELETED = 'File has been deleted'
 FILE_FOUND_IN_GCS = 'File is there in GCS'
-IMAGE_NOT_FOUND = 'Image(s) not found in external folder'
 EXP_REFERENCES_UNICODE_FILES = 'Exploration references unicode files'
 INVALID_GCS_URL = 'The url for the entity on GCS is invalid'
 NUMBER_OF_FILES_DELETED = 'Number of files that got deleted'
@@ -602,7 +601,6 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
             yield (status, values)
 
 
-
 class ImagesAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for checking whether all images in {{exp_id}}/assets/image/
     are also present in exploration/{{exp_id}}/assets/image/.
@@ -627,35 +625,36 @@ class ImagesAuditJob(jobs.BaseMapReduceOneOffJobManager):
             image_urls_internal = fs_internal.listdir('image')
             image_urls_external = fs_external.listdir('image')
 
-            image_filenames_internal = [
+            image_filenames_internal = set([
                 GCS_IMAGE_ID_REGEX.match(url).group(3)
-                for url in image_urls_internal]
+                for url in image_urls_internal])
 
-            image_filenames_external = [
+            image_filenames_external = set([
                 GCS_EXTERNAL_IMAGE_ID_REGEX.match(url).group(3)
-                for url in image_urls_external]
+                for url in image_urls_external])
 
             # Currently in editor.py and exp_services.py, all images are stored
             # in exploration/{{exp_id}}/ parent folder. So, we only need to
             # check if all images in the internal folder are there in the
             # external folder.
-            all_images_present = True
-            for image_filename in image_filenames_internal:
-                if image_filename not in image_filenames_external:
-                    all_images_present = False
-                    yield (
-                        IMAGE_NOT_FOUND,
-                        'Image %s not found for exploration: %s' % (
-                            image_filename, exp_id))
+            non_existent_images = image_filenames_internal.difference(
+                image_filenames_external)
 
-            if all_images_present:
+            if len(non_existent_images) > 0:
+                yield (
+                    exp_id,
+                    'Missing Images: %s' % list(non_existent_images))
+            else:
                 yield (
                     ALL_IMAGES_VERIFIED,
                     'All images verified for exploration: %s' % (exp_id))
 
     @staticmethod
     def reduce(status, values):
-        yield (status, values)
+        if status == ALL_IMAGES_VERIFIED:
+            yield (status, len(values))
+        else:
+            yield (status, values)
 
 
 class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
