@@ -13,14 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying animated loading dots.
+ * @fileoverview Directive for the attribution guide.
  */
 
-oppia.directive('loadingDots', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/loading/loading_dots_directive.html')
-    };
-  }]);
+angular.module('attributionGuideModule', []);

@@ -16,7 +16,7 @@
  * @fileoverview Directive for the Social Sharing Links.
  */
 
-oppia.directive('sharingLinks', [
+angular.module('sharingLinksModule').directive('sharingLinks', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -29,8 +29,8 @@ oppia.directive('sharingLinks', [
         getCollectionId: '&collectionId'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/share/' +
-        'sharing_links_directive.html'),
+        '/components/common-layout-directives/sharing-links/' +
+        'sharing-links.directive.html'),
       controller: [
         '$scope', '$window', 'HtmlEscaperService',
         'ExplorationEmbedButtonService', 'SiteAnalyticsService',

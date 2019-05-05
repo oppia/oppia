@@ -23,8 +23,8 @@ angular.module('hintAndSolutionButtonsModule').directive(
         restrict: 'E',
         scope: {},
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          'core/templates/dev/head/components/button-directives/' +
-          'hint-and-solution-buttons/hint-and-solution-buttons.directive.html'),
+          '/components/button-directives/hint-and-solution-buttons/' +
+          'hint-and-solution-buttons.directive.html'),
         controller: [
           '$scope', '$rootScope', 'HintsAndSolutionManagerService',
           'PlayerTranscriptService', 'ExplorationPlayerStateService',

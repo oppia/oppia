@@ -18,14 +18,14 @@
  * dismissible.
  */
 
-oppia.directive('promoBar', [
+angular.module('promoBarModule').directive('promoBar', [
   'PromoBarService', 'UrlInterpolationService',
   function(PromoBarService, UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/promo/' +
-        'promo_bar_directive.html'),
+        '/components/common-layout-directives/promo-bar/' +
+        'promo-bar.directive.html'),
       controller: [
         '$scope', function($scope) {
           var isPromoDismissed = function() {

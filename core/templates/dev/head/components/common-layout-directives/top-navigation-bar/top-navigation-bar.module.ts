@@ -13,21 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the side navigation bar.
+ * @fileoverview Directive for the top navigation bar. This excludes the part
+ * of the navbar that is used for local navigation (such as the various tabs in
+ * the editor pages).
  */
 
-oppia.directive('sideNavigationBar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/side_navigation_bar/' +
-        'side_navigation_bar_directive.html'),
-      controller: ['$scope', '$timeout', function(
-          $scope, $timeout) {
-        $scope.currentUrl = window.location.pathname;
-        $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-      }]
-    };
-  }]);
+angular.module('topNavigationBarModule', []);

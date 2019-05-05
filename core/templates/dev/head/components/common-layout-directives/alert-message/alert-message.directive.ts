@@ -16,7 +16,7 @@
  * @fileoverview Directive for Alert Messages
  */
 
-oppia.directive('alertMessage', [function() {
+angular.module('alertMessageModule').directive('alertMessage', [function() {
   return {
     restrict: 'E',
     scope: {

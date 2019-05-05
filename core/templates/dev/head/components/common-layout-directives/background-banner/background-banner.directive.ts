@@ -16,13 +16,14 @@
  * @fileoverview Directive for the background banner.
  */
 
-oppia.directive('backgroundBanner', [
+angular.module('backgroundBannerModule').directive('backgroundBanner', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/background/background_banner_directive.html'),
+        '/components/common-layout-directives/background-banner/' +
+        'background-banner.directive.html'),
       controller: [
         '$scope',
         function($scope) {

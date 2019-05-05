@@ -13,23 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the attribution guide.
+ * @fileoverview Directive for displaying animated loading dots.
  */
 
-oppia.directive('attributionGuide', [
+angular.module('loadingDotsModule').directive('loadingDots', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/attribution_guide/' +
-        'attribution_guide_directive.html'),
-      controller: [
-        '$scope', 'BrowserCheckerService', 'UrlService', function(
-            $scope, BrowserCheckerService, UrlService) {
-          $scope.isMobileDevice = BrowserCheckerService.isMobileDevice();
-          $scope.iframed = UrlService.isIframed();
-        }
-      ]
+        '/components/common-layout-directives/loading-dots/' +
+        'loading-dots.directive.html')
     };
   }]);

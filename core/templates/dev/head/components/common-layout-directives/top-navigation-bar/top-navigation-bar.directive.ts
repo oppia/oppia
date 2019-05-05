@@ -18,14 +18,14 @@
  * the editor pages).
  */
 
-oppia.directive('topNavigationBar', [
+angular.module('topNavigationBarModule').directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/top_navigation_bar/' +
-        'top_navigation_bar_directive.html'),
+        '/components/common-layout-directives/top-navigation-bar/' +
+        'top-navigation-bar.directive.html'),
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
