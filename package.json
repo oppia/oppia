@@ -11,7 +11,7 @@
     "url": "git+https://github.com/oppia/oppia.git"
   },
   "author": "",
-  "license": "Apache v2",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/oppia/oppia/issues"
   },
