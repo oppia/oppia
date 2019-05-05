@@ -93,6 +93,7 @@ def _get_current_version_tag(repo):
     """
     return repo.get_tags()[0]
 
+
 def get_extra_commits_in_new_release(base_commit, repo):
     """Gets extra commits in the new release.
 
