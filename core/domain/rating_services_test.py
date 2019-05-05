@@ -184,14 +184,8 @@ class RatingServicesTests(test_utils.GenericTestBase):
         def _mock_get_exploration_summary_by_id(exp_id):
             """Assign None to exploration summary ratings."""
             exp_summary_model = exp_models.ExpSummaryModel.get(exp_id)
-            if exp_summary_model:
-                exp_summary = exp_services.get_exploration_summary_from_model(
-                    exp_summary_model)
-                exp_summary.ratings = None
-                return exp_summary
-            else:
-                return None
-
+            exp_summary_model.ratings = None
+            return exp_summary_model
 
         with self.swap(
             exp_services, 'get_exploration_summary_by_id',

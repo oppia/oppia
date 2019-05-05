@@ -74,10 +74,8 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
 
         # Raise an error because generator id is invalid.
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'is not a valid generator '
-            'for exploration parameters. Valid generators must not require '
-            'any initialization arguments.'
-            ):
+            utils.ValidationError, 'Expected generator id to be a string, '
+            'received'):
             param_domain.ParamChange('abc', {'Copier': 'value'}, {}).validate()
 
     def test_param_change_class(self):
