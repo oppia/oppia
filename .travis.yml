@@ -19,37 +19,37 @@ branches:
 
 env:
   matrix:
-    # - RUN_LINT=true
-    # # These lines are commented out because these checks are being run on CircleCI
-    # # here: https://circleci.com/gh/oppia/oppia
-    # # - RUN_FRONTEND_TESTS=true
-    # # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false EXCLUDE_LOAD_TESTS=true
-    # # TODO(sll): Reinstate this when we can get it to run in reasonable time.
-    # # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
-    # # TODO(sll): Reinstate this when the load tests are more reliable.
-    # # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true EXCLUDE_LOAD_TESTS=false
-    # - RUN_E2E_TESTS_ACCESSIBILITY=true
-    # - RUN_E2E_TESTS_ADDITIONAL_EDITOR_AND_PLAYER_FEATURES=true
-    # - RUN_E2E_TESTS_COLLECTIONS=true
-    # - RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES=true
-    # - RUN_E2E_TESTS_EMBEDDING=true
-    # - RUN_E2E_TESTS_EXPLORATION_FEEDBACK_TAB=true
-    # - RUN_E2E_TESTS_EXPLORATION_HISTORY_TAB=true
-    # - RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB=true
-    # - RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB=true
-    # - RUN_E2E_TESTS_EXTENSIONS=true
-    # - RUN_E2E_TESTS_LEARNER_DASHBOARD=true
-    # - RUN_E2E_TESTS_LEARNER=true
-    # - RUN_E2E_TESTS_LIBRARY=true
-    # - RUN_E2E_TESTS_NAVIGATION=true
-    # - RUN_E2E_TESTS_PREFERENCES=true
-    # - RUN_E2E_TESTS_PROFILE_MENU=true
-    # - RUN_E2E_TESTS_PUBLICATION=true
-    # - RUN_E2E_TESTS_SKILL_EDITOR=true
-    # - RUN_E2E_TESTS_SUBSCRIPTIONS=true
-    # - RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD=true
-    # - RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR=true
-    # - RUN_E2E_TESTS_USERS=true
+    - RUN_LINT=true
+    # These lines are commented out because these checks are being run on CircleCI
+    # here: https://circleci.com/gh/oppia/oppia
+    # - RUN_FRONTEND_TESTS=true
+    # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false EXCLUDE_LOAD_TESTS=true
+    # TODO(sll): Reinstate this when we can get it to run in reasonable time.
+    # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
+    # TODO(sll): Reinstate this when the load tests are more reliable.
+    # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true EXCLUDE_LOAD_TESTS=false
+    - RUN_E2E_TESTS_ACCESSIBILITY=true
+    - RUN_E2E_TESTS_ADDITIONAL_EDITOR_AND_PLAYER_FEATURES=true
+    - RUN_E2E_TESTS_COLLECTIONS=true
+    - RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES=true
+    - RUN_E2E_TESTS_EMBEDDING=true
+    - RUN_E2E_TESTS_EXPLORATION_FEEDBACK_TAB=true
+    - RUN_E2E_TESTS_EXPLORATION_HISTORY_TAB=true
+    - RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB=true
+    - RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB=true
+    - RUN_E2E_TESTS_EXTENSIONS=true
+    - RUN_E2E_TESTS_LEARNER_DASHBOARD=true
+    - RUN_E2E_TESTS_LEARNER=true
+    - RUN_E2E_TESTS_LIBRARY=true
+    - RUN_E2E_TESTS_NAVIGATION=true
+    - RUN_E2E_TESTS_PREFERENCES=true
+    - RUN_E2E_TESTS_PROFILE_MENU=true
+    - RUN_E2E_TESTS_PUBLICATION=true
+    - RUN_E2E_TESTS_SKILL_EDITOR=true
+    - RUN_E2E_TESTS_SUBSCRIPTIONS=true
+    - RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD=true
+    - RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR=true
+    - RUN_E2E_TESTS_USERS=true
 
 matrix:
   allow_failures: []
