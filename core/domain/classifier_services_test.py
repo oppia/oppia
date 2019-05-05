@@ -510,8 +510,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected all classifier data objects to be '
             'lists, dicts, strings, integers but received'):
-            classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
-                2.0124)
+            (classifier_services.
+             convert_strings_to_float_numbers_in_classifier_data(2.0124))
 
     def test_can_not_mark_training_jobs_complete_due_to_invalid_job_id(self):
         with self.assertRaisesRegexp(
