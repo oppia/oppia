@@ -3119,6 +3119,7 @@ md-card.preview-conversation-skin-supplemental-card {
   position: absolute;
   word-wrap: break-word;
   -webkit-hyphens: auto;
+  width: 100%;
 }
 .oppia-activity-summary-tile.oppia-activity-playlist-tile .activity-title {
   font-size: 0.85em;
