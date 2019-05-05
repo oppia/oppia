@@ -75,8 +75,6 @@ def memoize(func):
         """
         with threadsafe_access(key):
             if key not in cache:
-                # We need to use a container because variable assignment
-                # doesn't work without the `nonlocal` keyword.
                 q = Queue.Queue()
                 threading.Thread(target=lambda: q.put(factory())).start()
                 value = q.get()
