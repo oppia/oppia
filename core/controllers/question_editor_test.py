@@ -175,6 +175,20 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             self.assertEqual(len(questions), 2)
             self.logout()
 
+    def test_post_with_invalid_question_returns_400_status(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            question_dict = self.question.to_dict()
+            question_dict['id'] = None
+            question_dict['question_state_data'] = 'invalid_question_state_data'
+            self.post_json(
+                '%s/%s' % (feconf.NEW_QUESTION_URL, self.skill_id), {
+                    'question_dict': question_dict
+                }, csrf_token=csrf_token, expected_status_int=400)
+            self.logout()
+
 
 class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
     """Tests link and unlink question from skills."""
@@ -416,6 +430,24 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
                 self.skill_id)
             self.logout()
 
+    def test_get_with_invalid_question_id_returns_404_status(self):
+        def _mock_get_question_by_id(unused_question_id, **unused_kwargs):
+            """Mocks '_get_question_by_id'. Returns None."""
+            return None
+
+        new_structure_editors_swap = self.swap(
+            constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True)
+        question_services_swap = self.swap(
+            question_services, 'get_question_by_id', _mock_get_question_by_id)
+
+        with new_structure_editors_swap, question_services_swap:
+            self.login(self.EDITOR_EMAIL)
+            self.get_json(
+                '%s/%s' % (
+                    feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
+                    self.question_id), expected_status_int=404)
+
+            self.logout()
 
     def test_delete_with_new_structures_disabled_returns_404_status(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
