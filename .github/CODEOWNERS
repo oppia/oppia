@@ -79,14 +79,14 @@
 
 
 # Global components.
-/core/templates/dev/head/components/alerts/ @ankita240796
-/core/templates/dev/head/components/attribution_guide/ @ankita240796
-/core/templates/dev/head/components/background/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/alert-message/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/attribution-guide/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/background-banner/ @ankita240796
 /core/templates/dev/head/components/button-directives/exploration-embed-modal/ @ankita240796
-/core/templates/dev/head/components/loading/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/loading-dots/ @ankita240796
 /core/templates/dev/head/components/profile_link/ @ankita240796
-/core/templates/dev/head/components/promo/ @ankita240796
-/core/templates/dev/head/components/share/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/promo-bar/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/sharing-links/ @ankita240796
 /core/templates/dev/head/components/button-directives/social-buttons/ @ankita240796
 /core/templates/dev/head/components/summary_tile/ @ankita240796
 
@@ -135,8 +135,8 @@
 # Navigation bar project.
 /core/templates/dev/head/domain/sidebar/ @nithusha21
 /core/templates/dev/head/components/button-directives/create-button/ @nithusha21
-/core/templates/dev/head/components/side_navigation_bar/ @nithusha21
-/core/templates/dev/head/components/top_navigation_bar/ @nithusha21
+/core/templates/dev/head/components/common-layout-directives/side-navigation-bar/ @nithusha21
+/core/templates/dev/head/components/common-layout-directives/top-navigation-bar/ @nithusha21
 
 
 # New structures team.
