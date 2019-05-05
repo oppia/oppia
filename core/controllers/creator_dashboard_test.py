@@ -18,6 +18,7 @@ import datetime
 
 from constants import constants
 from core.controllers import creator_dashboard
+from core.domain import collection_domain
 from core.domain import event_services
 from core.domain import exp_services
 from core.domain import feedback_domain
@@ -737,21 +738,38 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_collections_list(self):
-        self.set_admins([self.OWNER_USERNAME])
-        self.login(self.OWNER_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
-        collection_list = self.get_json(
-            feconf.CREATOR_DASHBOARD_DATA_URL)['collections_list']
-        self.assertEqual(collection_list, [])
-        collection_id = self.post_json(
-            feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[
-                creator_dashboard.COLLECTION_ID_KEY]
-        collection_list = self.get_json(
-            feconf.CREATOR_DASHBOARD_DATA_URL)['collections_list']
-        self.assertEqual(collection_list[-1]['id'], collection_id)
-        self.assertEqual(len(collection_list), 1)
-        self.logout()
+
+        class MockCollection(object):
+            @classmethod
+            def mock_create_default_collection(cls, collection_id):
+                """Mocks create_default_collection()."""
+                return collection_domain.Collection(
+                    collection_id, 'A title', 'A category',
+                    'An objective', constants.DEFAULT_LANGUAGE_CODE, [],
+                    feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0)
+
+        with self.swap(
+            collection_domain.Collection, 'create_default_collection',
+            MockCollection.mock_create_default_collection):
+            self.set_admins([self.OWNER_USERNAME])
+            self.login(self.OWNER_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            collection_list = self.get_json(
+                feconf.CREATOR_DASHBOARD_DATA_URL)['collections_list']
+            self.assertEqual(collection_list, [])
+            collection_id = self.post_json(
+                feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[
+                    creator_dashboard.COLLECTION_ID_KEY]
+            collection_list = self.get_json(
+                feconf.CREATOR_DASHBOARD_DATA_URL)['collections_list']
+
+            self.assertEqual(len(collection_list), 1)
+            self.assertEqual(collection_list[0]['id'], collection_id)
+            self.assertEqual(collection_list[0]['title'], 'A title')
+            self.assertEqual(collection_list[0]['objective'], 'An objective')
+            self.assertEqual(collection_list[0]['category'], 'A category')
+            self.logout()
 
     def test_get_suggestions_list(self):
         self.login(self.OWNER_EMAIL)
