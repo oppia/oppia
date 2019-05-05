@@ -27,15 +27,18 @@ import linter_utils
 class MemoizeTest(test_utils.GenericTestBase):
     """Tests for the memoize function."""
 
-    def test_memoize_always_returns_value(self):
+    def test_memoize_always_returns_same_value(self):
+        lst = []
         @linter_utils.memoize
-        def return_one():
-            """Returns the integer 1."""
-            return 1
+        def extend_then_return_lst():
+            """Appends 1 to the lst, then returns it."""
+            lst.append(1)
+            return lst
 
-        self.assertEqual(return_one(), 1)
-        self.assertEqual(return_one(), 1)
-        self.assertEqual(return_one(), 1)
+        self.assertEqual(extend_then_return_lst(), [1])
+        self.assertEqual(lst, [1])
+        self.assertEqual(extend_then_return_lst(), [1])
+        self.assertEqual(lst, [1])
 
     def test_memoize_with_args(self):
         call_counter = collections.Counter()
