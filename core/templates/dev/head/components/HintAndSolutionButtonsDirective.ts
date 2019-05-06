@@ -90,8 +90,8 @@ oppia.directive('hintAndSolutionButtons', [
 
           $scope.displaySolutionModal = function() {
             $scope.solutionModalIsActive = true;
-            var inPretestMode = ExplorationPlayerStateService.isInPretestMode();
-            if (!_editorPreviewMode && !inPretestMode) {
+            var inQuestionMode = ExplorationPlayerStateService.isInQuestionMode();
+            if (!_editorPreviewMode && !inQuestionMode) {
               StatsReportingService.recordSolutionHit(
                 PlayerPositionService.getCurrentStateName());
             }

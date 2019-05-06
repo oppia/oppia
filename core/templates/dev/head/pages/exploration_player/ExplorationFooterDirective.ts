@@ -45,6 +45,7 @@ oppia.directive('explorationFooter', [
           });
 
           $scope.contributorNames = [];
+          if(!ContextService.isInQuestionPlayerMode()) {
           ExplorationSummaryBackendApiService
             .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])
             .then(function(summaries) {
@@ -62,6 +63,7 @@ oppia.directive('explorationFooter', [
                   });
               }
             });
+          }
         }
       ]
     };
