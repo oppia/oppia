@@ -73,6 +73,7 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
+
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 

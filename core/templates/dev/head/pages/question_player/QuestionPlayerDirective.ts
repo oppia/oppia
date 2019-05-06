@@ -16,7 +16,6 @@
  * @fileoverview Controller for the questions player directive.
  */
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-
 oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',
   function(
