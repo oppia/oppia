@@ -2409,7 +2409,7 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
                 job_id)
             )
         expected_output = ['[u\'Summary model does not exist or is '
-            'deleted\', [u\'exp_id\']]']
+                           'deleted\', [u\'exp_id\']]']
         self.assertEqual(actual_output, expected_output)
 
         exp_rights_model_2 = exp_models.ExplorationRightsModel.get(
