@@ -32,9 +32,6 @@ class PracticeSessionsPage(base.BaseHandler):
 
         topic = topic_services.get_topic_by_name(topic_name)
 
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given name doesn\'t exist.'))
         topic_name = topic.name
 
         self.values.update({
