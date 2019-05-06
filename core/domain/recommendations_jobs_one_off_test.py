@@ -99,8 +99,8 @@ class ExplorationRecommendationsOneOffJobUnitTests(
                     'exp_id_1'))
             self.assertEqual(recommendations, ['exp_id_2', 'exp_id_3'])
 
-    def test_recommendations_with_invalid_exploration_summaries(self):
-
+    def test_recommendations_with_invalid_exploration_summaries_would_be_empty(
+            self):
         def _mock_get_non_private_exploration_summaries():
             """Return an invalid exploration summary dict."""
             return {'new_exp_id': 'new_exploration_summary'}
@@ -109,7 +109,10 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             jobs_registry, 'ONE_OFF_JOB_MANAGERS',
             self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
             ):
-
+            # We need to swap here to make the recommendations an empty list
+            # (since 'get_exploration_recommendations()' returns a list of ids
+            # of at most 10 recommended explorations to play after completing
+            # the exploration).
             with self.swap(
                 exp_services, 'get_non_private_exploration_summaries',
                 _mock_get_non_private_exploration_summaries):
