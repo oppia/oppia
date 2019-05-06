@@ -747,14 +747,17 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             item.commit('Admin', commit_message, commit_cmds)
 
             exp_summary_model = exp_models.ExpSummaryModel.get_by_id(item.id)
-            if exp_summary_model is None:
-                return
-
-            exp_summary_model.voice_artist_ids = translator_ids
-            exp_summary_model.translator_ids = []
-            exp_summary_model.put()
-            yield('SUCCESS', item.id)
+            if exp_summary_model is None or exp_summary_model.deleted:
+                yield ('Summary model does not exist or is deleted', item.id)
+            else:
+                exp_summary_model.voice_artist_ids = translator_ids
+                exp_summary_model.translator_ids = []
+                exp_summary_model.put()
+                yield ('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
