@@ -232,6 +232,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),
     get_redirect_route(
+        r'%s/<topic_name>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+        practice_sessions.PracticeSessionsPageDataHandler),
+    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
     get_redirect_route(
