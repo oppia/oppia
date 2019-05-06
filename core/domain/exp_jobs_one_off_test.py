@@ -106,7 +106,7 @@ def run_job_for_deleted_exp(
         self.assertEqual(job_class.get_output(job_id), [])
 
 
-class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
+'''class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
     """Tests for ExpSummary aggregations."""
 
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
@@ -2294,7 +2294,7 @@ class InteractionCustomizationArgsValidationJobTests(
 
         run_job_for_deleted_exp(
             self,
-            exp_jobs_one_off.InteractionCustomizationArgsValidationJob)
+            exp_jobs_one_off.InteractionCustomizationArgsValidationJob)'''
 
 
 class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
@@ -2334,6 +2334,17 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
         }]
         exp_rights_model.commit(self.user_a_id, commit_message, commit_cmds)
 
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exploration.id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            community_owned=exp_rights_model.community_owned,
+            translator_ids=[self.user_b_id]
+        )
+        exp_summary_model.put()
+
         job_id = (
             exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.create_new())
         exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.enqueue(job_id)
@@ -2351,6 +2362,9 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual([], exp_rights_model_2.translator_ids)
         self.assertEqual([self.user_b_id], exp_rights_model_2.voice_artist_ids)
 
+        exp_summary_model = exp_models.ExpSummaryModel.get(exploration.id)
+        self.assertEqual([], exp_summary_model.translator_ids)
+        self.assertEqual([self.user_b_id], exp_summary_model.voice_artist_ids)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         exp_id = '100'

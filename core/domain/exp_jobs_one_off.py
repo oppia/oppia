@@ -751,6 +751,7 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 return
 
             exp_summary_model.voice_artist_ids = translator_ids
+            exp_summary_model.translator_ids = []
             exp_summary_model.put()
             yield('SUCCESS', item.id)
 

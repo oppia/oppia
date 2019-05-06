@@ -393,6 +393,8 @@ class ExpSummaryModel(base_models.BaseModel):
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to voiceover this exploration.
     voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # DEPRECATED in v2.8.1. Do not use.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
