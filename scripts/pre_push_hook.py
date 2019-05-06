@@ -302,14 +302,15 @@ def _install_hook():
         print 'Copied file to .git/hooks directory'
 
 
-def does_diff_include_frontend_scripts(files_to_lint):
-    """Returns true if diff includes TypeScript or JavaScript files.
+def does_diff_include_js_or_ts_files(files_to_lint):
+    """Returns true if diff includes JavaScript or TypeScript files.
 
     Args:
         files_to_lint: list(str). List of files to be linted.
 
     Returns:
-        bool. Whether the diff contains changes in any frontend script.
+        bool. Whether the diff contains changes in any JavaScript or TypeScript
+            files.
     """
 
     for filename in files_to_lint:
@@ -350,7 +351,7 @@ def main():
                     print 'Push failed, please correct the linting issues above'
                     sys.exit(1)
             frontend_status = 0
-            if does_diff_include_frontend_scripts(files_to_lint):
+            if does_diff_include_js_or_ts_files(files_to_lint):
                 frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'
