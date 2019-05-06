@@ -87,7 +87,7 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
 
 class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
-     def test_get_fails_when_new_structures_not_enabled(self):
+    def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
                 '%s/%s' % (
@@ -95,7 +95,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                     'public_topic_name'),
                 expected_status_int=404)
 
-     def test_any_user_can_access_practice_sessions_data(self):
+    def test_any_user_can_access_practice_sessions_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/%s' % (
@@ -106,7 +106,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             self.assertEqual(json_response['skill_list'][0], 'skill_id_1')
             self.assertEqual(json_response['skill_list'][1], 'skill_id_2')
 
-     def test_no_user_can_access_unpublished_topic_practice_session_data(self):
+    def test_no_user_can_access_unpublished_topic_practice_session_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
                 '%s/%s' % (
@@ -114,7 +114,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
                     'private_topic_name'),
                 expected_status_int=404)
 
-     def test_get_fails_when_topic_doesnt_exist(self):
+    def test_get_fails_when_topic_doesnt_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
                 '%s/%s' % (
