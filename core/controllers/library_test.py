@@ -192,6 +192,24 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'objective': 'Objective B',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
+        
+ 
+class LibraryIndexHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(LibraryIndexHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
+    def test_library_index_handler(self):
+        response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+        self.assertDictContainsSubset({
+            'activity_summary_dicts_by_category' : [],
+        }, response_dict)
 
 
 class LibraryGroupPageTests(test_utils.GenericTestBase):
