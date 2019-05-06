@@ -18,7 +18,7 @@
 
 // TODO(bhenning): These constants should be provided by the backend.
 
-angular.module('collectionEditorModule').controller('CollectionEditor', [
+angular.module('collectionEditorPageModule').controller('CollectionEditor', [
   'CollectionEditorStateService',
   function(CollectionEditorStateService) {
     // Load the collection to be edited.

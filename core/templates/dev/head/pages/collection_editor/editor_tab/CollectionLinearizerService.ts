@@ -18,7 +18,7 @@
  * retrieving the collection, saving it, and listening for changes.
  */
 
-angular.module('collectionEditorModule').factory('CollectionLinearizerService', [
+angular.module('collectionEditorPageModule').factory('CollectionLinearizerService', [
   'CollectionUpdateService',
   function(CollectionUpdateService) {
     var _getNextExplorationId = function(collection, completedExpIds) {

@@ -18,7 +18,7 @@
 
 // TODO(bhenning): These constants should be provided by the backend.
 
-angular.module('collectionEditorModule', [
+angular.module('collectionEditorPageModule', [
   'collectionHistoryTabModule', 'collectionDetailsEditorModule',
   'collectionPermissionsCardModule', 'collectionSettingsTabModule',
   'collectionEditorNavbarBreadcrumbModule', 'collectionEditorTabModule',
@@ -26,20 +26,20 @@ angular.module('collectionEditorModule', [
   'collectionStatisticsTabModule', 'collectionEditorNavbarModule'
 ]);
 
-angular.module('collectionEditorModule').constant(
+angular.module('collectionEditorPageModule').constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
 
-angular.module('collectionEditorModule').constant(
+angular.module('collectionEditorPageModule').constant(
   'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
   '/collection_editor_handler/data/<collection_id>');
 
-angular.module('collectionEditorModule').constant(
+angular.module('collectionEditorPageModule').constant(
   'COLLECTION_RIGHTS_URL_TEMPLATE',
   '/collection_editor_handler/rights/<collection_id>');
 
-angular.module('collectionEditorModule').constant(
+angular.module('collectionEditorPageModule').constant(
   'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
 
-angular.module('collectionEditorModule').constant(
+angular.module('collectionEditorPageModule').constant(
   'SEARCH_EXPLORATION_URL_TEMPLATE',
   '/exploration/metadata_search?q=<query>');

@@ -114,7 +114,7 @@ angular.module('collectionEditorNavbarModule').directive('collectionEditorNavbar
             var isPrivate = $scope.collectionRights.isPrivate();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/collection_editor/' +
+                '/pages/collection_editor/collection-editor-navbar/' +
                 'collection-editor-save-modal.directive.html'),
               backdrop: true,
               controller: [
@@ -146,7 +146,7 @@ angular.module('collectionEditorNavbarModule').directive('collectionEditorNavbar
             if (additionalMetadataNeeded) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/collection_editor/' +
+                  '/pages/collection_editor/collection-editor-navbar/' +
                   'collection-editor-pre-publish-modal.directive.html'),
                 backdrop: true,
                 controller: [
