@@ -209,7 +209,35 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
             'activity_summary_dicts_by_category' : [],
+            'preferred_language_codes': ['en'],
         }, response_dict)
+
+        exp_services.load_demo('0')
+        rating_services.assign_rating_to_exploration('user', '0', 2)
+        response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+        self.assertEqual(
+            len(response_dict['activity_summary_dicts_by_category']), 1)
+        self.assertDictContainsSubset({
+            'preferred_language_codes': ['en'],
+        }, response_dict)
+        self.assertDictContainsSubset({
+            'categories': [],
+            'header_i18n_id': (
+                    feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
+            'has_full_results_page': True,
+            'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
+            'protractor_id': 'top-rated',
+        }, response_dict['activity_summary_dicts_by_category'][0])
+        self.assertEqual(
+            len(response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts']), 1)
+        self.assertDictContainsSubset({
+            'id': '0',
+            'category': 'Welcome',
+            'title': 'Welcome to Oppia!',
+            'language_code': 'en',
+            'objective': 'become familiar with Oppia\'s capabilities',
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0])
 
 
 class LibraryGroupPageTests(test_utils.GenericTestBase):
