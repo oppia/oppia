@@ -33,7 +33,7 @@ import github # isort:skip
 # pylint: enable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
-GIT_CMD_GET_NEW_COMMITS = 'git cherry %s -v'
+GIT_CMD_TEMPLATE_GET_NEW_COMMITS = 'git cherry %s -v'
 GIT_CMD_GET_LOGS_FORMAT_STRING = (
     'git log -z --no-color --pretty=format:%H{0}%aN{0}%aE{0}%B {1}..{2}')
 GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'
@@ -106,7 +106,7 @@ def get_extra_commits_in_new_release(base_commit, repo):
         list(github.Commit.Commit). List of commits from the base commit up to
         the current commit, which haven't been cherrypicked already.
     """
-    get_commits_cmd = GIT_CMD_GET_NEW_COMMITS % base_commit
+    get_commits_cmd = GIT_CMD_TEMPLATE_GET_NEW_COMMITS % base_commit
     out = _run_cmd(get_commits_cmd).split('\n')
     commits = []
     for line in out:
@@ -313,11 +313,8 @@ def main():
     new_release_logs = _gather_logs(base_commit)
 
     for index, log in enumerate(new_release_logs):
-        is_cherrypicked = True
-        for commit in new_commits:
-            if log.sha1 == commit.sha:
-                is_cherrypicked = False
-                break
+        is_cherrypicked = all(
+            [log.sha1 != commit.sha for commit in new_commits])
         if is_cherrypicked:
             del new_release_logs[index]
 
