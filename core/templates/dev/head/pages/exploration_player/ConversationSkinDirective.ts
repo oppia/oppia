@@ -524,7 +524,9 @@ oppia.directive('conversationSkin', [
           };
           var _addNewCard = function(newCard) {
             PlayerTranscriptService.addNewCard(newCard);
+
             var totalNumCards = PlayerTranscriptService.getNumCards();
+
             var previousSupplementalCardIsNonempty = (
               totalNumCards > 1 &&
               isSupplementalCardNonempty(
@@ -532,6 +534,7 @@ oppia.directive('conversationSkin', [
 
             var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
               PlayerTranscriptService.getLastCard());
+
             if (
               totalNumCards > 1 &&
               $scope.canWindowShowTwoCards() &&
