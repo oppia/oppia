@@ -212,7 +212,7 @@ describe('State content editor directive', function() {
       });
 
       var templateHtml = $templateCache.get(
-        '/pages/state-editor-page/state-content-editor/' +
+        '/pages/state-editor/state-content-editor/' +
         'state-content-editor.directive.html');
       $compile(templateHtml, $rootScope);
       $rootScope.$digest();

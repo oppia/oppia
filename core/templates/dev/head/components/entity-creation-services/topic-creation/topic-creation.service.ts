@@ -16,7 +16,7 @@
  * @fileoverview Modal and functionality for the create topic button.
  */
 
-oppia.factory('TopicCreationService', [
+angular.module('entityCreationServicesModule').factory('TopicCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
   'UrlInterpolationService',
   function(

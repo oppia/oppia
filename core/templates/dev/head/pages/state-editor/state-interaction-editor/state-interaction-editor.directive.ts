@@ -37,7 +37,7 @@ angular.module('stateInteractionEditorModule').directive(
           recomputeGraph: '='
         },
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/state-editor-page/state-interaction-editor/' +
+          '/pages/state-editor/state-interaction-editor/' +
           'state-interaction-editor.directive.html'),
         controller: [
           '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',

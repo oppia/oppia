@@ -30,7 +30,7 @@ angular.module('stateResponsesModule').directive('stateResponses', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor-page/state-responses/' +
+        '/pages/state-editor/state-responses/' +
         'state-responses.directive.html'),
       controller: [
         '$filter', '$scope', '$rootScope', '$uibModal', 'AlertsService',

@@ -16,7 +16,7 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
-oppia.factory('StoryCreationService', [
+angular.module('entityCreationServicesModule').factory('StoryCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
   'TopicEditorStateService', 'TopicUpdateService', 'UrlInterpolationService',
   function(

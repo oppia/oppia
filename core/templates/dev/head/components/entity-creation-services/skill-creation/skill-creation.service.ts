@@ -16,7 +16,7 @@
  * @fileoverview Functionality for creating a new skill.
  */
 
-oppia.factory('SkillCreationService', [
+angular.module('entityCreationServicesModule').factory('SkillCreationService', [
   '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
   'UrlInterpolationService',
   function(

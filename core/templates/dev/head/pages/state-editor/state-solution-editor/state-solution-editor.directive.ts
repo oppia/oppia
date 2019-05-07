@@ -27,7 +27,7 @@ angular.module('stateSolutionEditorModule').directive('stateSolutionEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor-page/state-solution-editor/' +
+        '/pages/state-editor/state-solution-editor/' +
         'state-solution-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter', 'StateEditorService',

@@ -33,7 +33,7 @@ angular.module('stateContentEditorModule').directive('stateContentEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor-page/state-content-editor/' +
+        '/pages/state-editor/state-content-editor/' +
         'state-content-editor.directive.html'),
       controller: [
         '$scope', 'StateContentService', 'EditabilityService',

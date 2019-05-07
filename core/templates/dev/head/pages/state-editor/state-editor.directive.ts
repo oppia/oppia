@@ -37,7 +37,7 @@ angular.module('stateEditorModule').directive('stateEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor-page/state-editor-page.mainpage.html'),
+        '/pages/state-editor/state-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', 'INTERACTION_SPECS', 'StateEditorService',
         'StateContentService', 'StateHintsService', 'StateSolutionService',

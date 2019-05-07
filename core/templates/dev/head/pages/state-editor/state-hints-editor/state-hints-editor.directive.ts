@@ -27,7 +27,7 @@ angular.module('stateHintsEditorModule').directive('stateHintsEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor-page/state-hints-editor/' +
+        '/pages/state-editor/state-hints-editor/' +
         'state-hints-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
