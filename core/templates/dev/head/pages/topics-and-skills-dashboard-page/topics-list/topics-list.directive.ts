@@ -55,7 +55,7 @@ angular.module('topicsListModule').directive('topicsList', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/' +
-                'topics-and-skills-dashboard-templates/' +
+                'topics-and-skills-dashboard-page-templates/' +
                 'delete-topic-modal.template.html'),
               backdrop: true,
               controller: [

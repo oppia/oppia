@@ -66,7 +66,7 @@ angular.module('skillsListModule').directive('skillsList', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/' +
-                'topics-and-skills-dashboard-templates/' +
+                'topics-and-skills-dashboard-page-templates/' +
                 'delete-skill-modal.template.html'),
               backdrop: true,
               controller: [
@@ -100,7 +100,7 @@ angular.module('skillsListModule').directive('skillsList', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/' +
-                'topics-and-skills-dashboard-templates/' +
+                'topics-and-skills-dashboard-page-templates/' +
                 'assign-skill-to-topic-modal.template.html'),
               backdrop: true,
               controller: [
@@ -156,7 +156,7 @@ angular.module('skillsListModule').directive('skillsList', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/' +
-                'topics-and-skills-dashboard-templates/' +
+                'topics-and-skills-dashboard-page-templates/' +
                 'merge-skill-modal.template.html'),
               backdrop: true,
               controller: [

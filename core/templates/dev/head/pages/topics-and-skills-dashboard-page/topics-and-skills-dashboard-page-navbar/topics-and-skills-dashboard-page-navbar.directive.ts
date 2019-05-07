@@ -23,8 +23,8 @@ angular.module('topicsAndSkillsDashboardNavbarModule').directive(
         restrict: 'E',
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/topics-and-skills-dashboard-page/' +
-          'topics-and-skills-dashboard-navbar/' +
-          'topics-and-skills-dashboard-navbar.directive.html'),
+          'topics-and-skills-dashboard-page-navbar/' +
+          'topics-and-skills-dashboard-page-navbar.directive.html'),
         controller: [
           '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
           'SkillCreationService', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
@@ -42,7 +42,7 @@ angular.module('topicsAndSkillsDashboardNavbarModule').directive(
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/topics-and-skills-dashboard-page/' +
-                  'topics-and-skills-dashboard-templates/' +
+                  'topics-and-skills-dashboard-page-templates/' +
                   'create-new-skill-modal.template.html'),
                 backdrop: 'static',
                 controller: [

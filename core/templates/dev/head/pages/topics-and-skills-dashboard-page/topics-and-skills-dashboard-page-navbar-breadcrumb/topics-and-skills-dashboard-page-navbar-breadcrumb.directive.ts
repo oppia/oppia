@@ -24,8 +24,8 @@ angular.module('topicsAndSkillsDashboardNavbarBreadcrumbModule').directive(
         scope: {},
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/topics-and-skills-dashboard/' +
-          'topics-and-skills-dashboard-navbar-breadcrumb/' +
-          'topics-and-skills-dashboard-navbar-breadcrumb.directive.html'),
+          'topics-and-skills-dashboard-page-navbar-breadcrumb/' +
+          'topics-and-skills-dashboard-page-navbar-breadcrumb.directive.html'),
         controller: [
           function() {}
         ]

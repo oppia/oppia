@@ -105,7 +105,7 @@ angular.module('topicsAndSkillsDashboardModule').controller(
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/' +
-            'topics-and-skills-dashboard-templates/' +
+            'topics-and-skills-dashboard-page-templates/' +
             'create-new-skill-modal.template.html'),
           backdrop: 'static',
           controller: [

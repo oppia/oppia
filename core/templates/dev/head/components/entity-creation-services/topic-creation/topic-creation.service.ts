@@ -33,7 +33,7 @@ angular.module('entityCreationServicesModule').factory('TopicCreationService', [
         var modalInstance = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/' +
-            'topics-and-skills-dashboard-templates/' +
+            'topics-and-skills-dashboard-page-templates/' +
             'new-topic-name-editor.template.html'),
           backdrop: true,
           controller: [
