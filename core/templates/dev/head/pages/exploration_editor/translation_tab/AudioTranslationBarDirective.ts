@@ -403,6 +403,9 @@ oppia.directive('audioTranslationBar', [
                 $scope.showRecorderWarning) {
                 $scope.recorder.stopRecord();
                 cancelTimer();
+                // when empty it runs fine but when set to anything else
+                // stuck on loading screen animation
+                $rootScope.loadingMessage = '';
               }
             }
             $scope.isTranslationTabBusy = false;
