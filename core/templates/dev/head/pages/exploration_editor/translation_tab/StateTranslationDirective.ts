@@ -101,8 +101,8 @@ oppia.directive('stateTranslation', [
           $scope.getEmptyContentMessage = function() {
             if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
               return (
-                'There is no text available to voice-over, add a text ' +
-                'translation through translation mode.');
+                'The translation for this section has not been created yet. ' +
+                'Switch to translation mode to add a text translation.');
             } else {
               return 'There is no text available to translate.';
             }

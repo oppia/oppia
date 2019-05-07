@@ -386,7 +386,6 @@ describe('Translation status service', function() {
       expect(explorationTranslationNotAvailableCount).toBe(7);
     });
 
-
     it('should correctly return an object containing status colors of audio ' +
       'for all states in the exploration', function() {
       ttams.activateVoiceoverMode();
@@ -403,6 +402,7 @@ describe('Translation status service', function() {
       value.addAudioTranslation('content', 'en', 'file.mp3', 1000);
       scitats.saveDisplayedValue();
       ess.saveContentIdsToAudioTranslations('Second', value);
+      tss.refresh();
       stateWiseStatusColor = tss.getAllStateStatusColors();
       expect(stateWiseStatusColor.Second).toBe(
         FEW_ASSETS_AVAILABLE_COLOR);
@@ -412,6 +412,7 @@ describe('Translation status service', function() {
       'translations for all states in the exploration', function() {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
+      tss.refresh();
       swts.init('Second', ess.getWrittenTranslationsMemento('Second'));
       var stateWiseStatusColor = tss.getAllStateStatusColors();
       expect(stateWiseStatusColor.First).toBe(FEW_ASSETS_AVAILABLE_COLOR);
@@ -421,6 +422,7 @@ describe('Translation status service', function() {
       swts.displayed.addWrittenTranslation('content', 'hi', 'content');
       ess.saveWrittenTranslations('Second', swts.displayed);
 
+      tss.refresh();
       stateWiseStatusColor = tss.getAllStateStatusColors();
       expect(stateWiseStatusColor.Second).toBe(FEW_ASSETS_AVAILABLE_COLOR);
     });

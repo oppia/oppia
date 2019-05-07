@@ -256,7 +256,6 @@ oppia.factory('TranslationStatusService', [
         return explorationContentNotAvailableCount;
       },
       getAllStateStatusColors: function() {
-        _computeAllStatesStatus();
         return stateWiseStatusColor;
       },
       getActiveStateComponentStatusColor: function(componentName) {

@@ -24,6 +24,7 @@ oppia.factory('StateTutorialFirstTimeService', [
     var STARTED_EDITOR_TUTORIAL_EVENT_URL = '/createhandler/' +
     'started_tutorial_event';
     var _currentlyInTranslationFirstVisit = true;
+    var _translationTutorialNotSeenBefore = false;
     var STARTED_TRANSLATION_TUTORIAL_EVENT_URL = '/createhandler/' +
     'started_translation_tutorial_event';
 
@@ -52,9 +53,13 @@ oppia.factory('StateTutorialFirstTimeService', [
 
         _currentlyInEditorFirstVisit = false;
       },
+      markTranslationTutorialNotSeenBefore: function() {
+        _translationTutorialNotSeenBefore = true;
+      },
       initTranslation: function(firstTime, expId) {
         // After the first call to it in a client session, this does nothing.
-        if (!firstTime || !_currentlyInTranslationFirstVisit) {
+        if (!_translationTutorialNotSeenBefore ||
+            !_currentlyInTranslationFirstVisit) {
           _currentlyInTranslationFirstVisit = false;
         }
 

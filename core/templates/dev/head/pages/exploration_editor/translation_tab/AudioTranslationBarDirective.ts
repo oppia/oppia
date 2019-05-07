@@ -68,8 +68,8 @@ oppia.directive('audioTranslationBar', [
         'IdGenerationService', 'SiteAnalyticsService',
         'StateContentIdsToAudioTranslationsService',
         'StateEditorService', 'TranslationLanguageService',
-        'recorderService', 'TranslationTabActiveContentIdService',
-        'RECORDING_TIME_LIMIT',
+        'recorderService', 'TranslationStatusService',
+        'TranslationTabActiveContentIdService', 'RECORDING_TIME_LIMIT',
         function(
             $filter, $rootScope, $scope, $timeout, $uibModal,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
@@ -77,8 +77,8 @@ oppia.directive('audioTranslationBar', [
             IdGenerationService, SiteAnalyticsService,
             StateContentIdsToAudioTranslationsService,
             StateEditorService, TranslationLanguageService,
-            recorderService, TranslationTabActiveContentIdService,
-            RECORDING_TIME_LIMIT) {
+            recorderService, TranslationStatusService,
+            TranslationTabActiveContentIdService, RECORDING_TIME_LIMIT) {
           $scope.RECORDER_ID = 'recorderId';
           $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
           $scope.audioBlob = null;
@@ -105,11 +105,12 @@ oppia.directive('audioTranslationBar', [
           };
 
           var saveContentIdsToAudioTranslationChanges = function() {
-            StateContentIdsToAudioTranslationsService.saveDisplayedValue();
             var stateName = StateEditorService.getActiveStateName();
             var value = StateContentIdsToAudioTranslationsService.displayed;
             ExplorationStatesService.saveContentIdsToAudioTranslations(
               stateName, value);
+            StateContentIdsToAudioTranslationsService.saveDisplayedValue();
+            TranslationStatusService.refresh();
           };
 
           var getAvailableAudio = function(contentId, languageCode) {

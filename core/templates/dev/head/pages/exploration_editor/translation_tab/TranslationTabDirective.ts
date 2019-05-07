@@ -16,42 +16,32 @@
  * @fileoverview Directive for the translation tab.
  */
 
-oppia.directive('translationTab', [
-  'ContextService', 'ExplorationDataService', 'ExplorationStatesService',
-  'StateContentIdsToAudioTranslationsService', 'StateEditorService',
-  'StateTutorialFirstTimeService', 'UrlInterpolationService',
-  function(
-      ContextService, ExplorationDataService, ExplorationStatesService,
-      StateContentIdsToAudioTranslationsService, StateEditorService,
-      StateTutorialFirstTimeService, UrlInterpolationService) {
+oppia.directive('translationTab', ['UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      link: function() {
-        ExplorationDataService.getData().then(function(data) {
-          StateTutorialFirstTimeService.initTranslation(
-            data.show_state_translation_tutorial_on_load,
-            ContextService.getExplorationId()
-          );
-        });
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
 
       controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
-        'EditabilityService', 'StateTutorialFirstTimeService',
-        'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
-        'UrlInterpolationService',
+        'ContextService', 'EditabilityService', 'ExplorationStatesService',
+        'StateContentIdsToAudioTranslationsService', 'StateEditorService',
+        'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
+        'TranslationTabActiveModeService',
         function($scope, $rootScope, $templateCache, $uibModal,
-            EditabilityService, StateTutorialFirstTimeService,
-            StateWrittenTranslationsService, TranslationTabActiveModeService,
-            UrlInterpolationService) {
+            ContextService, EditabilityService, ExplorationStatesService,
+            StateContentIdsToAudioTranslationsService, StateEditorService,
+            StateTutorialFirstTimeService, StateWrittenTranslationsService,
+            TranslationTabActiveModeService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
           $scope.showTranslationTabSubDirectives = false;
 
           var initTranslationTab = function() {
+            StateTutorialFirstTimeService.initTranslation(
+              ContextService.getExplorationId());
             var stateName = StateEditorService.getActiveStateName();
             StateContentIdsToAudioTranslationsService.init(
               stateName,
