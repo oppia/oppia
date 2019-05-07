@@ -21,8 +21,11 @@
   // es5 style worker
   // command message systems for worker
 
-  console.warn('MP3 conversion worker started.');
-  importScripts('/third_party/static/lamejs-1.2.0/lame.min.js');
+  // for karma tests prevent automatic loading from main thread
+  if('function' === typeof importScripts){
+    console.warn('MP3 conversion worker started.');
+    importScripts('/third_party/static/lamejs-1.2.0/lame.min.js');
+  }
 
   self.onmessage = function(e) {
     switch (e.data.cmd) {
