@@ -22,7 +22,7 @@
   // command message systems for worker
 
   // for karma tests prevent automatic loading from main thread
-  if('function' === typeof importScripts){
+  if ('function' === typeof importScripts) {
     console.warn('MP3 conversion worker started.');
     importScripts('/third_party/static/lamejs-1.2.0/lame.min.js');
   }
