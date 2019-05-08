@@ -258,7 +258,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             start_cursor: str. The starting point from which the batch of
                 questions are to be returned. This value should be urlsafe.
 
-        Returns:   
+        Returns:
             list(str), list(list(str)), str|None. The id of questions which
                 are linked to skill ids in the list, the corresponding skill
                 descriptions and the next cursor value to be used for the next
