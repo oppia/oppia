@@ -526,6 +526,8 @@ var constants = {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
+  "NUM_QUESTION_SKILL_LINKS_PER_PAGE": 30,
+
   "NEW_STATE_TEMPLATE": {
       "classifier_model_id": null,
       "content": {

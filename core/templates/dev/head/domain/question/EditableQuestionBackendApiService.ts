@@ -120,6 +120,28 @@ oppia.factory('EditableQuestionBackendApiService', [
       });
     };
 
+    var _addMultiQuestionSkillLink = function(
+        questionId, skillIds, successCallback, errorCallback) {
+      skillIds.forEach(function(skillId) {
+        var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
+          QUESTION_SKILL_LINK_URL_TEMPLATE, {
+            question_id: questionId,
+            skill_id: skillId
+        });
+
+        $http.post(addQuestionSkillLinkUrl).then(function(response) {
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
+      });
+
+      if (successCallback) {
+        successCallback();
+      }
+    };
+
     return {
       createQuestion: function(skillIds, questionDict) {
         return $q(function(resolve, reject) {
@@ -156,6 +178,13 @@ oppia.factory('EditableQuestionBackendApiService', [
           questionId, skillId) {
         return $q(function(resolve, reject) {
           _addQuestionSkillLink(questionId, skillId, resolve, reject);
+        });
+      },
+
+      addMultiQuestionSkillLink: function(
+        questionId, skillIds) {
+        return $q(function(resolve, reject) {
+          _addMultiQuestionSkillLink(questionId, skillIds, resolve, reject);
         });
       }
     };

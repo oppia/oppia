@@ -245,38 +245,39 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_models, skill_descriptions, next_cursor_str
 
     @classmethod
-    def get_all_question_ids_and_skill_descriptions(
-            cls, question_count, skill_ids, start_cursor):
+    def get_question_ids_and_skill_descriptions(
+            cls, question_skill_count, skill_ids, start_cursor):
         """Fetches question ids and skill descriptions linked to a list of
         skill ids.
 
         Args:
-            question_count: int. The number of questions to be returned.
+            question_skill_count: int. The number of question skill links
+                to be fetched.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
             start_cursor: str. The starting point from which the batch of
                 questions are to be returned. This value should be urlsafe.
 
-        Returns:
-            list(str), list(list(str)). The id of questions which are linked
-                to skill ids in the list, the corresponding skill descriptions
-                and the next cursor value to be used for the next page
-                (or None if no more pages are left). The returned next cursor
-                value is urlsafe.
+        Returns:   
+            list(str), list(list(str)), str|None. The id of questions which
+                are linked to skill ids in the list, the corresponding skill
+                descriptions and the next cursor value to be used for the next
+                page (or None if no more pages are left). The returned next
+                cursor value is urlsafe.
         """
         if not start_cursor == '':
             cursor = datastore_query.Cursor(urlsafe=start_cursor)
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(-cls.last_updated, cls.key).fetch_page(
-                question_count,
+                question_skill_count,
                 start_cursor=cursor
             )
         else:
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(-cls.last_updated, cls.key).fetch_page(
-                question_count
+                question_skill_count
             )
 
         question_ids = []

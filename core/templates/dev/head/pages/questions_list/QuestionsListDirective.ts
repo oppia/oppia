@@ -115,11 +115,9 @@ oppia.directive('questionsList', [
               EditableQuestionBackendApiService.createQuestion(
                 $scope.skillIds[0], $scope.question.toBackendDict(true)
               ).then(function(response) {
-                if ($scope.skillIds.length > 0) {
-                  for (var i = 1; i < $scope.skillIds.length; i++) {
-                    EditableQuestionBackendApiService.addQuestionSkillLink(
-                      response, $scope.skillIds[i]);
-                  }
+                if ($scope.skillIds.length > 1) {
+                  EditableQuestionBackendApiService.addMultiQuestionSkillLink(
+                    response, $scope.skillIds.slice(1));
                 }
               }).then(function() {
                 $timeout(function() {
@@ -206,22 +204,20 @@ oppia.directive('questionsList', [
 
             modalInstance.result.then(function(skillIds) {
               $scope.skillIds = skillIds;
-              for (var i = 0; i < skillIds.length; i++) {
-                EditableSkillBackendApiService.fetchSkill(
-                  skillIds[i]).then(
-                  function(skillDict) {
+              EditableSkillBackendApiService.fetchMultiSkills(
+                skillIds).then(
+                function(skillDicts) {
+                  skillDicts.forEach(function(skillDict) {
                     $scope.misconceptions += skillDict.misconceptions
                       .map(function(misconceptionsBackendDict) {
                         return MisconceptionObjectFactory
                           .createFromBackendDict(misconceptionsBackendDict);
                       });
-                  }, function(error) {
-                    AlertsService.addWarning();
                   });
-              }
-              if (AlertsService.warnings.length === 0) {
-                $scope.initializeNewQuestionCreation();
-              }
+                  $scope.initializeNewQuestionCreation();
+                }, function(error) {
+                  AlertsService.addWarning();
+                });
             });
           };
 

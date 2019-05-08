@@ -48,6 +48,27 @@ oppia.factory('EditableSkillBackendApiService', [
       });
     };
 
+    var _fetchMultiSkills = function(skillIds, successCallback, errorCallback) {
+      var skills = []
+      skillIds.forEach(function(skillId) {
+        var skillDataUrl = UrlInterpolationService.interpolateUrl(
+          EDITABLE_SKILL_DATA_URL_TEMPLATE, {
+            skill_id: skillId
+          });
+
+        $http.get(skillDataUrl).then(function(response) {
+          skills.push(angular.copy(response.data.skill));
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
+      });
+      if (successCallback) {
+        successCallback(skills);
+      }
+    };
+
     var _updateSkill = function(
         skillId, skillVersion, commitMessage, changeList,
         successCallback, errorCallback) {
@@ -120,6 +141,11 @@ oppia.factory('EditableSkillBackendApiService', [
       fetchSkill: function(skillId) {
         return $q(function(resolve, reject) {
           _fetchSkill(skillId, resolve, reject);
+        });
+      },
+      fetchMultiSkills: function(skillIds) {
+        return $q(function(resolve, reject) {
+          _fetchMultiSkills(skillIds, resolve, reject);
         });
       },
       updateSkill: function(
