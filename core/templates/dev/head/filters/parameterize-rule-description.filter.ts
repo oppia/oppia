@@ -19,7 +19,7 @@
 // Filter that changes {{...}} tags into the corresponding parameter input
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
-oppia.filter('parameterizeRuleDescription', [
+angular.module('filtersModule').filter('parameterizeRuleDescription', [
   '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
   'NumberWithUnitsObjectFactory', function( $filter, INTERACTION_SPECS,
       FractionObjectFactory, NumberWithUnitsObjectFactory) {

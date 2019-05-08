@@ -13,13 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview ReplaceInputsWithEllipses filter for Oppia.
+ * @fileoverview TruncateAtFirstEllipsis filter for Oppia.
  */
 
-// Filter that replaces all {{...}} in a string with '...'.
-oppia.filter('replaceInputsWithEllipses', [function() {
-  var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
-  return function(input) {
-    return input ? input.replace(pattern, '...') : '';
-  };
-}]);
+// Filter that truncates a string at the first '...'.
+angular.module('stringUtilityFiltersModule').filter(
+  'truncateAtFirstEllipsis', [function() {
+    var pattern = /\.\.\./g;
+    return function(input) {
+      if (!input) {
+        return '';
+      }
+      var matchLocation = input.search(pattern);
+      return matchLocation === -1 ? input : (input.substring(0, matchLocation));
+    };
+  }
+]);

@@ -13,16 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Capitalize filter for Oppia.
+ * @fileoverview FormatTimer filter for Oppia.
  */
 
-oppia.filter('capitalize', [function() {
+angular.module('filtersModule').filter('formatTimer', [function() {
   return function(input) {
-    if (!input) {
-      return input;
-    }
+    var formatNum = function(n) {
+      return (n < 10 ? '0' : '') + n;
+    };
 
-    var trimmedInput = input.trim();
-    return trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
+    var seconds = input % 60;
+    var minutes = Math.floor(input / 60);
+    return (formatNum(minutes) + ':' + formatNum(seconds));
   };
 }]);

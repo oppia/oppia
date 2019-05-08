@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,21 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview CamelCaseToHyphens filter for Oppia.
+ * @fileoverview Module for custom filters.
  */
 
-oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
-
-oppia.constant(
-  'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
-  constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);
-
-oppia.filter('camelCaseToHyphens', [function() {
-  return function(input) {
-    var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
-    if (result[0] === '-') {
-      result = result.substring(1);
-    }
-    return result;
-  };
-}]);
+angular.module('filtersModule', ['stringUtilityFiltersModule']);

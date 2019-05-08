@@ -13,20 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview ConvertToPlainText filter for Oppia.
+ * @fileoverview CamelCaseToHyphens filter for Oppia.
  */
 
-oppia.filter('convertToPlainText', [function() {
-  return function(input) {
-    var strippedText = input.replace(/(<([^>]+)>)/ig, '');
-    strippedText = strippedText.replace(/&nbsp;/ig, ' ');
-    strippedText = strippedText.replace(/&quot;/ig, '');
-
-    var trimmedText = strippedText.trim();
-    if (trimmedText.length === 0) {
-      return strippedText;
-    } else {
-      return trimmedText;
-    }
-  };
-}]);
+angular.module('stringUtilityFiltersModule').filter(
+  'camelCaseToHyphens', [function() {
+    return function(input) {
+      var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
+      if (result[0] === '-') {
+        result = result.substring(1);
+      }
+      return result;
+    };
+  }
+]);

@@ -49,12 +49,12 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
-  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
-  <script src="/templates/dev/head/filters/NormalizeWhitespaceFilter.js"></script>
-  <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
-  <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
-  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/camel-case-to-hyphens.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/convert-to-plain-text.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/normalize-whitespace.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/normalize-whitespace-punctuation-and-case.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/truncate-at-first-line.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/underscores-to-camel-case.filter.js"></script>
 
   <script src="/templates/dev/head/expressions/ExpressionSyntaxTreeService.js"></script>
   <script src="/templates/dev/head/expressions/ExpressionEvaluatorService.js"></script>

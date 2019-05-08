@@ -13,13 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview UnderscoresToCamelCase filter for Oppia.
+ * @fileoverview Capitalize filter for Oppia.
  */
 
-oppia.filter('underscoresToCamelCase', [function() {
+angular.module('stringUtilityFiltersModule').filter('capitalize', [function() {
   return function(input) {
-    return input.replace(/_+(.)/g, function(match, group1) {
-      return group1.toUpperCase();
-    });
+    if (!input) {
+      return input;
+    }
+
+    var trimmedInput = input.trim();
+    return trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
   };
 }]);

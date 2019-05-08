@@ -23,7 +23,7 @@ angular.module('topicsAndSkillsDashboardNavbarBreadcrumbModule').directive(
         restrict: 'E',
         scope: {},
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/topics-and-skills-dashboard/' +
+          '/pages/topics-and-skills-dashboard-page/' +
           'topics-and-skills-dashboard-page-navbar-breadcrumb/' +
           'topics-and-skills-dashboard-page-navbar-breadcrumb.directive.html'),
         controller: [

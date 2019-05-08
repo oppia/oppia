@@ -13,27 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Truncate filter for Oppia.
+ * @fileoverview RemoveDuplicatesInArray filter for Oppia.
  */
 
-// Filter that truncates long descriptors.
-oppia.filter('truncate', ['$filter', function($filter) {
-  return function(input, length, suffix) {
-    if (!input) {
-      return '';
-    }
-    if (isNaN(length)) {
-      length = 70;
-    }
-    if (suffix === undefined) {
-      suffix = '...';
-    }
-    if (!angular.isString(input)) {
-      input = String(input);
-    }
-    input = $filter('convertToPlainText')(input);
-    return (
-      input.length <= length ? input : (
-        input.substring(0, length - suffix.length) + suffix));
+angular.module('filtersModule').filter('removeDuplicatesInArray', [function() {
+  return function(input) {
+    return input.filter(function(val, pos) {
+      return input.indexOf(val) === pos;
+    });
   };
 }]);

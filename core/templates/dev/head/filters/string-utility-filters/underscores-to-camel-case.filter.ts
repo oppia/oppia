@@ -13,13 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview RemoveDuplicatesInArray filter for Oppia.
+ * @fileoverview UnderscoresToCamelCase filter for Oppia.
  */
 
-oppia.filter('removeDuplicatesInArray', [function() {
-  return function(input) {
-    return input.filter(function(val, pos) {
-      return input.indexOf(val) === pos;
-    });
-  };
-}]);
+angular.module('stringUtilityFiltersModule').filter(
+  'underscoresToCamelCase', [function() {
+    return function(input) {
+      return input.replace(/_+(.)/g, function(match, group1) {
+        return group1.toUpperCase();
+      });
+    };
+  }
+]);

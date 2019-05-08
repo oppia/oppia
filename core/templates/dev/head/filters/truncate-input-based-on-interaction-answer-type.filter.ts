@@ -22,19 +22,21 @@
     truncated.
  * @param {integer} length - Truncated length of answer.
  */
-oppia.filter('truncateInputBasedOnInteractionAnswerType', [
-  '$filter', 'INTERACTION_SPECS', function($filter, INTERACTION_SPECS) {
-    return function(input, interactionId, length) {
-      var answerType = INTERACTION_SPECS[interactionId].answer_type;
-      var actualInputToTruncate = '';
-      if (answerType === 'NormalizedString') {
-        actualInputToTruncate = input;
-      } else if (answerType === 'CodeEvaluation') {
-        actualInputToTruncate = input.code;
-      } else {
-        throw Error('Unknown interaction answer type');
-      }
-      return $filter('truncate')(actualInputToTruncate, length);
-    };
-  }
-]);
+angular.module('filtersModule').filter(
+  'truncateInputBasedOnInteractionAnswerType', [
+    '$filter', 'INTERACTION_SPECS', function($filter, INTERACTION_SPECS) {
+      return function(input, interactionId, length) {
+        var answerType = INTERACTION_SPECS[interactionId].answer_type;
+        var actualInputToTruncate = '';
+        if (answerType === 'NormalizedString') {
+          actualInputToTruncate = input;
+        } else if (answerType === 'CodeEvaluation') {
+          actualInputToTruncate = input.code;
+        } else {
+          throw Error('Unknown interaction answer type');
+        }
+        return $filter('truncate')(actualInputToTruncate, length);
+      };
+    }
+  ]
+);

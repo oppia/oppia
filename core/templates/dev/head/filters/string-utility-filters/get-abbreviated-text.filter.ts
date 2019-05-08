@@ -13,17 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview FormatTimer filter for Oppia.
+ * @fileoverview GetAbbreviatedText filter for Oppia.
  */
 
-oppia.filter('formatTimer', [function() {
-  return function(input) {
-    var formatNum = function(n) {
-      return (n < 10 ? '0' : '') + n;
-    };
+angular.module('stringUtilityFiltersModule').filter(
+  'getAbbreviatedText', [function() {
+    return function(text, characterCount) {
+      if (text.length > characterCount) {
+        var subject = text.substr(0, characterCount);
 
-    var seconds = input % 60;
-    var minutes = Math.floor(input / 60);
-    return (formatNum(minutes) + ':' + formatNum(seconds));
-  };
-}]);
+        if (subject.indexOf(' ') !== -1) {
+          subject = subject.split(' ').slice(0, -1).join(' ');
+        }
+        return subject.concat('...');
+      }
+      return text;
+    };
+  }
+]);

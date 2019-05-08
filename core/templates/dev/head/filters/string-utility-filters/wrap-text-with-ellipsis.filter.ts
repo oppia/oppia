@@ -16,7 +16,7 @@
  * @fileoverview WrapTextWithEllipsis filter for Oppia.
  */
 
-oppia.filter('wrapTextWithEllipsis', [
+angular.module('stringUtilityFiltersModule').filter('wrapTextWithEllipsis', [
   '$filter', 'UtilsService', function($filter, UtilsService) {
     return function(input, characterCount) {
       if (UtilsService.isString(input)) {

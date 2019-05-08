@@ -13,19 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview GetAbbreviatedText filter for Oppia.
+ * @fileoverview ConvertToPlainText filter for Oppia.
  */
 
-oppia.filter('getAbbreviatedText', [function() {
-  return function(text, characterCount) {
-    if (text.length > characterCount) {
-      var subject = text.substr(0, characterCount);
+angular.module('stringUtilityFiltersModule').filter(
+  'convertToPlainText', [function() {
+    return function(input) {
+      var strippedText = input.replace(/(<([^>]+)>)/ig, '');
+      strippedText = strippedText.replace(/&nbsp;/ig, ' ');
+      strippedText = strippedText.replace(/&quot;/ig, '');
 
-      if (subject.indexOf(' ') !== -1) {
-        subject = subject.split(' ').slice(0, -1).join(' ');
+      var trimmedText = strippedText.trim();
+      if (trimmedText.length === 0) {
+        return strippedText;
+      } else {
+        return trimmedText;
       }
-      return subject.concat('...');
-    }
-    return text;
-  };
-}]);
+    };
+  }
+]);

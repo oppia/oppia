@@ -27,7 +27,7 @@ var oppia = angular.module(
     'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
     'buttonsDirectivesModule', 'ckEditorHelpersModule',
     'commonLayoutDirectivesModule', 'entityCreationServicesModule',
-    'libraryPageModule',
+    'libraryPageModule', 'filtersModule',
     'profileLinkDirectivesModule', 'ratingsModule',
     'showSuggestionModalForCreatorViewModule',
     'showSuggestionModalForEditorViewModule',
