@@ -127,7 +127,7 @@ oppia.factory('EditableQuestionBackendApiService', [
           QUESTION_SKILL_LINK_URL_TEMPLATE, {
             question_id: questionId,
             skill_id: skillId
-        });
+          });
 
         $http.post(addQuestionSkillLinkUrl).then(function(response) {
         }, function(errorResponse) {
@@ -182,7 +182,7 @@ oppia.factory('EditableQuestionBackendApiService', [
       },
 
       addMultiQuestionSkillLink: function(
-        questionId, skillIds) {
+          questionId, skillIds) {
         return $q(function(resolve, reject) {
           _addMultiQuestionSkillLink(questionId, skillIds, resolve, reject);
         });
