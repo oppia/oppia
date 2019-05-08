@@ -84,7 +84,7 @@
 /core/templates/dev/head/components/common-layout-directives/background-banner/ @ankita240796
 /core/templates/dev/head/components/button-directives/exploration-embed-modal/ @ankita240796
 /core/templates/dev/head/components/common-layout-directives/loading-dots/ @ankita240796
-/core/templates/dev/head/components/profile_link/ @ankita240796
+/core/templates/dev/head/components/profile-link-directives/ @ankita240796
 /core/templates/dev/head/components/common-layout-directives/promo-bar/ @ankita240796
 /core/templates/dev/head/components/common-layout-directives/sharing-links/ @ankita240796
 /core/templates/dev/head/components/button-directives/social-buttons/ @ankita240796

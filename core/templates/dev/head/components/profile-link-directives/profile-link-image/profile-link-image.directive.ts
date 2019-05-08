@@ -16,7 +16,7 @@
  * @fileoverview Directive for creating image links to a user's profile page.
  */
 
-oppia.directive('profileLinkImage', [
+angular.module('profileLinkImageModule').directive('profileLinkImage', [
   'UrlInterpolationService', 'SYSTEM_USER_IDS',
   function(UrlInterpolationService, SYSTEM_USER_IDS) {
     return {
@@ -25,8 +25,8 @@ oppia.directive('profileLinkImage', [
         username: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile_link/' +
-        'profile_link_image_directive.html'),
+        '/components/profile-link-directives/profile-link-image/' +
+        'profile-link-image.directive.html'),
       controller: [
         '$scope', '$http',
         function($scope, $http) {

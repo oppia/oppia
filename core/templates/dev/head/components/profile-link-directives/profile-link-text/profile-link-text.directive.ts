@@ -16,7 +16,7 @@
  * @fileoverview Directives for creating text links to a user's profile page.
  */
 
-oppia.directive('profileLinkText', [
+angular.module('profileLinkTextModule').directive('profileLinkText', [
   'UrlInterpolationService', 'SYSTEM_USER_IDS',
   function(UrlInterpolationService, SYSTEM_USER_IDS) {
     return {
@@ -25,8 +25,8 @@ oppia.directive('profileLinkText', [
         username: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile_link/' +
-        'profile_link_text_directive.html'),
+        '/components/profile-link-directives/profile-link-text/' +
+        'profile-link-text.directive.html'),
       controller: ['$scope', function($scope) {
         $scope.isUsernameLinkable = function(username) {
           return SYSTEM_USER_IDS.indexOf(username) === -1;
