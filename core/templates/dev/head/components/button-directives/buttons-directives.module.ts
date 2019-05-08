@@ -17,6 +17,6 @@
  */
 
 angular.module('buttonsDirectivesModule', ['createActivityButtonModule',
-    'explorationEmbedButtonModule', 'hintAndSolutionButtonsModule',
-    'socialButtonsModule'
+  'explorationEmbedButtonModule', 'hintAndSolutionButtonsModule',
+  'socialButtonsModule'
 ]);

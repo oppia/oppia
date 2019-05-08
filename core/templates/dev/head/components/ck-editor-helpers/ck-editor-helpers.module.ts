@@ -17,5 +17,5 @@
  */
 
 angular.module('ckEditorHelpersModule', ['ckEditorRteModule',
-    'ckEditorWidgetsModule'
+  'ckEditorWidgetsModule'
 ]);

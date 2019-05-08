@@ -2233,7 +2233,7 @@ class LintChecksManager(object):
             self._check_for_copyright_notice())
         codeowner_messages = self._check_codeowner_file()
         all_messages = (
-            # js_and_ts_component_messages +
+            # js_and_ts_component_messages +.
             directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
             html_directive_name_messages + import_order_messages +

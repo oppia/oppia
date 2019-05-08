@@ -17,7 +17,7 @@
  */
 
 angular.module('commonLayoutDirectivesModule', ['alertMessageModule',
-    'attributionGuideModule', 'backgroundBannerModule',
-    'loadingDotsModule', 'promoBarModule', 'sharingLinksModule',
-    'sideNavigationBarModule', 'topNavigationBarModule'
+  'attributionGuideModule', 'backgroundBannerModule',
+  'loadingDotsModule', 'promoBarModule', 'sharingLinksModule',
+  'sideNavigationBarModule', 'topNavigationBarModule'
 ]);

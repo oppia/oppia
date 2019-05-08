@@ -44,7 +44,8 @@ angular.module('hintAndSolutionButtonsModule').directive(
             $scope.displayedCard = null;
             $scope.solutionModalIsActive = false;
             $scope.currentlyOnLatestCard = true;
-            $scope.isHintConsumed = HintsAndSolutionManagerService.isHintConsumed;
+            $scope.isHintConsumed = HintsAndSolutionManagerService
+              .isHintConsumed;
             $scope.isSolutionConsumed = (
               HintsAndSolutionManagerService.isSolutionConsumed);
 
@@ -81,7 +82,8 @@ angular.module('hintAndSolutionButtonsModule').directive(
                 $scope.displaySolutionModal();
               } else {
                 var interstitialModalPromise = (
-                  HintAndSolutionModalService.displaySolutionInterstitialModal());
+                  HintAndSolutionModalService
+                    .displaySolutionInterstitialModal());
                 interstitialModalPromise.result.then(function() {
                   $scope.displaySolutionModal();
                 }, function() {
@@ -92,7 +94,8 @@ angular.module('hintAndSolutionButtonsModule').directive(
 
             $scope.displaySolutionModal = function() {
               $scope.solutionModalIsActive = true;
-              var inPretestMode = ExplorationPlayerStateService.isInPretestMode();
+              var inPretestMode = ExplorationPlayerStateService
+                .isInPretestMode();
               if (!_editorPreviewMode && !inPretestMode) {
                 StatsReportingService.recordSolutionHit(
                   PlayerPositionService.getCurrentStateName());

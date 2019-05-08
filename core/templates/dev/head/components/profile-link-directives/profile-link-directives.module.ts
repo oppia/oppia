@@ -17,5 +17,5 @@
  */
 
 angular.module('profileLinkDirectivesModule', ['profileLinkTextModule',
-    'profileLinkImageModule', 'circularImageModule'
+  'profileLinkImageModule', 'circularImageModule'
 ]);
