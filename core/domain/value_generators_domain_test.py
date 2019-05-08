@@ -33,3 +33,8 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         all_generator_classes = (
             value_generators_domain.Registry.get_all_generator_classes())
         self.assertEqual(len(all_generator_classes), 2)
+
+    def test_generate_value_of_base_value_generator_raises_error(self):
+        base_generator = value_generators_domain.BaseValueGenerator()
+        with self.assertRaises(NotImplementedError):
+            base_generator.generate_value()

@@ -32,8 +32,16 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
             {}, **{'value': '{{a}}', 'parse_with_jinja': False}), '{{a}}')
         self.assertEqual(generator.generate_value(
             {'a': 'b'}, **{'value': '{{a}}', 'parse_with_jinja': True}), 'b')
+        self.assertTrue(generator.get_html_template().startswith(
+            '<span style='))
+        self.assertTrue(generator.get_js_template().startswith(
+            '// Copyright 2014 The Oppia Authors. All Rights Reserved.'))
 
     def test_random_selector(self):
         generator = generators.RandomSelector()
         self.assertIn(generator.generate_value(
             {}, **{'list_of_values': ['a', 'b', 'c']}), ['a', 'b', 'c'])
+        self.assertTrue(generator.get_html_template().startswith(
+            '<schema-based-editor schema='))
+        self.assertTrue(generator.get_js_template().startswith(
+            '// Copyright 2014 The Oppia Authors. All Rights Reserved.'))
