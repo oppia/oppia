@@ -88,7 +88,7 @@
 /core/templates/dev/head/components/common-layout-directives/promo-bar/ @ankita240796
 /core/templates/dev/head/components/common-layout-directives/sharing-links/ @ankita240796
 /core/templates/dev/head/components/button-directives/social-buttons/ @ankita240796
-/core/templates/dev/head/components/summary_tile/ @ankita240796
+/core/templates/dev/head/components/summary-tile-directives/ @ankita240796
 
 
 # Global stylesheet.
@@ -206,7 +206,7 @@
 
 # Rich text editor team.
 /core/domain/rte_component_registry*.py @AllanYangZhou @bansalnitish
-/core/templates/dev/head/components/CkEditorRteDirective.ts @AllanYangZhou @bansalnitish
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-rte/ck-editor-rte.directive.ts @AllanYangZhou @bansalnitish
 /extensions/rich_text_components/ @AllanYangZhou @bansalnitish
 /extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
 

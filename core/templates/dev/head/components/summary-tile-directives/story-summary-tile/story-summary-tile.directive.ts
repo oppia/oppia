@@ -16,7 +16,7 @@
  * @fileoverview Component for a canonical story tile.
  */
 
-oppia.directive('storySummaryTile', [
+angular.module('storySummaryTileModule').directive('storySummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -26,7 +26,8 @@ oppia.directive('storySummaryTile', [
         getStoryDescription: '&description',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary_tile/story_summary_tile_directive.html'),
+        '/components/summary-tile-directives/story-summary-tile/' +
+        'story-summary-tile.directive.html'),
       controller: ['$scope',
         function($scope) {
           $scope.getStoryLink = function() {

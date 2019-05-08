@@ -34,6 +34,7 @@ var oppia = angular.module(
     'showSuggestionModalForLearnerViewModule',
     'showSuggestionModalForLocalViewModule', 'skillEditorModule',
     'splashPageModule', 'stateEditorModule', 'storyEditorModule',
+    'summaryTileDirectivesModule',
     'teachPageModule', 'thanksPageModule', 'topicsAndSkillsDashboardModule',
     'topicEditorPageModule', 'topicViewerPageModule',
   ].concat(
