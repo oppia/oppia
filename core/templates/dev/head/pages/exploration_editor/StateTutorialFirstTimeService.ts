@@ -56,7 +56,7 @@ oppia.factory('StateTutorialFirstTimeService', [
       markTranslationTutorialNotSeenBefore: function() {
         _translationTutorialNotSeenBefore = true;
       },
-      initTranslation: function(firstTime, expId) {
+      initTranslation: function(expId) {
         // After the first call to it in a client session, this does nothing.
         if (!_translationTutorialNotSeenBefore ||
             !_currentlyInTranslationFirstVisit) {
