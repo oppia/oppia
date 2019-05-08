@@ -49,7 +49,7 @@ oppia.factory('EditableSkillBackendApiService', [
     };
 
     var _fetchMultiSkills = function(skillIds, successCallback, errorCallback) {
-      var skills = []
+      var skills = [];
       skillIds.forEach(function(skillId) {
         var skillDataUrl = UrlInterpolationService.interpolateUrl(
           EDITABLE_SKILL_DATA_URL_TEMPLATE, {
