@@ -16,6 +16,9 @@
  * @fileoverview Tests for QuestionContentsObjectFactory.
  */
 
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/skill/MisconceptionObjectFactory.ts');
+
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
   var _sampleQuestion = null;

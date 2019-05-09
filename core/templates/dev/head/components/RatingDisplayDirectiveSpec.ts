@@ -16,6 +16,8 @@
  * @fileoverview Tests that ratings are being displayed correctly.
  */
 
+require('components/RatingDisplayDirective.ts');
+
 describe('Rating display directive', function() {
   var outerScope, ctrlScope;
   beforeEach(angular.mock.module('directiveTemplates'));

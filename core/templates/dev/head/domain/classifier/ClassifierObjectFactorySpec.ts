@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the ClassifierObjectFactory.
  */
 
+require('domain/classifier/ClassifierObjectFactory.ts');
+
 describe('Classifier Object Factory', function() {
   var ClassifierObjectFactory;
 

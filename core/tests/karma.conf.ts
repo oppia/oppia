@@ -29,12 +29,15 @@ module.exports = function(config) {
       'third_party/static/angular-recorder-1.4.1/dist' +
       '/angular-audio-recorder.min.js',
       generatedJs,
-      'core/templates/dev/head/appInit.js',
+      'local_compiled_js/core/templates/dev/head/appInit.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*_directive.html',
-      'core/templates/dev/head/components/RatingComputationServiceSpec.js',
+      'core/templates/dev/head/components/**/*Spec.ts',
+      'core/templates/dev/head/domain/**/*Spec.ts',
+      'core/templates/dev/head/components/*Spec.ts',
+      'core/templates/dev/head/domain/*Spec.ts',
       //'extensions/**/*.js',
       {
         pattern: 'extensions/**/*.png',
@@ -70,8 +73,8 @@ module.exports = function(config) {
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
-      'core/templates/dev/head/*Spec.js': ['webpack'],
-      'core/templates/dev/head/**/*Spec.js': ['webpack'],
+      'core/templates/dev/head/*.ts': ['webpack'],
+      'core/templates/dev/head/**/*.ts': ['webpack'],
       'core/templates/dev/head/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
       'extensions/!(*Spec).js': ['coverage'],
@@ -139,8 +142,14 @@ module.exports = function(config) {
     webpack: {
       mode: 'development',
       resolve: {
-          modules: ['core/templates/dev/head'],
+        modules: ['core/templates/dev/head'],
       },
+      module: {
+        rules: [{
+          test: /\.ts$/,
+          use: 'ts-loader',
+        }]
+      }
     }
   });
-};
+}

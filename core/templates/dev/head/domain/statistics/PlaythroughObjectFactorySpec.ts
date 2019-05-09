@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the PlaythroughObjectFactory.
  */
 
+require('domain/statistics/LearnerActionObjectFactory.ts');
+require('domain/statistics/PlaythroughObjectFactory.ts');
+
 describe('Playthrough Object Factory', function() {
   beforeEach(angular.mock.module('oppia'));
 

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
+require('domain/question/EditableQuestionBackendApiService.ts');
+
 describe('Editable question backend API service', function() {
   var EditableQuestionBackendApiService = null;
   var sampleDataResults = null;

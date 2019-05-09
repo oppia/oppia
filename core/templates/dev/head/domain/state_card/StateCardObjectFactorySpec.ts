@@ -16,6 +16,12 @@
  * @fileoverview Tests for StateCardObjectFactory.
  */
 
+require('domain/exploration/AudioTranslationObjectFactory.ts');
+require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+require('domain/exploration/InteractionObjectFactory.ts');
+require('domain/state_card/StateCardObjectFactory.ts');
+require('pages/question_editor/QuestionEditorDirective.ts');
+
 describe('State card object factory', function() {
   var StateCardObjectFactory = null;
   var InteractionObjectFactory = null;

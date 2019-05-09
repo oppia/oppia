@@ -56,10 +56,6 @@ require('domain/utilities/UrlInterpolationService.ts');
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
-for (var constantName in constants) {
-  oppia.constant(constantName, constants[constantName]);
-}
-
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 
