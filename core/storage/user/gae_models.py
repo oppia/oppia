@@ -331,6 +331,25 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
 
+    @staticmethod
+    def export_data(user_id):
+        """Export UserSubscriptionsModel data."""
+        user_model = UserSubscriptionsModel.get(user_id, strict=False)
+
+        if user_model is None:
+            user_model = UserSubscriptionsModel(id=user_id)
+
+        user_data = {
+            'activity_ids': user_model.activity_ids,
+            'collection_ids': user_model.collection_ids,
+            'general_feedback_thread_ids': (
+                user_model.general_feedback_thread_ids),
+            'creator_ids': user_model.creator_ids,
+            'last_checked': user_model.last_checked
+        }
+
+        return user_data
+
 
 class UserSubscribersModel(base_models.BaseModel):
     """The list of subscribers of the user."""
