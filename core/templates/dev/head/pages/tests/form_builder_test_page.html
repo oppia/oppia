@@ -105,16 +105,16 @@
   <script src="/third_party/static/code-mirror-3.19.0/mode/python/python.js"></script>
   <script src="/third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js"></script>
   {{ super() }}
-  <script src="/templates/dev/head/components/forms/ConvertUnicodeWithParamsToHtmlFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/ConvertHtmlToUnicodeFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/ConvertUnicodeToHtmlFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsAtLeastFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsAtMostFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsFloatFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsIntegerFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsNonemptyFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-unicode-with-params-to-html.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-html-to-unicode.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-unicode-to-html.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-at-least.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-at-most.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-float.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-integer.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-nonempty.filter.js"></script>
+
+
   <script src="/templates/dev/head/filters/string-utility-filters/camel-case-to-hyphens.filter.js"></script>
   <script src="/templates/dev/head/filters/string-utility-filters/capitalize.filter.js"></script>
   <script src="/templates/dev/head/filters/string-utility-filters/convert-to-plain-text.filter.js"></script>
@@ -137,25 +137,6 @@
   <script src="/templates/dev/head/pages/tests/FormBuilderTestPage.js"></script>
   <script src="/templates/dev/head/pages/tests/FormOverlayDirective.js"></script>
   <script src="/templates/dev/head/components/ck-editor-helpers/ck-editor-widgets/ck-editor-widgets.initializer.js"></script>
-
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedDictViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedListViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
 
   <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
   <script src="/templates/dev/head/services/IdGenerationService.js"></script>
