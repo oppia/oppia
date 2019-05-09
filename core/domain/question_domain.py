@@ -307,7 +307,7 @@ class Question(object):
 
         return cls(
             question_id, default_question_state_data,
-            feconf.CURRENT_STATES_SCHEMA_VERSION,
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
     def update_language_code(self, language_code):
