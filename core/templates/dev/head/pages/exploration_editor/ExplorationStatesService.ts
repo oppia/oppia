@@ -329,9 +329,6 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
         saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
-        stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(stateName);
-        });
       },
       getHintsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'hints');
@@ -344,9 +341,6 @@ oppia.factory('ExplorationStatesService', [
       },
       saveSolution: function(stateName, newSolution) {
         saveStateProperty(stateName, 'solution', newSolution);
-        stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(stateName);
-        });
       },
       getContentIdsToAudioTranslationsMemento: function(stateName) {
         return getStatePropertyMemento(
