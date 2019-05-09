@@ -170,7 +170,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                      [u'1 skills successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
-    def test_migration_job_skips_with_new_structure_editors_disabled(self):
+    def test_migration_job_skips_when_new_structure_editor_is_disabled(self):
         skill = skill_domain.Skill.create_default_skill(
             self.SKILL_ID, description='A description')
         skill_services.save_new_skill(self.albert_id, skill)
@@ -195,17 +195,19 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.SKILL_ID, description='A description')
         skill_services.save_new_skill(self.albert_id, skill)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            with self.swap(
-                skill_services, 'get_skill_by_id', _mock_get_skill_by_id):
-                job_id = (
-                    skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
-                skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
-                self.process_and_flush_pending_tasks()
-                output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(
-                    job_id)
-                expected = [[u'validation_error',
-                             [u'Skill %s failed validation: \'str\' object has '
-                              'no attribute \'validate\'' % (self.SKILL_ID)]]]
-                self.assertEqual(
-                    expected, [ast.literal_eval(x) for x in output])
+        get_skill_by_id_swap = self.swap(
+            skill_services, 'get_skill_by_id', _mock_get_skill_by_id)
+        new_structure_editors_swap = self.swap(
+            constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True)
+        with new_structure_editors_swap, get_skill_by_id_swap:
+            job_id = (
+                skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
+            skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+            output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(
+                job_id)
+            expected = [[u'validation_error',
+                         [u'Skill %s failed validation: \'str\' object has '
+                          'no attribute \'validate\'' % (self.SKILL_ID)]]]
+            self.assertEqual(
+                expected, [ast.literal_eval(x) for x in output])
