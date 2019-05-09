@@ -357,12 +357,9 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
         self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
-        if iframe_restriction is not None:
-            if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers['X-Frame-Options'] = iframe_restriction
-            else:
-                raise Exception(
-                    'Invalid X-Frame-Options: %s' % iframe_restriction)
+        assert iframe_restriction in ['SAMEORIGIN', 'DENY'], (
+            'Invalid X-Frame-Options: %s' % (iframe_restriction))
+        self.response.headers['X-Frame-Options'] = iframe_restriction
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
@@ -406,7 +403,7 @@ class BaseHandler(webapp2.RequestHandler):
         assert error_code in [400, 401, 404, 500]
         values['status_code'] = error_code
         method = self.request.environ['REQUEST_METHOD']
-
+        assert method in ['GET', 'POST', 'PUT', 'DELETE']
         if method == 'GET':
             self._render_exception_json_or_html(
                 self.GET_HANDLER_ERROR_RETURN_TYPE, values)
@@ -419,10 +416,6 @@ class BaseHandler(webapp2.RequestHandler):
         elif method == 'DELETE':
             self._render_exception_json_or_html(
                 self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
-        else:
-            logging.warning('Not a recognized request method.')
-            self._render_exception_json_or_html(
-                None, values)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler.

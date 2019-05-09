@@ -19,6 +19,7 @@
 import datetime
 import inspect
 import json
+import logging
 import os
 import re
 import types
@@ -53,6 +54,18 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     TEST_CREATOR_USERNAME = 'testcreatoruser'
     TEST_EDITOR_EMAIL = 'test.editor@example.com'
     TEST_EDITOR_USERNAME = 'testeditoruser'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = 'invalid_type'
+
+        def get(self):
+            self.render_template('invalid_page.html')
+
+    class MockHandler1(base.BaseHandler):
+
+        def get(self):
+            self.values['iframed'] = True
+            self.render_template('invalid_page.html')
 
     def setUp(self):
         super(BaseHandlerTests, self).setUp()
@@ -133,6 +146,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/library/extra', payload={}, csrf_token=csrf_token,
             expected_status_int=404)
 
+        self.delete_json('/library/data', expected_status_int=404)
+
     def test_redirect_in_logged_out_states(self):
         """Test for a redirect in logged out state on '/'."""
 
@@ -209,6 +224,33 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertIn('dashboard', response.headers['location'])
         self.logout()
 
+    def test_get_with_invalid_return_type_logs_warning(self):
+        # Modify the testapp to use the mock handler.
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+        observed_log_messages = []
+        def mock_logging_function(msg, *_):
+            observed_log_messages.append(msg)
+
+        with self.swap(logging, 'warning', mock_logging_function):
+            self.get_json('/mock', expected_status_int=500)
+            self.assertEqual(len(observed_log_messages), 1)
+            self.assertEqual(
+                observed_log_messages[0],
+                'Not a recognized return type: defaulting to render JSON.')
+
+    def test_renders_error_page_with_iframed(self):
+        # Modify the testapp to use the mock handler.
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock1', self.MockHandler1, name='MockHandler1')],
+            debug=feconf.DEBUG,
+        ))
+        self.get_custom_response('/mock1', expected_content_type='text/plain',
+                                 expected_status_int=500)
+
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
@@ -257,6 +299,12 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
             current_time = orig_time + FORTY_EIGHT_HOURS_IN_SECS + PADDING
             self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
                 'uid', token))
+
+    def test_redirect_oppia_test_server(self):
+        self.testapp.get(
+            'https://oppiaserver.appspot.com/splash', status=301)
+        self.testapp.get(
+            'https://oppiatestserver.appspot.com/splash')
 
 
 class EscapingTests(test_utils.GenericTestBase):
@@ -351,6 +399,16 @@ class LogoutPageTests(test_utils.GenericTestBase):
         self.assertTrue(
             datetime.datetime.utcnow() > datetime.datetime.strptime(
                 expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))
+
+    def test_logout_page_with_dev_mode_disabled(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            response = self.get_html_response(
+                '/logout', expected_status_int=302)
+            expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
+
+            self.assertTrue(
+                datetime.datetime.utcnow() > datetime.datetime.strptime(
+                    expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))
 
 
 class I18nDictsTests(test_utils.GenericTestBase):
@@ -710,6 +768,34 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                                         msg=error_message)
 
         self.assertGreater(num_handlers_checked, 150)
+
+
+class HasSeenTutorialTests(test_utils.GenericTestBase):
+
+    class MockHandler(base.BaseHandler):
+        def get(self):
+            assert self.has_seen_editor_tutorial is True
+            assert self.has_seen_translation_tutorial is True
+            self.render_json({})
+
+
+    def setUp(self):
+        super(HasSeenTutorialTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        # Modify the testapp to use the mock handler.
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_user_has_seen_tutorial(self):
+        self.login(self.OWNER_EMAIL)
+        user_services.record_user_started_state_editor_tutorial(
+            self.owner_id)
+        user_services.record_user_started_state_translation_tutorial(
+            self.owner_id)
+        self.get_json('/mock')
 
 
 class SignUpTests(test_utils.GenericTestBase):
