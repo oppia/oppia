@@ -799,7 +799,6 @@ class StateAnswerStatisticsHandler(EditorHandler):
             state_name: current_exploration.states[state_name].interaction.id
             for state_name in top_state_answer_stats
         }
-        logging.error(top_state_interaction_ids)
         self.render_json({
             'answers': top_state_answer_stats,
             'interaction_ids': top_state_interaction_ids,
