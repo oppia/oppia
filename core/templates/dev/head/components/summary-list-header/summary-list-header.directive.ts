@@ -16,7 +16,7 @@
  * @fileoverview Directive for the header of items in a list.
  */
 
-oppia.directive('summaryListHeader', [
+angular.module('summaryListHeaderModule').directive('summaryListHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -31,7 +31,7 @@ oppia.directive('summaryListHeader', [
         getNumItems: '&numItems',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary_list_header_directive.html'),
+        '/components/summary-list-header/summary-list-header.directive.html'),
       controller: ['$scope',
         function($scope) {
           $scope.deleteItem = function(evt) {
