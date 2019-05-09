@@ -127,10 +127,17 @@ def _get_remote_name():
         raise ValueError(err)
 
     if not remote_num:
-        print ('Warning: Please set upstream for the lint checks to run '
-               'efficiently. You can learn more about it here -> '
-               'https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches\n')
-        return
+        raise Exception(
+            'Error: Please set upstream for the lint checks to run '
+            'efficiently. To do that follow these steps:\n'
+            '1. Run the command \'git remote -v\'\n'
+            '2a. If upstream is listed in the command output, then run the '
+            'command \'git remote set-url upstream '
+            'https://github.com/oppia/oppia.git\'\n'
+            '2b. If upstream is not listed in the command output, then run the '
+            'command \'git remote add upstream '
+            'https://github.com/oppia/oppia.git\'\n'
+        )
     elif remote_num > 1:
         print ('Warning: Please keep only one remote branch for oppia:develop '
                'to run the lint checks efficiently.\n')
@@ -299,13 +306,14 @@ def _install_hook():
 
 
 def does_diff_include_js_and_ts_files(files_to_lint):
-    """Returns true if diff includes JS and TS files.
+    """Returns true if diff includes JavaScript or TypeScript files.
 
     Args:
         files_to_lint: list(str). List of files to be linted.
 
     Returns:
-        bool. Status of JS and TS files in diff.
+        bool. Whether the diff contains changes in any JavaScript or TypeScript
+            files.
     """
 
     js_files_to_check = [
