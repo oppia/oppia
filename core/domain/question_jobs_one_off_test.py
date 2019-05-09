@@ -57,7 +57,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             question_services.get_question_by_id(self.QUESTION_ID))
         self.assertEqual(
             question.question_state_data_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         # Start migration job.
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
@@ -71,7 +71,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             question_services.get_question_by_id(self.QUESTION_ID))
         self.assertEqual(
             updated_question.question_state_data_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.assertEqual(question.question_state_data.to_dict(),
                          updated_question.question_state_data.to_dict())
 
@@ -135,7 +135,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             question_services.get_question_by_id(self.QUESTION_ID))
         self.assertEqual(
             updated_question.question_state_data_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         output = question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
         expected = [[u'question_migrated',

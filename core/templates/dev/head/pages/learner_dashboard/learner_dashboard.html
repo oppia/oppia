@@ -576,7 +576,7 @@
             <md-card class="oppia-subscription-card"
                      ng-repeat="subscription in subscriptionsList | orderBy:getValueOfSubscriptionSortKey:isCurrentSubscriptionSortDescending"
                      style="margin: 0 8px 0 4px; width: 197px;">
-              <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank">
+              <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank" rel="noopener">
                 <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
                 <span class="oppia-subscription-card-summary" style="color: black;">
                   <div style="margin-bottom: 5px; font-size: 17.5px;">
@@ -784,6 +784,10 @@
     </div>
   </div>
   <style>
+
+    body {
+      overflow-x: visible;
+    }
 
     .oppia-learner-dashboard-container {
       margin: 0 auto 30px auto;
