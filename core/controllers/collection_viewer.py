@@ -50,7 +50,7 @@ class CollectionPage(base.BaseHandler):
         })
 
         self.render_template(
-            'pages/collection_player/collection-player.mainpage.html')
+            'pages/collection-player-page/collection-player-page.mainpage.html')
 
 
 class CollectionDataHandler(base.BaseHandler):
