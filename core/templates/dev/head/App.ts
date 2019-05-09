@@ -31,10 +31,11 @@ var oppia = angular.module(
     'libraryPageModule', 'filtersModule', 'formsModule',
     'profileLinkDirectivesModule', 'ratingsModule', 'suggestionModalModule',
     'summaryListHeaderModule', 'skillEditorModule',
-    'splashPageModule', 'stateEditorModule', 'storyEditorModule',
-    'summaryTileDirectivesModule',
+    'splashPageModule', 'stateEditorModule', 'stateModule', 'storyEditorModule',
+    'summaryTileDirectivesModule', 'summaryListHeaderModule',
     'teachPageModule', 'thanksPageModule', 'topicsAndSkillsDashboardModule',
     'topicEditorPageModule', 'topicViewerPageModule',
+    'visualDiffVisualizationModule'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
