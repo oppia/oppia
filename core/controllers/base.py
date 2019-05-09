@@ -406,6 +406,7 @@ class BaseHandler(webapp2.RequestHandler):
         assert error_code in [400, 401, 404, 500]
         values['status_code'] = error_code
         method = self.request.environ['REQUEST_METHOD']
+
         if method == 'GET':
             self._render_exception_json_or_html(
                 self.GET_HANDLER_ERROR_RETURN_TYPE, values)
