@@ -61,8 +61,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def get(self):
             self.render_template('invalid_page.html')
 
-    class MockHandler1(base.BaseHandler):
+        def head(self):
+            """Do a HEAD request. This is an unrecognized request method in our
+            codebase.
+            """
+            self.render_template({'invalid_page.html'})
 
+    class MockHandler1(base.BaseHandler):
         def get(self):
             self.values['iframed'] = True
             self.render_template('invalid_page.html')
@@ -224,7 +229,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertIn('dashboard', response.headers['location'])
         self.logout()
 
-    def test_get_with_invalid_return_type_logs_warning(self):
+    def test_get_with_invalid_return_type_logs_correct_warning(self):
         # Modify the testapp to use the mock handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
@@ -242,14 +247,33 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 observed_log_messages[0],
                 'Not a recognized return type: defaulting to render JSON.')
 
+    def test_unrecognized_request_method_logs_correct_warning(self):
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+        observed_log_messages = []
+        def mock_logging_function(msg, *_):
+            observed_log_messages.append(msg)
+
+        with self.swap(logging, 'warning', mock_logging_function):
+            self.testapp.head('/mock', status=500)
+            self.assertEqual(len(observed_log_messages), 2)
+            self.assertEqual(
+                observed_log_messages[0],
+                'Not a recognized request method.')
+            self.assertEqual(
+                observed_log_messages[1],
+                'Not a recognized return type: defaulting to render JSON.')
+
     def test_renders_error_page_with_iframed(self):
         # Modify the testapp to use the mock handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock1', self.MockHandler1, name='MockHandler1')],
             debug=feconf.DEBUG,
         ))
-        self.get_custom_response('/mock1', expected_content_type='text/plain',
-                                 expected_status_int=500)
+        self.get_html_response('/mock1', expected_status_int=500)
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
@@ -774,9 +798,11 @@ class HasSeenTutorialTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         def get(self):
-            assert self.has_seen_editor_tutorial is True
-            assert self.has_seen_translation_tutorial is True
-            self.render_json({})
+            self.render_json({
+                'has_seen_editor_tutorial': self.has_seen_editor_tutorial,
+                'has_seen_translation_tutorial':
+                self.has_seen_translation_tutorial
+                })
 
 
     def setUp(self):
@@ -789,13 +815,60 @@ class HasSeenTutorialTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-    def test_user_has_seen_tutorial(self):
+    def test_user_has_seen_editor_tutorial(self):
         self.login(self.OWNER_EMAIL)
+        response = self.get_json('/mock')
+        self.assertFalse(response['has_seen_editor_tutorial'])
         user_services.record_user_started_state_editor_tutorial(
             self.owner_id)
+        response = self.get_json('/mock')
+        self.assertTrue(response['has_seen_editor_tutorial'])
+
+    def test_user_has_seen_translation_tutorial(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json('/mock')
+        self.assertFalse(response['has_seen_translation_tutorial'])
         user_services.record_user_started_state_translation_tutorial(
             self.owner_id)
-        self.get_json('/mock')
+        response = self.get_json('/mock')
+        self.assertTrue(response['has_seen_translation_tutorial'])
+
+
+class IframeRestrictionTests(test_utils.GenericTestBase):
+
+    class MockHandler(base.BaseHandler):
+        def get(self):
+            iframe_restriction = self.request.get(
+                'iframe_restriction', default_value=None)
+            self.render_template(
+                'pages/about/about.html',
+                iframe_restriction=iframe_restriction)
+
+    def setUp(self):
+        super(IframeRestrictionTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        # Modify the testapp to use the mock handler.
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_responses_with_valid_iframe_restriction(self):
+        self.login(self.OWNER_EMAIL)
+        self.get_html_response('/mock')
+        self.get_html_response('/mock', params={'iframe_restriction': 'DENY'})
+        self.get_html_response(
+            '/mock', params={'iframe_restriction': 'SAMEORIGIN'})
+        self.logout()
+
+    def test_responses_with_invalid_iframe_restriction(self):
+        self.login(self.OWNER_EMAIL)
+        self.get_html_response(
+            '/mock', params={
+                'iframe_restriction': 'invalid_iframe_restriction'},
+            expected_status_int=500)
+        self.logout()
 
 
 class SignUpTests(test_utils.GenericTestBase):
