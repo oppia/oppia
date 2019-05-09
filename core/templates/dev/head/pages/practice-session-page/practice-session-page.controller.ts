@@ -17,11 +17,28 @@
  */
 
 angular.module('practiceSessionPageModule').controller('PracticeSession', [
-  '$rootScope', '$scope', '$window', 'AlertsService',
-  'UrlService', 'FATAL_ERROR_CODES',
+  '$http', '$rootScope', '$scope', 'AlertsService',
+  'UrlInterpolationService', 'UrlService',
+  'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL', 'TOTAL_QUESTIONS',
   function(
-      $rootScope, $scope, $window, AlertsService,
-      UrlService, FATAL_ERROR_CODES) {
+      $http, $rootScope, $scope, AlertsService,
+      UrlInterpolationService, UrlService,
+      FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL, TOTAL_QUESTIONS
+  ) {
     $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
+    var _fetchSkillDetails = function() {
+      var practiceSessionsDataUrl = UrlInterpolationService.interpolateUrl(
+        PRACTICE_SESSIONS_DATA_URL, {
+          topic_name: $scope.topicName
+        });
+      $http.get(practiceSessionsDataUrl).then(function(result) {
+        var questionPlayerConfig = {
+          skillList: result.data.skill_list,
+          questionCount: TOTAL_QUESTIONS
+        };
+        $scope.questionPlayerConfig = questionPlayerConfig;
+      });
+    };
+    _fetchSkillDetails();
   }
 ]);

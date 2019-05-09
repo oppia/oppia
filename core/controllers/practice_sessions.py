@@ -18,6 +18,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import topic_services
+import feconf
 
 
 class PracticeSessionsPage(base.BaseHandler):
@@ -35,9 +36,31 @@ class PracticeSessionsPage(base.BaseHandler):
         if topic is None:
             raise self.PageNotFoundException(
                 Exception('The topic with the given name doesn\'t exist.'))
+
+        self.render_template('/pages/practice-session-page/practice-session-page.mainpage.html')
+
+
+class PracticeSessionsPageDataHandler(base.BaseHandler):
+    """Fetches relevant data for the practice sessions page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topic_viewer_page
+    def get(self, topic_name):
+
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
+        topic = topic_services.get_topic_by_name(topic_name)
+        skills_of_topic = topic.get_all_skill_ids()
+
+        if topic is None:
+            raise self.PageNotFoundException(
+                Exception('The topic with the given name doesn\'t exist.'))
         topic_name = topic.name
 
         self.values.update({
-            'topic_name': topic.name
+            'topic_name': topic.name,
+            'skill_list': skills_of_topic
         })
-        self.render_template('/pages/practice-session-page/practice-session-page.mainpage.html')
+        self.render_json(self.values)

@@ -17,3 +17,9 @@
  */
 
 angular.module('practiceSessionPageModule', []);
+
+angular.module('practiceSessionPageModule').constant('TOTAL_QUESTIONS', 20);
+
+angular.module('practiceSessionPageModule').constant(
+  'PRACTICE_SESSIONS_DATA_URL',
+  '/practice_session/data/<topic_name>');
