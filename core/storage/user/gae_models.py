@@ -119,7 +119,8 @@ class UserSettingsModel(base_models.BaseModel):
             'last_edited_an_exploration': user.last_edited_an_exploration,
             'profile_picture_data_url': user.profile_picture_data_url,
             'default_dashboard': user.default_dashboard,
-            'creator_dashboard_display_pref': user.creator_dashboard_display_pref,
+            'creator_dashboard_display_pref':
+                user.creator_dashboard_display_pref,
             'user_bio': user.user_bio,
             'subject_interests': user.subject_interests,
             'first_contribution_msec': user.first_contribution_msec,
