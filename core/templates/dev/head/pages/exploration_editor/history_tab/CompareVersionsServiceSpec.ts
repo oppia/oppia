@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the Compare versions Service.
  */
 
+require('pages/exploration_editor/history_tab/CompareVersionsService.ts');
+require('pages/exploration_editor/history_tab/VersionTreeService.ts');
+
 describe('Compare versions service', function() {
   beforeEach(angular.mock.module('oppia'));
 

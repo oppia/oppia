@@ -16,6 +16,8 @@
  * @fileoverview Unit test for the Translation tab active mode service.
  */
 
+require('pages/exploration_editor/translation_tab/TranslationTabActiveModeService.ts');
+
 describe('Translation tab active mode service', function() {
   beforeEach(angular.mock.module('oppia'));
   var ttams = null;

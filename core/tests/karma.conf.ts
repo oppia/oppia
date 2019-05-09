@@ -34,10 +34,8 @@ module.exports = function(config) {
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*_directive.html',
-      'core/templates/dev/head/components/**/*Spec.ts',
-      'core/templates/dev/head/domain/**/*Spec.ts',
-      'core/templates/dev/head/components/*Spec.ts',
-      'core/templates/dev/head/domain/*Spec.ts',
+      'core/templates/dev/head/pages/exploration_editor/**/*Spec.ts',
+      'core/templates/dev/head/pages/exploration_editor/*Spec.ts',
       //'extensions/**/*.js',
       {
         pattern: 'extensions/**/*.png',
@@ -63,7 +61,9 @@ module.exports = function(config) {
     exclude: [
       'local_compiled_js/core/templates/dev/head/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
-      'backend_prod_files/extensions/**'
+      'backend_prod_files/extensions/**',
+      //add these back after the templateCache is repaired
+      'core/templates/dev/head/pages/exploration_editor/editor_tab/StateNameEditorDirectiveSpec.ts'
     ],
     proxies: {
       // Karma serves files under the /base directory.
