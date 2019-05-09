@@ -965,7 +965,6 @@ class LintChecksManager(object):
         node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
         os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
-        self.compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
@@ -974,7 +973,7 @@ class LintChecksManager(object):
         """This function validates JavaScript and Typescript files and
         returns the parsed contents as a Python dictionary.
         """
-
+        compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
         # Select JS files which need to be checked.
         files_to_check = [
             filepath for filepath in self.all_filepaths if (
@@ -1000,17 +999,18 @@ class LintChecksManager(object):
                 # file.
                 if filepath.endswith('.js'):
                     raise Exception(e)
-                compiled_js_filepath = self._compile_ts_file(filepath)
+                compiled_js_filepath = self._compile_ts_file(
+                    filepath, compiled_js_dir)
                 file_content = FileCache.read(compiled_js_filepath).decode(
                     'utf-8')
                 parsed_js_and_ts_files[filepath] = esprima.parseScript(
                     file_content)
 
-        shutil.rmtree(self.compiled_js_dir)
+        shutil.rmtree(compiled_js_dir)
 
         return parsed_js_and_ts_files
 
-    def _compile_ts_file(self, filepath):
+    def _compile_ts_file(self, filepath, compiled_js_dir):
         """Compiles a typescript file and returns the path for compiled
         js file.
         """
@@ -1024,11 +1024,11 @@ class LintChecksManager(object):
             './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
             '-lib %s -noImplicitUseStrict %s -skipLibCheck '
             '%s -target %s -typeRoots %s %s typings/*') % (
-                self.compiled_js_dir, allow_js, lib, no_implicit_use_strict,
+                compiled_js_dir, allow_js, lib, no_implicit_use_strict,
                 skip_lib_check, target, type_roots, filepath)
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         compiled_js_filepath = os.path.join(
-            self.compiled_js_dir, os.path.basename(filepath).replace(
+            compiled_js_dir, os.path.basename(filepath).replace(
                 '.ts', '.js'))
         return compiled_js_filepath
 
