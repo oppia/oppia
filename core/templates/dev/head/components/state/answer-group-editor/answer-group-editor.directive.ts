@@ -16,7 +16,7 @@
  * @fileoverview Directive for the answer group editor.
  */
 
-oppia.directive('answerGroupEditor', [
+angular.module('answerGroupEditorModule').directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -37,7 +37,8 @@ oppia.directive('answerGroupEditor', [
         suppressWarnings: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/answer_group_editor_directive.html'),
+        '/components/state/answer-group-editor/' +
+        'answer-group-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
         'AlertsService', 'INTERACTION_SPECS', 'StateEditorService',

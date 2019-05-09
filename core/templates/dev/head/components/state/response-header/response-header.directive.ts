@@ -16,7 +16,7 @@
  * @fileoverview Directive for the header of the response tiles.
  */
 
-oppia.directive('responseHeader', [
+angular.module('responseHeaderModule').directive('responseHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -33,7 +33,7 @@ oppia.directive('responseHeader', [
         navigateToState: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/response_header_directive.html'),
+        '/components/state/response-header/response-header.directive.ts'),
       controller: [
         '$scope', 'EditabilityService', 'StateEditorService',
         'PLACEHOLDER_OUTCOME_DEST',

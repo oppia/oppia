@@ -13,23 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for the outcome feedback editor.
+ * @fileoverview Module for the outcome editor.
  */
 
-oppia.directive('outcomeFeedbackEditor', [
-  'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
-  function(SubtitledHtmlObjectFactory, UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        outcome: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/outcome_feedback_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.OUTCOME_FEEDBACK_SCHEMA = {
-          type: 'html'
-        };
-      }]
-    };
-  }]);
+angular.module('outcomeEditorModule', ['outcomeDestinationEditorModule',
+  'outcomeFeedbackEditorModule'
+]);

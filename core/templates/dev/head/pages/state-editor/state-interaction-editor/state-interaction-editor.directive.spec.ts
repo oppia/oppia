@@ -178,7 +178,7 @@ describe('State Interaction controller', function() {
       });
 
       var templateHtml = $templateCache.get(
-        'core/templates/dev/head/pages/state-editor/' +
+        '/pages/state-editor/' +
         'state-interaction-editor/state-interaction-editor.directive.html');
       $compile(templateHtml, $rootScope);
       $rootScope.$digest();

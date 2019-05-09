@@ -16,7 +16,7 @@
  * @fileoverview Directive for the solution editor.
  */
 
-oppia.directive('solutionEditor', [
+angular.module('solutionEditorModule').directive('solutionEditor', [
   '$uibModal', 'AlertsService', 'ContextService',
   'ExplorationHtmlFormatterService', 'SolutionObjectFactory',
   'SolutionVerificationService', 'StateCustomizationArgsService',

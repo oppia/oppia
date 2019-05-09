@@ -16,7 +16,7 @@
  * @fileoverview Directive for the hint editor.
  */
 
-oppia.directive('hintEditor', [
+angular.module('hintEditorModule').directive('hintEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -27,7 +27,7 @@ oppia.directive('hintEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/hint_editor_directive.html'),
+        '/components/state/hint-editor/hint-editor.directive.html'),
       controller: [
         '$scope', 'EditabilityService', 'StateHintsService',
         function($scope, EditabilityService, StateHintsService) {

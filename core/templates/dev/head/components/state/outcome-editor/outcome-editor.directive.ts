@@ -16,7 +16,7 @@
  * @fileoverview Directives for the outcome editor.
  */
 
-oppia.directive('outcomeEditor', [
+angular.module('outcomeEditorModule').directive('outcomeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -32,7 +32,7 @@ oppia.directive('outcomeEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/outcome_editor_directive.html'),
+        '/components/state/outcome-editor/outcome-editor.directive.html'),
       controller: [
         '$scope', 'StateEditorService', 'StateInteractionIdService',
         'INTERACTION_SPECS',

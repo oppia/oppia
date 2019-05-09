@@ -20,7 +20,7 @@
 // to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call
 // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
 // buttons only show up if 'isEditingRuleInline' is true.
-oppia.directive('ruleEditor', [
+angular.module('ruleEditorModule').directive('ruleEditor', [
   '$log', 'UrlInterpolationService', function($log, UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -32,7 +32,7 @@ oppia.directive('ruleEditor', [
         rule: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/rule_editor_directive.html'),
+        '/components/state/rule-editor/rule-editor.directive.html'),
       controller: [
         '$scope', '$timeout', 'StateEditorService',
         'ValidatorsService', 'INTERACTION_SPECS',
