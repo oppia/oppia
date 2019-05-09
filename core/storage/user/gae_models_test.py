@@ -82,7 +82,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             user.preferred_language_codes,
             user_data['preferred_language_codes'])
-        self.assertequal(
+        self.assertEqual(
             user.preferred_site_language_code,
             user_data['preferred_site_language_code'])
         self.assertEqual(
