@@ -1,0 +1,208 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Skill Editor
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
+    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
+      '{{DEFAULT_OBJECT_VALUES|js_string}}');
+  </script>
+
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <skill-editor-navbar-breadcrumb>
+  </skill-editor-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <skill-editor-navbar>
+  </skill-editor-navbar>
+{% endblock local_top_nav_options %}
+
+{% block content %}
+  <div ng-controller="SkillEditor">
+    <div ng-if="getActiveTabName() === 'main'">
+      <skill-editor-main-tab></skill-editor-main-tab>
+    </div>
+
+    <div ng-if="getActiveTabName() === 'questions'">
+      <questions-tab></questions-tab>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/templates/dev/head/directives/AngularHtmlBindDirective.js"></script>
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
+  <script src="/templates/dev/head/directives/MathjaxBindDirective.js"></script>
+
+  <script src="/templates/dev/head/filters/string-utility-filters/camel-case-to-hyphens.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/capitalize.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/convert-to-plain-text.filter.js"></script>
+  <script src="/templates/dev/head/filters/format-rte-preview.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/normalize-whitespace.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/normalize-whitespace-punctuation-and-case.filter.js"></script>
+  <script src="/templates/dev/head/filters/parameterize-rule-description.filter.js"></script>
+  <script src="/templates/dev/head/filters/remove-duplicates-in-array.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/replace-inputs-with-ellipses.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/truncate.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/truncate-at-first-ellipsis.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/truncate-at-first-line.filter.js"></script>
+  <script src="/templates/dev/head/filters/truncate-input-based-on-interaction-answer-type.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/underscores-to-camel-case.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/wrap-text-with-ellipsis.filter.js"></script>
+
+  <script src="/templates/dev/head/pages/skill-editor-page/skill-editor-services/skill-editor-state/skill-editor-state.service.js"></script>
+  <script src="/templates/dev/head/pages/skill-editor-page/skill-editor-services/skill-editor-routing/skill-editor-routing.service.js"></script>
+
+  <script src="/templates/dev/head/pages/state-editor/state-editor-properties-services/state-written-translations.service.js"></script>
+  <script src="/templates/dev/head/pages/state-editor/state-editor-properties-services/state-property/state-property.service.js"></script>
+  <script src="/templates/dev/head/pages/state-editor/state-editor-properties-services/state-content.service.js"></script>
+  <script src="/templates/dev/head/pages/state-editor/state-editor-properties-services/state-param-changes.service.js"></script>
+  <script src="/templates/dev/head/pages/state-editor/state-editor-properties-services/state-interaction-id.service.js"></script>
+  <script src="/templates/dev/head/pages/state-editor/state-editor-properties-services/state-customization-args.service.js"></script>
+  <script src="/templates/dev/head/pages/state-editor/state-editor-properties-services/state-hints.service.js"></script>
+  <script src="/templates/dev/head/pages/state-editor/state-editor-properties-services/state-solution.service.js"></script>
+  <script src="/templates/dev/head/pages/state-editor/state-editor-properties-services/state-content-ids-to-audio-translations.service.js"></script>
+
+  <script src="/templates/dev/head/domain/skill/SkillObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/skill/SkillRightsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/skill/ConceptCardObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/skill/MisconceptionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/skill/EditableSkillBackendApiService.js"></script>
+  <script src="/templates/dev/head/domain/skill/SkillRightsBackendApiService.js"></script>
+
+  <script src="/templates/dev/head/pages/state-editor/state-editor-properties-services/state-editor/state-editor.service.js"></script>
+
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/SolutionVerificationService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/SolutionValidityService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/InteractionDetailsCacheService.js"></script>
+  <script src="/templates/dev/head/pages/question_editor/QuestionEditorDirective.js"></script>
+  <script src="/templates/dev/head/pages/questions_list/QuestionsListDirective.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/EditorFirstTimeEventsService.js"></script>
+  <script src="/templates/dev/head/services/EditabilityService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/ResponsesService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/TrainingDataEditorPanelService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/editor_tab/AnswerGroupsCacheService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/AngularNameService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_editor/MarkAllAudioAndTranslationsAsNeedingUpdateController.js"></script>
+  <script src="/templates/dev/head/domain/classifier/AnswerClassificationResultObjectFactory.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/PredictionAlgorithmRegistryService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/AnswerClassificationService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/StateClassifierMappingService.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/PlayerConstants.js"></script>
+  <script src="/templates/dev/head/pages/exploration_player/CurrentInteractionService.js"></script>
+  <script src="/templates/dev/head/domain/classifier/ClassifierObjectFactory.js"></script>
+
+  <script src="/templates/dev/head/domain/skill/SkillUpdateService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/QuestionUndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/BaseUndoRedoService.js"></script>
+
+  <script src="/templates/dev/head/components/entity-creation-services/question-creation/question-creation.service.js"></script>
+  <script src="/templates/dev/head/components/ck-editor-helpers/ck-editor-widgets/ck-editor-widgets.initializer.js"></script>
+  <script src="/templates/dev/head/components/StateGraphLayoutService.js"></script>
+
+  <script src="/templates/dev/head/domain/question/EditableQuestionBackendApiService.js"></script>
+  <script src="/templates/dev/head/domain/question/QuestionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/question/QuestionUpdateService.js"></script>
+  <script src="/templates/dev/head/domain/state/StateObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/AnswerGroupObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/AnswerStatsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/AudioTranslationObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ExplorationDraftObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ExplorationObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/HintObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ContentIdsToAudioTranslationsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/InteractionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/OutcomeObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamChangeObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamChangesObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamMetadataObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamSpecObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamSpecsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/ParamTypeObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/RuleObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/SolutionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/StatesObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/WrittenTranslationObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/exploration/WrittenTranslationsObjectFactory.js"></script>
+
+
+  <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/objects/NumberWithUnitsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/objects/UnitsObjectFactory.js"></script>
+
+  <script src="/templates/dev/head/services/ExplorationHtmlFormatterService.js"></script>
+  <script src="/templates/dev/head/services/ExtensionTagAssemblerService.js"></script>
+
+
+  <script src="/templates/dev/head/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-unicode-with-params-to-html.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-html-to-unicode.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-unicode-to-html.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-at-least.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-at-most.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-float.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-integer.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-nonempty.filter.js"></script>
+
+  <script src="/extensions/objects/templates/BooleanEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/CodeStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/CoordTwoDimEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/DragAndDropHtmlStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/DragAndDropPositiveIntEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/FilepathEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/FractionEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/GraphEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/GraphPropertyEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/HtmlEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ImageWithRegionsEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/IntEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ListOfSetsOfHtmlStringsEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ListOfTabsEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ListOfUnicodeStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/LogicErrorCategoryEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/LogicQuestionEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/MusicPhraseEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/NonnegativeIntEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/NormalizedStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/NumberWithUnitsEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ParameterNameEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/RealEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/SetOfHtmlStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/SetOfUnicodeStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/UnicodeStringEditorDirective.js"></script>
+
+  <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
+  <script src="/templates/dev/head/services/IdGenerationService.js"></script>
+  <script src="/templates/dev/head/services/RteHelperService.js"></script>
+  <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
+  <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
+  <script src="/templates/dev/head/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
+  <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>
+  <script src="/templates/dev/head/services/ValidatorsService.js"></script>
+  <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>
+
+  <script src="/templates/dev/head/domain/utilities/LanguageUtilService.js"></script>
+  <script src="/templates/dev/head/domain/utilities/AudioLanguageObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/utilities/AutogeneratedAudioLanguageObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/utilities/BrowserCheckerService.js"></script>
+  <script src="/extensions/interactions/baseInteractionValidationService.js"></script>
+  {% include 'components/rich_text_components.html' %}
+  {{ interaction_templates }}
+  {{ visualizations_html }}
+  {{ dependencies_html }}
+{% endblock footer_js %}

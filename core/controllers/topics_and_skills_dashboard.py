@@ -37,8 +37,8 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.render_template(
-            'pages/topics_and_skills_dashboard/'
-            'topics_and_skills_dashboard.html')
+            'pages/topics-and-skills-dashboard-page/'
+            'topics-and-skills-dashboard-page.mainpage.html')
 
 
 class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):

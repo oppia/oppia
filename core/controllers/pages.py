@@ -45,10 +45,11 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            self.render_template('pages/splash/splash.html')
+            self.render_template('pages/splash-page/splash-page.mainpage.html')
         else:
             try:
-                self.render_template('pages/splash/splash_%s.html' % c_value)
+                self.render_template(
+                    'pages/splash-page/splash_%s.html' % c_value)
             except Exception:
                 # Old c values may have been deprecated, in which case we
                 # revert to the default splash page URL. When redirecting,
@@ -99,7 +100,7 @@ class TeachPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.TEACH_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/teach/teach.html')
+        self.render_template('/pages/teach-page/teach-page.mainpage.html')
 
 
 class ContactPage(base.BaseHandler):
@@ -135,7 +136,8 @@ class ThanksPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/thanks/thanks.html')
+        self.render_template(
+            '/pages/thanks-page/thanks-page.mainpage.html')
 
 
 class ForumRedirectPage(base.BaseHandler):
