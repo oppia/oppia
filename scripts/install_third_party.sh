@@ -151,7 +151,7 @@ echo Checking if pylint is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/pylint-1.9.4" ]; then
   echo Installing Pylint
 
-  pip_install pylint==1.9.4 --target="$TOOLS_DIR/pylint-1.9.4" --user --prefix= --system
+  pip_install pylint==1.9.4 --target="$TOOLS_DIR/pylint-1.9.4"
 fi
 
 echo Checking if pylint-quotes is installed in $TOOLS_DIR
@@ -208,21 +208,21 @@ echo Checking if browsermob-proxy is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
   echo Installing browsermob-proxy
 
-  pip_install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1" --user --prefix= --system
+  pip_install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   echo Installing selenium
 
-  pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2" --user --prefix= --system
+  pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
 echo Checking if PIL is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
   echo Installing PIL
 
-  pip_install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7" --user --prefix= --system
+  pip_install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
 
   if [[ $? != 0 && ${OS} == "Darwin" ]]; then
     echo "  PIL install failed. See troubleshooting instructions at:"
@@ -234,7 +234,7 @@ echo Checking if PyGithub is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/PyGithub-1.43.5" ]; then
   echo Installing PyGithub
 
-  pip install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5" --user --prefix= --system
+  pip install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5"
 fi
 
 # install pre-push script
