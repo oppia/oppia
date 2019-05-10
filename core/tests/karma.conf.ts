@@ -72,8 +72,6 @@ module.exports = function(config) {
         'coverage'],
       'local_compiled_js/core/templates/dev/head/!(*Spec).js': ['coverage'],
       'local_compiled_js/core/templates/dev/head/**/!(*Spec).js': ['coverage'],
-      'local_compiled_js/core/templates/dev/head/!(*\.spec).js': ['coverage'],
-      'local_compiled_js/core/templates/dev/head/**/!(*\.spec).js': ['coverage'],
       'local_compiled_js/extensions/!(*Spec).js': ['coverage'],
       'local_compiled_js/extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
