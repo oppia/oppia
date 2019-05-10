@@ -93,7 +93,7 @@ before_install:
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
 - bash -e /etc/init.d/xvfb start
-- upstream.sh
+- git remote add upstream https://github.com/oppia/oppia.git
 
 install:
 - pushd $TRAVIS_BUILD_DIR
