@@ -33,7 +33,7 @@ angular.module('responseHeaderModule').directive('responseHeader', [
         navigateToState: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/response-header/response-header.directive.ts'),
+        '/components/state/response-header/response-header.directive.html'),
       controller: [
         '$scope', 'EditabilityService', 'StateEditorService',
         'PLACEHOLDER_OUTCOME_DEST',
