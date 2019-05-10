@@ -93,7 +93,7 @@ oppia.controller('Signup', [
     // given username, or an empty string if the username is valid.
     $scope.updateWarningText = function(username) {
       var alphanumeric = /^[A-Za-z0-9]+$/;
-      var admin = /admin/i;
+      var admin = /admin-page/i;
       var oppia = /oppia/i;
 
       if (!username) {

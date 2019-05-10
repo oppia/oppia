@@ -28,7 +28,7 @@ oppia.directive('adminDevModeActivitiesTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/activities_tab/' +
+        '/pages/admin-page/activities_tab/' +
         'admin_dev_mode_activities_tab_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.reloadExploration = function(explorationId) {
