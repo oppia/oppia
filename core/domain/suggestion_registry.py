@@ -458,7 +458,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         if not (
                 question_state_data_schema_version >= 1 and
                 question_state_data_schema_version <=
-                feconf.CURRENT_STATES_SCHEMA_VERSION):
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Expected question state schema version to be between 1 and '
                 '%s' % feconf.CURRENTSTATES_SCHEMA_VERSION)
@@ -474,7 +474,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.validate()
         if (
                 question_dict['question_state_data_schema_version'] !=
-                feconf.CURRENT_STATES_SCHEMA_VERSION):
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Question state schema version is not up to date.')
 
