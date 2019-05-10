@@ -34,9 +34,9 @@ module.exports = function(config) {
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*_directive.html',
-      'core/templates/dev/head/pages/exploration_editor/**/*Spec.ts',
-      'core/templates/dev/head/pages/exploration_editor/*Spec.ts',
-      //'extensions/**/*.js',
+      'core/templates/dev/head/**/*Spec.ts',
+      'core/templates/dev/head/*Spec.ts',
+      'local_compiled_js/extensions/**/*.js',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
@@ -63,7 +63,16 @@ module.exports = function(config) {
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
       //add these back after the templateCache is repaired
-      'core/templates/dev/head/pages/exploration_editor/editor_tab/StateNameEditorDirectiveSpec.ts'
+      'core/templates/dev/head/pages/exploration_editor/editor_tab/SolutionVerificationServiceSpec.ts',
+      'core/templates/dev/head/pages/exploration_editor/editor_tab/StateNameEditorDirectiveSpec.ts',
+      'core/templates/dev/head/pages/state_editor/StateContentEditorDirectiveSpec.ts',
+      'core/templates/dev/head/pages/state_editor/StateInteractionEditorDirectiveSpec.ts',
+      'core/templates/dev/head/services/StateRulesStatsServiceSpec.ts',
+      'core/templates/dev/head/services/StateTopAnswersStatsServiceSpec.ts',
+      'local_compiled_js/extensions/classifiers/SVMPredictionServiceSpec.js',
+      'local_compiled_js/extensions/interactions/CodeRepl/CodeReplPredictionServiceSpec.js',
+      'local_compiled_js/extensions/interactions/TextInput/TextInputPredictionServiceSpec.js',
+      'local_compiled_js/extensions/classifiers/SVMPredictionServiceSpec.js',
     ],
     proxies: {
       // Karma serves files under the /base directory.

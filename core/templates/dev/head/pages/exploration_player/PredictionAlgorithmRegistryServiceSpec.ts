@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the prediction algorithm registry service.
  */
 
+require('pages/exploration_player/PredictionAlgorithmRegistryService.ts');
+
 describe('Prediction algorithm registry service', function() {
   beforeEach(angular.mock.module('oppia'));
 
