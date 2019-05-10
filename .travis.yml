@@ -67,12 +67,7 @@ jobs:
 notifications:
   email:
     recipients:
-    - sean@seanlip.org
-    - nithusha21@yahoo.co.in
-    - apurvabajaj007@gmail.com
-    - annonymousxyz@outlook.com
-    - anubhavsinha98@gmail.com
-    - yashjipkate@gmail.com
+    - nisheal.work@gmail.com
     on_success: change
     on_failure: change
   irc:
