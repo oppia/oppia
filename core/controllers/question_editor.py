@@ -76,16 +76,19 @@ class QuestionSkillLinkHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
-        if skill is None:
-            raise self.PageNotFoundException(
-                'The skill with the given id doesn\'t exist.')
+        for single_skill_id in skill_id.split(','):
+            skill_domain.Skill.require_valid_skill_id(single_skill_id)
+            skill = skill_services.get_skill_by_id(
+                single_skill_id, strict=False)
+            if skill is None:
+                raise self.PageNotFoundException(
+                    'The skill with the given id doesn\'t exist.')
 
-        # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
-        # with a value passed from the frontend.
-        question_services.create_new_question_skill_link(
-            question_id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
+            # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
+            # with a value passed from the frontend.
+            question_services.create_new_question_skill_link(
+                question_id, single_skill_id,
+                constants.DEFAULT_SKILL_DIFFICULTY)
         self.render_json(self.values)
 
     @acl_decorators.can_manage_question_skill_status

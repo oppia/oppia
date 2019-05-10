@@ -187,14 +187,17 @@ class EditableSkillDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
-        if skill is None:
-            raise self.PageNotFoundException(
-                Exception('The skill with the given id doesn\'t exist.'))
-
+        skill_dicts = []
+        for single_skill_id in skill_id.split(','):
+            skill_domain.Skill.require_valid_skill_id(single_skill_id)
+            skill = skill_services.get_skill_by_id(single_skill_id, strict=False)
+            if skill is None:
+                raise self.PageNotFoundException(
+                    Exception('The skill with the given id doesn\'t exist.'))
+            skill_dicts.append(skill.to_dict())
+        
         self.values.update({
-            'skill': skill.to_dict()
+            'skills': skill_dicts
         })
 
         self.render_json(self.values)

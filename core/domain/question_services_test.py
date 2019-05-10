@@ -63,6 +63,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'skill_1', self.admin_id, 'Skill Description 1')
         self.save_new_skill(
             'skill_2', self.admin_id, 'Skill Description 2')
+        self.save_new_skill(
+            'skill_3', self.admin_id, 'Skill Description 3')
 
     def test_get_question_by_id(self):
         question = question_services.get_question_by_id(self.question_id)
@@ -100,6 +102,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
+            self.question_id, 'skill_3', 0.8)
+        question_services.create_new_question_skill_link(
             question_id_2, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
             question_id_3, 'skill_2', 0.2)
@@ -126,9 +130,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # Make sure the correct skill description corresponds to respective
         # question summaries.
         for index, description in enumerate(skill_descriptions):
-            if (
-                    question_ids[index] == self.question_id or
-                    question_ids[index] == question_id_2):
+            if question_ids[index] == self.question_id:
+                self.assertEqual(['Skill Description 3', 'Skill Description 1'], description)
+            elif question_ids[index] == question_id_2:
                 self.assertEqual(['Skill Description 1'], description)
             else:
                 self.assertEqual(['Skill Description 2'], description)

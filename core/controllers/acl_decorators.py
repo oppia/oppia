@@ -1846,9 +1846,11 @@ def can_edit_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
-        if skill_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+        for single_skill_id in skill_id.split(','):
+            skill_rights = skill_services.get_skill_rights(
+                single_skill_id, strict=False)
+            if skill_rights is None:
+                raise base.UserFacingExceptions.PageNotFoundException
 
         if can_user_edit_skill(self.user, skill_rights):
             return handler(self, skill_id, **kwargs)
