@@ -67,7 +67,12 @@ jobs:
 notifications:
   email:
     recipients:
-    - nisheal.work@gmail.com
+    - sean@seanlip.org
+    - nithusha21@yahoo.co.in
+    - apurvabajaj007@gmail.com
+    - annonymousxyz@outlook.com
+    - anubhavsinha98@gmail.com
+    - yashjipkate@gmail.com
     on_success: change
     on_failure: change
   irc:
@@ -93,7 +98,6 @@ before_install:
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
 - bash -e /etc/init.d/xvfb start
-- git remote add upstream https://github.com/oppia/oppia.git
 
 install:
 - pushd $TRAVIS_BUILD_DIR
@@ -130,7 +134,7 @@ script:
 - if [ "$RUN_E2E_TESTS_PREFERENCES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="preferences" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PROFILE_MENU" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="profileMenu" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PUBLICATION" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="publication" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="skillEditor" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="skillEditorPage" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_SUBSCRIPTIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicsAndSkillsDashboard" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor" --prod_env; fi

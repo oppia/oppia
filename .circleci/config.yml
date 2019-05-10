@@ -5,12 +5,6 @@ anchor_for_job_defaults: &job_defaults
   docker:
     - image: *docker_image
 
-set_git: &set_git
-  name: set_git
-  command: |
-    git remote add upstream https://github.com/oppia/oppia.git
-
-
 anchor_for_installing_dependencies: &install_dependencies
   name: Install dependencies
   command: |
@@ -32,7 +26,6 @@ jobs:
       - restore_cache:
           <<: *restore_cache
       - run:
-          <<: *set_git
           <<: *install_dependencies
       - save_cache:
           key: setup-files-cache-{{ checksum "date" }}
