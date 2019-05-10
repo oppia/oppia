@@ -122,11 +122,11 @@ oppia.factory('EditableQuestionBackendApiService', [
 
     var _addMultiQuestionSkillLink = function(
         questionId, skillIds, successCallback, errorCallback) {
-      var skillIdsUrl = "";
+      var skillIdsUrl = '';
       skillIds.forEach(function(skillId) {
         skillIdsUrl = skillIdsUrl + skillId + ',';
       });
-      skillIdsUrl =  skillIdsUrl.substring(0, skillIdsUrl.length - 1);
+      skillIdsUrl = skillIdsUrl.substring(0, skillIdsUrl.length - 1);
 
       var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
