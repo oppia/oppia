@@ -17,13 +17,14 @@
  * is in production mode.
  */
 
-oppia.directive('adminProdModeActivitiesTab', [
+angular.module('adminProdModeActivitiesTab').directive(
+  'adminProdModeActivitiesTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/activities_tab/' +
-        'admin_prod_mode_activities_tab_directive.html')
+        '/pages/admin/activities_tab/admin-prod-mode-activities-tab/' +
+        'admin-prod-mode-activities-tab.directive.html')
     };
   }
 ]);

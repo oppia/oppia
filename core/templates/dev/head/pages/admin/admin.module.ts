@@ -16,7 +16,10 @@
  * @fileoverview Data and Module for the Oppia admin page.
  */
 
-angular.module('adminModule', ['adminNavbarModule', 'adminConfigTabModule', 'adminJobsTabModule', 'adminMiscTabModule', 'adminRolesTabModule', 'roleGraphModule']);
+angular.module('adminModule', [
+  'adminNavbarModule', 'adminConfigTabModule', 'adminJobsTabModule',
+  'adminMiscTabModule', 'adminRolesTabModule', 'roleGraphModule',
+  'adminDevModeActivitiesTabModule', 'adminProdModeActivitiesTab']);
 
 angular.module('adminModule').constant('ADMIN_HANDLER_URL', '/adminhandler');
 angular.module('adminModule')

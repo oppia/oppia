@@ -17,7 +17,8 @@
  * is in developer mode.
  */
 
-oppia.directive('adminDevModeActivitiesTab', [
+angular.module('adminDevModeActivitiesTabModule').directive(
+  'adminDevModeActivitiesTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL',
   function($http, AdminTaskManagerService, UrlInterpolationService,
