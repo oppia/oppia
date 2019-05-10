@@ -16,21 +16,7 @@
  * @fileoverview Controller for the learner's view of a collection.
  */
 
-oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
-
-oppia.animation('.oppia-collection-animate-slide', function() {
-  return {
-    enter: function(element) {
-      element.hide().slideDown();
-    },
-    leave: function(element) {
-      element.slideUp();
-    }
-  };
-});
-
-oppia.controller('CollectionPlayer', [
+angular.module('collectionPlayerPageModule').controller('CollectionPlayer', [
   '$anchorScroll', '$http', '$location', '$scope',
   'AlertsService', 'CollectionObjectFactory',
   'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',

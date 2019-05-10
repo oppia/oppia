@@ -30,7 +30,7 @@
 /core/storage/collection/ @kevinlee12
 /core/templates/dev/head/domain/collection/ @kevinlee12
 /core/templates/dev/head/pages/collection_editor/ @kevinlee12
-/core/templates/dev/head/pages/collection_player/ @kevinlee12
+/core/templates/dev/head/pages/collection-player-page/ @kevinlee12
 
 
 # Dashboard pages.
@@ -41,8 +41,8 @@
 /core/domain/subscription_services*.py @nithusha21
 /core/templates/dev/head/domain/creator_dashboard/ @nithusha21
 /core/templates/dev/head/domain/learner_dashboard/ @nithusha21
-/core/templates/dev/head/pages/creator_dashboard/ @nithusha21
-/core/templates/dev/head/pages/email_dashboard/ @nithusha21
+/core/templates/dev/head/pages/creator-dashboard-page/ @nithusha21
+/core/templates/dev/head/pages/email-dashboard-page/ @nithusha21
 /core/templates/dev/head/pages/learner_dashboard/ @nithusha21
 /core/templates/dev/head/pages/notifications_dashboard/ @nithusha21
 
@@ -186,7 +186,7 @@
 # Miscellaneous.
 /core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @seanlip
-/core/templates/dev/head/pages/about/ @seanlip
+/core/templates/dev/head/pages/about-page/ @seanlip
 /core/templates/dev/head/pages/privacy/ @seanlip
 /core/templates/dev/head/pages/terms/ @seanlip
 /core/templates/dev/head/pages/tests/ @seanlip
@@ -229,9 +229,9 @@
 
 
 # Simple pages.
-/core/templates/dev/head/pages/contact/ @vojtechjelinek
-/core/templates/dev/head/pages/donate/ @vojtechjelinek
-/core/templates/dev/head/pages/error/ @vojtechjelinek
+/core/templates/dev/head/pages/contact-page/ @vojtechjelinek
+/core/templates/dev/head/pages/donate-page/ @vojtechjelinek
+/core/templates/dev/head/pages/error-page/ @vojtechjelinek
 /core/templates/dev/head/pages/get_started/ @vojtechjelinek
 /core/templates/dev/head/pages/landing/ @vojtechjelinek
 /core/templates/dev/head/pages/maintenance/ @vojtechjelinek

@@ -98,7 +98,7 @@ class ExplorationPage(EditorHandler):
         """Handles GET requests."""
         if exploration_id in constants.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'pages/error/disabled_exploration.html',
+                'pages/error-page/disabled-exploration.mainpage.html',
                 iframe_restriction=None)
             return
 

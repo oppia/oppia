@@ -17,7 +17,7 @@
  * in collection player.
  */
 
-oppia.directive('collectionFooter', [
+angular.module('collectionFooterModule').directive('collectionFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -25,8 +25,8 @@ oppia.directive('collectionFooter', [
         twitterText: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_player/' +
-        'collection_footer_directive.html'),
+        '/pages/collection-player-page/collection-footer/' +
+        'collection-footer.directive.html'),
       controller: [
         '$scope',
         function($scope) {

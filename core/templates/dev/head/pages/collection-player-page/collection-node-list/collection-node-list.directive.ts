@@ -17,7 +17,7 @@
  * playing the exploration in each node.
  */
 
-oppia.directive('collectionNodeList', [
+angular.module('collectionNodeListModule').directive('collectionNodeList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -26,7 +26,7 @@ oppia.directive('collectionNodeList', [
         getCollectionNodes: '&collectionNodes'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_player/' +
-        'collection_node_list_directive.html')
+        '/pages/collection-player-page/collection-node-list/' +
+        'collection-node-list.directive.html')
     };
   }]);

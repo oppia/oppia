@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,18 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the error page.
+ * @fileoverview Module for oppia email dashboard page.
  */
 
-oppia.controller('Error', [
-  '$scope', 'PageTitleService', 'UrlInterpolationService',
-  function(
-      $scope, PageTitleService, UrlInterpolationService) {
-    $scope.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/general/oops_mint.png');
-
-    $scope.statusCode = GLOBALS.status_code;
-
-    PageTitleService.setPageTitle('Error ' + $scope.statusCode + ' - Oppia');
-  }
-]);
+angular.module('emailDashboardResultModule', []);
