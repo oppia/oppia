@@ -195,7 +195,7 @@ class SignupTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         values_dict = {
             u'can_send_emails': False,
-            u'has_agreed_to_latest_terms': None,
+            u'has_agreed_to_latest_terms': False,
             u'has_ever_registered': False,
             u'username': None,
         }
