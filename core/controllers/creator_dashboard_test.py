@@ -18,7 +18,6 @@ import datetime
 
 from constants import constants
 from core.controllers import creator_dashboard
-from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_services
@@ -739,32 +738,23 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_create_collections(self):
-
-        class MockCollection(object):
-            @classmethod
-            def mock_create_default_collection(cls, collection_id):
-                """Mocks create_default_collection()."""
-                return collection_domain.Collection(
-                    collection_id, 'A title', 'A category',
-                    'An objective', constants.DEFAULT_LANGUAGE_CODE, [],
-                    feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0)
-
-        with self.swap(
-            collection_domain.Collection, 'create_default_collection',
-            MockCollection.mock_create_default_collection):
-            self.set_admins([self.OWNER_USERNAME])
-            self.login(self.OWNER_EMAIL)
-            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-            csrf_token = self.get_csrf_token_from_response(response)
-            collection_id = self.post_json(
-                feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[
-                    creator_dashboard.COLLECTION_ID_KEY]
-            collection = collection_services.get_collection_by_id(collection_id)
-            self.assertEqual(collection.id, collection_id)
-            self.assertEqual(collection.title, 'A title')
-            self.assertEqual(collection.objective, 'An objective')
-            self.assertEqual(collection.category, 'A category')
-            self.logout()
+        self.set_admins([self.OWNER_USERNAME])
+        self.login(self.OWNER_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        collection_id = self.post_json(
+            feconf.NEW_COLLECTION_URL, {}, csrf_token=csrf_token)[
+                creator_dashboard.COLLECTION_ID_KEY]
+        collection = collection_services.get_collection_by_id(collection_id)
+        self.assertEqual(collection.id, collection_id)
+        self.assertEqual(collection.title, feconf.DEFAULT_COLLECTION_TITLE)
+        self.assertEqual(
+            collection.objective, feconf.DEFAULT_COLLECTION_CATEGORY)
+        self.assertEqual(
+            collection.category, feconf.DEFAULT_COLLECTION_OBJECTIVE)
+        self.assertEqual(
+            collection.language_code, constants.DEFAULT_LANGUAGE_CODE)
+        self.logout()
 
     def test_get_collections_list(self):
         self.set_admins([self.OWNER_USERNAME])
