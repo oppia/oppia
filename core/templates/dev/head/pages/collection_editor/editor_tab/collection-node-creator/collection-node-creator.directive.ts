@@ -22,7 +22,7 @@ angular.module('collectionNodeCreatorModule').directive('collectionNodeCreator',
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/editor_tab/collection-node-creator/' +
-        'collection-node-creator-directive.html'),
+        'collection-node-creator.directive.html'),
       controller: [
         '$scope', '$http', '$window', '$filter', 'AlertsService',
         'ValidatorsService', 'CollectionEditorStateService',
