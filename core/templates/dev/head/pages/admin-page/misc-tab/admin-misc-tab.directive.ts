@@ -28,7 +28,7 @@ angular.module('adminMiscTabModule').directive('adminMiscTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/misc-tab/' +
+        '/pages/admin-page/misc-tab/' +
         'admin-misc-tab.directive.html'),
       controller: ['$scope', function($scope) {
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (

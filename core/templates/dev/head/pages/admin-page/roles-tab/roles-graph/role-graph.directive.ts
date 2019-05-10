@@ -34,7 +34,7 @@ angular.module('roleGraphModule').directive('roleGraph', [
         graphDataLoaded: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/roles-tab/roles-graph/role-graph.directive.html'),
+        '/pages/admin-page/roles-tab/roles-graph/role-graph.directive.html'),
       controller: [
         '$scope', '$element', '$timeout', '$filter', 'StateGraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
