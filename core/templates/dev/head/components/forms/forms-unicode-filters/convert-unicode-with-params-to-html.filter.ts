@@ -30,14 +30,15 @@ angular.module('formsUnicodeFiltersModule').filter(
     };
 
     return function(text) {
-      // The parsing here needs to be done with more care because we are replacing
-      // two-character strings. We can't naively break by {{ because in strings
-      // like \{{{ the second and third characters will be taken as the opening
-      // brackets, which is wrong. We can't unescape characters because then the
-      // { characters that remain will be ambiguous (they may either be the
-      // openings of parameters or literal '{' characters entered by the user.
-      // So we build a standard left-to-right parser which examines each
-      // character of the string in turn, and processes it accordingly.
+      // The parsing here needs to be done with more care because we are
+      // replacing two-character strings. We can't naively break by {{ because
+      // in strings like \{{{ the second and third characters will be taken as
+      // the opening brackets, which is wrong. We can't unescape characters
+      // because then the { characters that remain will be ambiguous (they
+      // may either be the openings of parameters or literal '{' characters
+      // entered by the user. So we build a standard left-to-right parser which
+      // examines each character of the string in turn, and processes it
+      // accordingly.
       var textFragments = [];
       var currentFragment = '';
       var currentFragmentIsParam = false;
@@ -94,4 +95,4 @@ angular.module('formsUnicodeFiltersModule').filter(
       return result;
     };
   }
-]);
+  ]);

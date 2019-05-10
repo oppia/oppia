@@ -31,5 +31,5 @@ angular.module('schemaBasedHtmlEditorModule').directive(
           'schema-based-html-editor/schema-based-html-editor.directive.html'),
         restrict: 'E',
       };
-  }]
+    }]
 );

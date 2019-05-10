@@ -17,7 +17,7 @@
  */
 
 angular.module('summaryTileDirectivesModule', [
-    'collectionSummaryTileModule',
-    'explorationSummaryTileModule',
-    'storySummaryTileModule'
+  'collectionSummaryTileModule',
+  'explorationSummaryTileModule',
+  'storySummaryTileModule'
 ]);

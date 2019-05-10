@@ -60,4 +60,4 @@ angular.module('stringUtilityFiltersModule').filter(
       }
     };
   }
-]);
+  ]);

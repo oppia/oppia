@@ -80,7 +80,8 @@ angular.module('schemaBasedFloatEditorModule').directive(
             $scope.onKeypress = function(evt) {
               if (evt.keyCode === 13) {
                 if (
-                  Object.keys($scope.floatForm.floatValue.$error).length !== 0) {
+                  Object.keys(
+                    $scope.floatForm.floatValue.$error).length !== 0) {
                   $scope.isUserCurrentlyTyping = false;
                   FocusManagerService.setFocus($scope.labelForErrorFocusTarget);
                 } else {
@@ -95,13 +96,13 @@ angular.module('schemaBasedFloatEditorModule').directive(
               $scope.localValue = 0.0;
             }
 
-            // This prevents the red 'invalid input' warning message from flashing
-            // at the outset.
+            // This prevents the red 'invalid input' warning message from
+            // flashing at the outset.
             $timeout(function() {
               $scope.hasLoaded = true;
             });
           }
         ]
       };
-  }]
+    }]
 );

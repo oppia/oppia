@@ -59,5 +59,5 @@ angular.module('applyValidationModule').directive(
       }
     };
   }
-]);
+  ]);
 /* eslint-enable angular/directive-restrict */

@@ -88,7 +88,7 @@ angular.module('showSuggestionModalForEditorViewModule').factory(
                 if (result.audioUpdateRequired) {
                   state.contentIdsToAudioTranslations
                     .markAllAudioAsNeedingUpdate(
-                    state.content.getContentId());
+                      state.content.getContentId());
                 }
                 ExplorationDataService.data.version += 1;
                 ExplorationStatesService.setState(stateName, state);

@@ -38,4 +38,4 @@ angular.module('stringUtilityFiltersModule').filter(
           input.substring(0, length - suffix.length) + suffix));
     };
   }
-]);
+  ]);

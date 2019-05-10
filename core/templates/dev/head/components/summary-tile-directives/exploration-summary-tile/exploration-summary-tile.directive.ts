@@ -41,9 +41,9 @@ angular.module('explorationSummaryTileModule').directive(
           // will be displayed.
           isCollectionPreviewTile: '@isCollectionPreviewTile',
           // If the screen width is below the threshold defined here, the mobile
-          // version of the summary tile is displayed. This attribute is optional:
-          // if it is not specified, it is treated as 0, which means that the
-          // desktop version of the summary tile is always displayed.
+          // version of the summary tile is displayed. This attribute is
+          // optional: if it is not specified, it is treated as 0, which means
+          // that the desktop version of the summary tile is always displayed.
           mobileCutoffPx: '@mobileCutoffPx',
           isPlaylistTile: '&isPlaylistTile',
           getParentExplorationIds: '&parentExplorationIds',
@@ -62,8 +62,8 @@ angular.module('explorationSummaryTileModule').directive(
                 'exploration-summary-tile-mask mask');
               // As animation duration time may be 400ms, .stop(true) is used to
               // prevent the effects queue falling behind the mouse movement.
-              // .hide(1) and .show(1) used to place the animation in the effects
-              // queue.
+              // .hide(1) and .show(1) used to place the animation in the
+              // effects queue.
               element.find('.avatars-num-minus-one').stop(true).hide(1,
                 function() {
                   element.find('.all-avatars').stop(true).slideDown();
@@ -150,8 +150,8 @@ angular.module('explorationSummaryTileModule').directive(
                 var parentExplorationIds = $scope.getParentExplorationIds();
 
                 var collectionIdToAdd = $scope.getCollectionId();
-                // Replace the collection ID with the one in the URL if it exists
-                // in urlParams.
+                // Replace the collection ID with the one in the URL if it
+                // exists in urlParams.
                 if (parentExplorationIds &&
                     urlParams.hasOwnProperty('collection_id')) {
                   collectionIdToAdd = urlParams.collection_id;
@@ -190,5 +190,5 @@ angular.module('explorationSummaryTileModule').directive(
           }
         ]
       };
-  }]
+    }]
 );

@@ -57,4 +57,4 @@ angular.module('objectEditorModule').directive(
       restrict: 'E'
     };
   }
-]);
+  ]);

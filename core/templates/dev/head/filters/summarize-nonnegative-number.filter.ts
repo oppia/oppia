@@ -35,4 +35,4 @@ angular.module('filtersModule').filter(
         input);
     };
   }
-]);
+  ]);

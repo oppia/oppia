@@ -29,18 +29,19 @@ angular.module('visualDiffVisualizationModule').directive(
           //     - 'newestStateName': the latest name of the state
           //     - 'originalStateName': the first encountered name for the state
           //     - 'stateProperty': 'changed', 'unchanged', 'added' or 'deleted'
-          // - links: a list of objects representing links in the diff graph. Each
-          //     object represents one link, and has keys:
+          // - links: a list of objects representing links in the diff graph.
+          //     Each object represents one link, and has keys:
           //     - 'source': source state of link
           //     - 'target': target state of link
           //     - 'linkProperty': 'added', 'deleted' or 'unchanged'
           // - v1InitStateId: the id of the initial state in the earlier version
           // - v2InitStateId: the id of the initial state in the later version
-          // - finalStateIds: whether a state is terminal in either the earlier or
-          //     later version
+          // - finalStateIds: whether a state is terminal in either the earlier
+          //     or later version
           // - v1States: the states dict for the earlier version of the
-          // exploration
-          // - v2States: the states dict for the later version of the exploration
+          //     exploration
+          // - v2States: the states dict for the later version of the
+          //     exploration
           getDiffData: '&diffData',
           // The header for the pane of the state comparison modal corresponding
           // to the earlier version of the exploration.
@@ -89,7 +90,8 @@ angular.module('visualDiffVisualizationModule').directive(
           $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_DELETED] = COLOR_DELETED;
           $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED] = COLOR_CHANGED;
           $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_UNCHANGED] = COLOR_UNCHANGED;
-          $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_RENAMED] = COLOR_RENAMED_UNCHANGED;
+          $scope.LEGEND_GRAPH_COLORS[
+            NODE_TYPE_RENAMED] = COLOR_RENAMED_UNCHANGED;
           $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED_RENAMED] = COLOR_CHANGED;
 
           $scope.LEGEND_GRAPH_SECONDARY_LABELS = {};
@@ -205,8 +207,8 @@ angular.module('visualDiffVisualizationModule').directive(
           // - oldStateName is undefined if the name of the state is unchanged
           //     between the 2 versions, or the name of the state in the older
           //     version if the state name is changed.
-          // - stateProperty is whether the state is added, changed, unchanged or
-          //     deleted.
+          // - stateProperty is whether the state is added, changed, unchanged
+          //     or deleted.
           $scope.showStateDiffModal = function(
               newStateName, oldStateName, stateProperty) {
             $uibModal.open({
@@ -323,5 +325,5 @@ angular.module('visualDiffVisualizationModule').directive(
           };
         }]
       };
-  }]
+    }]
 );

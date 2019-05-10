@@ -37,5 +37,5 @@ angular.module('requireIsFloatModule').directive(
       }
     };
   }
-]);
+  ]);
 /* eslint-enable angular/directive-restrict */

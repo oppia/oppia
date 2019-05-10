@@ -22,4 +22,3 @@ angular.module('collectionSummaryTileModule').constant(
   'COLLECTION_VIEWER_URL', '/collection/<collection_id>');
 angular.module('collectionSummaryTileModule').constant(
   'COLLECTION_EDITOR_URL', '/collection_editor/create/<collection_id>');
-  

@@ -31,4 +31,4 @@ angular.module('stringUtilityFiltersModule').filter(
       }
     };
   }
-]);
+  ]);

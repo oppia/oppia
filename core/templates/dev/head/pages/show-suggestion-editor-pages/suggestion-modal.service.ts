@@ -47,4 +47,4 @@ angular.module('suggestionModalModule').factory(
       },
     };
   }
-]);
+  ]);

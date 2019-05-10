@@ -84,5 +84,5 @@ angular.module('collectionSummaryTileModule').directive(
           }
         ]
       };
-  }]
+    }]
 );

@@ -28,4 +28,4 @@ angular.module('stringUtilityFiltersModule').filter(
       return matchLocation === -1 ? input : (input.substring(0, matchLocation));
     };
   }
-]);
+  ]);

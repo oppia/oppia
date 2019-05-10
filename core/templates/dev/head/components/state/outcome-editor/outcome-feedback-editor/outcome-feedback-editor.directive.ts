@@ -34,5 +34,5 @@ angular.module('outcomeFeedbackEditorModule').directive(
           };
         }]
       };
-  }]
+    }]
 );

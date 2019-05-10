@@ -35,5 +35,5 @@ angular.module('schemaBasedExpressionEditorModule').directive(
         ),
         restrict: 'E'
       };
-  }]
+    }]
 );

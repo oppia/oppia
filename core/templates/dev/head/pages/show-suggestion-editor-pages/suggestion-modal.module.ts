@@ -17,8 +17,8 @@
  */
 
 angular.module('suggestionModalModule', [
-    'showSuggestionModalForCreatorViewModule',
-    'showSuggestionModalForEditorViewModule',
-    'showSuggestionModalForLocalViewModule',
-    'showSuggestionModalForLearnerViewModule'
+  'showSuggestionModalForCreatorViewModule',
+  'showSuggestionModalForEditorViewModule',
+  'showSuggestionModalForLocalViewModule',
+  'showSuggestionModalForLearnerViewModule'
 ]);

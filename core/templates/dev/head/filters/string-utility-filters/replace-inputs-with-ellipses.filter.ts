@@ -24,4 +24,4 @@ angular.module('stringUtilityFiltersModule').filter(
       return input ? input.replace(pattern, '...') : '';
     };
   }
-]);
+  ]);

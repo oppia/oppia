@@ -30,4 +30,4 @@ angular.module('stringUtilityFiltersModule').filter(
       return text;
     };
   }
-]);
+  ]);

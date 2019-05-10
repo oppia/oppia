@@ -22,4 +22,4 @@ angular.module('formsUnicodeFiltersModule').filter(
       return angular.element('<div>' + html + '</div>').text();
     };
   }
-]);
+  ]);

@@ -54,7 +54,8 @@ angular.module('solutionExplanationEditorModule').directive(
                 StateSolutionService.displayed.explanation.getHtml() !==
                 StateSolutionService.savedMemento.explanation.getHtml());
               if (contentHasChanged) {
-                var solutionContentId = StateSolutionService.displayed.explanation
+                var solutionContentId = StateSolutionService.displayed
+                  .explanation
                   .getContentId();
                 $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(
                   solutionContentId);
@@ -77,5 +78,5 @@ angular.module('solutionExplanationEditorModule').directive(
           }
         ]
       };
-  }]
+    }]
 );

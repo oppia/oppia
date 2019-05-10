@@ -44,4 +44,4 @@ angular.module('stringUtilityFiltersModule').filter(
         lines[firstNonemptyLineIndex] + suffix : '');
     };
   }
-]);
+  ]);

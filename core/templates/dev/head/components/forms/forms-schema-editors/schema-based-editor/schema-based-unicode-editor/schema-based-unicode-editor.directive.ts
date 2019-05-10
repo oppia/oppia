@@ -31,7 +31,8 @@ angular.module('schemaBasedUnicodeEditorModule').directive(
         },
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/components/forms/forms-schema-editors/schema-based-editor/' +
-          'schema-based-unicode-editor/schema-based-unicode-editor.directive.html'),
+          'schema-based-unicode-editor/' +
+          'schema-based-unicode-editor.directive.html'),
         restrict: 'E',
         controller: [
           '$scope', '$filter', '$sce', '$translate', 'DeviceInfoService',
@@ -47,7 +48,8 @@ angular.module('schemaBasedUnicodeEditorModule').directive(
                 // Convert tabs to spaces.
                 extraKeys: {
                   Tab: function(cm) {
-                    var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+                    var spaces = Array(
+                      cm.getOption('indentUnit') + 1).join(' ');
                     cm.replaceSelection(spaces);
                     // Move the cursor to the end of the selection.
                     var endSelectionPos = cm.getDoc().getCursor('head');

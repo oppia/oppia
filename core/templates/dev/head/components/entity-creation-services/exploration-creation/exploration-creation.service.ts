@@ -65,27 +65,27 @@ angular.module('entityCreationServicesModule').factory(
               'upload_activity_modal_directive.html'),
             controller: [
               '$scope', '$uibModalInstance', function(
-                $scope, $uibModalInstance) {
-                  $scope.save = function() {
-                    var returnObj = {
-                      yamlFile: null
-                    };
-                    var file = (
-                      <HTMLInputElement>document.getElementById('newFileInput')
-                    ).files[0];
-                    if (!file || !file.size) {
-                      AlertsService.addWarning('Empty file detected.');
-                      return;
-                    }
-                    returnObj.yamlFile = file;
-
-                    $uibModalInstance.close(returnObj);
+                  $scope, $uibModalInstance) {
+                $scope.save = function() {
+                  var returnObj = {
+                    yamlFile: null
                   };
+                  var file = (
+                    <HTMLInputElement>document.getElementById('newFileInput')
+                  ).files[0];
+                  if (!file || !file.size) {
+                    AlertsService.addWarning('Empty file detected.');
+                    return;
+                  }
+                  returnObj.yamlFile = file;
 
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
+                  $uibModalInstance.close(returnObj);
+                };
+
+                $scope.cancel = function() {
+                  $uibModalInstance.dismiss('cancel');
+                  AlertsService.clearWarnings();
+                };
               }
             ]
           }).result.then(function(result) {

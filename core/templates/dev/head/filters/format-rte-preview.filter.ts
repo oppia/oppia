@@ -40,4 +40,4 @@ angular.module('filtersModule').filter(
       return formattedOutput.trim();
     };
   }
-]);
+  ]);

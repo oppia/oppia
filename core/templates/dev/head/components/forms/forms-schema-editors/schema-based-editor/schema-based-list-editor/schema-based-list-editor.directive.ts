@@ -31,7 +31,8 @@ angular.module('schemaBasedListEditorModule').directive(
         scope: {
           localValue: '=',
           isDisabled: '&',
-          // Read-only property. The schema definition for each item in the list.
+          // Read-only property. The schema definition for each item in the
+          // list.
           itemSchema: '&',
           // The length of the list. If not specified, the list is of arbitrary
           // length.
@@ -51,14 +52,14 @@ angular.module('schemaBasedListEditorModule').directive(
             $scope.labelForFocusTarget() ||
             IdGenerationService.generateNewId() + '-');
           $scope.getFocusLabel = function(index) {
-            // Treat the first item in the list as a special case -- if this list
-            // is contained in another list, and the outer list is opened with a
-            // desire to autofocus on the first input field, we can then focus on
-            // the given $scope.labelForFocusTarget().
-            // NOTE: This will cause problems for lists nested within lists, since
-            // sub-element 0 > 1 will have the same label as sub-element 1 > 0.
-            // But we will assume (for now) that nested lists won't be used -- if
-            // they are, this will need to be changed.
+            // Treat the first item in the list as a special case -- if this
+            // list is contained in another list, and the outer list is opened
+            // with a desire to autofocus on the first input field, we can then
+            // focus on the given $scope.labelForFocusTarget().
+            // NOTE: This will cause problems for lists nested within lists,
+            // since sub-element 0 > 1 will have the same label as sub-element
+            // 1 > 0. But we will assume (for now) that nested lists won't be
+            // used -- if they are, this will need to be changed.
             return (
               index === 0 ? baseFocusLabel : baseFocusLabel + index.toString());
           };
@@ -173,9 +174,9 @@ angular.module('schemaBasedListEditorModule').directive(
             $scope._onChildFormSubmit = function(evt) {
               if (!$scope.isAddItemButtonPresent) {
                 /**
-                 * If form submission happens on last element of the set (i.e the
-                 * add item button is absent) then automatically add the element
-                 * to the list.
+                 * If form submission happens on last element of the set (i.e
+                 * the add item button is absent) then automatically add the
+                 * element to the list.
                  */
                 if (($scope.maxListLength === null ||
                     $scope.localValue.length < $scope.maxListLength) &&
@@ -192,7 +193,8 @@ angular.module('schemaBasedListEditorModule').directive(
               evt.stopPropagation();
             };
 
-            $scope.$on('submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
+            $scope.$on(
+              'submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
             $scope.$on(
               'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
             $scope.$on(
@@ -208,8 +210,8 @@ angular.module('schemaBasedListEditorModule').directive(
               throw 'Invalid length for list editor: ' + $scope.len;
             }
             if ($scope.len !== $scope.localValue.length) {
-              throw 'List editor length does not match length of input value: ' +
-                $scope.len + ' ' + $scope.localValue;
+              throw 'List editor length does not match length of input' +
+                ' value: ' + $scope.len + ' ' + $scope.localValue;
             }
           }
         }]

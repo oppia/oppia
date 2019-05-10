@@ -31,5 +31,5 @@ angular.module('schemaBasedBoolEditorModule').directive(
           'schema-based-bool-editor/schema-based-bool-editor.directive.html'),
         restrict: 'E'
       };
-  }]
+    }]
 );
