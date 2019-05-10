@@ -131,7 +131,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # question summaries.
         for index, description in enumerate(skill_descriptions):
             if question_ids[index] == self.question_id:
-                self.assertEqual(['Skill Description 3', 'Skill Description 1'], description)
+                self.assertEqual(
+                    ['Skill Description 3', 'Skill Description 1'], description)
             elif question_ids[index] == question_id_2:
                 self.assertEqual(['Skill Description 1'], description)
             else:

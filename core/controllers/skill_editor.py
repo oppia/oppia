@@ -190,12 +190,13 @@ class EditableSkillDataHandler(base.BaseHandler):
         skill_dicts = []
         for single_skill_id in skill_id.split(','):
             skill_domain.Skill.require_valid_skill_id(single_skill_id)
-            skill = skill_services.get_skill_by_id(single_skill_id, strict=False)
+            skill = skill_services.get_skill_by_id(
+                single_skill_id, strict=False)
             if skill is None:
                 raise self.PageNotFoundException(
                     Exception('The skill with the given id doesn\'t exist.'))
             skill_dicts.append(skill.to_dict())
-        
+
         self.values.update({
             'skills': skill_dicts
         })
