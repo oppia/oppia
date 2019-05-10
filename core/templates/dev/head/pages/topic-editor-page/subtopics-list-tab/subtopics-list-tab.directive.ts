@@ -54,8 +54,8 @@ angular.module('subtopicsListTabModule').directive('subtopicsListTab', [
             var subtopicTitles = $scope.subtopicTitles;
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/subtopics_editor/' +
-                'subtopic_editor_modal_directive.html'),
+                '/pages/topic-editor-page/topic-editor-templates/' +
+                'subtopic-editor-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -201,8 +201,8 @@ angular.module('subtopicsListTabModule').directive('subtopicsListTab', [
             var subtopicTitles = $scope.subtopicTitles;
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/subtopics_editor/' +
-                'new_subtopic_title_modal_directive.html'),
+                '/pages/topic-editor-page/topic-editor-templates/' +
+                'new-subtopic-title-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
