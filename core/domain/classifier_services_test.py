@@ -505,3 +505,34 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
                 test_dict))
         self.assertDictEqual(expected_dict, output_dict)
+
+    def test_can_not_convert_strings_to_float_numbers_in_classifier_data(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected all classifier data objects to be '
+            'lists, dicts, strings, integers but received'):
+            (classifier_services.
+             convert_strings_to_float_numbers_in_classifier_data(2.0124))
+
+    def test_can_not_mark_training_jobs_complete_due_to_invalid_job_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The ClassifierTrainingJobModel corresponding to the '
+            'job_id of the ClassifierTrainingJob does not exist.'):
+            classifier_services.mark_training_job_complete('invalid_job_id')
+
+    def test_can_not_mark_training_jobs_failed_due_to_invalid_job_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The ClassifierTrainingJobModel corresponding to the '
+            'job_id of the ClassifierTrainingJob does not exist.'):
+            classifier_services.mark_training_jobs_failed(['invalid_job_id'])
+
+    def test_can_not_mark_training_jobs_pending_due_to_invalid_job_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The ClassifierTrainingJobModel corresponding to the '
+            'job_id of the ClassifierTrainingJob does not exist.'):
+            classifier_services.mark_training_job_pending('invalid_job_id')
+
+    def test_can_not_store_classifier_data_due_to_invalid_job_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The ClassifierTrainingJobModel corresponding to the '
+            'job_id of the ClassifierTrainingJob does not exist.'):
+            classifier_services.store_classifier_data('invalid_job_id', {})
