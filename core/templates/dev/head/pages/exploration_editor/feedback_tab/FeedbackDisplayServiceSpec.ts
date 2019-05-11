@@ -18,7 +18,7 @@
  * feedback tab of the exploration editor.
  */
 
-describe('Thread Status Display Service', function() {
+describe('FeedbackDisplayService', function() {
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   var FeedbackDisplayService;
@@ -29,38 +29,24 @@ describe('Thread Status Display Service', function() {
   it('should give human readable status for status choice', function() {
     var mockStatusChoices = FeedbackDisplayService.STATUS_CHOICES;
 
-    for (var i = 0; i < mockStatusChoices.length; i++) {
-      mockStatusID = mockStatusChoices[i].id;
-      expect(
-        FeedbackDisplayService.getHumanReadableStatus(
-          mockStatusID)).toBe(mockStatusChoices[i].text);
-    }
-
-    var mockStatusID = 'INVALID_STATUS';
-    expect(
-      FeedbackDisplayService.getHumanReadableStatus(
-        mockStatusID)).toBe('');
+    Object.keys(mockStatusChoices).forEach(function(mockStatusID) {
+      expect(FeedbackDisplayService.getHumanReadableStatus(mockStatusID))
+        .toBe(mockStatusChoices[mockStatusID].text);
+    });
+    expect(FeedbackDisplayService.getHumanReadableStatus('INVALID_STATUS'))
+      .toBe('');
   });
 
   it('should give appropriate label class for status id', function() {
-    var mockStatusID = 'open';
-    expect(FeedbackDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-info');
-
-    mockStatusID = 'fixed';
-    expect(FeedbackDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
-
-    mockStatusID = 'ignored';
-    expect(FeedbackDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
-
-    mockStatusID = 'not_actionable';
-    expect(FeedbackDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-default');
-
-    mockStatusID = 'compliment';
-    expect(FeedbackDisplayService.getLabelClass(mockStatusID)).toBe(
-      'label label-success');
+    expect(FeedbackDisplayService.getLabelClass('open'))
+      .toBe('label label-info');
+    expect(FeedbackDisplayService.getLabelClass('fixed'))
+      .toBe('label label-default');
+    expect(FeedbackDisplayService.getLabelClass('ignored'))
+      .toBe('label label-default');
+    expect(FeedbackDisplayService.getLabelClass('not_actionable'))
+      .toBe('label label-default');
+    expect(FeedbackDisplayService.getLabelClass('compliment'))
+      .toBe('label label-success');
   });
 });

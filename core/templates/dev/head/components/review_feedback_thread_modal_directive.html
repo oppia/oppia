@@ -55,7 +55,7 @@
       <div ng-show="EditabilityService.isEditable()" style="float: left">
         Change status (optional):
         <select ng-model="tmpMessage.status"
-                ng-options="choice.id as choice.text for choice in STATUS_CHOICES"
+                ng-options="id as choice.text for (id, choice) in STATUS_CHOICES"
                 ng-disabled="messageSendingInProgress"
                 style="height: 34px; border-color: #ccc">
         </select>
