@@ -23,4 +23,4 @@ angular.module('statisticsTabModule', ['barChartModule',
 ]);
 
 angular.module('statisticsTabModule').constant(
-  'IMPROVE_TYPE_INCOMPLETE', 'incomplete');  
+  'IMPROVE_TYPE_INCOMPLETE', 'incomplete');

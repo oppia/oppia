@@ -16,26 +16,28 @@
  * @fileoverview Service for solution verification.
  */
 
-angular.module('explorationEditorTabModule').factory('SolutionVerificationService', [
-  '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'StateEditorService',
-  function(
-      $injector, AngularNameService, AnswerClassificationService,
-      StateEditorService) {
-    return {
-      verifySolution: function(stateName, interaction, correctAnswer) {
-        var interactionId = interaction.id;
-        var rulesServiceName = (
-          AngularNameService.getNameOfInteractionRulesService(interactionId));
-        var rulesService = $injector.get(rulesServiceName);
-        var result = (
-          AnswerClassificationService.getMatchingClassificationResult(
-            stateName, interaction, correctAnswer, rulesService
-          ));
-        if (StateEditorService.isInQuestionMode()) {
-          return result.outcome.labelledAsCorrect;
+angular.module('explorationEditorTabModule').factory(
+  'SolutionVerificationService', [
+    '$injector', 'AngularNameService', 'AnswerClassificationService',
+    'StateEditorService',
+    function(
+        $injector, AngularNameService, AnswerClassificationService,
+        StateEditorService) {
+      return {
+        verifySolution: function(stateName, interaction, correctAnswer) {
+          var interactionId = interaction.id;
+          var rulesServiceName = (
+            AngularNameService.getNameOfInteractionRulesService(interactionId));
+          var rulesService = $injector.get(rulesServiceName);
+          var result = (
+            AnswerClassificationService.getMatchingClassificationResult(
+              stateName, interaction, correctAnswer, rulesService
+            ));
+          if (StateEditorService.isInQuestionMode()) {
+            return result.outcome.labelledAsCorrect;
+          }
+          return stateName !== result.outcome.dest;
         }
-        return stateName !== result.outcome.dest;
-      }
-    };
-  }]);
+      };
+    }]
+);

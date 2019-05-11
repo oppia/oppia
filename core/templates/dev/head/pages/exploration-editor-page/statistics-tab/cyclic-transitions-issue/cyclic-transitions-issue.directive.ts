@@ -59,17 +59,18 @@ angular.module('cyclicTransitionIssueModule').directive(
                 issueResolved = true;
               } else {
                 AlertsService.addSuccessMessage(
-                  'Issue has already been resolved. No need to resolve again. ' +
-                  'Refresh the page to view changes.');
+                  'Issue has already been resolved. No need to resolve again.' +
+                  ' Refresh the page to view changes.');
               }
             };
 
             $scope.showPlaythrough = function(playthroughId) {
               var index = $scope.playthroughIds.indexOf(playthroughId);
-              PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
+              PlaythroughIssuesService.openPlaythroughModal(
+                playthroughId, index);
             };
           }
         ]
       };
-  }]
+    }]
 );

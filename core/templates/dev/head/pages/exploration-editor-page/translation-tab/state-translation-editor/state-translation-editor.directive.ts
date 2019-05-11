@@ -26,13 +26,15 @@ angular.module('stateTranslationEditorModule').directive(
           '/pages/exploration-editor-page/translation-tab/' +
           'state-translation-editor/state-translation-editor.directive.html'),
         controller: [
-          '$scope', '$uibModal', 'EditabilityService', 'ExplorationStatesService',
-          'StateEditorService', 'StateWrittenTranslationsService',
-          'TranslationLanguageService', 'TranslationTabActiveContentIdService',
+          '$scope', '$uibModal', 'EditabilityService',
+          'ExplorationStatesService', 'StateEditorService',
+          'StateWrittenTranslationsService', 'TranslationLanguageService',
+          'TranslationTabActiveContentIdService',
           'WrittenTranslationObjectFactory', function(
-              $scope, $uibModal, EditabilityService, ExplorationStatesService,
-              StateEditorService, StateWrittenTranslationsService,
-              TranslationLanguageService, TranslationTabActiveContentIdService,
+              $scope, $uibModal, EditabilityService,
+              ExplorationStatesService, StateEditorService,
+              StateWrittenTranslationsService, TranslationLanguageService,
+              TranslationTabActiveContentIdService,
               WrittenTranslationObjectFactory) {
             $scope.HTML_SCHEMA = {
               type: 'html',
@@ -96,8 +98,9 @@ angular.module('stateTranslationEditorModule').directive(
               contentId = (
                 TranslationTabActiveContentIdService.getActiveContentId());
               langaugeCode = TranslationLanguageService.getActiveLanguageCode();
-              if (StateWrittenTranslationsService.displayed.hasWrittenTranslation(
-                contentId, langaugeCode)) {
+              if (
+                StateWrittenTranslationsService.displayed.hasWrittenTranslation(
+                  contentId, langaugeCode)) {
                 $scope.activeWrittenTranslation = (
                   StateWrittenTranslationsService.displayed
                     .getWrittenTranslation(contentId, langaugeCode));

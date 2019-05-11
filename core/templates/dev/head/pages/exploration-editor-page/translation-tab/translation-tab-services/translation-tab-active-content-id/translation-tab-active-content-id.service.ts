@@ -16,22 +16,24 @@
  * @fileoverview Service to get and set active content id in translation tab.
  */
 
-angular.module('explorationEditorPageModule').factory('TranslationTabActiveContentIdService', [
-  '$log', '$rootScope', 'StateContentIdsToAudioTranslationsService',
-  function($log, $rootScope, StateContentIdsToAudioTranslationsService) {
-    var activeContentId = null;
-    return {
-      getActiveContentId: function() {
-        return activeContentId;
-      },
-      setActiveContentId: function(contentId) {
-        var allContentIds = StateContentIdsToAudioTranslationsService.displayed
-          .getAllContentId();
-        if (allContentIds.indexOf(contentId) === -1) {
-          throw Error('Invalid active content id: ' + contentId);
+angular.module('explorationEditorPageModule').factory(
+  'TranslationTabActiveContentIdService', [
+    '$log', '$rootScope', 'StateContentIdsToAudioTranslationsService',
+    function($log, $rootScope, StateContentIdsToAudioTranslationsService) {
+      var activeContentId = null;
+      return {
+        getActiveContentId: function() {
+          return activeContentId;
+        },
+        setActiveContentId: function(contentId) {
+          var allContentIds = StateContentIdsToAudioTranslationsService
+            .displayed.getAllContentId();
+          if (allContentIds.indexOf(contentId) === -1) {
+            throw Error('Invalid active content id: ' + contentId);
+          }
+          activeContentId = contentId;
+          $rootScope.$broadcast('activeContentIdChanged');
         }
-        activeContentId = contentId;
-        $rootScope.$broadcast('activeContentIdChanged');
-      }
-    };
-  }]);
+      };
+    }]
+);

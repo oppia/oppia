@@ -65,5 +65,5 @@ angular.module('stateTranslationStatusGraphModule').directive(
           }
         ]
       };
-  }]
+    }]
 );

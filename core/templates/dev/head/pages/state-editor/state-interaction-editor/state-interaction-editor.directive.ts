@@ -397,7 +397,7 @@ angular.module('stateInteractionEditorModule').directive(
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration-editor-page/exploration-editor-tab/' +
-                  'exploration-editor-tab-templates/'+
+                  'exploration-editor-tab-templates/' +
                   'delete-interaction-modal.template.html'),
                 backdrop: true,
                 controller: [

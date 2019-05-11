@@ -17,22 +17,26 @@
  * in the translation tab is currently active.
  */
 
-angular.module('explorationEditorPageModule').factory('TranslationLanguageService', [
-  '$log', '$rootScope', 'LanguageUtilService',
-  function($log, $rootScope, LanguageUtilService) {
-    var activeLanguageCode = null;
-    var allAudioLanguageCodes = LanguageUtilService.getAllAudioLanguageCodes();
-    return {
-      getActiveLanguageCode: function() {
-        return activeLanguageCode;
-      },
-      setActiveLanguageCode: function(newActiveLanguageCode) {
-        if (allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0) {
-          $log.error('Invalid active language code: ' + newActiveLanguageCode);
-          return;
+angular.module('explorationEditorPageModule').factory(
+  'TranslationLanguageService', [
+    '$log', '$rootScope', 'LanguageUtilService',
+    function($log, $rootScope, LanguageUtilService) {
+      var activeLanguageCode = null;
+      var allAudioLanguageCodes = LanguageUtilService
+        .getAllAudioLanguageCodes();
+      return {
+        getActiveLanguageCode: function() {
+          return activeLanguageCode;
+        },
+        setActiveLanguageCode: function(newActiveLanguageCode) {
+          if (allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0) {
+            $log.error(
+              'Invalid active language code: ' + newActiveLanguageCode);
+            return;
+          }
+          activeLanguageCode = newActiveLanguageCode;
+          $rootScope.$broadcast('activeLanguageChanged');
         }
-        activeLanguageCode = newActiveLanguageCode;
-        $rootScope.$broadcast('activeLanguageChanged');
-      }
-    };
-  }]);
+      };
+    }]
+);

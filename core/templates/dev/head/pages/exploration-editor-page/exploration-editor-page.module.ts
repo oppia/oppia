@@ -55,4 +55,9 @@ angular.module('explorationEditorPageModule').constant(
 
 angular.module('explorationEditorPageModule').constant(
   'PARAM_ACTION_SET', 'set');
-  
+
+angular.module('explorationEditorPageModule').constant(
+  'VOICEOVER_MODE', 'voiceoverMode');
+
+angular.module('explorationEditorPageModule').constant(
+  'TRANSLATION_MODE', 'translationMode');

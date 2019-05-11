@@ -54,7 +54,8 @@ angular.module('unresolvedAnswersOverviewModule').directive(
 
             $scope.isUnresolvedAnswersOverviewShown = function() {
               var activeStateName = StateEditorService.getActiveStateName();
-              return StateTopAnswersStatsService.hasStateStats(activeStateName) &&
+              return StateTopAnswersStatsService.hasStateStats(
+                activeStateName) &&
                 isStateRequiredToBeResolved(activeStateName);
             };
 
@@ -64,7 +65,8 @@ angular.module('unresolvedAnswersOverviewModule').directive(
 
             $scope.isCurrentInteractionLinear = function() {
               var interactionId = $scope.getCurrentInteractionId();
-              return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+              return interactionId && INTERACTION_SPECS[
+                interactionId].is_linear;
             };
 
             $scope.isCurrentInteractionTrainable = function() {
@@ -137,7 +139,8 @@ angular.module('unresolvedAnswersOverviewModule').directive(
                           state_name: stateName
                         }
                       }).success(function(response) {
-                        $scope.showUnresolvedAnswers(response.unresolved_answers);
+                        $scope.showUnresolvedAnswers(
+                          response.unresolved_answers);
                       }).error(function(response) {
                         $log.error(
                           'Error occurred while fetching unresolved answers ' +
@@ -185,7 +188,8 @@ angular.module('unresolvedAnswersOverviewModule').directive(
                       $scope.unresolvedAnswers.splice(answerIndex, 1);
 
                       var classificationType = (
-                        answer.classificationResult.classificationCategorization);
+                        answer
+                          .classificationResult.classificationCategorization);
                       var truncatedAnswer = $filter(
                         'truncateInputBasedOnInteractionAnswerType')(
                         answer.answer, interactionId, 12);
@@ -193,7 +197,8 @@ angular.module('unresolvedAnswersOverviewModule').directive(
                         'The answer ' + truncatedAnswer +
                         ' has been successfully trained.');
 
-                      if (classificationType === DEFAULT_OUTCOME_CLASSIFICATION) {
+                      if (
+                        classificationType === DEFAULT_OUTCOME_CLASSIFICATION) {
                         TrainingDataService.associateWithDefaultResponse(
                           answer.answer);
                         AlertsService.addSuccessMessage(
@@ -216,18 +221,20 @@ angular.module('unresolvedAnswersOverviewModule').directive(
                       var answer = unresolvedAnswer.answer;
                       var answerGroupIndex = (
                         unresolvedAnswer.classificationResult.answerGroupIndex);
-                      return TrainingModalService.openTrainUnresolvedAnswerModal(
-                        answer, function() {
-                          $scope.unresolvedAnswers.splice(selectedAnswerIndex, 1);
-                          var truncatedAnswer = $filter(
-                            'truncateInputBasedOnInteractionAnswerType')(
-                            answer, interactionId, 12);
-                          var successToast = (
-                            'The response for ' + truncatedAnswer +
-                            ' has been fixed.');
-                          AlertsService.addSuccessMessage(
-                            successToast, TOAST_TIMEOUT);
-                        });
+                      return TrainingModalService
+                        .openTrainUnresolvedAnswerModal(
+                          answer, function() {
+                            $scope.unresolvedAnswers.splice(
+                              selectedAnswerIndex, 1);
+                            var truncatedAnswer = $filter(
+                              'truncateInputBasedOnInteractionAnswerType')(
+                              answer, interactionId, 12);
+                            var successToast = (
+                              'The response for ' + truncatedAnswer +
+                              ' has been fixed.');
+                            AlertsService.addSuccessMessage(
+                              successToast, TOAST_TIMEOUT);
+                          });
                     };
 
                     $scope.finishTeaching = function(reopen) {
@@ -247,5 +254,5 @@ angular.module('unresolvedAnswersOverviewModule').directive(
           }
         ]
       };
-  }]
+    }]
 );

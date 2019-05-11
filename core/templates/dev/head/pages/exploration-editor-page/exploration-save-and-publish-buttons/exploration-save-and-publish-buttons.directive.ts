@@ -38,7 +38,8 @@ angular.module('explorationSaveAndPulishButtonsModule').directive(
             $scope.loadingDotsAreShown = false;
 
             $scope.showPublishButton = function() {
-              return GLOBALS.can_publish && ExplorationRightsService.isPrivate();
+              return GLOBALS.can_publish &&
+                ExplorationRightsService.isPrivate();
             };
 
             $scope.isPrivate = function() {
@@ -114,7 +115,8 @@ angular.module('explorationSaveAndPulishButtonsModule').directive(
               $scope.saveIsInProcess = true;
               $scope.loadingDotsAreShown = true;
 
-              ExplorationSaveService.saveChanges(showLoadingDots, hideLoadingDots)
+              ExplorationSaveService.saveChanges(
+                showLoadingDots, hideLoadingDots)
                 .then(function() {
                   $scope.saveIsInProcess = false;
                   $scope.loadingDotsAreShown = false;
@@ -123,5 +125,5 @@ angular.module('explorationSaveAndPulishButtonsModule').directive(
           }
         ]
       };
-  }]
+    }]
 );

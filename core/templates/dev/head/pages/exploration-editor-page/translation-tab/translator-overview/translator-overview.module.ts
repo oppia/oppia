@@ -21,4 +21,3 @@ angular.module('translatorOverviewModule', []);
 
 angular.module('translatorOverviewModule').constant(
   'DEFAULT_AUDIO_LANGUAGE', 'en');
-  

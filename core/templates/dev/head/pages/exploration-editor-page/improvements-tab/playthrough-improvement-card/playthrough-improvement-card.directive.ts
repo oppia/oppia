@@ -28,7 +28,8 @@ angular.module('playthroughImprovementCardModule').directive(
           '$scope', 'PlaythroughIssuesService',
           function($scope, PlaythroughIssuesService) {
             $scope.openPlaythroughModal = function(playthroughId, index) {
-              PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
+              PlaythroughIssuesService.openPlaythroughModal(
+                playthroughId, index);
             };
           }
         ]

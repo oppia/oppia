@@ -24,13 +24,15 @@ angular.module('creatorDashboardPageModule').constant(
   }
 );
 
-angular.module('creatorDashboardPageModule').constant('EXPLORATIONS_SORT_BY_KEYS', {
-  TITLE: 'title',
-  RATING: 'ratings',
-  NUM_VIEWS: 'num_views',
-  OPEN_FEEDBACK: 'num_open_threads',
-  LAST_UPDATED: 'last_updated_msec'
-});
+angular.module('creatorDashboardPageModule').constant(
+  'EXPLORATIONS_SORT_BY_KEYS', {
+    TITLE: 'title',
+    RATING: 'ratings',
+    NUM_VIEWS: 'num_views',
+    OPEN_FEEDBACK: 'num_open_threads',
+    LAST_UPDATED: 'last_updated_msec'
+  }
+);
 
 angular.module('creatorDashboardPageModule').constant(
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
@@ -42,10 +44,12 @@ angular.module('creatorDashboardPageModule').constant(
   }
 );
 
-angular.module('creatorDashboardPageModule').constant('SUBSCRIPTION_SORT_BY_KEYS', {
-  USERNAME: 'subscriber_username',
-  IMPACT: 'subscriber_impact'
-});
+angular.module('creatorDashboardPageModule').constant(
+  'SUBSCRIPTION_SORT_BY_KEYS', {
+    USERNAME: 'subscriber_username',
+    IMPACT: 'subscriber_impact'
+  }
+);
 
 angular.module('creatorDashboardPageModule').constant(
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {

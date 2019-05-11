@@ -26,230 +26,237 @@
  * learner actions and then returns a giant HTML string.
  */
 
-angular.module('explorationEditorPageModule').factory('LearnerActionRenderService', [
-  '$sce', 'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
-  'ACTION_TYPE_EXPLORATION_START', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
-  function(
-      $sce, ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
-      ACTION_TYPE_EXPLORATION_START,
-      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
-    var renderExplorationStartActionHTML = function(stateName, actionIndex) {
-      var htmlString =
-        '<span class="oppia-issues-learner-action">' + actionIndex +
-        '. Started exploration at card "' + stateName + '".</span>';
-      return htmlString;
-    };
-
-    var renderExplorationQuitActionHTML = function(
-        stateName, timeSpentInStateSecs, actionIndex) {
-      var htmlString =
-        '<span class="oppia-issues-learner-action">' + actionIndex +
-        '. Left the exploration after spending a ' + 'total of ' +
-        timeSpentInStateSecs + ' seconds on card "' + stateName + '".</span>';
-      return htmlString;
-    };
-
-    var renderContinueButtonSubmitActionHTML = function(
-        stateName, timeSpentInStateSecs, actionIndex) {
-      var htmlString =
-        '<span class="oppia-issues-learner-action">' + actionIndex +
-        '. Pressed "Continue" to move to card "' + stateName + '" after ' +
-        timeSpentInStateSecs + ' seconds.</span>';
-      return htmlString;
-    };
-
-    /**
-     * Renders the correct HTML for AnswerSubmit action after checking for a
-     * change in state.
-     * @param {string} answer.
-     * @param {string} destStateName.
-     * @param {int} timeSpentInStateSecs.
-     * @param {string} currentStateName.
-     * @param {int} actionIndex.
-     * @returns {string}
-     */
-    var renderAnswerSubmitActionHTML = function(
-        answer, destStateName, timeSpentInStateSecs, currentStateName,
-        actionIndex) {
-      var htmlString;
-      if (currentStateName === destStateName) {
-        htmlString =
+angular.module('explorationEditorPageModule').factory(
+  'LearnerActionRenderService', [
+    '$sce', 'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
+    'ACTION_TYPE_EXPLORATION_START',
+    'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+    function(
+        $sce, ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
+        ACTION_TYPE_EXPLORATION_START,
+        ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
+      var renderExplorationStartActionHTML = function(stateName, actionIndex) {
+        var htmlString =
           '<span class="oppia-issues-learner-action">' + actionIndex +
-          '. Submitted answer "' + answer + '" in card "' + currentStateName +
-          '".</span>';
-      } else {
-        htmlString =
+          '. Started exploration at card "' + stateName + '".</span>';
+        return htmlString;
+      };
+
+      var renderExplorationQuitActionHTML = function(
+          stateName, timeSpentInStateSecs, actionIndex) {
+        var htmlString =
           '<span class="oppia-issues-learner-action">' + actionIndex +
-          '. Submitted answer "' + answer + '" and moved to card "' +
-          destStateName + '" after spending ' + timeSpentInStateSecs +
-          ' seconds on card "' + currentStateName + '".</span>';
-      }
-      return htmlString;
-    };
+          '. Left the exploration after spending a ' + 'total of ' +
+          timeSpentInStateSecs + ' seconds on card "' + stateName + '".</span>';
+        return htmlString;
+      };
 
-    /**
-     * Renders the correct HTML for the table display for MultipleIncorrect
-     * issue.
-     * @param {LearnerAction[]} finalBlock.
-     * @returns {string}
-     */
-    var renderLearnerActionsTableForMultipleIncorrectIssue = function(
-        finalBlock) {
-      var index = finalBlock.length - 1;
-      var stateName =
-        finalBlock[index].actionCustomizationArgs.state_name.value;
+      var renderContinueButtonSubmitActionHTML = function(
+          stateName, timeSpentInStateSecs, actionIndex) {
+        var htmlString =
+          '<span class="oppia-issues-learner-action">' + actionIndex +
+          '. Pressed "Continue" to move to card "' + stateName + '" after ' +
+          timeSpentInStateSecs + ' seconds.</span>';
+        return htmlString;
+      };
 
-      var tableHTML =
-        '<table class="oppia-issues-learner-action-table"><tr><th>Answer</th>' +
-        '<th>Feedback</th></tr>';
-      for (var i = 0; i < index; i++) {
-        if (finalBlock[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT) {
-          continue;
-        }
-        var answer =
-          finalBlock[i].actionCustomizationArgs.submitted_answer.value;
-        var feedback =
-          finalBlock[i].actionCustomizationArgs.feedback.value._html;
-        feedback = feedback.replace('{{answer}}', answer);
-        tableHTML +=
-          '<tr><td>' + answer + '</td><td>' + feedback + '</td></tr>';
-      }
-      tableHTML += '</table>';
-      return tableHTML;
-    };
-
-    /**
-     * Renders the correct HTML for the learner action.
-     * @param {LearnerAction} learnerAction.
-     * @param {int} actionIndex.
-     * @returns {string}
-     */
-    var renderLearnerActionHTML = function(learnerAction, actionIndex) {
-      var actionType = learnerAction.actionType;
-      var custArgs = learnerAction.actionCustomizationArgs;
-      if (actionType === ACTION_TYPE_EXPLORATION_START) {
-        return renderExplorationStartActionHTML(
-          custArgs.state_name.value, actionIndex);
-      } else if (actionType === ACTION_TYPE_EXPLORATION_QUIT) {
-        return renderExplorationQuitActionHTML(
-          custArgs.state_name.value,
-          custArgs.time_spent_in_state_in_msecs.value, actionIndex);
-      } else if (actionType === ACTION_TYPE_ANSWER_SUBMIT) {
-        var interactionId = custArgs.interaction_id.value;
-        if (interactionId === 'Continue') {
-          return renderContinueButtonSubmitActionHTML(
-            custArgs.dest_state_name.value,
-            custArgs.time_spent_state_in_msecs.value, actionIndex);
-        } else {
-          return renderAnswerSubmitActionHTML(
-            custArgs.submitted_answer.value, custArgs.dest_state_name.value,
-            custArgs.time_spent_state_in_msecs.value, custArgs.state_name.value,
-            actionIndex);
-        }
-      }
-    };
-
-    /**
-     * Checks whether the block length is less than an explicit maximum value.
-     * The block is limitied to a maximum number of learner actions so that the
-     * display modal is cleaner. When this bound is exceeded, actions are added
-     * to the next block which can be accessed by an 'extend' button.
-     */
-    var withinBlockUpperBound = function(blockLength) {
-      return blockLength < 4;
-    };
-
-    /**
-     * Helper object to maintain the status of different display blocks while
-     * splitting up learner actions. This object will be updated as learner
-     * actions are inserted.
-     */
-    var groupedDisplayBlocks = {
-      displayBlocks: null,
-      localBlock: null,
-      latestStateName: null,
       /**
-       * Inserts new learner action into existing block or creates a new block
-       * correctly, following a change in state.
-       */
-      handleChangeInState: function(action) {
-        this.latestStateName = action.actionCustomizationArgs.state_name.value;
-        if (withinBlockUpperBound(this.localBlock.length)) {
-          // Add action to block.
-          this.localBlock.unshift(action);
-          return;
-        }
-        // Push current block to list of blocks and action into new block.
-        this.displayBlocks.push(this.localBlock);
-        this.localBlock = [action];
-      },
-      handleSameState: function(action) {
-        this.localBlock.unshift(action);
-      }
-    };
-
-    return {
-      /**
-       * Returns the HTML for the final display block in a MultipleIncorrect
-       * issue. This accounts for the table to be displayed.
-       * @param {LearnerAction[]} block.
-       * @param {int} actionStartIndex.
+       * Renders the correct HTML for AnswerSubmit action after checking for a
+       * change in state.
+       * @param {string} answer.
+       * @param {string} destStateName.
+       * @param {int} timeSpentInStateSecs.
+       * @param {string} currentStateName.
+       * @param {int} actionIndex.
        * @returns {string}
        */
-      renderFinalDisplayBlockForMISIssueHTML: function(
-          block, actionStartIndex) {
-        var index = block.length - 1;
-        var stateName = block[index].actionCustomizationArgs.state_name.value;
-        var htmlString = '';
-        for (
-          var i = 0; block[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT; i++) {
-          htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
+      var renderAnswerSubmitActionHTML = function(
+          answer, destStateName, timeSpentInStateSecs, currentStateName,
+          actionIndex) {
+        var htmlString;
+        if (currentStateName === destStateName) {
+          htmlString =
+            '<span class="oppia-issues-learner-action">' + actionIndex +
+            '. Submitted answer "' + answer + '" in card "' + currentStateName +
+            '".</span>';
+        } else {
+          htmlString =
+            '<span class="oppia-issues-learner-action">' + actionIndex +
+            '. Submitted answer "' + answer + '" and moved to card "' +
+            destStateName + '" after spending ' + timeSpentInStateSecs +
+            ' seconds on card "' + currentStateName + '".</span>';
         }
-        htmlString +=
-          '<span class="oppia-issues-learner-action">' +
-          (actionStartIndex + i).toString() +
-          '. Submitted the following answers in card "' + stateName +
-          '"</span>';
-        htmlString += renderLearnerActionsTableForMultipleIncorrectIssue(block);
-        htmlString += renderLearnerActionHTML(
-          block[index], actionStartIndex + i + 1);
-        return $sce.trustAsHtml(htmlString);
-      },
-      renderDisplayBlockHTML: function(block, actionStartIndex) {
-        var htmlString = '';
-        for (var i = 0; i < block.length; i++) {
-          htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
-        }
-        return $sce.trustAsHtml(htmlString);
-      },
+        return htmlString;
+      };
+
       /**
-       * Splits up the entire set of learner actions into correct display blocks
-       * to be displayed in sequence in the playthroughs modal.
-       * @param {LearnerActions[]} learnerActions.
-       * @returns {LearnerActions[][]}
+       * Renders the correct HTML for the table display for MultipleIncorrect
+       * issue.
+       * @param {LearnerAction[]} finalBlock.
+       * @returns {string}
        */
-      getDisplayBlocks: function(learnerActions) {
-        var lastIndex = learnerActions.length - 1;
-        groupedDisplayBlocks.displayBlocks = [];
-        groupedDisplayBlocks.localBlock = [learnerActions[lastIndex]];
-        groupedDisplayBlocks.latestStateName =
-          learnerActions[lastIndex].actionCustomizationArgs.state_name.value;
-        for (var i = lastIndex - 1; i >= 0; i--) {
-          var action = learnerActions[i];
-          var currentStateName =
-            action.actionCustomizationArgs.state_name.value;
-          if (currentStateName !== groupedDisplayBlocks.latestStateName) {
-            groupedDisplayBlocks.handleChangeInState(action);
+      var renderLearnerActionsTableForMultipleIncorrectIssue = function(
+          finalBlock) {
+        var index = finalBlock.length - 1;
+        var stateName =
+          finalBlock[index].actionCustomizationArgs.state_name.value;
+
+        var tableHTML =
+          '<table class="oppia-issues-learner-action-table"><tr>' +
+          '<th>Answer</th><th>Feedback</th></tr>';
+        for (var i = 0; i < index; i++) {
+          if (finalBlock[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT) {
+            continue;
+          }
+          var answer =
+            finalBlock[i].actionCustomizationArgs.submitted_answer.value;
+          var feedback =
+            finalBlock[i].actionCustomizationArgs.feedback.value._html;
+          feedback = feedback.replace('{{answer}}', answer);
+          tableHTML +=
+            '<tr><td>' + answer + '</td><td>' + feedback + '</td></tr>';
+        }
+        tableHTML += '</table>';
+        return tableHTML;
+      };
+
+      /**
+       * Renders the correct HTML for the learner action.
+       * @param {LearnerAction} learnerAction.
+       * @param {int} actionIndex.
+       * @returns {string}
+       */
+      var renderLearnerActionHTML = function(learnerAction, actionIndex) {
+        var actionType = learnerAction.actionType;
+        var custArgs = learnerAction.actionCustomizationArgs;
+        if (actionType === ACTION_TYPE_EXPLORATION_START) {
+          return renderExplorationStartActionHTML(
+            custArgs.state_name.value, actionIndex);
+        } else if (actionType === ACTION_TYPE_EXPLORATION_QUIT) {
+          return renderExplorationQuitActionHTML(
+            custArgs.state_name.value,
+            custArgs.time_spent_in_state_in_msecs.value, actionIndex);
+        } else if (actionType === ACTION_TYPE_ANSWER_SUBMIT) {
+          var interactionId = custArgs.interaction_id.value;
+          if (interactionId === 'Continue') {
+            return renderContinueButtonSubmitActionHTML(
+              custArgs.dest_state_name.value,
+              custArgs.time_spent_state_in_msecs.value, actionIndex);
           } else {
-            groupedDisplayBlocks.handleSameState(action);
+            return renderAnswerSubmitActionHTML(
+              custArgs.submitted_answer.value, custArgs.dest_state_name.value,
+              custArgs.time_spent_state_in_msecs.value,
+              custArgs.state_name.value, actionIndex);
           }
         }
-        // If there is a local block with actions at the end, push it.
-        if (groupedDisplayBlocks.localBlock) {
-          groupedDisplayBlocks.displayBlocks.push(
-            groupedDisplayBlocks.localBlock);
+      };
+
+      /**
+       * Checks whether the block length is less than an explicit maximum value.
+       * The block is limitied to a maximum number of learner actions so that
+       * the display modal is cleaner. When this bound is exceeded, actions are
+       * added to the next block which can be accessed by an 'extend' button.
+       */
+      var withinBlockUpperBound = function(blockLength) {
+        return blockLength < 4;
+      };
+
+      /**
+       * Helper object to maintain the status of different display blocks while
+       * splitting up learner actions. This object will be updated as learner
+       * actions are inserted.
+       */
+      var groupedDisplayBlocks = {
+        displayBlocks: null,
+        localBlock: null,
+        latestStateName: null,
+        /**
+         * Inserts new learner action into existing block or creates a new block
+         * correctly, following a change in state.
+         */
+        handleChangeInState: function(action) {
+          this.latestStateName = action
+            .actionCustomizationArgs.state_name.value;
+          if (withinBlockUpperBound(this.localBlock.length)) {
+            // Add action to block.
+            this.localBlock.unshift(action);
+            return;
+          }
+          // Push current block to list of blocks and action into new block.
+          this.displayBlocks.push(this.localBlock);
+          this.localBlock = [action];
+        },
+        handleSameState: function(action) {
+          this.localBlock.unshift(action);
         }
-        return groupedDisplayBlocks.displayBlocks;
-      }
-    };
-  }]);
+      };
+
+      return {
+        /**
+         * Returns the HTML for the final display block in a MultipleIncorrect
+         * issue. This accounts for the table to be displayed.
+         * @param {LearnerAction[]} block.
+         * @param {int} actionStartIndex.
+         * @returns {string}
+         */
+        renderFinalDisplayBlockForMISIssueHTML: function(
+            block, actionStartIndex) {
+          var index = block.length - 1;
+          var stateName = block[index].actionCustomizationArgs.state_name.value;
+          var htmlString = '';
+          for (
+            var i = 0; block[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT; i++) {
+            htmlString += renderLearnerActionHTML(
+              block[i], actionStartIndex + i);
+          }
+          htmlString +=
+            '<span class="oppia-issues-learner-action">' +
+            (actionStartIndex + i).toString() +
+            '. Submitted the following answers in card "' + stateName +
+            '"</span>';
+          htmlString += renderLearnerActionsTableForMultipleIncorrectIssue(
+            block);
+          htmlString += renderLearnerActionHTML(
+            block[index], actionStartIndex + i + 1);
+          return $sce.trustAsHtml(htmlString);
+        },
+        renderDisplayBlockHTML: function(block, actionStartIndex) {
+          var htmlString = '';
+          for (var i = 0; i < block.length; i++) {
+            htmlString += renderLearnerActionHTML(
+              block[i], actionStartIndex + i);
+          }
+          return $sce.trustAsHtml(htmlString);
+        },
+        /**
+         * Splits up the entire set of learner actions into correct display
+         * blocks to be displayed in sequence in the playthroughs modal.
+         * @param {LearnerActions[]} learnerActions.
+         * @returns {LearnerActions[][]}
+         */
+        getDisplayBlocks: function(learnerActions) {
+          var lastIndex = learnerActions.length - 1;
+          groupedDisplayBlocks.displayBlocks = [];
+          groupedDisplayBlocks.localBlock = [learnerActions[lastIndex]];
+          groupedDisplayBlocks.latestStateName =
+            learnerActions[lastIndex].actionCustomizationArgs.state_name.value;
+          for (var i = lastIndex - 1; i >= 0; i--) {
+            var action = learnerActions[i];
+            var currentStateName =
+              action.actionCustomizationArgs.state_name.value;
+            if (currentStateName !== groupedDisplayBlocks.latestStateName) {
+              groupedDisplayBlocks.handleChangeInState(action);
+            } else {
+              groupedDisplayBlocks.handleSameState(action);
+            }
+          }
+          // If there is a local block with actions at the end, push it.
+          if (groupedDisplayBlocks.localBlock) {
+            groupedDisplayBlocks.displayBlocks.push(
+              groupedDisplayBlocks.localBlock);
+          }
+          return groupedDisplayBlocks.displayBlocks;
+        }
+      };
+    }]
+);

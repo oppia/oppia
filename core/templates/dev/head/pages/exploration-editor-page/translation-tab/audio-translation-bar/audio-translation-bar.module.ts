@@ -21,4 +21,3 @@ angular.module('audioTranslationBarModule', []);
 // Constant for audio recording time limit.
 angular.module('audioTranslationBarModule').constant(
   'RECORDING_TIME_LIMIT', 300);
-  

@@ -54,4 +54,5 @@ angular.module('valueGeneratorEditorModule').directive(
       }
     };
   }
-]);
+  ]
+);

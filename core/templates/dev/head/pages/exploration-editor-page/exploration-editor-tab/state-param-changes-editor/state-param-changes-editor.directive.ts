@@ -25,7 +25,8 @@ angular.module('stateParamChangesEditorModule').directive(
         scope: {},
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/exploration-editor-tab/' +
-          'state-param-changes-editor/state-param-changes-editor.directive.html'),
+          'state-param-changes-editor/' +
+          'state-param-changes-editor.directive.html'),
         controller: [
           '$scope', 'StateEditorService', 'StateParamChangesService',
           function($scope, StateEditorService, StateParamChangesService) {
@@ -33,10 +34,11 @@ angular.module('stateParamChangesEditorModule').directive(
 
             $scope.$on('stateEditorInitialized', function(evt, stateData) {
               StateParamChangesService.init(
-                StateEditorService.getActiveStateName(), stateData.paramChanges);
+                StateEditorService.getActiveStateName(),
+                stateData.paramChanges);
             });
           }
         ]
       };
-  }]
+    }]
 );

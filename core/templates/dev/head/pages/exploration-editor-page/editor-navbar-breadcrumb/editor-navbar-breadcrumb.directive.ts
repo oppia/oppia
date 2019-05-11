@@ -37,7 +37,8 @@ angular.module('editorNavbarBreadcrumbModule').directive(
               $scope.navbarTitle = ExplorationTitleService.savedMemento;
               if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
                 $scope.navbarTitle = (
-                  $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...');
+                  $scope.navbarTitle.substring(
+                    0, _MAX_TITLE_LENGTH - 3) + '...');
               }
             });
 
@@ -68,5 +69,5 @@ angular.module('editorNavbarBreadcrumbModule').directive(
           }
         ]
       };
-  }]
+    }]
 );
