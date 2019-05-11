@@ -30,7 +30,7 @@ angular.module('collectionEditorNavbarBreadcrumbModule').directive('collectionEd
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/collection-editor-navbar-breadcrumb/' +
-        'collection-editor-navbar-breadcrumb-directive.html'),
+        'collection-editor-navbar-breadcrumb.directive.html'),
       controller: [
         '$scope', 'RouterService', 'CollectionEditorStateService',
         'FocusManagerService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
