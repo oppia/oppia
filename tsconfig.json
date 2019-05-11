@@ -7,7 +7,7 @@
     "rootDir": ".",
     "skipLibCheck": true,
     "target": "es5",
-    "typeRoots": ["../node_modules/@types"],
+    "typeRoots": ["./node_modules/@types"],
   },
   "files": [
     "assets/constants.js", 

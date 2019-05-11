@@ -17,7 +17,7 @@
  */
 
 require(
-  'domain/topic_and_skills_dashboard/' +
+  'domain/topics_and_skills_dashboard/' +
   'TopicsAndSkillsDashboardBackendApiService.ts'
 );
 require('domain/utilities/UrlInterpolationService.ts');

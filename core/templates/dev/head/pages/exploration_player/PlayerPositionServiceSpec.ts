@@ -26,7 +26,7 @@ describe('Player position service', function() {
   var pts = null;
   var pps = null;
   var scof = null;
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     pts = $injector.get('PlayerTranscriptService');
     pps = $injector.get('PlayerPositionService');
     scof = $injector.get('StateCardObjectFactory');

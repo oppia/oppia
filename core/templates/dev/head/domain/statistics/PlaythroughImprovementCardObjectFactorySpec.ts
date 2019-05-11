@@ -149,7 +149,7 @@ describe('PlaythroughImprovementCardObjectFactory', function() {
     });
 
     describe('Discard Action Button', function() {
-      beforeEach(inject(function($injector) {
+      beforeEach(angular.mock.inject(function($injector) {
         this.$uibModal = $injector.get('$uibModal');
       }));
 

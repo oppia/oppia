@@ -249,9 +249,8 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
-    'assets/scripts/*', 'core/templates/dev/head/dist/*', 'core/tests/data/*',
-    'core/tests/build_sources/*', '*.mp3', '*.mp4', 'typings/*',
-    'local_compiled_js/*')
+    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
+    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
@@ -963,7 +962,10 @@ class LintChecksManager(object):
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         # Set path for node.
-        node_path = os.path.join(os.pardir, 'oppia_tools/node-6.9.1')
+        # The path for node is set explicitly, since otherwise the lint
+        # tests fail on CircleCI due to the TypeScript files not being
+        # compilable.
+        node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
         os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
         self.compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
@@ -1020,9 +1022,9 @@ class LintChecksManager(object):
         no_implicit_use_strict = 'true'
         skip_lib_check = 'true'
         target = 'es5'
-        type_roots = '../node_modules/@types'
+        type_roots = './node_modules/@types'
         cmd = (
-            '../node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+            './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
             '-lib %s -noImplicitUseStrict %s -skipLibCheck '
             '%s -target %s -typeRoots %s %s typings/*') % (
                 self.compiled_js_dir, allow_js, lib, no_implicit_use_strict,
@@ -1050,11 +1052,11 @@ class LintChecksManager(object):
         parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
         node_path = os.path.join(
-            parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
+            parent_dir, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
         eslint_path = os.path.join(
-            parent_dir, 'node_modules', 'eslint', 'bin', 'eslint.js')
+            'node_modules', 'eslint', 'bin', 'eslint.js')
         stylelint_path = os.path.join(
-            parent_dir, 'node_modules', 'stylelint', 'bin', 'stylelint.js')
+            'node_modules', 'stylelint', 'bin', 'stylelint.js')
         config_path_for_css_in_html = os.path.join(
             parent_dir, 'oppia', '.stylelintrc')
         config_path_for_oppia_css = os.path.join(
@@ -1894,9 +1896,9 @@ class LintChecksManager(object):
         parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
         node_path = os.path.join(
-            parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
+            parent_dir, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
         htmllint_path = os.path.join(
-            parent_dir, 'node_modules', 'htmllint-cli', 'bin', 'cli.js')
+            'node_modules', 'htmllint-cli', 'bin', 'cli.js')
 
         error_summary = []
         total_error_count = 0

@@ -22,15 +22,17 @@ describe('Url Service', function() {
   var UrlService = null;
   var sampleHash = 'sampleHash';
   var pathname = 'sample.com/embed';
-  var mockLocation = {
-    href: 'http://' + pathname,
-    pathname: pathname,
-    hash: sampleHash,
-    search: ''
-  };
+  var mockLocation = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
+    mockLocation = {
+      href: 'http://' + pathname,
+      pathname: pathname,
+      hash: sampleHash,
+      search: ''
+    };
+
     UrlService = $injector.get('UrlService');
     spyOn(UrlService, 'getCurrentLocation').and.returnValue(mockLocation);
   }));

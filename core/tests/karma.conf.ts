@@ -1,7 +1,6 @@
 var argv = require('yargs').argv;
-var prodEnv = (argv.prod_env === 'True');
 var generatedJs = 'third_party/generated/js/third_party.js';
-if (prodEnv) {
+if (argv.prodEnv) {
   generatedJs = (
     'third_party/generated/js/third_party.min.js');
 }
@@ -9,8 +8,7 @@ if (prodEnv) {
 module.exports = function(config) {
   config.set({
     basePath: '../../',
-    // jasmine-jquery is used to load contents of external JSON files in tests.
-    frameworks: ['jasmine-jquery', 'jasmine'],
+    frameworks: ['jasmine'],
     files: [
       'local_compiled_js/core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
@@ -45,15 +43,10 @@ module.exports = function(config) {
       },
       'extensions/interactions/**/*_directive.html',
       'extensions/interactions/rule_templates.json',
+      'core/tests/data/*.json',
       {
         pattern: 'assets/i18n/**/*.json',
         watched: true,
-        served: true,
-        included: false
-      },
-      {
-        pattern: 'core/tests/data/**/*.json',
-        watched: false,
         served: true,
         included: false
       }
@@ -100,6 +93,7 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
+      'core/tests/data/*.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
@@ -131,7 +125,6 @@ module.exports = function(config) {
     },
 
     plugins: [
-      'karma-jasmine-jquery',
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-ng-html2js-preprocessor',

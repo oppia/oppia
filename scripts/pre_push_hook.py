@@ -124,10 +124,17 @@ def _get_remote_name():
         raise ValueError(err)
 
     if not remote_num:
-        print ('Warning: Please set upstream for the lint checks to run '
-               'efficiently. You can learn more about it here -> '
-               'https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches\n')
-        return
+        raise Exception(
+            'Error: Please set upstream for the lint checks to run '
+            'efficiently. To do that follow these steps:\n'
+            '1. Run the command \'git remote -v\'\n'
+            '2a. If upstream is listed in the command output, then run the '
+            'command \'git remote set-url upstream '
+            'https://github.com/oppia/oppia.git\'\n'
+            '2b. If upstream is not listed in the command output, then run the '
+            'command \'git remote add upstream '
+            'https://github.com/oppia/oppia.git\'\n'
+        )
     elif remote_num > 1:
         print ('Warning: Please keep only one remote branch for oppia:develop '
                'to run the lint checks efficiently.\n')
@@ -295,21 +302,21 @@ def _install_hook():
         print 'Copied file to .git/hooks directory'
 
 
-def does_diff_include_js_files(files_to_lint):
-    """Returns true if diff includes JS files.
+def does_diff_include_js_or_ts_files(files_to_lint):
+    """Returns true if diff includes JavaScript or TypeScript files.
 
     Args:
         files_to_lint: list(str). List of files to be linted.
 
     Returns:
-        bool. Status of JS files in diff.
+        bool. Whether the diff contains changes in any JavaScript or TypeScript
+            files.
     """
 
-    js_files_to_check = [
-        filename for filename in files_to_lint if
-        filename.endswith('.js')]
-
-    return bool(js_files_to_check)
+    for filename in files_to_lint:
+        if filename.endswith('.ts') or filename.endswith('.js'):
+            return True
+    return False
 
 
 def main():
@@ -344,7 +351,7 @@ def main():
                     print 'Push failed, please correct the linting issues above'
                     sys.exit(1)
             frontend_status = 0
-            if does_diff_include_js_files(files_to_lint):
+            if does_diff_include_js_or_ts_files(files_to_lint):
                 frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'

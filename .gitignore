@@ -10,6 +10,7 @@ local_compiled_js/*
 core/templates/prod/*
 core/templates/dev/head/dist/*
 core/tests/.browserstack.env
+node_modules/*
 .coverage*
 .viminfo
 .vscode/*

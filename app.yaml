@@ -171,6 +171,7 @@ skip_files:
 - scripts/
 - integrations/
 - integrations_dev/
+- node_modules/
 # Some third_party static scripts are directly imported, namely: jquery,
 # jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
