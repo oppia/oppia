@@ -22,7 +22,7 @@ angular.module('collectionHistoryTabModule').directive('collectionHistoryTab', [
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/history_tab/' +
-        'collection-history-tab-directive.html'),
+        'collection-history-tab.directive.html'),
       controller: [function() {}]
     };
   }]);

@@ -28,7 +28,7 @@ angular.module('collectionNodeEditorModule').directive('collectionNodeEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/editor_tab/collection-node-editor/' +
-        'collection-node-editor-directive.html'),
+        'collection-node-editor.directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
         'CollectionUpdateService', 'AlertsService',

@@ -22,7 +22,7 @@ angular.module('collectionStatisticsTabModule').directive('collectionStatisticsT
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/statistics_tab/' +
-        'collection-statistics-tab-directive.html'),
+        'collection-statistics-tab.directive.html'),
       controller: [function() {}]
     };
   }]);

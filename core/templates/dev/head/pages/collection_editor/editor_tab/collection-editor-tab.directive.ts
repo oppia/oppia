@@ -23,7 +23,7 @@ angular.module('collectionEditorTabModule').directive('collectionEditorTab', [
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/editor_tab/' +
-        'collection-editor-tab-directive.html'),
+        'collection-editor-tab.directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
         function(

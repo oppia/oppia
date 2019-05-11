@@ -23,7 +23,7 @@ angular.module('collectionPermissionsCardModule').directive('collectionPermissio
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/settings_tab/collection-permissions-card/' +
-        'collection-permissions-card-directive.html'),
+        'collection-permissions-card.directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService',
         function($scope, CollectionEditorStateService) {

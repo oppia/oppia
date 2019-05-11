@@ -22,7 +22,7 @@ angular.module('collectionEditorNavbarModule').directive('collectionEditorNavbar
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/collection-editor-navbar/' +
-        'collection-editor-navbar-directive.html'),
+        'collection-editor-navbar.directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'RouterService',
         'UndoRedoService', 'CollectionEditorStateService',

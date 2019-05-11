@@ -22,7 +22,7 @@ angular.module('collectionSettingsTabModule').directive('collectionSettingsTab',
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/settings_tab/' +
-        'collection-settings-tab-directive.html'),
+        'collection-settings-tab.directive.html'),
       controller: [function() {}]
     };
   }]);

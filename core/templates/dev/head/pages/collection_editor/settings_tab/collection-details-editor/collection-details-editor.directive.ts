@@ -24,7 +24,7 @@ angular.module('collectionDetailsEditorModule').directive('collectionDetailsEdit
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/settings_tab/collection-details-editor/' +
-        'collection-details-editor-directive.html'),
+        'collection-details-editor.directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
         'CollectionValidationService', 'AlertsService', 'ALL_CATEGORIES',
