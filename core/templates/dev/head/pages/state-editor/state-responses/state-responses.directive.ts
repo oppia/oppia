@@ -284,8 +284,9 @@ angular.module('stateResponsesModule').directive('stateResponses', [
             var currentInteractionId = $scope.getCurrentInteractionId();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'add_answer_group_modal_directive.html'),
+                '/pages/exploration-editor-page/exploration-editor-tab/' +
+                'exploration-editor-tab-templates/' +
+                'add-answer-group-modal.template.html'),
               // Clicking outside this modal should not dismiss it.
               backdrop: 'static',
               controller: [
@@ -405,8 +406,9 @@ angular.module('stateResponsesModule').directive('stateResponses', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'delete_answer_group_modal_directive.html'),
+                '/pages/exploration-editor-page/exploration-editor-tab/' +
+                'exploration-editor-tab-templates/' +
+                'delete-answer-group-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance', function(

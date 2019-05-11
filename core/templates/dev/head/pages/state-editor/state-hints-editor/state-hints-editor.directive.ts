@@ -118,8 +118,9 @@ angular.module('stateHintsEditorModule').directive('stateHintsEditor', [
 
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'add_hint_modal_directive.html'),
+                '/pages/exploration-editor-page/exploration-editor-tab/' +
+                'exploration-editor-tab-templates/' +
+                'add-hint-modal.template.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
@@ -186,8 +187,9 @@ angular.module('stateHintsEditorModule').directive('stateHintsEditor', [
 
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'delete_last_hint_modal_directive.html'),
+                '/pages/exploration-editor-page/exploration-editor-tab/' +
+                'exploration-editor-tab-templates/' +
+                'delete-last-hint-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -225,8 +227,9 @@ angular.module('stateHintsEditorModule').directive('stateHintsEditor', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'delete_hint_modal_directive.html'),
+                '/pages/exploration-editor-page/exploration-editor-tab/' +
+                'exploration-editor-tab-templates/' +
+                'delete-hint-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance', function(

@@ -213,8 +213,9 @@ angular.module('visualDiffVisualizationModule').directive(
               newStateName, oldStateName, stateProperty) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/' +
-                'state_diff_modal_directive.html'),
+                '/pages/exploration-editor-page/' +
+                'exploration-editor-page-templates/' +
+                'state-diff-modal.template.html'),
               backdrop: true,
               windowClass: 'state-diff-modal',
               resolve: {

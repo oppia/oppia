@@ -187,8 +187,9 @@ angular.module('stateInteractionEditorModule').directive(
 
                 $uibModal.open({
                   templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                    '/pages/exploration_editor/editor_tab/' +
-                    'customize_interaction_modal_directive.html'),
+                    '/pages/exploration-editor-page/exploration-editor-tab/' +
+                    'exploration-editor-tab-templates/' +
+                    'customize-interaction-modal.template.html'),
                   backdrop: true,
                   resolve: {},
                   controller: [
@@ -395,8 +396,9 @@ angular.module('stateInteractionEditorModule').directive(
               AlertsService.clearWarnings();
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration_editor/editor_tab/' +
-                  'delete_interaction_modal_directive.html'),
+                  '/pages/exploration-editor-page/exploration-editor-tab/' +
+                  'exploration-editor-tab-templates/'+
+                  'delete-interaction-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance', function(

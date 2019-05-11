@@ -112,8 +112,9 @@ angular.module('stateSolutionEditorModule').directive('stateSolutionEditor', [
             $scope.inlineSolutionEditorIsActive = false;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'add_or_update_solution_modal_directive.html'),
+                '/pages/exploration-editor-page/exploration-editor-tab/' +
+                'exploration-editor-tab-templates/' +
+                'add-or-update-solution-modal.template.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance', 'StateSolutionService',
@@ -226,8 +227,9 @@ angular.module('stateSolutionEditorModule').directive('stateSolutionEditor', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'delete_solution_modal_directive.html'),
+                '/pages/exploration-editor-page/exploration-editor-tab/' +
+                'exploration-editor-tab-templates/' +
+                'delete-solution-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
