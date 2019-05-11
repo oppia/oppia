@@ -21,7 +21,7 @@ oppia.constant(
   '/practice_session/data/<topic_name>');
 
 require('components/background/BackgroundBannerDirective.ts');
-require('pages/question_player/QuestionPlayerDirective.js');
+require('pages/question_player/QuestionPlayerDirective.ts');
 
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');

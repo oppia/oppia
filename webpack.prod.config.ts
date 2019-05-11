@@ -18,12 +18,20 @@ var path = require('path');
 
 module.exports = {
   mode: 'production',
-  entry: commonWebpackConfig.entries,
-  plugins: commonWebpackConfig.plugins,
   resolve: {
     modules: [
       path.resolve(__dirname, 'core/templates/dev/head'),
     ],
+  },
+  entry: commonWebpackConfig.entries,
+  plugins: commonWebpackConfig.plugins,
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+      }
+    ]
   },
   output: {
     filename: '[name].[contenthash].bundle.js',

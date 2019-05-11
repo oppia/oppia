@@ -69,10 +69,8 @@ YUICOMPRESSOR_DIR = os.path.join(
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 NODE_FILE = os.path.join(
     PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
-UGLIFY_FILE = os.path.join(
-    PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
-WEBPACK_FILE = os.path.join(
-    PARENT_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
+UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
+WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.

@@ -16,8 +16,8 @@
  * @fileoverview Controller for the questions player directive.
  */
 
-require('domain/question/QuestionPlayerBackendApiService.js');
-require('domain/utilities/UrlInterpolationService.js');
+require('domain/question/QuestionPlayerBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',

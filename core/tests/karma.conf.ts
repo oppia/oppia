@@ -27,7 +27,7 @@ module.exports = function(config) {
       'third_party/static/angular-recorder-1.4.1/dist' +
       '/angular-audio-recorder.min.js',
       generatedJs,
-      'local_compiled_js/core/templates/dev/head/appInit.js',
+      'local_compiled_js/core/templates/dev/head/AppInit.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
@@ -56,6 +56,7 @@ module.exports = function(config) {
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
       // add these back after the templateCache is repaired
+      'core/templates/dev/head/components/RatingDisplayDirectiveSpec.js',
       'core/templates/dev/head/pages/exploration_editor/editor_tab/' +
       'SolutionVerificationServiceSpec.ts',
       'core/templates/dev/head/pages/exploration_editor/editor_tab/' +
@@ -69,9 +70,10 @@ module.exports = function(config) {
       'local_compiled_js/extensions/classifiers/SVMPredictionServiceSpec.js',
       'local_compiled_js/extensions/interactions/CodeRepl/' +
       'CodeReplPredictionServiceSpec.js',
+      'local_compiled_js/extensions/interactions/MusicNotesInput/' + 
+      'directives/MusicNotesInputSpec.js',
       'local_compiled_js/extensions/interactions/TextInput/' +
       'TextInputPredictionServiceSpec.js',
-      'local_compiled_js/extensions/classifiers/SVMPredictionServiceSpec.js',
     ],
     proxies: {
       // Karma serves files under the /base directory.
