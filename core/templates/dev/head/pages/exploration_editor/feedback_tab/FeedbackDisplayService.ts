@@ -30,7 +30,7 @@ oppia.factory('FeedbackDisplayService', [function() {
     STATUS_CHOICES: angular.copy(_STATUS_CHOICES),
     getLabelClass: function(status) {
       var statusChoice = _STATUS_CHOICES[status];
-      return statusChoice ? statusChoice.label_class : '';
+      return 'label ' + (statusChoice ? statusChoice.label_class : '');
     },
     getHumanReadableStatus: function(status) {
       var statusChoice = _STATUS_CHOICES[status];
