@@ -89,11 +89,9 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
                 prod_validation_jobs_one_off.UserSubscriptionsModelValidator,
         }
 
-
     def test_standard_operation(self):
         job = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
-        job_id = (
-            job.create_new())
+        job_id = job.create_new()
         job.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
@@ -110,8 +108,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
             self.user_id, nonexist_thread_id)
 
         job = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
-        job_id = (
-            job.create_new())
+        job_id = job.create_new()
         job.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         actual_output = job.get_output(job_id)
@@ -161,8 +158,7 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
 
         job = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
-        job_id = (
-            job.create_new())
+        job_id = job.create_new()
         job.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
@@ -184,8 +180,7 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
         exp_services.delete_state_id_mapping_model_for_exploration('0', 1)
 
         job = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
-        job_id = (
-            job.create_new())
+        job_id = job.create_new()
         job.enqueue(job_id)
         self.process_and_flush_pending_tasks()
         actual_output = job.get_output(job_id)

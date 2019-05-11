@@ -29,9 +29,9 @@ class BaseModelValidator(object):
     """Base class for validating models."""
 
     errors = {}
-    # external_models is a map that's keyed by field name. Each value consists
+    # external_model_instances is keyed by field name. Each value consists
     # of the model class and a list of (external_key, external_model) tuples.
-    external_models = {}
+    external_model_instances = {}
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -56,7 +56,7 @@ class BaseModelValidator(object):
             item: ndb.Model. Entity to validate.
         """
         for field_name, (model_class, model_id_model_tuples) in (
-                cls.external_models.iteritems()):
+                cls.external_model_instances.iteritems()):
             for model_id, model in model_id_model_tuples:
                 if model is None or model.deleted:
                     cls.errors['%s field check' % field_name] = (
@@ -67,7 +67,7 @@ class BaseModelValidator(object):
                             str(model_class.__name__), model_id))
 
     @classmethod
-    def _fetch_external_models(cls, item):
+    def _fetch_external_model_instances(cls, item):
         """Fetch external models based on _get_external_id_relationships.
 
         This should be called before we call other _validate methods.
@@ -86,26 +86,28 @@ class BaseModelValidator(object):
         for (field_name, (model_class, field_values)), external_models in zip(
                 multiple_models_keys_to_fetch.iteritems(),
                 fetched_model_instances):
-            cls.external_models[field_name] = (
+            cls.external_model_instances[field_name] = (
                 model_class, zip(field_values, external_models))
 
     @classmethod
     def _get_validation_functions(cls):
-        """Returns the list of validation function to run."""
+        """Returns the list of validation function to run.
+
+        Each validation function should accept only a single arg, which is the
+        model instance to validate.
+        """
         raise NotImplementedError
 
     @classmethod
     def validate(cls, item):
-        """Run _fetch_external_models and all _validate functions.
-
-        The order of running _validate is not guaranteed.
+        """Run _fetch_external_model_instances and all _validate functions.
 
         Args:
             item: ndb.Model. Entity to validate.
         """
         cls.errors.clear()
-        cls.external_models.clear()
-        cls._fetch_external_models(item)
+        cls.external_model_instances.clear()
+        cls._fetch_external_model_instances(item)
 
         cls._validate_external_id_relationships(item)
         for func in cls._get_validation_functions():
@@ -154,10 +156,10 @@ class ExplorationModelValidator(BaseModelValidator):
         corresponding ExplorationModel states.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: ExplorationModel to validate.
         """
         _, state_id_mapping_model_tuples = (
-            cls.external_models['state_id_mapping_model'])
+            cls.external_model_instances['state_id_mapping_model'])
         state_id_mapping_model = state_id_mapping_model_tuples[0][1]
         if state_id_mapping_model:
             if (
