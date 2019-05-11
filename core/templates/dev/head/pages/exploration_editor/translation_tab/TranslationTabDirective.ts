@@ -17,9 +17,14 @@
  */
 
 require('components/attribution_guide/AttributionGuideDirective.ts');
-require('pages/exploration_editor/translation_tab/StateTranslationDirective.ts');
-require('pages/exploration_editor/translation_tab/StateTranslationStatusGraphDirective.ts');
-require('pages/exploration_editor/translation_tab/TranslatorOverviewDirective.ts');
+require(
+  'pages/exploration_editor/translation_tab/StateTranslationDirective.ts');
+require(
+  'pages/exploration_editor/translation_tab/' +
+  'StateTranslationStatusGraphDirective.ts'
+);
+require(
+  'pages/exploration_editor/translation_tab/TranslatorOverviewDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationDataService.ts');

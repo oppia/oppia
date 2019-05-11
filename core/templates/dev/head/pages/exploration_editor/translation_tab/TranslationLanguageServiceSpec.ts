@@ -16,7 +16,8 @@
  * @fileoverview Unit test for the Translation language service.
  */
 
-require('pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
+require(
+  'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
 
 describe('Translation language service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {

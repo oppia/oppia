@@ -17,7 +17,7 @@
  *               help tab in the navbar.
  */
 
-//vvv this block of requires should be removed vvv
+// vvv this block of requires should be removed vvv
 require('components/CkEditorRteDirective.ts');
 require('components/CkEditorWidgetsInitializer.ts');
 require('components/forms/ApplyValidationDirective.ts');
@@ -33,7 +33,8 @@ require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
+require(
+  'components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
@@ -43,7 +44,8 @@ require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
+require(
+  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
 require('components/forms/validators/IsAtLeastFilter.ts');
@@ -82,10 +84,13 @@ require('filters/TruncateAtFirstLineFilter.ts');
 require('filters/TruncateInputBasedOnInteractionAnswerTypeFilter.ts');
 require('filters/UnderscoresToCamelCaseFilter.ts');
 require('filters/WrapTextWithEllipsisFilter.ts');
-require('pages/exploration_editor/MarkAllAudioAndTranslationsAsNeedingUpdateController.ts');
+require(
+  'pages/exploration_editor/' +
+  'MarkAllAudioAndTranslationsAsNeedingUpdateController.ts'
+);
 require('pages/exploration_editor/statistics_tab/BarChartDirective.ts');
 require('pages/suggestion_editor/ShowSuggestionModalForEditorView.ts');
-//^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^
 
 require('components/VersionDiffVisualizationDirective.ts');
 require('components/attribution_guide/AttributionGuideDirective.ts');
@@ -94,20 +99,24 @@ require('components/profile_link/ProfileLinkTextDirective.ts');
 require('pages/exploration_editor/EditorNavbarBreadcrumbDirective.ts');
 require('pages/exploration_editor/EditorNavigationDirective.ts');
 require('pages/exploration_editor/ExplorationObjectiveEditorDirective.ts');
-require('pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.ts');
+require(
+  'pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.ts');
 require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
 require('pages/exploration_editor/ParamChangesEditorDirective.ts');
 require('pages/exploration_editor/editor_tab/ExplorationEditorTab.ts');
 require('pages/exploration_editor/editor_tab/ExplorationGraph.ts');
-require('pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');
+require(
+  'pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');
 require('pages/exploration_editor/feedback_tab/FeedbackTab.ts');
 require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
 require('pages/exploration_editor/history_tab/HistoryTab.ts');
-require('pages/exploration_editor/improvements_tab/ImprovementsTabDirective.ts');
+require(
+  'pages/exploration_editor/improvements_tab/ImprovementsTabDirective.ts');
 require('pages/exploration_editor/preview_tab/PreviewTab.ts');
 require('pages/exploration_editor/settings_tab/SettingsTab.ts');
 require('pages/exploration_editor/statistics_tab/PieChartDirective.ts');
-require('pages/exploration_editor/statistics_tab/PlaythroughIssuesDirective.ts');
+require(
+  'pages/exploration_editor/statistics_tab/PlaythroughIssuesDirective.ts');
 require('pages/exploration_editor/statistics_tab/StatisticsTab.ts');
 require('pages/exploration_editor/translation_tab/TranslationTabDirective.ts');
 require('pages/exploration_player/ConversationSkinDirective.ts');

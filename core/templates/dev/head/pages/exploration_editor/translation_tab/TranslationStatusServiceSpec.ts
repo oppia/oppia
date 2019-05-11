@@ -17,11 +17,19 @@
  */
 
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
+require(
+  'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
 require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
-require('pages/exploration_editor/translation_tab/TranslationTabActiveModeService.ts');
-require('pages/state_editor/state_properties/StateContentIdsToAudioTranslationsService.ts');
-require('pages/state_editor/state_properties/StateWrittenTranslationsService.ts');
+require(
+  'pages/exploration_editor/translation_tab/' +
+  'TranslationTabActiveModeService.ts'
+);
+require(
+  'pages/state_editor/state_properties/' +
+  'StateContentIdsToAudioTranslationsService.ts'
+);
+require(
+  'pages/state_editor/state_properties/StateWrittenTranslationsService.ts');
 
 describe('Translation status service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {

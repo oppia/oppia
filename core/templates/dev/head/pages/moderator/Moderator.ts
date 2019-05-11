@@ -16,7 +16,7 @@
 * @fileoverview Data and controllers for the Oppia moderator page.
 */
 
-//vvv this block of requires should be removed vvv
+// vvv this block of requires should be removed vvv
 require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
 require('components/forms/ConvertHtmlToUnicodeFilter.ts');
 require('components/forms/ConvertUnicodeToHtmlFilter.ts');
@@ -33,7 +33,7 @@ require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
-//^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^
 
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');

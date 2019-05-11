@@ -30,7 +30,8 @@ require('filters/ParameterizeRuleDescriptionFilter.ts');
 require('filters/TruncateFilter.ts');
 require('filters/WrapTextWithEllipsisFilter.ts');
 require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
-require('pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+require(
+  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
 require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require('pages/state_editor/state_properties/StateContentService.ts');
 require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');

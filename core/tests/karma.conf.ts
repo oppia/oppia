@@ -62,16 +62,22 @@ module.exports = function(config) {
       'local_compiled_js/core/templates/dev/head/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
-      //add these back after the templateCache is repaired
-      'core/templates/dev/head/pages/exploration_editor/editor_tab/SolutionVerificationServiceSpec.ts',
-      'core/templates/dev/head/pages/exploration_editor/editor_tab/StateNameEditorDirectiveSpec.ts',
-      'core/templates/dev/head/pages/state_editor/StateContentEditorDirectiveSpec.ts',
-      'core/templates/dev/head/pages/state_editor/StateInteractionEditorDirectiveSpec.ts',
+      // add these back after the templateCache is repaired
+      'core/templates/dev/head/pages/exploration_editor/editor_tab/' +
+      'SolutionVerificationServiceSpec.ts',
+      'core/templates/dev/head/pages/exploration_editor/editor_tab/' +
+      'StateNameEditorDirectiveSpec.ts',
+      'core/templates/dev/head/pages/state_editor/' +
+      'StateContentEditorDirectiveSpec.ts',
+      'core/templates/dev/head/pages/state_editor/' +
+      'StateInteractionEditorDirectiveSpec.ts',
       'core/templates/dev/head/services/StateRulesStatsServiceSpec.ts',
       'core/templates/dev/head/services/StateTopAnswersStatsServiceSpec.ts',
       'local_compiled_js/extensions/classifiers/SVMPredictionServiceSpec.js',
-      'local_compiled_js/extensions/interactions/CodeRepl/CodeReplPredictionServiceSpec.js',
-      'local_compiled_js/extensions/interactions/TextInput/TextInputPredictionServiceSpec.js',
+      'local_compiled_js/extensions/interactions/CodeRepl/' +
+      'CodeReplPredictionServiceSpec.js',
+      'local_compiled_js/extensions/interactions/TextInput/' +
+      'TextInputPredictionServiceSpec.js',
       'local_compiled_js/extensions/classifiers/SVMPredictionServiceSpec.js',
     ],
     proxies: {
@@ -161,4 +167,4 @@ module.exports = function(config) {
       }
     }
   });
-}
+};

@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia admin page.
  */
 
-//vvv this block of requires should be removed vvv
+// vvv this block of requires should be removed vvv
 require('directives/FocusOnDirective.ts');
 require('components/forms/validators/IsAtLeastFilter.ts');
 require('components/forms/validators/IsAtMostFilter.ts');
@@ -31,13 +31,14 @@ require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
+require(
+  'components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
-//^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^
 
 require('pages/admin/AdminNavbarDirective.ts');
 require('pages/admin/activities_tab/AdminDevModeActivitiesTabDirective.ts');

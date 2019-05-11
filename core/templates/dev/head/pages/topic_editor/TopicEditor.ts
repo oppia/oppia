@@ -16,7 +16,7 @@
  * @fileoverview Primary controller for the topic editor page.
  */
 
-//vvv this block of requires should be removed vvv
+// vvv this block of requires should be removed vvv
 require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
 require('components/forms/ConvertHtmlToUnicodeFilter.ts');
 require('components/forms/ConvertUnicodeToHtmlFilter.ts');
@@ -34,7 +34,8 @@ require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
+require(
+  'components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
@@ -44,12 +45,13 @@ require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
+require(
+  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
 require('components/forms/Select2DropdownDirective.ts');
 require('components/forms/ImageUploaderDirective.ts');
-//^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^
 
 require('pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.ts');
 require('pages/topic_editor/TopicEditorNavbarDirective.ts');

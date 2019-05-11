@@ -249,8 +249,9 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
-    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'typings/*', 'local_compiled_js/*')
+    'assets/scripts/*', 'core/templates/dev/head/dist/*', 'core/tests/data/*',
+    'core/tests/build_sources/*', '*.mp3', '*.mp4', 'typings/*',
+    'local_compiled_js/*')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
@@ -263,7 +264,10 @@ CONFIG_FILE_PATHS = (
     'core/tests/karma.conf.ts',
     'core/templates/dev/head/mathjaxConfig.ts',
     'assets/constants.js',
-    'assets/rich_text_components_definitions.js')
+    'assets/rich_text_components_definitions.js',
+    'webpack.config.ts',
+    'webpack.dev.config.ts',
+    'webpack.prod.config.ts')
 
 CODEOWNER_DIR_PATHS = [
     './core', './extensions', './scripts', './export', './.github']

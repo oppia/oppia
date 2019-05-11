@@ -24,7 +24,10 @@ require('filters/CamelCaseToHyphensFilter.ts');
 require('pages/exploration_editor/ExplorationDataService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/RouterService.ts');
-require('pages/exploration_editor/statistics_tab/StateImprovementSuggestionService.ts');
+require(
+  'pages/exploration_editor/statistics_tab/' +
+  'StateImprovementSuggestionService.ts'
+);
 require('services/AlertsService.ts');
 require('services/ComputeGraphService.ts');
 require('services/DateTimeFormatService.ts');

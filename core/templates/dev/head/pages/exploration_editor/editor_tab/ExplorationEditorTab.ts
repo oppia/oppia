@@ -17,7 +17,8 @@
  */
 
 require('pages/exploration_editor/editor_tab/StateNameEditorDirective.ts');
-require('pages/exploration_editor/editor_tab/StateParamChangesEditorDirective.ts');
+require(
+  'pages/exploration_editor/editor_tab/StateParamChangesEditorDirective.ts');
 require('pages/state_editor/StateEditorDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');

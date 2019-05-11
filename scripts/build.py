@@ -73,7 +73,7 @@ UGLIFY_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join(
     PARENT_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
-WEBPACK_PROD_CONFIG = 'webpack.prod.config.js'
+WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
@@ -753,8 +753,8 @@ def minify_func(source_path, target_path, file_hashes, filename):
         with open(source_path, 'r+') as source_html_file:
             with open(target_path, 'w+') as minified_html_file:
                 process_html(source_html_file, minified_html_file, file_hashes)
-    elif ((filename.endswith('.css') or filename.endswith('.js')) and 
-           not skip_minify):
+    elif ((filename.endswith('.css') or filename.endswith('.js')) and
+          not skip_minify):
         print 'Minifying %s' % source_path
         _minify(source_path, target_path)
     else:

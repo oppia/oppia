@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
-//vvv this block of requires should be removed vvv
+// vvv this block of requires should be removed vvv
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require('filters/CamelCaseToHyphensFilter.ts');
@@ -50,7 +50,8 @@ require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
+require(
+  'components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
@@ -60,7 +61,8 @@ require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
+require(
+  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
 require('components/forms/Select2DropdownDirective.ts');
@@ -78,7 +80,7 @@ require('components/state/RuleTypeSelectorDirective.ts');
 require('components/state/SolutionEditorDirective.ts');
 require('components/state/SolutionExplanationEditorDirective.ts');
 require('components/forms/HtmlSelectDirective.ts');
-//^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^
 
 require('components/share/SharingLinksDirective.ts');
 require('components/background/BackgroundBannerDirective.ts');
@@ -92,7 +94,10 @@ require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/suggestion/SuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
-require('domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardBackendApiService.ts'
+);
 require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
 require('pages/suggestion_editor/ShowSuggestionModalForCreatorViewService.ts');
 require('domain/utilities/UrlInterpolationService.ts');

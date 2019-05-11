@@ -16,7 +16,7 @@
  * @fileoverview NormalizeWhitespace filter for Oppia.
  */
 
-//this is intentional since normalizeWhitespace is use from /extensions
+// this is intentional since normalizeWhitespace is use from /extensions
 try {
   require('services/UtilsService.ts');
 } catch (e) {

@@ -13,40 +13,28 @@
 // limitations under the License.
 
 
-var commonWebpackConfig = require('./webpack.config.js');
+var commonWebpackConfig = require('./webpack.config.ts');
 var path = require('path');
 
 module.exports = {
-  mode: 'development',
-  resolve: {
-    modules: [
-      path.resolve(__dirname, 'core/templates/dev/head'), 
-    ],
-  },
+  mode: 'production',
   entry: commonWebpackConfig.entries,
   plugins: commonWebpackConfig.plugins,
-  module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        use: 'ts-loader',
-      }
-    ]
+  resolve: {
+    modules: [
+      path.resolve(__dirname, 'core/templates/dev/head'),
+    ],
   },
   output: {
-    filename: '[name].bundle.js',
+    filename: '[name].[contenthash].bundle.js',
     path: path.resolve(__dirname, 'core/templates/dev/head/dist')
   },
-  devtool: 'inline-source-map',
+  devtool: 'source-map',
   optimization: {
     splitChunks: {
       chunks: 'all',
       minSize: 1024 * 10,
       maxInitialRequests: 9,
     }
-  },
-  watchOptions: {
-    aggregateTimeout: 500,
-    poll: 1000
   }
 };

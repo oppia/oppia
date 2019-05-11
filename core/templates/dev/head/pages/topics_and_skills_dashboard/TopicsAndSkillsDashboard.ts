@@ -18,13 +18,22 @@
 
 require('components/background/BackgroundBannerDirective.ts');
 require('pages/topics_and_skills_dashboard/SkillsListDirective.ts');
-require('pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarBreadcrumbDirective.ts');
-require('pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarDirective.ts');
+require(
+  'pages/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardNavbarBreadcrumbDirective.ts'
+);
+require(
+  'pages/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardNavbarDirective.ts'
+);
 require('pages/topics_and_skills_dashboard/TopicsListDirective.ts');
 
 require('components/SkillCreationService.ts');
 require('components/TopicCreationService.ts');
-require('domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardBackendApiService.ts'
+);
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 

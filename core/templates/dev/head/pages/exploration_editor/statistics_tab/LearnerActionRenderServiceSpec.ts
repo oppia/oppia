@@ -20,7 +20,8 @@
  */
 
 require('domain/statistics/LearnerActionObjectFactory.ts');
-require('pages/exploration_editor/statistics_tab/LearnerActionRenderService.ts');
+require(
+  'pages/exploration_editor/statistics_tab/LearnerActionRenderService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/PlaythroughService.ts');
 

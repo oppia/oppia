@@ -18,11 +18,19 @@
  */
 
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
-require('pages/exploration_editor/translation_tab/TranslationTabActiveModeService.ts');
-require('pages/state_editor/state_properties/StateContentIdsToAudioTranslationsService.ts');
+require(
+  'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
+require(
+  'pages/exploration_editor/translation_tab/' +
+  'TranslationTabActiveModeService.ts'
+);
+require(
+  'pages/state_editor/state_properties/' +
+  'StateContentIdsToAudioTranslationsService.ts'
+);
 require('pages/state_editor/state_properties/StatePropertyService.ts');
-require('pages/state_editor/state_properties/StateWrittenTranslationsService.ts');
+require(
+  'pages/state_editor/state_properties/StateWrittenTranslationsService.ts');
 
 oppia.factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateContentIdsToAudioTranslationsService',

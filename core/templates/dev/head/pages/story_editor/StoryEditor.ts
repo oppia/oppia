@@ -16,6 +16,7 @@
  * @fileoverview Primary controller for the story editor page.
  */
 
+// vvv this block of requires should be removed vvv
 require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
 require('components/forms/ConvertHtmlToUnicodeFilter.ts');
 require('components/forms/ConvertUnicodeToHtmlFilter.ts');
@@ -28,11 +29,11 @@ require('components/forms/ApplyValidationDirective.ts');
 require('components/forms/RequireIsFloatDirective.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
-
 require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
+require(
+  'components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
 require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
@@ -42,10 +43,10 @@ require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
+require(
+  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
-
 require('services/HtmlEscaperService.ts');
 require('services/IdGenerationService.ts');
 require('services/RteHelperService.ts');
@@ -54,7 +55,6 @@ require('services/SchemaUndefinedLastElementService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 require('services/GenerateContentIdService.ts');
 require('components/loading/LoadingDotsDirective.ts');
-
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
@@ -64,6 +64,7 @@ require('domain/story/StoryObjectFactory.ts');
 require('domain/story/StoryContentsObjectFactory.ts');
 require('domain/story/StoryNodeObjectFactory.ts');
 require('domain/story/StoryUpdateService.ts');
+// ^^^ this block of requires should be removed ^^^
 
 require('pages/story_editor/StoryEditorNavbarBreadcrumbDirective.ts');
 require('pages/story_editor/StoryEditorNavbarDirective.ts');

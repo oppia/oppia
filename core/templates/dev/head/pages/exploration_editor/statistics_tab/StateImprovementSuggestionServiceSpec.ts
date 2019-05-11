@@ -17,7 +17,10 @@
  */
 
 require('domain/exploration/StatesObjectFactory.ts');
-require('pages/exploration_editor/statistics_tab/StateImprovementSuggestionService.ts');
+require(
+  'pages/exploration_editor/statistics_tab/' +
+  'StateImprovementSuggestionService.ts'
+);
 require('pages/exploration_editor/statistics_tab/StatisticsTab.ts');
 
 describe('StateImprovementSuggestionService', function() {

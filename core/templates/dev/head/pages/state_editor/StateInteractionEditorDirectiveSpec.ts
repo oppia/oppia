@@ -18,7 +18,8 @@
 
 require('pages/exploration_editor/ChangeListService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+require(
+  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
 require('pages/state_editor/state_properties/StateContentService.ts');
 require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');

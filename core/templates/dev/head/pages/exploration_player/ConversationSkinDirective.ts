@@ -50,7 +50,8 @@ require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.ts');
 require('pages/exploration_player/PlayerPositionService.ts');
 require('pages/exploration_player/PlayerTranscriptService.ts');
 require('pages/exploration_player/PretestEngineService.ts');
-require('pages/exploration_player/RefresherExplorationConfirmationModalService.ts');
+require(
+  'pages/exploration_player/RefresherExplorationConfirmationModalService.ts');
 require('pages/exploration_player/StateClassifierMappingService.ts');
 require('pages/exploration_player/StatsReportingService.ts');
 require('services/AlertsService.ts');

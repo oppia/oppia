@@ -22,7 +22,8 @@ require('directives/AngularHtmlBindDirective.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
-require('pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+require(
+  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
 require('pages/state_editor/state_properties/StateContentService.ts');
 require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');

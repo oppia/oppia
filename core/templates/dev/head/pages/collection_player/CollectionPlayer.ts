@@ -16,9 +16,9 @@
  * @fileoverview Controller for the learner's view of a collection.
  */
 
-//vvv this block of requires should be removed vvv
+// vvv this block of requires should be removed vvv
 require('pages/collection_player/CollectionNodeListDirective.ts');
-//^^^ this block of requires should be removed ^^^
+// ^^^ this block of requires should be removed ^^^
 
 require('components/attribution_guide/AttributionGuideDirective.ts');
 require('components/background/BackgroundBannerDirective.ts');

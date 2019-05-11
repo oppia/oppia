@@ -43,10 +43,10 @@
   <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
   <script src="/extensions/objects/templates/ListOfTabsEditorDirective.js"></script>
 <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-  <% if (webpackConfig.mode == 'production') { %> 
-    <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <% if (webpackConfig.mode == 'production') { %>
+  <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
   <% } else { %>
-    <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
   <% } %>
 <% } %>
   {% include 'components/rich_text_components.html' %}
