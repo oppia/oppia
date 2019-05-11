@@ -102,7 +102,7 @@ var suites = {
     ],
 
     users: [
-      'protractor_desktop/UserJourneys.js',
+      'protractor_desktop/userJourneys.js',
     ],
   };
 
@@ -147,14 +147,14 @@ exports.config = {
       var patterns = suites[key];
       for (var pattern of patterns) {
         var fullPattern = path.resolve(__dirname, pattern);
-        var files = glob.sync(fullPattern)
+        var files = glob.sync(fullPattern);
         if (files.length == 0) {
           var errorMessage = '';
           if (glob.hasMagic(pattern)) {
             errorMessage = 'There are no files with the following pattern: ' + (
-              pattern)
+              pattern);
           } else {
-            errorMessage = pattern + ' does not exists.'
+            errorMessage = pattern + ' does not exist.';
           }
           throw Error(errorMessage)
         }
