@@ -16,4 +16,7 @@
  * @fileoverview Module for the translation tab.
  */
 
-angular.module('translationTabModule', []);
+angular.module('translationTabModule', ['audioTranslationBarModule',
+  'stateTranslationModule', 'stateTranslationEditorModule',
+  'stateTranslationStatusGraphModule', 'translatorOverviewModule'
+]);
