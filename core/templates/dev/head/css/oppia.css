@@ -3111,14 +3111,15 @@ md-card.preview-conversation-skin-supplemental-card {
   font-weight: normal;
   hyphens: auto;
   line-height: 1.2em;
-  margin: 0.3em 0.5em;
+  margin: 0.3em;
   -ms-hyphens: auto;
   -moz-hyphens: auto;
   overflow-wrap: break-word;
-  padding: 0.2em;
+  padding: 0.3em;
   position: absolute;
   word-wrap: break-word;
   -webkit-hyphens: auto;
+  width: inherit;
 }
 .oppia-activity-summary-tile.oppia-activity-playlist-tile .activity-title {
   font-size: 0.85em;
