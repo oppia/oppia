@@ -29,9 +29,10 @@ class BaseModelValidator(object):
     """Base class for validating models."""
 
     errors = {}
-    # external_model_instances is keyed by field name. Each value consists
-    # of the model class and a list of (external_key, external_model) tuples.
-    external_model_instances = {}
+    # external_models is keyed by field name. Each value consists
+    # of the model class and a list of (external_key, external_model_instance)
+    # tuples.
+    external_models = {}
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -56,7 +57,7 @@ class BaseModelValidator(object):
             item: ndb.Model. Entity to validate.
         """
         for field_name, (model_class, model_id_model_tuples) in (
-                cls.external_model_instances.iteritems()):
+                cls.external_models.iteritems()):
             for model_id, model in model_id_model_tuples:
                 if model is None or model.deleted:
                     cls.errors['%s field check' % field_name] = (
@@ -67,7 +68,7 @@ class BaseModelValidator(object):
                             str(model_class.__name__), model_id))
 
     @classmethod
-    def _fetch_external_model_instances(cls, item):
+    def _fetch_external_models(cls, item):
         """Fetch external models based on _get_external_id_relationships.
 
         This should be called before we call other _validate methods.
@@ -86,7 +87,7 @@ class BaseModelValidator(object):
         for (field_name, (model_class, field_values)), external_models in zip(
                 multiple_models_keys_to_fetch.iteritems(),
                 fetched_model_instances):
-            cls.external_model_instances[field_name] = (
+            cls.external_models[field_name] = (
                 model_class, zip(field_values, external_models))
 
     @classmethod
@@ -100,14 +101,14 @@ class BaseModelValidator(object):
 
     @classmethod
     def validate(cls, item):
-        """Run _fetch_external_model_instances and all _validate functions.
+        """Run _fetch_external_models and all _validate functions.
 
         Args:
             item: ndb.Model. Entity to validate.
         """
         cls.errors.clear()
-        cls.external_model_instances.clear()
-        cls._fetch_external_model_instances(item)
+        cls.external_models.clear()
+        cls._fetch_external_models(item)
 
         cls._validate_external_id_relationships(item)
         for func in cls._get_validation_functions():
@@ -159,7 +160,7 @@ class ExplorationModelValidator(BaseModelValidator):
             item: ExplorationModel to validate.
         """
         _, state_id_mapping_model_tuples = (
-            cls.external_model_instances['state_id_mapping_model'])
+            cls.external_models['state_id_mapping_model'])
         state_id_mapping_model = state_id_mapping_model_tuples[0][1]
         if state_id_mapping_model:
             if (
