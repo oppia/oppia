@@ -34,46 +34,21 @@ class BaseModelValidator(object):
     external_models = {}
 
     @classmethod
-    def _validate(cls, item):
-        """Wraps a list of functions to run to validate item.
-
-        Args:
-            item: ndb.Model. Entity to validate.
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def _get_external_id_relationships(cls):
+    def _get_external_id_relationships(cls, item):
         """Defines a mapping of external id to model class.
 
-        Returns:
-            dict(str, ndb.Model). A dictionary whose keys are fields of the
-            model to validate, and whose values are the corresponding model
-            classes.
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def _get_custom_external_id_relationship(cls, item):  # pylint: disable=unused-argument
-        """Define custom external relationships.
-
-        Sometimes we need more complicated logic to determine which external
-        model to fetch. Two example use cases are:
-        1) the field name follows some convention e.g. {exp_id}.{exp_version}
-        2) the field name has to be extracted from a structured field
-
         Args:
             item: ndb.Model. Entity to validate.
 
         Returns:
-            dict(str: (ndb.Model, list(str)).
-            Key is the field name (for debug output) and value is a tuple
-            consisting of the external model class and a list of keys to fetch.
+            dict(str, (ndb.Model, list(str)). A dictionary whose keys are
+            field names of the model to validate, and whose values are tuples
+            that consist of the external model class and list of keys to fetch.
         """
         raise NotImplementedError
 
     @classmethod
-    def _validate_get_external_id_relationships(cls, item):
+    def _validate_external_id_relationships(cls, item):
         """Check whether the external id properties on the model correspond
         to valid instances.
 
@@ -101,15 +76,8 @@ class BaseModelValidator(object):
             item: ndb.Model. Entity to validate.
         """
         multiple_models_keys_to_fetch = {}
-        for field_name, model_class in (
-                cls._get_external_id_relationships().iteritems()):
-            field_value = getattr(item, field_name)
-            if field_value:
-                multiple_models_keys_to_fetch[field_name] = (
-                    model_class, [field_value] if isinstance(field_value, str)
-                    else field_value)
         for field_name_debug, (model_class, keys_to_fetch) in (
-                cls._get_custom_external_id_relationship(item).iteritems()):
+                cls._get_external_id_relationships(item).iteritems()):
             multiple_models_keys_to_fetch[field_name_debug] = (
                 model_class, keys_to_fetch)
         fetched_model_instances = (
@@ -120,6 +88,11 @@ class BaseModelValidator(object):
                 fetched_model_instances):
             cls.external_models[field_name] = (
                 model_class, zip(field_values, external_models))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        """Returns the list of validation function to run."""
+        raise NotImplementedError
 
     @classmethod
     def validate(cls, item):
@@ -134,42 +107,38 @@ class BaseModelValidator(object):
         cls.external_models.clear()
         cls._fetch_external_models(item)
 
-        cls._validate_get_external_id_relationships(item)
-        cls._validate(item)
+        cls._validate_external_id_relationships(item)
+        for func in cls._get_validation_functions():
+            func(item)
 
 
 class UserSubscriptionsModelValidator(BaseModelValidator):
     """Class for validating UserSubscriptionsModels."""
 
     @classmethod
-    def _get_external_id_relationships(cls):
+    def _get_external_id_relationships(cls, item):
         return {
-            'activity_ids': exp_models.ExplorationModel,
-            'collection_ids': collection_models.CollectionModel,
+            'activity_ids': (exp_models.ExplorationModel, item.activity_ids),
+            'collection_ids': (
+                collection_models.CollectionModel,
+                item.collection_ids),
             'general_feedback_thread_ids': (
-                feedback_models.GeneralFeedbackThreadModel),
-            'creator_ids': user_models.UserSettingsModel,
-            'id': user_models.UserSettingsModel,
+                feedback_models.GeneralFeedbackThreadModel,
+                item.general_feedback_thread_ids),
+            'creator_ids': (user_models.UserSettingsModel, item.creator_ids),
+            'id': (user_models.UserSettingsModel, [item.id]),
         }
 
     @classmethod
-    def _get_custom_external_id_relationship(cls, item):
-        return {}
-
-    @classmethod
-    def _validate(cls, item):
-        pass
+    def _get_validation_functions(cls):
+        return []
 
 
 class ExplorationModelValidator(BaseModelValidator):
     """Class for validating ExplorationModel."""
 
     @classmethod
-    def _get_external_id_relationships(cls):
-        return {}
-
-    @classmethod
-    def _get_custom_external_id_relationship(cls, item):
+    def _get_external_id_relationships(cls, item):
         state_id_mapping_model_ids = [
             '%s.%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
@@ -181,7 +150,12 @@ class ExplorationModelValidator(BaseModelValidator):
 
     @classmethod
     def _validate_state_name(cls, item):
-        """Validate the state names match the StateIdMappingModel."""
+        """Validate that state name of StateIdMappingModel matches
+        corresponding ExplorationModel states.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
         _, state_id_mapping_model_tuples = (
             cls.external_models['state_id_mapping_model'])
         state_id_mapping_model = state_id_mapping_model_tuples[0][1]
@@ -204,10 +178,8 @@ class ExplorationModelValidator(BaseModelValidator):
                         (item.id, state_id_mapping_model.id, state_name))
 
     @classmethod
-    def _validate(cls, item):
-        # Verify that state name of StateIdMappingModel matches corresponding
-        # Exploration.states.
-        cls._validate_state_name(item)
+    def _get_validation_functions(cls):
+        return [cls._validate_state_name]
 
 
 MODEL_TO_VALIDATOR_MAPPING = {
