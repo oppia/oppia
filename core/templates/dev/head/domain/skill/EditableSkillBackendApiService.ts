@@ -37,7 +37,7 @@ oppia.factory('EditableSkillBackendApiService', [
         });
 
       $http.get(skillDataUrl).then(function(response) {
-        var skill = angular.copy(response.data.skill);
+        var skill = angular.copy(response.data.skills[0]);
         if (successCallback) {
           successCallback(skill);
         }
@@ -88,7 +88,7 @@ oppia.factory('EditableSkillBackendApiService', [
 
       $http.put(editableSkillDataUrl, putData).then(function(response) {
         // The returned data is an updated skill dict.
-        var skill = angular.copy(response.data.skill);
+        var skill = angular.copy(response.data.skills[0]);
         if (successCallback) {
           successCallback(skill);
         }
