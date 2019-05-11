@@ -21,7 +21,7 @@
 
 # Audio and Translation team.
 /core/controllers/translator*.py @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/translation_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration-editor-page/translation-tab/ @DubeySandeep
 
 
 # Collection project.
@@ -65,10 +65,10 @@
 /core/templates/dev/head/domain/exploration/ @DubeySandeep
 /core/templates/dev/head/domain/state/ @aks681
 /core/templates/dev/head/domain/state_card/ @aks681
-/core/templates/dev/head/pages/exploration_editor/editor_tab/ @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/history_tab/ @DubeySandeep
-/core/templates/dev/head/pages/exploration_editor/preview_tab/ @aks681
-/core/templates/dev/head/pages/exploration_editor/settings_tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration-editor-page/history-tab/ @DubeySandeep
+/core/templates/dev/head/pages/exploration-editor-page/preview-tab/ @aks681
+/core/templates/dev/head/pages/exploration-editor-page/settings-tab/ @DubeySandeep
 /core/templates/dev/head/pages/exploration_player/ @aks681
 /core/templates/dev/head/pages/state-editor/ @aks681
 /core/templates/dev/head/components/state/ @aks681
@@ -117,8 +117,8 @@
 /core/domain/visualization_registry*.py @brianrodri
 /core/storage/statistics/ @brianrodri
 /core/templates/dev/head/domain/statistics/ @brianrodri
-/core/templates/dev/head/pages/exploration_editor/improvements_tab/ @brianrodri
-/core/templates/dev/head/pages/exploration_editor/statistics_tab/ @brianrodri
+/core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @brianrodri
+/core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @brianrodri
 /extensions/actions/ @brianrodri
 /extensions/answer_summarizers/ @brianrodri
 /extensions/issues/ @brianrodri
@@ -225,7 +225,7 @@
 /core/storage/feedback/ @nithusha21
 /core/templates/dev/head/domain/feedback_message/ @nithusha21
 /core/templates/dev/head/domain/feedback_thread/ @nithusha21
-/core/templates/dev/head/pages/exploration_editor/feedback_tab/ @nithusha21
+/core/templates/dev/head/pages/exploration-editor-page/feedback-tab/ @nithusha21
 
 
 # Simple pages.

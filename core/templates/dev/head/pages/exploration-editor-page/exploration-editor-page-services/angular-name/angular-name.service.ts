@@ -16,14 +16,16 @@
  * @fileoverview A service that maps IDs to Angular names.
  */
 
-angular.module('explorationEditorPageModule').factory('AngularNameService', [function() {
-  var angularName = null;
+angular.module('explorationEditorPageModule').factory(
+  'AngularNameService', [function() {
+    var angularName = null;
 
-  return {
-    getNameOfInteractionRulesService: function(interactionId) {
-      angularName = interactionId.charAt(0) +
-        interactionId.slice(1) + 'RulesService';
-      return angularName;
-    }
-  };
-}]);
+    return {
+      getNameOfInteractionRulesService: function(interactionId) {
+        angularName = interactionId.charAt(0) +
+          interactionId.slice(1) + 'RulesService';
+        return angularName;
+      }
+    };
+  }]
+);

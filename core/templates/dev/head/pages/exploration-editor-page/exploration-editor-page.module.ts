@@ -49,3 +49,10 @@ angular.module('explorationEditorPageModule').constant(
 angular.module('explorationEditorPageModule').constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
+
+angular.module('explorationEditorPageModule').constant(
+  'PARAM_ACTION_GET', 'get');
+
+angular.module('explorationEditorPageModule').constant(
+  'PARAM_ACTION_SET', 'set');
+  

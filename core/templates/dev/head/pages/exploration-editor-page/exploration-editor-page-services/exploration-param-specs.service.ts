@@ -17,10 +17,12 @@
  * the specification of the parameters.
  */
 
-angular.module('explorationEditorPageModule').factory('ExplorationParamSpecsService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'param_specs';
-    return child;
-  }
-]);
+angular.module('explorationEditorPageModule').factory(
+  'ExplorationParamSpecsService', [
+    'ExplorationPropertyService', function(ExplorationPropertyService) {
+      var child = Object.create(ExplorationPropertyService);
+      child.propertyName = 'param_specs';
+      return child;
+    }
+  ]
+);

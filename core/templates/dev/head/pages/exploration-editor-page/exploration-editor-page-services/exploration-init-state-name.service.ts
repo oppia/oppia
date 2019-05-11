@@ -19,10 +19,12 @@
  * valid.
  */
 
-angular.module('explorationEditorPageModule').factory('ExplorationInitStateNameService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'init_state_name';
-    return child;
-  }
-]);
+angular.module('explorationEditorPageModule').factory(
+  'ExplorationInitStateNameService', [
+    'ExplorationPropertyService', function(ExplorationPropertyService) {
+      var child = Object.create(ExplorationPropertyService);
+      child.propertyName = 'init_state_name';
+      return child;
+    }
+  ]
+);

@@ -14,25 +14,27 @@
 
 /** @fileoverview A data service that stores the exploration language code. */
 
-angular.module('explorationEditorPageModule').factory('ExplorationLanguageCodeService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'language_code';
-    child.getAllLanguageCodes = function() {
-      return constants.ALL_LANGUAGE_CODES;
-    };
-    child.getCurrentLanguageDescription = function() {
-      for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
-        if (constants.ALL_LANGUAGE_CODES[i].code === child.displayed) {
-          return constants.ALL_LANGUAGE_CODES[i].description;
+angular.module('explorationEditorPageModule').factory(
+  'ExplorationLanguageCodeService', [
+    'ExplorationPropertyService', function(ExplorationPropertyService) {
+      var child = Object.create(ExplorationPropertyService);
+      child.propertyName = 'language_code';
+      child.getAllLanguageCodes = function() {
+        return constants.ALL_LANGUAGE_CODES;
+      };
+      child.getCurrentLanguageDescription = function() {
+        for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
+          if (constants.ALL_LANGUAGE_CODES[i].code === child.displayed) {
+            return constants.ALL_LANGUAGE_CODES[i].description;
+          }
         }
-      }
-    };
-    child._isValid = function(value) {
-      return constants.ALL_LANGUAGE_CODES.some(function(elt) {
-        return elt.code === value;
-      });
-    };
-    return child;
-  }
-]);
+      };
+      child._isValid = function(value) {
+        return constants.ALL_LANGUAGE_CODES.some(function(elt) {
+          return elt.code === value;
+        });
+      };
+      return child;
+    }
+  ]
+);

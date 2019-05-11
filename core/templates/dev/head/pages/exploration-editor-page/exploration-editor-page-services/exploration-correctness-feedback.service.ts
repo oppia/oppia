@@ -17,24 +17,26 @@
  * exploration.
  */
 
-angular.module('explorationEditorPageModule').factory('ExplorationCorrectnessFeedbackService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'correctness_feedback_enabled';
+angular.module('explorationEditorPageModule').factory(
+  'ExplorationCorrectnessFeedbackService', [
+    'ExplorationPropertyService', function(ExplorationPropertyService) {
+      var child = Object.create(ExplorationPropertyService);
+      child.propertyName = 'correctness_feedback_enabled';
 
-    child._isValid = function(value) {
-      return (typeof value === 'boolean');
-    };
+      child._isValid = function(value) {
+        return (typeof value === 'boolean');
+      };
 
-    child.isEnabled = function() {
-      return child.savedMemento;
-    };
+      child.isEnabled = function() {
+        return child.savedMemento;
+      };
 
-    child.toggleCorrectnessFeedback = function() {
-      child.displayed = !child.displayed;
-      child.saveDisplayedValue();
-    };
+      child.toggleCorrectnessFeedback = function() {
+        child.displayed = !child.displayed;
+        child.saveDisplayedValue();
+      };
 
-    return child;
-  }
-]);
+      return child;
+    }
+  ]
+);

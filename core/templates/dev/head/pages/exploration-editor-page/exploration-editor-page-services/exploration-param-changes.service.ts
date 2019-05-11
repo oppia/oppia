@@ -17,10 +17,12 @@
  * changes to parameters.
  */
 
-angular.module('explorationEditorPageModule').factory('ExplorationParamChangesService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'param_changes';
-    return child;
-  }
-]);
+angular.module('explorationEditorPageModule').factory(
+  'ExplorationParamChangesService', [
+    'ExplorationPropertyService', function(ExplorationPropertyService) {
+      var child = Object.create(ExplorationPropertyService);
+      child.propertyName = 'param_changes';
+      return child;
+    }
+  ]
+);

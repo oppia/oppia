@@ -17,20 +17,22 @@
  * that it can be displayed and edited in multiple places in the UI.
  */
 
-angular.module('explorationEditorPageModule').factory('ExplorationObjectiveService', [
-  '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
-  'ValidatorsService',
-  function(
-      $filter, ExplorationPropertyService, ExplorationRightsService,
-      ValidatorsService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'objective';
-    child._normalize = $filter('normalizeWhitespace');
-    child._isValid = function(value) {
-      return (
-        ExplorationRightsService.isPrivate() ||
-        ValidatorsService.isNonempty(value, false));
-    };
-    return child;
-  }
-]);
+angular.module('explorationEditorPageModule').factory(
+  'ExplorationObjectiveService', [
+    '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
+    'ValidatorsService',
+    function(
+        $filter, ExplorationPropertyService, ExplorationRightsService,
+        ValidatorsService) {
+      var child = Object.create(ExplorationPropertyService);
+      child.propertyName = 'objective';
+      child._normalize = $filter('normalizeWhitespace');
+      child._isValid = function(value) {
+        return (
+          ExplorationRightsService.isPrivate() ||
+          ValidatorsService.isNonempty(value, false));
+      };
+      return child;
+    }
+  ]
+);

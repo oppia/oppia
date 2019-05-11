@@ -16,55 +16,57 @@
  * @fileoverview User exploration emails service for the exploration settings.
  */
 
-angular.module('explorationEditorPageModule').factory('UserEmailPreferencesService', [
-  '$http', '$q', 'AlertsService', 'ExplorationDataService',
-  'UrlInterpolationService',
-  function(
-      $http, $q, AlertsService,
-      ExplorationDataService, UrlInterpolationService) {
-    var MESSAGE_TYPE_SUGGESTION = 'suggestion';
-    var MESSAGE_TYPE_FEEDBACK = 'feedback';
-    return {
-      init: function(
-          feedbackNotificationsMuted, suggestionNotificationsMuted) {
-        this.feedbackNotificationsMuted = feedbackNotificationsMuted;
-        this.suggestionNotificationsMuted = suggestionNotificationsMuted;
-      },
-      areFeedbackNotificationsMuted: function() {
-        return this.feedbackNotificationsMuted;
-      },
-      areSuggestionNotificationsMuted: function() {
-        return this.suggestionNotificationsMuted;
-      },
-      setFeedbackNotificationPreferences: function(mute) {
-        this.saveChangeToBackend({
-          message_type: MESSAGE_TYPE_FEEDBACK,
-          mute: mute
-        });
-      },
-      setSuggestionNotificationPreferences: function(mute) {
-        this.saveChangeToBackend({
-          message_type: MESSAGE_TYPE_SUGGESTION,
-          mute: mute
-        });
-      },
-      saveChangeToBackend: function(requestParams) {
-        var that = this;
-        var emailPreferencesUrl = UrlInterpolationService.interpolateUrl(
-          '/createhandler/notificationpreferences/<exploration_id>', {
-            exploration_id: ExplorationDataService.explorationId
-          }
-        );
-        return $http.put(emailPreferencesUrl, requestParams).then(
-          function(response) {
-            var data = response.data;
-            AlertsService.clearWarnings();
-            that.init(
-              data.email_preferences.mute_feedback_notifications,
-              data.email_preferences.mute_suggestion_notifications);
-          }
-        );
-      }
-    };
-  }
-]);
+angular.module('explorationEditorPageModule').factory(
+  'UserEmailPreferencesService', [
+    '$http', '$q', 'AlertsService', 'ExplorationDataService',
+    'UrlInterpolationService',
+    function(
+        $http, $q, AlertsService,
+        ExplorationDataService, UrlInterpolationService) {
+      var MESSAGE_TYPE_SUGGESTION = 'suggestion';
+      var MESSAGE_TYPE_FEEDBACK = 'feedback';
+      return {
+        init: function(
+            feedbackNotificationsMuted, suggestionNotificationsMuted) {
+          this.feedbackNotificationsMuted = feedbackNotificationsMuted;
+          this.suggestionNotificationsMuted = suggestionNotificationsMuted;
+        },
+        areFeedbackNotificationsMuted: function() {
+          return this.feedbackNotificationsMuted;
+        },
+        areSuggestionNotificationsMuted: function() {
+          return this.suggestionNotificationsMuted;
+        },
+        setFeedbackNotificationPreferences: function(mute) {
+          this.saveChangeToBackend({
+            message_type: MESSAGE_TYPE_FEEDBACK,
+            mute: mute
+          });
+        },
+        setSuggestionNotificationPreferences: function(mute) {
+          this.saveChangeToBackend({
+            message_type: MESSAGE_TYPE_SUGGESTION,
+            mute: mute
+          });
+        },
+        saveChangeToBackend: function(requestParams) {
+          var that = this;
+          var emailPreferencesUrl = UrlInterpolationService.interpolateUrl(
+            '/createhandler/notificationpreferences/<exploration_id>', {
+              exploration_id: ExplorationDataService.explorationId
+            }
+          );
+          return $http.put(emailPreferencesUrl, requestParams).then(
+            function(response) {
+              var data = response.data;
+              AlertsService.clearWarnings();
+              that.init(
+                data.email_preferences.mute_feedback_notifications,
+                data.email_preferences.mute_suggestion_notifications);
+            }
+          );
+        }
+      };
+    }
+  ]
+);
