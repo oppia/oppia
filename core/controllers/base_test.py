@@ -312,6 +312,7 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
         """Mock handler that subclasses BaseHandler and serves a response
         that is of a 'downloadable' type.
         """
+
         def get(self):
             """Handles GET requests."""
             file_contents = 'example'
@@ -337,6 +338,12 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
 
 
 class LogoutPageTests(test_utils.GenericTestBase):
+    """Class to test LogoutPage."""
+
+    def setUp(self):
+        super(LogoutPageTests, self).setUp()
+        self.signup('user@example.com', 'user')
+        self.login('user@example.com')
 
     def test_logout_page(self):
         """Tests for logout handler."""
@@ -351,6 +358,19 @@ class LogoutPageTests(test_utils.GenericTestBase):
         self.assertTrue(
             datetime.datetime.utcnow() > datetime.datetime.strptime(
                 expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))
+
+    def test_logout_page_redirect_not_dev_mode(self):
+        """Test that logout handler redirects to '/' in dev mode."""
+        with self.swap(constants, 'DEV_MODE', False):
+            response = self.get_html_response(
+                '/about',
+                expected_status_int=200)
+
+            response = self.get_html_response(
+                '/logout',
+                expected_status_int=302)
+
+            self.assertEqual('/', response.headers['location'].strip()[-1])
 
 
 class I18nDictsTests(test_utils.GenericTestBase):
