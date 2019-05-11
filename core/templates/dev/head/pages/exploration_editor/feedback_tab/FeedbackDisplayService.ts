@@ -19,18 +19,18 @@
 
 oppia.factory('FeedbackDisplayService', [function() {
   var _STATUS_CHOICES = {
-    open: {text: 'Open', label_class: 'label-info'},
-    fixed: {text: 'Fixed', label_class: 'label-default'},
-    ignored: {text: 'Ignored', label_class: 'label-default'},
-    compliment: {text: 'Compliment', label_class: 'label-success'},
-    not_actionable: {text: 'Not Actionable', label_class: 'label-default'},
+    open: {text: 'Open', label_class: 'info'},
+    fixed: {text: 'Fixed', label_class: 'default'},
+    ignored: {text: 'Ignored', label_class: 'default'},
+    compliment: {text: 'Compliment', label_class: 'success'},
+    not_actionable: {text: 'Not Actionable', label_class: 'default'},
   };
 
   return {
     STATUS_CHOICES: angular.copy(_STATUS_CHOICES),
     getLabelClass: function(status) {
       var statusChoice = _STATUS_CHOICES[status];
-      return 'label ' + (statusChoice ? statusChoice.label_class : '');
+      return 'label label-' + (statusChoice ? statusChoice.label_class : '');
     },
     getHumanReadableStatus: function(status) {
       var statusChoice = _STATUS_CHOICES[status];
