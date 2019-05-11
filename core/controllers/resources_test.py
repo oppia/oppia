@@ -16,6 +16,7 @@
 
 import os
 
+from constants import constants
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
@@ -225,6 +226,14 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.get_html_response(
             '/assetsdevhandler/0/assets/unknowntype/myfile',
             expected_status_int=404)
+        self.logout()
+
+    def test_get_response_with_dev_mode_disabled_returns_404_status(self):
+        self.login(self.EDITOR_EMAIL)
+        with self.swap(constants, 'DEV_MODE', False):
+            self.get_json(
+                '/assetsdevhandler/0/assets/image/myfile',
+                expected_status_int=404)
         self.logout()
 
 
