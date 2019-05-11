@@ -18,41 +18,23 @@
  */
 
 oppia.factory('FeedbackDisplayService', [function() {
-  var _STATUS_CHOICES = [{
-    id: 'open',
-    text: 'Open'
-  }, {
-    id: 'fixed',
-    text: 'Fixed'
-  }, {
-    id: 'ignored',
-    text: 'Ignored'
-  }, {
-    id: 'compliment',
-    text: 'Compliment'
-  }, {
-    id: 'not_actionable',
-    text: 'Not Actionable'
-  }];
+  var _STATUS_CHOICES = {
+    open: {text: 'Open', labelClass: 'label-info'},
+    fixed: {text: 'Fixed', labelClass: 'label-default'},
+    ignored: {text: 'Ignored', labelClass: 'label-default'},
+    compliment: {text: 'Compliment', labelClass: 'label-success'},
+    not_actionable: {text: 'Not Actionable', labelClass: 'label-default'},
+  };
 
   return {
     STATUS_CHOICES: angular.copy(_STATUS_CHOICES),
     getLabelClass: function(status) {
-      if (status === 'open') {
-        return 'label label-info';
-      } else if (status === 'compliment') {
-        return 'label label-success';
-      } else {
-        return 'label label-default';
-      }
+      var statusChoice = _STATUS_CHOICES[status];
+      return statusChoice ? statusChoice.labelClass : '';
     },
     getHumanReadableStatus: function(status) {
-      for (var i = 0; i < _STATUS_CHOICES.length; i++) {
-        if (_STATUS_CHOICES[i].id === status) {
-          return _STATUS_CHOICES[i].text;
-        }
-      }
-      return '';
+      var statusChoice = _STATUS_CHOICES[status];
+      return statusChoice ? statusChoice.text : '';
     }
   };
 }]);
