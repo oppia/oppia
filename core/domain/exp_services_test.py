@@ -340,14 +340,14 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         # activity ids.
         subscription_services.subscribe_to_exploration(
             self.owner_id, self.EXP_ID_0)
-        self.assertTrue(
-            self.EXP_ID_0 in
+        self.assertIn(
+            self.EXP_ID_0,
             subscription_services.get_exploration_ids_subscribed_to(
                 self.owner_id))
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
         self.process_and_flush_pending_tasks()
-        self.assertFalse(
-            self.EXP_ID_0 in
+        self.assertNotIn(
+            self.EXP_ID_0,
             subscription_services.get_exploration_ids_subscribed_to(
                 self.owner_id))
 
