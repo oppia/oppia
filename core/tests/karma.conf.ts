@@ -34,6 +34,7 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*Spec.ts',
       'core/templates/dev/head/*Spec.ts',
+      'local_compiled_js/core/templates/dev/head/**/*.js',
       'local_compiled_js/extensions/**/*.js',
       {
         pattern: 'extensions/**/*.png',
@@ -65,15 +66,6 @@ module.exports = function(config) {
        'StateContentEditorDirectiveSpec.ts'),
       ('core/templates/dev/head/pages/state_editor/' +
        'StateInteractionEditorDirectiveSpec.ts'),
-      'core/templates/dev/head/services/StateRulesStatsServiceSpec.ts',
-      'core/templates/dev/head/services/StateTopAnswersStatsServiceSpec.ts',
-      'local_compiled_js/extensions/classifiers/SVMPredictionServiceSpec.js',
-      ('local_compiled_js/extensions/interactions/CodeRepl/' +
-       'CodeReplPredictionServiceSpec.js'),
-      ('local_compiled_js/extensions/interactions/MusicNotesInput/' + 
-       'directives/MusicNotesInputSpec.js'),
-      ('local_compiled_js/extensions/interactions/TextInput/' +
-       'TextInputPredictionServiceSpec.js'),
     ],
     proxies: {
       // Karma serves files under the /base directory.
