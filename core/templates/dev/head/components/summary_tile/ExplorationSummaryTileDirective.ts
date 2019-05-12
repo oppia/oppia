@@ -18,6 +18,7 @@
 
 require('components/summary_tile/CircularImageDirective.ts');
 require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
+require('filters/SummarizeNonnegativeNumberFilter.ts');
 require('filters/TruncateAndCapitalizeFilter.ts');
 require('filters/TruncateFilter.ts');
 
