@@ -191,6 +191,33 @@ class SignupTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_user_settings_of_non_existing_user(self):
+        self.login(self.OWNER_EMAIL)
+        values_dict = {
+            u'can_send_emails': False,
+            u'has_agreed_to_latest_terms': False,
+            u'has_ever_registered': False,
+            u'username': None,
+        }
+        response = self.get_json(feconf.SIGNUP_DATA_URL)
+        self.assertEqual(response, values_dict)
+        self.logout()
+
+    def test_user_settings_of_existing_user(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        values_dict = {
+            u'can_send_emails': True,
+            u'has_agreed_to_latest_terms': True,
+            u'has_ever_registered': True,
+            u'username': 'owner',
+        }
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            response = self.get_json(feconf.SIGNUP_DATA_URL)
+            self.assertEqual(response, values_dict)
+
+        self.logout()
+
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
@@ -431,6 +458,53 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             self.viewer_id, self.owner_id)
         response = self.get_json(feconf.PREFERENCES_DATA_URL)
         self.assertEqual(len(response['subscription_list']), 0)
+        self.logout()
+
+    def test_can_update_profile_picture_data_url(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.get_html_response('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertTrue(
+            user_settings.profile_picture_data_url.startswith(
+                'data:image/png;'))
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            payload={'update_type': 'profile_picture_data_url',
+                     'data': 'new_profile_picture_data_url'},
+            csrf_token=csrf_token)
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertEqual(
+            user_settings.profile_picture_data_url,
+            'new_profile_picture_data_url')
+        self.logout()
+
+    def test_can_update_default_dashboard(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.get_html_response('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertIsNone(user_settings.default_dashboard)
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            payload={'update_type': 'default_dashboard',
+                     'data': constants.DASHBOARD_TYPE_CREATOR},
+            csrf_token=csrf_token)
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertEqual(
+            user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR)
+        self.logout()
+
+    def test_update_preferences_with_invalid_update_type_raises_exception(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.get_html_response('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        with self.assertRaisesRegexp(Exception, 'Invalid update type:'):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                payload={'update_type': 'invalid_update_type'},
+                csrf_token=csrf_token)
+        self.logout()
 
 
 class ProfileLinkTests(test_utils.GenericTestBase):
@@ -576,6 +650,41 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
             first_time_in_msecs)
 
 
+class ProfilePageTests(test_utils.GenericTestBase):
+
+    def test_get_profile_page_of_non_existing_user_raises_status_404(self):
+        self.get_html_response(
+            '/profile/%s' % self.OWNER_USERNAME, expected_status_int=404)
+
+    def test_get_profile_page_of_existing_user(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
+        self.assertIn(
+            '<p class="oppia-profile-first-contributed" '
+            'ng-if="firstContributionMsec">', response.body)
+
+
+class ProfilePictureHandlerTests(test_utils.GenericTestBase):
+
+    def test_get_profile_picture_with_updated_value(self):
+        self.get_json(
+            '/preferenceshandler/profile_picture', expected_status_int=401)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.login(self.OWNER_EMAIL)
+        user_settings = user_services.get_user_settings(owner_id)
+        response = self.get_json('/preferenceshandler/profile_picture')
+        self.assertEqual(
+            response['profile_picture_data_url'],
+            user_settings.profile_picture_data_url)
+        user_services.update_profile_picture_data_url(
+            owner_id, 'new_profile_picture')
+        response = self.get_json('/preferenceshandler/profile_picture')
+        self.assertEqual(
+            response['profile_picture_data_url'], 'new_profile_picture')
+        self.logout()
+
+
 class UserContributionsTests(test_utils.GenericTestBase):
 
     USERNAME_A = 'a'
@@ -655,11 +764,15 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
 class SiteLanguageHandlerTests(test_utils.GenericTestBase):
 
+    def setUp(self):
+        super(SiteLanguageHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
     def test_save_site_language_handler(self):
         """Test the language is saved in the preferences when handler is
         called.
         """
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         language_code = 'es'
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('/preferences')
@@ -675,6 +788,21 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             preferences['preferred_site_language_code'], language_code)
 
+        self.logout()
+
+    def test_can_update_site_language_code(self):
+        self.login(self.EDITOR_EMAIL)
+        user_settings = user_services.get_user_settings(
+            self.editor_id, strict=True)
+        self.assertIsNone(user_settings.preferred_site_language_code)
+        response = self.get_html_response('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json(
+            feconf.SITE_LANGUAGE_DATA_URL, payload={'site_language_code': 'en'},
+            csrf_token=csrf_token)
+        user_settings = user_services.get_user_settings(
+            self.editor_id, strict=True)
+        self.assertEqual(user_settings.preferred_site_language_code, 'en')
         self.logout()
 
 
@@ -737,3 +865,18 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
         self.get_json('/userinfohandler', expected_status_int=401)
+
+
+class UrlHandlerTests(test_utils.GenericTestBase):
+
+    def test_login_url_is_none_for_signed_in_user(self):
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_json('/url_handler')
+        self.assertIsNone(response['login_url'])
+        self.logout()
+
+    def test_login_url_gets_created_for_signed_out_users(self):
+        response = self.get_json(
+            '/url_handler', params={'current_url': 'random_url'})
+        self.assertTrue(response['login_url'].endswith('random_url'))
