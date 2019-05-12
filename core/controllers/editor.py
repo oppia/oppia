@@ -98,7 +98,7 @@ class ExplorationPage(EditorHandler):
         """Handles GET requests."""
         if exploration_id in constants.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'pages/error/disabled_exploration.html',
+                'pages/error-page/disabled-exploration.mainpage.html',
                 iframe_restriction=None)
             return
 
@@ -159,7 +159,9 @@ class ExplorationPage(EditorHandler):
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template('pages/exploration_editor/exploration_editor.html')
+        self.render_template(
+            'pages/exploration-editor-page/' +
+            'exploration-editor-page.mainpage.html')
 
 
 class ExplorationHandler(EditorHandler):

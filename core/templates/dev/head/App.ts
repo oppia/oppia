@@ -29,7 +29,22 @@ var oppia = angular.module(
     'moderatorPageModule', 'notificationsDashboardPageModule',
     'practiceSessionPageModule', 'preferencesPageModule', 'profilePageModule',
     'questionEditorPageModule', 'questionsListPageModule',
-    'topicLandingPageModule'
+    'topicLandingPageModule',
+    'aboutPageModule',
+    'creatorDashboardPageModule', 'donatePageModule', 'errorPageModule',
+    'explorationEditorPageModule',
+    'collectionPlayerPageModule', 'emailDashboardPageModule',
+    'answerGroupEditorModule', 'buttonsDirectivesModule',
+    'ckEditorHelpersModule', 'codemirrorMergeviewModule',
+    'commonLayoutDirectivesModule', 'entityCreationServicesModule',
+    'libraryPageModule', 'filtersModule', 'formsModule',
+    'profileLinkDirectivesModule', 'ratingsModule', 'suggestionModalModule',
+    'summaryListHeaderModule', 'skillEditorModule',
+    'splashPageModule', 'stateEditorModule', 'stateModule', 'storyEditorModule',
+    'summaryTileDirectivesModule', 'summaryListHeaderModule',
+    'teachPageModule', 'thanksPageModule', 'topicsAndSkillsDashboardModule',
+    'topicEditorPageModule', 'topicViewerPageModule',
+    'visualDiffVisualizationModule'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 

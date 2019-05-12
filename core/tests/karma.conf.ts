@@ -35,6 +35,7 @@ module.exports = function(config) {
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'local_compiled_js/core/templates/dev/head/**/*.js',
+      'core/templates/dev/head/**/*\.directive.html',
       'core/templates/dev/head/**/*_directive.html',
       'local_compiled_js/extensions/**/*.js',
       {
@@ -66,6 +67,9 @@ module.exports = function(config) {
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
+      'local_compiled_js/core/templates/dev/head/!(*\.spec).js': ['coverage'],
+      'local_compiled_js/core/templates/dev/head/**/!(*\.spec).js': [
+        'coverage'],
       'local_compiled_js/core/templates/dev/head/!(*Spec).js': ['coverage'],
       'local_compiled_js/core/templates/dev/head/**/!(*Spec).js': ['coverage'],
       'local_compiled_js/extensions/!(*Spec).js': ['coverage'],
@@ -73,6 +77,8 @@ module.exports = function(config) {
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
+      'core/templates/dev/head/**/*\.directive.html': ['ng-html2js'],
+      'core/templates/dev/head/**/*\.template.html': ['ng-html2js'],
       'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],

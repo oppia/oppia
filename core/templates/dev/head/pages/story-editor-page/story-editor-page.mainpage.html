@@ -1,0 +1,77 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  {{ story_title }} - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <story-editor-navbar-breadcrumb>
+  </story-editor-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <story-editor-navbar>
+  </story-editor-navbar>
+{% endblock local_top_nav_options %}
+
+{% block content %}
+  <div ng-controller="StoryEditor" class="story-editor">
+    <button class="btn btn-primary back-to-topic-button protractor-test-return-to-topic-button"
+            ng-click="returnToTopicEditorPage()">
+      <i class="fa fa-arrow-left"></i> &nbsp;Return to topic
+    </button>
+    <story-editor></story-editor>
+  </div>
+
+  <style>
+    .story-editor .back-to-topic-button {
+      margin-top: 1.5%;
+      margin-left: 10%;
+    }
+  </style>
+{% endblock content %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
+  <script src="/templates/dev/head/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-unicode-with-params-to-html.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-html-to-unicode.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-unicode-to-html.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-at-least.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-at-most.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-float.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-integer.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-nonempty.filter.js"></script>
+  <script src="/templates/dev/head/directives/AngularHtmlBindDirective.js"></script>
+  <script src="/templates/dev/head/directives/MathjaxBindDirective.js"></script>
+
+  <script src="/templates/dev/head/filters/string-utility-filters/underscores-to-camel-case.filter.js"></script>
+
+  <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ListOfTabsEditorDirective.js"></script>
+
+  <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
+  <script src="/templates/dev/head/services/IdGenerationService.js"></script>
+  <script src="/templates/dev/head/services/RteHelperService.js"></script>
+  <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
+  <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
+  <script src="/templates/dev/head/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
+  <script src="/templates/dev/head/services/GenerateContentIdService.js"></script>
+
+  <script src="/templates/dev/head/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/QuestionUndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/editor/undo_redo/BaseUndoRedoService.js"></script>
+  <script src="/templates/dev/head/domain/story/EditableStoryBackendApiService.js"></script>
+  <script src="/templates/dev/head/domain/story/StoryObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/story/StoryContentsObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/story/StoryNodeObjectFactory.js"></script>
+  <script src="/templates/dev/head/domain/story/StoryUpdateService.js"></script>
+
+  <script src="/templates/dev/head/pages/story-editor-page/story-editor-services/story-editor-state/story-editor-state.service.js"></script>
+  {% include 'components/rich_text_components.html' %}
+{% endblock footer_js %}

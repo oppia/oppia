@@ -106,27 +106,20 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/components/forms/ConvertUnicodeWithParamsToHtmlFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/ConvertHtmlToUnicodeFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/ConvertUnicodeToHtmlFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsAtLeastFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsAtMostFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsFloatFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsIntegerFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsNonemptyFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
-  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-unicode-with-params-to-html.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-html-to-unicode.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-unicode-to-html.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-at-least.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-at-most.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-float.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-integer.filter.js"></script>
+  <script src="/templates/dev/head/components/forms/forms-validators/is-nonempty.filter.js"></script>
+  <script src="/templates/dev/head/filters/string-utility-filters/underscores-to-camel-case.filter.js"></script>
 
   <script src="/templates/dev/head/services/RteHelperService.js"></script>
   <script src="/templates/dev/head/services/IdGenerationService.js"></script>
   <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
   <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
   <script src="/templates/dev/head/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
 
 {% endblock footer_js %}

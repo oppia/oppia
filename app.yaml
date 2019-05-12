@@ -61,6 +61,12 @@ handlers:
   upload: local_compiled_js/core/templates/dev/head/(.*\.(js))$
   secure: always
   expiration: "0"
+- url: /templates/dev/head/(.*\.template\.html)$
+  static_files: core/templates/dev/head/\1
+  upload: core/templates/dev/head/(.*\.template\.html)$
+  secure: always
+  expiration: "0"
+  application_readable: true
 - url: /templates/dev/head/(.*directive\.html)$
   static_files: core/templates/dev/head/\1
   upload: core/templates/dev/head/(.*directive\.html)$
