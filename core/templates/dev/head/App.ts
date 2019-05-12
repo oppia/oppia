@@ -134,6 +134,18 @@ oppia.constant('LOGOUT_URL', '/logout');
 // page visited.
 oppia.constant('ENABLE_PROMO_BAR', true);
 
+// TODO(vojtechjelinek) move these to separate file later
+oppia.constant(
+  'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE',
+  '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>');
+oppia.constant(
+  'TOPIC_RIGHTS_URL_TEMPLATE', '/rightshandler/get_topic_rights/<topic_id>');
+oppia.constant(
+  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
+  '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
+oppia.constant(
+  'EDITABLE_TOPIC_DATA_URL_TEMPLATE', '/topic_editor_handler/data/<topic_id>');
+
 oppia.config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
   '$interpolateProvider', '$locationProvider',

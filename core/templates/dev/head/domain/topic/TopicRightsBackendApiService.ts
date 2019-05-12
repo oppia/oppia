@@ -17,7 +17,6 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/topic_editor/TopicEditor.ts');
 
 oppia.factory('TopicRightsBackendApiService', [
   '$http', '$log', '$q', 'UrlInterpolationService',

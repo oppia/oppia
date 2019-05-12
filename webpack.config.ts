@@ -39,6 +39,8 @@ module.exports = {
     donate: commonPrefix + '/pages/donate/Donate.ts',
     email_dashboard:
       commonPrefix + '/pages/email_dashboard/EmailDashboard.ts',
+    email_dashboard_result:
+      commonPrefix + '/pages/email_dashboard/EmailDashboardResult.ts',
     error: commonPrefix + '/pages/error/Error.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration_editor/ExplorationEditor.ts',
@@ -136,6 +138,14 @@ module.exports = {
       chunks: ['email_dashboard'],
       filename: 'email_dashboard.html',
       template: commonPrefix + '/pages/email_dashboard/email_dashboard.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['email_dashboard_result'],
+      filename: 'email_dashboard_result.html',
+      template: 
+        commonPrefix + '/pages/email_dashboard/email_dashboard_result.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

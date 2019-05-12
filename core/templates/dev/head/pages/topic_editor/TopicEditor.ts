@@ -17,6 +17,8 @@
  */
 
 // vvv this block of requires should be removed vvv
+require('components/CkEditorRteDirective.ts');
+require('components/CkEditorWidgetsInitializer.ts');
 require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
 require('components/forms/ConvertHtmlToUnicodeFilter.ts');
 require('components/forms/ConvertUnicodeToHtmlFilter.ts');
@@ -63,16 +65,6 @@ require('pages/topic_editor/TopicEditorStateService.ts');
 require('services/contextual/UrlService.ts');
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant(
-  'EDITABLE_TOPIC_DATA_URL_TEMPLATE', '/topic_editor_handler/data/<topic_id>');
-oppia.constant(
-  'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE',
-  '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>');
-oppia.constant(
-  'TOPIC_RIGHTS_URL_TEMPLATE', '/rightshandler/get_topic_rights/<topic_id>');
-oppia.constant(
-  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
-  '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
 
 oppia.constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');

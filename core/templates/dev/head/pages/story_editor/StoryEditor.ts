@@ -17,6 +17,8 @@
  */
 
 // vvv this block of requires should be removed vvv
+require('components/CkEditorRteDirective.ts');
+require('components/CkEditorWidgetsInitializer.ts');
 require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
 require('components/forms/ConvertHtmlToUnicodeFilter.ts');
 require('components/forms/ConvertUnicodeToHtmlFilter.ts');

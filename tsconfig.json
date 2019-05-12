@@ -15,9 +15,11 @@
     "core/tests/karma-globals.ts", 
     "core/tests/karma.conf.ts",
     "core/templates/dev/head/AppInit.ts",
+    "core/templates/dev/head/mathjaxConfig.ts",
     "core/templates/dev/head/domain/classifier/PredictionResultObjectFactory.ts",
     "core/templates/dev/head/expressions/ExpressionParserService.js",
-    "core/templates/dev/head/mathjaxConfig.ts"
+    "core/templates/dev/head/filters/ConvertToPlainTextFilter.ts",
+    "core/templates/dev/head/filters/NormalizeWhitespaceFilter.ts",
   ],
   "include": ["extensions", "typings"]
 }
