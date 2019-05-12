@@ -182,7 +182,13 @@ BAD_PATTERNS_JS_REGEXP = [
                    'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()
-    }
+    }.
+    {
+        'regexp': r'require\(.*\.\..*\);',
+        'message': 'Please, don\'t use relative imports in require().',
+        'excluded_files': (),
+        'excluded_dirs': ('core/tests/')
+    },
 ]
 
 BAD_LINE_PATTERNS_HTML_REGEXP = [
