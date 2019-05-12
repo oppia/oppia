@@ -200,7 +200,7 @@ class ConsoleErrorPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/tests/console_errors.html')
+        self.render_template('dist/console_errors.html')
 
 
 class MaintenancePage(base.BaseHandler):

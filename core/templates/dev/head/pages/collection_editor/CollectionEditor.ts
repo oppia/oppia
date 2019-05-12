@@ -42,6 +42,8 @@ oppia.constant(
   'SEARCH_EXPLORATION_URL_TEMPLATE',
   '/exploration/metadata_search?q=<query>');
 
+oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+
 oppia.controller('CollectionEditor', [
   'CollectionEditorStateService',
   function(CollectionEditorStateService) {

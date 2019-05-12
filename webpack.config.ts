@@ -113,6 +113,12 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      filename: 'console_errors.html',
+      template: commonPrefix + '/pages/tests/console_errors.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['contact'],
       filename: 'contact.html',
       template: commonPrefix + '/pages/contact/contact.html',
