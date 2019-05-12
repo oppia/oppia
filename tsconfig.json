@@ -20,6 +20,7 @@
     "core/templates/dev/head/expressions/ExpressionParserService.js",
     "core/templates/dev/head/filters/ConvertToPlainTextFilter.ts",
     "core/templates/dev/head/filters/NormalizeWhitespaceFilter.ts",
+    "core/templates/dev/head/filters/TruncateAtFirstLineFilter.ts"
   ],
   "include": ["extensions", "typings"]
 }
