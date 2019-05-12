@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the questions player directive.
+ * @fileoverview Directive for the questions player directive.
  */
-oppia.directive('questionPlayer', [
+
+angular.module('questionPlayerPageModule').directive('questionPlayer', [
   '$http', 'UrlInterpolationService',
   function(
       $http, UrlInterpolationService) {
@@ -25,7 +26,7 @@ oppia.directive('questionPlayer', [
         getQuestionPlayerConfig: '&playerConfig',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/question_player/question_player_directive.html'),
+        '/pages/question-player-page/question-player-page.directive.html'),
       controller: [
         '$scope', '$rootScope', 'QuestionPlayerBackendApiService',
         function(

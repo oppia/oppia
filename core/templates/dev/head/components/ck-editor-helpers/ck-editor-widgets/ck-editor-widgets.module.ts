@@ -13,9 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the CkEditor helpers.
+ * @fileoverview Code to dynamically generate CKEditor widgets for the rich
+ * text components.
  */
 
-angular.module('ckEditorHelpersModule', ['ckEditorRteModule',
-  'ckEditorWidgetsModule'
-]);
+angular.module('ckEditorWidgetsModule', []);
