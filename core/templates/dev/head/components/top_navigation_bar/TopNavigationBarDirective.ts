@@ -266,7 +266,7 @@ oppia.directive('topNavigationBar', [
                   // Force a digest cycle to hide element immediately.
                   // Otherwise it would be hidden after the next call.
                   // This is due to setTimeout use in debounce.
-                  ctrl.$apply();
+                  $scope.$apply();
                   $timeout(truncateNavbar, 50);
                   return;
                 }
@@ -282,7 +282,7 @@ oppia.directive('topNavigationBar', [
           // check if i18n is complete and set a new timeout if it is not. Since
           // a timeout of 0 works for at least one browser, it is used here.
           $timeout(truncateNavbar, 0);
-          ctrl.$on('searchBarLoaded', function() {
+          $scope.$on('searchBarLoaded', function() {
             $timeout(truncateNavbar, 100);
           });
         }
