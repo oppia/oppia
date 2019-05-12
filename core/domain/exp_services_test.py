@@ -32,6 +32,7 @@ from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -333,6 +334,22 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_ids_matching_query(''),
             ([], None))
+
+    def test_get_subscribed_users_activity_ids_with_deleted_explorations(self):
+        # Ensure a deleted exploration does not show up in subscribed users
+        # activity ids.
+        subscription_services.subscribe_to_exploration(
+            self.owner_id, self.EXP_ID_0)
+        self.assertTrue(
+            self.EXP_ID_0 in
+            subscription_services.get_exploration_ids_subscribed_to(
+                self.owner_id))
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
+        self.process_and_flush_pending_tasks()
+        self.assertFalse(
+            self.EXP_ID_0 in
+            subscription_services.get_exploration_ids_subscribed_to(
+                self.owner_id))
 
     def test_search_exploration_summaries(self):
         # Search within the 'Architecture' category.

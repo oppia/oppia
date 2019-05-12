@@ -1042,7 +1042,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     # Remove from subscribers.
     taskqueue_services.defer(
         delete_exploration_from_subscribed_users,
-        taskqueue_services.QUEUE_NAME_EVENTS,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
         exploration_id)
 
 
@@ -1053,12 +1053,11 @@ def delete_exploration_from_subscribed_users(exploration_id):
         exploration_id: The id of the exploration to delete.
     """
     subscription_models = user_models.UserSubscriptionsModel.query(
-        user_models.UserSubscriptionsModel.activity_ids.IN(
-            [exploration_id])).fetch()
-
+        user_models.UserSubscriptionsModel.activity_ids ==
+        exploration_id).fetch()
     for model in subscription_models:
         model.activity_ids.remove(exploration_id)
-        model.put()
+    user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 
 # Operations on exploration snapshots.
