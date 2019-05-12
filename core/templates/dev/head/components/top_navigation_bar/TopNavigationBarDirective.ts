@@ -29,12 +29,12 @@ oppia.directive('topNavigationBar', [
         'top_navigation_bar_directive.html'),
       controllerAs: 'topNavigationBarCtrl',
       controller: [
-        '$http', '$window', '$timeout', '$translate',
+        '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
         'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
         function(
-            $http, $window, $timeout, $translate,
+            $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
             DebouncerService, DeviceInfoService, LOGOUT_URL) {
@@ -166,7 +166,7 @@ oppia.directive('topNavigationBar', [
           angular.element(document).on('click', function(evt) {
             if (!angular.element(evt.target).closest('li').length) {
               ctrl.activeMenuName = '';
-              ctrl.$apply();
+              $scope.$apply();
             }
           });
 
