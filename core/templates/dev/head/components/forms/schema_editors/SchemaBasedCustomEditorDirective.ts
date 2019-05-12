@@ -16,8 +16,6 @@
  * @fileoverview Directive for a schema-based editor for custom values.
  */
 
-require('components/forms/ObjectEditorDirective.ts');
-
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
