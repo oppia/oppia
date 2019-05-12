@@ -25,7 +25,7 @@ var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
-angular.module('conversationSkinModule', []);
+angular.module('conversationSkinModule')
   .animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
     var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
     var tutorCardAnimatedLeft, tutorCardAnimatedWidth;
