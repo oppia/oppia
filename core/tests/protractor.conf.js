@@ -100,7 +100,7 @@ exports.config = {
     ],
 
     explorationTranslationTab: [
-      'protractor_desktop/ExplorationTranslationTab.js'
+      'protractor_desktop/explorationTranslationTab.js'
     ],
 
     extensions: [
@@ -151,8 +151,8 @@ exports.config = {
       'protractor_desktop/topicsAndSkillsDashboard.js'
     ],
 
-    skillEditorPage: [
-      'protractor_desktop/skillEditorPage.js'
+    skillEditor: [
+      'protractor_desktop/skillEditor.js'
     ],
 
     users: [
