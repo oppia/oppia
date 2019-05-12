@@ -223,23 +223,23 @@ describe('Exploration translation', function() {
   it('should correctly switch to different modes', function() {
     users.login('common@translationTab.com');
     workflow.createExploration();
-     explorationEditorPage.navigateToTranslationTab();
+    explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.expectToBeInVoiceoverMode();
 
-     explorationEditorTranslationTab.switchToTranslationMode();
+    explorationEditorTranslationTab.switchToTranslationMode();
     explorationEditorTranslationTab.expectToBeInTranslationMode();
 
-     explorationEditorTranslationTab.switchToVoiceoverMode();
+    explorationEditorTranslationTab.switchToVoiceoverMode();
     explorationEditorTranslationTab.expectToBeInVoiceoverMode();
   });
 
-   it('should correctly set translation for active content', function() {
+  it('should correctly set translation for active content', function() {
     users.login('common@translationTab.com');
     creatorDashboardPage.get();
     // Test using common exploration.
     creatorDashboardPage.editExploration('tests');
 
-     explorationEditorPage.navigateToTranslationTab();
+    explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.exitTutorial();
     explorationEditorTranslationTab.changeTranslationLanguage('Hindi');
     explorationEditorTranslationTab.expectContentTabContentToMatch(
