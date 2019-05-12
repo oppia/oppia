@@ -16,7 +16,7 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
-oppia.directive('ckEditorRte', [
+angular.module('ckEditorRteModule').directive('ckEditorRte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
   function(ContextService, RteHelperService, PAGE_CONTEXT) {
     return {
