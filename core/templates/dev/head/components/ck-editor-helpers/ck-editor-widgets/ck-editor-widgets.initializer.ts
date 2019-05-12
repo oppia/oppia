@@ -17,7 +17,7 @@
  * text components.
  */
 
-angular.module('oppia').run([
+oppia.run([
   '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
   'HtmlEscaperService',
   function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
