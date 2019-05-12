@@ -16,7 +16,7 @@
  * @fileoverview Directives for the outcome destination editor.
  */
 
-require('../StateGraphLayoutService.ts');
+require('components/StateGraphLayoutService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');

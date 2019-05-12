@@ -16,8 +16,8 @@
  * @fileoverview Directive for the Create Exploration/Collection button.
  */
 
-require('../CollectionCreationService.ts');
-require('../ExplorationCreationService.ts');
+require('components/CollectionCreationService.ts');
+require('components/ExplorationCreationService.ts');
 require('domain/utilities/BrowserCheckerService.ts');
 require('services/contextual/UrlService.ts');
 require('services/SiteAnalyticsService.ts');
