@@ -735,24 +735,35 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         translator_ids = item.translator_ids
         if len(translator_ids) > 0:
-            item.voice_artist_ids = translator_ids
-            item.translator_ids = []
-            commit_message = 'Migrate from translator to voice artist'
-            commit_cmds = [{
-                'cmd': 'change_role',
-                'assignee_ids': translator_ids,
-                'old_role': 'translator',
-                'new_role': 'voice artist'
-            }]
-            item.commit('Admin', commit_message, commit_cmds)
-
             exp_summary_model = exp_models.ExpSummaryModel.get_by_id(item.id)
+
             if exp_summary_model is None or exp_summary_model.deleted:
+                item.voice_artist_ids = translator_ids
+                item.translator_ids = []
+                commit_message = 'Migrate from translator to voice artist'
+                commit_cmds = [{
+                    'cmd': 'change_role',
+                    'assignee_ids': translator_ids,
+                    'old_role': 'translator',
+                    'new_role': 'voice artist'
+                }]
+                item.commit('Admin', commit_message, commit_cmds)
                 yield ('Summary model does not exist or is deleted', item.id)
             else:
                 exp_summary_model.voice_artist_ids = translator_ids
                 exp_summary_model.translator_ids = []
                 exp_summary_model.put()
+
+                item.voice_artist_ids = translator_ids
+                item.translator_ids = []
+                commit_message = 'Migrate from translator to voice artist'
+                commit_cmds = [{
+                    'cmd': 'change_role',
+                    'assignee_ids': translator_ids,
+                    'old_role': 'translator',
+                    'new_role': 'voice artist'
+                }]
+                item.commit('Admin', commit_message, commit_cmds)
                 yield ('SUCCESS', item.id)
 
     @staticmethod
