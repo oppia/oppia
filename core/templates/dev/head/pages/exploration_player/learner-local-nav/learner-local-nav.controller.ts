@@ -16,10 +16,7 @@
  * @fileoverview Controller for the local navigation in the learner view.
  */
 
-oppia.constant(
-  'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
-
-oppia.controller('LearnerLocalNav', [
+angular.module('LearnerLocalNavModule').controller('LearnerLocalNav', [
   '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
   'ExplorationEngineService', 'ExplorationPlayerStateService',
   'FocusManagerService', 'ShowSuggestionModalForLearnerLocalViewService',
@@ -52,7 +49,8 @@ oppia.controller('LearnerLocalNav', [
     $scope.showFlagExplorationModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_player/flag_exploration_modal_directive.html'),
+          '/pages/exploration_player/learner-local-nav/' +
+          'flag-exploration-modal.directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$uibModalInstance', 'PlayerPositionService',
@@ -98,8 +96,8 @@ oppia.controller('LearnerLocalNav', [
         });
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/' +
-            'exploration_successfully_flagged_modal_directive.html'),
+            '/pages/exploration_player/learner-local-nav/' +
+            'exploration-successfully-flagged-modal.directive.html'),
           backdrop: true,
           controller: [
             '$scope', '$uibModalInstance',

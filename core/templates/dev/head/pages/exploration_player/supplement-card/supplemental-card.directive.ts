@@ -16,7 +16,7 @@
  * @fileoverview Controller for the supplemental card.
  */
 
-oppia.directive('supplementalCard', [
+angular.module('supplementalCardModule').directive('supplementalCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -26,7 +26,8 @@ oppia.directive('supplementalCard', [
         getDisplayedCard: '&displayedCard',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/supplemental_card_directive.html'),
+        '/pages/exploration_player/supplemental-card/' +
+        'supplemental-card.directive.html'),
       controller: [
         '$scope', '$timeout', '$window',
         'WindowDimensionsService', 'CONTENT_FOCUS_LABEL_PREFIX',

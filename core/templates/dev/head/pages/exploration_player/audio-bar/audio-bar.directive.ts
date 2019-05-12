@@ -17,15 +17,15 @@
  * audio translation in the learner view.
  */
 
-oppia.directive('audioBar', [
+angular.module('audioBarModule').directive('audioBar', [
   'AudioPreloaderService', 'UrlInterpolationService',
   function(AudioPreloaderService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/' +
-        'audio_bar_directive.html'),
+        '/pages/exploration_player/audio-bar/' +
+        'audio-bar.directive.html'),
       controller: [
         '$scope', '$interval', '$timeout', 'AudioTranslationLanguageService',
         'AudioPlayerService', 'LanguageUtilService', 'AssetsBackendApiService',

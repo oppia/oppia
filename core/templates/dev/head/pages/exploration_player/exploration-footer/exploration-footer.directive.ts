@@ -17,7 +17,7 @@
  * in exploration player.
  */
 
-oppia.directive('explorationFooter', [
+angular.module('explorationFooterModule').directive('explorationFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -25,7 +25,8 @@ oppia.directive('explorationFooter', [
         twitterText: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/exploration_footer_directive.html'),
+        '/pages/exploration_player/exploration-footer/' +
+        'exploration-footer.directive.html'),
       controller: [
         '$scope', '$http', '$log', 'ContextService',
         'ExplorationSummaryBackendApiService', 'UrlService',

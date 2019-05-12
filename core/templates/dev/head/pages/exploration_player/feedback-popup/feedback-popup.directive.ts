@@ -16,24 +16,15 @@
  * @fileoverview Directive for the feedback popup.
  */
 
-// This directive is unusual in that it should only be invoked indirectly, as
-// follows:
-//
-// <some-html-element popover-placement="bottom"
-//                    uib-popover-template="'<[getFeedbackPopoverUrl()]>'"
-//                    popover-trigger="click" state-name="<[STATE_NAME]>">
-// </some-html-element>
-//
-// The state-name argument is optional. If it is not provided, the feedback is
-// assumed to apply to the exploration as a whole.
-oppia.directive('feedbackPopup', [
+angular.module('feedbackPopupModule').directive('feedbackPopup', [
   'ExplorationEngineService', 'UrlInterpolationService',
   function(ExplorationEngineService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/feedback_popup_directive.html'),
+        '/pages/exploration_player/feedback-popup/' +
+        'feedback-popup.directive.html'),
       controller: [
         '$scope', '$element', '$filter', '$http', '$log', '$timeout',
         'AlertsService', 'BackgroundMaskService', 'FocusManagerService',

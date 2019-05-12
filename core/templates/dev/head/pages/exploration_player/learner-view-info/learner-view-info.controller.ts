@@ -17,7 +17,7 @@
  * footer.
  */
 
-oppia.controller('LearnerViewInfo', [
+angular.module('LearnerViewInfoModule').controller('LearnerViewInfo', [
   '$http', '$log', '$scope', '$uibModal', 'ContextService',
   'UrlInterpolationService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
   function($http, $log, $scope, $uibModal, ContextService,
@@ -49,7 +49,8 @@ oppia.controller('LearnerViewInfo', [
       $uibModal.open({
         animation: true,
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_player/information_card_modal_directive.html'),
+	'/pages/exploration_player/learner-view-info/' +
+	'information-card-modal.directive.html'),
         windowClass: 'oppia-modal-information-card',
         resolve: {
           expInfo: function() {
