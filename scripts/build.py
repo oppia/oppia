@@ -79,7 +79,7 @@ FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
 # not be served in production. (This includes protractor.js files in
 # /extensions.)
 JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
-JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js')
+JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
 
 # These files are present in both extensions and local_compiled_js/extensions.
@@ -515,7 +515,7 @@ def build_third_party_libs(third_party_directory_path):
             dependency_filepaths['fonts'], FONTS_DIR))
 
 
-def webpack_build():
+def build_using_webpack():
     """Execute webpack build process."""
 
     print 'Building webpack'
@@ -1255,7 +1255,7 @@ def build():
         raise Exception(
             'minify_third_party_libs_only should not be set in non-prod mode.')
     if options.prod_mode:
-        webpack_build()
+        build_using_webpack()
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         if not options.minify_third_party_libs_only:
             generate_build_directory()

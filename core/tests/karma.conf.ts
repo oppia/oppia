@@ -57,23 +57,23 @@ module.exports = function(config) {
       'backend_prod_files/extensions/**',
       // add these back after the templateCache is repaired
       'core/templates/dev/head/components/RatingDisplayDirectiveSpec.js',
-      'core/templates/dev/head/pages/exploration_editor/editor_tab/' +
-      'SolutionVerificationServiceSpec.ts',
-      'core/templates/dev/head/pages/exploration_editor/editor_tab/' +
-      'StateNameEditorDirectiveSpec.ts',
-      'core/templates/dev/head/pages/state_editor/' +
-      'StateContentEditorDirectiveSpec.ts',
-      'core/templates/dev/head/pages/state_editor/' +
-      'StateInteractionEditorDirectiveSpec.ts',
+      ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
+       'SolutionVerificationServiceSpec.ts'),
+      ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
+       'StateNameEditorDirectiveSpec.ts'),
+      ('core/templates/dev/head/pages/state_editor/' +
+       'StateContentEditorDirectiveSpec.ts'),
+      ('core/templates/dev/head/pages/state_editor/' +
+       'StateInteractionEditorDirectiveSpec.ts'),
       'core/templates/dev/head/services/StateRulesStatsServiceSpec.ts',
       'core/templates/dev/head/services/StateTopAnswersStatsServiceSpec.ts',
       'local_compiled_js/extensions/classifiers/SVMPredictionServiceSpec.js',
-      'local_compiled_js/extensions/interactions/CodeRepl/' +
-      'CodeReplPredictionServiceSpec.js',
-      'local_compiled_js/extensions/interactions/MusicNotesInput/' + 
-      'directives/MusicNotesInputSpec.js',
-      'local_compiled_js/extensions/interactions/TextInput/' +
-      'TextInputPredictionServiceSpec.js',
+      ('local_compiled_js/extensions/interactions/CodeRepl/' +
+       'CodeReplPredictionServiceSpec.js'),
+      ('local_compiled_js/extensions/interactions/MusicNotesInput/' + 
+       'directives/MusicNotesInputSpec.js'),
+      ('local_compiled_js/extensions/interactions/TextInput/' +
+       'TextInputPredictionServiceSpec.js'),
     ],
     proxies: {
       // Karma serves files under the /base directory.
