@@ -68,7 +68,7 @@ class BaseModelValidator(object):
                             str(model_class.__name__), model_id))
 
     @classmethod
-    def _fetch_external_models(cls, item):
+    def fetch_external_models(cls, item):
         """Fetch external models based on _get_external_id_relationships.
 
         This should be called before we call other _validate methods.
@@ -101,14 +101,14 @@ class BaseModelValidator(object):
 
     @classmethod
     def validate(cls, item):
-        """Run _fetch_external_models and all _validate functions.
+        """Run fetch_external_models and all _validate functions.
 
         Args:
             item: ndb.Model. Entity to validate.
         """
         cls.errors.clear()
         cls.external_models.clear()
-        cls._fetch_external_models(item)
+        cls.fetch_external_models(item)
 
         cls._validate_external_id_relationships(item)
         for func in cls._get_validation_functions():
@@ -135,28 +135,6 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
     @classmethod
     def _get_validation_functions(cls):
         return []
-
-    @classmethod
-    def cleanup(cls, item):
-        """Remove invalid ids in a UserSubscriptionsModel entity.
-        This method is only invoked in oneoff jobs to clean up models in prod.
-
-        Args:
-            item: UserSubscriptionsModel. Entity to clean up.
-        Returns:
-            bool. Whether item is mutated.
-        """
-        should_mutate = False
-        cls._fetch_external_models(item)
-        for field_name, (_, model_id_model_tuples) in (
-                cls.external_models.iteritems()):
-            for model_id, model in model_id_model_tuples:
-                if model is None or model.deleted:
-                    should_mutate = True
-                    getattr(item, field_name).remove(model_id)
-        if should_mutate:
-            item.put()
-        return should_mutate
 
 
 class ExplorationModelValidator(BaseModelValidator):

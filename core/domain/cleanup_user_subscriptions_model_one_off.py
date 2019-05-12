@@ -27,8 +27,12 @@ class CleanupUserSubscriptionsModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One off job that cleans up UserSubscriptionsModel."""
 
+
+
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Remove invalid ids in a UserSubscriptionsModel entity."""
+
         return [user_models.UserSubscriptionsModel]
 
     @staticmethod
@@ -36,7 +40,17 @@ class CleanupUserSubscriptionsModelOneOffJob(
         if not model_instance.deleted:
             user_subs_model = (
                 prod_validation_jobs_one_off.UserSubscriptionsModelValidator())
-            if user_subs_model.cleanup(model_instance):
+            user_subs_model.fetch_external_models(model_instance)
+
+            should_mutate = False
+            for field_name, (_, model_id_model_tuples) in (
+                    user_subs_model.external_models.iteritems()):
+                for model_id, model in model_id_model_tuples:
+                    if model is None or model.deleted:
+                        should_mutate = True
+                        getattr(model_instance, field_name).remove(model_id)
+            if should_mutate:
+                model_instance.put()
                 yield ('Successfully cleaned up UserSubscriptionModel', 1)
 
     @staticmethod
