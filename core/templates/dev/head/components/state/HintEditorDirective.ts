@@ -31,8 +31,8 @@ oppia.directive('hintEditor', [
         '/components/state/hint_editor_directive.html'),
       controllerAs: 'hintEditorCtrl',
       controller: [
-        'EditabilityService', 'StateHintsService',
-        function(EditabilityService, StateHintsService) {
+        '$scope', 'EditabilityService', 'StateHintsService',
+        function($scope, EditabilityService, StateHintsService) {
           var ctrl = this;
           ctrl.isEditable = EditabilityService.isEditable();
           ctrl.StateHintsService = StateHintsService;
@@ -74,7 +74,7 @@ oppia.directive('hintEditor', [
             ctrl.hintEditorIsOpen = false;
           };
 
-          ctrl.$on('externalSave', function() {
+          $scope.$on('externalSave', function() {
             if (ctrl.hintEditorIsOpen &&
                 ctrl.editHintForm.$valid) {
               ctrl.saveThisHint();

@@ -36,10 +36,10 @@ oppia.directive('outcomeEditor', [
         '/components/state/outcome_editor_directive.html'),
       controllerAs: 'outcomeEditorCtrl',
       controller: [
-        'StateEditorService', 'StateInteractionIdService',
+        '$scope', 'StateEditorService', 'StateInteractionIdService',
         'INTERACTION_SPECS',
         function(
-            StateEditorService, StateInteractionIdService,
+            $scope, StateEditorService, StateInteractionIdService,
             INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.editOutcomeForm = {};
@@ -98,11 +98,11 @@ oppia.directive('outcomeEditor', [
             }
           };
 
-          ctrl.$on('externalSave', function() {
+          $scope.$on('externalSave', function() {
             onExternalSave();
           });
 
-          ctrl.$on('onInteractionIdChanged', function() {
+          $scope.$on('onInteractionIdChanged', function() {
             onExternalSave();
           });
 
@@ -147,7 +147,7 @@ oppia.directive('outcomeEditor', [
           };
 
           ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
-            ctrl.$broadcast('saveOutcomeFeedbackDetails');
+            $scope.$broadcast('saveOutcomeFeedbackDetails');
             ctrl.feedbackEditorIsOpen = false;
             var contentHasChanged = (
               ctrl.savedOutcome.feedback.getHtml() !==
@@ -163,7 +163,7 @@ oppia.directive('outcomeEditor', [
           };
 
           ctrl.saveThisDestination = function() {
-            ctrl.$broadcast('saveOutcomeDestDetails');
+            $scope.$broadcast('saveOutcomeDestDetails');
             ctrl.destinationEditorIsOpen = false;
             ctrl.savedOutcome.dest = angular.copy(ctrl.outcome.dest);
             if (!ctrl.isSelfLoop(ctrl.outcome)) {

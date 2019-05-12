@@ -27,10 +27,10 @@ oppia.directive('ruleTypeSelector', [function() {
     template: '<select></select>',
     controllerAs: 'ruleTypeSelectorCtrl',
     controller: [
-      '$element', '$rootScope', '$filter',
+      '$element', '$scope', '$rootScope', '$filter',
       'StateInteractionIdService', 'INTERACTION_SPECS',
       function(
-          $element, $rootScope, $filter,
+          $element, $scope, $rootScope, $filter,
           StateInteractionIdService, INTERACTION_SPECS) {
         var ctrl = this;
         var choices = [];
@@ -86,7 +86,7 @@ oppia.directive('ruleTypeSelector', [function() {
           // This is needed to propagate the change and display input fields
           // for parameterizing the rule. Otherwise, the input fields do not
           // get updated when the rule type is changed.
-          ctrl.$apply();
+          $scope.$apply();
         });
       }
     ]

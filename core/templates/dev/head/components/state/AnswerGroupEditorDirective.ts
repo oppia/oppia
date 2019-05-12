@@ -41,12 +41,12 @@ oppia.directive('answerGroupEditor', [
         '/components/state/answer_group_editor_directive.html'),
       controllerAs: 'answerGroupEditorCtrl',
       controller: [
-        '$rootScope', '$uibModal', 'StateInteractionIdService',
+        '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
         'AlertsService', 'INTERACTION_SPECS', 'StateEditorService',
         'RuleObjectFactory', 'TrainingDataEditorPanelService',
         'ENABLE_ML_CLASSIFIERS', 'ResponsesService',
         function(
-            $rootScope, $uibModal, StateInteractionIdService,
+            $scope, $rootScope, $uibModal, StateInteractionIdService,
             AlertsService, INTERACTION_SPECS, StateEditorService,
             RuleObjectFactory, TrainingDataEditorPanelService,
             ENABLE_ML_CLASSIFIERS, ResponsesService) {
@@ -133,7 +133,7 @@ oppia.directive('answerGroupEditor', [
           // interaction's customization arguments.
           // TODO(sll): Remove the need for this watcher, or make it less
           // ad hoc.
-          ctrl.$on('updateAnswerChoices', function() {
+          $scope.$on('updateAnswerChoices', function() {
             ctrl.answerChoices = ctrl.getAnswerChoices();
           });
 
@@ -141,7 +141,7 @@ oppia.directive('answerGroupEditor', [
             return StateInteractionIdService.savedMemento;
           };
 
-          ctrl.$on('externalSave', function() {
+          $scope.$on('externalSave', function() {
             if (ctrl.isRuleEditorOpen()) {
               ctrl.saveRules();
             }
@@ -326,11 +326,11 @@ oppia.directive('answerGroupEditor', [
             return ENABLE_ML_CLASSIFIERS;
           };
 
-          ctrl.$on('onInteractionIdChanged', function() {
+          $scope.$on('onInteractionIdChanged', function() {
             if (ctrl.isRuleEditorOpen()) {
               ctrl.saveRules();
             }
-            ctrl.$broadcast('updateAnswerGroupInteractionId');
+            $scope.$broadcast('updateAnswerGroupInteractionId');
             ctrl.answerChoices = ctrl.getAnswerChoices();
           });
         }

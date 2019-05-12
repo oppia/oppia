@@ -36,11 +36,11 @@ oppia.directive('ruleEditor', [
         '/components/state/rule_editor_directive.html'),
       controllerAs: 'ruleEditorCtrl',
       controller: [
-        '$timeout', 'StateEditorService',
+        '$scope', '$timeout', 'StateEditorService',
         'ValidatorsService', 'INTERACTION_SPECS',
         'ResponsesService', 'StateInteractionIdService',
         function(
-            $timeout, StateEditorService,
+            $scope, $timeout, StateEditorService,
             ValidatorsService, INTERACTION_SPECS,
             ResponsesService, StateInteractionIdService) {
           var ctrl = this;
@@ -184,7 +184,7 @@ oppia.directive('ruleEditor', [
             return ruleDescription;
           };
 
-          ctrl.$on('updateAnswerGroupInteractionId', function(
+          $scope.$on('updateAnswerGroupInteractionId', function(
               evt, newInteractionId) {
             ctrl.currentInteractionId = newInteractionId;
           });

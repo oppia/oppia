@@ -30,8 +30,8 @@ oppia.directive('solutionExplanationEditor', [
         '/components/state/solution_explanation_editor_directive.html'),
       controllerAs: 'solutionExplanationEditorCtrl',
       controller: [
-        'EditabilityService', 'StateSolutionService',
-        function(EditabilityService, StateSolutionService) {
+        '$scope', 'EditabilityService', 'StateSolutionService',
+        function($scope, EditabilityService, StateSolutionService) {
           var ctrl = this;
           ctrl.isEditable = EditabilityService.isEditable();
           ctrl.editSolutionForm = {};
@@ -69,7 +69,7 @@ oppia.directive('solutionExplanationEditor', [
             ctrl.explanationEditorIsOpen = false;
           };
 
-          ctrl.$on('externalSave', function() {
+          $scope.$on('externalSave', function() {
             if (ctrl.explanationEditorIsOpen &&
               ctrl.editSolutionForm.$valid) {
               ctrl.saveThisExplanation();

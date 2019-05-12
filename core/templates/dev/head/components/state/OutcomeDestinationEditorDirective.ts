@@ -30,11 +30,11 @@ oppia.directive('outcomeDestinationEditor', [
         '/components/state/outcome_destination_editor_directive.html'),
       controllerAs: 'outcomeDestinationEditorCtrl',
       controller: [
-        'EditorFirstTimeEventsService', 'FocusManagerService',
+        '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
         'StateEditorService', 'StateGraphLayoutService', 'UserService',
         'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
-            EditorFirstTimeEventsService, FocusManagerService,
+            $scope, EditorFirstTimeEventsService, FocusManagerService,
             StateEditorService, StateGraphLayoutService, UserService,
             EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
@@ -44,7 +44,7 @@ oppia.directive('outcomeDestinationEditor', [
             constants.ENABLE_PREREQUISITE_SKILLS &&
             StateEditorService.isExplorationWhitelisted());
 
-          ctrl.$on('saveOutcomeDestDetails', function() {
+          $scope.$on('saveOutcomeDestDetails', function() {
             // Create new state if specified.
             if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
               EditorFirstTimeEventsService
@@ -86,7 +86,7 @@ oppia.directive('outcomeDestinationEditor', [
 
           ctrl.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
           ctrl.destChoices = [];
-          ctrl.$watch(StateEditorService.getStateNames, function() {
+          $scope.$watch(StateEditorService.getStateNames, function() {
             currentStateName = StateEditorService.getActiveStateName();
 
             var questionModeEnabled = StateEditorService.isInQuestionMode();
