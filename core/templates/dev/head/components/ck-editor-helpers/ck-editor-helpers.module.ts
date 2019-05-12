@@ -16,6 +16,4 @@
  * @fileoverview Module for the CkEditor helpers.
  */
 
-angular.module('ckEditorHelpersModule', ['ckEditorRteModule',
-  'ckEditorWidgetsModule'
-]);
+angular.module('ckEditorHelpersModule', ['ckEditorRteModule']);

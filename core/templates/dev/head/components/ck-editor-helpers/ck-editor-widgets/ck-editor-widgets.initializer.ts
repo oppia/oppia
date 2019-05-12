@@ -17,7 +17,7 @@
  * text components.
  */
 
-angular.module('ckEditorWidgetsModule').run([
+angular.module('oppia').run([
   '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
   'HtmlEscaperService',
   function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
