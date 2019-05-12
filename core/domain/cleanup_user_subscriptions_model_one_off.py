@@ -23,11 +23,11 @@ from core.platform import models
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class CleanupUserSubscriptionsModelOneOffJob(
+class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """One off job that cleans up UserSubscriptionsModel."""
-
-
+    """One off job that removes nonexisting activity ids from
+    UserSubscriptionsModel.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -43,12 +43,12 @@ class CleanupUserSubscriptionsModelOneOffJob(
             user_subs_model.fetch_external_models(model_instance)
 
             should_mutate = False
-            for field_name, (_, model_id_model_tuples) in (
-                    user_subs_model.external_models.iteritems()):
-                for model_id, model in model_id_model_tuples:
-                    if model is None or model.deleted:
-                        should_mutate = True
-                        getattr(model_instance, field_name).remove(model_id)
+            _, model_id_model_tuples = (
+                user_subs_model.external_models['activity_ids'])
+            for model_id, model in model_id_model_tuples:
+                if model is None or model.deleted:
+                    should_mutate = True
+                    model_instance.activity_ids.remove(model_id)
             if should_mutate:
                 model_instance.put()
                 yield ('Successfully cleaned up UserSubscriptionModel', 1)

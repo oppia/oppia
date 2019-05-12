@@ -54,7 +54,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.CopyToNewDirectoryJob,
     exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob,
     prod_validation_jobs_one_off.ProdValidationAuditOneOffJob,
-    cleanup_user_subscriptions_model_one_off.CleanupUserSubscriptionsModelOneOffJob, # pylint: disable=line-too-long
+    cleanup_user_subscriptions_model_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob, # pylint: disable=line-too-long
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
