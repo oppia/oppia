@@ -20,10 +20,7 @@ from core import jobs
 from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 
-(user_models, exp_models, collection_models) = (
-    models.Registry.import_models([
-        models.NAMES.user, models.NAMES.exploration,
-        models.NAMES.collection]))
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class CleanupUserSubscriptionsModelOneOffJob(
