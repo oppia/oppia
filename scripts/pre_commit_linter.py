@@ -973,6 +973,7 @@ class LintChecksManager(object):
         """This function validates JavaScript and Typescript files and
         returns the parsed contents as a Python dictionary.
         """
+
         # Select JS files which need to be checked.
         files_to_check = [
             filepath for filepath in self.all_filepaths if (
