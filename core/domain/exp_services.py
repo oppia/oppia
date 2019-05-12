@@ -59,7 +59,6 @@ gae_image_services = models.Registry.import_gae_image_services()
 
 # Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
-# Name for the task queue event type.
 
 # The maximum number of iterations allowed for populating the results of a
 # search query.
@@ -1040,6 +1039,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     delete_state_id_mapping_model_for_exploration(
         exploration_id, exploration_version)
 
+    # Remove from subscribers.
     taskqueue_services.defer(
         delete_exploration_from_subscribed_users,
         taskqueue_services.QUEUE_NAME_EVENTS,
