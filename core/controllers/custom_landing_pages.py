@@ -38,7 +38,8 @@ class TopicLandingPage(base.BaseHandler):
         """Handles GET requests."""
         if subject in feconf.AVAILABLE_LANDING_PAGES:
             if topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
-                self.render_template('pages/landing/topic_landing_page.html')
+                self.render_template(
+                    'pages/topic-landing-page/topic-landing-page.mainpage.html')
             else:
                 raise self.PageNotFoundException
         else:
@@ -54,4 +55,5 @@ class StewardsLandingPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.render_template(
-            'pages/landing/stewards/landing_page_stewards.html')
+            'pages/topic-landing-page/topic-landing-page-stewards/' +
+            'topic-landing-page-stewards.directive.html')

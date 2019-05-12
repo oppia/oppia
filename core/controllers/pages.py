@@ -167,7 +167,7 @@ class PrivacyPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/privacy/privacy.html')
+        self.render_template('pages/privacy-page/privacy-page.mainpage.html')
 
 
 class AboutRedirectPage(base.BaseHandler):
@@ -212,4 +212,5 @@ class MaintenancePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
-        self.render_template('pages/maintenance/maintenance.html')
+        self.render_template(
+            'pages/maintenance-page/maintenance-page.mainpage.html')

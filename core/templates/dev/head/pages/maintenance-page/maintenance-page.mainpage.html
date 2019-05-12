@@ -1,169 +1,126 @@
-{% macro warnings_and_loader() -%}
-  <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
-    <div class="oppia-toast-container toast-top-center">
-      <div ng-repeat="warning in (AlertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
-        <button type="button" class="toast-close-button" ng-click="AlertsService.deleteWarning(warning)" role="button">&times;</button>
-        <div class="toast-message">
-          <[warning.content]>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div ng-repeat="message in AlertsService.messages track by $index">
-        <alert-message message-object="message" message-index="$index"></alert-message>
-      </div>
-    </div>
-
-    <div ng-show="loadingMessage" class="oppia-loading-fullpage">
-      <div class="oppia-align-center">
-        <span translate="<[loadingMessage]>"></span>
-        <span class="oppia-loading-dot-one">.</span>
-        <span class="oppia-loading-dot-two">.</span>
-        <span class="oppia-loading-dot-three">.</span>
-      </div>
-    </div>
-    <div ng-show="!loadingMessage">
-      {% block content %}
-      {% endblock %}
-      {% block footer %}
-      {% endblock %}
-    </div>
-  </div>
-{%- endmacro %}
-
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Maintenance" itemscope itemtype="http://schema.org/Organization">
   <head>
-    {% block prerender %}
-    {% endblock prerender %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta name="referrer" content="no-referrer">
-    <meta name="description" content="Oppia is a free site for sharing knowledge via interactive lessons called explorations. Learn from user-created explorations, or teach and create your own.">
-
-    <!-- Tiles for Internet Explorer. -->
-    <meta name="application-name" content="<[siteName]>">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-square70x70logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-tiny.png')}}">
-    <meta name="msapplication-square150x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-square.png')}}">
-    <meta name="msapplication-wide310x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-wide.png')}}">
-    <meta name="msapplication-square310x310logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-large.png')}}">
-
-    <!-- The itemprops are for G+ sharing. -->
-    <meta itemprop="name" content="{{meta_name}}">
-    <meta itemprop="description" content="{{meta_description}}">
-    <!-- The og tags are for Facebook sharing. -->
-    <meta property="og:title" content="{{meta_name}}">
-    <meta property="og:site_name" content="Oppia">
-    <meta property="og:url" content="{{FULL_URL}}">
-    <meta property="og:description" content="{{meta_description}}">
-    <meta property="og:type" content="article">
-    <meta property="og:image" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/288x288_logo_mint.png')}}">
-
-    <link rel="apple-touch-icon" href="/assets/images/logo/favicon.png">
-
-    <title itemprop="name">
-      {% block maintitle %}
-        Oppia
-      {% endblock maintitle %}
-    </title>
-    {% block base_url %}
-    {% endblock base_url %}
-
-    {% block header_css %}
-      {% include 'pages/header_css_libs.html' %}
-    {% endblock header_css %}
+    <title itemprop="name" translate="Down for Maintenance - Oppia"></title>
+    {% include 'pages/header_css_libs.html' %}
 
     <script>
       var GLOBALS = {
-        ADDITIONAL_ANGULAR_MODULES: JSON.parse(
-          '{{additional_angular_modules|js_string}}'),
-        csrf_token: JSON.parse('{{csrf_token|js_string}}'),
-        status_code: JSON.parse('{{status_code}}'),
-        GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
-        isTopicManager: JSON.parse('{{is_topic_manager|js_string}}'),
-        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
+        ADDITIONAL_ANGULAR_MODULES: [],
+        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
       };
     </script>
-
-    {% block header_js %}
-      {% include 'pages/header_js_libs.html' %}
-    {% endblock header_js %}
-
-    {{BEFORE_END_HEAD_TAG_HOOK}}
+    {% include 'pages/header_js_libs.html' %}
   </head>
-
   <body>
-    <div ng-if="iframed">
-      {{ warnings_and_loader() }}
-    </div>
-    <div ng-if="!iframed">
-      <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
-      <promo-bar>
-      </promo-bar>
-      <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
-      </div>
-
-      <div class="oppia-base-container"
-           ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
-           ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
-        <div class="oppia-content-container">
-          <div id="wrapper">
-            <div class="oppia-main-body">
-              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="0" offset="0">
-                <div class="navbar-container">
-                  <top-navigation-bar></top-navigation-bar>
-                  <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
-                    {% block navbar_breadcrumb %}
-                    {% endblock navbar_breadcrumb %}
-
-                    {% block local_top_nav_options %}
-                    {% endblock local_top_nav_options %}
-                  </div>
+    <div class="oppia-base-container">
+      <div class="oppia-content-container">
+        <div id="wrapper">
+          <div class="oppia-main-body">
+            <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
+              <div class="navbar-container">
+                <div class="navbar-header protractor-test-navbar-header pull-left">
+                  <a class="oppia-navbar-brand-name oppia-transition-200" href="/">
+                    <img ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>"
+                         class="oppia-logo oppia-logo-wide" alt="Oppia Home">
+                  </a>
                 </div>
-              </nav>
-
-              <div class="oppia-top-of-page-padding">
+                <div ng-cloak class="navbar-header pull-right">
+                </div>
               </div>
+            </nav>
 
-              {{ warnings_and_loader() }}
+            <div class="oppia-top-of-page-padding"></div>
+            <div class="oppia-page-cards-container">
+              <md-card class="oppia-page-card oppia-long-text">
+                <h2>The Oppia site is temporarily unavailable.</h2>
+
+                <p>
+                  Oppia is currently being upgraded, and the site should be up
+                  and running again in a few hours. Thanks for your patience!
+                </p>
+              </md-card>
             </div>
-
-            <noscript>
-              <div class="oppia-page-cards-container">
-                <div class="md-default-theme oppia-page-card oppia-long-text">
-                  <!-- Note to developers: We replicate the translated text inline because, without JavaScript enabled, the translation engine doesn't kick in.-->
-                  <h2>
-                    <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE">We Need JavaScript in Your Browser</span>
-                    <i class="material-icons">&#xE811;</i>
-                  </h2>
-                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
-                     translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">
-                     Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com">click here.</a>
-                  </p>
-                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
-                </div>
-              </div>
-            </noscript>
-
-            <side-navigation-bar></side-navigation-bar>
           </div>
         </div>
       </div>
-
-      <div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>
-        Dev Mode
-      </div>
-
-      <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank"
-         rel="noopener" class="oppia-site-feedback oppia-transition-200">
-        <i class="material-icons md-18">&#xE87F;</i>
-        <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
-      </a>
     </div>
 
     {% include 'pages/footer_js_libs.html' %}
+
+    <!-- About-page -->
+    <script src="/templates/dev/head/pages/about-page/about-page.module.js"></script>
+    <script src="/templates/dev/head/pages/about-page/about-page.controller.js"></script>
+
+    <!-- Donate page -->
+    <script src="/templates/dev/head/pages/donate-page/donate-page.module.js"></script>
+    <script src="/templates/dev/head/pages/donate-page/donate-page.controller.js"></script>
+
+    <!-- Creator Dashboard -->
+    <script src="/templates/dev/head/pages/creator-dashboard-page/creator-dashboard-page.module.js"></script>
+    <script src="/templates/dev/head/pages/creator-dashboard-page/creator-dashboard-page.controller.js"></script>
+
+    <!-- Error page -->
+    <script src="/templates/dev/head/pages/error-page/error-page.module.js"></script>
+    <script src="/templates/dev/head/pages/error-page/error-page.controller.js"></script>
+
+    <!-- Collection player page -->
+    <script src="/templates/dev/head/pages/collection-player-page/collection-node-list/collection-node-list.module.js"></script>
+    <script src="/templates/dev/head/pages/collection-player-page/collection-node-list/collection-node-list.directive.js"></script>
+    <script src="/templates/dev/head/pages/collection-player-page/collection-local-nav/collection-local-nav.module.js"></script>
+    <script src="/templates/dev/head/pages/collection-player-page/collection-local-nav/collection-local-nav.controller.js"></script>
+    <script src="/templates/dev/head/pages/collection-player-page/collection-footer/collection-footer.module.js"></script>
+    <script src="/templates/dev/head/pages/collection-player-page/collection-footer/collection-footer.directive.js"></script>
+    <script src="/templates/dev/head/pages/collection-player-page/collection-player-page.module.js"></script>
+    <script src="/templates/dev/head/pages/collection-player-page/collection-player-page.controller.js"></script>
+
+    <!-- Email dashboard page -->
+    <script src="/templates/dev/head/pages/email-dashboard-page/email-dashboard-result/email-dashboard-result.module.js"></script>
+    <script src="/templates/dev/head/pages/email-dashboard-page/email-dashboard-result/email-dashboard-result.controller.js"></script>
+    <script src="/templates/dev/head/pages/email-dashboard-page/email-dashboard-page.module.js"></script>
+    <script src="/templates/dev/head/pages/email-dashboard-page/email-dashboard-page.controller.js"></script>
+
+    <!--Exploration editor page-->
+    <script src="/templates/dev/head/pages/exploration-editor-page/editor-navbar-breadcrumb/editor-navbar-breadcrumb.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/editor-navigation/editor-navigation.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/exploration-graph/exploration-graph.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/state-graph-visualization/state-graph-visualization.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/state-name-editor/state-name-editor.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/state-param-changes-editor/state-param-changes-editor.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/test-interaction-panel/test-interaction-panel.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/training-panel/training-panel.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/unresolved-answers-overview/unresolved-answers-overview.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/exploration-editor-tab.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-objective-editor/exploration-objective-editor.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/feedback-tab/thread-table/thread-table.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/feedback-tab/feedback-tab.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/history-tab/history-tab.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/improvements-tab/playthrough-improvement-card/playthrough-improvement-card.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/improvements-tab/improvements-tab.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/mark-all-audio-and-translations-as-needing-update/mark-all-audio-and-translations-as-needing-update.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/param-changes-editor/param-changes-editor.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/preview-tab/preview-tab.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/settings-tab/settings-tab.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/bar-chart/bar-chart.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/cyclic-transitions-issue/cyclic-transitions-issue.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/early-quit-issue/early-quit-issue.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/multiple-incorrect-issue/multiple-incorrect-issue.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/pie-chart/pie-chart.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/playthrough-issues/playthrough-issues.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/statistics-tab.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/audio-translation-bar/audio-translation-bar.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/state-translation/state-translation.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/state-translation-status-graph/state-translation-status-graph.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/translator-overview/translator-overview.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/translation-tab.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/value-generator-editor/value-generator-editor.module.js"></script>
+    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-page.module.js"></script>
+
     <!--Skill editor scripts-->
     <script src="/templates/dev/head/pages/skill-editor-page/skill-editor-main-tab/skill-concept-card-editor/worked-example-editor/worked-example-editor.module.js"></script>
     <script src="/templates/dev/head/pages/skill-editor-page/skill-editor-main-tab/skill-concept-card-editor/worked-example-editor/worked-example-editor.directive.js"></script>
@@ -186,7 +143,7 @@
     <script src="/templates/dev/head/pages/skill-editor-page/skill-editor-page.module.js"></script>
     <script src="/templates/dev/head/pages/skill-editor-page/skill-editor-page.controller.js"></script>
 
-    <!-- Splash page scripts -->
+    <!--Splash page scripts-->
     <script src="/templates/dev/head/pages/splash-page/splash-page.module.js"></script>
     <script src="/templates/dev/head/pages/splash-page/splash-page.controller.js"></script>
 
@@ -273,7 +230,7 @@
     <script src="/templates/dev/head/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module.js"></script>
     <script src="/templates/dev/head/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.controller.js"></script>
 
-    <!--Library page scripts-->
+    <!--Library Page scripts-->
     <script src="/templates/dev/head/pages/library-page/activity-tiles-infinity-grid/activity-tiles-infinity-grid.module.js"></script>
     <script src="/templates/dev/head/pages/library-page/activity-tiles-infinity-grid/activity-tiles-infinity-grid.directive.js"></script>
     <script src="/templates/dev/head/pages/library-page/library-footer/library-footer.module.js"></script>
@@ -429,84 +386,35 @@
     <script src="/templates/dev/head/components/version-diff-visualization/version-diff-visualization.module.js"></script>
     <script src="/templates/dev/head/components/version-diff-visualization/version-diff-visualization.directive.js"></script>
 
-    <!-- About-page -->
-    <script src="/templates/dev/head/pages/about-page/about-page.module.js"></script>
-    <script src="/templates/dev/head/pages/about-page/about-page.controller.js"></script>
+    <script src="/templates/dev/head/App.js"></script>
+    <script src="/templates/dev/head/I18nFooter.js"></script>
 
-    <!-- Donate page -->
-    <script src="/templates/dev/head/pages/donate-page/donate-page.module.js"></script>
-    <script src="/templates/dev/head/pages/donate-page/donate-page.controller.js"></script>
+    <script src="/templates/dev/head/filters/string-utility-filters/underscores-to-camel-case.filter.js"></script>
 
-    <!-- Creator dashboard page -->
-    <script src="/templates/dev/head/pages/creator-dashboard-page/creator-dashboard-page.module.js"></script>
-    <script src="/templates/dev/head/pages/creator-dashboard-page/creator-dashboard-page.controller.js"></script>
+    <script src="/templates/dev/head/services/AlertsService.js"></script>
+    <script src="/templates/dev/head/services/UtilsService.js"></script>
+    <script src="/templates/dev/head/services/ContextService.js"></script>
+    <script src="/templates/dev/head/services/IdGenerationService.js"></script>
+    <script src="/templates/dev/head/services/DebouncerService.js"></script>
+    <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
+    <script src="/templates/dev/head/services/RteHelperService.js"></script>
+    <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
+    <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-unicode-with-params-to-html.filter.js"></script>
+    <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-html-to-unicode.filter.js"></script>
+    <script src="/templates/dev/head/components/forms/forms-unicode-filters/convert-unicode-to-html.filter.js"></script>
+    <script src="/templates/dev/head/components/forms/forms-validators/is-at-least.filter.js"></script>
+    <script src="/templates/dev/head/components/forms/forms-validators/is-at-most.filter.js"></script>
+    <script src="/templates/dev/head/components/forms/forms-validators/is-float.filter.js"></script>
+    <script src="/templates/dev/head/components/forms/forms-validators/is-integer.filter.js"></script>
+    <script src="/templates/dev/head/components/forms/forms-validators/is-nonempty.filter.js"></script>
 
-    <!-- Error page -->
-    <script src="/templates/dev/head/pages/error-page/error-page.module.js"></script>
-    <script src="/templates/dev/head/pages/error-page/error-page.controller.js"></script>
-
-    <!-- Collection player page -->
-    <script src="/templates/dev/head/pages/collection-player-page/collection-node-list/collection-node-list.module.js"></script>
-    <script src="/templates/dev/head/pages/collection-player-page/collection-node-list/collection-node-list.directive.js"></script>
-    <script src="/templates/dev/head/pages/collection-player-page/collection-local-nav/collection-local-nav.module.js"></script>
-    <script src="/templates/dev/head/pages/collection-player-page/collection-local-nav/collection-local-nav.controller.js"></script>
-    <script src="/templates/dev/head/pages/collection-player-page/collection-footer/collection-footer.module.js"></script>
-    <script src="/templates/dev/head/pages/collection-player-page/collection-footer/collection-footer.directive.js"></script>
-    <script src="/templates/dev/head/pages/collection-player-page/collection-player-page.module.js"></script>
-    <script src="/templates/dev/head/pages/collection-player-page/collection-player-page.controller.js"></script>
-
-    <!-- Email dashboard page -->
-    <script src="/templates/dev/head/pages/email-dashboard-page/email-dashboard-result/email-dashboard-result.module.js"></script>
-    <script src="/templates/dev/head/pages/email-dashboard-page/email-dashboard-result/email-dashboard-result.controller.js"></script>
-    <script src="/templates/dev/head/pages/email-dashboard-page/email-dashboard-page.module.js"></script>
-    <script src="/templates/dev/head/pages/email-dashboard-page/email-dashboard-page.controller.js"></script>
-
-    <!--Exploration editor page-->
-    <script src="/templates/dev/head/pages/exploration-editor-page/editor-navbar-breadcrumb/editor-navbar-breadcrumb.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/editor-navigation/editor-navigation.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/exploration-graph/exploration-graph.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/state-graph-visualization/state-graph-visualization.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/state-name-editor/state-name-editor.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/state-param-changes-editor/state-param-changes-editor.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/test-interaction-panel/test-interaction-panel.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/training-panel/training-panel.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/unresolved-answers-overview/unresolved-answers-overview.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-tab/exploration-editor-tab.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-objective-editor/exploration-objective-editor.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/feedback-tab/thread-table/thread-table.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/feedback-tab/feedback-tab.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/history-tab/history-tab.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/improvements-tab/playthrough-improvement-card/playthrough-improvement-card.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/improvements-tab/improvements-tab.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/mark-all-audio-and-translations-as-needing-update/mark-all-audio-and-translations-as-needing-update.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/param-changes-editor/param-changes-editor.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/preview-tab/preview-tab.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/settings-tab/settings-tab.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/bar-chart/bar-chart.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/cyclic-transitions-issue/cyclic-transitions-issue.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/early-quit-issue/early-quit-issue.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/multiple-incorrect-issue/multiple-incorrect-issue.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/pie-chart/pie-chart.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/playthrough-issues/playthrough-issues.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/statistics-tab/statistics-tab.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/audio-translation-bar/audio-translation-bar.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/state-translation/state-translation.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/state-translation-status-graph/state-translation-status-graph.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/translator-overview/translator-overview.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/translation-tab/translation-tab.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/value-generator-editor/value-generator-editor.module.js"></script>
-    <script src="/templates/dev/head/pages/exploration-editor-page/exploration-editor-page.module.js"></script>
-
-    <!--Learner Dashboard page scripts-->
-    <script src="/templates/dev/head/pages/learner-dashboard-page/learner-dashboard-page.module.js"></script>
-    <script src="/templates/dev/head/pages/learner-dashboard-page/learner-dashboard-page.controller.js"></script>
-
-    <!--Maintenance Dashboard page scripts-->
+    <script src="/templates/dev/head/domain/utilities/UrlInterpolationService.js"></script>
     <script src="/templates/dev/head/pages/maintenance-page/maintenance-page.module.js"></script>
     <script src="/templates/dev/head/pages/maintenance-page/maintenance-page.controller.js"></script>
+
+   <!--Learner Dashboard page scripts-->
+    <script src="/templates/dev/head/pages/learner-dashboard-page/learner-dashboard-page.module.js"></script>
+    <script src="/templates/dev/head/pages/learner-dashboard-page/learner-dashboard-page.controller.js"></script>
 
     <!--Moderator Dashboard page scripts-->
     <script src="/templates/dev/head/pages/moderator-page/moderator-page.module.js"></script>
@@ -542,34 +450,9 @@
     <script src="/templates/dev/head/pages/topic-landing-page/topic-landing-page.module.js"></script>
     <script src="/templates/dev/head/pages/topic-landing-page/topic-landing-page.controller.js"></script>
 
-    <script src="/templates/dev/head/App.js"></script>
-    <script src="/templates/dev/head/I18nFooter.js"></script>
-
-    <script src="/templates/dev/head/directives/FocusOnDirective.js"></script>
-
-    <script src="/templates/dev/head/pages/Base.js"></script>
-
-    <script src="/templates/dev/head/services/AlertsService.js"></script>
-    <script src="/templates/dev/head/services/ContextService.js"></script>
-    <script src="/templates/dev/head/services/NavigationService.js"></script>
-    <script src="/templates/dev/head/services/UtilsService.js"></script>
-    <script src="/templates/dev/head/services/DebouncerService.js"></script>
-    <script src="/templates/dev/head/services/DateTimeFormatService.js"></script>
-    <script src="/templates/dev/head/services/TranslationFileHashLoaderService.js"></script>
-    <script src="/templates/dev/head/services/UserService.js"></script>
-    <script src="/templates/dev/head/services/PromoBarService.js"></script>
+    <!-- These three files need to be loaded here only because they are dependencies for $provide, and Angular will not load without them. -->
     <script src="/templates/dev/head/services/contextual/DeviceInfoService.js"></script>
-    <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
-    <script src="/templates/dev/head/services/contextual/WindowDimensionsService.js"></script>
-    <script src="/templates/dev/head/services/stateful/BackgroundMaskService.js"></script>
     <script src="/templates/dev/head/services/stateful/FocusManagerService.js"></script>
-    <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
-
-    <script src="/templates/dev/head/domain/sidebar/SidebarStatusService.js"></script>
-    <script src="/templates/dev/head/domain/user/UserInfoObjectFactory.js"></script>
-    <script src="/templates/dev/head/domain/utilities/UrlInterpolationService.js"></script>
-
-    {% block footer_js %}
-    {% endblock footer_js %}
+    <script src="/templates/dev/head/services/TranslationFileHashLoaderService.js"></script>
   </body>
 </html>

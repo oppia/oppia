@@ -41,10 +41,10 @@
 /core/domain/subscription_services*.py @nithusha21
 /core/templates/dev/head/domain/creator_dashboard/ @nithusha21
 /core/templates/dev/head/domain/learner_dashboard/ @nithusha21
+/core/templates/dev/head/pages/learner-dashboard-page/ @nithusha21
+/core/templates/dev/head/pages/notifications-dashboard-page/ @nithusha21
 /core/templates/dev/head/pages/creator-dashboard-page/ @nithusha21
 /core/templates/dev/head/pages/email-dashboard-page/ @nithusha21
-/core/templates/dev/head/pages/learner_dashboard/ @nithusha21
-/core/templates/dev/head/pages/notifications_dashboard/ @nithusha21
 
 
 # Dev workflow team.
@@ -145,8 +145,8 @@
 /core/domain/question*.py  @aks681
 /core/storage/question/ @aks681
 /core/templates/dev/head/domain/question/ @aks681
-/core/templates/dev/head/pages/question_editor/ @aks681
-/core/templates/dev/head/pages/questions_list/ @aks681
+/core/templates/dev/head/pages/question-editor-page/ @aks681
+/core/templates/dev/head/pages/questions-list-page/ @aks681
 
 # Skill project.
 /core/controllers/skill*.py @aks681
@@ -186,8 +186,13 @@
 # Miscellaneous.
 /core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @seanlip
+<<<<<<< HEAD
+/core/templates/dev/head/pages/about/ @seanlip
+/core/templates/dev/head/pages/privacy-page/ @seanlip
+=======
 /core/templates/dev/head/pages/about-page/ @seanlip
 /core/templates/dev/head/pages/privacy/ @seanlip
+>>>>>>> modularity-restructure
 /core/templates/dev/head/pages/terms/ @seanlip
 /core/templates/dev/head/pages/tests/ @seanlip
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
@@ -197,7 +202,7 @@
 /core/controllers/admin*.py @seanlip
 /core/domain/moderator_services*.py @seanlip
 /core/templates/dev/head/pages/admin/ @seanlip
-/core/templates/dev/head/pages/moderator/ @seanlip
+/core/templates/dev/head/pages/moderator-page/ @seanlip
 
 
 # QA team.
@@ -233,9 +238,9 @@
 /core/templates/dev/head/pages/donate-page/ @vojtechjelinek
 /core/templates/dev/head/pages/error-page/ @vojtechjelinek
 /core/templates/dev/head/pages/get_started/ @vojtechjelinek
-/core/templates/dev/head/pages/landing/ @vojtechjelinek
-/core/templates/dev/head/pages/maintenance/ @vojtechjelinek
-/core/templates/dev/head/pages/preferences/ @vojtechjelinek
+/core/templates/dev/head/pages/topic-landing-page/ @vojtechjelinek
+/core/templates/dev/head/pages/maintenance-page/ @vojtechjelinek
+/core/templates/dev/head/pages/preferences-page/ @vojtechjelinek
 /core/templates/dev/head/pages/signup/ @vojtechjelinek
 /core/templates/dev/head/pages/splash-page/ @vojtechjelinek
 /core/templates/dev/head/pages/teach-page/ @vojtechjelinek
@@ -256,7 +261,7 @@
 
 # User’s profile page.
 /core/templates/dev/head/domain/user/ @kevinlee12
-/core/templates/dev/head/pages/profile/ @kevinlee12
+/core/templates/dev/head/pages/profile-page/ @kevinlee12
 
 
 # Critical files.
