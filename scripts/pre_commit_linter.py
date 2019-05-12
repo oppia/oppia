@@ -973,7 +973,6 @@ class LintChecksManager(object):
         """This function validates JavaScript and Typescript files and
         returns the parsed contents as a Python dictionary.
         """
-        compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
         # Select JS files which need to be checked.
         files_to_check = [
             filepath for filepath in self.all_filepaths if (
@@ -983,6 +982,7 @@ class LintChecksManager(object):
         parsed_js_and_ts_files = dict()
         if not files_to_check:
             return parsed_js_and_ts_files
+        compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
         if not self.verbose_mode_enabled:
             print 'Validating and parsing JS and TS files ...'
         for filepath in files_to_check:
