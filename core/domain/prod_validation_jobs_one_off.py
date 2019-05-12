@@ -136,6 +136,28 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
     def _get_validation_functions(cls):
         return []
 
+    @classmethod
+    def cleanup(cls, item):
+        """Remove invalid ids in a UserSubscriptionsModel entity.
+        This method is only invoked in oneoff jobs to clean up models in prod.
+
+        Args:
+            item: UserSubscriptionsModel. Entity to clean up.
+        Returns:
+            bool. Whether item is mutated.
+        """
+        should_mutate = False
+        cls._fetch_external_models(item)
+        for field_name, (_, model_id_model_tuples) in (
+                cls.external_models.iteritems()):
+            for model_id, model in model_id_model_tuples:
+                if model is None or model.deleted:
+                    should_mutate = True
+                    getattr(item, field_name).remove(model_id)
+        if should_mutate:
+            item.put()
+        return should_mutate
+
 
 class ExplorationModelValidator(BaseModelValidator):
     """Class for validating ExplorationModel."""
