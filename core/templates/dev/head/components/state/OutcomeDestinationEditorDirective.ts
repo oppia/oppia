@@ -20,77 +20,80 @@ oppia.directive('outcomeDestinationEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         outcomeHasFeedback: '=',
         outcome: '=',
         addState: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/outcome_destination_editor_directive.html'),
+      controllerAs: 'outcomeDestinationEditorCtrl',
       controller: [
-        '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
+        'EditorFirstTimeEventsService', 'FocusManagerService',
         'StateEditorService', 'StateGraphLayoutService', 'UserService',
         'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
-            $scope, EditorFirstTimeEventsService, FocusManagerService,
+            EditorFirstTimeEventsService, FocusManagerService,
             StateEditorService, StateGraphLayoutService, UserService,
             EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
+          var ctrl = this;
           var currentStateName = null;
-          $scope.canAddPrerequisiteSkill = (
+          ctrl.canAddPrerequisiteSkill = (
             constants.ENABLE_NEW_STRUCTURE_EDITORS &&
             constants.ENABLE_PREREQUISITE_SKILLS &&
             StateEditorService.isExplorationWhitelisted());
 
-          $scope.$on('saveOutcomeDestDetails', function() {
+          ctrl.$on('saveOutcomeDestDetails', function() {
             // Create new state if specified.
-            if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
+            if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
               EditorFirstTimeEventsService
                 .registerFirstCreateSecondStateEvent();
 
-              var newStateName = $scope.outcome.newStateName;
-              $scope.outcome.dest = newStateName;
-              delete $scope.outcome.newStateName;
+              var newStateName = ctrl.outcome.newStateName;
+              ctrl.outcome.dest = newStateName;
+              delete ctrl.outcome.newStateName;
 
-              $scope.addState(newStateName);
+              ctrl.addState(newStateName);
             }
           });
 
-          $scope.canEditRefresherExplorationId = null;
+          ctrl.canEditRefresherExplorationId = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
             // We restrict editing of refresher exploration IDs to
             // admins/moderators for now, since the feature is still in
             // development.
-            $scope.canEditRefresherExplorationId = (
+            ctrl.canEditRefresherExplorationId = (
               userInfo.isAdmin() || userInfo.isModerator());
           });
 
-          $scope.explorationAndSkillIdPattern =
+          ctrl.explorationAndSkillIdPattern =
             EXPLORATION_AND_SKILL_ID_PATTERN;
 
-          $scope.isSelfLoop = function() {
-            return $scope.outcome.dest === currentStateName;
+          ctrl.isSelfLoop = function() {
+            return ctrl.outcome.dest === currentStateName;
           };
 
-          $scope.onDestSelectorChange = function() {
-            if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
+          ctrl.onDestSelectorChange = function() {
+            if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
               FocusManagerService.setFocus('newStateNameInputField');
             }
           };
 
-          $scope.isCreatingNewState = function(outcome) {
+          ctrl.isCreatingNewState = function(outcome) {
             return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
           };
 
-          $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
-          $scope.destChoices = [];
-          $scope.$watch(StateEditorService.getStateNames, function() {
+          ctrl.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
+          ctrl.destChoices = [];
+          ctrl.$watch(StateEditorService.getStateNames, function() {
             currentStateName = StateEditorService.getActiveStateName();
 
             var questionModeEnabled = StateEditorService.isInQuestionMode();
             // This is a list of objects, each with an ID and name. These
             // represent all states, as well as an option to create a
             // new state.
-            $scope.destChoices = [{
+            ctrl.destChoices = [{
               id: (questionModeEnabled ? null : currentStateName),
               text: '(try again)'
             }];
@@ -142,7 +145,7 @@ oppia.directive('outcomeDestinationEditor', [
 
             for (var i = 0; i < stateNames.length; i++) {
               if (stateNames[i] !== currentStateName) {
-                $scope.destChoices.push({
+                ctrl.destChoices.push({
                   id: stateNames[i],
                   text: stateNames[i]
                 });
@@ -150,7 +153,7 @@ oppia.directive('outcomeDestinationEditor', [
             }
 
             if (!questionModeEnabled) {
-              $scope.destChoices.push({
+              ctrl.destChoices.push({
                 id: PLACEHOLDER_OUTCOME_DEST,
                 text: 'A New Card Called...'
               });

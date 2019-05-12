@@ -21,11 +21,14 @@ oppia.directive('socialButtons', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: true,
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/social_buttons/' +
         'social_buttons_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+      controllerAs: 'socialButtonsCtrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
       }]
     };
   }]);

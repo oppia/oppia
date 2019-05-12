@@ -1,13 +1,13 @@
-<a ng-href="<[getStoryLink()]>">
+<a ng-href="<[storySummaryTileCtrl.getStoryLink()]>">
   <div class="oppia-story-image">
-    <img ng-src="<[getStaticImageUrl('/icons/story-image-icon.png')]>" alt="">
+    <img ng-src="<[storySummaryTileCtrl.getStaticImageUrl('/icons/story-image-icon.png')]>" alt="">
   </div>
   <div class="oppia-story-details">
     <div class="oppia-story-title">
-      <[::getStoryTitle()]>
+      <[::storySummaryTileCtrl.getStoryTitle()]>
     </div>
     <div class="oppia-story-description">
-      <[::getStoryDescription()]>
+      <[::storySummaryTileCtrl.getStoryDescription()]>
     </div>
   </div>
 </a>

@@ -24,7 +24,7 @@ oppia.directive('createActivityButton', [
       bindToController: true,
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/create_button/create_activity_button_directive.html'),
-      controllerAs: 'ctrl1',
+      controllerAs: 'createActivityButtonCtrl',
       controller: [
         '$timeout', '$window', '$uibModal',
         'ExplorationCreationService', 'CollectionCreationService',

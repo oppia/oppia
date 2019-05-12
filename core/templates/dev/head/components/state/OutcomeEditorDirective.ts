@@ -20,7 +20,8 @@ oppia.directive('outcomeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         isEditable: '&isEditable',
         displayFeedback: '=',
         getOnSaveDestFn: '&onSaveDest',
@@ -33,36 +34,38 @@ oppia.directive('outcomeEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/outcome_editor_directive.html'),
+      controllerAs: 'outcomeEditorCtrl',
       controller: [
-        '$scope', 'StateEditorService', 'StateInteractionIdService',
+        'StateEditorService', 'StateInteractionIdService',
         'INTERACTION_SPECS',
         function(
-            $scope, StateEditorService, StateInteractionIdService,
+            StateEditorService, StateInteractionIdService,
             INTERACTION_SPECS) {
-          $scope.editOutcomeForm = {};
-          $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
-          $scope.canAddPrerequisiteSkill =
+          var ctrl = this;
+          ctrl.editOutcomeForm = {};
+          ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
+          ctrl.canAddPrerequisiteSkill =
             constants.ENABLE_NEW_STRUCTURE_EDITORS &&
               constants.ENABLE_PREREQUISITE_SKILLS &&
                 StateEditorService.isExplorationWhitelisted();
-          $scope.feedbackEditorIsOpen = false;
-          $scope.destinationEditorIsOpen = false;
-          $scope.correctnessLabelEditorIsOpen = false;
+          ctrl.feedbackEditorIsOpen = false;
+          ctrl.destinationEditorIsOpen = false;
+          ctrl.correctnessLabelEditorIsOpen = false;
           // TODO(sll): Investigate whether this line can be removed, due to
-          // $scope.savedOutcome now being set in onExternalSave().
-          $scope.savedOutcome = angular.copy($scope.outcome);
+          // ctrl.savedOutcome now being set in onExternalSave().
+          ctrl.savedOutcome = angular.copy(ctrl.outcome);
 
-          $scope.getCurrentInteractionId = function() {
+          ctrl.getCurrentInteractionId = function() {
             return StateInteractionIdService.savedMemento;
           };
 
-          $scope.isCorrectnessFeedbackEnabled = function() {
+          ctrl.isCorrectnessFeedbackEnabled = function() {
             return StateEditorService.getCorrectnessFeedbackEnabled();
           };
 
           // This returns false if the current interaction ID is null.
-          $scope.isCurrentInteractionLinear = function() {
-            var interactionId = $scope.getCurrentInteractionId();
+          ctrl.isCurrentInteractionLinear = function() {
+            var interactionId = ctrl.getCurrentInteractionId();
             return interactionId && INTERACTION_SPECS[interactionId].is_linear;
           };
 
@@ -70,130 +73,130 @@ oppia.directive('outcomeEditor', [
             // The reason for this guard is because, when the editor page for an
             // exploration is first opened, the 'initializeAnswerGroups' event
             // (which fires an 'externalSave' event) only fires after the
-            // $scope.savedOutcome is set above. Until then, $scope.savedOutcome
+            // ctrl.savedOutcome is set above. Until then, ctrl.savedOutcome
             // is undefined.
-            if ($scope.savedOutcome === undefined) {
-              $scope.savedOutcome = angular.copy($scope.outcome);
+            if (ctrl.savedOutcome === undefined) {
+              ctrl.savedOutcome = angular.copy(ctrl.outcome);
             }
 
-            if ($scope.feedbackEditorIsOpen) {
-              if ($scope.editOutcomeForm.editFeedbackForm.$valid &&
-                  !$scope.invalidStateAfterFeedbackSave()) {
-                $scope.saveThisFeedback(false);
+            if (ctrl.feedbackEditorIsOpen) {
+              if (ctrl.editOutcomeForm.editFeedbackForm.$valid &&
+                  !ctrl.invalidStateAfterFeedbackSave()) {
+                ctrl.saveThisFeedback(false);
               } else {
-                $scope.cancelThisFeedbackEdit();
+                ctrl.cancelThisFeedbackEdit();
               }
             }
 
-            if ($scope.destinationEditorIsOpen) {
-              if ($scope.editOutcomeForm.editDestForm.$valid &&
-                  !$scope.invalidStateAfterDestinationSave()) {
-                $scope.saveThisDestination();
+            if (ctrl.destinationEditorIsOpen) {
+              if (ctrl.editOutcomeForm.editDestForm.$valid &&
+                  !ctrl.invalidStateAfterDestinationSave()) {
+                ctrl.saveThisDestination();
               } else {
-                $scope.cancelThisDestinationEdit();
+                ctrl.cancelThisDestinationEdit();
               }
             }
           };
 
-          $scope.$on('externalSave', function() {
+          ctrl.$on('externalSave', function() {
             onExternalSave();
           });
 
-          $scope.$on('onInteractionIdChanged', function() {
+          ctrl.$on('onInteractionIdChanged', function() {
             onExternalSave();
           });
 
-          $scope.isSelfLoop = function(outcome) {
+          ctrl.isSelfLoop = function(outcome) {
             return (
               outcome &&
               outcome.dest === StateEditorService.getActiveStateName());
           };
 
-          $scope.getCurrentInteractionId = function() {
+          ctrl.getCurrentInteractionId = function() {
             return StateInteractionIdService.savedMemento;
           };
 
-          $scope.isSelfLoopWithNoFeedback = function(outcome) {
+          ctrl.isSelfLoopWithNoFeedback = function(outcome) {
             if (!outcome) {
               return false;
             }
-            return $scope.isSelfLoop(outcome) &&
+            return ctrl.isSelfLoop(outcome) &&
               !outcome.hasNonemptyFeedback();
           };
 
-          $scope.invalidStateAfterFeedbackSave = function() {
-            var tmpOutcome = angular.copy($scope.savedOutcome);
-            tmpOutcome.feedback = angular.copy($scope.outcome.feedback);
-            return $scope.isSelfLoopWithNoFeedback(tmpOutcome);
+          ctrl.invalidStateAfterFeedbackSave = function() {
+            var tmpOutcome = angular.copy(ctrl.savedOutcome);
+            tmpOutcome.feedback = angular.copy(ctrl.outcome.feedback);
+            return ctrl.isSelfLoopWithNoFeedback(tmpOutcome);
           };
-          $scope.invalidStateAfterDestinationSave = function() {
-            var tmpOutcome = angular.copy($scope.savedOutcome);
-            tmpOutcome.dest = angular.copy($scope.outcome.dest);
-            return $scope.isSelfLoopWithNoFeedback(tmpOutcome);
+          ctrl.invalidStateAfterDestinationSave = function() {
+            var tmpOutcome = angular.copy(ctrl.savedOutcome);
+            tmpOutcome.dest = angular.copy(ctrl.outcome.dest);
+            return ctrl.isSelfLoopWithNoFeedback(tmpOutcome);
           };
-          $scope.openFeedbackEditor = function() {
-            if ($scope.isEditable()) {
-              $scope.feedbackEditorIsOpen = true;
+          ctrl.openFeedbackEditor = function() {
+            if (ctrl.isEditable()) {
+              ctrl.feedbackEditorIsOpen = true;
             }
           };
 
-          $scope.openDestinationEditor = function() {
-            if ($scope.isEditable()) {
-              $scope.destinationEditorIsOpen = true;
+          ctrl.openDestinationEditor = function() {
+            if (ctrl.isEditable()) {
+              ctrl.destinationEditorIsOpen = true;
             }
           };
 
-          $scope.saveThisFeedback = function(fromClickSaveFeedbackButton) {
-            $scope.$broadcast('saveOutcomeFeedbackDetails');
-            $scope.feedbackEditorIsOpen = false;
+          ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
+            ctrl.$broadcast('saveOutcomeFeedbackDetails');
+            ctrl.feedbackEditorIsOpen = false;
             var contentHasChanged = (
-              $scope.savedOutcome.feedback.getHtml() !==
-              $scope.outcome.feedback.getHtml());
-            $scope.savedOutcome.feedback = angular.copy(
-              $scope.outcome.feedback);
-            var feedbackContentId = $scope.savedOutcome.feedback.getContentId();
+              ctrl.savedOutcome.feedback.getHtml() !==
+              ctrl.outcome.feedback.getHtml());
+            ctrl.savedOutcome.feedback = angular.copy(
+              ctrl.outcome.feedback);
+            var feedbackContentId = ctrl.savedOutcome.feedback.getContentId();
             if (fromClickSaveFeedbackButton && contentHasChanged) {
-              var contentId = $scope.savedOutcome.feedback.getContentId();
-              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
+              var contentId = ctrl.savedOutcome.feedback.getContentId();
+              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
             }
-            $scope.getOnSaveFeedbackFn()($scope.savedOutcome);
+            ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);
           };
 
-          $scope.saveThisDestination = function() {
-            $scope.$broadcast('saveOutcomeDestDetails');
-            $scope.destinationEditorIsOpen = false;
-            $scope.savedOutcome.dest = angular.copy($scope.outcome.dest);
-            if (!$scope.isSelfLoop($scope.outcome)) {
-              $scope.outcome.refresherExplorationId = null;
+          ctrl.saveThisDestination = function() {
+            ctrl.$broadcast('saveOutcomeDestDetails');
+            ctrl.destinationEditorIsOpen = false;
+            ctrl.savedOutcome.dest = angular.copy(ctrl.outcome.dest);
+            if (!ctrl.isSelfLoop(ctrl.outcome)) {
+              ctrl.outcome.refresherExplorationId = null;
             }
-            $scope.savedOutcome.refresherExplorationId = (
-              $scope.outcome.refresherExplorationId);
-            $scope.savedOutcome.missingPrerequisiteSkillId =
-              $scope.outcome.missingPrerequisiteSkillId;
+            ctrl.savedOutcome.refresherExplorationId = (
+              ctrl.outcome.refresherExplorationId);
+            ctrl.savedOutcome.missingPrerequisiteSkillId =
+              ctrl.outcome.missingPrerequisiteSkillId;
 
-            $scope.getOnSaveDestFn()($scope.savedOutcome);
+            ctrl.getOnSaveDestFn()(ctrl.savedOutcome);
           };
 
-          $scope.onChangeCorrectnessLabel = function() {
-            $scope.savedOutcome.labelledAsCorrect = (
-              $scope.outcome.labelledAsCorrect);
+          ctrl.onChangeCorrectnessLabel = function() {
+            ctrl.savedOutcome.labelledAsCorrect = (
+              ctrl.outcome.labelledAsCorrect);
 
-            $scope.getOnSaveCorrectnessLabelFn()($scope.savedOutcome);
+            ctrl.getOnSaveCorrectnessLabelFn()(ctrl.savedOutcome);
           };
 
-          $scope.cancelThisFeedbackEdit = function() {
-            $scope.outcome.feedback = angular.copy(
-              $scope.savedOutcome.feedback);
-            $scope.feedbackEditorIsOpen = false;
+          ctrl.cancelThisFeedbackEdit = function() {
+            ctrl.outcome.feedback = angular.copy(
+              ctrl.savedOutcome.feedback);
+            ctrl.feedbackEditorIsOpen = false;
           };
 
-          $scope.cancelThisDestinationEdit = function() {
-            $scope.outcome.dest = angular.copy($scope.savedOutcome.dest);
-            $scope.outcome.refresherExplorationId = (
-              $scope.savedOutcome.refresherExplorationId);
-            $scope.outcome.missingPrerequisiteSkillId =
-              $scope.savedOutcome.missingPrerequisiteSkillId;
-            $scope.destinationEditorIsOpen = false;
+          ctrl.cancelThisDestinationEdit = function() {
+            ctrl.outcome.dest = angular.copy(ctrl.savedOutcome.dest);
+            ctrl.outcome.refresherExplorationId = (
+              ctrl.savedOutcome.refresherExplorationId);
+            ctrl.outcome.missingPrerequisiteSkillId =
+              ctrl.savedOutcome.missingPrerequisiteSkillId;
+            ctrl.destinationEditorIsOpen = false;
           };
         }
       ]
