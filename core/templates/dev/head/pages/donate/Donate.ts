@@ -16,32 +16,47 @@
  * @fileoverview Controllers for the donate page.
  */
 
-oppia.controller('Donate', [
-  '$http', '$scope', '$timeout', '$window', 'SiteAnalyticsService',
-  'UrlInterpolationService', 'WindowDimensionsService',
-  function(
-      $http, $scope, $timeout, $window, SiteAnalyticsService,
-      UrlInterpolationService, WindowDimensionsService) {
-    $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-    $scope.donateImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/general/opp_donate_text.svg');
+oppia.directive('donate', ['UrlInterpolationService', function(
+  UrlInterpolationService){
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: true,
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/donate/donate-page.directive.html'),
+      controllerAs: 'donateCtrl',
+      controller: [
+        '$http','$timeout', '$window', 'SiteAnalyticsService',
+        'UrlInterpolationService', 'WindowDimensionsService',
+        function(
+            $http, $timeout, $window, SiteAnalyticsService,
+            UrlInterpolationService, WindowDimensionsService) {
 
-    $scope.onDonateThroughAmazon = function() {
-      SiteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
-      $timeout(function() {
-        $window.location = 'https://smile.amazon.com/ch/81-1740068';
-      }, 150);
-      return false;
-    };
+          var ctrl = this;
+          ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+          ctrl.donateImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/opp_donate_text.svg');
 
-    $scope.onDonateThroughPayPal = function() {
-      // Redirection to PayPal will be initiated at the same time as this
-      // function is run, but should be slow enough to allow this function time
-      // to complete. It is not possible to do $http.post() in javascript after
-      // a delay because cross-site POSTing is not permitted in scripts; see
-      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
-      // for more information.
-      SiteAnalyticsService.registerGoToDonationSiteEvent('PayPal');
+          ctrl.onDonateThroughAmazon = function() {
+            SiteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
+            $timeout(function() {
+              $window.location = 'https://smile.amazon.com/ch/81-1740068';
+            }, 150);
+            return false;
+          };
+
+          ctrl.onDonateThroughPayPal = function() {
+            // Redirection to PayPal will be initiated at the same time as this
+            // function is run, but should be slow enough to allow this function
+            // time to complete. It is not possible to do $http.post() in
+            // javascript after a delay because cross-site POSTing is not
+            // permitted in scripts; see
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+            // for more information.
+            SiteAnalyticsService.registerGoToDonationSiteEvent('PayPal');
+          };
+        }
+      ]
     };
   }
 ]);
