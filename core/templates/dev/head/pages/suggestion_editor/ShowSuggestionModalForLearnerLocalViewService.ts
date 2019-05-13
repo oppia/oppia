@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/suggestion_editor/ShowSuggestionModalForLearnerLocalViewService.ts');
+  'pages/suggestion_editor/ShowSuggestionModalForLearnerLocalView.ts');
 require('services/AlertsService.ts');
 
 oppia.factory('ShowSuggestionModalForLearnerLocalViewService', [
