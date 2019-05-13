@@ -80,6 +80,7 @@ require('components/state/RuleTypeSelectorDirective.ts');
 require('components/state/SolutionEditorDirective.ts');
 require('components/state/SolutionExplanationEditorDirective.ts');
 require('components/forms/HtmlSelectDirective.ts');
+require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require('components/share/SharingLinksDirective.ts');

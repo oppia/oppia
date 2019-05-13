@@ -63,6 +63,7 @@ require('components/state/RuleEditorDirective.ts');
 require('components/state/RuleTypeSelectorDirective.ts');
 require('components/state/SolutionEditorDirective.ts');
 require('components/state/SolutionExplanationEditorDirective.ts');
+require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require('pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.ts');

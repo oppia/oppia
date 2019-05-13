@@ -90,6 +90,7 @@ require(
 );
 require('pages/exploration_editor/statistics_tab/BarChartDirective.ts');
 require('pages/suggestion_editor/ShowSuggestionModalForEditorView.ts');
+require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require('components/VersionDiffVisualizationDirective.ts');

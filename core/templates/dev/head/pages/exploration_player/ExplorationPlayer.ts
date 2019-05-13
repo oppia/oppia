@@ -51,6 +51,7 @@ require(
   'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
+require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require('components/attribution_guide/AttributionGuideDirective.ts');
