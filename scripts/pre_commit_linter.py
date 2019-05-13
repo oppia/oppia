@@ -999,6 +999,7 @@ class LintChecksManager(object):
                 # Compile typescript file which has syntax not valid for JS
                 # file.
                 if filepath.endswith('.js'):
+                    shutil.rmtree(compiled_js_dir)
                     raise Exception(e)
                 compiled_js_filepath = self._compile_ts_file(
                     filepath, compiled_js_dir)
@@ -1029,8 +1030,7 @@ class LintChecksManager(object):
                 skip_lib_check, target, type_roots, filepath)
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         compiled_js_filepath = os.path.join(
-            compiled_js_dir, os.path.basename(filepath).replace(
-                '.ts', '.js'))
+            compiled_js_dir, os.path.basename(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
 
     def _lint_all_files(self):
