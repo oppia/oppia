@@ -68,7 +68,7 @@ class BaseModelValidator(object):
                             str(model_class.__name__), model_id))
 
     @classmethod
-    def fetch_external_models(cls, item):
+    def _fetch_external_models(cls, item):
         """Fetch external models based on _get_external_id_relationships.
 
         This should be called before we call other _validate methods.
@@ -101,14 +101,14 @@ class BaseModelValidator(object):
 
     @classmethod
     def validate(cls, item):
-        """Run fetch_external_models and all _validate functions.
+        """Run _fetch_external_models and all _validate functions.
 
         Args:
             item: ndb.Model. Entity to validate.
         """
         cls.errors.clear()
         cls.external_models.clear()
-        cls.fetch_external_models(item)
+        cls._fetch_external_models(item)
 
         cls._validate_external_id_relationships(item)
         for func in cls._get_validation_functions():

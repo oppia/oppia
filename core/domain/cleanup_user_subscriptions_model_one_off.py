@@ -17,10 +17,10 @@
 """One-off job for cleaning up UserSubscriptionsModel models in prod."""
 
 from core import jobs
-from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
@@ -38,17 +38,17 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
     @staticmethod
     def map(model_instance):
         if not model_instance.deleted:
-            user_subs_model = (
-                prod_validation_jobs_one_off.UserSubscriptionsModelValidator())
-            user_subs_model.fetch_external_models(model_instance)
+            fetched_exploration_model_instances = (
+                datastore_services.fetch_multiple_entities_by_ids_and_models(
+                    [('ExplorationModel', model_instance.activity_ids)]))[0]
 
             should_mutate = False
-            _, model_id_model_tuples = (
-                user_subs_model.external_models['activity_ids'])
-            for model_id, model in model_id_model_tuples:
-                if model is None or model.deleted:
+            for exp_id, exp_instance in zip(
+                    model_instance.activity_ids,
+                    fetched_exploration_model_instances):
+                if exp_instance is None or exp_instance.deleted:
                     should_mutate = True
-                    model_instance.activity_ids.remove(model_id)
+                    model_instance.activity_ids.remove(exp_id)
             if should_mutate:
                 model_instance.put()
                 yield ('Successfully cleaned up UserSubscriptionModel', 1)
