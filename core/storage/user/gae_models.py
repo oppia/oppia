@@ -112,9 +112,9 @@ class UserSettingsModel(base_models.BaseModel):
             'normalized_username': user.normalized_username,
             'last_agreed_to_terms': user.last_agreed_to_terms,
             'last_started_state_editor_tutorial': (
-            user.last_started_state_editor_tutorial),
+                user.last_started_state_editor_tutorial),
             'last_started_state_translation_tutorial': (
-            user.last_started_state_translation_tutorial),
+                user.last_started_state_translation_tutorial),
             'last_logged_in': user.last_logged_in,
             'last_edited_an_exploration': user.last_edited_an_exploration,
             'profile_picture_data_url': user.profile_picture_data_url,
