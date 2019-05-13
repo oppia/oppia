@@ -1,6 +1,6 @@
-<a ng-if="isUsernameLinkable(username())" ng-href="/profile/<[username()]>">
-  <[username()]>
+<a ng-if="profileLinkTextCtrl.isUsernameLinkable(profileLinkTextCtrl.username())" ng-href="/profile/<[profileLinkTextCtrl.username()]>">
+  <[profileLinkTextCtrl.username()]>
 </a>
-<span ng-if="!isUsernameLinkable(username())">
-  <[username()]>
+<span ng-if="!profileLinkTextCtrl.isUsernameLinkable(profileLinkTextCtrl.username())">
+  <[profileLinkTextCtrl.username()]>
 </span>
