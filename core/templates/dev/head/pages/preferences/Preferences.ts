@@ -19,6 +19,7 @@
 require('components/forms/Select2DropdownDirective.ts');
 require('components/forms/ImageUploaderDirective.ts');
 require('components/background/BackgroundBannerDirective.ts');
+require('filters/TruncateFilter.ts');
 
 require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/UrlInterpolationService.ts');

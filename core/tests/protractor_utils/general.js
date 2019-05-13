@@ -174,7 +174,6 @@ var checkConsoleErrorsExist = function(expectedErrors) {
     // To keep consistent behaviour across browsers, we keep only the logs
     // that have a unique value for their message attribute.
     var uniqueLogMessages = _getUniqueLogMessages(browserLogs);
-    console.log(uniqueLogMessages);
     expect(uniqueLogMessages.length).toBe(expectedErrors.length);
     for (var i = 0; i < expectedErrors.length; i++) {
       var errorPresent = false;

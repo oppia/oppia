@@ -16,6 +16,8 @@
  * @fileoverview Directive for the rule editor.
  */
 
+require('filters/TruncateFilter.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');

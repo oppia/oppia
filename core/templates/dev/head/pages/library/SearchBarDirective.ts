@@ -16,6 +16,8 @@
  * @fileoverview Directive for the Search Bar.
  */
 
+require('filters/TruncateFilter.ts');
+
 require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/ConstructTranslationIdsService.ts');

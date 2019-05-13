@@ -21,6 +21,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationDataService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
+require('pages/suggestion_editor/ShowSuggestionModalForEditorView.ts');
 require('pages/suggestion_editor/SuggestionModalService.ts');
 
 oppia.factory('ShowSuggestionModalForEditorViewService', [

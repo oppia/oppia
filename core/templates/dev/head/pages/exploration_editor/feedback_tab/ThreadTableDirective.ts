@@ -17,6 +17,8 @@
  * tab of the exploration editor.
  */
 
+require('filters/TruncateFilter.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
 require('services/DateTimeFormatService.ts');

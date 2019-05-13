@@ -150,7 +150,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['email_dashboard_result'],
       filename: 'email_dashboard_result.html',
-      template: 
+      template:
         commonPrefix + '/pages/email_dashboard/email_dashboard_result.html',
       minify: htmlMinifyConfig,
       inject: false
