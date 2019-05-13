@@ -81,7 +81,7 @@ oppia.directive('outcomeDestinationEditor', [
           };
 
           ctrl.isCreatingNewState = function(outcome) {
-            return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
+            return ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST;
           };
 
           ctrl.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
