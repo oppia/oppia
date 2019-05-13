@@ -758,8 +758,9 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
     def handle_data(self, data):
         """Handle indentation level."""
         data_lines = data.split('\n')
-        opening_block = tuple(['{% block', '{% macro', '{% if'])
-        ending_block = tuple(['{% end', '{%- end'])
+        opening_block = tuple(
+            ['{% block', '{% macro', '{% if', '% for', '% if'])
+        ending_block = tuple(['{% end', '{%- end', '% } %>'])
         for data_line in data_lines:
             data_line = data_line.lstrip()
             if data_line.startswith(opening_block):

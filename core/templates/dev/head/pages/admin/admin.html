@@ -71,13 +71,15 @@
     {% include 'pages/footer_js_libs.html' %}
 
     <script src="/templates/dev/head/AppInit.js"></script>
-<% for (var chunk in htmlWebpackPlugin.files.js) { %>
-  <% if (webpackConfig.mode == 'production') { %>
-    <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-  <% } else { %>
-    <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-  <% } %>
-<% } %>
+    <!-- This code is used for inserting webpack bundles
+       https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+    <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+      <% if (webpackConfig.mode == 'production') { %>
+        <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <% } else { %>
+        <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <% } %>
+    <% } %>
     {% include 'components/rich_text_components.html' %}
 
     <script>

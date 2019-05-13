@@ -40,12 +40,14 @@
   <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
   <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
   <script src="/extensions/objects/templates/ListOfTabsEditorDirective.js"></script>
-<% for (var chunk in htmlWebpackPlugin.files.js) { %>
-  <% if (webpackConfig.mode == 'production') { %>
-  <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-  <% } else { %>
-  <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
   <% } %>
-<% } %>
   {% include 'components/rich_text_components.html' %}
 {% endblock footer_js %}
