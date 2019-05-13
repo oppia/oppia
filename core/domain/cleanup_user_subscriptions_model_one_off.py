@@ -51,7 +51,7 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
                     model_instance.activity_ids.remove(exp_id)
             if should_mutate:
                 model_instance.put()
-                yield ('Successfully cleaned up UserSubscriptionModel', 1)
+                yield ('Successfully cleaned up UserSubscriptionsModel', 1)
 
     @staticmethod
     def reduce(key, values):
