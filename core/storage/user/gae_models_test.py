@@ -48,45 +48,45 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user = user_models.UserSettingsModel.get_by_role(
             feconf.ROLE_ID_ADMIN)[0]
         user_data = user.export_data(user.id)
-        self.assertEqual(user.email, user_data['email'])
-        self.assertEqual(user.role, user_data['role'])
-        self.assertEqual(user.username, user_data['username'])
+        self.assertEqual('user@example.com', user_data['email'])
+        self.assertEqual(feconf.ROLE_ID_ADMIN, user_data['role'])
+        self.assertEqual(None, user_data['username'])
         self.assertEqual(
-            user.normalized_username,
+            None,
             user_data['normalized_username'])
         self.assertEqual(
-            user.last_agreed_to_terms,
+            None,
             user_data['last_agreed_to_terms'])
         self.assertEqual(
-            user.last_started_state_editor_tutorial,
+            None,
             user_data['last_started_state_editor_tutorial'])
         self.assertEqual(
-            user.last_started_state_translation_tutorial,
+            None,
             user_data['last_started_state_translation_tutorial'])
-        self.assertEqual(user.last_logged_in, user_data['last_logged_in'])
+        self.assertEqual(None, user_data['last_logged_in'])
         self.assertEqual(
-            user.last_edited_an_exploration,
+            None,
             user_data['last_edited_an_exploration'])
         self.assertEqual(
-            user.profile_picture_data_url,
+            None,
             user_data['profile_picture_data_url'])
-        self.assertEqual(user.default_dashboard, user_data['default_dashboard'])
+        self.assertEqual('learner', user_data['default_dashboard'])
         self.assertEqual(
-            user.creator_dashboard_display_pref,
+            'card',
             user_data['creator_dashboard_display_pref'])
-        self.assertEqual(user.user_bio, user_data['user_bio'])
-        self.assertEqual(user.subject_interests, user_data['subject_interests'])
+        self.assertEqual(None, user_data['user_bio'])
+        self.assertEqual([], user_data['subject_interests'])
         self.assertEqual(
-            user.first_contribution_msec,
+            None,
             user_data['first_contribution_msec'])
         self.assertEqual(
-            user.preferred_language_codes,
+            [],
             user_data['preferred_language_codes'])
         self.assertEqual(
-            user.preferred_site_language_code,
+            None,
             user_data['preferred_site_language_code'])
         self.assertEqual(
-            user.preferred_audio_language_code,
+            None,
             user_data['preferred_audio_language_code'])
 
 
