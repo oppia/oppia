@@ -20,6 +20,7 @@ require('components/loading/LoadingDotsDirective.ts');
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/skill_editor/SkillEditorRoutingService.ts');
 require('pages/skill_editor/SkillEditorStateService.ts');
 require('services/AlertsService.ts');
 

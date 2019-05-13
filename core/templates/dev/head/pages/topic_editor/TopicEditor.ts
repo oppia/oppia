@@ -53,6 +53,16 @@ require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
 require('components/forms/Select2DropdownDirective.ts');
 require('components/forms/ImageUploaderDirective.ts');
+require('components/state/AnswerGroupEditorDirective.ts');
+require('components/state/HintEditorDirective.ts');
+require('components/state/OutcomeEditorDirective.ts');
+require('components/state/OutcomeDestinationEditorDirective.ts');
+require('components/state/OutcomeFeedbackEditorDirective.ts');
+require('components/state/ResponseHeaderDirective.ts');
+require('components/state/RuleEditorDirective.ts');
+require('components/state/RuleTypeSelectorDirective.ts');
+require('components/state/SolutionEditorDirective.ts');
+require('components/state/SolutionExplanationEditorDirective.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require('pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.ts');
