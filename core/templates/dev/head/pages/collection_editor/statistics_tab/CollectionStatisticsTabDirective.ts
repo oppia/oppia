@@ -22,9 +22,12 @@ oppia.directive('collectionStatisticsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: true,
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/statistics_tab/' +
         'collection_statistics_tab_directive.html'),
+      controllerAs: 'collectionStatisticsTabCtrl',
       controller: [function() {}]
     };
   }]);
