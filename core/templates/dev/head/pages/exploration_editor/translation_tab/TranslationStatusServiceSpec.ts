@@ -25,10 +25,6 @@ require(
   'TranslationTabActiveModeService.ts'
 );
 require(
-  'pages/state_editor/state_properties/' +
-  'StateContentIdsToAudioTranslationsService.ts'
-);
-require(
   'pages/state_editor/state_properties/StateWrittenTranslationsService.ts');
 
 describe('Translation status service', function() {

@@ -17,10 +17,6 @@
  */
 
 require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
-require(
-  'pages/state_editor/state_properties/' +
-  'StateContentIdsToAudioTranslationsService.ts'
-);
 require('services/GenerateContentIdService.ts');
 
 describe('GenerateContentIdService', function() {
