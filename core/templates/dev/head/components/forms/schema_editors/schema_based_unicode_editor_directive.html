@@ -1,28 +1,28 @@
 <span>
-  <textarea ng-if="!getCodingMode() && getRows()"
+  <textarea ng-if="!schemaBasedUnicodeEditorCtrl.getCodingMode() && schemaBasedUnicodeEditorCtrl.getRows()"
             ng-model="$parent.localValue"
-            rows="<[getRows()]>"
-            placeholder="<[getPlaceholder()]>"
-            ng-disabled="isDisabled()"
-            class="form-control" focus-on="<[labelForFocusTarget()]>"
-            ng-blur="onInputBlur()"
-            ng-focus="onInputFocus()">
+            rows="<[schemaBasedUnicodeEditorCtrl.getRows()]>"
+            placeholder="<[schemaBasedUnicodeEditorCtrl.getPlaceholder()]>"
+            ng-disabled="schemaBasedUnicodeEditorCtrl.isDisabled()"
+            class="form-control" focus-on="<[schemaBasedUnicodeEditorCtrl.labelForFocusTarget()]>"
+            ng-blur="schemaBasedUnicodeEditorCtrl.onInputBlur()"
+            ng-focus="schemaBasedUnicodeEditorCtrl.onInputFocus()">
   </textarea>
 
-  <span ng-if="!getCodingMode() && !getRows()">
-    <input type="text" ng-disabled="isDisabled()" class="form-control"
-           ng-model="$parent.localValue" ng-blur="onInputBlur()"
-           ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
-           ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" apply-validation="validators()"
+  <span ng-if="!schemaBasedUnicodeEditorCtrl.getCodingMode() && !schemaBasedUnicodeEditorCtrl.getRows()">
+    <input type="text" ng-disabled="schemaBasedUnicodeEditorCtrl.isDisabled()" class="form-control"
+           ng-model="$parent.localValue" ng-blur="schemaBasedUnicodeEditorCtrl.onInputBlur()"
+           ng-focus="schemaBasedUnicodeEditorCtrl.onInputFocus()" focus-on="<[schemaBasedUnicodeEditorCtrl.labelForFocusTarget()]>"
+           ng-keypress="schemaBasedUnicodeEditorCtrl.onKeypress($event)" placeholder="<[schemaBasedUnicodeEditorCtrl.getPlaceholder()]>" apply-validation="schemaBasedUnicodeEditorCtrl.validators()"
            style="display: inline;">
   </span>
 
   <!-- Note that we do not yet support ng-blur for the code editor. -->
-  <div ng-if="getCodingMode()" style="border: 1px solid #ccc;">
+  <div ng-if="schemaBasedUnicodeEditorCtrl.getCodingMode()" style="border: 1px solid #ccc;">
     <div ui-codemirror
          ng-model="$parent.localValue"
-         ui-codemirror-opts="codemirrorOptions"
-         ui-refresh="codemirrorStatus">
+         ui-codemirror-opts="schemaBasedUnicodeEditorCtrl.codemirrorOptions"
+         ui-refresh="schemaBasedUnicodeEditorCtrl.codemirrorStatus">
     </div>
   </div>
 </span>
