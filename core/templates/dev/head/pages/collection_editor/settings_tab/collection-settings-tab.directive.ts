@@ -21,7 +21,7 @@ angular.module('collectionSettingsTabModule').directive('collectionSettingsTab',
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/settings-tab/' +
+        '/pages/collection_editor/settings_tab/' +
         'collection-settings-tab.directive.html'),
       controller: [function() {}]
     };
