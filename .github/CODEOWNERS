@@ -249,6 +249,7 @@
 /core/templates/dev/head/pages/practice_session/ @vinitamurthi
 /core/templates/dev/head/pages/question_editor/ @aks681
 /core/templates/dev/head/pages/questions_list/ @aks681
+/core/templates/dev/head/pages/question_player/ @vinitamurthi
 
 # Skill project.
 /core/controllers/concept_card_viewer*.py @aks681
@@ -426,5 +427,6 @@
 /core/domain/user*.py @seanlip
 /export/ @seanlip
 /manifest.json @seanlip @vojtechjelinek
+/package*.json @seanlip @vojtechjelinek
 /scripts/install_third_party.sh @seanlip @vojtechjelinek
 /.github/ @seanlip
