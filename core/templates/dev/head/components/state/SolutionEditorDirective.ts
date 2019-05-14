@@ -29,7 +29,8 @@ oppia.directive('solutionEditor', [
       StateSolutionService, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getInteractionId: '&interactionId',
         onSaveSolution: '=',
         correctAnswerEditorHtml: '=',
@@ -38,17 +39,19 @@ oppia.directive('solutionEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/solution_editor_directive.html'),
+      controllerAs: 'solutionEditorCtrl',
       controller: [
-        '$scope', 'StateSolutionService',
-        function($scope, StateSolutionService) {
-          $scope.StateSolutionService = StateSolutionService;
+        'StateSolutionService',
+        function(StateSolutionService) {
+          var ctrl = this;
+          ctrl.StateSolutionService = StateSolutionService;
 
-          $scope.EXPLANATION_FORM_SCHEMA = {
+          ctrl.EXPLANATION_FORM_SCHEMA = {
             type: 'html',
             ui_config: {}
           };
 
-          $scope.getAnswerHtml = function() {
+          ctrl.getAnswerHtml = function() {
             return ExplorationHtmlFormatterService.getAnswerHtml(
               StateSolutionService.savedMemento.correctAnswer,
               StateInteractionIdService.savedMemento,
