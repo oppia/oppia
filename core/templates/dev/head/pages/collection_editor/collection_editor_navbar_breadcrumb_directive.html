@@ -1,15 +1,15 @@
 <div class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak">
   <span class="oppia-navbar-breadcrumb-separator"></span>
-  <span ng-if="collection.getTitle()">
-    <[collection.getTitle()]> (v<[collection.getVersion()]>)
+  <span ng-if="collectionEditorNavbarBreadcrumbCtrl.collection.getTitle()">
+    <[collectionEditorNavbarBreadcrumbCtrl.collection.getTitle()]> (v<[collectionEditorNavbarBreadcrumbCtrl.collection.getVersion()]>)
   </span>
-  <span ng-if="!collection.getTitle()" style="opacity: 0.6;"
-        ng-click="editCollectionTitle()">
-    Untitled Collection (v<[collection.getVersion()]>)
+  <span ng-if="!collectionEditorNavbarBreadcrumbCtrl.collection.getTitle()" style="opacity: 0.6;"
+        ng-click="collectionEditorNavbarBreadcrumbCtrl.editCollectionTitle()">
+    Untitled Collection (v<[collectionEditorNavbarBreadcrumbCtrl.collection.getVersion()]>)
   </span>
 
   <span class="oppia-navbar-breadcrumb-separator" style="margin-left: 5px;"></span>
   <span>
-    <[getCurrentTabName()]> (Beta)
+    <[collectionEditorNavbarBreadcrumbCtrl.getCurrentTabName()]> (Beta)
   </span>
 </div>

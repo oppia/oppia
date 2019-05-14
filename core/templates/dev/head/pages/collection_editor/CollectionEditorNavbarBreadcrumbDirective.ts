@@ -27,15 +27,18 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: true,
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/' +
         'collection_editor_navbar_breadcrumb_directive.html'),
+      controllerAs: 'collectionEditorNavbarBreadcrumbCtrl',
       controller: [
-        '$scope', 'RouterService', 'CollectionEditorStateService',
+        'RouterService', 'CollectionEditorStateService',
         'FocusManagerService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
         function(
-            $scope, RouterService, CollectionEditorStateService,
+            RouterService, CollectionEditorStateService,
             FocusManagerService, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
+          var ctrl = this;
           var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
             main: 'Edit',
             preview: 'Preview',
@@ -45,14 +48,14 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
             history: 'History',
           };
 
-          $scope.collection = CollectionEditorStateService.getCollection();
+          ctrl.collection = CollectionEditorStateService.getCollection();
 
-          $scope.getCurrentTabName = function() {
+          ctrl.getCurrentTabName = function() {
             return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
               RouterService.getActiveTabName()];
           };
 
-          $scope.editCollectionTitle = function() {
+          ctrl.editCollectionTitle = function() {
             RouterService.navigateToSettingsTab();
             FocusManagerService.setFocus(COLLECTION_TITLE_INPUT_FOCUS_LABEL);
           };
