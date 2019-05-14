@@ -20,8 +20,11 @@ oppia.directive('collectionEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: true,
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/collection_editor_navbar_directive.html'),
+      controllerAs: 'collectionEditorNavbarCtrl',
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'RouterService',
         'UndoRedoService', 'CollectionEditorStateService',
@@ -38,35 +41,36 @@ oppia.directive('collectionEditorNavbar', [
             EditableCollectionBackendApiService,
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-          $scope.collectionId = GLOBALS.collectionId;
-          $scope.collection = CollectionEditorStateService.getCollection();
-          $scope.collectionRights = (
+          var ctrl = this;
+          ctrl.collectionId = GLOBALS.collectionId;
+          ctrl.collection = CollectionEditorStateService.getCollection();
+          ctrl.collectionRights = (
             CollectionEditorStateService.getCollectionRights());
 
-          $scope.isLoadingCollection = (
+          ctrl.isLoadingCollection = (
             CollectionEditorStateService.isLoadingCollection);
-          $scope.validationIssues = [];
-          $scope.isSaveInProgress = (
+          ctrl.validationIssues = [];
+          ctrl.isSaveInProgress = (
             CollectionEditorStateService.isSavingCollection);
 
-          $scope.getActiveTabName = RouterService.getActiveTabName;
-          $scope.selectMainTab = RouterService.navigateToMainTab;
-          $scope.selectPreviewTab = RouterService.navigateToPreviewTab;
-          $scope.selectSettingsTab = RouterService.navigateToSettingsTab;
-          $scope.selectStatsTab = RouterService.navigateToStatsTab;
-          $scope.selectHistoryTab = RouterService.navigateToHistoryTab;
+          ctrl.getActiveTabName = RouterService.getActiveTabName;
+          ctrl.selectMainTab = RouterService.navigateToMainTab;
+          ctrl.selectPreviewTab = RouterService.navigateToPreviewTab;
+          ctrl.selectSettingsTab = RouterService.navigateToSettingsTab;
+          ctrl.selectStatsTab = RouterService.navigateToStatsTab;
+          ctrl.selectHistoryTab = RouterService.navigateToHistoryTab;
 
           var _validateCollection = function() {
-            if ($scope.collectionRights.isPrivate()) {
-              $scope.validationIssues = (
+            if (ctrl.collectionRights.isPrivate()) {
+              ctrl.validationIssues = (
                 CollectionValidationService
                   .findValidationIssuesForPrivateCollection(
-                    $scope.collection));
+                    ctrl.collection));
             } else {
-              $scope.validationIssues = (
+              ctrl.validationIssues = (
                 CollectionValidationService
                   .findValidationIssuesForPublicCollection(
-                    $scope.collection));
+                    ctrl.collection));
             }
           };
 
@@ -74,11 +78,11 @@ oppia.directive('collectionEditorNavbar', [
             // TODO(bhenning): This also needs a confirmation of destructive
             // action since it is not reversible.
             CollectionRightsBackendApiService.setCollectionPublic(
-              $scope.collectionId, $scope.collection.getVersion()).then(
+              ctrl.collectionId, ctrl.collection.getVersion()).then(
               function() {
-                $scope.collectionRights.setPublic();
+                ctrl.collectionRights.setPublic();
                 CollectionEditorStateService.setCollectionRights(
-                  $scope.collectionRights);
+                  ctrl.collectionRights);
               });
           };
 
@@ -88,29 +92,29 @@ oppia.directive('collectionEditorNavbar', [
           $scope.$on(
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
 
-          $scope.getWarningsCount = function() {
-            return $scope.validationIssues.length;
+          ctrl.getWarningsCount = function() {
+            return ctrl.validationIssues.length;
           };
 
-          $scope.getChangeListCount = function() {
+          ctrl.getChangeListCount = function() {
             return UndoRedoService.getChangeCount();
           };
 
-          $scope.isCollectionSaveable = function() {
+          ctrl.isCollectionSaveable = function() {
             return (
-              $scope.getChangeListCount() > 0 &&
-              $scope.validationIssues.length === 0);
+              ctrl.getChangeListCount() > 0 &&
+              ctrl.validationIssues.length === 0);
           };
 
-          $scope.isCollectionPublishable = function() {
+          ctrl.isCollectionPublishable = function() {
             return (
-              $scope.collectionRights.isPrivate() &&
-              $scope.getChangeListCount() === 0 &&
-              $scope.validationIssues.length === 0);
+              ctrl.collectionRights.isPrivate() &&
+              ctrl.getChangeListCount() === 0 &&
+              ctrl.validationIssues.length === 0);
           };
 
-          $scope.saveChanges = function() {
-            var isPrivate = $scope.collectionRights.isPrivate();
+          ctrl.saveChanges = function() {
+            var isPrivate = ctrl.collectionRights.isPrivate();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/collection_editor/' +
@@ -136,11 +140,11 @@ oppia.directive('collectionEditorNavbar', [
             });
           };
 
-          $scope.publishCollection = function() {
+          ctrl.publishCollection = function() {
             var additionalMetadataNeeded = (
-              !$scope.collection.getTitle() ||
-              !$scope.collection.getObjective() ||
-              !$scope.collection.getCategory());
+              !ctrl.collection.getTitle() ||
+              !ctrl.collection.getObjective() ||
+              !ctrl.collection.getCategory());
 
             if (additionalMetadataNeeded) {
               $uibModal.open({
@@ -234,13 +238,13 @@ oppia.directive('collectionEditorNavbar', [
 
           // Unpublish the collection. Will only show up if the collection is
           // public and the user has access to the collection.
-          $scope.unpublishCollection = function() {
+          ctrl.unpublishCollection = function() {
             CollectionRightsBackendApiService.setCollectionPrivate(
-              $scope.collectionId, $scope.collection.getVersion()).then(
+              ctrl.collectionId, ctrl.collection.getVersion()).then(
               function() {
-                $scope.collectionRights.setPrivate();
+                ctrl.collectionRights.setPrivate();
                 CollectionEditorStateService.setCollectionRights(
-                  $scope.collectionRights);
+                  ctrl.collectionRights);
               }, function() {
                 AlertsService.addWarning(
                   'There was an error when unpublishing the collection.');

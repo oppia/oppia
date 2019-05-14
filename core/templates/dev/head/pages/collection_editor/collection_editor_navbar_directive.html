@@ -1,20 +1,20 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" style="margin-left: 20px;">
   <!-- Editor -->
-  <li ng-class="{'active': getActiveTabName() === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>">
-    <a href="#" uib-tooltip="Editor" ng-click="selectMainTab()" class="protractor-test-main-tab">
+  <li ng-class="{'active': collectionEditorNavbarCtrl.getActiveTabName() === 'main', 'uib-dropdown': collectionEditorNavbarCtrl.getWarningsCount()}" ng-attr-uib-dropdown="<[collectionEditorNavbarCtrl.getWarningsCount()]>">
+    <a href="#" uib-tooltip="Editor" ng-click="collectionEditorNavbarCtrl.selectMainTab()" class="protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
-    <div ng-show="getWarningsCount()"
+    <div ng-show="collectionEditorNavbarCtrl.getWarningsCount()"
          class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-         ng-click="selectMainTab()">
+         ng-click="collectionEditorNavbarCtrl.selectMainTab()">
       <span class="oppia-editor-warnings-count">
-        <[getWarningsCount()]>
+        <[collectionEditorNavbarCtrl.getWarningsCount()]>
       </span>
     </div>
     <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
       <span class="oppia-editor-warnings-header">Warnings</span>
       <li class="oppia-editor-warnings-text"
-          ng-repeat="issue in validationIssues track by $index">
+          ng-repeat="issue in collectionEditorNavbarCtrl.validationIssues track by $index">
         <hr class="oppia-editor-warnings-separator">
         <[issue]>
       </li>
@@ -22,39 +22,39 @@
   </li>
 
   <!-- Settings -->
-  <li ng-class="{'active': getActiveTabName() === 'settings'}">
-    <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
+  <li ng-class="{'active': collectionEditorNavbarCtrl.getActiveTabName() === 'settings'}">
+    <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="collectionEditorNavbarCtrl.selectSettingsTab()" class="protractor-test-settings-tab">
       <i class="material-icons">&#xE8B8;</i>
     </a>
   </li>
 
   <!-- Player -->
   <li>
-    <a ng-href="/collection/<[collectionId]>" target="_blank" rel="noopener" uib-tooltip="Player (new tab)" tooltip-placement="bottom">
+    <a ng-href="/collection/<[collectionEditorNavbarCtrl.collectionId]>" target="_blank" rel="noopener" uib-tooltip="Player (new tab)" tooltip-placement="bottom">
       <i class="material-icons">&#xE037;</i>
     </a>
   </li>
 </ul>
 
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-if="!isLoadingCollection()">
+<ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-if="!collectionEditorNavbarCtrl.isLoadingCollection()">
   <li style="margin-right: 10px; margin-top: 8px;">
     <button class="btn btn-default oppia-save-draft-button protractor-test-save-draft-button"
-            ng-class="{'btn-success': isCollectionSaveable()}"
-            ng-click="saveChanges()"
-            ng-disabled="!isCollectionSaveable()">
-      <span ng-if="!isSaveInProgress()">
-        <span ng-if="collectionRights.isPrivate()">
+            ng-class="{'btn-success': collectionEditorNavbarCtrl.isCollectionSaveable()}"
+            ng-click="collectionEditorNavbarCtrl.saveChanges()"
+            ng-disabled="!collectionEditorNavbarCtrl.isCollectionSaveable()">
+      <span ng-if="!collectionEditorNavbarCtrl.isSaveInProgress()">
+        <span ng-if="collectionEditorNavbarCtrl.collectionRights.isPrivate()">
           <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Save Collection">
             &#xE161;
           </i>
           <span class="oppia-save-publish-button-label">Save Draft</span>
           <span class="hidden-sm hidden-xs" style="opacity: 0.5"
-                ng-if="getChangeListCount() > 0">
-            (<[getChangeListCount()]>)
+                ng-if="collectionEditorNavbarCtrl.getChangeListCount() > 0">
+            (<[collectionEditorNavbarCtrl.getChangeListCount()]>)
           </span>
         </span>
-        <span ng-if="collectionRights.isPublic()" title="Publish Changes">
+        <span ng-if="collectionEditorNavbarCtrl.collectionRights.isPublic()" title="Publish Changes">
           <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Publish Changes">
             &#xE2C3;
@@ -63,18 +63,18 @@
         </span>
       </span>
 
-      <span ng-if="isSaveInProgress()">
-        <span ng-if="collectionRights.isPrivate()" class="oppia-save-publish-button-label">Saving</span>
-        <span ng-if="collectionRights.isPublic()" class="oppia-save-publish-button-label">Publishing</span>
+      <span ng-if="collectionEditorNavbarCtrl.isSaveInProgress()">
+        <span ng-if="collectionEditorNavbarCtrl.collectionRights.isPrivate()" class="oppia-save-publish-button-label">Saving</span>
+        <span ng-if="collectionEditorNavbarCtrl.collectionRights.isPublic()" class="oppia-save-publish-button-label">Publishing</span>
         <loading-dots></loading-dots>
       </span>
     </button>
 
-    <button type="button" ng-if="collectionRights.isPrivate()"
+    <button type="button" ng-if="collectionEditorNavbarCtrl.collectionRights.isPrivate()"
             class="btn btn-default oppia-editor-publish-button protractor-test-editor-publish-button"
-            ng-class="{'btn-success': isCollectionPublishable()}"
-            ng-click="publishCollection()"
-            ng-disabled="!isCollectionPublishable()">
+            ng-class="{'btn-success': collectionEditorNavbarCtrl.isCollectionPublishable()}"
+            ng-click="collectionEditorNavbarCtrl.publishCollection()"
+            ng-disabled="!collectionEditorNavbarCtrl.isCollectionPublishable()">
       <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
         &#xE2C3;
@@ -82,8 +82,8 @@
       <span class="oppia-save-publish-button-label">Publish</span>
     </button>
 
-    <button type="button" ng-click="unpublishCollection()"
-            ng-if="collectionRights.isPublic() && collectionRights.canUnpublish()"
+    <button type="button" ng-click="collectionEditorNavbarCtrl.unpublishCollection()"
+            ng-if="collectionEditorNavbarCtrl.collectionRights.isPublic() && collectionEditorNavbarCtrl.collectionRights.canUnpublish()"
             class="btn btn-default">
       Unpublish (as moderator)
     </button>
