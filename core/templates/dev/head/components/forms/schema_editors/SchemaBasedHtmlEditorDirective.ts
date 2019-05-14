@@ -19,7 +19,8 @@
 oppia.directive('schemaBasedHtmlEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      scope: {},
+      bindToController: {
         localValue: '=',
         isDisabled: '&',
         labelForFocusTarget: '&',
@@ -28,6 +29,8 @@ oppia.directive('schemaBasedHtmlEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_editors/' +
         'schema_based_html_editor_directive.html'),
+      controllerAs: 'schemaBasedHtmlEditorCtrl',
+      controller: [function() {}],
       restrict: 'E',
     };
   }]);
