@@ -20,45 +20,49 @@ oppia.directive('activityTilesInfinityGrid', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: true,
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/' +
         'activity_tiles_infinity_grid_directive.html'),
+      controllerAs: 'activityTilesInfinityGridCtrl',
       controller: [
         '$scope', '$rootScope', 'SearchService', 'WindowDimensionsService',
         function($scope, $rootScope, SearchService, WindowDimensionsService) {
-          $scope.endOfPageIsReached = false;
-          $scope.allActivitiesInOrder = [];
+          var ctrl = this;
+          ctrl.endOfPageIsReached = false;
+          ctrl.allActivitiesInOrder = [];
           // Called when the first batch of search results is retrieved from the
           // server.
           $scope.$on(
             'initialSearchResultsLoaded', function(evt, activityList) {
-              $scope.allActivitiesInOrder = activityList;
-              $scope.endOfPageIsReached = false;
+              ctrl.allActivitiesInOrder = activityList;
+              ctrl.endOfPageIsReached = false;
             }
           );
 
-          $scope.showMoreActivities = function() {
-            if (!$rootScope.loadingMessage && !$scope.endOfPageIsReached) {
-              $scope.searchResultsAreLoading = true;
+          ctrl.showMoreActivities = function() {
+            if (!$rootScope.loadingMessage && !ctrl.endOfPageIsReached) {
+              ctrl.searchResultsAreLoading = true;
               SearchService.loadMoreData(function(data, endOfPageIsReached) {
-                $scope.allActivitiesInOrder =
-                $scope.allActivitiesInOrder.concat(
+                ctrl.allActivitiesInOrder =
+                ctrl.allActivitiesInOrder.concat(
                   data.activity_list);
-                $scope.endOfPageIsReached = endOfPageIsReached;
-                $scope.searchResultsAreLoading = false;
+                ctrl.endOfPageIsReached = endOfPageIsReached;
+                ctrl.searchResultsAreLoading = false;
               }, function(endOfPageIsReached) {
-                $scope.endOfPageIsReached = endOfPageIsReached;
-                $scope.searchResultsAreLoading = false;
+                ctrl.endOfPageIsReached = endOfPageIsReached;
+                ctrl.searchResultsAreLoading = false;
               });
             }
           };
 
           var libraryWindowCutoffPx = 530;
-          $scope.libraryWindowIsNarrow = (
+          ctrl.libraryWindowIsNarrow = (
             WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
           WindowDimensionsService.registerOnResizeHook(function() {
-            $scope.libraryWindowIsNarrow = (
+            ctrl.libraryWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
             $scope.$apply();
           });
