@@ -37,20 +37,20 @@
     }
   }
 </style>
-<div class="oppia-example-header-block" ng-class="{'left-padding': !isSortingDisabled()}">
+<div class="oppia-example-header-block" ng-class="{'left-padding': !summaryListHeaderCtrl.isSortingDisabled()}">
   <div class="oppia-example-header">
-    <span ng-if="!isActive()" ng-attr-title="<[getSummary()]>">
-      <[getShortSummary()]>
-      <span ng-if="getNumItems() > 1" class="label label-primary" style="position: relative; bottom: 4px;">
-        +<[getNumItems() - 1]>
+    <span ng-if="!summaryListHeaderCtrl.isActive()" ng-attr-title="<[summaryListHeaderCtrl.getSummary()]>">
+      <[summaryListHeaderCtrl.getShortSummary()]>
+      <span ng-if="summaryListHeaderCtrl.getNumItems() > 1" class="label label-primary" style="position: relative; bottom: 4px;">
+        +<[summaryListHeaderCtrl.getNumItems() - 1]>
       </span>
     </span>
-    <span ng-if="isActive()">&nbsp;</span>
+    <span ng-if="summaryListHeaderCtrl.isActive()">&nbsp;</span>
   </div>
 </div>
 
 <span class="oppia-delete-example-button oppia-transition-200"
-      ng-if="isDeleteAvailable() && getOnDeleteFn()"
-      ng-click="deleteItem($event)">
+      ng-if="summaryListHeaderCtrl.isDeleteAvailable() && summaryListHeaderCtrl.getOnDeleteFn()"
+      ng-click="summaryListHeaderCtrl.deleteItem($event)">
   <i class="material-icons md-18">&#xE5CD;</i>
 </span>
