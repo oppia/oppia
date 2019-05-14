@@ -134,7 +134,8 @@ oppia.constant('LOGOUT_URL', '/logout');
 // page visited.
 oppia.constant('ENABLE_PROMO_BAR', true);
 
-// TODO(vojtechjelinek) move these to separate file later
+// TODO(vojtechjelinek): Move these to separate file later, after we establish 
+// process to follow for Angular constants (#6731).
 oppia.constant(
   'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE',
   '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>');

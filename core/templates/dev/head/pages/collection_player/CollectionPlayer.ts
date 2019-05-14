@@ -16,7 +16,8 @@
  * @fileoverview Controller for the learner's view of a collection.
  */
 
-// vvv this block of requires should be removed vvv
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
 require('pages/collection_player/CollectionNodeListDirective.ts');
 // ^^^ this block of requires should be removed ^^^
 

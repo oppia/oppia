@@ -16,7 +16,8 @@
  * @fileoverview Data and controllers for the Oppia admin page.
  */
 
-// vvv this block of requires should be removed vvv
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
 require('directives/FocusOnDirective.ts');
 require('components/forms/validators/IsAtLeastFilter.ts');
 require('components/forms/validators/IsAtMostFilter.ts');

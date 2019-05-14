@@ -16,12 +16,7 @@
  * @fileoverview NormalizeWhitespace filter for Oppia.
  */
 
-// this is intentional since normalizeWhitespace is use from /extensions
-try {
-  require('services/UtilsService.ts');
-} catch (e) {
-
-}
+require('services/UtilsService.ts');
 
 // Filter that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.

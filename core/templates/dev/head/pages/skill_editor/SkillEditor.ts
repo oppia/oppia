@@ -16,7 +16,8 @@
  * @fileoverview Primary controller for the skill editor page.
  */
 
-// vvv this block of requires should be removed vvv
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
 require('components/CkEditorRteDirective.ts');
 require('components/CkEditorWidgetsInitializer.ts');
 require('components/state/AnswerGroupEditorDirective.ts');
@@ -57,6 +58,7 @@ require(
 require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
 require('directives/MathjaxBindDirective.ts');
+require('filters/NormalizeWhitespaceFilter.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require('pages/skill_editor/SkillEditorNavbarDirective.ts');

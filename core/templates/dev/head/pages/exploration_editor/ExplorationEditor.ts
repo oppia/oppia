@@ -17,7 +17,8 @@
  *               help tab in the navbar.
  */
 
-// vvv this block of requires should be removed vvv
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
 require('components/CkEditorRteDirective.ts');
 require('components/CkEditorWidgetsInitializer.ts');
 require('components/forms/ApplyValidationDirective.ts');

@@ -16,7 +16,8 @@
  * @fileoverview Dependencies for the explaration player page.
  */
 
-// vvv this block of requires should be removed vvv
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
 require('components/CkEditorRteDirective.ts');
 require('components/CkEditorWidgetsInitializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
@@ -51,6 +52,7 @@ require(
   'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
+require('filters/NormalizeWhitespaceFilter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 

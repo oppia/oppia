@@ -16,7 +16,8 @@
  * @fileoverview Primary controller for the topic editor page.
  */
 
-// vvv this block of requires should be removed vvv
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
 require('components/CkEditorRteDirective.ts');
 require('components/CkEditorWidgetsInitializer.ts');
 require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
@@ -63,6 +64,7 @@ require('components/state/RuleEditorDirective.ts');
 require('components/state/RuleTypeSelectorDirective.ts');
 require('components/state/SolutionEditorDirective.ts');
 require('components/state/SolutionExplanationEditorDirective.ts');
+require('filters/NormalizeWhitespaceFilter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 

@@ -16,13 +16,15 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
-// vvv this block of requires should be removed vvv
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require('filters/CamelCaseToHyphensFilter.ts');
 require('filters/CapitalizeFilter.ts');
 require('filters/ConvertToPlainTextFilter.ts');
 require('filters/FormatRtePreviewFilter.ts');
+require('filters/NormalizeWhitespaceFilter.ts');
 require('filters/NormalizeWhitespacePunctuationAndCaseFilter.ts');
 require('filters/ParameterizeRuleDescriptionFilter.ts');
 require('filters/RemoveDuplicatesInArrayFilter.ts');
