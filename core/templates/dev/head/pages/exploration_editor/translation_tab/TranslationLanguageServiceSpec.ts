@@ -22,7 +22,7 @@ require(
 describe('Translation language service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', {
-      getAllAudioLanguageCodes: function() {
+      getAllVoiceoverLanguageCodes: function() {
         return ['en', 'hi'];
       }
     });

@@ -61,9 +61,8 @@ oppia.factory('ExplorationStatesService', [
       content: function(content) {
         return content.toBackendDict();
       },
-      content_ids_to_audio_translations: function(
-          contentIdsToAudioTranslations) {
-        return contentIdsToAudioTranslations.toBackendDict();
+      recorded_voiceovers: function(recordedVoiceovers) {
+        return recordedVoiceovers.toBackendDict();
       },
       default_outcome: function(defaultOutcome) {
         if (defaultOutcome) {
@@ -103,7 +102,7 @@ oppia.factory('ExplorationStatesService', [
       confirmed_unclassified_answers: [
         'interaction', 'confirmedUnclassifiedAnswers'],
       content: ['content'],
-      content_ids_to_audio_translations: ['contentIdsToAudioTranslations'],
+      recorded_voiceovers: ['recordedVoiceovers'],
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
       param_specs: ['paramSpecs'],
@@ -205,12 +204,11 @@ oppia.factory('ExplorationStatesService', [
           var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
             newContentIds, oldContentIds);
           contentIdsToDelete.forEach(function(contentId) {
-            newStateData.contentIdsToAudioTranslations.deleteContentId(
-              contentId);
+            newStateData.recordedVoiceovers.deleteContentId(contentId);
             newStateData.writtenTranslations.deleteContentId(contentId);
           });
           contentIdsToAdd.forEach(function(contentId) {
-            newStateData.contentIdsToAudioTranslations.addContentId(contentId);
+            newStateData.recordedVoiceovers.addContentId(contentId);
             newStateData.writtenTranslations.addContentId(contentId);
           });
         }
@@ -346,15 +344,12 @@ oppia.factory('ExplorationStatesService', [
       saveSolution: function(stateName, newSolution) {
         saveStateProperty(stateName, 'solution', newSolution);
       },
-      getContentIdsToAudioTranslationsMemento: function(stateName) {
-        return getStatePropertyMemento(
-          stateName, 'content_ids_to_audio_translations');
+      getRecordedVoiceoversMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'recorded_voiceovers');
       },
-      saveContentIdsToAudioTranslations: function(
-          stateName, newContentIdsToAudioTranslations) {
+      saveRecordedVoiceovers: function(stateName, newRecordedVoiceovers) {
         saveStateProperty(
-          stateName, 'content_ids_to_audio_translations',
-          newContentIdsToAudioTranslations);
+          stateName, 'recorded_voiceovers', newRecordedVoiceovers);
       },
       getWrittenTranslationsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'written_translations');

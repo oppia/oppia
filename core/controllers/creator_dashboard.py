@@ -417,7 +417,7 @@ class UploadExplorationHandler(base.BaseHandler):
         if constants.ALLOW_YAML_FILE_UPLOAD:
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.user_id, yaml_content, new_exploration_id, [],
-                strip_audio_translations=True)
+                strip_voiceovers=True)
             self.render_json({
                 EXPLORATION_ID_KEY: new_exploration_id
             })

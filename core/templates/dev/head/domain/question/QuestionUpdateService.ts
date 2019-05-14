@@ -94,13 +94,11 @@ oppia.factory('QuestionUpdateService', [
       var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
         newContentIds, oldContentIds);
       contentIdsToDelete.forEach(function(contentId) {
-        newState.contentIdsToAudioTranslations.deleteContentId(
-          contentId);
-        newState.writtenTranslations.deleteContentId(
-          contentId);
+        newState.recordedVoiceovers.deleteContentId(contentId);
+        newState.writtenTranslations.deleteContentId(contentId);
       });
       contentIdsToAdd.forEach(function(contentId) {
-        newState.contentIdsToAudioTranslations.addContentId(contentId);
+        newState.recordedVoiceovers.addContentId(contentId);
         newState.writtenTranslations.addContentId(contentId);
       });
     };

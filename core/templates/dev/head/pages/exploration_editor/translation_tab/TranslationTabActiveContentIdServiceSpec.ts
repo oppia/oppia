@@ -23,7 +23,7 @@ require(
 
 describe('Translation tab active content id service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('StateContentIdsToAudioTranslationsService', {
+    $provide.value('StateRecordedVoiceoversService', {
       displayed: {
         getAllContentId: function() {
           return ['content', 'feedback_1'];
@@ -37,7 +37,7 @@ describe('Translation tab active content id service', function() {
     ttacis = $injector.get('TranslationTabActiveContentIdService');
   }));
 
-  it('should correctly set and get state names', function() {
+  it('should correctly set and get active content id', function() {
     expect(ttacis.getActiveContentId()).toBeNull();
     ttacis.setActiveContentId('content');
     expect(ttacis.getActiveContentId()).toBe('content');

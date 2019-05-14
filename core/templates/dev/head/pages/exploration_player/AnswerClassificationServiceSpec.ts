@@ -56,11 +56,13 @@ describe('Answer classification service with string classifier disabled',
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {},
-          feedback_2: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
         },
         interaction: {
           id: 'RuleTest',
@@ -197,10 +199,12 @@ describe('Answer classification service with string classifier disabled',
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'RuleTest',
@@ -303,11 +307,13 @@ describe('Answer classification service with string classifier enabled',
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {},
-          feedback_2: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
         },
         interaction: {
           id: 'TrainableInteraction',
@@ -471,11 +477,13 @@ describe('Answer classification service with training data classification',
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {},
-          feedback_2: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
         },
         interaction: {
           id: 'TrainableInteraction',

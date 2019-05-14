@@ -52,12 +52,11 @@ oppia.factory('HintAndSolutionModalService', [
               $scope.hint = HintsAndSolutionManagerService.displayHint(index);
               var displayedCard = PlayerTranscriptService.getCard(
                 PlayerPositionService.getDisplayedCardIndex());
-              var contentIdsToAudioTranslations =
-                displayedCard.getContentIdsToAudioTranslations();
+              var recordedVoiceovers = displayedCard.getRecordedVoiceovers();
               var hintContentId = $scope.hint.getContentId();
               AudioTranslationManagerService.setSecondaryAudioTranslations(
-                contentIdsToAudioTranslations.getBindableAudioTranslations(
-                  hintContentId), $scope.hint.getHtml(), COMPONENT_NAME_HINT);
+                recordedVoiceovers.getBindableVoiceovers(hintContentId),
+                $scope.hint.getHtml(), COMPONENT_NAME_HINT);
               $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               $scope.closeModal = function() {
                 AudioPlayerService.stop();
@@ -83,12 +82,11 @@ oppia.factory('HintAndSolutionModalService', [
               var solutionContentId = solution.explanation.getContentId();
               var displayedCard = PlayerTranscriptService.getCard(
                 PlayerPositionService.getDisplayedCardIndex());
-              var contentIdsToAudioTranslations =
-                displayedCard.getContentIdsToAudioTranslations();
+              var recordedVoiceovers = displayedCard.getRecordedVoiceovers();
               AudioTranslationManagerService.setSecondaryAudioTranslations(
-                contentIdsToAudioTranslations.getBindableAudioTranslations(
-                  solutionContentId), solution.explanation.getHtml(),
-                COMPONENT_NAME_SOLUTION);
+                recordedVoiceovers.getBindableVoiceovers(
+                  solutionContentId),
+                solution.explanation.getHtml(), COMPONENT_NAME_SOLUTION);
               $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               var interaction = displayedCard.getInteraction();
               $scope.shortAnswerHtml = solution.getOppiaShortAnswerResponseHtml(

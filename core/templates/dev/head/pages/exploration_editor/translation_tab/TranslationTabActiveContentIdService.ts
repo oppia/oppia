@@ -17,18 +17,20 @@
  */
 
 require('pages/state_editor/state_properties/StatePropertyService.ts');
+require(
+  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
 
 oppia.factory('TranslationTabActiveContentIdService', [
-  '$log', '$rootScope', 'StateContentIdsToAudioTranslationsService',
-  function($log, $rootScope, StateContentIdsToAudioTranslationsService) {
+  '$log', '$rootScope', 'StateRecordedVoiceoversService',
+  function($log, $rootScope, StateRecordedVoiceoversService) {
     var activeContentId = null;
     return {
       getActiveContentId: function() {
         return activeContentId;
       },
       setActiveContentId: function(contentId) {
-        var allContentIds = StateContentIdsToAudioTranslationsService.displayed
-          .getAllContentId();
+        var allContentIds = (
+          StateRecordedVoiceoversService.displayed.getAllContentId());
         if (allContentIds.indexOf(contentId) === -1) {
           throw Error('Invalid active content id: ' + contentId);
         }

@@ -66,9 +66,11 @@ describe('Sidebar state name controller', function() {
             content_id: 'content',
             html: 'First State Content'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           interaction: {
             answer_groups: [],
@@ -95,9 +97,11 @@ describe('Sidebar state name controller', function() {
             content_id: 'content',
             html: 'Second State Content'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           interaction: {
             answer_groups: [],
@@ -124,9 +128,11 @@ describe('Sidebar state name controller', function() {
             content_id: 'content',
             html: 'This is some content.'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           interaction: {
             answer_groups: [],

@@ -91,7 +91,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
               state.content.setHtml(
                 activeThread.getReplacementHtmlFromSuggestion());
               if (result.audioUpdateRequired) {
-                state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
+                state.recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
                   state.content.getContentId());
               }
               ExplorationDataService.data.version += 1;

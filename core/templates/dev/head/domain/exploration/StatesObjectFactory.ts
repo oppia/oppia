@@ -97,16 +97,14 @@ oppia.factory('StatesObjectFactory', [
       return finalStateNames;
     };
 
-    States.prototype.getAllAudioLanguageCodes = function() {
+    States.prototype.getAllVoiceoverLanguageCodes = function() {
       var allAudioLanguageCodes = [];
       for (var stateName in this._states) {
         var state = this._states[stateName];
-        var contentIdsList =
-          state.contentIdsToAudioTranslations.getAllContentId();
+        var contentIdsList = state.recordedVoiceovers.getAllContentId();
         contentIdsList.forEach(function(contentId) {
           var audioLanguageCodes = (
-            state.contentIdsToAudioTranslations.getAudioLanguageCodes(
-              contentId));
+            state.recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
           audioLanguageCodes.forEach(function(languageCode) {
             if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
               allAudioLanguageCodes.push(languageCode);
@@ -117,16 +115,15 @@ oppia.factory('StatesObjectFactory', [
       return allAudioLanguageCodes;
     };
 
-    States.prototype.getAllAudioTranslations = function(languageCode) {
+    States.prototype.getAllVoiceovers = function(languageCode) {
       var allAudioTranslations = {};
       for (var stateName in this._states) {
         var state = this._states[stateName];
         allAudioTranslations[stateName] = [];
-        var contentIdsList =
-          state.contentIdsToAudioTranslations.getAllContentId();
+        var contentIdsList = state.recordedVoiceovers.getAllContentId();
         contentIdsList.forEach(function(contentId) {
-          var audioTranslations = state.contentIdsToAudioTranslations
-            .getBindableAudioTranslations(contentId);
+          var audioTranslations = (
+            state.recordedVoiceovers.getBindableVoiceovers(contentId));
           if (audioTranslations.hasOwnProperty(languageCode)) {
             allAudioTranslations[stateName].push(
               audioTranslations[languageCode]);

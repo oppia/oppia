@@ -17,6 +17,7 @@
  */
 
 require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('pages/exploration_editor/ChangeListService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
@@ -25,10 +26,12 @@ require(
   'StateContentIdsToAudioTranslationsService.ts'
 );
 require('pages/state_editor/state_properties/StateContentService.ts');
+require(
+  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
 require('services/EditabilityService.ts');
 
 describe('State content editor directive', function() {
-  var outerScope, ctrlScope, shof, cls, scs, es, ess, citat, scitat;
+  var outerScope, ctrlScope, shof, cls, scs, es, ess, rvo, srvos;
   var mockExplorationData;
 
   var _getContent = function(contentId, contentString) {
@@ -36,10 +39,6 @@ describe('State content editor directive', function() {
       content_id: contentId,
       html: contentString
     });
-  };
-
-  var _getContentIdsToAUdioTranslations = function(citatDict) {
-    return citat.createFromBackendDict(citatDict);
   };
 
   beforeEach(angular.mock.module('directiveTemplates'));
@@ -59,20 +58,22 @@ describe('State content editor directive', function() {
     function($compile, $injector, $rootScope, $templateCache) {
       shof = $injector.get('SubtitledHtmlObjectFactory');
       cls = $injector.get('ChangeListService');
-      citat = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
-      scitat = $injector.get('StateContentIdsToAudioTranslationsService');
+      rvo = $injector.get('RecordedVoiceoversObjectFactory');
+      srvos = $injector.get('StateRecordedVoiceoversService');
       scs = $injector.get('StateContentService');
       es = $injector.get('EditabilityService');
       ess = $injector.get('ExplorationStatesService');
 
-      var citatDict = {
-        content: {},
-        default_outcome: {},
-        feedback_1: {}
+      var rvoDict = {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {}
+        }
       };
 
       scs.init('Third State', _getContent('content', 'This is some content.'));
-      scitat.init('Third State', _getContentIdsToAUdioTranslations(citatDict));
+      srvos.init('Third State', rvo.createFromBackendDict(rvoDict));
       es.markEditable();
       ess.init({
         'First State': {
@@ -80,10 +81,12 @@ describe('State content editor directive', function() {
             content_id: 'content',
             html: 'First State Content'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           interaction: {
             id: 'TextInput',
@@ -126,10 +129,12 @@ describe('State content editor directive', function() {
             content_id: 'content',
             html: 'Second State Content'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           interaction: {
             id: 'TextInput',
@@ -172,10 +177,12 @@ describe('State content editor directive', function() {
             content_id: 'content',
             html: 'This is some content.'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           interaction: {
             id: 'TextInput',

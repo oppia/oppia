@@ -30,6 +30,8 @@ require(
 require('pages/state_editor/state_properties/StateEditorService.ts');
 require('pages/state_editor/state_properties/StatePropertyService.ts');
 require(
+  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
+require(
   'pages/state_editor/state_properties/StateWrittenTranslationsService.ts');
 
 oppia.directive('stateTranslationStatusGraph', [
@@ -44,11 +46,11 @@ oppia.directive('stateTranslationStatusGraph', [
         'state_translation_status_graph_directive.html'),
       controller: [
         '$scope', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
-        'StateEditorService', 'StateContentIdsToAudioTranslationsService',
+        'StateEditorService', 'StateRecordedVoiceoversService',
         'StateWrittenTranslationsService', 'TranslationStatusService',
         function(
             $scope, $rootScope, ExplorationStatesService, GraphDataService,
-            StateEditorService, StateContentIdsToAudioTranslationsService,
+            StateEditorService, StateRecordedVoiceoversService,
             StateWrittenTranslationsService, TranslationStatusService) {
           $scope.getGraphData = GraphDataService.getGraphData;
           $scope.nodeColors = TranslationStatusService.getAllStateStatusColors;
@@ -64,9 +66,9 @@ oppia.directive('stateTranslationStatusGraph', [
             var stateName = StateEditorService.getActiveStateName();
             var stateData = ExplorationStatesService.getState(stateName);
             if (stateName && stateData) {
-              StateContentIdsToAudioTranslationsService.init(
+              StateRecordedVoiceoversService.init(
                 StateEditorService.getActiveStateName(),
-                stateData.contentIdsToAudioTranslations);
+                stateData.recordedVoiceovers);
               StateWrittenTranslationsService.init(
                 StateEditorService.getActiveStateName(),
                 stateData.writtenTranslations);

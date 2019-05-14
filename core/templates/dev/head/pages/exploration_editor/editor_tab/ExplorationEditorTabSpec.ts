@@ -42,10 +42,12 @@ describe('Exploration editor tab controller', function() {
             content_id: 'content',
             html: 'First State Content'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           interaction: {
             id: 'TextInput',
@@ -88,10 +90,12 @@ describe('Exploration editor tab controller', function() {
             content_id: 'content',
             html: 'Second State Content'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           interaction: {
             id: 'TextInput',
@@ -134,10 +138,12 @@ describe('Exploration editor tab controller', function() {
             content_id: 'content',
             html: 'This is some content.'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           interaction: {
             id: 'TextInput',

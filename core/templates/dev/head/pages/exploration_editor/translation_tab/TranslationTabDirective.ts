@@ -32,16 +32,18 @@ require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');
 require('pages/state_editor/state_properties/StatePropertyService.ts');
+require(
+  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 
 oppia.directive('translationTab', [
   'ContextService', 'ExplorationDataService', 'ExplorationStatesService',
-  'StateContentIdsToAudioTranslationsService', 'StateEditorService',
+  'StateEditorService', 'StateRecordedVoiceoversService',
   'StateTutorialFirstTimeService', 'UrlInterpolationService',
   function(
       ContextService, ExplorationDataService, ExplorationStatesService,
-      StateContentIdsToAudioTranslationsService, StateEditorService,
+      StateEditorService, StateRecordedVoiceoversService,
       StateTutorialFirstTimeService, UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -72,9 +74,8 @@ oppia.directive('translationTab', [
 
           var initTranslationTab = function() {
             var stateName = StateEditorService.getActiveStateName();
-            StateContentIdsToAudioTranslationsService.init(
-              stateName,
-              ExplorationStatesService.getContentIdsToAudioTranslationsMemento(
+            StateRecordedVoiceoversService.init(
+              stateName, ExplorationStatesService.getRecordedVoiceoversMemento(
                 stateName));
             StateWrittenTranslationsService.init(stateName,
               ExplorationStatesService.getWrittenTranslationsMemento(

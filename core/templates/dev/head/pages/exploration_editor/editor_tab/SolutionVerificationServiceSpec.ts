@@ -78,12 +78,14 @@ describe('Solution Verification Service', function() {
           content_id: 'content',
           html: 'First State Content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {},
-          hint_1: {},
-          hint_2: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            hint_1: {},
+            hint_2: {}
+          }
         },
         interaction: {
           id: 'TextInput',
@@ -141,10 +143,12 @@ describe('Solution Verification Service', function() {
           content_id: 'content',
           html: ''
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'TextInput',

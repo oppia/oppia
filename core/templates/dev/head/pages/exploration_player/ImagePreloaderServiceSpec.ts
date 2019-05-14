@@ -80,9 +80,11 @@ describe('Image preloader service', function() {
             html: '',
             content_id: 'content'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           interaction: {
             id: 'Continue',
@@ -118,8 +120,10 @@ describe('Image preloader service', function() {
             content_id: 'content',
             html: 'Congratulations, you have finished!'
           },
-          content_ids_to_audio_translations: {
-            content: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {}
+            }
           },
           interaction: {
             id: 'EndExploration',
@@ -148,11 +152,13 @@ describe('Image preloader service', function() {
             content_id: 'content',
             html: 'Multiple Choice'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
           },
           interaction: {
             id: 'MultipleChoiceInput',
@@ -243,12 +249,14 @@ describe('Image preloader service', function() {
             content_id: 'content',
             html: '<p>Text Input Content</p>'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {},
-            hint_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              hint_1: {}
+            }
           },
           interaction: {
             id: 'TextInput',
