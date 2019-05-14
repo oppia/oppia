@@ -25,20 +25,23 @@ oppia.directive('htmlSelect', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         options: '=',
         selection: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/html_select_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.select = function(id) {
-          $scope.selection = id;
+      controllerAs: 'htmlSelectCtrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.select = function(id) {
+          ctrl.selection = id;
         };
 
-        $scope.getSelectionIndex = function() {
-          for (var index = 0; index < $scope.options.length; index++) {
-            if ($scope.options[index].id === $scope.selection) {
+        ctrl.getSelectionIndex = function() {
+          for (var index = 0; index < ctrl.options.length; index++) {
+            if (ctrl.options[index].id === ctrl.selection) {
               return index;
             }
           }
