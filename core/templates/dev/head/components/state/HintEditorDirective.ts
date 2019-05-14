@@ -20,7 +20,8 @@ oppia.directive('hintEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         hint: '=',
         getIndexPlusOne: '&indexPlusOne',
         getOnSaveFn: '&onSave',
@@ -28,53 +29,55 @@ oppia.directive('hintEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/hint_editor_directive.html'),
+      controllerAs: 'hintEditorCtrl',
       controller: [
         '$scope', 'EditabilityService', 'StateHintsService',
         function($scope, EditabilityService, StateHintsService) {
-          $scope.isEditable = EditabilityService.isEditable();
-          $scope.StateHintsService = StateHintsService;
-          $scope.editHintForm = {};
-          $scope.hintEditorIsOpen = false;
+          var ctrl = this;
+          ctrl.isEditable = EditabilityService.isEditable();
+          ctrl.StateHintsService = StateHintsService;
+          ctrl.editHintForm = {};
+          ctrl.hintEditorIsOpen = false;
 
-          $scope.HINT_FORM_SCHEMA = {
+          ctrl.HINT_FORM_SCHEMA = {
             type: 'html',
             ui_config: {}
           };
 
-          $scope.hintMemento = null;
+          ctrl.hintMemento = null;
 
-          $scope.openHintEditor = function() {
-            if ($scope.isEditable) {
-              $scope.hintMemento = angular.copy($scope.hint);
-              $scope.hintEditorIsOpen = true;
+          ctrl.openHintEditor = function() {
+            if (ctrl.isEditable) {
+              ctrl.hintMemento = angular.copy(ctrl.hint);
+              ctrl.hintEditorIsOpen = true;
             }
           };
 
-          $scope.saveThisHint = function() {
-            $scope.hintEditorIsOpen = false;
+          ctrl.saveThisHint = function() {
+            ctrl.hintEditorIsOpen = false;
             var contentHasChanged = (
-              $scope.hintMemento.hintContent.getHtml() !==
-              $scope.hint.hintContent.getHtml());
-            $scope.hintMemento = null;
+              ctrl.hintMemento.hintContent.getHtml() !==
+              ctrl.hint.hintContent.getHtml());
+            ctrl.hintMemento = null;
             if (contentHasChanged) {
-              var hintContentId = $scope.hint.hintContent.getContentId();
-              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+              var hintContentId = ctrl.hint.hintContent.getContentId();
+              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
                 hintContentId);
             }
-            $scope.getOnSaveFn()();
+            ctrl.getOnSaveFn()();
           };
 
-          $scope.cancelThisHintEdit = function() {
-            $scope.hint.hintContent =
-              angular.copy($scope.hintMemento.hintContent);
-            $scope.hintMemento = null;
-            $scope.hintEditorIsOpen = false;
+          ctrl.cancelThisHintEdit = function() {
+            ctrl.hint.hintContent =
+              angular.copy(ctrl.hintMemento.hintContent);
+            ctrl.hintMemento = null;
+            ctrl.hintEditorIsOpen = false;
           };
 
           $scope.$on('externalSave', function() {
-            if ($scope.hintEditorIsOpen &&
-                $scope.editHintForm.$valid) {
-              $scope.saveThisHint();
+            if (ctrl.hintEditorIsOpen &&
+                ctrl.editHintForm.$valid) {
+              ctrl.saveThisHint();
             }
           });
         }
