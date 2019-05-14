@@ -19,12 +19,15 @@
 oppia.directive('schemaBasedHtmlViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      scope: {},
+      bindToController: {
         localValue: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_viewers/' +
         'schema_based_html_viewer_directive.html'),
+      controllerAs: 'schemaBasedHtmlViewerCtrl',
+      controller: [function() {}],
       restrict: 'E'
     };
   }]);
