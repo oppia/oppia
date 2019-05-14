@@ -59,7 +59,7 @@ describe('Editable skill backend API service', function() {
     };
 
     sampleResponse = {
-      skill: skillDict
+      skills: [skillDict]
     };
   }));
 
@@ -80,7 +80,7 @@ describe('Editable skill backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleResponse.skill);
+      expect(successHandler).toHaveBeenCalledWith(sampleResponse.skills[0]);
       expect(failHandler).not.toHaveBeenCalled();
     });
 
