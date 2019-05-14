@@ -25,193 +25,189 @@ oppia.factory('ThreadDataService', [
       $http, $log, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionObjectFactory,
       SuggestionThreadObjectFactory, ACTION_ACCEPT_SUGGESTION) {
-    var _expId = ExplorationDataService.explorationId;
-    var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
-    var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
-    var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
-    var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' +
-        'exploration/' + _expId + '/';
-    var _THREAD_HANDLER_PREFIX = '/threadhandler/';
-    var _FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
-    var _THREAD_STATUS_OPEN = 'open';
+    var expId = ExplorationDataService.explorationId;
+    var FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + expId;
+    var FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
+    var SUGGESTION_ACTION_HANDLER_URL = (
+      '/suggestionactionhandler/exploration/' + expId + '/');
+    var SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
+    var THREAD_HANDLER_PREFIX = '/threadhandler/';
+    var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
+    var THREAD_STATUS_OPEN = 'open';
 
     // All the threads for this exploration. This is a list whose entries are
     // objects, each representing threads. The 'messages' key of this object
-    // is updated lazily.
-    var _data = {
+    // are updated lazily.
+    var data = {
       feedbackThreads: [],
-      suggestionThreads: []
+      suggestionThreads: [],
     };
+
+    // Helper object to efficiently remember which thread objects are associated
+    // to which id.
+    var threadsById = {};
 
     // Number of open threads that need action
-    var _openThreadsCount = 0;
+    var openThreadsCount = 0;
 
-    var _fetchThreads = function(successCallback = function() {}) {
-      var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
-      var params = {
-        target_type: 'exploration',
-        target_id: _expId
+    // Helper which creates a function which compares two objects by a property.
+    var compareBy = function(propertyName) {
+      return function(lhs, rhs) {
+        var lhsKey = lhs[propertyName];
+        var rhsKey = rhs[propertyName];
+        return (lhsKey === rhsKey) ? 0 : (lhsKey < rhsKey) ? -1 : 1;
       };
-      var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-        params: params
-      });
-
-      $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
-        _data.feedbackThreads = res[0].data.feedback_thread_dicts.map(
-          FeedbackThreadObjectFactory.createFromBackendDict);
-
-        _data.suggestionThreads = [];
-        var suggestionThreads = res[0].data.suggestion_thread_dicts;
-        if (suggestionThreads.length !== res[1].data.suggestions.length) {
-          $log.error('Number of suggestion threads doesn\'t match number of' +
-                     'suggestion objects');
-        }
-        for (var i = 0; i < suggestionThreads.length; i++) {
-          for (var j = 0; j < res[1].data.suggestions.length; j++) {
-            var suggestion = (
-              SuggestionObjectFactory.createFromBackendDict(
-                res[1].data.suggestions[j]));
-            if (suggestionThreads[i].thread_id ===
-                suggestion.getThreadId()) {
-              var suggestionThread = (
-                SuggestionThreadObjectFactory.createFromBackendDicts(
-                  suggestionThreads[i], res[1].data.suggestions[j]));
-              _data.suggestionThreads.push(suggestionThread);
-              break;
-            }
-          }
-        }
-        successCallback();
-      });
     };
 
-    var _fetchMessages = function(threadId) {
-      $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(response) {
-        var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
-        for (var i = 0; i < allThreads.length; i++) {
-          if (allThreads[i].threadId === threadId) {
-            allThreads[i].setMessages(response.data.messages);
-            break;
+    // Removes invalid elements from the arrays while logging helpful errors.
+    var sanitizeSuggestionBackendDicts = function(
+        suggestionThreadBackendDicts, suggestionObjectBackendDicts) {
+      suggestionThreadBackendDicts.sort(compareBy('thread_id'));
+      suggestionObjectBackendDicts.sort(compareBy('suggestion_id'));
+
+      for (var i = 0; i < suggestionThreadBackendDicts.length; ++i) {
+        var suggestionThreadBackendDict = suggestionThreadBackendDicts[i];
+        var suggestionObjectBackendDict = suggestionObjectBackendDicts[i];
+
+        var hasSuggestionThread = (suggestionThreadBackendDict !== undefined);
+        var hasSuggestionObject = (suggestionObjectBackendDict !== undefined);
+
+        if (hasSuggestionThread && hasSuggestionObject) {
+          var threadId = suggestionThreadBackendDict.thread_id;
+          var suggestionId = suggestionObjectBackendDict.suggestion_id;
+          if (threadId < suggestionId) {
+            $log.error(
+              'Suggestion Thread with id "' + threadId + '" has no ' +
+              'associated Suggestion Object in the backend.');
+            suggestionThreadBackendDicts.splice(i, 1);
+            --i; // Try this index again.
+          } else if (suggestionId < threadId) {
+            $log.error(
+              'Suggestion Object with id "' + suggestionId + '" has no ' +
+              'associated Suggestion Thread in the backend.');
+            suggestionObjectBackendDicts.splice(i, 1);
+            --i; // Try this index again.
           }
+        } else if (hasSuggestionThread && !hasSuggestionObject) {
+          $log.error(
+            'Suggestion Thread with id "' +
+            suggestionThreadBackendDict.thread_id + '" has no associated ' +
+            'Suggestion Object in the backend.');
+          // Remove all remaining elements.
+          suggestionThreadBackendDicts.length = i;
+        } else if (!hasSuggestionThread && hasSuggestionObject) {
+          $log.error(
+            'Suggestion Object with id "' +
+            suggestionObjectBackendDict.suggestion_id + '" has no ' +
+            'associated Suggestion Thread in the backend.');
+          // Remove all remaining elements.
+          suggestionObjectBackendDicts.length = i;
         }
-      });
+      }
     };
 
     return {
-      data: _data,
+      data: data,
       fetchThreads: function(successCallback) {
-        _fetchThreads(successCallback);
+        return $q.all([
+          $http.get(THREAD_LIST_HANDLER_URL),
+          $http.get(SUGGESTION_LIST_HANDLER_URL, {
+            params: {target_type: 'exploration', target_id: expId},
+          }),
+        ]).then(function(responses) {
+          var threads = responses[0].data;
+          var suggestions = responses[1].data;
+          var feedbackThreadBackendDicts = threads.feedback_thread_dicts;
+          var suggestionThreadBackendDicts = threads.suggestion_thread_dicts;
+          var suggestionObjectBackendDicts = suggestions.suggestions;
+
+          threadsById = {};
+
+          data.feedbackThreads = [];
+          feedbackThreadBackendDicts.forEach(function(backendDict) {
+            var feedbackThread =
+              FeedbackThreadObjectFactory.createFromBackendDict(backendDict);
+            threadsById[feedbackThread.threadId] = feedbackThread;
+            data.feedbackThreads.push(feedbackThread);
+          });
+
+          data.suggestionThreads = [];
+          sanitizeSuggestionBackendDicts(
+            suggestionThreadBackendDicts, suggestionObjectBackendDicts);
+          for (var i = 0; i < suggestionThreadBackendDicts.length; ++i) {
+            var suggestionThread =
+              SuggestionThreadObjectFactory.createFromBackendDicts(
+                suggestionThreadBackendDicts[i],
+                suggestionObjectBackendDicts[i]);
+            threadsById[suggestionThread.threadId] = suggestionThread;
+            data.suggestionThreads.push(suggestionThread);
+          }
+        }).then(successCallback);
       },
       fetchMessages: function(threadId) {
-        _fetchMessages(threadId);
+        return $http.get(THREAD_HANDLER_PREFIX + threadId).then(function(res) {
+          threadsById[threadId].setMessages(res.data.messages);
+        });
       },
       fetchFeedbackStats: function() {
-        $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
-          _openThreadsCount = response.data.num_open_threads;
+        $http.get(FEEDBACK_STATS_HANDLER_URL).then(function(response) {
+          openThreadsCount = response.data.num_open_threads;
         });
       },
       getOpenThreadsCount: function() {
-        return _openThreadsCount;
+        return openThreadsCount;
       },
       createNewThread: function(newSubject, newText, successCallback) {
-        _openThreadsCount += 1;
-        $http.post(_THREAD_LIST_HANDLER_URL, {
+        var thisService = this;
+
+        return $http.post(THREAD_LIST_HANDLER_URL, {
           state_name: null,
           subject: newSubject,
-          text: newText
+          text: newText,
         }).then(function() {
-          _fetchThreads();
-          if (successCallback) {
-            successCallback();
-          }
-        }, function() {
-          _openThreadsCount -= 1;
+          openThreadsCount += 1;
+          return thisService.fetchThreads();
+        }).then(successCallback, function(rejectionReason) {
           AlertsService.addWarning('Error creating new thread.');
+          return $q.reject(rejectionReason);
         });
       },
       markThreadAsSeen: function(threadId) {
-        var requestUrl = _FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId;
-        $http.post(requestUrl, {
+        return $http.post(FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
           thread_id: threadId
         });
       },
       addNewMessage: function(
-          threadId, newMessage, newStatus, successCallback, errorCallback) {
-        var url = _THREAD_HANDLER_PREFIX + threadId;
-        var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
-        var thread = null;
-
-        for (var i = 0; i < allThreads.length; i++) {
-          if (allThreads[i].threadId === threadId) {
-            thread = allThreads[i];
-            break;
-          }
-        }
-
-        // This is only set if the status has changed.
-        // Assume a successful POST, in case of an error
-        // the changes are reverted in the error callback.
-        var updatedStatus = null;
+          threadId, newMessage, newStatus, onSuccess, onFailure) {
+        var thisService = this;
+        var thread = threadsById[threadId];
         var oldStatus = thread.status;
-        if (newStatus !== oldStatus) {
-          updatedStatus = newStatus;
-          if (oldStatus === _THREAD_STATUS_OPEN) {
-            _openThreadsCount -= 1;
-          } else if (newStatus === _THREAD_STATUS_OPEN) {
-            _openThreadsCount += 1;
-          }
-          thread.status = updatedStatus;
-        }
 
-        var payload = {
-          updated_status: updatedStatus,
+        return $http.post(THREAD_HANDLER_PREFIX + threadId, {
+          updated_status: (newStatus === oldStatus) ? null : newStatus,
           updated_subject: null,
-          text: newMessage
-        };
-
-        $http.post(url, payload).then(function() {
-          _fetchMessages(threadId);
-
-          if (successCallback) {
-            successCallback();
+          text: newMessage,
+        }).then(function() {
+          thread.status = newStatus;
+          if (oldStatus === THREAD_STATUS_OPEN) {
+            openThreadsCount -= 1;
+          } else if (newStatus === THREAD_STATUS_OPEN) {
+            openThreadsCount += 1;
           }
-        }, function() {
-          // Revert changes
-          if (newStatus !== oldStatus) {
-            if (oldStatus === _THREAD_STATUS_OPEN) {
-              _openThreadsCount += 1;
-            } else if (newStatus === _THREAD_STATUS_OPEN) {
-              _openThreadsCount -= 1;
-            }
-            thread.status = oldStatus;
-          }
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
+          return thisService.fetchMessages(threadId);
+        }).then(onSuccess, onFailure);
       },
       resolveSuggestion: function(
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
           onSuccess, onFailure) {
-        var payload = {
+        return $http.put(SUGGESTION_ACTION_HANDLER_URL + threadId, {
           action: action,
           review_message: reviewMsg,
-          commit_message: null
-        };
-
-        if (action === ACTION_ACCEPT_SUGGESTION) {
-          payload.commit_message = commitMsg;
-        }
-        _openThreadsCount -= 1;
-        $http.put(
-          _SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(
-          onSuccess, function() {
-            _openThreadsCount += 1;
-            if (onFailure) {
-              onFailure();
-            }
-          }
-        );
+          commit_message: (
+            action === ACTION_ACCEPT_SUGGESTION) ? commitMsg : null,
+        }).then(function() {
+          openThreadsCount -= 1;
+        }).then(onSuccess, onFailure);
       }
     };
   }
