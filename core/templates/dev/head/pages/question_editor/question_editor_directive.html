@@ -1,18 +1,18 @@
-<div class="oppia-editor-cards-container" ng-if="stateEditorInitialized">
-  <state-editor on-save-state-content="saveStateContent"
-                on-save-interaction-customization-args="saveInteractionCustomizationArgs"
-                on-save-interaction-id="saveInteractionId"
-                on-save-interaction-default-outcome="saveInteractionDefaultOutcome"
-                on-save-interaction-answer-groups="saveInteractionAnswerGroups"
-                on-save-solution="saveSolution"
-                on-save-hints="saveHints"
-                state-content-placeholder="getStateContentPlaceholder()"
-                show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired"
-                interaction-is-shown="interactionIsShown"
-                recompute-graph="recomputeGraph"
-                navigate-to-state="navigateToState"
-                add-state="addState"
-                refresh-warnings="refreshWarnings">
+<div class="oppia-editor-cards-container" ng-if="questionEditorCtrl.stateEditorInitialized">
+  <state-editor on-save-state-content="questionEditorCtrl.saveStateContent"
+                on-save-interaction-customization-args="questionEditorCtrl.saveInteractionCustomizationArgs"
+                on-save-interaction-id="questionEditorCtrl.saveInteractionId"
+                on-save-interaction-default-outcome="questionEditorCtrl.saveInteractionDefaultOutcome"
+                on-save-interaction-answer-groups="questionEditorCtrl.saveInteractionAnswerGroups"
+                on-save-solution="questionEditorCtrl.saveSolution"
+                on-save-hints="questionEditorCtrl.saveHints"
+                state-content-placeholder="questionEditorCtrl.getStateContentPlaceholder()"
+                show-mark-all-audio-as-needing-update-modal-if-required="questionEditorCtrl.showMarkAllAudioAsNeedingUpdateModalIfRequired"
+                interaction-is-shown="questionEditorCtrl.interactionIsShown"
+                recompute-graph="questionEditorCtrl.recomputeGraph"
+                navigate-to-state="questionEditorCtrl.navigateToState"
+                add-state="questionEditorCtrl.addState"
+                refresh-warnings="questionEditorCtrl.refreshWarnings">
   </state-editor>
 </div>
 
