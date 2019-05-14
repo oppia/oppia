@@ -2231,7 +2231,7 @@ class LintChecksManager(object):
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
         or extensions folder which are not specified in
-        JS_FILEPATHS_NOT_TO_BUILD.
+        build.JS_FILEPATHS_NOT_TO_BUILD.
         """
         summary_messages = []
         js_files_to_check = [
@@ -2246,9 +2246,10 @@ class LintChecksManager(object):
 
         if len(extra_js_files):
             err_msg = (
-                'You have extra js files in your repo. If you want them to be '
-                'present as js files, add them to the list '
-                'JS_FILEPATHS_NOT_TO_BUILD in build.py else rename them to .ts')
+                'You have following extra js files in your repo: %s. If you '
+                'want them to be present as js files, add them to the list '
+                'JS_FILEPATHS_NOT_TO_BUILD in build.py else rename them to .ts'
+            ) % (extra_js_files)
             summary_message = '%s   %s' % (_MESSAGE_TYPE_FAILED, err_msg)
         else:
             summary_message = '%s  Extra JS files check passed' % (

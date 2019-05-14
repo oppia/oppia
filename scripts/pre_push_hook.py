@@ -39,6 +39,7 @@ import sys
 
 # pylint: enable=wrong-import-order
 
+
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
@@ -312,17 +313,10 @@ def does_diff_include_js_or_ts_files(files_to_lint):
             files.
     """
 
-    js_files_to_check = [
-        filename for filename in files_to_lint if
-        filename.endswith('.js')]
-
-    ts_files_to_check = [
-        filename for filename in files_to_lint if
-        filename.endswith('.ts')]
-
-    all_files_to_check = js_files_to_check + ts_files_to_check
-
-    return bool(all_files_to_check)
+    for filename in files_to_lint:
+        if filename.endswith('.ts') or filename.endswith('.js'):
+            return True
+    return False
 
 
 def main():
