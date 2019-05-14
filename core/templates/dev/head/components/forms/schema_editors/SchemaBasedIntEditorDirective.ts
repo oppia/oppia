@@ -19,7 +19,8 @@
 oppia.directive('schemaBasedIntEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      scope: {},
+      bindToController: {
         localValue: '=',
         isDisabled: '&',
         validators: '&',
@@ -31,13 +32,15 @@ oppia.directive('schemaBasedIntEditor', [
         '/components/forms/schema_editors/' +
         'schema_based_int_editor_directive.html'),
       restrict: 'E',
+      controllerAs: 'schemaBasedIntEditorCtrl',
       controller: [
         '$scope', function($scope) {
-          if ($scope.localValue === undefined) {
-            $scope.localValue = 0;
+          var ctrl = this;
+          if (ctrl.localValue === undefined) {
+            ctrl.localValue = 0;
           }
 
-          $scope.onKeypress = function(evt) {
+          ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
               $scope.$emit('submittedSchemaBasedIntForm');
             }

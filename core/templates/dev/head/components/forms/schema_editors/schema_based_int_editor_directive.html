@@ -6,11 +6,11 @@
 </style>
 
 <div class="input-group">
-  <span ng-if="!expressionMode">
+  <span ng-if="!schemaBasedIntEditorCtrl.expressionMode">
     <md-input-group class="long oppia-blue-on-focus md-default-theme" style="margin: 0px;">
-      <input type="number" ng-model="$parent.localValue" ng-disabled="isDisabled()"
-             required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>"
-             ng-blur="onInputBlur()" ng-focus="onInputFocus()">
+      <input type="number" ng-model="$parent.localValue" ng-disabled="schemaBasedIntEditorCtrl.isDisabled()"
+             required apply-validation="schemaBasedIntEditorCtrl.validators()" focus-on="<[schemaBasedIntEditorCtrl.labelForFocusTarget()]>"
+             ng-blur="schemaBasedIntEditorCtrl.onInputBlur()" ng-focus="schemaBasedIntEditorCtrl.onInputFocus()">
     </md-input-group>
   </span>
 </div>
