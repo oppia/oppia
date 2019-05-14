@@ -20,7 +20,8 @@ oppia.directive('schemaBasedBoolEditor', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
-      scope: {
+      scope: {},
+      bindToController: {
         localValue: '=',
         isDisabled: '&',
         labelForFocusTarget: '&'
@@ -28,6 +29,8 @@ oppia.directive('schemaBasedBoolEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_editors/' +
         'schema_based_bool_editor_directive.html'),
+      controllerAs: 'schemaBasedBoolEditorCtrl',
+      controller: [function() {}],
       restrict: 'E'
     };
   }]);
