@@ -20,7 +20,8 @@ oppia.directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         addState: '=',
         displayFeedback: '=',
         getOnSaveTaggedMisconception: '&onSaveTaggedMisconception',
@@ -38,6 +39,7 @@ oppia.directive('answerGroupEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/answer_group_editor_directive.html'),
+      controllerAs: 'answerGroupEditorCtrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
         'AlertsService', 'INTERACTION_SPECS', 'StateEditorService',
@@ -48,28 +50,29 @@ oppia.directive('answerGroupEditor', [
             AlertsService, INTERACTION_SPECS, StateEditorService,
             RuleObjectFactory, TrainingDataEditorPanelService,
             ENABLE_ML_CLASSIFIERS, ResponsesService) {
-          $scope.rulesMemento = null;
-          $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
-          $scope.editAnswerGroupForm = {};
-          $scope.misconceptionName = null;
-          $scope.misconceptions = StateEditorService.getMisconceptions();
+          var ctrl = this;
+          ctrl.rulesMemento = null;
+          ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
+          ctrl.editAnswerGroupForm = {};
+          ctrl.misconceptionName = null;
+          ctrl.misconceptions = StateEditorService.getMisconceptions();
 
           var _getTaggedMisconceptionName = function(misconceptionId) {
-            for (var i = 0; i < $scope.misconceptions.length; i++) {
+            for (var i = 0; i < ctrl.misconceptions.length; i++) {
               if (
-                $scope.misconceptions[i].getId() === misconceptionId) {
-                $scope.misconceptionName = $scope.misconceptions[i].getName();
+                ctrl.misconceptions[i].getId() === misconceptionId) {
+                ctrl.misconceptionName = ctrl.misconceptions[i].getName();
               }
             }
           };
 
-          _getTaggedMisconceptionName($scope.getTaggedMisconceptionId());
+          _getTaggedMisconceptionName(ctrl.getTaggedMisconceptionId());
 
-          $scope.isInQuestionMode = function() {
+          ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();
           };
 
-          $scope.tagAnswerGroupWithMisconception = function() {
+          ctrl.tagAnswerGroupWithMisconception = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/questions/' +
@@ -109,21 +112,21 @@ oppia.directive('answerGroupEditor', [
             modalInstance.result.then(function(returnObject) {
               var misconception = returnObject.misconception;
               var feedbackIsUsed = returnObject.feedbackIsUsed;
-              var outcome = angular.copy($scope.outcome);
+              var outcome = angular.copy(ctrl.outcome);
               if (feedbackIsUsed) {
                 outcome.feedback.setHtml(misconception.getFeedback());
-                $scope.getOnSaveAnswerGroupFeedbackFn()(outcome);
+                ctrl.getOnSaveAnswerGroupFeedbackFn()(outcome);
                 $rootScope.$broadcast('externalSave');
               }
-              $scope.getOnSaveTaggedMisconception()(misconception.getId());
+              ctrl.getOnSaveTaggedMisconception()(misconception.getId());
               _getTaggedMisconceptionName(misconception.getId());
             });
           };
 
-          $scope.getAnswerChoices = function() {
+          ctrl.getAnswerChoices = function() {
             return ResponsesService.getAnswerChoices();
           };
-          $scope.answerChoices = $scope.getAnswerChoices();
+          ctrl.answerChoices = ctrl.getAnswerChoices();
 
           // Updates answer choices when the interaction requires it -- e.g.,
           // the rules for multiple choice need to refer to the multiple choice
@@ -131,16 +134,16 @@ oppia.directive('answerGroupEditor', [
           // TODO(sll): Remove the need for this watcher, or make it less
           // ad hoc.
           $scope.$on('updateAnswerChoices', function() {
-            $scope.answerChoices = $scope.getAnswerChoices();
+            ctrl.answerChoices = ctrl.getAnswerChoices();
           });
 
-          $scope.getCurrentInteractionId = function() {
+          ctrl.getCurrentInteractionId = function() {
             return StateInteractionIdService.savedMemento;
           };
 
           $scope.$on('externalSave', function() {
-            if ($scope.isRuleEditorOpen()) {
-              $scope.saveRules();
+            if (ctrl.isRuleEditorOpen()) {
+              ctrl.saveRules();
             }
           });
 
@@ -229,9 +232,9 @@ oppia.directive('answerGroupEditor', [
             }
           };
 
-          $scope.addNewRule = function() {
+          ctrl.addNewRule = function() {
             // Build an initial blank set of inputs for the initial rule.
-            var interactionId = $scope.getCurrentInteractionId();
+            var interactionId = ctrl.getCurrentInteractionId();
             var ruleDescriptions = (
               INTERACTION_SPECS[interactionId].rule_descriptions);
             var ruleTypes = Object.keys(ruleDescriptions);
@@ -259,76 +262,76 @@ oppia.directive('answerGroupEditor', [
 
             // Save the state of the rules before adding a new one (in case the
             // user cancels the addition).
-            $scope.rulesMemento = angular.copy($scope.rules);
+            ctrl.rulesMemento = angular.copy(ctrl.rules);
 
             // TODO(bhenning): Should use functionality in ruleEditor.js, but
             // move it to ResponsesService in StateResponses.js to properly
             // form a new rule.
-            $scope.rules.push(RuleObjectFactory.createNew(ruleType, inputs));
-            $scope.changeActiveRuleIndex($scope.rules.length - 1);
+            ctrl.rules.push(RuleObjectFactory.createNew(ruleType, inputs));
+            ctrl.changeActiveRuleIndex(ctrl.rules.length - 1);
           };
 
-          $scope.deleteRule = function(index) {
-            $scope.rules.splice(index, 1);
-            $scope.saveRules();
+          ctrl.deleteRule = function(index) {
+            ctrl.rules.splice(index, 1);
+            ctrl.saveRules();
 
-            if ($scope.rules.length === 0) {
+            if (ctrl.rules.length === 0) {
               AlertsService.addWarning(
                 'All answer groups must have at least one rule.');
             }
           };
 
-          $scope.cancelActiveRuleEdit = function() {
-            $scope.rules.splice(0, $scope.rules.length);
-            for (var i = 0; i < $scope.rulesMemento.length; i++) {
-              $scope.rules.push($scope.rulesMemento[i]);
+          ctrl.cancelActiveRuleEdit = function() {
+            ctrl.rules.splice(0, ctrl.rules.length);
+            for (var i = 0; i < ctrl.rulesMemento.length; i++) {
+              ctrl.rules.push(ctrl.rulesMemento[i]);
             }
-            $scope.saveRules();
+            ctrl.saveRules();
           };
 
-          $scope.saveRules = function() {
-            $scope.changeActiveRuleIndex(-1);
-            $scope.rulesMemento = null;
-            $scope.getOnSaveAnswerGroupRulesFn()($scope.rules);
+          ctrl.saveRules = function() {
+            ctrl.changeActiveRuleIndex(-1);
+            ctrl.rulesMemento = null;
+            ctrl.getOnSaveAnswerGroupRulesFn()(ctrl.rules);
           };
 
-          $scope.changeActiveRuleIndex = function(newIndex) {
+          ctrl.changeActiveRuleIndex = function(newIndex) {
             ResponsesService.changeActiveRuleIndex(newIndex);
-            $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
+            ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           };
 
-          $scope.openRuleEditor = function(index) {
-            if (!$scope.isEditable) {
+          ctrl.openRuleEditor = function(index) {
+            if (!ctrl.isEditable) {
               // The rule editor may not be opened in a read-only editor view.
               return;
             }
-            $scope.rulesMemento = angular.copy($scope.rules);
-            $scope.changeActiveRuleIndex(index);
+            ctrl.rulesMemento = angular.copy(ctrl.rules);
+            ctrl.changeActiveRuleIndex(index);
           };
 
-          $scope.isRuleEditorOpen = function() {
-            return $scope.activeRuleIndex !== -1;
+          ctrl.isRuleEditorOpen = function() {
+            return ctrl.activeRuleIndex !== -1;
           };
 
-          $scope.isCurrentInteractionTrainable = function() {
-            var interactionId = $scope.getCurrentInteractionId();
+          ctrl.isCurrentInteractionTrainable = function() {
+            var interactionId = ctrl.getCurrentInteractionId();
             return INTERACTION_SPECS[interactionId].is_trainable;
           };
 
-          $scope.openTrainingDataEditor = function() {
+          ctrl.openTrainingDataEditor = function() {
             TrainingDataEditorPanelService.openTrainingDataEditor();
           };
 
-          $scope.isMLEnabled = function() {
+          ctrl.isMLEnabled = function() {
             return ENABLE_ML_CLASSIFIERS;
           };
 
           $scope.$on('onInteractionIdChanged', function() {
-            if ($scope.isRuleEditorOpen()) {
-              $scope.saveRules();
+            if (ctrl.isRuleEditorOpen()) {
+              ctrl.saveRules();
             }
             $scope.$broadcast('updateAnswerGroupInteractionId');
-            $scope.answerChoices = $scope.getAnswerChoices();
+            ctrl.answerChoices = ctrl.getAnswerChoices();
           });
         }
       ]
