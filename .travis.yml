@@ -106,6 +106,9 @@ install:
 - bash scripts/install_third_party.sh
 
 script:
+# All the python scripts should behave as modules -- the
+# pre_commit_linter needs to import other Python files and that is
+# only possible if we treat it as a module.
 - if [ "$RUN_LINT" == 'true' ]; then python scripts/third_party_size_check.py; python -m scripts.pre_commit_linter --path=. --verbose; fi
 # These lines are commented out because these checks are being run on CircleCI
 # here: https://circleci.com/gh/oppia/oppia
