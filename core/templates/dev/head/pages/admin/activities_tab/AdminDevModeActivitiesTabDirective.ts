@@ -24,14 +24,17 @@ oppia.directive('adminDevModeActivitiesTab', [
       ADMIN_HANDLER_URL) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/activities_tab/' +
         'admin_dev_mode_activities_tab_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.reloadExploration = function(explorationId) {
+      controllerAs: 'adminDevModeActivitiesTabCtrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.reloadExploration = function(explorationId) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -39,28 +42,28 @@ oppia.directive('adminDevModeActivitiesTab', [
             return;
           }
 
-          $scope.setStatusMessage('Processing...');
+          ctrl.setStatusMessage('Processing...');
 
           AdminTaskManagerService.startTask();
           $http.post(ADMIN_HANDLER_URL, {
             action: 'reload_exploration',
             exploration_id: String(explorationId)
           }).then(function() {
-            $scope.setStatusMessage('Data reloaded successfully.');
+            ctrl.setStatusMessage('Data reloaded successfully.');
             AdminTaskManagerService.finishTask();
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
             AdminTaskManagerService.finishTask();
           });
         };
 
-        $scope.DEMO_EXPLORATIONS = GLOBALS.DEMO_EXPLORATIONS;
-        $scope.DEMO_COLLECTIONS = GLOBALS.DEMO_COLLECTIONS;
-        $scope.numDummyExpsToPublish = 0;
-        $scope.numDummyExpsToGenerate = 0;
+        ctrl.DEMO_EXPLORATIONS = GLOBALS.DEMO_EXPLORATIONS;
+        ctrl.DEMO_COLLECTIONS = GLOBALS.DEMO_COLLECTIONS;
+        ctrl.numDummyExpsToPublish = 0;
+        ctrl.numDummyExpsToGenerate = 0;
 
-        $scope.reloadAllExplorations = function() {
+        ctrl.reloadAllExplorations = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -68,7 +71,7 @@ oppia.directive('adminDevModeActivitiesTab', [
             return;
           }
 
-          $scope.setStatusMessage('Processing...');
+          ctrl.setStatusMessage('Processing...');
           AdminTaskManagerService.startTask();
 
           var numSucceeded = 0;
@@ -76,12 +79,12 @@ oppia.directive('adminDevModeActivitiesTab', [
           var numTried = 0;
           var printResult = function() {
             if (numTried < GLOBALS.DEMO_EXPLORATION_IDS.length) {
-              $scope.setStatusMessage(
+              ctrl.setStatusMessage(
                 'Processing...' + numTried + '/' +
                 GLOBALS.DEMO_EXPLORATION_IDS.length);
               return;
             }
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Reloaded ' + GLOBALS.DEMO_EXPLORATION_IDS.length +
               ' explorations: ' + numSucceeded + ' succeeded, ' + numFailed +
               ' failed.');
@@ -106,30 +109,30 @@ oppia.directive('adminDevModeActivitiesTab', [
           }
         };
 
-        $scope.generateDummyExplorations = function() {
+        ctrl.generateDummyExplorations = function() {
           // Generate dummy explorations with random title.
-          if ($scope.numDummyExpsToPublish > $scope.numDummyExpsToGenerate) {
-            $scope.setStatusMessage(
+          if (ctrl.numDummyExpsToPublish > ctrl.numDummyExpsToGenerate) {
+            ctrl.setStatusMessage(
               'Publish count should be less than or equal to generate count');
             return;
           }
           AdminTaskManagerService.startTask();
-          $scope.setStatusMessage('Processing...');
+          ctrl.setStatusMessage('Processing...');
           $http.post(ADMIN_HANDLER_URL, {
             action: 'generate_dummy_explorations',
-            num_dummy_exps_to_generate: $scope.numDummyExpsToGenerate,
-            num_dummy_exps_to_publish: $scope.numDummyExpsToPublish
+            num_dummy_exps_to_generate: ctrl.numDummyExpsToGenerate,
+            num_dummy_exps_to_publish: ctrl.numDummyExpsToPublish
           }).then(function() {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Dummy explorations generated successfully.');
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
           AdminTaskManagerService.finishTask();
         };
 
-        $scope.reloadCollection = function(collectionId) {
+        ctrl.reloadCollection = function(collectionId) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -137,16 +140,16 @@ oppia.directive('adminDevModeActivitiesTab', [
             return;
           }
 
-          $scope.setStatusMessage('Processing...');
+          ctrl.setStatusMessage('Processing...');
 
           AdminTaskManagerService.startTask();
           $http.post(ADMIN_HANDLER_URL, {
             action: 'reload_collection',
             collection_id: String(collectionId)
           }).then(function() {
-            $scope.setStatusMessage('Data reloaded successfully.');
+            ctrl.setStatusMessage('Data reloaded successfully.');
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
           AdminTaskManagerService.finishTask();
