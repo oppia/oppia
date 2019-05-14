@@ -21,7 +21,8 @@ oppia.directive('select2Dropdown', [
     // Directive for incorporating select2 dropdowns.
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         // Whether to allow multiple choices. In order to do so, the value of
         // this attribute must be the exact string 'true'.
         allowMultipleChoices: '@',
@@ -44,19 +45,21 @@ oppia.directive('select2Dropdown', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/select2_dropdown_directive.html'),
+      controllerAs: 'select2DropdownCtrl',
       controller: ['$scope', '$element', function($scope, $element) {
-        $scope.newChoiceValidator = new RegExp($scope.newChoiceRegex);
+        var ctrl = this;
+        ctrl.newChoiceValidator = new RegExp(ctrl.newChoiceRegex);
 
         var select2Options = {
           allowClear: false,
-          data: $scope.choices,
-          multiple: $scope.allowMultipleChoices === 'true',
-          tags: $scope.newChoiceRegex !== undefined,
-          placeholder: $scope.placeholder,
-          width: $scope.width || '250px',
+          data: ctrl.choices,
+          multiple: ctrl.allowMultipleChoices === 'true',
+          tags: ctrl.newChoiceRegex !== undefined,
+          placeholder: ctrl.placeholder,
+          width: ctrl.width || '250px',
           dropdownCssClass: null,
           createTag: function(params) {
-            return params.term.match($scope.newChoiceValidator) ? {
+            return params.term.match(ctrl.newChoiceValidator) ? {
               id: params.term,
               text: params.term
             } : null;
@@ -66,11 +69,11 @@ oppia.directive('select2Dropdown', [
               return choice.id === queryResult.text;
             };
 
-            if ($scope.choices && $scope.choices.some(doesChoiceMatchText)) {
+            if (ctrl.choices && ctrl.choices.some(doesChoiceMatchText)) {
               return queryResult.text;
             } else {
-              if ($scope.formatNewSelection) {
-                return $scope.formatNewSelection(queryResult.text);
+              if (ctrl.formatNewSelection) {
+                return ctrl.formatNewSelection(queryResult.text);
               } else {
                 return queryResult.text;
               }
@@ -78,8 +81,8 @@ oppia.directive('select2Dropdown', [
           },
           language: {
             noResults: function() {
-              if ($scope.invalidSearchTermMessage) {
-                return $scope.invalidSearchTermMessage;
+              if (ctrl.invalidSearchTermMessage) {
+                return ctrl.invalidSearchTermMessage;
               } else {
                 return 'No matches found';
               }
@@ -87,25 +90,25 @@ oppia.directive('select2Dropdown', [
           }
         };
 
-        if ($scope.dropdownCssClass) {
-          select2Options.dropdownCssClass = $scope.dropdownCssClass;
+        if (ctrl.dropdownCssClass) {
+          select2Options.dropdownCssClass = ctrl.dropdownCssClass;
         }
 
         var select2Node = $element[0].firstChild;
 
         // Initialize the dropdown.
         $(select2Node).select2(select2Options);
-        $(select2Node).val($scope.item).trigger('change');
+        $(select2Node).val(ctrl.item).trigger('change');
 
-        // Update $scope.item when the selection changes.
+        // Update ctrl.item when the selection changes.
         $(select2Node).on('change', function() {
-          $scope.item = $(select2Node).val();
+          ctrl.item = $(select2Node).val();
           $scope.$apply();
-          $scope.onSelectionChange();
+          ctrl.onSelectionChange();
         });
 
-        // Respond to external changes in $scope.item
-        $scope.$watch('item', function(newValue) {
+        // Respond to external changes in ctrl.item
+        $scope.$watch('select2DropdownCtrl.item', function(newValue) {
           $(select2Node).val(newValue);
         });
       }]
