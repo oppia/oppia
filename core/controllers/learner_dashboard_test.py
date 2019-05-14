@@ -246,7 +246,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             learner_dashboard_activity_ids['collection_playlist_ids'],
             [self.COL_ID_3])
 
-    def test_get_with_threads_update_thread_summaries(self):
+    def test_get_threads_after_updating_thread_summaries(self):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
@@ -261,6 +261,9 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
         thread_summaries = response['thread_summaries']
+        thread_id = thread_summaries[0]['thread_id']
+        thread = feedback_services.get_thread(thread_id)
+
         self.assertEqual(len(thread_summaries), 1)
         self.assertEqual(thread_summaries[0]['total_message_count'], 1)
         self.assertEqual(
@@ -269,6 +272,8 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(thread_summaries[0]['last_message_text'], 'some text')
         self.assertEqual(
             thread_summaries[0]['original_author_id'], self.owner_id)
+        self.assertEqual(thread.subject, 'a subject')
+        self.assertEqual(thread.entity_type, 'exploration')
         self.logout()
 
 
@@ -367,7 +372,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(messages_summary['author_username'], None)
         self.assertEqual(messages_summary['author_picture_data_url'], None)
 
-    def test_get_with_suggestions_update_suggestion_summary(self):
+    def test_get_suggestions_after_updating_suggestion_summary(self):
         self.login(self.EDITOR_EMAIL)
         response_dict = self.get_json(
             '%s/%s' %
