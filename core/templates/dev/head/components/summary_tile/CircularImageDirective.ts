@@ -20,15 +20,18 @@ oppia.directive('circularImage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         src: '&',
         link: '&?'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/circular_image_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.isLinkAvailable = function() {
-          return $scope.link() ? true : false;
+      controllerAs: 'circularImageCtrl',
+      controller: [function() {
+        var ctrl = this;
+        this.isLinkAvailable = function() {
+          return this.link() ? true : false;
         };
       }]
     };
