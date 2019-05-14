@@ -27,9 +27,12 @@ oppia.directive('collectionSettingsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: true,
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/settings_tab/' +
         'collection_settings_tab_directive.html'),
+      controllerAs: 'collectionSettingsTabCtrl',
       controller: [function() {}]
     };
   }]);
