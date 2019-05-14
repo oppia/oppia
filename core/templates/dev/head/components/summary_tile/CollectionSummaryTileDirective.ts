@@ -25,7 +25,8 @@ oppia.directive('collectionSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getCollectionId: '&collectionId',
         getCollectionTitle: '&collectionTitle',
         getObjective: '&objective',
@@ -44,45 +45,47 @@ oppia.directive('collectionSummaryTile', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
         'collection_summary_tile_directive.html'),
+      controllerAs: 'collectionSummaryTileCtrl',
       controller: [
-        '$scope', 'DateTimeFormatService', 'UserService',
+        'DateTimeFormatService', 'UserService',
         'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function(
-            $scope, DateTimeFormatService, UserService,
+            DateTimeFormatService, UserService,
             COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL) {
-          $scope.userIsLoggedIn = null;
+          var ctrl = this;
+          ctrl.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           });
-          $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
-          $scope.ACTIVITY_TYPE_COLLECTION = constants.ACTIVITY_TYPE_COLLECTION;
+          ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
+          ctrl.ACTIVITY_TYPE_COLLECTION = constants.ACTIVITY_TYPE_COLLECTION;
 
-          $scope.getLastUpdatedDatetime = function() {
+          ctrl.getLastUpdatedDatetime = function() {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-              $scope.getLastUpdatedMsec());
+              ctrl.getLastUpdatedMsec());
           };
 
-          $scope.getCollectionLink = function() {
+          ctrl.getCollectionLink = function() {
             var targetUrl = (
-              $scope.isLinkedToEditorPage ?
+              ctrl.isLinkedToEditorPage ?
                 COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
             return UrlInterpolationService.interpolateUrl(
               targetUrl, {
-                collection_id: $scope.getCollectionId()
+                collection_id: ctrl.getCollectionId()
               }
             );
           };
 
-          $scope.getCompleteThumbnailIconUrl = function() {
+          ctrl.getCompleteThumbnailIconUrl = function() {
             return UrlInterpolationService.getStaticImageUrl(
-              $scope.getThumbnailIconUrl());
+              ctrl.getThumbnailIconUrl());
           };
 
-          $scope.getStaticImageUrl = function(url) {
+          ctrl.getStaticImageUrl = function(url) {
             return UrlInterpolationService.getStaticImageUrl(url);
           };
 
-          $scope.setHoverState = function(hoverState) {
-            $scope.collectionIsCurrentlyHoveredOver = hoverState;
+          ctrl.setHoverState = function(hoverState) {
+            ctrl.collectionIsCurrentlyHoveredOver = hoverState;
           };
         }
       ]
