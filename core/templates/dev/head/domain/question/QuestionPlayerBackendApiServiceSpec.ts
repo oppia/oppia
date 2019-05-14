@@ -24,7 +24,7 @@ describe('Question Player backend Api service', function() {
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     QuestionPlayerBackendApiService = $injector.get(
       'QuestionPlayerBackendApiService');
     $httpBackend = $injector.get('$httpBackend');
@@ -38,7 +38,9 @@ describe('Question Player backend Api service', function() {
           content: {
             html: 'Question 1'
           },
-          content_ids_to_audio_translations: {},
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          },
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],
