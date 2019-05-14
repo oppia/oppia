@@ -374,6 +374,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
     def test_get_suggestions_after_updating_suggestion_summary(self):
         self.login(self.EDITOR_EMAIL)
+
         response_dict = self.get_json(
             '%s/%s' %
             (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
@@ -383,6 +384,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
             feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL, thread_id)
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list'][0]
+
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
         self.assertTrue(
@@ -391,6 +393,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.assertFalse(messages_summary.get('suggestion_html'))
         self.assertFalse(messages_summary.get('current_content_html'))
         self.assertFalse(messages_summary.get('description'))
+
         new_content = state_domain.SubtitledHtml(
             'content', 'new content html').to_dict()
         change_cmd = {
@@ -399,6 +402,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
             'state_name': 'Welcome!',
             'new_value': new_content
             }
+
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID_1, 1,
@@ -413,6 +417,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
                 suggestion.change.state_name].content.html)
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list'][0]
+
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
         self.assertTrue(
