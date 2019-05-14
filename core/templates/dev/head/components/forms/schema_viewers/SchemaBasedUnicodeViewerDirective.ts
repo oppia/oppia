@@ -19,19 +19,22 @@
 oppia.directive('schemaBasedUnicodeViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      scope: {},
+      bindToController: {
         localValue: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_viewers/' +
         'schema_based_unicode_viewer_directive.html'),
       restrict: 'E',
+      controllerAs: 'schemaBasedUnicodeViewerCtrl',
       controller: [
-        '$scope', '$filter', '$sce',
-        function($scope, $filter, $sce) {
-          $scope.getDisplayedValue = function() {
+        '$filter', '$sce',
+        function($filter, $sce) {
+          var ctrl = this;
+          ctrl.getDisplayedValue = function() {
             return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
-              $scope.localValue));
+              ctrl.localValue));
           };
         }]
     };
