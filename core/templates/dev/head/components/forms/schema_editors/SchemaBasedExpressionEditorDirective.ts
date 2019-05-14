@@ -19,7 +19,8 @@
 oppia.directive('schemaBasedExpressionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      scope: {
+      scope: {},
+      bindToController: {
         localValue: '=',
         isDisabled: '&',
         // TODO(sll): Currently only takes a string which is either 'bool',
@@ -31,6 +32,8 @@ oppia.directive('schemaBasedExpressionEditor', [
         '/components/forms/schema_editors/' +
         'schema_based_expression_editor_directive.html'
       ),
+      controllerAs: 'schemaBasedExpressionEditorCtrl',
+      controller: [function() {}],
       restrict: 'E'
     };
   }]);
