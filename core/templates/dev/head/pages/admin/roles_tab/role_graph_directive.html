@@ -24,24 +24,24 @@
   }
 </style>
 
-<div style="height: <[getGraphHeightInPixels()]>px;">
+<div style="height: <[roleGraphCtrl.getGraphHeightInPixels()]>px;">
 
   <svg class="oppia-static-graph" width="100%" height="100%">
     <g>
-      <g ng-repeat="link in augmentedLinks">
+      <g ng-repeat="link in roleGraphCtrl.augmentedLinks">
         <path class="link protractor-test-link" ng-if="link.d" ng-attr-d="<[link.d]>" marker-end="url(#arrowhead)" ng-attr-style="<[link.style]>">
         </path>
       </g>
 
-      <g class="node protractor-test-node" ng-repeat="node in nodeList">
+      <g class="node protractor-test-node" ng-repeat="node in roleGraphCtrl.nodeList">
         <rect rx="2" ry="2" ng-attr-height="<[node.height]>" ng-attr-width="<[node.width]>"
               class="protractor-test-node-background <[node.nodeClass]>"
               ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
               ng-attr-style="<[node.style]>">
         </rect>
-        <title><[getNodeTitle(node)]></title>
+        <title><[roleGraphCtrl.getNodeTitle(node)]></title>
         <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>" class="protractor-test-node-label">
-          <tspan alignment-baseline="central"><[getTruncatedLabel(node.label)]></tspan>
+          <tspan alignment-baseline="central"><[roleGraphCtrl.getTruncatedLabel(node.label)]></tspan>
         </text>
       </g>
     </g>
