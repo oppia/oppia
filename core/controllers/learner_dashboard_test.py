@@ -14,11 +14,19 @@
 
 """Tests for the learner dashboard and the notifications dashboard."""
 
+from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import learner_progress_services
+from core.domain import state_domain
 from core.domain import subscription_services
+from core.domain import suggestion_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
+
+(suggestion_models, feedback_models) = models.Registry.import_models([
+    models.NAMES.suggestion, models.NAMES.feedback])
 
 
 class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
@@ -238,6 +246,31 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             learner_dashboard_activity_ids['collection_playlist_ids'],
             [self.COL_ID_3])
 
+    def test_get_with_threads_update_thread_summaries(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        thread_summaries = response['thread_summaries']
+        self.assertEqual(thread_summaries, [])
+
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, self.owner_id, 'a subject',
+            'some text')
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        thread_summaries = response['thread_summaries']
+        self.assertEqual(len(thread_summaries), 1)
+        self.assertEqual(thread_summaries[0]['total_message_count'], 1)
+        self.assertEqual(
+            thread_summaries[0]['exploration_title'], self.EXP_TITLE_1)
+        self.assertEqual(thread_summaries[0]['exploration_id'], self.EXP_ID_1)
+        self.assertEqual(thread_summaries[0]['last_message_text'], 'some text')
+        self.assertEqual(
+            thread_summaries[0]['original_author_id'], self.owner_id)
+        self.logout()
+
 
 class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
@@ -249,7 +282,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         # Load exploration 0.
         exp_services.load_demo(self.EXP_ID_1)
-
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         # Get the CSRF token and create a single thread with a single message.
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('/create/%s' % self.EXP_ID_1)
@@ -333,3 +366,57 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(messages_summary['author_username'], None)
         self.assertEqual(messages_summary['author_picture_data_url'], None)
+
+    def test_get_with_suggestions_update_suggestion_summary(self):
+        self.login(self.EDITOR_EMAIL)
+        response_dict = self.get_json(
+            '%s/%s' %
+            (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
+        thread_url = '%s/%s' % (
+            feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL, thread_id)
+        response_dict = self.get_json(thread_url)
+        messages_summary = response_dict['message_summary_list'][0]
+        self.assertEqual(
+            messages_summary['author_username'], self.EDITOR_USERNAME)
+        self.assertTrue(
+            messages_summary['author_picture_data_url'].startswith(
+                'data:image/png;'))
+        self.assertFalse(messages_summary.get('suggestion_html'))
+        self.assertFalse(messages_summary.get('current_content_html'))
+        self.assertFalse(messages_summary.get('description'))
+        new_content = state_domain.SubtitledHtml(
+            'content', 'new content html').to_dict()
+        change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Welcome!',
+            'new_value': new_content
+            }
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID_1, 1,
+            suggestion_models.STATUS_IN_REVIEW, self.editor_id, None,
+            change_cmd, 'score category', thread_id)
+
+        suggestion_thread = feedback_services.get_thread(thread_id)
+        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID_1)
+        current_content_html = (
+            exploration.states[
+                suggestion.change.state_name].content.html)
+        response_dict = self.get_json(thread_url)
+        messages_summary = response_dict['message_summary_list'][0]
+        self.assertEqual(
+            messages_summary['author_username'], self.EDITOR_USERNAME)
+        self.assertTrue(
+            messages_summary['author_picture_data_url'].startswith(
+                'data:image/png;'))
+        self.assertEqual(
+            messages_summary['suggestion_html'], 'new content html')
+        self.assertEqual(
+            messages_summary['current_content_html'], current_content_html)
+        self.assertEqual(
+            messages_summary['description'], suggestion_thread.subject)
+        self.logout()
