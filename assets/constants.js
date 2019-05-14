@@ -554,14 +554,16 @@ var constants = {
             "solution": null
         },
       "param_changes": [],
-      "content_ids_to_audio_translations": {
-          "content": {},
-          "default_outcome": {}
+      "recorded_voiceovers": {
+          "voiceovers_mapping": {
+              "content": {},
+              "default_outcome": {}
+          }
       },
       "written_translations": {
           "translations_mapping": {
-            "content": {},
-            "default_outcome": {}
+              "content": {},
+              "default_outcome": {}
           }
       }
   },

@@ -43,15 +43,13 @@ oppia.directive('stateTranslationEditor', [
               contentId, langaugeCode) {
             var stateName = StateEditorService.getActiveStateName();
             var state = ExplorationStatesService.getState(stateName);
-            var contentIdsToAudioTranslations = (
-              state.contentIdsToAudioTranslations);
+            var recordedVoiceovers = state.recordedVoiceovers;
             var availableAudioLanguages = (
-              contentIdsToAudioTranslations.getAudioLanguageCodes(contentId));
+              recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
             if (availableAudioLanguages.indexOf(langaugeCode) !== -1) {
-              var audioTranslation = (
-                contentIdsToAudioTranslations.getAudioTranslation(
-                  contentId, langaugeCode));
-              if (audioTranslation.needsUpdate) {
+              var voiceover = recordedVoiceovers.getVoiceover(
+                contentId, langaugeCode);
+              if (voiceover.needsUpdate) {
                 return;
               }
               $uibModal.open({
@@ -70,10 +68,10 @@ oppia.directive('stateTranslationEditor', [
                   };
                 }]
               }).result.then(function() {
-                contentIdsToAudioTranslations.toggleNeedsUpdateAttribute(
+                recordedVoiceovers.toggleNeedsUpdateAttribute(
                   contentId, langaugeCode);
-                ExplorationStatesService.saveContentIdsToAudioTranslations(
-                  stateName, contentIdsToAudioTranslations);
+                ExplorationStatesService.saveRecordedVoiceovers(
+                  stateName, recordedVoiceovers);
               });
             }
           };

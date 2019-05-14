@@ -169,8 +169,7 @@ oppia.factory('ExplorationEngineService', [
       var initialCard =
         StateCardObjectFactory.createNewCard(
           currentStateName, questionHtml, interactionHtml,
-          interaction,
-          initialState.contentIdsToAudioTranslations,
+          interaction, initialState.recordedVoiceovers,
           initialState.content.getContentId());
       successCallback(initialCard, nextFocusLabel);
     };
@@ -240,7 +239,7 @@ oppia.factory('ExplorationEngineService', [
           visitedStateNames = [exploration.getInitialState().name];
           initParams(manualParamChanges);
           AudioTranslationLanguageService.init(
-            exploration.getAllAudioLanguageCodes(),
+            exploration.getAllVoiceoverLanguageCodes(),
             null,
             exploration.getLanguageCode(),
             explorationDict.auto_tts_enabled);
@@ -254,7 +253,7 @@ oppia.factory('ExplorationEngineService', [
           version = explorationVersion;
           initParams([]);
           AudioTranslationLanguageService.init(
-            exploration.getAllAudioLanguageCodes(),
+            exploration.getAllVoiceoverLanguageCodes(),
             preferredAudioLanguage,
             exploration.getLanguageCode(),
             autoTtsEnabled);
@@ -302,8 +301,7 @@ oppia.factory('ExplorationEngineService', [
         answerIsBeingProcessed = true;
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
-        var contentIdsToAudioTranslations =
-          oldState.contentIdsToAudioTranslations;
+        var recordedVoiceovers = oldState.recordedVoiceovers;
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             oldStateName, oldState.interaction, answer,
@@ -349,9 +347,8 @@ oppia.factory('ExplorationEngineService', [
         var feedbackHtml =
           makeFeedback(outcome.feedback.getHtml(), [oldParams]);
         var feedbackContentId = outcome.feedback.getContentId();
-        var feedbackAudioTranslations =
-          contentIdsToAudioTranslations.getBindableAudioTranslations(
-            feedbackContentId);
+        var feedbackAudioTranslations = (
+          recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
         if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');
@@ -404,7 +401,7 @@ oppia.factory('ExplorationEngineService', [
         var nextCard = StateCardObjectFactory.createNewCard(
           nextStateName, questionHtml, nextInteractionHtml,
           exploration.getInteraction(nextStateName),
-          exploration.getState(nextStateName).contentIdsToAudioTranslations,
+          exploration.getState(nextStateName).recordedVoiceovers,
           exploration.getState(nextStateName).content.getContentId());
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,

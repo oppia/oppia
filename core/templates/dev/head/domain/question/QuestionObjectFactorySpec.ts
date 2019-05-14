@@ -94,12 +94,14 @@ describe('Question object factory', function() {
           id: 'TextInput'
         },
         param_changes: [],
-        content_ids_to_audio_translations: {
-          content_1: {},
-          content_2: {},
-          content_3: {},
-          content_4: {},
-          content_5: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content_1: {},
+            content_2: {},
+            content_3: {},
+            content_4: {},
+            content_5: {}
+          }
         },
         written_translations: {
           translations_mapping: {

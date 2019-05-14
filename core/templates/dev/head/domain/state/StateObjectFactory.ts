@@ -18,20 +18,20 @@
  */
 
 oppia.factory('StateObjectFactory', [
-  'ContentIdsToAudioTranslationsObjectFactory', 'InteractionObjectFactory',
-  'ParamChangesObjectFactory', 'SubtitledHtmlObjectFactory',
+  'InteractionObjectFactory', 'ParamChangesObjectFactory',
+  'RecordedVoiceoversObjectFactory', 'SubtitledHtmlObjectFactory',
   'WrittenTranslationsObjectFactory', function(
-      ContentIdsToAudioTranslationsObjectFactory, InteractionObjectFactory,
-      ParamChangesObjectFactory, SubtitledHtmlObjectFactory,
+      InteractionObjectFactory, ParamChangesObjectFactory,
+      RecordedVoiceoversObjectFactory, SubtitledHtmlObjectFactory,
       WrittenTranslationsObjectFactory) {
     var State = function(name, classifierModelId, content, interaction,
-        paramChanges, contentIdsToAudioTranslations, writtenTranslations) {
+        paramChanges, recordedVoiceovers, writtenTranslations) {
       this.name = name;
       this.classifierModelId = classifierModelId;
       this.content = content;
       this.interaction = interaction;
       this.paramChanges = paramChanges;
-      this.contentIdsToAudioTranslations = contentIdsToAudioTranslations;
+      this.recordedVoiceovers = recordedVoiceovers;
       this.writtenTranslations = writtenTranslations;
     };
 
@@ -48,8 +48,7 @@ oppia.factory('StateObjectFactory', [
         param_changes: this.paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
         }),
-        content_ids_to_audio_translations: (
-          this.contentIdsToAudioTranslations.toBackendDict()),
+        recorded_voiceovers: this.recordedVoiceovers.toBackendDict(),
         written_translations: this.writtenTranslations.toBackendDict()
       };
     };
@@ -60,8 +59,7 @@ oppia.factory('StateObjectFactory', [
       this.content = angular.copy(otherState.content);
       this.interaction.copy(otherState.interaction);
       this.paramChanges = angular.copy(otherState.paramChanges);
-      this.contentIdsToAudioTranslations =
-        angular.copy(otherState.contentIdsToAudioTranslations);
+      this.recordedVoiceovers = angular.copy(otherState.recordedVoiceovers);
       this.writtenTranslations = angular.copy(otherState.writtenTranslations);
     };
 
@@ -75,8 +73,7 @@ oppia.factory('StateObjectFactory', [
         content: newStateTemplate.content,
         interaction: newStateTemplate.interaction,
         param_changes: newStateTemplate.param_changes,
-        content_ids_to_audio_translations: (
-          newStateTemplate.content_ids_to_audio_translations),
+        recorded_voiceovers: newStateTemplate.recorded_voiceovers,
         written_translations: newStateTemplate.written_translations
       });
       newState.interaction.defaultOutcome.dest = newStateName;
@@ -96,8 +93,8 @@ oppia.factory('StateObjectFactory', [
         InteractionObjectFactory.createFromBackendDict(stateDict.interaction),
         ParamChangesObjectFactory.createFromBackendList(
           stateDict.param_changes),
-        ContentIdsToAudioTranslationsObjectFactory.createFromBackendDict(
-          stateDict.content_ids_to_audio_translations),
+        RecordedVoiceoversObjectFactory.createFromBackendDict(
+          stateDict.recorded_voiceovers),
         WrittenTranslationsObjectFactory.createFromBackendDict(
           stateDict.written_translations));
     };

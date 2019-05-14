@@ -17,10 +17,10 @@
  * to audio translations.
  */
 
-oppia.factory('StateContentIdsToAudioTranslationsService', [
+oppia.factory('StateRecordedVoiceoversService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveContentIdsToAudioTranslations';
+    child.setterMethodKey = 'saveRecordedVoiceovers';
     return child;
   }
 ]);

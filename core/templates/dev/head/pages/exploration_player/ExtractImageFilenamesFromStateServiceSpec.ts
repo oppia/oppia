@@ -69,9 +69,11 @@ describe('Extracting Image file names in the state service', function() {
             content_id: 'content',
             html: ''
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           interaction: {
             id: 'Continue',
@@ -107,9 +109,11 @@ describe('Extracting Image file names in the state service', function() {
             content_id: 'content',
             html: 'Congratulations, you have finished!'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           interaction: {
             id: 'EndExploration',
@@ -139,11 +143,13 @@ describe('Extracting Image file names in the state service', function() {
             content_id: 'content',
             html: 'Multiple Choice'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
           },
           interaction: {
             id: 'MultipleChoiceInput',
@@ -232,11 +238,13 @@ describe('Extracting Image file names in the state service', function() {
                   'quot;s4Content.png&amp;quot;">' +
                   '</oppia-noninteractive-image></p>'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
           },
           interaction: {
             id: 'ItemSelectionInput',
@@ -338,14 +346,16 @@ describe('Extracting Image file names in the state service', function() {
             content_id: 'content',
             html: ''
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {},
-            feedback_3: {},
-            feedback_4: {},
-            feedback_5: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              feedback_3: {},
+              feedback_4: {},
+              feedback_5: {}
+            }
           },
           interaction: {
             id: 'ImageClickInput',
@@ -533,13 +543,15 @@ describe('Extracting Image file names in the state service', function() {
             content_id: 'content',
             html: '<p>Text Input Content</p>'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {},
-            hint_1: {},
-            solution: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              hint_1: {},
+              solution: {}
+            }
           },
           interaction: {
             id: 'TextInput',

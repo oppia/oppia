@@ -45,8 +45,7 @@ import utils
 # 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
-STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = (
-    'content_ids_to_audio_translations')
+STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
@@ -113,7 +112,7 @@ class ExplorationChange(object):
     STATE_PROPERTIES = (
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
-        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+        STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
@@ -578,15 +577,10 @@ class Exploration(object):
                 [state_domain.Hint.from_dict(h) for h in idict['hints']],
                 solution)
 
-            state.content_ids_to_audio_translations = {
-                content_id: {
-                    language_code: state_domain.AudioTranslation.from_dict(
-                        audio_translation_dict)
-                    for language_code, audio_translation_dict in
-                    audio_translations.iteritems()
-                } for content_id, audio_translations in (
-                    sdict['content_ids_to_audio_translations'].iteritems())
-            }
+            state.recorded_voiceovers = (
+                state_domain.RecordedVoiceovers.from_dict(
+                    sdict['recorded_voiceovers']))
+
             state.written_translations = (
                 state_domain.WrittenTranslations.from_dict(
                     sdict['written_translations']))
@@ -2177,6 +2171,26 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v27_dict_to_v28_dict(cls, states_dict):
+        """Converts from version 27 to 28. Version 28 replaces
+        content_ids_to_audio_translations with recorded_voiceovers.
+
+         Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.itervalues():
+            state_dict['recorded_voiceovers'] = {
+                'voiceovers_mapping': (
+                    state_dict.pop('content_ids_to_audio_translations'))
+            }
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2211,7 +2225,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 32
+    CURRENT_EXP_SCHEMA_VERSION = 33
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2789,6 +2803,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v32_dict_to_v33_dict(cls, exploration_dict):
+        """Converts a v32 exploration dict into a v33 exploration dict.
+
+        Replaces content_ids_to_audio_translations with recorded_voiceovers in
+        each state of the exploration.
+        """
+        exploration_dict['schema_version'] = 33
+
+        exploration_dict['states'] = cls._convert_states_v27_dict_to_v28_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 28
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -2980,6 +3009,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v31_dict_to_v32_dict(
                 exploration_dict)
             exploration_schema_version = 32
+
+        if exploration_schema_version == 32:
+            exploration_dict = cls._convert_v32_dict_to_v33_dict(
+                exploration_dict)
+            exploration_schema_version = 33
 
         return (exploration_dict, initial_schema_version)
 
