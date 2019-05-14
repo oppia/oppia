@@ -24,56 +24,59 @@ oppia.directive('adminRolesTab', [
       ADMIN_ROLE_HANDLER_URL) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/roles_tab/roles_tab_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.UPDATABLE_ROLES = GLOBALS.UPDATABLE_ROLES;
-        $scope.VIEWABLE_ROLES = GLOBALS.VIEWABLE_ROLES;
-        $scope.topicSummaries = GLOBALS.TOPIC_SUMMARIES;
-        $scope.graphData = GLOBALS.ROLE_GRAPH_DATA;
-        $scope.resultRolesVisible = false;
-        $scope.result = {};
-        $scope.setStatusMessage('');
-        $scope.viewFormValues = {};
-        $scope.updateFormValues = {};
-        $scope.viewFormValues.method = 'role';
+      controllerAs: 'adminRolesTabCtrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.UPDATABLE_ROLES = GLOBALS.UPDATABLE_ROLES;
+        ctrl.VIEWABLE_ROLES = GLOBALS.VIEWABLE_ROLES;
+        ctrl.topicSummaries = GLOBALS.TOPIC_SUMMARIES;
+        ctrl.graphData = GLOBALS.ROLE_GRAPH_DATA;
+        ctrl.resultRolesVisible = false;
+        ctrl.result = {};
+        ctrl.setStatusMessage('');
+        ctrl.viewFormValues = {};
+        ctrl.updateFormValues = {};
+        ctrl.viewFormValues.method = 'role';
 
-        $scope.graphDataLoaded = false;
+        ctrl.graphDataLoaded = false;
         // Calculating initStateId and finalStateIds for graphData
         // Since role graph is acyclic, node with no incoming edge
         // is initState and nodes with no outgoing edge are finalStates.
         var hasIncomingEdge = [];
         var hasOutgoingEdge = [];
-        for (var i = 0; i < $scope.graphData.links.length; i++) {
-          hasIncomingEdge.push($scope.graphData.links[i].target);
-          hasOutgoingEdge.push($scope.graphData.links[i].source);
+        for (var i = 0; i < ctrl.graphData.links.length; i++) {
+          hasIncomingEdge.push(ctrl.graphData.links[i].target);
+          hasOutgoingEdge.push(ctrl.graphData.links[i].source);
         }
         var finalStateIds = [];
-        for (var role in $scope.graphData.nodes) {
-          if ($scope.graphData.nodes.hasOwnProperty(role)) {
+        for (var role in ctrl.graphData.nodes) {
+          if (ctrl.graphData.nodes.hasOwnProperty(role)) {
             if (hasIncomingEdge.indexOf(role) === -1) {
-              $scope.graphData.initStateId = role;
+              ctrl.graphData.initStateId = role;
             }
             if (hasOutgoingEdge.indexOf(role) === -1) {
               finalStateIds.push(role);
             }
           }
         }
-        $scope.graphData.finalStateIds = finalStateIds;
-        $scope.graphDataLoaded = true;
+        ctrl.graphData.finalStateIds = finalStateIds;
+        ctrl.graphDataLoaded = true;
 
-        $scope.submitRoleViewForm = function(values) {
+        ctrl.submitRoleViewForm = function(values) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
 
-          $scope.setStatusMessage('Processing query...');
+          ctrl.setStatusMessage('Processing query...');
 
           AdminTaskManagerService.startTask();
-          $scope.result = {};
+          ctrl.result = {};
           $http.get(ADMIN_ROLE_HANDLER_URL, {
             params: {
               method: values.method,
@@ -81,42 +84,42 @@ oppia.directive('adminRolesTab', [
               username: values.username
             }
           }).then(function(response) {
-            $scope.result = response.data;
-            if (Object.keys($scope.result).length === 0) {
-              $scope.resultRolesVisible = false;
-              $scope.setStatusMessage('No results.');
+            ctrl.result = response.data;
+            if (Object.keys(ctrl.result).length === 0) {
+              ctrl.resultRolesVisible = false;
+              ctrl.setStatusMessage('No results.');
             } else {
-              $scope.resultRolesVisible = true;
-              $scope.setStatusMessage('Success.');
+              ctrl.resultRolesVisible = true;
+              ctrl.setStatusMessage('Success.');
             }
-            $scope.viewFormValues.username = '';
-            $scope.viewFormValues.role = '';
+            ctrl.viewFormValues.username = '';
+            ctrl.viewFormValues.role = '';
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
           AdminTaskManagerService.finishTask();
         };
 
-        $scope.submitUpdateRoleForm = function(values) {
+        ctrl.submitUpdateRoleForm = function(values) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-          $scope.setStatusMessage('Updating User Role');
+          ctrl.setStatusMessage('Updating User Role');
           AdminTaskManagerService.startTask();
           $http.post(ADMIN_ROLE_HANDLER_URL, {
             role: values.newRole,
             username: values.username,
             topic_id: values.topicId
           }).then(function() {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Role of ' + values.username +
               ' successfully updated to ' + values.newRole);
-            $scope.updateFormValues.username = '';
-            $scope.updateFormValues.newRole = '';
-            $scope.updateFormValues.topicId = '';
+            ctrl.updateFormValues.username = '';
+            ctrl.updateFormValues.newRole = '';
+            ctrl.updateFormValues.topicId = '';
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
           AdminTaskManagerService.finishTask();
