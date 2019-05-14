@@ -517,10 +517,10 @@ def build_third_party_libs(third_party_directory_path):
 
 def build_using_webpack():
     """Execute webpack build process. This takes all TypeScript files we have in
-    /templates/dev/head and generates JS bundles according the require() imports 
+    /templates/dev/head and generates JS bundles according the require() imports
     and also compiles HTML pages into the /templates/dev/head/dist folder.
 
-    The settings for this are specified in webpack.prod.config.ts
+    The settings for this are specified in webpack.prod.config.ts.
     """
 
     print 'Building webpack'

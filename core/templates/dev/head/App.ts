@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Initialization and basic configuration for the Oppia module.
+ */
+
 require('I18nFooter.ts');
 require('directives/FocusOnDirective.ts');
 
@@ -50,11 +54,6 @@ require('components/top_navigation_bar/TopNavigationBarDirective.ts');
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-
-
-/**
- * @fileoverview Initialization and basic configuration for the Oppia module.
- */
 
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
@@ -134,7 +133,7 @@ oppia.constant('LOGOUT_URL', '/logout');
 // page visited.
 oppia.constant('ENABLE_PROMO_BAR', true);
 
-// TODO(vojtechjelinek): Move these to separate file later, after we establish 
+// TODO(vojtechjelinek): Move these to separate file later, after we establish
 // process to follow for Angular constants (#6731).
 oppia.constant(
   'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE',
