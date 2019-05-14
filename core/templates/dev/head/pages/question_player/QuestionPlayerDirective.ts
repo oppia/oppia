@@ -21,23 +21,26 @@ oppia.directive('questionPlayer', [
       $http, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getQuestionPlayerConfig: '&playerConfig',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_player/question_player_directive.html'),
+      controllerAs: 'questionPlayerCtrl',
       controller: [
-        '$scope', '$rootScope', 'QuestionPlayerBackendApiService',
+        '$rootScope', 'QuestionPlayerBackendApiService',
         function(
-            $scope, $rootScope, QuestionPlayerBackendApiService) {
-          var questionPlayerConfig = $scope.getQuestionPlayerConfig();
+            $rootScope, QuestionPlayerBackendApiService) {
+          var ctrl = this;
+          var questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           QuestionPlayerBackendApiService.fetchQuestions(
             questionPlayerConfig.skillList,
             questionPlayerConfig.questionCount, true).then(function(result) {
-            $scope.currentQuestion = 1;
-            $scope.totalQuestions = result.length;
-            $scope.currentProgress = (
-              $scope.currentQuestion * 100 / $scope.totalQuestions);
+            ctrl.currentQuestion = 1;
+            ctrl.totalQuestions = result.length;
+            ctrl.currentProgress = (
+              ctrl.currentQuestion * 100 / ctrl.totalQuestions);
           });
         }
       ]
