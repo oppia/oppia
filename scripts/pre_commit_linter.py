@@ -2240,8 +2240,9 @@ class LintChecksManager(object):
 
         extra_js_files = []
         for filename in js_files_to_check:
-            if filename.startswith(('core', 'extensions')) and (
-                    filename not in build.JS_FILEPATHS_NOT_TO_BUILD):
+            if filename.startswith(('core/templates', 'extensions')) and (
+                    filename not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
+                        not filename.endswith('protractor.js')):
                 extra_js_files.append(filename)
 
         if len(extra_js_files):
