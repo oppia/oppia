@@ -21,12 +21,15 @@ oppia.directive('collectionNodeList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getCollectionId: '&collectionId',
         getCollectionNodes: '&collectionNodes'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_player/' +
-        'collection_node_list_directive.html')
+        'collection_node_list_directive.html'),
+      controllerAs: 'collectionNodeListCtrl',
+      controller: [function() {}]
     };
   }]);
