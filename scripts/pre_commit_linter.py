@@ -69,6 +69,7 @@ import tempfile
 import threading
 import time
 
+import build # pylint: disable=relative-import
 import docstrings_checker  # pylint: disable=relative-import
 
 # pylint: enable=wrong-import-order
@@ -838,7 +839,7 @@ def _lint_js_and_ts_files(
     num_js_and_ts_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
-        print 'There are no JavaScript files to lint.'
+        print 'There are no JavaScript or Typescript files to lint.'
         return
 
     print 'Total js and ts files: ', num_js_and_ts_files
@@ -2227,6 +2228,38 @@ class LintChecksManager(object):
 
         return summary_messages
 
+    def _check_extra_js_files(self):
+        """Checks if the changes made include extra js files in core
+        or extensions folder which are not specified in
+        JS_FILEPATHS_NOT_TO_BUILD.
+        """
+        summary_messages = []
+        js_files_to_check = [
+            filepath for filepath in self.all_filepaths if (
+                filepath.endswith('.js'))]
+
+        extra_js_files = []
+        for filename in js_files_to_check:
+            if filename.startswith(('core', 'extensions')) and (
+                    filename not in build.JS_FILEPATHS_NOT_TO_BUILD):
+                extra_js_files.append(filename)
+
+        if len(extra_js_files):
+            err_msg = (
+                'You have extra js files in your repo. If you want them to be '
+                'present as js files, add them to the list '
+                'JS_FILEPATHS_NOT_TO_BUILD in build.py else rename them to .ts')
+            summary_message = '%s   %s' % (_MESSAGE_TYPE_FAILED, err_msg)
+        else:
+            summary_message = '%s  Extra JS files check passed' % (
+                _MESSAGE_TYPE_SUCCESS)
+
+        summary_messages.append(summary_message)
+        print summary_message
+        print ''
+
+        return summary_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2236,6 +2269,7 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
+        extra_js_files_messages = self._check_extra_js_files()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
@@ -2258,12 +2292,12 @@ class LintChecksManager(object):
             self._check_for_copyright_notice())
         codeowner_messages = self._check_codeowner_file()
         all_messages = (
-            js_and_ts_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages +
-            html_directive_name_messages + import_order_messages +
-            docstring_messages + comment_messages +
-            html_tag_and_attribute_messages +
-            html_linter_messages + linter_messages + pattern_messages +
+            extra_js_files_messages + js_and_ts_component_messages +
+            directive_scope_messages + sorted_dependencies_messages +
+            controller_dependency_messages + html_directive_name_messages +
+            import_order_messages + docstring_messages + comment_messages +
+            html_tag_and_attribute_messages + html_linter_messages +
+            linter_messages + pattern_messages +
             copyright_notice_messages + codeowner_messages)
         return all_messages
 

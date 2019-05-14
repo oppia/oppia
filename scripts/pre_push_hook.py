@@ -37,10 +37,6 @@ import shutil
 import subprocess
 import sys
 
-# pylint: disable=relative-import
-import build
-# pylint: enable=relative-import
-
 # pylint: enable=wrong-import-order
 
 GitRef = collections.namedtuple(
@@ -319,20 +315,6 @@ def does_diff_include_js_or_ts_files(files_to_lint):
     js_files_to_check = [
         filename for filename in files_to_lint if
         filename.endswith('.js')]
-
-    extra_js_files = []
-    for filename in js_files_to_check:
-        if filename.startswith(('core', 'extensions')) and (
-                filename not in build.JS_FILEPATHS_NOT_TO_BUILD):
-            extra_js_files.append(filename)
-
-    if len(extra_js_files):
-        err_msg = (
-            'Push aborted since you have extra js files in your repo. '
-            'If you want them to be present as js files, add them to the list '
-            'JS_FILEPATHS_NOT_TO_BUILD in build.py else rename them to .ts')
-        print err_msg
-        sys.exit(1)
 
     ts_files_to_check = [
         filename for filename in files_to_lint if
