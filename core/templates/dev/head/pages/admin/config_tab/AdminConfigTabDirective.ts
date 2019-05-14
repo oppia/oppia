@@ -22,16 +22,19 @@ oppia.directive('adminConfigTab', [
       UrlInterpolationService, ADMIN_HANDLER_URL) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/config_tab/' +
         'admin_config_tab_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.configProperties = {};
+      controllerAs: 'adminConfigTabCtrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.configProperties = {};
 
-        $scope.isNonemptyObject = function(object) {
+        ctrl.isNonemptyObject = function(object) {
           var hasAtLeastOneElement = false;
           for (var property in object) {
             hasAtLeastOneElement = true;
@@ -39,13 +42,13 @@ oppia.directive('adminConfigTab', [
           return hasAtLeastOneElement;
         };
 
-        $scope.reloadConfigProperties = function() {
+        ctrl.reloadConfigProperties = function() {
           $http.get(ADMIN_HANDLER_URL).then(function(response) {
-            $scope.configProperties = response.data.config_properties;
+            ctrl.configProperties = response.data.config_properties;
           });
         };
 
-        $scope.revertToDefaultConfigPropertyValue = function(configPropertyId) {
+        ctrl.revertToDefaultConfigPropertyValue = function(configPropertyId) {
           if (!confirm('This action is irreversible. Are you sure?')) {
             return;
           }
@@ -54,15 +57,15 @@ oppia.directive('adminConfigTab', [
             action: 'revert_config_property',
             config_property_id: configPropertyId
           }).then(function() {
-            $scope.setStatusMessage('Config property reverted successfully.');
-            $scope.reloadConfigProperties();
+            ctrl.setStatusMessage('Config property reverted successfully.');
+            ctrl.reloadConfigProperties();
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
         };
 
-        $scope.saveConfigProperties = function() {
+        ctrl.saveConfigProperties = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -70,29 +73,29 @@ oppia.directive('adminConfigTab', [
             return;
           }
 
-          $scope.setStatusMessage('Saving...');
+          ctrl.setStatusMessage('Saving...');
 
           AdminTaskManagerService.startTask();
           var newConfigPropertyValues = {};
-          for (var property in $scope.configProperties) {
+          for (var property in ctrl.configProperties) {
             newConfigPropertyValues[property] = (
-              $scope.configProperties[property].value);
+              ctrl.configProperties[property].value);
           }
 
           $http.post(ADMIN_HANDLER_URL, {
             action: 'save_config_properties',
             new_config_property_values: newConfigPropertyValues
           }).then(function() {
-            $scope.setStatusMessage('Data saved successfully.');
+            ctrl.setStatusMessage('Data saved successfully.');
             AdminTaskManagerService.finishTask();
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
             AdminTaskManagerService.finishTask();
           });
         };
 
-        $scope.reloadConfigProperties();
+        ctrl.reloadConfigProperties();
       }]
     };
   }
