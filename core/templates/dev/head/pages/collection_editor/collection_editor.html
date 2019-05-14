@@ -27,24 +27,7 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  <div ng-controller="CollectionEditor">
-    <div ng-if="getActiveTabName() === 'main'">
-      <collection-editor-tab></collection-editor-tab>
-    </div>
-
-    <div ng-show="getActiveTabName() === 'settings'">
-      <collection-settings-tab></collection-settings-tab>
-    </div>
-
-    <div ng-show="getActiveTabName() === 'history'">
-      <collection-history-tab></collection-history-tab>
-    </div>
-
-    <div ng-show="getActiveTabName() === 'stats'">
-      <collection-statistics-tab></collection-statistics-tab>
-    </div>
-  </div>
-
+<collection-editor></collection-editor>
 {% endblock content %}
 
 {% block footer_js %}
