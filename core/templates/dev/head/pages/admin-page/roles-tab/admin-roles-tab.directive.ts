@@ -28,7 +28,7 @@ angular.module('adminRolesTabModule').directive('adminRolesTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/roles-tab/roles-tab.directive.html'),
+        '/pages/admin-page/roles-tab/roles-tab.directive.html'),
       controller: ['$scope', function($scope) {
         $scope.UPDATABLE_ROLES = GLOBALS.UPDATABLE_ROLES;
         $scope.VIEWABLE_ROLES = GLOBALS.VIEWABLE_ROLES;

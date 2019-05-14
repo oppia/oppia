@@ -188,7 +188,7 @@ def _require_sender_id_is_valid(intent, sender_id):
     """Ensure that the sender ID is valid, based on the email's intent.
 
     Many emails are only allowed to be sent by a certain user or type of user,
-    e.g. 'admin' or an admin/moderator. This function will raise an exception
+    e.g. 'admin' or an admin-page/moderator. This function will raise an exception
     if the given sender is not allowed to send this type of email.
 
     Args:

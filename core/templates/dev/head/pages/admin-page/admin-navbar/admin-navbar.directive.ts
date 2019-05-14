@@ -28,7 +28,7 @@ angular.module('adminNavbarModule').directive('adminNavbar', [
         getUserEmail: '&userEmail'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/admin-navbar/' +
+        '/pages/admin-page/admin-navbar/' +
         'admin-navbar.directive.html'),
       controller: ['$scope', 'UserService', function($scope, UserService) {
         $scope.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
