@@ -1,9 +1,9 @@
 <button class="btn btn-default protractor-test-create-question-button"
-        ng-click="createQuestion()"
+        ng-click="questionsListCtrl.createQuestion()"
         style="float: right;">
   Create Question
 </button>
-<table class="dashboard-table" ng-if="questionSummaries.length > 0">
+<table class="dashboard-table" ng-if="questionsListCtrl.questionSummaries.length > 0">
   <colgroup>
     <col style="width: 5%;">
     <col style="width: 60%;">
@@ -16,25 +16,25 @@
     <th class="dashboard-table-headings">
       <p> Question Content </p>
     </th>
-    <th class="dashboard-table-headings" ng-if="!getSkill()">
+    <th class="dashboard-table-headings" ng-if="!questionsListCtrl.getSkill()">
       <p> Skill Description </p>
     </th>
   </tr>
-  <tr ng-repeat="question in questionSummaries"
+  <tr ng-repeat="question in questionsListCtrl.questionSummaries"
       class="list-item protractor-test-question-list-item"
       style="height: 4em;"
-      ng-click="editQuestion(question.summary)">
-    <td> <[getQuestionIndex($index)]> </td>
-    <td> <[truncatedQuestionSummaries[$index]]> </td>
-    <td ng-if="!getSkill()">{{question.skill_description}}</td>
+      ng-click="questionsListCtrl.editQuestion(question.summary)">
+    <td> <[questionsListCtrl.getQuestionIndex($index)]> </td>
+    <td> <[questionsListCtrl.truncatedQuestionSummaries[$index]]> </td>
+    <td ng-if="!questionsListCtrl.getSkill()">{{question.skill_description}}</td>
   </tr>
 </table>
-<h4 ng-if="questionSummaries.length === 0" style="color: gray;">
+<h4 ng-if="questionsListCtrl.questionSummaries.length === 0" style="color: gray;">
   Click on Create Question to create a new question.
 </h4>
 
-<h3 class="form-heading" ng-if="getQuestionSuggestionThreads().length > 0"> Questions suggested </h3>
-<table class="dashboard-table" ng-if="getQuestionSuggestionThreads().length > 0">
+<h3 class="form-heading" ng-if="questionsListCtrl.getQuestionSuggestionThreads().length > 0"> Questions suggested </h3>
+<table class="dashboard-table" ng-if="questionsListCtrl.getQuestionSuggestionThreads().length > 0">
   <colgroup>
     <col style="width: 10%;">
     <col style="width: 80%;">
@@ -51,7 +51,7 @@
       <p> Status </p>
     </th>
   </tr>
-  <tr ng-repeat="questionSuggestionThread in getQuestionSuggestionThreads()" ng-click="setActiveQuestion(questionSuggestionThread)" class="list-item">
+  <tr ng-repeat="questionSuggestionThread in questionsListCtrl.getQuestionSuggestionThreads()" ng-click="questionsListCtrl.setActiveQuestion(questionSuggestionThread)" class="list-item">
     <td> <[$index + 1]> </td>
     <td>
       <a class="list-summary">
@@ -64,25 +64,25 @@
   </tr>
 </table>
 
-<div class="page-navigation-arrows" ng-if="questionSummaries.length > 0">
+<div class="page-navigation-arrows" ng-if="questionsListCtrl.questionSummaries.length > 0">
   <i class="material-icons md-18"
-     ng-if="currentPage !== 0"
-     ng-click="goToPreviousPage()">&#xE5C4;
-  </i> Page <[currentPage + 1]>
-  <i class="material-icons md-18" ng-if="!isLastPage(currentPage)" ng-click="goToNextPage()">&#xE5C8;</i>
+     ng-if="questionsListCtrl.currentPage !== 0"
+     ng-click="questionsListCtrl.goToPreviousPage()">&#xE5C4;
+  </i> Page <[questionsListCtrl.currentPage + 1]>
+  <i class="material-icons md-18" ng-if="!questionsListCtrl.isLastPage(questionsListCtrl.currentPage)" ng-click="questionsListCtrl.goToNextPage()">&#xE5C8;</i>
 </div>
 
-<div ng-if="activeQuestion">
-  <question-editor question-id="activeQuestion.getId()"
-                   misconceptions="emptyMisconceptionsList"
-                   question="activeQuestion"
+<div ng-if="questionsListCtrl.activeQuestion">
+  <question-editor question-id="questionsListCtrl.activeQuestion.getId()"
+                   misconceptions="questionsListCtrl.emptyMisconceptionsList"
+                   question="questionsListCtrl.activeQuestion"
                    can-edit-question="false">
   </question-editor>
 
-  <textarea ng-model="suggestionReviewMessage"></textarea><br>
-  <button class="btn btn-default" ng-click="showSelectSkillModal()">Select skill</button>
-  <button class="btn btn-success" ng-click="acceptQuestion(idOfActiveSuggestion, suggestionReviewMessage)">Approve</button>
-  <button class="btn btn-danger" ng-click="rejectQuestion(idOfActiveSuggestion, suggestionReviewMessage)">Reject</button>
+  <textarea ng-model="questionsListCtrl.suggestionReviewMessage"></textarea><br>
+  <button class="btn btn-default" ng-click="questionsListCtrl.showSelectSkillModal()">Select skill</button>
+  <button class="btn btn-success" ng-click="questionsListCtrl.acceptQuestion(questionsListCtrl.idOfActiveSuggestion, questionsListCtrl.suggestionReviewMessage)">Approve</button>
+  <button class="btn btn-danger" ng-click="questionsListCtrl.rejectQuestion(questionsListCtrl.idOfActiveSuggestion, questionsListCtrl.suggestionReviewMessage)">Reject</button>
 </div>
 <style>
 questions-list .oppia-editor-publish-button {
