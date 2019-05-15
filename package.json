@@ -11,7 +11,7 @@
     "url": "git+https://github.com/oppia/oppia.git"
   },
   "author": "",
-  "license": "Apache v2",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/oppia/oppia/issues"
   },
@@ -32,7 +32,7 @@
     "@types/mathjax": "0.0.35",
     "@types/mathjs": "^5.0.0",
     "@types/mousetrap": "^1.6.1",
-    "@types/node": "^6.14.3",
+    "@types/node": "^10.14.6",
     "@types/q": "^1.5.1",
     "@types/select2": "^4.0.48",
     "@types/selenium-webdriver": "^2.53.43",

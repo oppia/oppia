@@ -19,20 +19,20 @@
 describe('Audio translation manager service', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  var atms, atof;
+  var atms, vof;
   var testAudioTranslations;
   var testAudioTranslations2;
   beforeEach(angular.mock.inject(function($injector) {
     atms = $injector.get('AudioTranslationManagerService');
-    atof = $injector.get('AudioTranslationObjectFactory');
+    vof = $injector.get('VoiceoverObjectFactory');
 
     testAudioTranslations = {
-      en: atof.createFromBackendDict({
+      en: vof.createFromBackendDict({
         filename: 'audio-en.mp3',
         file_size_bytes: 0.5,
         needs_update: false
       }),
-      es: atof.createFromBackendDict({
+      es: vof.createFromBackendDict({
         filename: 'audio-es.mp3',
         file_size_bytes: 0.5,
         needs_update: false
@@ -40,12 +40,12 @@ describe('Audio translation manager service', function() {
     };
 
     testAudioTranslations2 = {
-      zh: atof.createFromBackendDict({
+      zh: vof.createFromBackendDict({
         filename: 'audio-zh.mp3',
         file_size_bytes: 0.5,
         needs_update: false
       }),
-      'hi-en': atof.createFromBackendDict({
+      'hi-en': vof.createFromBackendDict({
         filename: 'audio-hi-en.mp3',
         file_size_bytes: 0.5,
         needs_update: false
@@ -57,12 +57,12 @@ describe('Audio translation manager service', function() {
     function() {
       atms.setContentAudioTranslations(testAudioTranslations);
       expect(atms.getCurrentAudioTranslations()).toEqual({
-        en: atof.createFromBackendDict({
+        en: vof.createFromBackendDict({
           filename: 'audio-en.mp3',
           file_size_bytes: 0.5,
           needs_update: false
         }),
-        es: atof.createFromBackendDict({
+        es: vof.createFromBackendDict({
           filename: 'audio-es.mp3',
           file_size_bytes: 0.5,
           needs_update: false
@@ -70,12 +70,12 @@ describe('Audio translation manager service', function() {
       });
       atms.setSecondaryAudioTranslations(testAudioTranslations2);
       expect(atms.getCurrentAudioTranslations()).toEqual({
-        zh: atof.createFromBackendDict({
+        zh: vof.createFromBackendDict({
           filename: 'audio-zh.mp3',
           file_size_bytes: 0.5,
           needs_update: false
         }),
-        'hi-en': atof.createFromBackendDict({
+        'hi-en': vof.createFromBackendDict({
           filename: 'audio-hi-en.mp3',
           file_size_bytes: 0.5,
           needs_update: false
@@ -83,12 +83,12 @@ describe('Audio translation manager service', function() {
       });
       atms.clearSecondaryAudioTranslations();
       expect(atms.getCurrentAudioTranslations()).toEqual({
-        en: atof.createFromBackendDict({
+        en: vof.createFromBackendDict({
           filename: 'audio-en.mp3',
           file_size_bytes: 0.5,
           needs_update: false
         }),
-        es: atof.createFromBackendDict({
+        es: vof.createFromBackendDict({
           filename: 'audio-es.mp3',
           file_size_bytes: 0.5,
           needs_update: false
