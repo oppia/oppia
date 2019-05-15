@@ -469,28 +469,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def test_get_all_completed_exp_ids(self):
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
             self.user_id), [])
@@ -516,8 +494,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_3)
         self.assertEqual(
-            len(learner_progress_services.get_all_completed_exp_ids(
-                self.user_id)), 3)
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
 
         # Unpublish EXP_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
@@ -551,6 +529,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_1)
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_3)
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
 
         # Unpublish EXP_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
@@ -562,8 +543,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Publish EXP_ID_3 to change status back to ACTIVITY_STATUS_PUBLIC.
         self.publish_exploration(self.owner_id, self.EXP_ID_3)
-        learner_progress_services.mark_exploration_as_completed(
-            self.user_id, self.EXP_ID_3)
         public_exploration = exp_services.get_exploration_summary_by_id(
             self.EXP_ID_3)
         self.assertEqual(
@@ -577,18 +556,16 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             all_filtered_summaries.completed_exp_summaries)
 
         # Test that completed exp summaries includes all 3 of the explorations.
+        # Ensure that completed_exp_summaries[0] matches EXP_ID_0.
+        self.assertEqual(
+            completed_exp_summaries[0].id, '0_en_arch_bridges_in_england')
+        # Ensure that completed_exp_summaries[1] matches EXP_ID_1.
+        self.assertEqual(
+            completed_exp_summaries[1].id, '1_fi_arch_sillat_suomi')
+        # Ensure that completed_exp_summaries[2] matches EXP_ID_3.
+        self.assertEqual(
+            completed_exp_summaries[2].id, '3_welcome_oppia')
         self.assertEqual(len(completed_exp_summaries), 3)
-
-
-
-
-
-
-
-
-
-
-
 
     def test_get_all_completed_collection_ids(self):
         self.assertEqual(
@@ -618,8 +595,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_3)
         self.assertEqual(
-            len(learner_progress_services.get_all_completed_collection_ids(
-                self.user_id)), 3)
+            learner_progress_services.get_all_completed_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
 
         # Unpublish COL_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
@@ -653,6 +630,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.COL_ID_1)
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_3)
+        self.assertEqual(
+            learner_progress_services.get_all_completed_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
 
         # Unpublish COL_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
@@ -664,8 +644,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Publish COL_ID_3 to change status back to ACTIVITY_STATUS_PUBLIC.
         self.publish_collection(self.owner_id, self.COL_ID_3)
-        learner_progress_services.mark_collection_as_completed(
-            self.user_id, self.COL_ID_3)
         public_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_3)
         self.assertEqual(
@@ -679,17 +657,16 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             all_filtered_summaries.completed_collection_summaries)
 
         # Test that completed col summaries includes all 3 of the collections.
+        # Ensure that completed_collection_summaries[0] matches COL_ID_0.
+        self.assertEqual(
+            completed_collection_summaries[0].id, '0_arch_bridges_in_england')
+        # Ensure that completed_collection_summaries[1] matches COL_ID_1.
+        self.assertEqual(
+            completed_collection_summaries[1].id, '1_welcome_introduce_oppia')
+        # Ensure that completed_collection_summaries[2] matches COL_ID_3.
+        self.assertEqual(
+            completed_collection_summaries[2].id, '3_welcome_oppia_collection')
         self.assertEqual(len(completed_collection_summaries), 3)
-
-
-
-
-
-
-
-
-
-
 
     def test_get_all_incomplete_exp_ids(self):
         self.assertEqual(
@@ -725,8 +702,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_3, state_name, version)
         self.assertEqual(
-            len(learner_progress_services.get_all_incomplete_exp_ids(
-                self.user_id)), 3)
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
 
         # Unpublish EXP_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
@@ -763,6 +740,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_1, state_name, version)
         learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_3, state_name, version)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
 
         # Unpublish EXP_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
@@ -774,8 +754,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Publish EXP_ID_3 to change status back to ACTIVITY_STATUS_PUBLIC.
         self.publish_exploration(self.owner_id, self.EXP_ID_3)
-        learner_progress_services.mark_exploration_as_incomplete(
-            self.user_id, self.EXP_ID_3, state_name, version)
         public_exploration = exp_services.get_exploration_summary_by_id(
             self.EXP_ID_3)
         self.assertEqual(
@@ -788,24 +766,17 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         incomplete_exp_summaries = (
             all_filtered_summaries.incomplete_exp_summaries)
 
-        # Test that incomplete exp summaries includes all 3 of the explorations.
+        # Test that incomplete exp summaries includes all 3 explorations.
+        # Ensure that incomplete_exp_summaries[0] matches EXP_ID_0.
+        self.assertEqual(
+            incomplete_exp_summaries[0].id, '0_en_arch_bridges_in_england')
+        # Ensure that incomplete_exp_summaries[1] matches EXP_ID_1.
+        self.assertEqual(
+            incomplete_exp_summaries[1].id, '1_fi_arch_sillat_suomi')
+        # Ensure that incomplete_exp_summaries[2] matches EXP_ID_3.
+        self.assertEqual(
+            incomplete_exp_summaries[2].id, '3_welcome_oppia')
         self.assertEqual(len(incomplete_exp_summaries), 3)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def test_get_all_incomplete_collection_ids(self):
         self.assertEqual(
@@ -835,8 +806,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_3)
         self.assertEqual(
-            len(learner_progress_services.get_all_incomplete_collection_ids(
-                self.user_id)), 3)
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
 
         # Unpublish COL_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
@@ -870,6 +841,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.COL_ID_1)
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_3)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
 
         # Unpublish COL_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
@@ -881,8 +855,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Publish COL_ID_3 to change status back to ACTIVITY_STATUS_PUBLIC.
         self.publish_collection(self.owner_id, self.COL_ID_3)
-        learner_progress_services.mark_collection_as_incomplete(
-            self.user_id, self.COL_ID_3)
         public_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_3)
         self.assertEqual(
@@ -896,24 +868,17 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             all_filtered_summaries.incomplete_collection_summaries)
 
         # Test that incomplete col summaries includes all 3 of the collections.
+        # Ensure that incomplete_collection_summaries[0] matches COL_ID_0.
+        self.assertEqual(
+            incomplete_collection_summaries[0].id, '0_arch_bridges_in_england')
+        # Ensure that incomplete_collection_summaries[1] matches COL_ID_1.
+        self.assertEqual(
+            incomplete_collection_summaries[1].id, '1_welcome_introduce_oppia')
+        # Ensure that incomplete_collection_summaries[2] matches COL_ID_3.
+        self.assertEqual(
+            incomplete_collection_summaries[2].id, (
+                '3_welcome_oppia_collection'))
         self.assertEqual(len(incomplete_collection_summaries), 3)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def test_get_ids_of_activities_in_learner_dashboard(self):
         # Add activities to the completed section.
@@ -938,7 +903,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Get the ids of all the activities.
         activity_ids = (
-            learner_progress_services.get_learner_dashboard_activities( # pylint: disable=line-too-long
+            learner_progress_services.get_learner_dashboard_activities(
                 self.user_id))
 
         self.assertEqual(
