@@ -203,8 +203,7 @@ oppia.factory('ThreadDataService', [
         return $http.put(SUGGESTION_ACTION_HANDLER_URL + threadId, {
           action: action,
           review_message: reviewMsg,
-          commit_message: (
-            action === ACTION_ACCEPT_SUGGESTION) ? commitMsg : null,
+          commit_message: action !== ACTION_ACCEPT_SUGGESTION ? null : commitMsg
         }).then(function() {
           openThreadsCount -= 1;
         }).then(onSuccess, onFailure);
