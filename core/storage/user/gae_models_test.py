@@ -398,10 +398,10 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     """Tests for UserSubscriptionsModel."""
     USER_ID_1 = 'user_id_1'
     USER_ID_2 = 'user_id_2'
-    CREATOR_IDS = ["4", "8", "16"]
-    COLLECTION_IDS = ["23", "42", "4"]
-    ACTIVITY_IDS = ["8", "16", "23"]
-    GENERAL_FEEDBACK_THREAD_IDS = ["42", "4", "8"]
+    CREATOR_IDS = ['4', '8', '16']
+    COLLECTION_IDS = ['23', '42', '4']
+    ACTIVITY_IDS = ['8', '16', '23']
+    GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
