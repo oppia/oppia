@@ -45,7 +45,7 @@ oppia.directive('collectionSummaryTile', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
         'collection_summary_tile_directive.html'),
-      controllerAs: 'collectionSummaryTileCtrl',
+      controllerAs: '$ctrl',
       controller: [
         'DateTimeFormatService', 'UserService',
         'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function(

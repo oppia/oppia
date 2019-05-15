@@ -25,7 +25,7 @@ oppia.directive('attributionGuide', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/attribution_guide/' +
         'attribution_guide_directive.html'),
-      controllerAs: 'attributionGuideCtrl',
+      controllerAs: '$ctrl',
       controller: [
         'BrowserCheckerService', 'UrlService', function(
             BrowserCheckerService, UrlService) {

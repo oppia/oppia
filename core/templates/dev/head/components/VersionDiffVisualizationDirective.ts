@@ -52,7 +52,7 @@ oppia.directive('versionDiffVisualization', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/' +
         'version_diff_visualization_directive.html'),
-      controllerAs: 'versionDiffVisualizationCtrl',
+      controllerAs: '$ctrl',
       controller: ['$uibModal', function($uibModal) {
         var ctrl = this;
         // Constants for color of nodes in diff graph

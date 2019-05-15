@@ -29,7 +29,7 @@ oppia.directive('hintEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/hint_editor_directive.html'),
-      controllerAs: 'hintEditorCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', 'EditabilityService', 'StateHintsService',
         function($scope, EditabilityService, StateHintsService) {

@@ -28,7 +28,7 @@ oppia.directive('profileLinkText', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/profile_link/' +
         'profile_link_text_directive.html'),
-      controllerAs: 'profileLinkTextCtrl',
+      controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
         this.isUsernameLinkable = function(username) {

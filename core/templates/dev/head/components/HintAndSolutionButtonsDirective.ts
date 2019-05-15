@@ -24,7 +24,7 @@ oppia.directive('hintAndSolutionButtons', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/hint_and_solution_buttons_directive.html'),
-      controllerAs: 'hintAndSolutionButtonsCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', 'HintsAndSolutionManagerService',
         'PlayerTranscriptService', 'ExplorationPlayerStateService',

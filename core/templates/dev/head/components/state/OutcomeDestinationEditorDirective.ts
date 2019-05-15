@@ -28,7 +28,7 @@ oppia.directive('outcomeDestinationEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/outcome_destination_editor_directive.html'),
-      controllerAs: 'outcomeDestinationEditorCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
         'StateEditorService', 'StateGraphLayoutService', 'UserService',

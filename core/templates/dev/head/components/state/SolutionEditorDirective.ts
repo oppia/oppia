@@ -39,7 +39,7 @@ oppia.directive('solutionEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/solution_editor_directive.html'),
-      controllerAs: 'solutionEditorCtrl',
+      controllerAs: '$ctrl',
       controller: [
         'StateSolutionService',
         function(StateSolutionService) {

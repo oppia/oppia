@@ -28,7 +28,7 @@ oppia.directive('profileLinkImage', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/profile_link/' +
         'profile_link_image_directive.html'),
-      controllerAs: 'profileLinkImageCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$http',
         function($http) {

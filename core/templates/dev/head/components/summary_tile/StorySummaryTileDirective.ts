@@ -28,7 +28,7 @@ oppia.directive('storySummaryTile', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/story_summary_tile_directive.html'),
-      controllerAs: 'storySummaryTileCtrl',
+      controllerAs: '$ctrl',
       controller: [
         function() {
           var ctrl = this;

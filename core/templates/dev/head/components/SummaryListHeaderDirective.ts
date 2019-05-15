@@ -33,7 +33,7 @@ oppia.directive('summaryListHeader', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_list_header_directive.html'),
-      controllerAs: 'summaryListHeaderCtrl',
+      controllerAs: '$ctrl',
       controller: [
         function() {
           var ctrl = this;

@@ -27,7 +27,7 @@ oppia.directive('topNavigationBar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/top_navigation_bar/' +
         'top_navigation_bar_directive.html'),
-      controllerAs: 'topNavigationBarCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',

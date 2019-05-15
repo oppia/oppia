@@ -1,4 +1,4 @@
-<div ng-hide="versionDiffVisualizationCtrl.diffGraphData" class="oppia-align-center">
+<div ng-hide="$ctrl.diffGraphData" class="oppia-align-center">
   Loading
   <loading-dots></loading-dots>
 </div>
@@ -6,21 +6,21 @@
 <div class="row">
   <div class="col-sm-8 col-md-8 col-lg-8">
     <div state-graph-visualization class="protractor-test-history-graph diff-graph"
-         graph-data="versionDiffVisualizationCtrl.diffGraphData" node-colors="versionDiffVisualizationCtrl.diffGraphNodeColors"
-         node-secondary-labels="versionDiffVisualizationCtrl.diffGraphSecondaryLabels"
-         init-state-id2="versionDiffVisualizationCtrl.v1InitStateId"
-         link-property-mapping="versionDiffVisualizationCtrl.DIFF_GRAPH_LINK_PROPERTY_MAPPING"
-         on-click-function="versionDiffVisualizationCtrl.onClickStateInDiffGraph">
+         graph-data="$ctrl.diffGraphData" node-colors="$ctrl.diffGraphNodeColors"
+         node-secondary-labels="$ctrl.diffGraphSecondaryLabels"
+         init-state-id2="$ctrl.v1InitStateId"
+         link-property-mapping="$ctrl.DIFF_GRAPH_LINK_PROPERTY_MAPPING"
+         on-click-function="$ctrl.onClickStateInDiffGraph">
     </div>
   </div>
 
   <div class="col-sm-4 col-md-4 col-lg-4">
-    <div class="legend-graph" ng-show="versionDiffVisualizationCtrl.diffGraphData">
+    <div class="legend-graph" ng-show="$ctrl.diffGraphData">
       <h4>Exploration Graph Legend</h4>
-      <div state-graph-visualization graph-data="versionDiffVisualizationCtrl.legendGraph"
-           node-colors="versionDiffVisualizationCtrl.LEGEND_GRAPH_COLORS"
-           node-secondary-labels="versionDiffVisualizationCtrl.LEGEND_GRAPH_SECONDARY_LABELS"
-           link-property-mapping="versionDiffVisualizationCtrl.LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
+      <div state-graph-visualization graph-data="$ctrl.legendGraph"
+           node-colors="$ctrl.LEGEND_GRAPH_COLORS"
+           node-secondary-labels="$ctrl.LEGEND_GRAPH_SECONDARY_LABELS"
+           link-property-mapping="$ctrl.LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
            id="legend-graph">
       </div>
     </div>

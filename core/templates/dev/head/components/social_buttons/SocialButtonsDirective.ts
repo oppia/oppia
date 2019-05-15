@@ -25,7 +25,7 @@ oppia.directive('socialButtons', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/social_buttons/' +
         'social_buttons_directive.html'),
-      controllerAs: 'socialButtonsCtrl',
+      controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
         ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
