@@ -18,11 +18,11 @@
 
 oppia.directive('translationTab', [
   'ContextService', 'ExplorationDataService', 'ExplorationStatesService',
-  'StateContentIdsToAudioTranslationsService', 'StateEditorService',
+  'StateEditorService', 'StateRecordedVoiceoversService',
   'StateTutorialFirstTimeService', 'UrlInterpolationService',
   function(
       ContextService, ExplorationDataService, ExplorationStatesService,
-      StateContentIdsToAudioTranslationsService, StateEditorService,
+      StateEditorService, StateRecordedVoiceoversService,
       StateTutorialFirstTimeService, UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -53,9 +53,8 @@ oppia.directive('translationTab', [
 
           var initTranslationTab = function() {
             var stateName = StateEditorService.getActiveStateName();
-            StateContentIdsToAudioTranslationsService.init(
-              stateName,
-              ExplorationStatesService.getContentIdsToAudioTranslationsMemento(
+            StateRecordedVoiceoversService.init(
+              stateName, ExplorationStatesService.getRecordedVoiceoversMemento(
                 stateName));
             StateWrittenTranslationsService.init(stateName,
               ExplorationStatesService.getWrittenTranslationsMemento(
