@@ -28,13 +28,13 @@ oppia.directive('translationTab', ['UrlInterpolationService',
       controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
         'StateContentIdsToAudioTranslationsService', 'StateEditorService',
-        'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
-        'TranslationTabActiveModeService',
+        'StateRecordedVoiceoversService', 'StateTutorialFirstTimeService',
+        'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
         function($scope, $rootScope, $templateCache, $uibModal,
             ContextService, EditabilityService, ExplorationStatesService,
             StateContentIdsToAudioTranslationsService, StateEditorService,
-            StateTutorialFirstTimeService, StateWrittenTranslationsService,
-            TranslationTabActiveModeService) {
+            StateRecordedVoiceoversService, StateTutorialFirstTimeService,
+            StateWrittenTranslationsService, TranslationTabActiveModeService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
           $scope.showTranslationTabSubDirectives = false;
@@ -43,9 +43,8 @@ oppia.directive('translationTab', ['UrlInterpolationService',
             StateTutorialFirstTimeService.initTranslation(
               ContextService.getExplorationId());
             var stateName = StateEditorService.getActiveStateName();
-            StateContentIdsToAudioTranslationsService.init(
-              stateName,
-              ExplorationStatesService.getContentIdsToAudioTranslationsMemento(
+            StateRecordedVoiceoversService.init(
+              stateName, ExplorationStatesService.getRecordedVoiceoversMemento(
                 stateName));
             StateWrittenTranslationsService.init(stateName,
               ExplorationStatesService.getWrittenTranslationsMemento(

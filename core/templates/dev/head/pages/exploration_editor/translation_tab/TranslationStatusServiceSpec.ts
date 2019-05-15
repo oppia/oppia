@@ -19,7 +19,7 @@
 describe('Translation status service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', {
-      getAllAudioLanguageCodes: function() {
+      getAllVoiceoverLanguageCodes: function() {
         return ['en', 'hi'];
       }
     });
@@ -38,7 +38,7 @@ describe('Translation status service', function() {
 
   describe('Translation status service', function() {
     var ess = null;
-    var scitats = null;
+    var srvs = null;
     var swts = null;
     var tss = null;
     var ttams = null;
@@ -66,7 +66,7 @@ describe('Translation status service', function() {
       ess = $injector.get('ExplorationStatesService');
       ttams = $injector.get('TranslationTabActiveModeService');
       tls = $injector.get('TranslationLanguageService');
-      scitats = $injector.get('StateContentIdsToAudioTranslationsService');
+      srvs = $injector.get('StateRecordedVoiceoversService');
       swts = $injector.get('StateWrittenTranslationsService');
 
       statesWithAudioDict = {
@@ -93,17 +93,19 @@ describe('Translation status service', function() {
               }
             }
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_2: {
-              en: {
-                needs_update: false,
-                filename: 'filename1.mp3',
-                file_size_bytes: 43467
-              }
-            },
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_2: {
+                en: {
+                  needs_update: false,
+                  filename: 'filename1.mp3',
+                  file_size_bytes: 43467
+                }
+              },
+              feedback_1: {}
+            }
           },
           interaction: {
             answer_groups: [{
@@ -184,10 +186,12 @@ describe('Translation status service', function() {
               feedback_1: {}
             }
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           interaction: {
             answer_groups: [{
@@ -245,12 +249,14 @@ describe('Translation status service', function() {
               content: {}
             }
           },
-          content_ids_to_audio_translations: {
-            content: {
-              en: {
-                needs_update: false,
-                filename: 'content-en-s86jb5zajs.mp3',
-                file_size_bytes: 38870
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                en: {
+                  needs_update: false,
+                  filename: 'content-en-s86jb5zajs.mp3',
+                  file_size_bytes: 38870
+                }
               }
             }
           },
@@ -283,12 +289,11 @@ describe('Translation status service', function() {
       var statesNeedingAudioUpdate = tss.getAllStatesNeedUpdatewarning();
       // To check that initially no state contains audio that needs update.
       expect(Object.keys(statesNeedingAudioUpdate).length).toBe(0);
-      scitats.init('First', ess.getContentIdsToAudioTranslationsMemento(
-        'First'));
-      var value = scitats.displayed;
+      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
+      var value = srvs.displayed;
       value.toggleNeedsUpdateAttribute('feedback_2', 'en');
-      scitats.saveDisplayedValue();
-      ess.saveContentIdsToAudioTranslations('First', value);
+      srvs.saveDisplayedValue();
+      ess.saveRecordedVoiceovers('First', value);
       tss.refresh();
 
       statesNeedingAudioUpdate = tss.getAllStatesNeedUpdatewarning();
@@ -390,22 +395,17 @@ describe('Translation status service', function() {
       'for all states in the exploration', function() {
       ttams.activateVoiceoverMode();
       var stateWiseStatusColor = tss.getAllStateStatusColors();
-      expect(stateWiseStatusColor.First).toBe(
-        FEW_ASSETS_AVAILABLE_COLOR);
-      expect(stateWiseStatusColor.Second).toBe(
-        NO_ASSETS_AVAILABLE_COLOR);
-      expect(stateWiseStatusColor.Third).toBe(
-        ALL_ASSETS_AVAILABLE_COLOR);
-      scitats.init('Second', ess.getContentIdsToAudioTranslationsMemento(
-        'Second'));
-      var value = scitats.displayed;
-      value.addAudioTranslation('content', 'en', 'file.mp3', 1000);
-      scitats.saveDisplayedValue();
-      ess.saveContentIdsToAudioTranslations('Second', value);
+      expect(stateWiseStatusColor.First).toBe(FEW_ASSETS_AVAILABLE_COLOR);
+      expect(stateWiseStatusColor.Second).toBe(NO_ASSETS_AVAILABLE_COLOR);
+      expect(stateWiseStatusColor.Third).toBe(ALL_ASSETS_AVAILABLE_COLOR);
+      srvs.init('Second', ess.getRecordedVoiceoversMemento('Second'));
+      var value = srvs.displayed;
+      value.addVoiceover('content', 'en', 'file.mp3', 1000);
+      srvs.saveDisplayedValue();
+      ess.saveRecordedVoiceovers('Second', value);
       tss.refresh();
       stateWiseStatusColor = tss.getAllStateStatusColors();
-      expect(stateWiseStatusColor.Second).toBe(
-        FEW_ASSETS_AVAILABLE_COLOR);
+      expect(stateWiseStatusColor.Second).toBe(FEW_ASSETS_AVAILABLE_COLOR);
     });
 
     it('should correctly return an object containing status colors of ' +
@@ -430,8 +430,7 @@ describe('Translation status service', function() {
     it('should return correct status color for audio availability in the ' +
       'active state components', function() {
       ttams.activateVoiceoverMode();
-      scitats.init('First', ess.getContentIdsToAudioTranslationsMemento(
-        'First'));
+      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
       var activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('content');
       expect(activeStateComponentStatus).toBe(NO_ASSETS_AVAILABLE_COLOR);
@@ -440,23 +439,21 @@ describe('Translation status service', function() {
       expect(activeStateComponentStatus).toBe(FEW_ASSETS_AVAILABLE_COLOR);
       // To test changes after adding an audio translation to "content"
       // in the first state.
-      scitats.displayed.addAudioTranslation('content', 'en', 'file.mp3', 1000);
-      scitats.saveDisplayedValue();
-      var value = scitats.displayed;
-      ess.saveContentIdsToAudioTranslations('First', value);
+      srvs.displayed.addVoiceover('content', 'en', 'file.mp3', 1000);
+      srvs.saveDisplayedValue();
+      var value = srvs.displayed;
+      ess.saveRecordedVoiceovers('First', value);
       activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('content');
       expect(activeStateComponentStatus).toBe(ALL_ASSETS_AVAILABLE_COLOR);
-      scitats.init('Second', ess.getContentIdsToAudioTranslationsMemento(
-        'Second'));
+      srvs.init('Second', ess.getRecordedVoiceoversMemento('Second'));
       activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('content');
       expect(activeStateComponentStatus).toBe(NO_ASSETS_AVAILABLE_COLOR);
       activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('feedback');
       expect(activeStateComponentStatus).toBe(NO_ASSETS_AVAILABLE_COLOR);
-      scitats.init('Third', ess.getContentIdsToAudioTranslationsMemento(
-        'Third'));
+      srvs.init('Third', ess.getRecordedVoiceoversMemento('Third'));
       activeStateComponentStatus = tss
         .getActiveStateComponentStatusColor('content');
       expect(activeStateComponentStatus).toBe(ALL_ASSETS_AVAILABLE_COLOR);
@@ -488,18 +485,17 @@ describe('Translation status service', function() {
     it('should correctly return whether active state component audio needs ' +
       'update', function() {
       ttams.activateVoiceoverMode();
-      scitats.init('First', ess.getContentIdsToAudioTranslationsMemento(
-        'First'));
+      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
       var activeStateComponentNeedsUpdateStatus = tss
         .getActiveStateComponentNeedsUpdateStatus('feedback');
         // To check that initially the state component "feedback" does not
         // contain audio that needs update.
       expect(activeStateComponentNeedsUpdateStatus).toBe(false);
-      var value = scitats.displayed;
+      var value = srvs.displayed;
       // To test changes after changing "needs update" status of an audio.
       value.toggleNeedsUpdateAttribute('feedback_2', 'en');
-      scitats.saveDisplayedValue();
-      ess.saveContentIdsToAudioTranslations('First', value);
+      srvs.saveDisplayedValue();
+      ess.saveRecordedVoiceovers('First', value);
       activeStateComponentNeedsUpdateStatus = tss
         .getActiveStateComponentNeedsUpdateStatus('feedback');
       // To check that the state component "feedback" contains audio that
@@ -527,8 +523,7 @@ describe('Translation status service', function() {
     it('should return correct audio availability status color of a contentId ' +
       'of active state', function() {
       ttams.activateVoiceoverMode();
-      scitats.init('First', ess.getContentIdsToAudioTranslationsMemento(
-        'First'));
+      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
       var activeStateContentIdStatusColor = tss
         .getActiveStateContentIdStatusColor('content');
       expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
@@ -538,25 +533,23 @@ describe('Translation status service', function() {
       activeStateContentIdStatusColor = tss
         .getActiveStateContentIdStatusColor('feedback_2');
       expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
-      var value = scitats.displayed;
+      var value = srvs.displayed;
       // To test changes after adding an audio translation to "content"
       // in the first state.
-      value.addAudioTranslation('content', 'en', 'file.mp3', 1000);
-      scitats.saveDisplayedValue();
-      ess.saveContentIdsToAudioTranslations('First', value);
+      value.addVoiceover('content', 'en', 'file.mp3', 1000);
+      srvs.saveDisplayedValue();
+      ess.saveRecordedVoiceovers('First', value);
       activeStateContentIdStatusColor = tss
         .getActiveStateContentIdStatusColor('content');
       expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
-      scitats.init('Second', ess.getContentIdsToAudioTranslationsMemento(
-        'Second'));
+      srvs.init('Second', ess.getRecordedVoiceoversMemento('Second'));
       activeStateContentIdStatusColor = tss
         .getActiveStateContentIdStatusColor('content');
       expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
       activeStateContentIdStatusColor = tss
         .getActiveStateContentIdStatusColor('feedback_1');
       expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
-      scitats.init('Third', ess.getContentIdsToAudioTranslationsMemento(
-        'Third'));
+      srvs.init('Third', ess.getRecordedVoiceoversMemento('Third'));
       activeStateContentIdStatusColor = tss
         .getActiveStateContentIdStatusColor('content');
       expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
@@ -599,17 +592,16 @@ describe('Translation status service', function() {
     it('should return correct needs update status of voice-over of active ' +
       'state contentId', function() {
       ttams.activateVoiceoverMode();
-      scitats.init(
-        'First', ess.getContentIdsToAudioTranslationsMemento('First'));
+      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
       var activeStateContentIdNeedsUpdateStatus = tss
         .getActiveStateContentIdNeedsUpdateStatus('feedback_2');
       // To check that initially the state content id "feedback" does not
       // contain audio that needs update.
       expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
 
-      var value = scitats.displayed;
+      var value = srvs.displayed;
       value.toggleNeedsUpdateAttribute('feedback_2', 'en');
-      scitats.saveDisplayedValue();
+      srvs.saveDisplayedValue();
       activeStateContentIdNeedsUpdateStatus = (
         tss.getActiveStateContentIdNeedsUpdateStatus('feedback_2'));
       // To check that the state content id "feedback" contains audio that
