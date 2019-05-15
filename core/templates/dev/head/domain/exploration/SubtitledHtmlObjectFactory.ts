@@ -16,6 +16,7 @@
  * @fileoverview Factory for creating new frontend instances of SubtitledHtml
  * domain objects.
  */
+
 oppia.factory('SubtitledHtmlObjectFactory', [function() {
   var SubtitledHtml = function(html, contentId) {
     this._html = html;
