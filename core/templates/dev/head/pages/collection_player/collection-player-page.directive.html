@@ -1,16 +1,16 @@
 <div>
   <background-banner></background-banner>
-  <div ng-if="collectionPlayerCtrl.collection" class="oppia-collectionPlayerCtrl.collection-player-tiles-container">
-    <h2 ng-if="!collectionPlayerCtrl.collectionPlaythrough.hasFinishedcollectionPlayerCtrl.collection()" class="oppia-page-heading" align="center">
-      <span ng-if="!collectionPlayerCtrl.collectionPlaythrough.hasStartedcollectionPlayerCtrl.collection()" class="oppia-collectionPlayerCtrl.collection-player-title-font">Begin <[collectionPlayerCtrl.collection.getTitle()]>:</span>
-      <span ng-if="collectionPlayerCtrl.collectionPlaythrough.hasStartedcollectionPlayerCtrl.collection()" class="oppia-collectionPlayerCtrl.collection-player-title-font">Continue <[collectionPlayerCtrl.collection.getTitle()]>:</span>
+  <div ng-if="$ctrl.collection" class="oppia-$ctrl.collection-player-tiles-container">
+    <h2 ng-if="!$ctrl.collectionPlaythrough.hasFinished$ctrl.collection()" class="oppia-page-heading" align="center">
+      <span ng-if="!$ctrl.collectionPlaythrough.hasStarted$ctrl.collection()" class="oppia-$ctrl.collection-player-title-font">Begin <[$ctrl.collection.getTitle()]>:</span>
+      <span ng-if="$ctrl.collectionPlaythrough.hasStarted$ctrl.collection()" class="oppia-$ctrl.collection-player-title-font">Continue <[$ctrl.collection.getTitle()]>:</span>
     </h2>
-    <h2 ng-if="collectionPlayerCtrl.collectionPlaythrough.hasFinishedcollectionPlayerCtrl.collection()" class="oppia-page-heading">
-      <span>You have finished the collectionPlayerCtrl.collection! Feel free to replay any explorations below.</span>
+    <h2 ng-if="$ctrl.collectionPlaythrough.hasFinished$ctrl.collection()" class="oppia-page-heading">
+      <span>You have finished the $ctrl.collection! Feel free to replay any explorations below.</span>
     </h2>
 
-    <div ng-if="collectionPlayerCtrl.collection" class="oppia-collectionPlayerCtrl.collection-path-section hidden-sm hidden-xs">
-      <svg width="500px" ng-attr-height="<[collectionPlayerCtrl.svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
+    <div ng-if="$ctrl.collection" class="oppia-$ctrl.collection-path-section hidden-sm hidden-xs">
+      <svg width="500px" ng-attr-height="<[$ctrl.svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
         <path fill="none"
               stroke="#296E5F"
               stroke-dasharray="15,28"
@@ -23,15 +23,15 @@
               stroke-linecap="round"
               stroke-width="12"
               ng-attr-d="<[pathSvgParameters]>"/>
-        <image ng-if="!collectionPlayerCtrl.collectionPlaythrough.hasStartedcollectionPlayerCtrl.collection()"
+        <image ng-if="!$ctrl.collectionPlaythrough.hasStarted$ctrl.collection()"
                x="175"
                y="100"
                height="100"
                width="100"
-               ng-attr-xlink:href="<[collectionPlayerCtrl.getStaticImageUrl('/general/collectionPlayerCtrl.collection_start_here_arrow.svg')]>"
+               ng-attr-xlink:href="<[$ctrl.getStaticImageUrl('/general/$ctrl.collection_start_here_arrow.svg')]>"
                xlink:href="">
         </image>
-        <text ng-if="!collectionPlayerCtrl.collectionPlaythrough.hasStartedcollectionPlayerCtrl.collection()"
+        <text ng-if="!$ctrl.collectionPlaythrough.hasStarted$ctrl.collection()"
               x="210"
               y="170"
               alignment-baseline="middle"
@@ -43,11 +43,11 @@
         </text>
       </svg>
 
-      <img ng-src="<[collectionPlayerCtrl.getStaticImageUrl('/general/collectionPlayerCtrl.collection_mascot.svg')]>" class="collectionPlayerCtrl.collection-mascot">
-      <a ng-repeat="node in collectionPlayerCtrl.collection.getcollectionPlayerCtrl.collectionNodes()"
-         ng-href="<[collectionPlayerCtrl.getExplorationUrl(node.getExplorationId())]>"
-         ng-style="{position: 'absolute', left: '<[collectionPlayerCtrl.pathIconParameters[$index].left]>', top: '<[collectionPlayerCtrl.pathIconParameters[$index].top]>'}">
-        <svg class="protractor-test-collectionPlayerCtrl.collection-exploration"
+      <img ng-src="<[$ctrl.getStaticImageUrl('/general/$ctrl.collection_mascot.svg')]>" class="$ctrl.collection-mascot">
+      <a ng-repeat="node in $ctrl.collection.get$ctrl.collectionNodes()"
+         ng-href="<[$ctrl.getExplorationUrl(node.getExplorationId())]>"
+         ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}">
+        <svg class="protractor-test-$ctrl.collection-exploration"
              width="100"
              height="125"
              xmlns="http://www.w3.org/2000/svg"
@@ -58,39 +58,39 @@
               <circle cx="50"
                       cy="70"
                       r="50"
-                      ng-attr-fill="<[collectionPlayerCtrl.pathIconParameters[$index].thumbnailBgColor]>"/>
-              <image ng-if="collectionPlayerCtrl.isCompletedExploration(node.getExplorationId())"
+                      ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>"/>
+              <image ng-if="$ctrl.isCompletedExploration(node.getExplorationId())"
                      x="0"
                      y="20"
                      height="100"
                      width="100"
-                     ng-attr-xlink:href="<[collectionPlayerCtrl.getStaticImageUrl('/general/collectionPlayerCtrl.collection_paw.svg')]>"
+                     ng-attr-xlink:href="<[$ctrl.getStaticImageUrl('/general/$ctrl.collection_paw.svg')]>"
                      xlink:href="">
               </image>
-              <image ng-if="!collectionPlayerCtrl.isCompletedExploration(node.getExplorationId())"
+              <image ng-if="!$ctrl.isCompletedExploration(node.getExplorationId())"
                      x="10"
                      y="30"
                      height="80"
                      width="80"
-                     ng-attr-xlink:href="<[collectionPlayerCtrl.getStaticImageUrl(collectionPlayerCtrl.pathIconParameters[$index].thumbnailIconUrl)]>"
+                     ng-attr-xlink:href="<[$ctrl.getStaticImageUrl($ctrl.pathIconParameters[$index].thumbnailIconUrl)]>"
                      xlink:href="">
               </image>
             </pattern>
           </defs>
-          <a xlink:href="<[collectionPlayerCtrl.getExplorationUrl(node.getExplorationId())]>"
-             ng-mouseover="collectionPlayerCtrl.updateExplorationPreview(node.getExplorationId());
-                           collectionPlayerCtrl.setIconHighlight($index);"
-             ng-mouseleave="collectionPlayerCtrl.togglePreviewCard();
-                            uncollectionPlayerCtrl.setIconHighlight($index);">
-            <circle ng-show="node.getExplorationId() === collectionPlayerCtrl.nextExplorationId &&
-              $index !== collectionPlayerCtrl.activeHighlightedIconIndex"
+          <a xlink:href="<[$ctrl.getExplorationUrl(node.getExplorationId())]>"
+             ng-mouseover="$ctrl.updateExplorationPreview(node.getExplorationId());
+                           $ctrl.setIconHighlight($index);"
+             ng-mouseleave="$ctrl.togglePreviewCard();
+                            un$ctrl.setIconHighlight($index);">
+            <circle ng-show="node.getExplorationId() === $ctrl.nextExplorationId &&
+              $index !== $ctrl.activeHighlightedIconIndex"
                     cx="50"
                     cy="70"
                     r="50"
                     id="<['highlight' + $index]>"
                     fill="#FF8C00"
                     fill-opacity="0.5"/>
-            <circle ng-show="($index===collectionPlayerCtrl.activeHighlightedIconIndex)?true:false"
+            <circle ng-show="($index===$ctrl.activeHighlightedIconIndex)?true:false"
                     cx="50"
                     cy="70"
                     r="50"
@@ -117,26 +117,26 @@
       </a>
     </div>
 
-    <div ng-if="collectionPlayerCtrl.collection" class="oppia-collectionPlayerCtrl.collection-table hidden-md hidden-lg hidden-xl">
-      <img ng-src="<[collectionPlayerCtrl.getStaticImageUrl('/general/collectionPlayerCtrl.collection_mascot.svg')]>" class="mobile-lesson-icon">
-      <div class="mobile-path-segment" ng-repeat="node in collectionPlayerCtrl.collection.getcollectionPlayerCtrl.collectionNodes()" id="mobile-path-anchor-<[$index]>">
+    <div ng-if="$ctrl.collection" class="oppia-$ctrl.collection-table hidden-md hidden-lg hidden-xl">
+      <img ng-src="<[$ctrl.getStaticImageUrl('/general/$ctrl.collection_mascot.svg')]>" class="mobile-lesson-icon">
+      <div class="mobile-path-segment" ng-repeat="node in $ctrl.collection.get$ctrl.collectionNodes()" id="mobile-path-anchor-<[$index]>">
         <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;">
-          <svg class="protractor-mobile-test-collectionPlayerCtrl.collection-exploration"
+          <svg class="protractor-mobile-test-$ctrl.collection-exploration"
                width="100"
                height="150"
                xmlns="http://www.w3.org/2000/svg"
                xmlns:xlink="http://www.w3.org/1999/xlink"
                version="1.1"
-               ng-click="collectionPlayerCtrl.scrollToLocation('mobile-path-anchor-' + $index); collectionPlayerCtrl.updateExplorationPreview(node.getExplorationId());">
-            <image ng-if="!collectionPlayerCtrl.collectionPlaythrough.hasStartedcollectionPlayerCtrl.collection() && $index===0"
+               ng-click="$ctrl.scrollToLocation('mobile-path-anchor-' + $index); $ctrl.updateExplorationPreview(node.getExplorationId());">
+            <image ng-if="!$ctrl.collectionPlaythrough.hasStarted$ctrl.collection() && $index===0"
                    x="0"
                    y="83"
                    height="80"
                    width="100"
-                   ng-attr-xlink:href="<[collectionPlayerCtrl.getStaticImageUrl('/general/collectionPlayerCtrl.collection_start_here_arrow.svg')]>"
+                   ng-attr-xlink:href="<[$ctrl.getStaticImageUrl('/general/$ctrl.collection_start_here_arrow.svg')]>"
                    xlink:href="">
             </image>
-            <text ng-if="!collectionPlayerCtrl.collectionPlaythrough.hasStartedcollectionPlayerCtrl.collection() && $index===0"
+            <text ng-if="!$ctrl.collectionPlaythrough.hasStarted$ctrl.collection() && $index===0"
                   x="50"
                   y="140"
                   alignment-baseline="middle"
@@ -151,34 +151,34 @@
                 <circle cx="50"
                         cy="70"
                         r="50"
-                        ng-attr-fill="<[collectionPlayerCtrl.pathIconParameters[$index].thumbnailBgColor]>"/>
-                <image ng-if="collectionPlayerCtrl.isCompletedExploration(node.getExplorationId())"
+                        ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>"/>
+                <image ng-if="$ctrl.isCompletedExploration(node.getExplorationId())"
                        x="0"
                        y="20"
                        height="100"
                        width="100"
-                       ng-attr-xlink:href="<[collectionPlayerCtrl.getStaticImageUrl('/general/collectionPlayerCtrl.collection_paw.svg')]>"
+                       ng-attr-xlink:href="<[$ctrl.getStaticImageUrl('/general/$ctrl.collection_paw.svg')]>"
                        xlink:href="">
                 </image>
-                <image ng-if="!collectionPlayerCtrl.isCompletedExploration(node.getExplorationId())"
+                <image ng-if="!$ctrl.isCompletedExploration(node.getExplorationId())"
                        x="10"
                        y="30"
                        height="80"
                        width="80"
-                       ng-attr-xlink:href="<[collectionPlayerCtrl.getStaticImageUrl(collectionPlayerCtrl.pathIconParameters[$index].thumbnailIconUrl)]>"
+                       ng-attr-xlink:href="<[$ctrl.getStaticImageUrl($ctrl.pathIconParameters[$index].thumbnailIconUrl)]>"
                        xlink:href="">
                 </image>
               </pattern>
             </defs>
-            <circle ng-show="node.getExplorationId() === collectionPlayerCtrl.nextExplorationId &&
-              $index !== collectionPlayerCtrl.activeHighlightedIconIndex"
+            <circle ng-show="node.getExplorationId() === $ctrl.nextExplorationId &&
+              $index !== $ctrl.activeHighlightedIconIndex"
                     cx="50"
                     cy="70"
                     r="50"
                     id="<['highlight' + $index]>"
                     fill="#FF8C00"
                     fill-opacity="0.5"/>
-            <circle ng-show="($index===collectionPlayerCtrl.activeHighlightedIconIndex)?true:false"
+            <circle ng-show="($index===$ctrl.activeHighlightedIconIndex)?true:false"
                     cx="50"
                     cy="70"
                     r="50"
@@ -202,12 +202,12 @@
             </text>
           </svg>
         </a>
-        <img ng-src="<[collectionPlayerCtrl.getStaticImageUrl('/general/mobile_path_segment.svg')]>">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/general/mobile_path_segment.svg')]>">
         <div style="position: fixed; z-index: 100; top: 0; left: 0;">
-          <div ng-class="{'oppia-activity-summary-tile-mobile-background-mask': collectionPlayerCtrl.explorationCardIsShown}" ng-click="collectionPlayerCtrl.closeOnClickingOutside()">
-            <exploration-summary-tile ng-if="collectionPlayerCtrl.explorationCardIsShown"
-                                      ng-click="collectionPlayerCtrl.onClickStopPropagation($event)"
-                                      collectionPlayerCtrl.collection-id="collectionPlayerCtrl.collectionId"
+          <div ng-class="{'oppia-activity-summary-tile-mobile-background-mask': $ctrl.explorationCardIsShown}" ng-click="$ctrl.closeOnClickingOutside()">
+            <exploration-summary-tile ng-if="$ctrl.explorationCardIsShown"
+                                      ng-click="$ctrl.onClickStopPropagation($event)"
+                                      $ctrl.collection-id="$ctrl.collectionId"
                                       exploration-id="currentExplorationId"
                                       exploration-title="summaryToPreview.title"
                                       last-updated-msec="summaryToPreview.last_updated_msec"
@@ -218,7 +218,7 @@
                                       thumbnail-icon-url="summaryToPreview.thumbnail_icon_url"
                                       thumbnail-bg-color="summaryToPreview.thumbnail_bg_color"
                                       is-community-owned="summaryToPreview.community_owned"
-                                      is-collectionPlayerCtrl.collection-preview-tile="true"
+                                      is-$ctrl.collection-preview-tile="true"
                                       style="position: absolute; z-index: 10;">
             </exploration-summary-tile>
           </div>
@@ -227,17 +227,17 @@
 
     </div>
 
-    <div ng-if="collectionPlayerCtrl.collection && collectionPlayerCtrl.collectionSummary" class="oppia-card-preview-panel hidden-sm hidden-xs">
+    <div ng-if="$ctrl.collection && $ctrl.collectionSummary" class="oppia-card-preview-panel hidden-sm hidden-xs">
       <md-card class="oppia-activity-summary-tile md-default-theme">
-        <div class="title-section" style="background-color: <[collectionPlayerCtrl.collectionSummary.thumbnail_bg_color]>; z-index: 1;">
-          <img ng-src="<[collectionPlayerCtrl.getStaticImageUrl(collectionPlayerCtrl.collectionSummary.thumbnail_icon_url)]>" class="thumbnail-image">
+        <div class="title-section" style="background-color: <[$ctrl.collectionSummary.thumbnail_bg_color]>; z-index: 1;">
+          <img ng-src="<[$ctrl.getStaticImageUrl($ctrl.collectionSummary.thumbnail_icon_url)]>" class="thumbnail-image">
         </div>
         <div class="title-section-mask objective oppia-activity-summary-tile-pre-hover-preview">
           <span>Hover over an icon to preview an exploration.</span>
         </div>
       </md-card>
-      <exploration-summary-tile ng-if="collectionPlayerCtrl.explorationCardIsShown"
-                                collectionPlayerCtrl.collection-id="collectionPlayerCtrl.collectionId"
+      <exploration-summary-tile ng-if="$ctrl.explorationCardIsShown"
+                                $ctrl.collection-id="$ctrl.collectionId"
                                 exploration-id="currentExplorationId"
                                 exploration-title="summaryToPreview.title"
                                 last-updated-msec="summaryToPreview.last_updated_msec"

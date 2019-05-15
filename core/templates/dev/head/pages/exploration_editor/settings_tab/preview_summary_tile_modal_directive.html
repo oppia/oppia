@@ -5,15 +5,15 @@
 <div class="modal-body text-center">
   This is how your activity will appear to learners in search results
   or the library.
-  <exploration-summary-tile exploration-title="getExplorationTitle()"
-                            objective="getExplorationObjective()"
-                            category="getExplorationCategory()"
-                            thumbnail-icon-url="getThumbnailIconUrl()"
-                            thumbnail-bg-color="getThumbnailBgColor()"
+  <exploration-summary-tile exploration-title="$ctrl.getExplorationTitle()"
+                            objective="$ctrl.getExplorationObjective()"
+                            category="$ctrl.getExplorationCategory()"
+                            thumbnail-icon-url="$ctrl.getThumbnailIconUrl()"
+                            thumbnail-bg-color="$ctrl.getThumbnailIconUrl()"
                             class="protractor-test-exploration-summary-tile">
   </exploration-summary-tile>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-default protractor-test-close-preview-summary-modal" ng-click="close()">Return to editor</button>
+  <button class="btn btn-default protractor-test-close-preview-summary-modal" ng-click="$ctrl.close()">Return to editor</button>
 </div>

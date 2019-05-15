@@ -21,10 +21,10 @@ oppia.directive('emailDashboard', ['UrlInterpolationService', function(
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/email_dashboard/email-dashboard-page.directive.html'),
-      controllerAs: 'emailDashboardCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$rootScope', 'EmailDashboardDataService', 'UserService',
         function($rootScope, EmailDashboardDataService, UserService) {
@@ -65,7 +65,8 @@ oppia.directive('emailDashboard', ['UrlInterpolationService', function(
 
           ctrl.getNextPageOfQueries = function() {
             if (EmailDashboardDataService.isNextPageAvailable()) {
-              EmailDashboardDataService.getNextQueries().then(function(queries) {
+              EmailDashboardDataService.getNextQueries().then(function(
+                  queries) {
                 ctrl.currentPageOfQueries = queries;
               });
             }

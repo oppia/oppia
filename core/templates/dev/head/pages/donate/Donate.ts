@@ -21,10 +21,10 @@ oppia.directive('donate', ['UrlInterpolationService', function(
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/donate/donate-page.directive.html'),
-      controllerAs: 'donateCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$http','$timeout', '$window', 'SiteAnalyticsService',
         'UrlInterpolationService', 'WindowDimensionsService',

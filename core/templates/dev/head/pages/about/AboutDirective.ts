@@ -21,10 +21,10 @@ oppia.directive('about', ['UrlInterpolationService',
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/about/about_directive.html'),
-      controllerAs: 'aboutCtrl',
+      controllerAs: '$ctrl',
       controller: [
         'UrlInterpolationService',
         function(UrlInterpolationService) {

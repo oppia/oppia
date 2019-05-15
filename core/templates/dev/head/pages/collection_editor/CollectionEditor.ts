@@ -38,10 +38,10 @@ oppia.directive('collectionEditor', ['UrlInterpolationService', function(
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/collection-editor-page.directive.html'),
-      controllerAs: 'collectionEditorCtrl',
+      controllerAs: '$ctrl',
       controller: [
         'CollectionEditorStateService',
         function(CollectionEditorStateService) {

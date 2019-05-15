@@ -21,7 +21,7 @@ oppia.directive('createActivityButton', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/create_button/create_activity_button_directive.html'),
       controllerAs: 'createActivityButtonCtrl',

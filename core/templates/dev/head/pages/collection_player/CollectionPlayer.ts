@@ -35,18 +35,18 @@ oppia.directive('collectionPlayer', ['UrlInterpolationService', function(
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_player/collection-player-page.directive.html'),
-      controllerAs: 'collectionPlayerCtrl',
+      controllerAs: '$ctrl',
       controller: [
-        '$anchorScroll', '$http', '$location',
+        '$anchorScroll', '$http', '$location', '$scope',
         'AlertsService', 'CollectionObjectFactory',
         'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
         'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
-            $anchorScroll, $http, $location,
+            $anchorScroll, $http, $location, $scope,
             AlertsService, CollectionObjectFactory,
             CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
             ReadOnlyCollectionBackendApiService, UrlInterpolationService,
@@ -286,7 +286,7 @@ oppia.directive('collectionPlayer', ['UrlInterpolationService', function(
             }
           );
 
-          ctrl.$watch('collection', function(newValue) {
+          $scope.$watch('collection', function(newValue) {
             if (newValue !== null) {
               ctrl.generatePathParameters();
             }

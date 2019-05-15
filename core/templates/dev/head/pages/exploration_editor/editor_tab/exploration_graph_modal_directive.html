@@ -3,12 +3,12 @@
 </div>
 
 <div class="modal-body" style="overflow-y: hidden; padding-bottom: 0;">
-  <div state-graph-visualization style="height: 300px;" graph-data="graphData" allow-panning="true" current-state-id="currentStateName" on-click-function="selectState" on-delete-function="deleteState" center-at-current-state="true" is-editable="isEditable">
+  <div state-graph-visualization style="height: 300px;" graph-data="$ctrl.graphData" allow-panning="true" current-state-id="$ctrl.currentStateName" on-click-function="$ctrl.selectState" on-delete-function="$ctrl.deleteState" center-at-current-state="true" is-editable="$ctrl.isEditable">
   </div>
 </div>
 
 <div class="modal-footer" style="margin-top: 0; text-align: inherit;">
   <span class="pull-right">
-    <button class="btn btn-default" ng-click="cancel()">Close</button>
+    <button class="btn btn-default" ng-click="$ctrl.cancel()">Close</button>
   </span>
 </div>

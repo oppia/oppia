@@ -19,7 +19,7 @@
 
 describe('Creator dashboard controller', function() {
   describe('CreatorDashboard', function() {
-    var scope, ctrl, $httpBackend;
+    var scope, ctrl, $httpBackend, $componentController;
     var CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data';
     var dashboardData = {
       explorations_list: [{
@@ -59,6 +59,10 @@ describe('Creator dashboard controller', function() {
       angular.mock.module('oppia');
     });
 
+    beforeEach(inject(function(_$componentController_) {
+      $componentController = _$componentController_;
+    }));
+
     beforeEach(angular.mock.inject(function($injector) {
       $httpBackend = $injector.get('$httpBackend');
     }));
@@ -67,9 +71,7 @@ describe('Creator dashboard controller', function() {
       function($controller, $rootScope, CreatorDashboardBackendApiService) {
         $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
           dashboardData);
-        scope = $rootScope.$new();
-        ctrl = $controller('CreatorDashboard', {
-          $scope: scope,
+        ctrl = $componentController('creatorDashboard', null, {
           AlertsService: null,
           CreatorDashboardBackendApiService: CreatorDashboardBackendApiService
         });
@@ -78,10 +80,10 @@ describe('Creator dashboard controller', function() {
 
     it('should have the correct data for creator dashboard', function() {
       $httpBackend.flush();
-      expect(scope.explorationsList).toEqual(dashboardData.explorations_list);
-      expect(scope.collectionsList).toEqual(dashboardData.collections_list);
-      expect(scope.dashboardStats).toEqual(dashboardData.dashboard_stats);
-      expect(scope.lastWeekStats).toEqual(dashboardData.last_week_stats);
+      expect(ctrl.explorationsList).toEqual(dashboardData.explorations_list);
+      expect(ctrl.collectionsList).toEqual(dashboardData.collections_list);
+      expect(ctrl.dashboardStats).toEqual(dashboardData.dashboard_stats);
+      expect(ctrl.lastWeekStats).toEqual(dashboardData.last_week_stats);
     });
   });
 });

@@ -8,13 +8,13 @@
       <div class="about-nav md-tab">
         <ul class="oppia-about-tabs">
           <li class="oppia-about-tabs-active">
-            <a ng-click="aboutCtrl.onTabClick(aboutCtrl.TAB_ID_ABOUT)" href="" class="oppia-about-tabs-text" id="about" translate="I18N_ABOUT_PAGE_TABS_ABOUT"></a>
+            <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_ABOUT)" href="" class="oppia-about-tabs-text" id="about" translate="I18N_ABOUT_PAGE_TABS_ABOUT"></a>
           </li>
           <li>
-            <a ng-click="aboutCtrl.onTabClick(aboutCtrl.TAB_ID_FOUNDATION)" href="" class="oppia-about-tabs-text" id="foundation" translate="I18N_ABOUT_PAGE_TABS_FOUNDATION"></a>
+            <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_FOUNDATION)" href="" class="oppia-about-tabs-text" id="foundation" translate="I18N_ABOUT_PAGE_TABS_FOUNDATION"></a>
           </li>
           <li>
-            <a ng-click="aboutCtrl.onTabClick(aboutCtrl.TAB_ID_CREDITS)" href="" class="oppia-about-tabs-text" id="credits" translate="I18N_ABOUT_PAGE_TABS_CREDITS"></a>
+            <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_CREDITS)" href="" class="oppia-about-tabs-text" id="credits" translate="I18N_ABOUT_PAGE_TABS_CREDITS"></a>
           </li>
         </ul>
       </div>
@@ -47,19 +47,19 @@
 
             <div class="oppia-static-card-content-wide oppia-about-three-cols-container">
               <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-                <img ng-src="<[aboutCtrl.getStaticImageUrl('/general/creator-create-exp.png')]>" alt="">
+                <img ng-src="<[$ctrl.getStaticImageUrl('/general/creator-create-exp.png')]>" alt="">
                 <h3 translate="I18N_ABOUT_PAGE_ABOUT_TAB_CREATE"></h3>
                 <p style="margin-top: -10px;" translate="I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT">
                 </p>
               </div>
               <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-                <img ng-src="<[aboutCtrl.getStaticImageUrl('/general/creator-pub-share.png')]>" alt="">
+                <img ng-src="<[$ctrl.getStaticImageUrl('/general/creator-pub-share.png')]>" alt="">
                 <h3 translate="I18N_ABOUT_PAGE_ABOUT_TAB_SHARE"></h3>
                 <p style="margin-top: -10px;" translate="I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT">
                 </p>
               </div>
               <div class="oppia-about-three-cols-layout oppia-about-three-cols-feature">
-                <img ng-src="<[aboutCtrl.getStaticImageUrl('/general/creator-feedback.png')]>" alt="">
+                <img ng-src="<[$ctrl.getStaticImageUrl('/general/creator-feedback.png')]>" alt="">
                 <h3 translate="I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK"></h3>
                 <p style="margin-top: -10px;" translate="I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT">
                 </p>
@@ -474,7 +474,7 @@
                 <li>Zoe Madden-Wood</li>
               </ul>
             </div>
-            <p translate="I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM" translate-values="{listOfNames: '<[aboutCtrl.listOfNames]>'}">
+            <p translate="I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM" translate-values="{listOfNames: '<[$ctrl.listOfNames]>'}">
             </p>
             <p translate="I18N_ABOUT_PAGE_CREDITS_THANK_TRANSLATEWIKI">
             </p>
@@ -486,7 +486,7 @@
     <div class="oppia-about-extra-container">
       <div class="oppia-static-extra-content oppia-about-clearfix">
         <div class="oppia-about-otter-container">
-          <img ng-src="<[aboutCtrl.aboutPageMascotImgUrl]>" class="oppia-about-otter" alt="Otter">
+          <img ng-src="<[$ctrl.aboutPageMascotImgUrl]>" class="oppia-about-otter" alt="Otter">
         </div>
         <div class="oppia-about-otter-speech-card">
           <blockquote class="oppia-about-otter-speech-bubble">

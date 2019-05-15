@@ -21,7 +21,7 @@ oppia.directive('sideNavigationBar', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/side_navigation_bar/' +
         'side_navigation_bar_directive.html'),

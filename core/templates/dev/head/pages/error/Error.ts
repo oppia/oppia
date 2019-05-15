@@ -21,10 +21,10 @@ oppia.directive('error', ['UrlInterpolationService', function(
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/error/error-page.directive.html'),
-      controllerAs: 'errorCtrl',
+      controllerAs: '$ctrl',
       controller: [
         'PageTitleService', 'UrlInterpolationService',
         function(

@@ -51,10 +51,10 @@ oppia.directive('creatorDashboard', ['UrlInterpolationService', function(
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/creator_dashboard/creator-dashboard-page.directive.html'),
-      controllerAs: 'creatorDashboardCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$q', '$rootScope', '$uibModal', '$window',
         'AlertsService', 'CreatorDashboardBackendApiService', 'DateTimeFormatService',

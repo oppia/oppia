@@ -3,11 +3,11 @@
 </div>
 
 <div class="modal-body">
-  <p>Thread subject: <input type="text" ng-model="newThreadSubject"></p>
-  <p>Message text <textarea ng-model="newThreadText" rows="6"></textarea></p>
+  <p>Thread subject: <input type="text" ng-model="$ctrl.newThreadSubject"></p>
+  <p>Message text <textarea ng-model="$ctrl.newThreadText" rows="6"></textarea></p>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-success" ng-click="create(newThreadSubject, newThreadText)" ng-disabled="!newThreadSubject || !newThreadText">Create Thread</button>
-  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success" ng-click="$ctrl.create($ctrl.newThreadSubject, $ctrl.newThreadText)" ng-disabled="!$ctrl.newThreadSubject || !$ctrl.newThreadText">Create Thread</button>
+  <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
 </div>

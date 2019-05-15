@@ -1,6 +1,6 @@
-<div ng-controller="PreviewTab">
-  <div ng-if="isExplorationPopulated">
-    <div ng-if="previewWarning">
+<div>
+  <div ng-if="$ctrl.isExplorationPopulated">
+    <div ng-if="$ctrl.previewWarning">
       <div class="oppia-preview-state-warning"><[previewWarning]></div>
     </div>
     <conversation-skin></conversation-skin>
@@ -9,10 +9,10 @@
   </div>
 
   <div class="oppia-preview-bottom-right-container">
-    <div class="oppia-parameter-summary" ng-if="showParameterSummary()">
+    <div class="oppia-parameter-summary" ng-if="$ctrl.showParameterSummary()">
       <strong>Parameters:</strong>
       <table>
-        <tr ng-repeat="(paramName, paramValue) in allParams">
+        <tr ng-repeat="(paramName, paramValue) in $ctrl.allParams">
           <td style="padding: 1px 5px;"><[paramName]>:</td>
           <td style="padding: 1px 5px;">
             <[paramValue != "" ? paramValue : "[Not set]"]>
@@ -20,7 +20,7 @@
         </tr>
       </table>
     </div>
-    <button class="btn-lg" ng-click="resetPreview()">
+    <button class="btn-lg" ng-click="$ctrl.resetPreview()">
       <i class="material-icons" style="margin-bottom: 2px;">&#xE5D5;</i>
       <span style="margin-left: 10px; padding-top: 20px;">Restart From Beginning</span>
     </button>
