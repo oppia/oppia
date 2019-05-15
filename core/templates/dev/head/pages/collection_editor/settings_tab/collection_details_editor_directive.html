@@ -1,8 +1,8 @@
 <div role="form" class="form-horizontal">
   <div class="form-group" ng-class="{'has-error': !collectionDetailsEditorCtrl.displayedCollectionTitle}">
-    <label for="collectionTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
+    <label for="collectionDetailsEditorCtrl.collectionTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
-      <input id="collectionTitle" type="text" class="form-control"
+      <input id="collectionDetailsEditorCtrl.collectionTitle" type="text" class="form-control"
              ng-model="collectionDetailsEditorCtrl.displayedCollectionTitle"
              ng-blur="collectionDetailsEditorCtrl.updateCollectionTitle()"
              placeholder="Choose a title for your collection."
@@ -11,9 +11,9 @@
   </div>
 
   <div class="form-group" ng-class="{'has-error': !collectionDetailsEditorCtrl.displayedCollectionObjective}">
-    <label for="collectionObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
+    <label for="collectionDetailsEditorCtrl.collectionObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
-      <input id="collectionObjective" type="text" class="form-control"
+      <input id="collectionDetailsEditorCtrl.collectionObjective" type="text" class="form-control"
              ng-model="collectionDetailsEditorCtrl.displayedCollectionObjective"
              ng-blur="collectionDetailsEditorCtrl.updateCollectionObjective()"
              placeholder="Learn how to ...">
@@ -24,10 +24,10 @@
   </div>
 
   <div class="form-group" ng-class="{'has-error': !collectionDetailsEditorCtrl.displayedCollectionCategory}">
-    <label for="collectionCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
+    <label for="collectionDetailsEditorCtrl.collectionCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
       <div ng-if="collectionDetailsEditorCtrl.hasPageLoaded()">
-        <select2-dropdown id="collectionCategory"
+        <select2-dropdown id="collectionDetailsEditorCtrl.collectionCategory"
                           item="$parent.displayedCollectionCategory"
                           choices="collectionDetailsEditorCtrl.CATEGORY_LIST_FOR_SELECT2"
                           placeholder="Choose or type new"
@@ -41,9 +41,9 @@
   </div>
 
   <div class="form-group">
-    <label for="collectionLanguage" class="col-lg-2 col-md-2 col-sm-2">Language</label>
+    <label for="collectionDetailsEditorCtrl.collectionLanguage" class="col-lg-2 col-md-2 col-sm-2">Language</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
-      <select id="collectionLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="collectionDetailsEditorCtrl.displayedCollectionLanguage" ng-change="collectionDetailsEditorCtrl.updateCollectionLanguageCode()" ng-options="lc.code as lc.description for lc in collectionDetailsEditorCtrl.languageListForSelect">
+      <select id="collectionDetailsEditorCtrl.collectionLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="collectionDetailsEditorCtrl.displayedCollectionLanguage" ng-change="collectionDetailsEditorCtrl.updateCollectionLanguageCode()" ng-options="lc.code as lc.description for lc in collectionDetailsEditorCtrl.languageListForSelect">
       </select>
       <span class="help-block" style="font-size: smaller">
         <em>
@@ -54,7 +54,7 @@
   </div>
 
   <div class="form-group">
-    <label for="collectionTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
+    <label for="collectionDetailsEditorCtrl.collectionTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
       <div ng-if="collectionDetailsEditorCtrl.hasPageLoaded">
         <select2-dropdown item="$parent.displayedCollectionTags"

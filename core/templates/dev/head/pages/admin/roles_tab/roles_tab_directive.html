@@ -11,10 +11,10 @@
   <div class="row">
     <div class="col-md-8">
       <md-card class="oppia-page-card oppia-long-text">
-        <form class="form-horizontal" name="viewRoleForm" ng-submit="adminRolesTabCtrl.submitRoleViewForm(adminRolesTabCtrl.viewFormValues)">
+        <form class="form-horizontal" name="adminRolesTabCtrl.viewRoleForm" ng-submit="adminRolesTabCtrl.submitRoleViewForm(adminRolesTabCtrl.viewFormValues)">
           <legend class="text-center">View User Roles</legend>
           <div class="form-group">
-            <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left" for="viewFormValues.method">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left" for="adminRolesTabCtrl.viewFormValues.method">
               Select Method
             </label>
             <div class="col-md-8">
@@ -65,7 +65,7 @@
       </md-card>
 
       <md-card class="oppia-page-card oppia-long-text">
-        <form class="form-horizontal" name="updateRoleForm" ng-submit="adminRolesTabCtrl.submitUpdateRoleForm(adminRolesTabCtrl.updateFormValues)">
+        <form class="form-horizontal" name="adminRolesTabCtrl.updateRoleForm" ng-submit="adminRolesTabCtrl.submitUpdateRoleForm(adminRolesTabCtrl.updateFormValues)">
           <legend class="text-center">Update Role</legend>
           <div class="form-group">
             <label class="col-md-4 col-lg-4 col-sm-4 control-label">Enter Username</label>
