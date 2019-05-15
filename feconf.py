@@ -284,7 +284,8 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
 ACCEPTED_AUDIO_EXTENSIONS = {
-    'mp3': ['audio/mp3']
+    'mp3': ['audio/mp3'],
+    'flac': ['audio/flac']
 }
 
 # Prefix for data sent from the server to the client via JSON.

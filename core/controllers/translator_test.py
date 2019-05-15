@@ -72,7 +72,40 @@ class TranslatorTest(BaseTranslatorControllerTests):
         response = self.get_html_response('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
 
-    def test_transator_can_save_valid_change_list(self):
+    def test_put_with_no_payload_version_raises_error(self):
+        state_name = feconf.DEFAULT_INIT_STATE_NAME
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid POST request: a version must be specified.'):
+            self.put_json(
+                '/createhandler/translate/%s' % self.EXP_ID, {
+                    'change_list': [{
+                        'cmd': 'edit_state_property',
+                        'state_name': state_name,
+                        'property_name': 'recorded_voiceovers',
+                        'new_value': self.RECORDED_VOICEOVERS
+                    }],
+                    'commit_message': 'Translated first state content'
+                }, csrf_token=self.csrf_token)
+
+    def test_put_with_payload_version_different_from_exp_version_raises_error(
+            self):
+        state_name = feconf.DEFAULT_INIT_STATE_NAME
+        with self.assertRaisesRegexp(
+            Exception, 'Trying to update version .+ of exploration from version'
+            ' 3, which is too old. Please reload the page and try again.'):
+            self.put_json(
+                '/createhandler/translate/%s' % self.EXP_ID, {
+                    'change_list': [{
+                        'cmd': 'edit_state_property',
+                        'state_name': state_name,
+                        'property_name': 'recorded_voiceovers',
+                        'new_value': self.RECORDED_VOICEOVERS
+                    }],
+                    'commit_message': 'Translated first state content',
+                    'version': 3
+                }, csrf_token=self.csrf_token)
+
+    def test_translator_can_save_valid_change_list(self):
         state_name = feconf.DEFAULT_INIT_STATE_NAME
         response = self.put_json(
             '/createhandler/translate/%s' % self.EXP_ID, {
