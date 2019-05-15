@@ -23,7 +23,7 @@ oppia.directive('topNavigationBar', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/top_navigation_bar/' +
         'top_navigation_bar_directive.html'),

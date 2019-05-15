@@ -21,7 +21,7 @@ oppia.directive('attributionGuide', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/attribution_guide/' +
         'attribution_guide_directive.html'),

@@ -21,7 +21,7 @@ oppia.directive('backgroundBanner', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/background/background_banner_directive.html'),
       controllerAs: 'backgroundBannerCtrl',
