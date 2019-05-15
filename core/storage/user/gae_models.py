@@ -96,7 +96,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
-        """(Takeout) Exports the data from UserSettingsModel into dictionary
+        """Exports the data from UserSettingsModel into dict format for Takeout.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
@@ -104,7 +104,30 @@ class UserSettingsModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from UserSettingsModel.
         """
-        return UserSettingsModel.get(user_id).__dict__
+        user = UserSettingsModel.get(user_id)
+        return {
+            'email': user.email,
+            'role': user.role,
+            'username': user.username,
+            'normalized_username': user.normalized_username,
+            'last_agreed_to_terms': user.last_agreed_to_terms,
+            'last_started_state_editor_tutorial': (
+                user.last_started_state_editor_tutorial),
+            'last_started_state_translation_tutorial': (
+                user.last_started_state_translation_tutorial),
+            'last_logged_in': user.last_logged_in,
+            'last_edited_an_exploration': user.last_edited_an_exploration,
+            'profile_picture_data_url': user.profile_picture_data_url,
+            'default_dashboard': user.default_dashboard,
+            'creator_dashboard_display_pref': (
+                user.creator_dashboard_display_pref),
+            'user_bio': user.user_bio,
+            'subject_interests': user.subject_interests,
+            'first_contribution_msec': user.first_contribution_msec,
+            'preferred_language_codes': user.preferred_language_codes,
+            'preferred_site_language_code': user.preferred_site_language_code,
+            'preferred_audio_language_code': user.preferred_audio_language_code
+        }
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
