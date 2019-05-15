@@ -21,7 +21,7 @@ oppia.directive('collectionNodeCreator', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/editor_tab/' +
         'collection_node_creator_directive.html'),

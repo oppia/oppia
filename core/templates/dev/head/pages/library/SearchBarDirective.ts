@@ -21,7 +21,7 @@ oppia.directive('searchBar', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/' +
         'search_bar_directive.html'),

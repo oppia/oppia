@@ -21,7 +21,7 @@ oppia.directive('searchResults', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/search_results_directive.html'),
       controllerAs: 'searchResultsCtrl',

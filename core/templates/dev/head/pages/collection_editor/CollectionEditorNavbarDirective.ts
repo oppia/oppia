@@ -21,7 +21,7 @@ oppia.directive('collectionEditorNavbar', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/collection_editor_navbar_directive.html'),
       controllerAs: 'collectionEditorNavbarCtrl',

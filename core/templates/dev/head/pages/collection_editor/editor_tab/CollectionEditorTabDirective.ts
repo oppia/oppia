@@ -21,7 +21,7 @@ oppia.directive('collectionEditorTab', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/editor_tab/' +
         'collection_editor_tab_directive.html'),
