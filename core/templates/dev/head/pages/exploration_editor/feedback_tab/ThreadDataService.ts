@@ -198,8 +198,7 @@ oppia.factory('ThreadDataService', [
         }).then(onSuccess, onFailure);
       },
       resolveSuggestion: function(
-          threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
-          onSuccess, onFailure) {
+          threadId, action, commitMsg, reviewMsg, onSuccess, onFailure) {
         return $http.put(SUGGESTION_ACTION_HANDLER_URL + threadId, {
           action: action,
           review_message: reviewMsg,

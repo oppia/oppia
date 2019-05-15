@@ -66,7 +66,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
       }).result.then(function(result) {
         ThreadDataService.resolveSuggestion(
           activeThread.threadId, result.action, result.commitMessage,
-          result.reviewMessage, result.audioUpdateRequired, function() {
+          result.reviewMessage, function() {
             ThreadDataService.fetchThreads(function() {
               setActiveThread(activeThread.threadId);
             });
