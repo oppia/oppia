@@ -43,7 +43,7 @@
 <div ng-if="outcomeEditorCtrl.isEditable() && outcomeEditorCtrl.feedbackEditorIsOpen">
   <form role="form"
         class="form-inline protractor-test-edit-outcome-feedback"
-        name="editOutcomeForm.editFeedbackForm">
+        name="outcomeEditorCtrl.editOutcomeForm.editFeedbackForm">
     <outcome-feedback-editor outcome="outcomeEditorCtrl.outcome">
     </outcome-feedback-editor>
   </form>
@@ -107,7 +107,7 @@
 <div ng-if="outcomeEditorCtrl.isEditable() && outcomeEditorCtrl.destinationEditorIsOpen && !outcomeEditorCtrl.isInQuestionMode()">
   <form role="form"
         class="form-inline protractor-test-edit-outcome-dest"
-        name="editOutcomeForm.editDestForm"
+        name="outcomeEditorCtrl.editOutcomeForm.editDestForm"
         ng-submit="outcomeEditorCtrl.saveThisDestination()">
     <outcome-destination-editor outcome="outcomeEditorCtrl.outcome"
                                 outcome-has-feedback="outcomeEditorCtrl.displayFeedback"
