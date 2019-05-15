@@ -18,10 +18,13 @@
  * retrieving the collection, saving it, and listening for changes.
  */
 
-angular.module('collectionEditorPageModule').constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
-angular.module('collectionEditorPageModule').constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
+angular.module('collectionEditorPageModule').constant(
+  'EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
+angular.module('collectionEditorPageModule').constant(
+  'EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
 
-angular.module('collectionEditorPageModule').factory('CollectionEditorStateService', [
+angular.module('collectionEditorPageModule').factory(
+  'CollectionEditorStateService', [
   '$rootScope', 'AlertsService', 'CollectionObjectFactory',
   'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
   'EditableCollectionBackendApiService', 'UndoRedoService',
