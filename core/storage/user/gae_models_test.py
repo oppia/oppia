@@ -413,7 +413,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         user_model_2.collection_ids = self.COLLECTION_IDS
         user_model_2.activity_ids = self.ACTIVITY_IDS
         user_model_2.general_feedback_thread_ids = (
-        	   self.GENERAL_FEEDBACK_THREAD_IDS)
+               self.GENERAL_FEEDBACK_THREAD_IDS)
         user_models.UserSubscriptionsModel.put(user_model_2)
 
     def test_export_data_trivial(self):
