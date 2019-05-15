@@ -26,7 +26,7 @@ angular.module('adminConfigTabModule').directive('adminConfigTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin-page/config-tab/' +
+        '/pages/admin/config-tab/' +
         'admin-config-tab.directive.html'),
       controller: ['$scope', function($scope) {
         $scope.configProperties = {};
