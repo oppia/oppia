@@ -21,7 +21,8 @@ oppia.factory('TranslationLanguageService', [
   '$log', '$rootScope', 'LanguageUtilService',
   function($log, $rootScope, LanguageUtilService) {
     var activeLanguageCode = null;
-    var allAudioLanguageCodes = LanguageUtilService.getAllAudioLanguageCodes();
+    var allAudioLanguageCodes = (
+      LanguageUtilService.getAllVoiceoverLanguageCodes());
     return {
       getActiveLanguageCode: function() {
         return activeLanguageCode;
