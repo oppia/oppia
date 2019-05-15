@@ -35,7 +35,7 @@ oppia.directive('responseHeader', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/response_header_directive.html'),
-      controllerAs: 'responseHeaderCtrl',
+      controllerAs: '$ctrl',
       controller: [
         'EditabilityService', 'StateEditorService',
         'PLACEHOLDER_OUTCOME_DEST',

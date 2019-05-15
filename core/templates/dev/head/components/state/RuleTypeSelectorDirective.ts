@@ -25,7 +25,7 @@ oppia.directive('ruleTypeSelector', [function() {
       onSelectionChange: '&'
     },
     template: '<select></select>',
-    controllerAs: 'ruleTypeSelectorCtrl',
+    controllerAs: '$ctrl',
     controller: [
       '$element', '$scope', '$rootScope', '$filter',
       'StateInteractionIdService', 'INTERACTION_SPECS',

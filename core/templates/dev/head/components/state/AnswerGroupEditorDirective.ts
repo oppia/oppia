@@ -39,7 +39,7 @@ oppia.directive('answerGroupEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/answer_group_editor_directive.html'),
-      controllerAs: 'answerGroupEditorCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
         'AlertsService', 'INTERACTION_SPECS', 'StateEditorService',

@@ -1,12 +1,12 @@
 <div style="height: 100%;">
-  <div ng-if="!solutionExplanationEditorCtrl.explanationEditorIsOpen"
+  <div ng-if="!$ctrl.explanationEditorIsOpen"
        style="height: 100%;"
-       ng-attr-title="<[solutionExplanationEditorCtrl.isEditable ? 'Edit explanation' : '']>">
+       ng-attr-title="<[$ctrl.isEditable ? 'Edit explanation' : '']>">
     <div class="oppia-readonly-rule-tile"
          ng-class="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview oppia-transition-200">
         <div class="oppia-click-to-start-editing"
-             ng-if="solutionExplanationEditorCtrl.isEditable" ng-click="solutionExplanationEditorCtrl.openExplanationEditor()">
+             ng-if="$ctrl.isEditable" ng-click="$ctrl.openExplanationEditor()">
           <i class="material-icons oppia-editor-edit-icon pull-right"
              title="Edit Explanation">&#xE254;
           </i>
@@ -20,11 +20,11 @@
     </div>
   </div>
 
-  <div ng-if="solutionExplanationEditorCtrl.isEditable && solutionExplanationEditorCtrl.explanationEditorIsOpen">
+  <div ng-if="$ctrl.isEditable && $ctrl.explanationEditorIsOpen">
     <div class="oppia-rule-details-header">
       <strong>Explanation:</strong>
       <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
-      <schema-based-editor schema="solutionExplanationEditorCtrl.EXPLANATION_FORM_SCHEMA"
+      <schema-based-editor schema="$ctrl.EXPLANATION_FORM_SCHEMA"
                            local-value="StateSolutionService.displayed.explanation._html">
       </schema-based-editor>
     </div>
@@ -33,13 +33,13 @@
       <div class="pull-right">
         <button type="button"
                 class="btn btn-default"
-                ng-click="solutionExplanationEditorCtrl.cancelThisExplanationEdit()">
+                ng-click="$ctrl.cancelThisExplanationEdit()">
           Cancel
         </button>
         <button type="button"
                 class="btn btn-success"
                 ng-disabled="!StateSolutionService.displayed.explanation.getHtml()"
-                ng-click="solutionExplanationEditorCtrl.saveThisExplanation()">
+                ng-click="$ctrl.saveThisExplanation()">
           Save
         </button>
       </div>

@@ -32,7 +32,7 @@ oppia.directive('sharingLinks', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/share/' +
         'sharing_links_directive.html'),
-      controllerAs: 'sharingLinksCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$window', 'HtmlEscaperService',
         'ExplorationEmbedButtonService', 'SiteAnalyticsService',
