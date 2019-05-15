@@ -61,47 +61,40 @@ oppia.factory('ThreadDataService', [
 
     // Removes invalid elements from the arrays while logging helpful errors.
     var sanitizeSuggestionBackendDicts = function(
-        suggestionThreadBackendDicts, suggestionObjectBackendDicts) {
-      suggestionThreadBackendDicts.sort(compareBy('thread_id'));
-      suggestionObjectBackendDicts.sort(compareBy('suggestion_id'));
+        threadBackendDicts, objectBackendDicts) {
+      var remainingBackendDicts = function() {
+        return Math.max(threadBackendDicts.length, objectBackendDicts.length);
+      };
 
-      for (var i = 0; i < suggestionThreadBackendDicts.length; ++i) {
-        var suggestionThreadBackendDict = suggestionThreadBackendDicts[i];
-        var suggestionObjectBackendDict = suggestionObjectBackendDicts[i];
+      threadBackendDicts.sort(compareBy('thread_id'));
+      objectBackendDicts.sort(compareBy('suggestion_id'));
 
-        var hasSuggestionThread = (suggestionThreadBackendDict !== undefined);
-        var hasSuggestionObject = (suggestionObjectBackendDict !== undefined);
+      for (var i = 0; i < remainingBackendDicts(); ++i) {
+        if (threadBackendDicts[i] && objectBackendDicts[i]) {
+          var threadId = threadBackendDicts[i].thread_id;
+          var objectId = objectBackendDicts[i].suggestion_id;
 
-        if (hasSuggestionThread && hasSuggestionObject) {
-          var threadId = suggestionThreadBackendDict.thread_id;
-          var suggestionId = suggestionObjectBackendDict.suggestion_id;
-          if (threadId < suggestionId) {
+          if (threadId < objectId) {
             $log.error(
-              'Suggestion Thread with id "' + threadId + '" has no ' +
-              'associated Suggestion Object in the backend.');
-            suggestionThreadBackendDicts.splice(i, 1);
-            --i; // Try this index again.
-          } else if (suggestionId < threadId) {
+              'Suggestion Thread with id=' + threadId +
+              ' has no corresponding Suggestion Object in the backend.');
+            threadBackendDicts.splice(i--, 1);
+          } else if (objectId < threadId) {
             $log.error(
-              'Suggestion Object with id "' + suggestionId + '" has no ' +
-              'associated Suggestion Thread in the backend.');
-            suggestionObjectBackendDicts.splice(i, 1);
-            --i; // Try this index again.
+              'Suggestion Object with id=' + objectId +
+              ' has no corresponding Suggestion Thread in the backend.');
+            objectBackendDicts.splice(i--, 1);
           }
-        } else if (hasSuggestionThread && !hasSuggestionObject) {
+        } else if (threadBackendDicts[i] && !objectBackendDicts[i]) {
           $log.error(
-            'Suggestion Thread with id "' +
-            suggestionThreadBackendDict.thread_id + '" has no associated ' +
-            'Suggestion Object in the backend.');
-          // Remove all remaining elements.
-          suggestionThreadBackendDicts.length = i;
-        } else if (!hasSuggestionThread && hasSuggestionObject) {
+            'Suggestion Thread with id=' + threadBackendDicts[i].thread_id +
+            ' has no corresponding Suggestion Object in the backend.');
+          threadBackendDicts.splice(i--, 1);
+        } else if (!threadBackendDicts[i] && objectBackendDicts[i]) {
           $log.error(
-            'Suggestion Object with id "' +
-            suggestionObjectBackendDict.suggestion_id + '" has no ' +
-            'associated Suggestion Thread in the backend.');
-          // Remove all remaining elements.
-          suggestionObjectBackendDicts.length = i;
+            'Suggestion Object with id=' + objectBackendDicts[i].suggestion_id +
+            ' has no corresponding Suggestion Thread in the backend.');
+          objectBackendDicts.splice(i--, 1);
         }
       }
     };
