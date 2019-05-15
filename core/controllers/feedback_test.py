@@ -16,12 +16,14 @@
 
 """Tests for the feedback controllers."""
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -554,3 +556,214 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         }
         self.assertDictContainsSubset(
             expected_suggestion_dict, response['suggestion'])
+
+    def test_get_feedback_threads_with_no_text_and_no_updated_status_raises_400(
+            self):
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_html_response('/create/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, self.owner_id_1,
+            'a subject', 'some text', has_suggestion=True)
+
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
+        threadlist = response_dict['suggestion_thread_dicts']
+        thread_id = threadlist[0]['thread_id']
+
+        new_content = state_domain.SubtitledHtml(
+            'content', 'new content html').to_dict()
+        change = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Welcome!',
+            'new_value': new_content}
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID,
+            1, suggestion_models.STATUS_IN_REVIEW, self.owner_id_1,
+            None, change, 'score category', thread_id)
+
+        thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
+        self.post_json(
+            thread_url, {
+                'text': None,
+                'updated_subject': None,
+                'updated_status': None
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.logout()
+
+    def test_get_feedback_threads_with_updated_suggestion_status_raises_400(
+            self):
+        self.login(self.OWNER_EMAIL_1)
+        response = self.get_html_response('/create/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, self.owner_id_1,
+            'a subject', 'some text', has_suggestion=True)
+
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
+        threadlist = response_dict['suggestion_thread_dicts']
+        thread_id = threadlist[0]['thread_id']
+
+        new_content = state_domain.SubtitledHtml(
+            'content', 'new content html').to_dict()
+        change = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Welcome!',
+            'new_value': new_content}
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID,
+            1, suggestion_models.STATUS_IN_REVIEW, self.owner_id_1,
+            None, change, 'score category', thread_id)
+
+        thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
+        self.post_json(
+            thread_url, {
+                'text': 'Message 1',
+                'updated_subject': None,
+                'updated_status': 'open'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.logout()
+
+
+class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ThreadListHandlerForTopicsHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.OWNER_USERNAME])
+
+        self.topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, self.owner_id, 'Name', 'Description',
+            [], [], [], [], 1)
+
+    def test_get_feedback_threads_with_new_structure_editors_disabled_raise_404(
+            self):
+        self.login(self.OWNER_EMAIL)
+
+        feedback_services.create_thread(
+            feconf.ENTITY_TYPE_TOPIC, self.topic_id, self.owner_id,
+            'a subject', 'some text', has_suggestion=True)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.get_json(
+                '%s/%s' % (
+                    feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
+                    self.topic_id), expected_status_int=404)
+        self.logout()
+
+    def test_get_feedback_threads_linked_to_topics(self):
+        self.login(self.OWNER_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            response_dict = self.get_json(
+                '%s/%s' % (
+                    feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
+                    self.topic_id))
+            suggestion_thread_dicts = response_dict[
+                'suggestion_thread_dicts']
+
+            self.assertEqual(suggestion_thread_dicts, [])
+
+            feedback_services.create_thread(
+                feconf.ENTITY_TYPE_TOPIC, self.topic_id, self.owner_id,
+                'a subject', 'some text', has_suggestion=True)
+
+            response_dict = self.get_json(
+                '%s/%s' % (
+                    feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
+                    self.topic_id))
+            suggestion_thread_dicts = response_dict[
+                'suggestion_thread_dicts'][0]
+            topic_thread = feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_TOPIC, self.topic_id, True)[0]
+
+            self.assertEqual(suggestion_thread_dicts['subject'], 'a subject')
+            self.assertEqual(
+                suggestion_thread_dicts['thread_id'], topic_thread.id)
+        self.logout()
+
+
+class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(RecentFeedbackMessagesHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.set_admins([self.OWNER_USERNAME])
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exp_id = 'exp_id'
+
+    def test_get_recently_posted_feedback_messages(self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
+
+        self.assertEqual(response['results'], [])
+        self.assertFalse(response['more'])
+
+        self.save_new_valid_exploration(
+            self.exp_id, self.owner_id, title='Exploration title',
+            category='Architecture', language_code='en')
+        feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.owner_id,
+            'a subject', 'some text')
+
+        response = self.get_json(
+            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
+        results = response['results']
+
+        self.assertFalse(response['more'])
+        self.assertEqual(results[0]['text'], 'some text')
+        self.assertEqual(results[0]['updated_subject'], 'a subject')
+        self.assertEqual(results[0]['entity_type'], 'exploration')
+        self.assertEqual(results[0]['entity_id'], self.exp_id)
+
+        self.logout()
+
+
+class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(FeedbackStatsHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.set_admins([self.OWNER_USERNAME])
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exp_id = 'exp_id'
+
+    def test_get_num_threads_after_creating_feedback_analytics(self):
+        self.login(self.OWNER_EMAIL)
+
+        self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id),
+            expected_status_int=404)
+
+        self.save_new_valid_exploration(
+            self.exp_id, self.owner_id, title='Exploration title',
+            category='Architecture', language_code='en')
+
+        response = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
+
+        self.assertEqual(response['num_total_threads'], 0)
+        self.assertEqual(response['num_open_threads'], 0)
+
+        feedback_models.FeedbackAnalyticsModel.create(self.exp_id, 2, 3)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
+
+        self.assertEqual(response['num_total_threads'], 3)
+        self.assertEqual(response['num_open_threads'], 2)
+
+        self.logout()
