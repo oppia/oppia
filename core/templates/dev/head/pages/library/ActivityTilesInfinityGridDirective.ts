@@ -25,7 +25,7 @@ oppia.directive('activityTilesInfinityGrid', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/' +
         'activity_tiles_infinity_grid_directive.html'),

@@ -32,7 +32,7 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: true,
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/' +
         'collection_editor_navbar_breadcrumb_directive.html'),
