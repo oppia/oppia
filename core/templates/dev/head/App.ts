@@ -316,9 +316,8 @@ Number.isInteger = Number.isInteger || function(value) {
 if (!Array.prototype.fill) {
   Object.defineProperty(Array.prototype, 'fill', {
     value: function(value) {
-
       // Steps 1-2.
-      if (this == null) {
+      if (this === null) {
         throw new TypeError('this is null or not defined');
       }
 
