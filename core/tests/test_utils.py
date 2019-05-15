@@ -345,9 +345,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -365,6 +362,10 @@ states:
       id: null
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -374,9 +375,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -394,6 +392,10 @@ states:
       id: null
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
