@@ -29,7 +29,7 @@ angular.module('adminDevModeActivitiesTabModule').directive(
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/activities-tab/' +
+        '/pages/admin-page/activities-tab/' +
         'admin_dev_mode_activities-tab_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.reloadExploration = function(explorationId) {

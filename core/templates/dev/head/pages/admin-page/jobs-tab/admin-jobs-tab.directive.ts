@@ -28,7 +28,7 @@ angular.module('adminJobsTabModule').directive('adminJobsTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/jobs-tab/' +
+        '/pages/admin-page/jobs-tab/' +
         'admin-jobs-tab.directive.html'),
       controller: ['$scope', function($scope) {
         $scope.HUMAN_READABLE_CURRENT_TIME = (

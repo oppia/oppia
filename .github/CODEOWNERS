@@ -196,7 +196,7 @@
 # Restricted pages.
 /core/controllers/admin*.py @seanlip
 /core/domain/moderator_services*.py @seanlip
-/core/templates/dev/head/pages/admin/ @seanlip
+/core/templates/dev/head/pages/admin-page/ @seanlip
 /core/templates/dev/head/pages/moderator/ @seanlip
 
 
