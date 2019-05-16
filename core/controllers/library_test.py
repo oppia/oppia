@@ -15,14 +15,18 @@
 """Tests for the library page and associated handlers."""
 
 import json
+import logging
 import os
 
 from constants import constants
+from core.domain import activity_domain
+from core.domain import activity_services
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rating_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.domain import user_services
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -47,6 +51,63 @@ class LibraryPageTests(test_utils.GenericTestBase):
         """Test access to the library page."""
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
         response.mustcontain('ng-controller="Library"')
+
+    def test_library_handler_with_exceeding_query_limit_logs_error(self):
+        response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
+        self.assertEqual({
+            'iframed': False,
+            'is_admin': False,
+            'is_topic_manager': False,
+            'is_moderator': False,
+            'is_super_admin': False,
+            'activity_list': [],
+            'additional_angular_modules': [],
+            'search_cursor': None
+        }, response_dict)
+
+        # Load a public demo exploration.
+        exp_services.load_demo('0')
+
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *_):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        default_query_limit_swap = self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 1)
+        # Load the search results with an empty query.
+        with default_query_limit_swap, logging_swap:
+            self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
+
+            self.assertEqual(len(observed_log_messages), 1)
+            self.assertEqual(
+                observed_log_messages[0],
+                (
+                    '1 activities were fetched to load the library page. '
+                    'You may be running up against the default query limits.'
+                )
+            )
+
+    def test_library_handler_with_given_category_and_language_code(self):
+        self.login(self.ADMIN_EMAIL)
+
+        exp_id = exp_services.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        exp_services.index_explorations_given_ids([exp_id])
+        response_dict = self.get_json(
+            feconf.LIBRARY_SEARCH_DATA_URL, params={
+                'category': 'A category',
+                'language_code': 'en'
+            })
+        activity_list = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [exp_id]))
+
+        self.assertEqual(response_dict['activity_list'], activity_list)
+
+        self.logout()
 
     def test_library_handler_demo_exploration(self):
         """Test the library data handler on demo explorations."""
@@ -194,6 +255,76 @@ class LibraryPageTests(test_utils.GenericTestBase):
         }, response_dict['activity_list'][0])
 
 
+class LibraryIndexHandlerTests(test_utils.GenericTestBase):
+
+    EXP_ID = 'exp_id'
+
+    def setUp(self):
+        super(LibraryIndexHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+
+    def test_library_index_handler_updates_featured_activity_summary_dicts(
+            self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+        self.assertEqual(response['activity_summary_dicts_by_category'], [])
+
+        activity_services.update_featured_activity_references([
+            activity_domain.ActivityReference(
+                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID)
+        ])
+        featured_activity_summary_dicts = (
+            summary_services.get_featured_activity_summary_dicts(
+                [constants.DEFAULT_LANGUAGE_CODE]))
+        expected_dict = {
+            'activity_summary_dicts': featured_activity_summary_dicts,
+            'categories': [],
+            'header_i18n_id': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
+            'has_full_results_page': False,
+            'full_results_url': None
+            }
+
+        response = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+        self.assertEqual(
+            response['activity_summary_dicts_by_category'][0], expected_dict)
+
+        self.logout()
+
+    def test_library_index_handler_updates_top_rated_activity_summary_dicts(
+            self):
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+        self.assertEqual(response['activity_summary_dicts_by_category'], [])
+
+        rating_services.assign_rating_to_exploration(
+            self.owner_id, self.EXP_ID, 5)
+        top_rated_activity_summary_dicts = (
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [constants.DEFAULT_LANGUAGE_CODE],
+                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
+        expected_dict = {
+            'activity_summary_dicts': top_rated_activity_summary_dicts,
+            'categories': [],
+            'header_i18n_id': feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS,
+            'has_full_results_page': True,
+            'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
+            'protractor_id': 'top-rated'
+            }
+
+        response = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+        self.assertEqual(
+            response['activity_summary_dicts_by_category'][0], expected_dict)
+
+        self.logout()
+
+
 class LibraryGroupPageTests(test_utils.GenericTestBase):
 
     def test_library_group_pages(self):
@@ -201,6 +332,29 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
         self.get_html_response(feconf.LIBRARY_TOP_RATED_URL)
 
         self.get_html_response(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
+
+    def test_handler_updates_preferred_language_codes(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            params={'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
+
+        self.assertEqual(
+            response_dict['preferred_language_codes'],
+            [constants.DEFAULT_LANGUAGE_CODE])
+
+        user_services.update_preferred_language_codes(owner_id, ['es'])
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            params={'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
+
+        self.assertEqual(
+            response_dict['preferred_language_codes'], ['es'])
+
+        self.logout()
 
     def test_handler_for_recently_published_library_group_page(self):
         """Test library handler for recently published group page."""
@@ -348,6 +502,24 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(
             self.editor, self.PUBLIC_EXP_ID_EDITOR)
 
+    def test_handler_with_invalid_stringified_exp_ids_raises_error_404(self):
+        # 'stringified_exp_ids' should be a list.
+        self.get_json(
+            feconf.EXPLORATION_SUMMARIES_DATA_URL,
+            params={
+                'stringified_exp_ids': json.dumps(self.PRIVATE_EXP_ID_EDITOR)
+            }, expected_status_int=404)
+
+        # 'stringified_exp_ids' should contain exploration ids for which valid
+        # explorations are created. No exploration is created for exp id 2.
+        self.get_json(
+            feconf.EXPLORATION_SUMMARIES_DATA_URL,
+            params={
+                'stringified_exp_ids': json.dumps([
+                    2, self.PUBLIC_EXP_ID_EDITOR,
+                    self.PRIVATE_EXP_ID_VIEWER])
+            }, expected_status_int=404)
+
     def test_can_get_public_exploration_summaries(self):
         self.login(self.VIEWER_EMAIL)
 
@@ -433,3 +605,44 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(summaries[0]['id'], self.PUBLIC_EXP_ID_EDITOR)
         self.assertEqual(summaries[0]['status'], 'public')
+
+
+class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
+
+    COLLECTION_ID = 'colid'
+
+    def setUp(self):
+        super(CollectionSummariesHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+    def test_can_get_collection_summaries(self):
+        self.login(self.EDITOR_EMAIL)
+
+        response_dict = self.get_json(
+            feconf.COLLECTION_SUMMARIES_DATA_URL,
+            params={
+                'stringified_collection_ids': json.dumps([self.COLLECTION_ID])
+            })
+        self.assertEqual(response_dict['summaries'], [])
+
+        self.save_new_valid_collection(
+            self.COLLECTION_ID, self.editor_id)
+        self.publish_collection(self.editor_id, self.COLLECTION_ID)
+
+        response_dict = self.get_json(
+            feconf.COLLECTION_SUMMARIES_DATA_URL,
+            params={
+                'stringified_collection_ids': json.dumps([self.COLLECTION_ID])
+            })
+        self.assertIn('summaries', response_dict)
+
+        summaries = response_dict['summaries']
+        self.assertEqual(len(summaries), 1)
+
+        self.assertEqual(summaries[0]['id'], self.COLLECTION_ID)
+        self.assertEqual(summaries[0]['category'], 'A category')
+        self.assertEqual(summaries[0]['title'], 'A title')
+        self.assertEqual(summaries[0]['objective'], 'An objective')
+
+        self.logout()
