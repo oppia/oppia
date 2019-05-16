@@ -20,8 +20,12 @@ angular.module('loadingDotsModule').directive('loadingDots', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/common-layout-directives/loading-dots/' +
-        'loading-dots.directive.html')
+        'loading-dots.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [function() {}]
     };
   }]);

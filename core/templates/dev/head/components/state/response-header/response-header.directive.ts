@@ -20,7 +20,8 @@ angular.module('responseHeaderModule').directive('responseHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getIndex: '&index',
         getOutcome: '&outcome',
         getSummary: '&summary',
@@ -34,47 +35,49 @@ angular.module('responseHeaderModule').directive('responseHeader', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/response-header/response-header.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', 'EditabilityService', 'StateEditorService',
+        'EditabilityService', 'StateEditorService',
         'PLACEHOLDER_OUTCOME_DEST',
         'StateInteractionIdService', 'INTERACTION_SPECS',
         function(
-            $scope, EditabilityService, StateEditorService,
+            EditabilityService, StateEditorService,
             PLACEHOLDER_OUTCOME_DEST,
             StateInteractionIdService, INTERACTION_SPECS) {
-          $scope.EditabilityService = EditabilityService;
-          $scope.isInQuestionMode = StateEditorService.isInQuestionMode;
+          var ctrl = this;
+          ctrl.EditabilityService = EditabilityService;
+          ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
 
-          $scope.getCurrentInteractionId = function() {
+          ctrl.getCurrentInteractionId = function() {
             return StateInteractionIdService.savedMemento;
           };
 
-          $scope.isCorrectnessFeedbackEnabled = function() {
+          ctrl.isCorrectnessFeedbackEnabled = function() {
             return StateEditorService.getCorrectnessFeedbackEnabled();
           };
           // This returns false if the current interaction ID is null.
-          $scope.isCurrentInteractionLinear = function() {
-            var interactionId = $scope.getCurrentInteractionId();
+          ctrl.isCurrentInteractionLinear = function() {
+            var interactionId = ctrl.getCurrentInteractionId();
             return interactionId && INTERACTION_SPECS[interactionId].is_linear;
           };
 
-          $scope.isCorrect = function() {
-            return $scope.getOutcome() && $scope.getOutcome().labelledAsCorrect;
+          ctrl.isCorrect = function() {
+            return ctrl.getOutcome() && ctrl.getOutcome().labelledAsCorrect;
           };
 
-          $scope.isOutcomeLooping = function() {
-            var outcome = $scope.getOutcome();
+          ctrl.isOutcomeLooping = function() {
+            var outcome = ctrl.getOutcome();
             var activeStateName = StateEditorService.getActiveStateName();
             return outcome && (outcome.dest === activeStateName);
           };
 
-          $scope.isCreatingNewState = function() {
-            var outcome = $scope.getOutcome();
+          ctrl.isCreatingNewState = function() {
+            var outcome = ctrl.getOutcome();
             return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
           };
 
-          $scope.deleteResponse = function(evt) {
-            $scope.getOnDeleteFn()($scope.getIndex(), evt);
+          ctrl.deleteResponse = function(evt) {
+            ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
           };
         }
       ]

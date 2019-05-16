@@ -21,33 +21,36 @@ angular.module('profileLinkImageModule').directive('profileLinkImage', [
   function(UrlInterpolationService, SYSTEM_USER_IDS) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         username: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/profile-link-directives/profile-link-image/' +
         'profile-link-image.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$http',
-        function($scope, $http) {
+        '$http',
+        function($http) {
+          var ctrl = this;
           var DEFAULT_PROFILE_IMAGE_PATH = (
             UrlInterpolationService.getStaticImageUrl(
               '/avatar/user_blue_72px.png'));
 
-          $scope.isUsernameLinkable = function(username) {
+          ctrl.isUsernameLinkable = function(username) {
             return SYSTEM_USER_IDS.indexOf(username) === -1;
           };
 
-          $scope.profileImageUrl = (
+          ctrl.profileImageUrl = (
             '/preferenceshandler/profile_picture_by_username/' +
-            $scope.username());
-          $scope.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
+            ctrl.username());
+          ctrl.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
 
           // Returns a promise for the user profile picture, or the default
           // image if user is not logged in or has not uploaded a profile
           // picture, or the player is in preview mode.
-          $http.get($scope.profileImageUrl).then(function(response) {
-            $scope.profilePicture = (
+          $http.get(ctrl.profileImageUrl).then(function(response) {
+            ctrl.profilePicture = (
               response.data.profile_picture_data_url_for_username ||
               DEFAULT_PROFILE_IMAGE_PATH);
           });

@@ -21,13 +21,15 @@ angular.module('sideNavigationBarModule').directive('sideNavigationBar', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/common-layout-directives/side-navigation-bar/' +
         'side-navigation-bar.directive.html'),
-      controller: ['$scope', '$timeout', function(
-          $scope, $timeout) {
-        $scope.currentUrl = window.location.pathname;
-        $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+      controllerAs: '$ctrl',
+      controller: ['$timeout', function($timeout) {
+        var ctrl = this;
+        ctrl.currentUrl = window.location.pathname;
+        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
       }]
     };
   }]);

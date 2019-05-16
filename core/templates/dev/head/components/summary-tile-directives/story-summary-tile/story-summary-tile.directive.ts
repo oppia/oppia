@@ -20,7 +20,8 @@ angular.module('storySummaryTileModule').directive('storySummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getStoryId: '&storyId',
         getStoryTitle: '&title',
         getStoryDescription: '&description',
@@ -28,14 +29,16 @@ angular.module('storySummaryTileModule').directive('storySummaryTile', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile-directives/story-summary-tile/' +
         'story-summary-tile.directive.html'),
-      controller: ['$scope',
-        function($scope) {
-          $scope.getStoryLink = function() {
+      controllerAs: '$ctrl',
+      controller: [
+        function() {
+          var ctrl = this;
+          ctrl.getStoryLink = function() {
             return UrlInterpolationService.getStoryUrl(
-              '/story', $scope.getStoryId());
+              '/story', ctrl.getStoryId());
           };
 
-          $scope.getStaticImageUrl = function(url) {
+          ctrl.getStaticImageUrl = function(url) {
             return UrlInterpolationService.getStaticImageUrl(url);
           };
         }

@@ -20,16 +20,19 @@ angular.module('circularImageModule').directive('circularImage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         src: '&',
         link: '&?'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/profile-link-directives/circular-image/' +
         'circular-image.directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.isLinkAvailable = function() {
-          return $scope.link() ? true : false;
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.isLinkAvailable = function() {
+          return ctrl.link() ? true : false;
         };
       }]
     };

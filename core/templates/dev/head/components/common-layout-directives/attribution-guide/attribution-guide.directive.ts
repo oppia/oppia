@@ -21,14 +21,17 @@ angular.module('attributionGuideModule').directive('attributionGuide', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/common-layout-directives/attribution-guide/' +
         'attribution-guide.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', 'BrowserCheckerService', 'UrlService', function(
-            $scope, BrowserCheckerService, UrlService) {
-          $scope.isMobileDevice = BrowserCheckerService.isMobileDevice();
-          $scope.iframed = UrlService.isIframed();
+        'BrowserCheckerService', 'UrlService', function(
+            BrowserCheckerService, UrlService) {
+          var ctrl = this;
+          ctrl.isMobileDevice = BrowserCheckerService.isMobileDevice();
+          ctrl.iframed = UrlService.isIframed();
         }
       ]
     };

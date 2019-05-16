@@ -22,17 +22,19 @@ angular.module('outcomeFeedbackEditorModule').directive(
     function(SubtitledHtmlObjectFactory, UrlInterpolationService) {
       return {
         restrict: 'E',
-        scope: {
+        scope: {},
+        bindToController: {
           outcome: '='
         },
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/components/state/outcome-editor/outcome-feedback-editor/' +
           'outcome-feedback-editor.directive.html'),
-        controller: ['$scope', function($scope) {
-          $scope.OUTCOME_FEEDBACK_SCHEMA = {
+        controllerAs: '$ctrl',
+        controller: [function() {
+          var ctrl = this;
+          ctrl.OUTCOME_FEEDBACK_SCHEMA = {
             type: 'html'
           };
         }]
       };
-    }]
-);
+    }]);

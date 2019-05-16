@@ -20,33 +20,37 @@ angular.module('createActivityButtonModule').directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/button-directives/create-button/' +
         'create-activity-button.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', '$window', '$uibModal',
+        '$timeout', '$window', '$uibModal',
         'ExplorationCreationService', 'CollectionCreationService',
         'SiteAnalyticsService', 'UrlService', 'UserService',
         'ALLOW_YAML_FILE_UPLOAD',
         function(
-            $scope, $timeout, $window, $uibModal,
+            $timeout, $window, $uibModal,
             ExplorationCreationService, CollectionCreationService,
             SiteAnalyticsService, UrlService, UserService,
             ALLOW_YAML_FILE_UPLOAD) {
-          $scope.creationInProgress = false;
-          $scope.allowYamlFileUpload = ALLOW_YAML_FILE_UPLOAD;
+          var ctrl = this;
+          ctrl.creationInProgress = false;
+          ctrl.allowYamlFileUpload = ALLOW_YAML_FILE_UPLOAD;
 
-          $scope.canCreateCollections = null;
-          $scope.userIsLoggedIn = null;
+          ctrl.canCreateCollections = null;
+          ctrl.userIsLoggedIn = null;
           UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.canCreateCollections = userInfo.canCreateCollections();
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            ctrl.canCreateCollections = userInfo.canCreateCollections();
+            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           });
 
-          $scope.showUploadExplorationModal = (
+          ctrl.showUploadExplorationModal = (
             ExplorationCreationService.showUploadExplorationModal);
 
-          $scope.onRedirectToLogin = function(destinationUrl) {
+          ctrl.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent(
               'createActivityButton');
             $timeout(function() {
@@ -55,16 +59,16 @@ angular.module('createActivityButtonModule').directive('createActivityButton', [
             return false;
           };
 
-          $scope.initCreationProcess = function() {
+          ctrl.initCreationProcess = function() {
             // Without this, the modal keeps reopening when the window is
             // resized.
-            if ($scope.creationInProgress) {
+            if (ctrl.creationInProgress) {
               return;
             }
 
-            $scope.creationInProgress = true;
+            ctrl.creationInProgress = true;
 
-            if (!$scope.canCreateCollections) {
+            if (!ctrl.canCreateCollections) {
               ExplorationCreationService.createNewExploration();
             } else if (UrlService.getPathname() !== '/creator_dashboard') {
               $window.location.replace('/creator_dashboard?mode=create');
@@ -107,7 +111,7 @@ angular.module('createActivityButtonModule').directive('createActivityButton', [
                   }],
                 windowClass: 'oppia-creation-modal'
               }).result.then(function() {}, function() {
-                $scope.creationInProgress = false;
+                ctrl.creationInProgress = false;
               });
             }
           };
@@ -116,10 +120,10 @@ angular.module('createActivityButtonModule').directive('createActivityButton', [
           // open the create modal immediately (or redirect to the exploration
           // editor if the create modal does not need to be shown).
           if (UrlService.getUrlParams().mode === 'create') {
-            if (!$scope.canCreateCollections) {
+            if (!ctrl.canCreateCollections) {
               ExplorationCreationService.createNewExploration();
             } else {
-              $scope.initCreationProcess();
+              ctrl.initCreationProcess();
             }
           }
         }

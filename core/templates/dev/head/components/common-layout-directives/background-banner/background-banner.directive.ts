@@ -21,17 +21,19 @@ angular.module('backgroundBannerModule').directive('backgroundBanner', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/common-layout-directives/background-banner/' +
         'background-banner.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope',
-        function($scope) {
+        function() {
+          var ctrl = this;
           var possibleBannerFilenames = [
             'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
           var bannerImageFilename = possibleBannerFilenames[
             Math.floor(Math.random() * possibleBannerFilenames.length)];
-          $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+          ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
             '/background/' + bannerImageFilename);
         }
       ]

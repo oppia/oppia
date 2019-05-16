@@ -24,7 +24,8 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
   '$log', 'UrlInterpolationService', function($log, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         isEditable: '=',
         isEditingRuleInline: '&',
         onCancelRuleEdit: '&',
@@ -33,6 +34,7 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/rule-editor/rule-editor.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$timeout', 'StateEditorService',
         'ValidatorsService', 'INTERACTION_SPECS',
@@ -41,21 +43,22 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
             $scope, $timeout, StateEditorService,
             ValidatorsService, INTERACTION_SPECS,
             ResponsesService, StateInteractionIdService) {
+          var ctrl = this;
           var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
 
-          $scope.currentInteractionId = StateInteractionIdService.savedMemento;
-          $scope.editRuleForm = {};
+          ctrl.currentInteractionId = StateInteractionIdService.savedMemento;
+          ctrl.editRuleForm = {};
 
           // This returns the rule description string.
           var computeRuleDescriptionFragments = function() {
-            if (!$scope.rule.type) {
-              $scope.ruleDescriptionFragments = [];
+            if (!ctrl.rule.type) {
+              ctrl.ruleDescriptionFragments = [];
               return '';
             }
 
             var ruleDescription = (
-              INTERACTION_SPECS[$scope.currentInteractionId].rule_descriptions[
-                $scope.rule.type]);
+              INTERACTION_SPECS[ctrl.currentInteractionId].rule_descriptions[
+                ctrl.rule.type]);
 
             var PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
             var finalInputArray = ruleDescription.split(PATTERN);
@@ -82,7 +85,7 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
                 // TODO(sll): Remove the need for this special case.
                 if (answerChoices.length > 0) {
                   if (finalInputArray[2] === 'SetOfHtmlString') {
-                    $scope.ruleDescriptionChoices = answerChoices.map(
+                    ctrl.ruleDescriptionChoices = answerChoices.map(
                       function(choice) {
                         return {
                           id: choice.label,
@@ -95,7 +98,7 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
                       varName: finalInputArray[i + 1]
                     });
                   } else if (finalInputArray[2] === 'ListOfSetsOfHtmlStrings') {
-                    $scope.ruleDescriptionChoices = answerChoices.map(
+                    ctrl.ruleDescriptionChoices = answerChoices.map(
                       function(choice) {
                         return {
                           id: choice.label,
@@ -109,7 +112,7 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
                     });
                   } else if (
                     finalInputArray[i + 2] === 'DragAndDropHtmlString') {
-                    $scope.ruleDescriptionChoices = answerChoices.map(
+                    ctrl.ruleDescriptionChoices = answerChoices.map(
                       function(choice) {
                         return {
                           id: choice.label,
@@ -123,7 +126,7 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
                     });
                   } else if (
                     finalInputArray[i + 2] === 'DragAndDropPositiveInt') {
-                    $scope.ruleDescriptionChoices = answerChoices.map(
+                    ctrl.ruleDescriptionChoices = answerChoices.map(
                       function(choice) {
                         return {
                           id: choice.label,
@@ -136,7 +139,7 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
                       varName: finalInputArray[i + 1]
                     });
                   } else {
-                    $scope.ruleDescriptionChoices = answerChoices.map(
+                    ctrl.ruleDescriptionChoices = answerChoices.map(
                       function(choice) {
                         return {
                           id: choice.val,
@@ -148,13 +151,13 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
                       type: 'select',
                       varName: finalInputArray[i + 1]
                     });
-                    if (!$scope.rule.inputs[finalInputArray[i + 1]]) {
-                      $scope.rule.inputs[finalInputArray[i + 1]] = (
-                        $scope.ruleDescriptionChoices[0].id);
+                    if (!ctrl.rule.inputs[finalInputArray[i + 1]]) {
+                      ctrl.rule.inputs[finalInputArray[i + 1]] = (
+                        ctrl.ruleDescriptionChoices[0].id);
                     }
                   }
                 } else {
-                  $scope.ruleDescriptionChoices = [];
+                  ctrl.ruleDescriptionChoices = [];
                   result.push({
                     text: ' [Error: No choices available] ',
                     type: 'noneditable'
@@ -173,9 +176,9 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
             // changed. This is an issue for, e.g., the MusicNotesInput
             // interaction, where the rule inputs can sometimes be integers and
             // sometimes be lists of music notes.
-            $scope.ruleDescriptionFragments = [];
+            ctrl.ruleDescriptionFragments = [];
             $timeout(function() {
-              $scope.ruleDescriptionFragments = result;
+              ctrl.ruleDescriptionFragments = result;
             }, 10);
 
             return ruleDescription;
@@ -183,23 +186,23 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
 
           $scope.$on('updateAnswerGroupInteractionId', function(
               evt, newInteractionId) {
-            $scope.currentInteractionId = newInteractionId;
+            ctrl.currentInteractionId = newInteractionId;
           });
 
-          $scope.onSelectNewRuleType = function(newRuleType) {
-            var oldRuleInputs = angular.copy($scope.rule.inputs) || {};
-            var oldRuleInputTypes = angular.copy($scope.rule.inputTypes) || {};
+          ctrl.onSelectNewRuleType = function(newRuleType) {
+            var oldRuleInputs = angular.copy(ctrl.rule.inputs) || {};
+            var oldRuleInputTypes = angular.copy(ctrl.rule.inputTypes) || {};
 
-            $scope.rule.type = newRuleType;
-            $scope.rule.inputs = {};
-            $scope.rule.inputTypes = {};
+            ctrl.rule.type = newRuleType;
+            ctrl.rule.inputs = {};
+            ctrl.rule.inputTypes = {};
 
             var tmpRuleDescription = computeRuleDescriptionFragments();
             // This provides the list of choices for the multiple-choice and
             // image-click interactions.
             var answerChoices = ResponsesService.getAnswerChoices();
 
-            // Finds the parameters and sets them in $scope.rule.inputs.
+            // Finds the parameters and sets them in ctrl.rule.inputs.
             var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
             while (true) {
               if (!tmpRuleDescription.match(PATTERN)) {
@@ -210,7 +213,7 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
               if (tmpRuleDescription.match(PATTERN)[2]) {
                 varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
               }
-              $scope.rule.inputTypes[varName] = varType;
+              ctrl.rule.inputTypes[varName] = varType;
 
               // TODO(sll): Find a more robust way of doing this. For example,
               // we could associate a particular varName with answerChoices
@@ -218,42 +221,42 @@ angular.module('ruleEditorModule').directive('ruleEditor', [
               // default value from answerChoices, but other variables would
               // take their default values from the DEFAULT_OBJECT_VALUES dict.
               if (angular.equals(DEFAULT_OBJECT_VALUES[varType], [])) {
-                $scope.rule.inputs[varName] = [];
+                ctrl.rule.inputs[varName] = [];
               } else if (answerChoices) {
-                $scope.rule.inputs[varName] = angular.copy(
+                ctrl.rule.inputs[varName] = angular.copy(
                   answerChoices[0].val);
               } else {
-                $scope.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
+                ctrl.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
               }
 
               tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
             }
 
-            for (var key in $scope.rule.inputs) {
+            for (var key in ctrl.rule.inputs) {
               if (oldRuleInputs.hasOwnProperty(key) &&
-                oldRuleInputTypes[key] === $scope.rule.inputTypes[key]) {
-                $scope.rule.inputs[key] = oldRuleInputs[key];
+                oldRuleInputTypes[key] === ctrl.rule.inputTypes[key]) {
+                ctrl.rule.inputs[key] = oldRuleInputs[key];
               }
             }
           };
 
-          $scope.cancelThisEdit = function() {
-            $scope.onCancelRuleEdit();
+          ctrl.cancelThisEdit = function() {
+            ctrl.onCancelRuleEdit();
           };
 
-          $scope.saveThisRule = function() {
-            $scope.onSaveRule();
+          ctrl.saveThisRule = function() {
+            ctrl.onSaveRule();
           };
 
-          $scope.init = function() {
+          ctrl.init = function() {
             // Select a default rule type, if one isn't already selected.
-            if ($scope.rule.type === null) {
-              $scope.onSelectNewRuleType($scope.rule.type);
+            if (ctrl.rule.type === null) {
+              ctrl.onSelectNewRuleType(ctrl.rule.type);
             }
             computeRuleDescriptionFragments();
           };
 
-          $scope.init();
+          ctrl.init();
         }
       ]
     };
