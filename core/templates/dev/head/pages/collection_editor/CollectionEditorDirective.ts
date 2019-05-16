@@ -44,10 +44,24 @@ oppia.constant(
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
-oppia.controller('CollectionEditor', [
-  'CollectionEditorStateService',
-  function(CollectionEditorStateService) {
-    // Load the collection to be edited.
-    CollectionEditorStateService.loadCollection(GLOBALS.collectionId);
+oppia.directive('collectionEditor', [
+  'CollectionEditorStateService', 'RouterService', 'UrlInterpolationService',
+  function(
+      CollectionEditorStateService, RouterService, UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_editor/collection_editor_directive.html'),
+      controllerAs: '$ctrl',
+      controller: ['CollectionEditorStateService',
+        function(CollectionEditorStateService) {
+          var ctrl = this;
+          ctrl.getActiveTabName = RouterService.getActiveTabName;
+          // Load the collection to be edited.
+          CollectionEditorStateService.loadCollection(GLOBALS.collectionId);
+        }]
+    };
   }
 ]);
