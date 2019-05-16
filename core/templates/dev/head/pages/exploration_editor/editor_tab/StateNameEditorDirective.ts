@@ -29,7 +29,7 @@ oppia.directive('stateNameEditor', [
       },
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor-tab/' +
+        '/pages/exploration_editor/editor_tab/' +
         'state_name_editor_directive.html'),
       controller: [
         '$scope', '$filter', '$rootScope', 'EditabilityService',

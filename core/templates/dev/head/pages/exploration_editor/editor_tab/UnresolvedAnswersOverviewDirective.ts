@@ -22,7 +22,7 @@ oppia.directive('unresolvedAnswersOverview', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor-tab/' +
+        '/pages/exploration_editor/editor_tab/' +
         'unresolved_answers_overview_directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'EditabilityService',
@@ -81,7 +81,7 @@ oppia.directive('unresolvedAnswersOverview', [
 
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor-tab/' +
+                '/pages/exploration_editor/editor_tab/' +
                 'teach_oppia_modal_directive.html'),
               backdrop: true,
               controller: [

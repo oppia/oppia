@@ -22,7 +22,7 @@ oppia.directive('stateParamChangesEditor', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor-tab/' +
+        '/pages/exploration_editor/editor_tab/' +
         'state_param_changes_editor_directive.html'),
       controller: [
         '$scope', 'StateEditorService', 'StateParamChangesService',

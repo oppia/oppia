@@ -25,7 +25,7 @@ oppia.directive('testInteractionPanel', [
         getInputTemplate: '&inputTemplate',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor-tab/' +
+        '/pages/exploration_editor/editor_tab/' +
         'test_interaction_modal_directive.html'),
       controller: [
         '$scope', 'ExplorationStatesService',

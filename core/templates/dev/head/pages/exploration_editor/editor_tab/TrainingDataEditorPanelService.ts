@@ -28,7 +28,7 @@ oppia.factory('TrainingDataEditorPanelService', [
         AlertsService.clearWarnings();
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/editor-tab/' +
+            '/pages/exploration_editor/editor_tab/' +
             'training_data_editor_directive.html'),
           backdrop: true,
           controller: [
