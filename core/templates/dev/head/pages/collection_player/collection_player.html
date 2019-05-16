@@ -102,14 +102,7 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-right: 0px;" ng-controller="CollectionLocalNav">
-    <li ng-if="canEdit">
-      <a ng-href="/collection_editor/create/{{collection_id}}" uib-tooltip="Edit" tooltip-placement="bottom" target="_blank" rel="noopener">
-        <i class="material-icons">&#xE254;</i>
-        <span class="oppia-icon-accessibility-label">Edit</span>
-      </a>
-    </li>
-  </ul>
+  <collection-local-nav></collection-local-nav>
 {% endblock local_top_nav_options %}
 
 {% block content %}
@@ -131,7 +124,7 @@
 
   <script src="/templates/dev/head/pages/collection_player/CollectionPlayerDirective.js"></script>
   <script src="/templates/dev/head/pages/collection_player/CollectionNodeListDirective.js"></script>
-  <script src="/templates/dev/head/pages/collection_player/CollectionLocalNav.js"></script>
+  <script src="/templates/dev/head/pages/collection_player/CollectionLocalNavDirective.js"></script>
 
   <script src="/templates/dev/head/domain/collection/CollectionNodeObjectFactory.js"></script>
   <script src="/templates/dev/head/domain/collection/CollectionObjectFactory.js"></script>
