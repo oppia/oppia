@@ -29,7 +29,7 @@ oppia.directive('collectionPermissionsCard', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/settings_tab/' +
         'collection_permissions_card_directive.html'),
-      controllerAs: 'collectionPermissionsCardCtrl',
+      controllerAs: '$ctrl',
       controller: [
         'CollectionEditorStateService',
         function(CollectionEditorStateService) {

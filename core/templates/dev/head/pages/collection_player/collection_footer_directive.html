@@ -3,7 +3,7 @@
     <div class="col-sm-5">
       <ul>
         <li>
-          <img ng-src="<[collectionFooterCtrl.getStaticImageUrl('/general/apple.svg')]>" class="collection-footer-img" alt="">
+          <img ng-src="<[$ctrl.getStaticImageUrl('/general/apple.svg')]>" class="collection-footer-img" alt="">
         </li>
       </ul>
     </div>
@@ -15,8 +15,8 @@
           </li>
           <li>
             <sharing-links ng-click="$event.stopPropagation()"
-                           twitter-text="collectionFooterCtrl.getTwitterText()"
-                           collection-id="collectionFooterCtrl.collectionId"
+                           twitter-text="$ctrl.getTwitterText()"
+                           collection-id="$ctrl.collectionId"
                            layout-type="row"
                            share-type="collection"
                            class="oppia-collection-footer-sharing-links">

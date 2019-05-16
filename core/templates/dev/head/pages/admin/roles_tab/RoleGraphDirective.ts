@@ -40,7 +40,7 @@ oppia.directive('roleGraph', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/roles_tab/role_graph_directive.html'),
-      controllerAs: 'roleGraphCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$element', '$timeout', '$filter', 'StateGraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',

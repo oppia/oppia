@@ -32,7 +32,7 @@ oppia.directive('adminConfigTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/config_tab/' +
         'admin_config_tab_directive.html'),
-      controllerAs: 'adminConfigTabCtrl',
+      controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
         ctrl.configProperties = {};

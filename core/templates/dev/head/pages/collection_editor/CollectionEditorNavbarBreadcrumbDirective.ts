@@ -36,7 +36,7 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/' +
         'collection_editor_navbar_breadcrumb_directive.html'),
-      controllerAs: 'collectionEditorNavbarBreadcrumbCtrl',
+      controllerAs: '$ctrl',
       controller: [
         'RouterService', 'CollectionEditorStateService',
         'FocusManagerService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',

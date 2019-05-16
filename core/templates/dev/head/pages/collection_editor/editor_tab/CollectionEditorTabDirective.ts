@@ -32,7 +32,7 @@ oppia.directive('collectionEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/editor_tab/' +
         'collection_editor_tab_directive.html'),
-      controllerAs: 'collectionEditorTabCtrl',
+      controllerAs: '$ctrl',
       controller: [
         'CollectionEditorStateService', 'CollectionLinearizerService',
         function(

@@ -37,7 +37,7 @@ oppia.directive('collectionEditorNavbar', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/collection_editor_navbar_directive.html'),
-      controllerAs: 'collectionEditorNavbarCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'RouterService',
         'UndoRedoService', 'CollectionEditorStateService',

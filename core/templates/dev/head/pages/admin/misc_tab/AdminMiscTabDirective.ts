@@ -34,7 +34,7 @@ oppia.directive('adminMiscTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/misc_tab/' +
         'admin_misc_tab_directive.html'),
-      controllerAs: 'adminMiscTabCtrl',
+      controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (

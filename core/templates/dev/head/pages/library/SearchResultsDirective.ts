@@ -30,7 +30,7 @@ oppia.directive('searchResults', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/search_results_directive.html'),
-      controllerAs: 'searchResultsCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$q', '$timeout', '$window',
         'SiteAnalyticsService', 'UserService',

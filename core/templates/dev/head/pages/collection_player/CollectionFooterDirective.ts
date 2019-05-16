@@ -32,7 +32,7 @@ oppia.directive('collectionFooter', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_player/' +
         'collection_footer_directive.html'),
-      controllerAs: 'collectionFooterCtrl',
+      controllerAs: '$ctrl',
       controller: [
         function() {
           var ctrl = this;

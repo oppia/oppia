@@ -1,14 +1,14 @@
-<div ng-if="collectionEditorTabCtrl.hasLoadedCollection()">
+<div ng-if="$ctrl.hasLoadedCollection()">
   <div class="collection-editor-cards-container">
     <md-card class="oppia-page-card oppia-long-text">
       <!-- Collection node list graph -->
       <div class="collection-editor-node-list-container">
-        <div ng-if="collectionEditorTabCtrl.collection.getCollectionNodeCount() === 0">
+        <div ng-if="$ctrl.collection.getCollectionNodeCount() === 0">
           No explorations have been added to this collection yet.
         </div>
-        <div ng-if="collectionEditorTabCtrl.collection.getCollectionNodeCount() > 0">
-          <div class="collectionEditorTabCtrl.collection-editor-node-container"
-               ng-repeat="node in collectionEditorTabCtrl.getLinearlySortedNodes() track by $index">
+        <div ng-if="$ctrl.collection.getCollectionNodeCount() > 0">
+          <div class="$ctrl.collection-editor-node-container"
+               ng-repeat="node in $ctrl.getLinearlySortedNodes() track by $index">
             <collection-node-editor collection-node="node"
                                     linear-index="$index"
                                     ng-class="{true: 'collection-editor-last-node'} [$last]">

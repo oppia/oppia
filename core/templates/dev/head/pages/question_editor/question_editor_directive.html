@@ -1,18 +1,18 @@
-<div class="oppia-editor-cards-container" ng-if="questionEditorCtrl.stateEditorInitialized">
-  <state-editor on-save-state-content="questionEditorCtrl.saveStateContent"
-                on-save-interaction-customization-args="questionEditorCtrl.saveInteractionCustomizationArgs"
-                on-save-interaction-id="questionEditorCtrl.saveInteractionId"
-                on-save-interaction-default-outcome="questionEditorCtrl.saveInteractionDefaultOutcome"
-                on-save-interaction-answer-groups="questionEditorCtrl.saveInteractionAnswerGroups"
-                on-save-solution="questionEditorCtrl.saveSolution"
-                on-save-hints="questionEditorCtrl.saveHints"
-                state-content-placeholder="questionEditorCtrl.getStateContentPlaceholder()"
-                show-mark-all-audio-as-needing-update-modal-if-required="questionEditorCtrl.showMarkAllAudioAsNeedingUpdateModalIfRequired"
-                interaction-is-shown="questionEditorCtrl.interactionIsShown"
-                recompute-graph="questionEditorCtrl.recomputeGraph"
-                navigate-to-state="questionEditorCtrl.navigateToState"
-                add-state="questionEditorCtrl.addState"
-                refresh-warnings="questionEditorCtrl.refreshWarnings">
+<div class="oppia-editor-cards-container" ng-if="$ctrl.stateEditorInitialized">
+  <state-editor on-save-state-content="$ctrl.saveStateContent"
+                on-save-interaction-customization-args="$ctrl.saveInteractionCustomizationArgs"
+                on-save-interaction-id="$ctrl.saveInteractionId"
+                on-save-interaction-default-outcome="$ctrl.saveInteractionDefaultOutcome"
+                on-save-interaction-answer-groups="$ctrl.saveInteractionAnswerGroups"
+                on-save-solution="$ctrl.saveSolution"
+                on-save-hints="$ctrl.saveHints"
+                state-content-placeholder="$ctrl.getStateContentPlaceholder()"
+                show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired"
+                interaction-is-shown="$ctrl.interactionIsShown"
+                recompute-graph="$ctrl.recomputeGraph"
+                navigate-to-state="$ctrl.navigateToState"
+                add-state="$ctrl.addState"
+                refresh-warnings="$ctrl.refreshWarnings">
   </state-editor>
 </div>
 

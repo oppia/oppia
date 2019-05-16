@@ -36,7 +36,7 @@ oppia.directive('searchBar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library/' +
         'search_bar_directive.html'),
-      controllerAs: 'searchBarCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$location', '$rootScope', '$scope', '$timeout', '$translate',
         '$window', 'ConstructTranslationIdsService', 'DebouncerService',
@@ -173,7 +173,7 @@ oppia.directive('searchBar', [
             onSearchQueryChangeExec();
           };
 
-          $scope.$watch('searchBarCtrl.searchQuery', function(
+          $scope.$watch('$ctrl.searchQuery', function(
               newQuery, oldQuery) {
             // Run only if the query has changed.
             if (newQuery !== oldQuery) {

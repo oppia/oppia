@@ -31,7 +31,7 @@ oppia.directive('questionPlayer', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_player/question_player_directive.html'),
-      controllerAs: 'questionPlayerCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$rootScope', 'QuestionPlayerBackendApiService',
         function(
