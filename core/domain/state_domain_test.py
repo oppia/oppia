@@ -49,16 +49,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'content_id': 'content',
                 'html': ''
             },
-            'content_ids_to_audio_translations': {
-                'content': {},
-                'default_outcome': {}
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    'content': {},
-                    'default_outcome': {}
-                }
-            },
             'interaction': {
                 'answer_groups': [],
                 'confirmed_unclassified_answers': [],
@@ -79,6 +69,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'solution': None,
             },
             'param_changes': [],
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {},
+                    'default_outcome': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {},
+                    'default_outcome': {}
+                }
+            }
         }
         self.assertEqual(expected_dict, state_dict)
 
@@ -736,3 +738,204 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(Exception, 'Invalid language_code: ed'):
             written_translations.validate(['content'])
+
+
+class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
+    """Test methods operating on recorded voiceovers."""
+
+    def test_from_and_to_dict_wroks_correctly(self):
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content1': {
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'filename': 'abc.mp3',
+                        'file_size_bytes': 1234,
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+        self.assertEqual(
+            recorded_voiceovers.to_dict(), recorded_voiceovers_dict)
+
+    def test_get_content_ids_for_voiceovers_return_correct_list_of_content_id(self): # pylint: disable=line-too-long
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
+            'voiceovers_mapping': {}
+        })
+        self.assertEqual(
+            recorded_voiceovers.get_content_ids_for_voiceovers(), [])
+
+        recorded_voiceovers.add_content_id_for_voiceover('feedback_1')
+        recorded_voiceovers.add_content_id_for_voiceover('feedback_2')
+        self.assertEqual(recorded_voiceovers.get_content_ids_for_voiceovers(), [
+            'feedback_2', 'feedback_1'])
+
+    def test_add_content_id_for_voiceovers_adds_content_id(self):
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
+            'voiceovers_mapping': {}
+        })
+
+        self.assertEqual(
+            len(recorded_voiceovers.get_content_ids_for_voiceovers()), 0)
+
+        new_content_id = 'content_id'
+        recorded_voiceovers.add_content_id_for_voiceover(new_content_id)
+
+        self.assertEqual(
+            len(recorded_voiceovers.get_content_ids_for_voiceovers()), 1)
+        self.assertEqual(
+            recorded_voiceovers.get_content_ids_for_voiceovers(),
+            ['content_id'])
+
+    def test_add_content_id_for_voiceover_with_invalid_content_id_raise_error(
+            self):
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
+            'voiceovers_mapping': {}
+        })
+        invalid_content_id = 123
+        with self.assertRaisesRegexp(
+            Exception, 'Expected content_id to be a string, received 123'):
+            recorded_voiceovers.add_content_id_for_voiceover(
+                invalid_content_id)
+
+    def test_add_content_id_for_voiceover_with_existing_content_id_raise_error( # pylint: disable=line-too-long
+            self):
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'feedback_1': {
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+        existing_content_id = 'feedback_1'
+        with self.assertRaisesRegexp(
+            Exception, 'The content_id feedback_1 already exist.'):
+            recorded_voiceovers.add_content_id_for_voiceover(
+                existing_content_id)
+
+    def test_delete_content_id_for_voiceovers_deletes_content_id(self):
+        old_recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            old_recorded_voiceovers_dict)
+        self.assertEqual(
+            len(recorded_voiceovers.get_content_ids_for_voiceovers()), 1)
+
+        recorded_voiceovers.delete_content_id_for_voiceover('content')
+
+        self.assertEqual(
+            len(recorded_voiceovers.get_content_ids_for_voiceovers()), 0)
+
+    def test_delete_content_id_for_voiceover_with_nonexisting_content_id_raise_error(self): # pylint: disable=line-too-long
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {}
+            }
+        }
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+        nonexisting_content_id_to_delete = 'feedback_1'
+        with self.assertRaisesRegexp(
+            Exception, 'The content_id feedback_1 does not exist.'):
+            recorded_voiceovers.delete_content_id_for_voiceover(
+                nonexisting_content_id_to_delete)
+
+    def test_delete_content_id_for_voiceover_with_invalid_content_id_raise_error(self): # pylint: disable=line-too-long
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
+            'voiceovers_mapping': {}
+        })
+        invalid_content_id_to_delete = 123
+        with self.assertRaisesRegexp(
+            Exception, 'Expected content_id to be a string, '):
+            recorded_voiceovers.delete_content_id_for_voiceover(
+                invalid_content_id_to_delete)
+
+    def test_validation_with_invalid_content_id_raise_error(self):
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                123: {}
+            }
+        }
+
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected content_id to be a string, '):
+            recorded_voiceovers.validate([123])
+
+    def test_validation_with_invalid_type_langauge_code_raise_error(self):
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    123: {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected language_code to be a string, '):
+            recorded_voiceovers.validate(['content'])
+
+    def test_validation_with_unknown_langauge_code_raise_error(self):
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'ed': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+
+        with self.assertRaisesRegexp(Exception, 'Invalid language_code: ed'):
+            recorded_voiceovers.validate(['content'])
