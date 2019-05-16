@@ -106,8 +106,8 @@ oppia.factory('EditableQuestionBackendApiService', [
         questionId, skillId, successCallback, errorCallback) {
       var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
-            question_id: questionId,
-            skill_ids: JSON.stringify([skillId])
+          question_id: questionId,
+          skill_ids: JSON.stringify([skillId])
         });
       $http.post(addQuestionSkillLinkUrl).then(function(response) {
         if (successCallback) {

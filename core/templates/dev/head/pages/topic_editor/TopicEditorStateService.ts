@@ -128,14 +128,14 @@ oppia.factory('TopicEditorStateService', [
       // if the first id of newQuestionSummaries is equal to the last id of
       // _questionSummaries, deduplicate by merging them to solve the page
       // boundary issue.
-      if (newQuestionSummaries[0]['summary']['id'] ===
-        _questionSummaries.slice(-1)[0]['summary']['id']) {
-          _questionSummaries.slice(-1)[0]['skill_descriptions'] =
-            newQuestionSummaries[0]['skill_descriptions'].concat(
-              _questionSummaries.slice(-1)[0]['skill_descriptions']
-            );
+      if (newQuestionSummaries[0].summary.id ===
+          _questionSummaries.slice(-1)[0].summary.id) {
+        _questionSummaries.slice(-1)[0].skill_descriptions =
+          newQuestionSummaries[0].skill_descriptions.concat(
+            _questionSummaries.slice(-1)[0].skill_descriptions
+          );
         newQuestionSummaries = newQuestionSummaries.slice(1);
-        }
+      }
       return newQuestionSummaries;
     };
 
@@ -218,8 +218,8 @@ oppia.factory('TopicEditorStateService', [
       isLastQuestionBatch: function(index) {
         return (
           _nextCursorForQuestions === null &&
-          (index + 1) * constants.NUM_QUESTIONS_PER_PAGE
-            >= _questionSummaries.length);
+          (index + 1) * constants.NUM_QUESTIONS_PER_PAGE >=
+            _questionSummaries.length);
       },
 
       /**

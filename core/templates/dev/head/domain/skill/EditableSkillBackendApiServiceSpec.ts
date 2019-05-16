@@ -74,7 +74,7 @@ describe('Editable skill backend API service', function() {
 
     sampleResponse2 = {
       skills: [skillDict, skillDict2]
-    }
+    };
   }));
 
 
