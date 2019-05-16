@@ -98,6 +98,8 @@ oppia.factory('HintsAndSolutionManagerService', [
         $timeout.cancel(tooltipTimeout);
       }
 
+      $rootScope.$broadcast('hintConsumed');
+
       numHintsConsumed++;
       wrongAnswersSinceLastHintConsumed = 0;
 
@@ -150,6 +152,7 @@ oppia.factory('HintsAndSolutionManagerService', [
       displaySolution: function() {
         hintsDiscovered = true;
         solutionConsumed = true;
+        $rootScope.$broadcast('solutionViewed');
         if (tooltipTimeout) {
           $timeout.cancel(tooltipTimeout);
         }

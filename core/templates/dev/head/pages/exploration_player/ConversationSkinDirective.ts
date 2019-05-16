@@ -273,7 +273,8 @@ oppia.directive('conversationSkin', [
         'StateClassifierMappingService', 'ImagePreloaderService',
         'PlaythroughService', 'PretestEngineService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
-        'ExplorationPlayerStateService', 'INTERACTION_DISPLAY_MODE_INLINE',
+        'ExplorationPlayerStateService', 'QuestionPlayerStateService',
+        'INTERACTION_DISPLAY_MODE_INLINE',
         'CurrentInteractionService', 'UserService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
@@ -300,7 +301,8 @@ oppia.directive('conversationSkin', [
             StateClassifierMappingService, ImagePreloaderService,
             PlaythroughService, PretestEngineService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
-            ExplorationPlayerStateService, INTERACTION_DISPLAY_MODE_INLINE,
+            ExplorationPlayerStateService, QuestionPlayerStateService,
+            INTERACTION_DISPLAY_MODE_INLINE,
             CurrentInteractionService, UserService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
@@ -518,6 +520,14 @@ oppia.directive('conversationSkin', [
             }, TIME_NUM_CARDS_CHANGE_MSEC);
           };
 
+          $rootScope.$on('hintConsumed', function(evt) {
+            QuestionPlayerStateService.hintUsed(PretestEngineService.getCurrentQuestionId());
+          });
+
+           $rootScope.$on('solutionViewed', function(evt, timestamp) {
+              QuestionPlayerStateService.solutionViewed(PretestEngineService.getCurrentQuestionId());
+          });
+
           $scope.isCurrentCardAtEndOfTranscript = function() {
             return PlayerTranscriptService.isLastCard(
               PlayerPositionService.getDisplayedCardIndex());
@@ -730,6 +740,9 @@ oppia.directive('conversationSkin', [
                   $rootScope.$broadcast(
                     'playerStateChange', nextCard.getStateName());
                 }
+                else {
+                  QuestionPlayerStateService.answerSubmitted(PretestEngineService.getCurrentQuestionId(),!remainOnCurrentCard);
+                }
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
                 var millisecsLeftToWait = (
@@ -822,6 +835,10 @@ oppia.directive('conversationSkin', [
                     // the feedback, and display a 'Continue' button.
                     $scope.displayedCard.markAsCompleted();
                     if (isFinalQuestion) {
+                      if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
+                        // We will redirect to the results page here
+                        $scope.questionSessionCompleted = true;
+                      }
                       $scope.moveToExploration = true;
                       if (feedbackHtml) {
                         PlayerTranscriptService.addNewResponse(feedbackHtml);
@@ -920,6 +937,12 @@ oppia.directive('conversationSkin', [
               $scope.returnToExplorationAfterConceptCard();
               return;
             }
+            if($scope.questionSessionCompleted) {
+              $rootScope.$broadcast(
+              'questionSessionCompleted',
+              QuestionPlayerStateService.getQuestionStateData());
+              return;
+            }
             if ($scope.moveToExploration) {
               $scope.moveToExploration = false;
               ExplorationPlayerStateService.moveToExploration(
@@ -929,7 +952,7 @@ oppia.directive('conversationSkin', [
             if (
               $scope.displayedCard.isCompleted() &&
               ($scope.nextCard.getStateName() ===
-              $scope.displayedCard.getStateName())) {
+              $scope.displayedCard.getStateName()) && $scope.conceptCard) {
               ExplorationPlayerStateService.recordNewCardAdded();
               _addNewCard(
                 StateCardObjectFactory.createNewCard(

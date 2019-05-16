@@ -146,6 +146,9 @@ oppia.factory('PretestEngineService', [
       recordNewCardAdded: function() {
         currentIndex = nextIndex;
       },
+      getCurrentQuestionId: function() {
+        return pretestQuestions[currentIndex].getId();
+      },
       getPretestQuestionCount: function() {
         return pretestQuestions.length;
       },

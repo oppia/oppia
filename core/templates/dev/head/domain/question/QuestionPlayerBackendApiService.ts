@@ -15,6 +15,8 @@
  * @fileoverview Service to receive questions for practice given a set of
  * skill_ids.
  */
+oppia.constant('SKILLS_FOR_QUESTION_URL_TEMPLATE',
+  '/question_player_handler/fetch_skills?question_ids=<question_ids>');
 oppia.constant(
   'QUESTION_PLAYER_URL_TEMPLATE',
   '/question_player_handler?skill_ids=<skill_ids>&question_count' +
@@ -22,7 +24,9 @@ oppia.constant(
 
 oppia.factory('QuestionPlayerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTION_PLAYER_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE) {
+  'SKILLS_FOR_QUESTION_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE,
+    SKILLS_FOR_QUESTION_URL_TEMPLATE) {
     var _startCursor = '';
     var _fetchQuestions = function(
         skillIds, questionCount, resetHistory, successCallback, errorCallback) {
@@ -46,6 +50,30 @@ oppia.factory('QuestionPlayerBackendApiService', [
           successCallback(questionDicts);
         }
       }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchSkillsForQuestions = function(
+        questionIds, successCallback, errorCallback) {
+      if(!isListOfStrings(questionIds)) {
+        errorCallback('Question ids should be a list of strings');
+        return;
+      }
+      var questionDataUrl = UrlInterpolationService.interpolateUrl(
+        SKILLS_FOR_QUESTION_URL_TEMPLATE, {
+          question_ids: questionIds.join(',')
+        });
+      $http.get(questionDataUrl).then(function(response){
+        var skillDescriptionAndQuestionDicts = (
+          angular.copy(response.data.skill_description_and_questions));
+        if (successCallback) {
+          successCallback(skillDescriptionAndQuestionDicts);
+        }
+
+      },function(errorResponse) {
         if (errorCallback) {
           errorCallback(errorResponse.data);
         }
@@ -98,6 +126,11 @@ oppia.factory('QuestionPlayerBackendApiService', [
         return $q(function(resolve, reject) {
           _fetchQuestions(
             skillIds, questionCount, resetHistory, resolve, reject);
+        });
+      },
+      fetchSkillsForQuestions: function(questionIds) {
+        return $q(function(resolve, reject) {
+          _fetchSkillsForQuestions(questionIds, resolve, reject);
         });
       }
     };
