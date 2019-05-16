@@ -31,9 +31,24 @@ oppia.constant(
 oppia.constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
 
+oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
+oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
+
 oppia.controller('TopicEditor', [
-  '$scope', 'TopicEditorStateService', 'UrlService',
-  function($scope, TopicEditorStateService, UrlService) {
+  '$scope', 'PageTitleService', 'TopicEditorStateService', 'UrlService',
+  'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+  function($scope, PageTitleService, TopicEditorStateService, UrlService,
+      EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
     TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+
+    $scope.$on(EVENT_TOPIC_INITIALIZED, function() {
+      PageTitleService.setPageTitle(
+        TopicEditorStateService.getTopic()._name + '- Oppia');
+    });
+
+    $scope.$on(EVENT_TOPIC_REINITIALIZED, function() {
+      PageTitleService.setPageTitle(
+        TopicEditorStateService.getTopic()._name + '- Oppia');
+    });
   }
 ]);
