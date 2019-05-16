@@ -87,8 +87,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
 
     def test_get_questions_with_single_skill(self):
-        # Create 5 questions linked to the same skill.
-        for i in range(0, 6): #pylint: disable=unused-variable
+        # Create 6 questions linked to the same skill.
+        for _ in range(0, 6):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
@@ -98,7 +98,7 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.ADMIN_EMAIL)
-            with self.swap(constants, 'NUM_QUESTION_SKILL_LINKS_PER_PAGE', 3):
+            with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
                 json_response = self.get_json(
                     '%s/%s?cursor=' % (
                         feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
@@ -115,7 +115,7 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
                     json_response['question_summary_dicts'])
                 self.assertEqual(len(question_summary_dicts_2), 3)
                 self.assertEqual(
-                    question_summary_dicts[0]['skill_description'],
+                    question_summary_dicts[0]['skill_descriptions'],
                     ['Skill Description'])
                 self.assertNotEqual(
                     question_summary_dicts[0]['summary']['id'],
@@ -149,7 +149,7 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
             self.logout()
 
     def test_get_questions_with_multi_skills(self):
-        for i in range(0, 4): #pylint: disable=unused-variable
+        for _ in range(0, 4):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
@@ -161,7 +161,7 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.ADMIN_EMAIL)
-            with self.swap(constants, 'NUM_QUESTION_SKILL_LINKS_PER_PAGE', 6):
+            with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 2):
                 json_response = self.get_json(
                     '%s/%s?cursor=' % (
                         feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
@@ -177,9 +177,13 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
                 question_summary_dicts_2 = (
                     json_response['question_summary_dicts'])
                 self.assertEqual(len(question_summary_dicts_2), 1)
+                for i in range(0, 3):
+                    self.assertEqual(
+                        question_summary_dicts[i]['skill_descriptions'],
+                        ['Skill Description 2', 'Skill Description'])
                 self.assertEqual(
-                    question_summary_dicts[0]['skill_description'],
-                    ['Skill Description 2', 'Skill Description'])
+                        question_summary_dicts_2[0]['skill_descriptions'],
+                        ['Skill Description 2', 'Skill Description'])
                 self.assertNotEqual(
                     question_summary_dicts[0]['summary']['id'],
                     question_summary_dicts_2[0]['summary']['id'])

@@ -112,13 +112,31 @@ oppia.factory('TopicEditorStateService', [
       _canonicalStorySummaries = angular.copy(canonicalStorySummaries);
       $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
-    var _setQuestionSummaries = function(questionSummaries) {
+    var _setQuestionSummaries = function(newQuestionSummaries) {
+      if (_questionSummaries.length > 0) {
+        newQuestionSummaries = _deduplicateQuestionSummaries(
+          newQuestionSummaries);
+      }
       _questionSummaries = _questionSummaries.concat(
-        angular.copy(questionSummaries));
+        angular.copy(newQuestionSummaries));
       $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
     };
     var _setNextQuestionsCursor = function(nextCursor) {
       _nextCursorForQuestions = nextCursor;
+    };
+    var _deduplicateQuestionSummaries = function(newQuestionSummaries) {
+      // if the first id of newQuestionSummaries is equal to the last id of
+      // _questionSummaries, deduplicate by merging them to solve the page
+      // boundary issue.
+      if (newQuestionSummaries[0]['summary']['id'] ===
+        _questionSummaries.slice(-1)[0]['summary']['id']) {
+          _questionSummaries.slice(-1)[0]['skill_descriptions'] =
+            newQuestionSummaries[0]['skill_descriptions'].concat(
+              _questionSummaries.slice(-1)[0]['skill_descriptions']
+            );
+        newQuestionSummaries = newQuestionSummaries.slice(1);
+        }
+      return newQuestionSummaries;
     };
 
     return {
@@ -143,6 +161,7 @@ oppia.factory('TopicEditorStateService', [
             EditableTopicBackendApiService.fetchQuestions(
               topicId, _nextCursorForQuestions).then(
               function(returnObject) {
+                //console.log(returnObject.questionSummaries);
                 _setQuestionSummaries(returnObject.questionSummaries);
                 _setNextQuestionsCursor(returnObject.nextCursor);
               }
@@ -199,7 +218,8 @@ oppia.factory('TopicEditorStateService', [
       isLastQuestionBatch: function(index) {
         return (
           _nextCursorForQuestions === null &&
-          (index + 1) * 10 >= _questionSummaries.length);
+          (index + 1) * constants.NUM_QUESTIONS_PER_PAGE
+            >= _questionSummaries.length);
       },
 
       /**

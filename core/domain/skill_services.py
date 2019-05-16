@@ -762,6 +762,24 @@ def get_skill_rights(skill_id, strict=True):
     return get_skill_rights_from_model(model)
 
 
+def get_multi_skill_rights(skill_ids):
+    """Retrieves the rights object for the given skill.
+
+    Args:
+        skill_ids: list(str). Skill IDs of the skill for which rights are
+            requested.
+
+    Returns:
+        list(SkillRights). The list of skill rights objects.
+    """
+
+    skill_rights_models = skill_models.SkillRightsModel.get_multi(skill_ids)
+    skill_rights_list = [
+        get_skill_rights_from_model(skill_rights_model)
+        for skill_rights_model in skill_rights_models]
+    return skill_rights_list
+
+
 def get_unpublished_skill_rights_by_creator(user_id):
     """Retrives the rights objects that are private and were created by the
     user with the provided user ID.

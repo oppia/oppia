@@ -526,9 +526,9 @@ var constants = {
 
   "ENABLE_NEW_STRUCTURE_PLAYERS": false,
 
-  "NUM_QUESTIONS_PER_PAGE": 10,
+  "MAX_SKILLS_PER_QUESTION": 3,
 
-  "NUM_QUESTION_SKILL_LINKS_PER_PAGE": 30,
+  "NUM_QUESTIONS_PER_PAGE": 10,
 
   "NEW_STATE_TEMPLATE": {
       "classifier_model_id": null,

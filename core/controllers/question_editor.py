@@ -16,6 +16,8 @@
 and are created.
 """
 
+import json
+
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -71,15 +73,24 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     """A handler for linking and unlinking questions to or from a skill."""
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self, question_id, skill_id):
+    def post(self, question_id, skill_ids):
         """Links a question to a skill."""
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
-        for single_skill_id in skill_id.split(','):
-            skill_domain.Skill.require_valid_skill_id(single_skill_id)
+        try:
+            skill_ids = json.loads(skill_ids)
+        except Exception:
+            raise self.PageNotFoundException
+
+        if (not isinstance(skill_ids, list) or not all([
+                isinstance(skill_id, basestring) for skill_id in skill_ids])):
+            raise self.PageNotFoundException
+
+        for skill_id in skill_ids:
+            skill_domain.Skill.require_valid_skill_id(skill_id)
             skill = skill_services.get_skill_by_id(
-                single_skill_id, strict=False)
+                skill_id, strict=False)
             if skill is None:
                 raise self.PageNotFoundException(
                     'The skill with the given id doesn\'t exist.')
@@ -87,18 +98,18 @@ class QuestionSkillLinkHandler(base.BaseHandler):
             # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
             # with a value passed from the frontend.
             question_services.create_new_question_skill_link(
-                question_id, single_skill_id,
+                question_id, skill_id,
                 constants.DEFAULT_SKILL_DIFFICULTY)
         self.render_json(self.values)
 
     @acl_decorators.can_manage_question_skill_status
-    def delete(self, question_id, skill_id):
+    def delete(self, question_id, skill_ids):
         """Unlinks a question from a skill."""
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
         question_services.delete_question_skill_link(
-            question_id, skill_id)
+            question_id, skill_ids)
         self.render_json(self.values)
 
 

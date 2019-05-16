@@ -18,7 +18,7 @@
 
 oppia.constant(
   'EDITABLE_SKILL_DATA_URL_TEMPLATE',
-  '/skill_editor_handler/data/<skill_id>');
+  '/skill_editor_handler/data/<skill_ids>');
 
 oppia.constant(
   'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
@@ -33,7 +33,7 @@ oppia.factory('EditableSkillBackendApiService', [
     var _fetchSkill = function(skillId, successCallback, errorCallback) {
       var skillDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_SKILL_DATA_URL_TEMPLATE, {
-          skill_id: skillId
+          skill_ids: JSON.stringify([skillId])
         });
 
       $http.get(skillDataUrl).then(function(response) {
@@ -49,15 +49,9 @@ oppia.factory('EditableSkillBackendApiService', [
     };
 
     var _fetchMultiSkills = function(skillIds, successCallback, errorCallback) {
-      var skillIdsUrl = '';
-      skillIds.forEach(function(skillId) {
-        skillIdsUrl = skillIdsUrl + skillId + ',';
-      });
-      skillIdsUrl = skillIdsUrl.substring(0, skillIdsUrl.length - 1);
-
       var skillDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_SKILL_DATA_URL_TEMPLATE, {
-          skill_id: skillIdsUrl
+          skill_ids: JSON.stringify(skillIds)
         });
 
       $http.get(skillDataUrl).then(function(response) {
@@ -77,7 +71,7 @@ oppia.factory('EditableSkillBackendApiService', [
         successCallback, errorCallback) {
       var editableSkillDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_SKILL_DATA_URL_TEMPLATE, {
-          skill_id: skillId
+          skill_ids: JSON.stringify([skillId])
         });
 
       var putData = {
@@ -126,7 +120,7 @@ oppia.factory('EditableSkillBackendApiService', [
     var _deleteSkill = function(skillId, successCallback, errorCallback) {
       var skillDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_SKILL_DATA_URL_TEMPLATE, {
-          skill_id: skillId
+          skill_ids: JSON.stringify([skillId])
         });
 
       $http['delete'](skillDataUrl).then(function(response) {

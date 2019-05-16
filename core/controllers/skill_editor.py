@@ -14,6 +14,8 @@
 
 """Controllers for the skill editor."""
 
+import json
+
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -181,17 +183,22 @@ class EditableSkillDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_skill
-    def get(self, skill_id):
+    @acl_decorators.can_edit_skills
+    def get(self, skill_ids):
         """Populates the data on the individual skill page."""
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
+        
+        try:
+            skill_ids = json.loads(skill_ids)
+        except Exception:
+            raise self.PageNotFoundException
 
         skill_dicts = []
-        for single_skill_id in skill_id.split(','):
-            skill_domain.Skill.require_valid_skill_id(single_skill_id)
+        for skill_id in skill_ids:
+            skill_domain.Skill.require_valid_skill_id(skill_id)
             skill = skill_services.get_skill_by_id(
-                single_skill_id, strict=False)
+                skill_id, strict=False)
             if skill is None:
                 raise self.PageNotFoundException(
                     Exception('The skill with the given id doesn\'t exist.'))
@@ -203,12 +210,13 @@ class EditableSkillDataHandler(base.BaseHandler):
 
         self.render_json(self.values)
 
-    @acl_decorators.can_edit_skill
-    def put(self, skill_id):
+    @acl_decorators.can_edit_skills
+    def put(self, skill_ids):
         """Updates properties of the given skill."""
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
+        skill_id = json.loads(skill_ids)[0]
         skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
         if skill is None:
@@ -239,11 +247,12 @@ class EditableSkillDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_skill
-    def delete(self, skill_id):
+    def delete(self, skill_ids):
         """Handles Delete requests."""
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
+        skill_id = json.loads(skill_ids)[0]
         skill_domain.Skill.require_valid_skill_id(skill_id)
         if skill_services.skill_has_associated_questions(skill_id):
             raise Exception(

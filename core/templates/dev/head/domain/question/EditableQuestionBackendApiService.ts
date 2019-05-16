@@ -23,7 +23,7 @@ oppia.constant(
   'QUESTION_CREATION_URL', '/question_editor_handler/create_new/<skill_id>');
 oppia.constant(
   'QUESTION_SKILL_LINK_URL_TEMPLATE',
-  '/manage_question_skill_link/<question_id>/<skill_id>');
+  '/manage_question_skill_link/<question_id>/<skill_ids>');
 
 oppia.factory('EditableQuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
@@ -106,8 +106,8 @@ oppia.factory('EditableQuestionBackendApiService', [
         questionId, skillId, successCallback, errorCallback) {
       var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
-          question_id: questionId,
-          skill_id: skillId
+            question_id: questionId,
+            skill_ids: JSON.stringify([skillId])
         });
       $http.post(addQuestionSkillLinkUrl).then(function(response) {
         if (successCallback) {
@@ -120,18 +120,12 @@ oppia.factory('EditableQuestionBackendApiService', [
       });
     };
 
-    var _addMultiQuestionSkillLink = function(
+    var _addMultiQuestionSkillLinks = function(
         questionId, skillIds, successCallback, errorCallback) {
-      var skillIdsUrl = '';
-      skillIds.forEach(function(skillId) {
-        skillIdsUrl = skillIdsUrl + skillId + ',';
-      });
-      skillIdsUrl = skillIdsUrl.substring(0, skillIdsUrl.length - 1);
-
       var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
           question_id: questionId,
-          skill_id: skillIdsUrl
+          skill_ids: JSON.stringify(skillIds)
         });
       $http.post(addQuestionSkillLinkUrl).then(function(response) {
         if (successCallback) {
@@ -183,10 +177,10 @@ oppia.factory('EditableQuestionBackendApiService', [
         });
       },
 
-      addMultiQuestionSkillLink: function(
+      addMultiQuestionSkillLinks: function(
           questionId, skillIds) {
         return $q(function(resolve, reject) {
-          _addMultiQuestionSkillLink(questionId, skillIds, resolve, reject);
+          _addMultiQuestionSkillLinks(questionId, skillIds, resolve, reject);
         });
       }
     };

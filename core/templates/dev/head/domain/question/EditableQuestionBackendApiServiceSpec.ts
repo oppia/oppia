@@ -176,7 +176,9 @@ describe('Editable question backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('POST', '/manage_question_skill_link/0/1').respond();
+    var addQuestionSkillLinkUrl = '/manage_question_skill_link/0/' +
+      encodeURIComponent(JSON.stringify(['1']));
+    $httpBackend.expect('POST', addQuestionSkillLinkUrl).respond();
     EditableQuestionBackendApiService.addQuestionSkillLink('0', '1').then(
       successHandler, failHandler);
     $httpBackend.flush();
@@ -190,7 +192,9 @@ describe('Editable question backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('POST', '/manage_question_skill_link/0/1').respond(
+      var addQuestionSkillLinkUrl = '/manage_question_skill_link/0/' +
+        encodeURIComponent(JSON.stringify(['1']));
+      $httpBackend.expect('POST', addQuestionSkillLinkUrl).respond(
         404, 'The skill with the given id doesn\'t exist.');
 
       EditableQuestionBackendApiService.addQuestionSkillLink('0', '1').then(
@@ -200,5 +204,21 @@ describe('Editable question backend API service', function() {
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
         'The skill with the given id doesn\'t exist.');
+    });
+
+    it('should add multiple question skill links, function()',
+      function() {
+        var successHandler = jasmine.createSpy('success');
+        var failHandler = jasmine.createSpy('fail');
+
+        var addQuestionSkillLinkUrl = '/manage_question_skill_link/0/' +
+          encodeURIComponent(JSON.stringify(['1', '2']));
+        $httpBackend.expect('POST', addQuestionSkillLinkUrl).respond();
+        EditableQuestionBackendApiService.addMultiQuestionSkillLinks(
+          '0', ['1', '2']).then(successHandler, failHandler);
+        $httpBackend.flush();
+
+        expect(successHandler).toHaveBeenCalled();
+        expect(failHandler).not.toHaveBeenCalled();
     });
 });

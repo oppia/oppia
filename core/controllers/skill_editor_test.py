@@ -14,6 +14,8 @@
 
 """Tests for the skill editor page."""
 
+import json
+
 from constants import constants
 from core.domain import role_services
 from core.domain import skill_services
@@ -157,7 +159,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     def setUp(self):
         super(EditableSkillDataHandlerTest, self).setUp()
         self.url = '%s/%s' % (
-            feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id)
+            feconf.SKILL_EDITOR_DATA_URL_PREFIX, json.dumps([self.skill_id]))
         self.put_payload = {
             'version': 1,
             'commit_message': 'changed description',

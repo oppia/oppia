@@ -97,11 +97,7 @@ oppia.directive('questionsList', [
           };
 
           $scope.getSkillDescription = function(skillDescriptions) {
-            var skillDescription = '';
-            skillDescriptions.forEach(function(description) {
-              skillDescription = skillDescription.concat(description, ', ');
-            });
-            return skillDescription.substring(0, skillDescription.length - 2);
+            return skillDescriptions.join(', ');
           };
 
           $scope.saveAndPublishQuestion = function() {
@@ -116,7 +112,7 @@ oppia.directive('questionsList', [
                 $scope.skillIds[0], $scope.question.toBackendDict(true)
               ).then(function(response) {
                 if ($scope.skillIds.length > 1) {
-                  EditableQuestionBackendApiService.addMultiQuestionSkillLink(
+                  EditableQuestionBackendApiService.addMultiQuestionSkillLinks(
                     response, $scope.skillIds.slice(1));
                 }
               }).then(function() {
