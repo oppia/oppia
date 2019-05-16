@@ -125,3 +125,4 @@ angular.module('adminRolesTabModule').directive('adminRolesTab', [
     };
   }
 ]);
+

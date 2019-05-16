@@ -38,3 +38,4 @@ angular.module('adminModule').controller('Admin', [
     });
   }
 ]);
+

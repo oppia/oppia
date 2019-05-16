@@ -78,3 +78,4 @@ angular.module('adminNavbarModule').directive('adminNavbar', [
     };
   }
 ]);
+

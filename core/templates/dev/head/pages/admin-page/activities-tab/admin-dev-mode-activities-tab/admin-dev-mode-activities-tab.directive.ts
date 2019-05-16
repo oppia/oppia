@@ -156,3 +156,4 @@ angular.module('adminDevModeActivitiesTabModule').directive(
       };
     }
   ]);
+

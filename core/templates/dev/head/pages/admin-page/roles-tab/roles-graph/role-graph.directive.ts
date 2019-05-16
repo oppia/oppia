@@ -96,3 +96,4 @@ angular.module('roleGraphModule').directive('roleGraph', [
       ]
     };
   }]);
+

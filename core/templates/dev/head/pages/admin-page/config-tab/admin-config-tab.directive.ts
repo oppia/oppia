@@ -97,3 +97,4 @@ angular.module('adminConfigTabModule').directive('adminConfigTab', [
     };
   }
 ]);
+

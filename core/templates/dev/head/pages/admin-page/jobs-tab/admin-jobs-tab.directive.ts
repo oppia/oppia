@@ -119,3 +119,4 @@ angular.module('adminJobsTabModule').directive('adminJobsTab', [
     };
   }
 ]);
+

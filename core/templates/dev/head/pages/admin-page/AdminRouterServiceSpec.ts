@@ -109,3 +109,4 @@ describe('Admin router service', function() {
     expect(AdminRouterService.isJobsTabOpen()).toBe(true);
   });
 });
+

@@ -58,3 +58,4 @@ describe('Admin task manager service', function() {
     expect(AdminTaskManagerService.isTaskRunning()).toBe(false);
   });
 });
+

@@ -30,3 +30,4 @@ angular.module('adminModule').constant(
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
 angular.module('adminModule').constant(
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
+
