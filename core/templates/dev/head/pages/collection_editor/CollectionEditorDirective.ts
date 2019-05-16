@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Primary controller for the collection editor page.
+ * @fileoverview Primary directive for the collection editor page.
  */
 
 require('pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.ts');
