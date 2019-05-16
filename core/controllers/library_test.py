@@ -24,7 +24,6 @@ from core.domain import exp_services
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import user_services
-from core.domain import activity_services
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
@@ -491,5 +490,3 @@ class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'summaries' : [],
         }, response_dict)
-
-        # collection_services.load_demo('0');
