@@ -1,9 +1,5 @@
 {% extends 'pages/base.html' %}
 
-{% block maintitle %}
-  {{ topic_name }} - Oppia
-{% endblock maintitle %}
-
 {% block navbar_breadcrumb %}
   <topic-viewer-navbar-breadcrumb>
   </topic-viewer-navbar-breadcrumb>
@@ -135,4 +131,5 @@
   <script src="/templates/dev/head/pages/topic_viewer/TopicViewerNavbarBreadcrumbDirective.js"></script>
   <script src="/templates/dev/head/pages/topic_viewer/StoriesListDirective.js"></script>
   <script src="/templates/dev/head/pages/topic_viewer/TopicViewer.js"></script>
+  <script src="/templates/dev/head/services/PageTitleService.js"></script>
 {% endblock footer_js %}
