@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Primary controller for the collection editor page.
+ * @fileoverview Primary directive for the collection editor page.
  */
 
 // TODO(bhenning): These constants should be provided by the backend.
