@@ -40,7 +40,7 @@ gae_image_services = models.Registry.import_gae_image_services()
 
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
-ALL_IMAGES_VERIFIED = 'All images verified for an exploration'
+ALL_IMAGES_VERIFIED = 'Images verified'
 ERROR_IN_FILENAME = 'There is an error in the filename'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
@@ -634,7 +634,7 @@ class ImagesAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 for url in image_urls_external])
 
             # Currently in editor.py and exp_services.py, all images are stored
-            # in exploration/{{exp_id}}/ parent folder. So, we only need to
+            # in exploration/{{exp_id}}/ external folder. So, we only need to
             # check if all images in the internal folder are there in the
             # external folder.
             non_existent_images = image_filenames_internal.difference(
@@ -646,13 +646,12 @@ class ImagesAuditJob(jobs.BaseMapReduceOneOffJobManager):
                     'Missing Images: %s' % list(non_existent_images))
             else:
                 yield (
-                    ALL_IMAGES_VERIFIED,
-                    'All images verified for exploration: %s' % (exp_id))
+                    ALL_IMAGES_VERIFIED, len(image_filenames_external))
 
     @staticmethod
     def reduce(status, values):
         if status == ALL_IMAGES_VERIFIED:
-            yield (status, len(values))
+            yield (status, sum([int(elem) for elem in values]))
         else:
             yield (status, values)
 
