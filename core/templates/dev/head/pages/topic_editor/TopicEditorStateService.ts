@@ -125,7 +125,7 @@ oppia.factory('TopicEditorStateService', [
       _nextCursorForQuestions = nextCursor;
     };
     var _deduplicateQuestionSummaries = function(newQuestionSummaries) {
-      // if the first id of newQuestionSummaries is equal to the last id of
+      // If the first id of newQuestionSummaries is equal to the last id of
       // _questionSummaries, deduplicate by merging them to solve the page
       // boundary issue.
       if (newQuestionSummaries[0].summary.id ===
@@ -161,7 +161,6 @@ oppia.factory('TopicEditorStateService', [
             EditableTopicBackendApiService.fetchQuestions(
               topicId, _nextCursorForQuestions).then(
               function(returnObject) {
-                //console.log(returnObject.questionSummaries);
                 _setQuestionSummaries(returnObject.questionSummaries);
                 _setNextQuestionsCursor(returnObject.nextCursor);
               }

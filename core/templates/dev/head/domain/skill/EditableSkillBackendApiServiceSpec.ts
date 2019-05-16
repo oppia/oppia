@@ -117,7 +117,7 @@ describe('Editable skill backend API service', function() {
       expect(failHandler).toHaveBeenCalledWith('Error loading skill 1.');
     });
 
-    it('should succesfully fetch multiple existing skills from the backend',
+  it('should succesfully fetch multiple existing skills from the backend',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
