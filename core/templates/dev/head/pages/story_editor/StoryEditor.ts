@@ -17,14 +17,19 @@
  */
 oppia.constant('NODE_ID_PREFIX', 'node_');
 
+oppia.constant('EVENT_STORY_INITIALIZED', 'storyInitialized');
+oppia.constant('EVENT_STORY_REINITIALIZED', 'storyReinitialized');
+
 oppia.controller('StoryEditor', [
-  '$scope', '$uibModal', '$window', 'StoryEditorStateService',
-  'UndoRedoService',
+  '$scope', '$uibModal', '$window', 'PageTitleService',
+  'StoryEditorStateService', 'UndoRedoService',
   'UrlInterpolationService', 'UrlService',
+  'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
   function(
-      $scope, $uibModal, $window, StoryEditorStateService,
-      UndoRedoService,
-      UrlInterpolationService, UrlService) {
+      $scope, $uibModal, $window, PageTitleService,
+      StoryEditorStateService, UndoRedoService,
+      UrlInterpolationService, UrlService,
+      EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
     var topicId = UrlService.getTopicIdFromUrl();
     StoryEditorStateService.loadStory(
@@ -54,5 +59,15 @@ oppia.controller('StoryEditor', [
           ), '_self');
       }
     };
+
+    $scope.$on(EVENT_STORY_INITIALIZED, function() {
+      PageTitleService.setPageTitle(
+        StoryEditorStateService.getStory()._title + ' - Oppia');
+    });
+
+    $scope.$on(EVENT_STORY_REINITIALIZED, function() {
+      PageTitleService.setPageTitle(
+        StoryEditorStateService.getStory()._title + ' - Oppia');
+    });
   }
 ]);

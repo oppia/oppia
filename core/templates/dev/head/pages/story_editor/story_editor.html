@@ -1,9 +1,5 @@
 {% extends 'pages/base.html' %}
 
-{% block maintitle %}
-  {{ story_title }} - Oppia
-{% endblock maintitle %}
-
 {% block navbar_breadcrumb %}
   <story-editor-navbar-breadcrumb>
   </story-editor-navbar-breadcrumb>
@@ -100,5 +96,6 @@
   <script src="/templates/dev/head/pages/story_editor/main_editor/StoryNodeEditorDirective.js"></script>
   <script src="/templates/dev/head/pages/story_editor/StoryEditorNavbarBreadcrumbDirective.js"></script>
   <script src="/templates/dev/head/pages/story_editor/StoryEditorNavbarDirective.js"></script>
+  <script src="/templates/dev/head/services/PageTitleService.js"></script>
   {% include 'components/rich_text_components.html' %}
 {% endblock footer_js %}
