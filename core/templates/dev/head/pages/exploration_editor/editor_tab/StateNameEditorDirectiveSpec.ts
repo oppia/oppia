@@ -157,7 +157,7 @@ describe('Sidebar state name controller', function() {
       });
 
       var templateHtml = $templateCache.get(
-        '/pages/exploration_editor/editor_tab/' +
+        '/pages/exploration_editor/editor-tab/' +
         'state_name_editor_directive.html');
       $compile(templateHtml, $rootScope);
       $rootScope.$digest();

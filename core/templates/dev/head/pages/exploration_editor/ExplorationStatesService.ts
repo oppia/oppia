@@ -385,7 +385,7 @@ oppia.factory('ExplorationStatesService', [
 
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/editor_tab/' +
+            '/pages/exploration_editor/editor-tab/' +
             'confirm_delete_state_modal_directive.html'),
           backdrop: true,
           resolve: {

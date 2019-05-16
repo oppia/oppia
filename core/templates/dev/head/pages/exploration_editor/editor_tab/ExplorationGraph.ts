@@ -51,7 +51,7 @@ oppia.controller('ExplorationGraph', [
 
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_editor/editor_tab/' +
+          '/pages/exploration_editor/editor-tab/' +
           'exploration_graph_modal_directive.html'),
         backdrop: true,
         resolve: {

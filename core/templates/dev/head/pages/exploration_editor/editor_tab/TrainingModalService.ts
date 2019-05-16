@@ -32,7 +32,7 @@ oppia.factory('TrainingModalService', [
         AlertsService.clearWarnings();
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/editor_tab/' +
+            '/pages/exploration_editor/editor-tab/' +
             'training_unresolved_answer_modal_directive.html'),
           backdrop: true,
           controller: [
