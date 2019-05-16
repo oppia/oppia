@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for SpeechSynthesisChunkerService.
  */
 
+require('services/RteHelperService.ts');
+require('services/SpeechSynthesisChunkerService.ts');
+
 describe('Speech Synthesis Chunker Service', function() {
   var SpeechSynthesisChunkerService = null;
 

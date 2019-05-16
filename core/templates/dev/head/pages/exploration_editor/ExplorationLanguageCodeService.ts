@@ -14,6 +14,9 @@
 
 /** @fileoverview A data service that stores the exploration language code. */
 
+
+require('pages/exploration_editor/ExplorationPropertyService.ts');
+
 oppia.factory('ExplorationLanguageCodeService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);

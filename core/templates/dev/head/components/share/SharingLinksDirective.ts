@@ -16,6 +16,11 @@
  * @fileoverview Directive for the Social Sharing Links.
  */
 
+require('components/embed_modal/ExplorationEmbedButtonService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+require('services/SiteAnalyticsService.ts');
+
 oppia.directive('sharingLinks', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

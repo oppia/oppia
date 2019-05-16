@@ -16,6 +16,15 @@
  * @fileoverview Primary controller for the collection editor page.
  */
 
+require('pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.ts');
+require('pages/collection_editor/CollectionEditorNavbarDirective.ts');
+require('pages/collection_editor/editor_tab/CollectionEditorTabDirective.ts');
+require('pages/collection_editor/history_tab/CollectionHistoryTabDirective.ts');
+require(
+  'pages/collection_editor/settings_tab/CollectionSettingsTabDirective.ts');
+require(
+  'pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.ts');
+
 // TODO(bhenning): These constants should be provided by the backend.
 oppia.constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
@@ -32,6 +41,8 @@ oppia.constant(
 oppia.constant(
   'SEARCH_EXPLORATION_URL_TEMPLATE',
   '/exploration/metadata_search?q=<query>');
+
+oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 oppia.controller('CollectionEditor', [
   'CollectionEditorStateService',

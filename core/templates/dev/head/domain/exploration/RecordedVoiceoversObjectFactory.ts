@@ -17,6 +17,8 @@
  * RecordedVoiceovers domain objects.
  */
 
+require('domain/exploration/VoiceoverObjectFactory.ts');
+
 oppia.factory('RecordedVoiceoversObjectFactory', [
   'VoiceoverObjectFactory', 'COMPONENT_NAME_FEEDBACK',
   function(
