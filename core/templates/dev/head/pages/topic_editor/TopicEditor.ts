@@ -41,14 +41,13 @@ oppia.controller('TopicEditor', [
       EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
     TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
 
-    $scope.$on(EVENT_TOPIC_INITIALIZED, function() {
+    function setPageTitle() {
       PageTitleService.setPageTitle(
-        TopicEditorStateService.getTopic()._name + '- Oppia');
-    });
+        TopicEditorStateService.getName() + '- Oppia');
+    }
 
-    $scope.$on(EVENT_TOPIC_REINITIALIZED, function() {
-      PageTitleService.setPageTitle(
-        TopicEditorStateService.getTopic()._name + '- Oppia');
-    });
+    $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
+
+    $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
   }
 ]);

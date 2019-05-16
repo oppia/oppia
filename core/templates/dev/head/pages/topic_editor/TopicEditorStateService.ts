@@ -422,6 +422,10 @@ oppia.factory('TopicEditorStateService', [
        */
       isSavingTopic: function() {
         return _topicIsBeingSaved;
+      },
+
+      getName: function() {
+        return _topic._name;
       }
     };
   }

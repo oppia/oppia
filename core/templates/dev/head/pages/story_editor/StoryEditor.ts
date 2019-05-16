@@ -60,14 +60,13 @@ oppia.controller('StoryEditor', [
       }
     };
 
-    $scope.$on(EVENT_STORY_INITIALIZED, function() {
+    function setPageTitle() {
       PageTitleService.setPageTitle(
-        StoryEditorStateService.getStory()._title + ' - Oppia');
-    });
+        StoryEditorStateService.getTitle()+ ' - Oppia');
+    }
 
-    $scope.$on(EVENT_STORY_REINITIALIZED, function() {
-      PageTitleService.setPageTitle(
-        StoryEditorStateService.getStory()._title + ' - Oppia');
-    });
+    $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
+
+    $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
   }
 ]);
