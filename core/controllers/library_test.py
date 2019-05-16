@@ -18,6 +18,7 @@ import json
 import os
 
 from constants import constants
+from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
@@ -490,3 +491,21 @@ class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'summaries': [],
         }, response_dict)
+
+    def test_access_collection(self):
+        collection_services.load_demo('0');
+        response_dict = self.get_json(
+            feconf.COLLECTION_SUMMARIES_DATA_URL,
+            params={'stringified_collection_ids': json.dumps('0')})
+        self.assertEqual(len(response_dict['summaries']), 1)
+        self.assertDictContainsSubset({
+            'id': '0',
+            'title': 'Introduction to Collections in Oppia',
+            'category': 'Welcome',
+            'objective': 'To introduce collections using demo explorations.',
+            'language_code': 'en',
+            'tags': [],
+            'node_count': 4,
+        }, response_dict['summaries'][0])
+
+
