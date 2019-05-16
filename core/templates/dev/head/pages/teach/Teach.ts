@@ -16,6 +16,10 @@
  * @fileoverview Controllers for the teach page.
  */
 
+require('components/background/BackgroundBannerDirective.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/SiteAnalyticsService.ts');
+
 oppia.controller('Teach', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService',

@@ -16,6 +16,13 @@
  * @fileoverview Service to preload audio into AssetsBackendApiService's cache.
  */
 
+require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/AudioTranslationLanguageService.ts');
+require('services/AssetsBackendApiService.ts');
+require('services/ComputeGraphService.ts');
+require('services/ContextService.ts');
+
 oppia.factory('AudioPreloaderService', [
   '$uibModal', 'AssetsBackendApiService', 'AudioTranslationLanguageService',
   'ComputeGraphService', 'ContextService',
@@ -44,7 +51,7 @@ oppia.factory('AudioPreloaderService', [
           _exploration.getStates(),
           sourceStateName);
       var audioFilenames = [];
-      var allAudioTranslations = _exploration.getAllAudioTranslations(
+      var allAudioTranslations = _exploration.getAllVoiceovers(
         languageCode);
       stateNamesInBfsOrder.forEach(function(stateName) {
         var allAudioTranslationsForState = allAudioTranslations[stateName];

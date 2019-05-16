@@ -305,3 +305,34 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             self.post_json(
                 self.url, {}, csrf_token=csrf_token, expected_status_int=404)
         self.logout()
+
+    def test_merge_skill_fails_when_new_skill_id_is_invalid(self):
+        self.login(self.ADMIN_EMAIL)
+        old_skill_id = self.linked_skill_id
+        payload = {
+            'old_skill_id': old_skill_id,
+            'new_skill_id': 'invalid_new_skill_id'
+            }
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            csrf_token = self._get_csrf_token_for_put()
+            self.post_json(
+                self.url, payload, csrf_token=csrf_token,
+                expected_status_int=404)
+
+        self.logout()
+
+    def test_merge_skill_fails_when_old_skill_id_is_invalid(self):
+        self.login(self.ADMIN_EMAIL)
+        new_skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(new_skill_id, self.admin_id, 'Skill Description')
+        payload = {
+            'old_skill_id': 'invalid_old_skill_id',
+            'new_skill_id': new_skill_id
+            }
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            csrf_token = self._get_csrf_token_for_put()
+            self.post_json(
+                self.url, payload, csrf_token=csrf_token,
+                expected_status_int=404)
+
+        self.logout()

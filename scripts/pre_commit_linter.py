@@ -182,7 +182,13 @@ BAD_PATTERNS_JS_REGEXP = [
                    'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()
-    }
+    },
+    {
+        'regexp': r'require\(.*\.\..*\);',
+        'message': 'Please, don\'t use relative imports in require().',
+        'excluded_files': (),
+        'excluded_dirs': ('core/tests/')
+    },
 ]
 
 BAD_LINE_PATTERNS_HTML_REGEXP = [
@@ -263,12 +269,10 @@ CONFIG_FILE_PATHS = (
     'core/tests/karma.conf.ts',
     'core/templates/dev/head/mathjaxConfig.ts',
     'assets/constants.js',
-    'assets/rich_text_components_definitions.js')
-
-CODEOWNER_DIR_PATHS = [
-    './core', './extensions', './scripts', './export', './.github']
-
-CODEOWNER_FILE_PATHS = ['./app.yaml', './manifest.json']
+    'assets/rich_text_components_definitions.js',
+    'webpack.config.ts',
+    'webpack.dev.config.ts',
+    'webpack.prod.config.ts')
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -471,6 +475,56 @@ def _get_expression_from_node_if_one_exists(
     if component not in components_to_check:
         return
     return expression
+
+
+def _walk_with_gitignore(root, exclude_dirs):
+    """A walk function similar to os.walk but this would ignore the files and
+    directories which is not tracked by git. Also, this will ignore the
+    directories mentioned in exclude_dirs.
+
+    Args:
+        root: str. The path from where the function should start walking.
+        exclude_dirs: list(str). A list of dir path which should be ignored.
+
+    Yields:
+        list(str). A list of unignored files.
+    """
+    dirs, file_paths = [], []
+    for name in os.listdir(root):
+        if os.path.isdir(os.path.join(root, name)):
+            dirs.append(os.path.join(root, name))
+        else:
+            file_paths.append(os.path.join(root, name))
+
+    yield [file_path for file_path in file_paths if not _is_path_ignored(
+        file_path)]
+
+    for dir_path in dirs:
+        # Adding "/" in the end of the dir path according to the git dir path
+        # structure.
+        if (not _is_path_ignored(dir_path + '/')) and (
+                dir_path not in exclude_dirs):
+            for x in _walk_with_gitignore(dir_path, exclude_dirs):
+                yield x
+
+
+def _is_path_ignored(path_to_check):
+    """Checks whether the given path is ignored by git.
+
+    Args:
+        path_to_check: str. A path to a file or a dir.
+
+    Returns:
+        bool. Whether the given path is ignored by git.
+    """
+    command = ['git', 'check-ignore', '-q', path_to_check]
+
+    # The "git check-ignore <path>" command returns 0 when the path is ignored
+    # otherwise it returns 1. subprocess.call then returns this returncode.
+    if subprocess.call(command):
+        return False
+    else:
+        return True
 
 
 def _get_changed_filepaths():
@@ -749,8 +803,9 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
     def handle_data(self, data):
         """Handle indentation level."""
         data_lines = data.split('\n')
-        opening_block = tuple(['{% block', '{% macro', '{% if'])
-        ending_block = tuple(['{% end', '{%- end'])
+        opening_block = tuple(
+            ['{% block', '{% macro', '{% if', '% for', '% if'])
+        ending_block = tuple(['{% end', '{%- end', '% } %>'])
         for data_line in data_lines:
             data_line = data_line.lstrip()
             if data_line.startswith(opening_block):
@@ -2104,18 +2159,35 @@ class LintChecksManager(object):
             summary_messages = []
             # Checks whether every pattern in the CODEOWNERS file matches at
             # least one dir/file.
-            path_patterns = []
+            file_patterns = []
+            dir_patterns = []
             for line_num, line in enumerate(FileCache.readlines(
                     codeowner_filepath)):
                 stripped_line = line.strip()
                 if stripped_line and stripped_line[0] != '#':
                     if '@' not in line:
-                        print ('%s --> Pattern on line %s doesn\'t have'
+                        print ('%s --> Pattern on line %s doesn\'t have '
                                'codeowner' % (codeowner_filepath, line_num + 1))
                         failed = True
                     else:
                         # Extract the file pattern from the line.
                         line_in_concern = line.split('@')[0].strip()
+                        # Checks if the path is the full path relative to the
+                        # root oppia directory.
+                        if not line_in_concern.startswith('/'):
+                            print ('%s --> Pattern on line %s is invalid. Use '
+                                   'full path relative to the root directory'
+                                   % (codeowner_filepath, line_num + 1))
+                            failed = True
+
+                        # The double asterisks pattern is supported by the
+                        # CODEOWNERS syntax but not the glob in Python 2.
+                        # The following condition checks this.
+                        if '**' in line_in_concern:
+                            print ('%s --> Pattern on line %s is invalid. '
+                                   '\'**\' wildcard not allowed' % (
+                                       codeowner_filepath, line_num + 1))
+                            failed = True
                         # Adjustments to the dir paths in CODEOWNERS syntax
                         # for glob-style patterns to match correctly.
                         if line_in_concern.endswith('/'):
@@ -2126,29 +2198,12 @@ class LintChecksManager(object):
                         # full path relative to root, but python glob module
                         # does not conform to this logic and literally matches
                         # the '/' character. Therefore the leading '/' has to
-                        # be removed for glob patterns to match correctly.
-                        if not glob.glob(line_in_concern.replace('/', '', 1)):
+                        # be changed to './' for glob patterns to match
+                        # correctly.
+                        line_in_concern = line_in_concern.replace('/', './', 1)
+                        if not glob.glob(line_in_concern):
                             print ('%s --> Pattern on line %s doesn\'t match '
                                    'any file or directory' % (
-                                       codeowner_filepath, line_num + 1))
-                            failed = True
-                        # Checks if the path is the full path relative to the
-                        # root oppia directory. Patterns starting with '/' are
-                        # considered relative to root whereas patterns starting
-                        # with './' are relative to the .github directory.
-                        if (not line_in_concern.startswith('/') and
-                                not './' +
-                                line_in_concern in CODEOWNER_FILE_PATHS):
-                            print ('%s --> Pattern on line %s is invalid. Use '
-                                   'full path relative to the root directory'
-                                   % (codeowner_filepath, line_num + 1))
-                            failed = True
-                        # The double asterisks pattern is supported by the
-                        # CODEOWNERS syntax but not the glob in Python 2.
-                        # The following condition checks this.
-                        if '**' in line_in_concern:
-                            print ('%s --> Pattern on line %s is invalid. '
-                                   '\'**\' wildcard not allowed' % (
                                        codeowner_filepath, line_num + 1))
                             failed = True
                         # The following list is being populated with the
@@ -2156,63 +2211,23 @@ class LintChecksManager(object):
                         # leading '/' to aid in the glob pattern matching in
                         # the next part of the check wherein the valid patterns
                         # are used to check if they cover the entire codebase.
-                        path_patterns.append(line_in_concern.replace(
-                            '/', '', 1))
+                        if os.path.isdir(line_in_concern):
+                            dir_patterns.append(line_in_concern)
+                        else:
+                            file_patterns.append(line_in_concern)
 
-            # Checks that every dir/file is covered under CODEOWNERS.
-            for root, _, file_names in os.walk('.'):
-                for file_name in file_names:
-                    # This bool checks if the file belongs to the root
-                    # oppia directory.
-                    is_root_file = False
-                    if os.path.join(root, file_name) in CODEOWNER_FILE_PATHS:
-                        is_root_file = True
-                    if (any(root.startswith(
-                            dir_path) for dir_path in CODEOWNER_DIR_PATHS)
-                            or is_root_file):
-                        match = False
-                        # Ignore .pyc and __init__.py files.
-                        if file_name.endswith(
-                                '.pyc') or file_name == '__init__.py':
+            # Checks that every file (except those under the dir represented by
+            # the dir_patterns) is covered under CODEOWNERS.
+            for file_paths in _walk_with_gitignore('.', dir_patterns):
+                for file_path in file_paths:
+                    match = False
+                    for file_pattern in file_patterns:
+                        if file_path in glob.glob(file_pattern):
                             match = True
-                            continue
-                        for path_to_match in path_patterns:
-                            # The level of the file in the directory
-                            # structure. For e.g. /core/controllers/
-                            # domain.py is on third level.
-                            # This condition checks if the path to check
-                            # is a directory or a file. If it is a
-                            # file, the level would be the same as found
-                            # by calculating len(path_to_match.split('/'))
-                            # but is reduced by one if it is a directory
-                            # since the split command will return an empty
-                            # string at the last of the list which will
-                            # wrongfully increase the level.
-                            if path_to_match.split('/')[-1]:
-                                level = len(path_to_match.split('/'))
-                            else:
-                                level = len(path_to_match.split('/')) - 1
-                            # This condition finally matches the file being
-                            # walked currently against the path from the
-                            # CODEOWNERS file. The level helps in matching
-                            # by considering the file name upto only the
-                            # the level of the CODEOWNERS path. For e.g.
-                            # if the file being walked upon is /core/domain
-                            # /domain.py and the path from CODEOWNERS to be
-                            # matched is /core/ then it will only consider
-                            # the file name upto level 1 i.e. just the '/core'
-                            # part of the file name since it is sufficient to
-                            # be matched.
-                            if os.path.join(*((
-                                    os.path.join(root, file_name).replace(
-                                        './', '', 1)).split(
-                                            '/')[:level])) in glob.glob(
-                                                path_to_match):
-                                match = True
-                                break
-                        if not match and self.verbose_mode_enabled:
-                            print ('WARNING! %s/%s is not covered under '
-                                   'CODEOWNERS' % (root, file_name))
+                            break
+                    if not match:
+                        print '%s is not covered under CODEOWNERS' % file_path
+                        failed = True
 
             if failed:
                 summary_message = '%s   CODEOWNERS file check failed' % (
