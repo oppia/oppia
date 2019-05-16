@@ -27,14 +27,14 @@ oppia.directive('translationTab', ['UrlInterpolationService',
 
       controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
-        'StateContentIdsToAudioTranslationsService', 'StateEditorService',
-        'StateRecordedVoiceoversService', 'StateTutorialFirstTimeService',
-        'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
+        'StateEditorService', 'StateRecordedVoiceoversService',
+        'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
+        'TranslationTabActiveModeService',
         function($scope, $rootScope, $templateCache, $uibModal,
             ContextService, EditabilityService, ExplorationStatesService,
-            StateContentIdsToAudioTranslationsService, StateEditorService,
-            StateRecordedVoiceoversService, StateTutorialFirstTimeService,
-            StateWrittenTranslationsService, TranslationTabActiveModeService) {
+            StateEditorService, StateRecordedVoiceoversService,
+            StateTutorialFirstTimeService, StateWrittenTranslationsService,
+            TranslationTabActiveModeService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
           $scope.showTranslationTabSubDirectives = false;
