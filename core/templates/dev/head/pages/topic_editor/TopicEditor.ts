@@ -41,10 +41,10 @@ oppia.controller('TopicEditor', [
       EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
     TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
 
-    function setPageTitle() {
+    var setPageTitle = function() {
       PageTitleService.setPageTitle(
-        TopicEditorStateService.getName() + '- Oppia');
-    }
+        TopicEditorStateService.getName() + ' - Oppia');
+    };
 
     $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
 

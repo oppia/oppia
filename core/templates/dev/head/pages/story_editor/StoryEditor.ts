@@ -60,10 +60,10 @@ oppia.controller('StoryEditor', [
       }
     };
 
-    function setPageTitle() {
+    var setPageTitle = function() {
       PageTitleService.setPageTitle(
-        StoryEditorStateService.getTitle()+ ' - Oppia');
-    }
+        StoryEditorStateService.getTitle() + ' - Oppia');
+    };
 
     $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
 
