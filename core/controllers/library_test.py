@@ -208,7 +208,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
     def test_library_index_handler(self):
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
-            'activity_summary_dicts_by_category' : [],
+            'activity_summary_dicts_by_category': [],
             'preferred_language_codes': ['en'],
         }, response_dict)
 
@@ -223,13 +223,13 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'categories': [],
             'header_i18n_id': (
-                    feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
+                feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
             'has_full_results_page': True,
             'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
             'protractor_id': 'top-rated',
         }, response_dict['activity_summary_dicts_by_category'][0])
         self.assertEqual(
-            len(response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts']), 1)
+            len(response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts']), 1) # pylint: disable=line-too-long
         self.assertDictContainsSubset({
             'id': '0',
             'category': 'Welcome',
@@ -237,7 +237,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0])
+        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0]) # pylint: disable=line-too-long
 
 
 class LibraryGroupPageTests(test_utils.GenericTestBase):
@@ -488,5 +488,5 @@ class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
             feconf.COLLECTION_SUMMARIES_DATA_URL,
             params={'stringified_collection_ids': json.dumps('0')})
         self.assertDictContainsSubset({
-            'summaries' : [],
+            'summaries': [],
         }, response_dict)
