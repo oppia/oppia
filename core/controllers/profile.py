@@ -45,7 +45,7 @@ class ProfilePage(base.BaseHandler):
         self.values.update({
             'PROFILE_USERNAME': user_settings.username,
         })
-        self.render_template('pages/profile/profile.html')
+        self.render_template('dist/profile.html')
 
 
 class ProfileHandler(base.BaseHandler):
@@ -108,7 +108,7 @@ class PreferencesPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/preferences/preferences.html')
+        self.render_template('dist/preferences.html')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -261,7 +261,7 @@ class SignupPage(base.BaseHandler):
             'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
             'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
         })
-        self.render_template('pages/signup/signup.html')
+        self.render_template('dist/signup.html')
 
 
 class SignupHandler(base.BaseHandler):

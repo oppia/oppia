@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the email dashboard page.
  */
 
+require('pages/email_dashboard/EmailDashboardDataService.ts');
+
 describe('Email Dashboard Services', function() {
   beforeEach(angular.mock.module('oppia'));
 

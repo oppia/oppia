@@ -16,6 +16,9 @@
  * @fileoverview Directive for the exploration objective/goal field in forms.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationObjectiveService.ts');
+
 oppia.directive('explorationObjectiveEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

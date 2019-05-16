@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for UrlInterpolationService.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 describe('URL Interpolation Service', function() {
   var uis = null;
 

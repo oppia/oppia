@@ -16,6 +16,8 @@
  * @fileoverview Tests for SkillSummaryObjectFactory.
  */
 
+require('domain/skill/SkillSummaryObjectFactory.ts');
+
 describe('Skill summary object factory', function() {
   var SkillSummaryObjectFactory = null;
 

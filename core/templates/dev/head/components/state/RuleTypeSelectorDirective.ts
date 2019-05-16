@@ -16,6 +16,10 @@
  * @fileoverview Directive for the rule type selector.
  */
 
+require('filters/ReplaceInputsWithEllipsesFilter.ts');
+require('filters/TruncateAtFirstEllipsisFilter.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+
 oppia.directive('ruleTypeSelector', [function() {
   return {
     restrict: 'E',

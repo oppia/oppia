@@ -16,6 +16,11 @@
  * @fileoverview Service that handles routing for the exploration editor page.
  */
 
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/ExplorationFeaturesService.ts');
+
 oppia.factory('RouterService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
   'ExplorationFeaturesService', 'ExplorationInitStateNameService',

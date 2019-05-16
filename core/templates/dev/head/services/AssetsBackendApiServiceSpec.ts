@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for AssetsBackendApiService
  */
 
+require('domain/utilities/FileDownloadRequestObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AssetsBackendApiService.ts');
+
 describe('Assets Backend API Service', function() {
   var AssetsBackendApiService = null;
   var FileDownloadRequestObjectFactory = null;

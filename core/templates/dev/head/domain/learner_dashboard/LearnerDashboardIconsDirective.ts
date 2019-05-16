@@ -16,6 +16,8 @@
  * @fileoverview Directive for showing learner dashboard icons.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('learnerDashboardIcons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -17,6 +17,15 @@
  * answer groups.
  */
 
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('pages/exploration_editor/editor_tab/AnswerGroupsCacheService.ts');
+require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
+require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+
 oppia.factory('ResponsesService', [
   '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
   'ContextService', 'OutcomeObjectFactory',

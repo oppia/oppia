@@ -17,6 +17,9 @@
  * to audio translations.
  */
 
+require(
+  'pages/state_editor/state_properties/StatePropertyService.ts');
+
 oppia.factory('StateRecordedVoiceoversService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);

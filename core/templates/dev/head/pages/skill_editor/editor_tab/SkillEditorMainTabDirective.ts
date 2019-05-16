@@ -16,6 +16,13 @@
  * @fileoverview Controller for the main tab of the skill editor.
  */
 
+require('pages/skill_editor/editor_tab/SkillDescriptionEditorDirective.ts');
+require('pages/skill_editor/editor_tab/SkillConceptCardEditorDirective.ts');
+require('pages/skill_editor/editor_tab/SkillMisconceptionsEditorDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/skill_editor/SkillEditorStateService.ts');
+
 oppia.directive('skillEditorMainTab', [
   'SkillEditorStateService', 'UrlInterpolationService',
   function(SkillEditorStateService, UrlInterpolationService) {

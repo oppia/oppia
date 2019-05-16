@@ -17,6 +17,8 @@
  * exploration.
  */
 
+require('pages/exploration_editor/ExplorationPropertyService.ts');
+
 oppia.factory('ExplorationCorrectnessFeedbackService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);

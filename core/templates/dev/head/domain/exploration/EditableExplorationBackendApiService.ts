@@ -16,6 +16,10 @@
  * @fileoverview Service to send changes to a exploration to the backend.
  */
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/PlayerConstants.ts');
+
 oppia.factory('EditableExplorationBackendApiService', [
   '$http', '$q', 'ReadOnlyExplorationBackendApiService',
   'UrlInterpolationService',

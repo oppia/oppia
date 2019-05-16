@@ -16,6 +16,9 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/UserService.ts');
+
 describe('User Service', function() {
   var UserService, $httpBackend, UrlInterpolationService;
 

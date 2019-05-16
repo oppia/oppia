@@ -16,6 +16,16 @@
  * @fileoverview Unit tests for Solution Verification Service.
  */
 
+require('App.ts');
+require('domain/exploration/SolutionObjectFactory.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require(
+  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
+require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+
 describe('Solution Verification Service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');

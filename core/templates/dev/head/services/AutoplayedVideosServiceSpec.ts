@@ -15,6 +15,8 @@
  * @fileoverview Unit tests for AutoplayedVideosService.
  */
 
+require('services/AutoplayedVideosService.ts');
+
 describe('AutoplayedVideosService', function() {
   var AutoplayedVideosService = null;
 

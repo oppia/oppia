@@ -17,6 +17,8 @@
  * by both the learner and editor views
  */
 
+require('services/ExplorationHtmlFormatterService.ts');
+
 describe('Exploration Html Formatter Service', function() {
   beforeEach(angular.mock.module('oppia'));
   var ehfs = null;

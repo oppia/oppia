@@ -17,6 +17,8 @@
  * user's explorations.
  */
 
+require('pages/creator_dashboard/CreatorDashboard.ts');
+
 describe('Creator dashboard controller', function() {
   describe('CreatorDashboard', function() {
     var scope, ctrl, $httpBackend;

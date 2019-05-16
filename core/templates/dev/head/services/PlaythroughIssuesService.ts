@@ -16,6 +16,9 @@
  * @fileoverview Service for retrieving issues and playthroughs.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/PlaythroughIssuesBackendApiService.ts');
+
 oppia.factory('PlaythroughIssuesService', [
   '$uibModal', 'PlaythroughIssuesBackendApiService', 'UrlInterpolationService',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',

@@ -16,6 +16,9 @@
  * @fileoverview Tests that the resource service is working as expected.
  */
 
+require('App.ts');
+require('services/PromoBarService.ts');
+
 describe('Promo bar Service', function() {
   var PromoBarService, $httpBackend;
 

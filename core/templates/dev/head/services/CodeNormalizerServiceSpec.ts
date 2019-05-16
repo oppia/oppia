@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Code Normalizer Service.
  */
 
+require('services/CodeNormalizerService.ts');
+
 describe('Code Normalization', function() {
   beforeEach(angular.mock.module('oppia'));
 

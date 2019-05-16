@@ -16,6 +16,10 @@
  * @fileoverview User exploration emails service for the exploration settings.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('services/AlertsService.ts');
+
 oppia.factory('UserEmailPreferencesService', [
   '$http', '$q', 'AlertsService', 'ExplorationDataService',
   'UrlInterpolationService',

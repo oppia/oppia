@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the Param Specs object factory.
  */
 
+require('domain/exploration/ParamSpecObjectFactory.ts');
+require('domain/exploration/ParamSpecsObjectFactory.ts');
+
 describe('ParamSpecs', function() {
   var ParamSpecsObjectFactory = null;
   var ParamSpecObjectFactory = null;

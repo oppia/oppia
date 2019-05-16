@@ -16,6 +16,9 @@
  * @fileoverview Tests for UndoRedoService.
  */
 
+require('domain/editor/undo_redo/ChangeObjectFactory.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+
 describe('Undo/Redo Service', function() {
   var UndoRedoService = null;
   var ChangeObjectFactory = null;

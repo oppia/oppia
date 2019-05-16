@@ -16,6 +16,9 @@
  * @fileoverview unit tests for the local save services.
  */
 
+require('domain/exploration/ExplorationDraftObjectFactory.ts');
+require('services/LocalStorageService.ts');
+
 describe('LocalStorageService', function() {
   beforeEach(angular.mock.module('oppia'));
 

@@ -16,6 +16,15 @@
  * @fileoverview Directive for a schema-based editor for lists.
  */
 
+require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/IdGenerationService.ts');
+require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
+require('services/SchemaDefaultValueService.ts');
+require('services/SchemaUndefinedLastElementService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 oppia.directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',
   'NestedDirectivesRecursionTimeoutPreventionService',

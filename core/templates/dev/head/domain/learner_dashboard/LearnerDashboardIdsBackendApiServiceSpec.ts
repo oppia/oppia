@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for LearnerDashboardIdsBackendApiService.
  */
 
+require('domain/learner_dashboard/LearnerDashboardIdsBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 describe('Learner Dashboard Backend API Service', function() {
   var LearnerDashboardIdsBackendApiService = null;
   var $httpBackend = null;

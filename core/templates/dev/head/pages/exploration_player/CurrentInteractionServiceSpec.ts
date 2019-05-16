@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for CurrentInteractionService.
  */
 
+require('pages/exploration_player/CurrentInteractionService.ts');
+
 describe('Current Interaction Service', function() {
   beforeEach(angular.mock.module('oppia'));
 

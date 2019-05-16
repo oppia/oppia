@@ -16,6 +16,8 @@
  * @fileoverview Service for the rating functionality in the learner view.
  */
 
+require('pages/exploration_player/ExplorationEngineService.ts');
+
 oppia.factory('LearnerViewRatingService', [
   '$http', '$rootScope', 'ExplorationEngineService',
   function($http, $rootScope, ExplorationEngineService) {

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Exploration data service.
  */
 
+require('pages/exploration_editor/ExplorationDataService.ts');
+
 describe('Exploration data service', function() {
   beforeEach(angular.mock.module('oppia'));
 

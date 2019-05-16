@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for EditableExplorationBackendApiService.
  */
 
+require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+
 describe('Editable exploration backend API service', function() {
   var EditableExplorationBackendApiService = null;
   var ReadOnlyExplorationBackendApiService = null;

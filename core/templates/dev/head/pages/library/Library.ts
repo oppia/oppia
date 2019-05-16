@@ -16,6 +16,29 @@
  * @fileoverview Data and controllers for the Oppia contributors' library page.
  */
 
+require('components/loading/LoadingDotsDirective.ts');
+require('components/summary_tile/ExplorationSummaryTileDirective.ts');
+require('components/summary_tile/CollectionSummaryTileDirective.ts');
+require('pages/library/LibraryFooter.ts');
+require('pages/library/SearchBarDirective.ts');
+require('pages/library/SearchResultsDirective.ts');
+
+require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
+require('domain/learner_dashboard/LearnerDashboardIdsBackendApiService.ts');
+require('domain/learner_dashboard/LearnerPlaylistService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/ConstructTranslationIdsService.ts');
+require('services/PageTitleService.ts');
+require('services/SearchService.ts');
+require('services/UserService.ts');
+require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
+// NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
+// be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
+// LIBRARY_PAGE_MODES.GROUP should have the same value as
+// LIBRARY_PAGE_MODE_GROUP in feconf.py.
 oppia.constant('LIBRARY_PAGE_MODES', {
   GROUP: 'group',
   INDEX: 'index',

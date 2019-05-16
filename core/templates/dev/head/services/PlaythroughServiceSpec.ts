@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for the playthrough service.
  */
 
+require('App.ts');
+require('domain/statistics/LearnerActionObjectFactory.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/PlaythroughService.ts');
+
 describe('PlaythroughService', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the SubtitledHtml object factory.
  */
 
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+
 describe('SubtitledHtml object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 

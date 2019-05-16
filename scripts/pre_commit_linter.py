@@ -182,7 +182,13 @@ BAD_PATTERNS_JS_REGEXP = [
                    'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()
-    }
+    },
+    {
+        'regexp': r'require\(.*\.\..*\);',
+        'message': 'Please, don\'t use relative imports in require().',
+        'excluded_files': (),
+        'excluded_dirs': ('core/tests/')
+    },
 ]
 
 BAD_LINE_PATTERNS_HTML_REGEXP = [
@@ -263,7 +269,10 @@ CONFIG_FILE_PATHS = (
     'core/tests/karma.conf.ts',
     'core/templates/dev/head/mathjaxConfig.ts',
     'assets/constants.js',
-    'assets/rich_text_components_definitions.js')
+    'assets/rich_text_components_definitions.js',
+    'webpack.config.ts',
+    'webpack.dev.config.ts',
+    'webpack.prod.config.ts')
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -794,8 +803,9 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
     def handle_data(self, data):
         """Handle indentation level."""
         data_lines = data.split('\n')
-        opening_block = tuple(['{% block', '{% macro', '{% if'])
-        ending_block = tuple(['{% end', '{%- end'])
+        opening_block = tuple(
+            ['{% block', '{% macro', '{% if', '% for', '% if'])
+        ending_block = tuple(['{% end', '{%- end', '% } %>'])
         for data_line in data_lines:
             data_line = data_line.lstrip()
             if data_line.startswith(opening_block):

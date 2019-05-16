@@ -16,6 +16,8 @@
  * @fileoverview Tests for CollectionNodeObjectFactory.
  */
 
+require('domain/collection/CollectionNodeObjectFactory.ts');
+
 describe('Collection node object factory', function() {
   var CollectionNodeObjectFactory = null;
 

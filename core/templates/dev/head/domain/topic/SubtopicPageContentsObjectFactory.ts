@@ -17,6 +17,9 @@
  * subtopic page data domain objects.
  */
 
+require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+
 oppia.factory('SubtopicPageContentsObjectFactory', [
   'ContentIdsToAudioTranslationsObjectFactory', 'SubtitledHtmlObjectFactory',
   function(

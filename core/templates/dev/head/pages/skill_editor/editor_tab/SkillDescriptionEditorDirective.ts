@@ -16,6 +16,11 @@
  * @fileoverview Directive for the skill description editor.
  */
 
+require('domain/skill/SkillObjectFactory.ts');
+require('domain/skill/SkillUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/skill_editor/SkillEditorStateService.ts');
+
 oppia.directive('skillDescriptionEditor', [
   'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
   'UrlInterpolationService',

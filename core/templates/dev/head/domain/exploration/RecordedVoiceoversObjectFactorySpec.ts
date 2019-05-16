@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for RecordedVoiceovers object factory.
  */
 
+require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
+require('domain/exploration/VoiceoverObjectFactory.ts');
+
 describe('RecordedVoiceovers object factory', function() {
   var rvof = null;
   var vof = null;

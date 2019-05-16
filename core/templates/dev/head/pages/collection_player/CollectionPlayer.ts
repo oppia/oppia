@@ -16,6 +16,24 @@
  * @fileoverview Controller for the learner's view of a collection.
  */
 
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
+require('pages/collection_player/CollectionNodeListDirective.ts');
+// ^^^ this block of requires should be removed ^^^
+
+require('components/attribution_guide/AttributionGuideDirective.ts');
+require('components/background/BackgroundBannerDirective.ts');
+require('components/summary_tile/ExplorationSummaryTileDirective.ts');
+require('pages/collection_player/CollectionFooterDirective.ts');
+require('pages/collection_player/CollectionLocalNav.ts');
+
+require('domain/collection/CollectionObjectFactory.ts');
+require('domain/collection/CollectionPlaythroughObjectFactory.ts');
+require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+
 oppia.constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
 

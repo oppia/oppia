@@ -14,6 +14,9 @@
 /**
  * @fileoverview Unit tests for QuestionPlayerBackendApiService.
  */
+
+require('domain/question/QuestionPlayerBackendApiService.ts');
+
 describe('Question Player backend Api service', function() {
   var QuestionPlayerBackendApiService = null;
   var sampleDataResults = null;

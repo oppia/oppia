@@ -16,6 +16,8 @@
  * @fileoverview Tests for SubtopicObjectFactory.
  */
 
+require('domain/topic/SubtopicObjectFactory.ts');
+
 describe('Subtopic object factory', function() {
   var SubtopicObjectFactory = null;
   var _sampleSubtopic = null;

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
+require('pages/library/Library.ts');
+
 describe('Library controller', function() {
   beforeEach(angular.mock.module('oppia'));
 

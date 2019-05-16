@@ -16,6 +16,8 @@
  * @fileoverview Unit test for the page title service.
  */
 
+require('services/PageTitleService.ts');
+
 describe('Page title service', function() {
   beforeEach(angular.mock.module('oppia'));
   var pts = null;

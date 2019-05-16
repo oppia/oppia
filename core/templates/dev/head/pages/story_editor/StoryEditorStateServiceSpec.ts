@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for StoryEditorStateService.
  */
 
+require('domain/story/StoryObjectFactory.ts');
+require('domain/story/StoryUpdateService.ts');
+require('pages/story_editor/StoryEditorStateService.ts');
+
 describe('Story editor state service', function() {
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;

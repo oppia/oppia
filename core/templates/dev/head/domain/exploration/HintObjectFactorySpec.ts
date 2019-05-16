@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for hint object factory.
  */
 
+require('domain/exploration/HintObjectFactory.ts');
+
 describe('Hint object factory', function() {
   beforeEach(angular.mock.module('oppia'));
   var hof = null;

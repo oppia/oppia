@@ -18,6 +18,13 @@
  * retrieving the collection, saving it, and listening for changes.
  */
 
+require('domain/collection/CollectionObjectFactory.ts');
+require('domain/collection/CollectionRightsBackendApiService.ts');
+require('domain/collection/CollectionRightsObjectFactory.ts');
+require('domain/collection/EditableCollectionBackendApiService.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('services/AlertsService.ts');
+
 oppia.constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
 oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
 

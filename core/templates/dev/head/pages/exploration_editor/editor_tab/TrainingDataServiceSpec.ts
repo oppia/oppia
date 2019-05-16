@@ -16,6 +16,15 @@
  * @fileoverview Unit tests for the training data service.
  */
 
+require('App.ts');
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require('pages/exploration_editor/editor_tab/TrainingDataService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+
 describe('TrainingDataService', function() {
   var $httpBackend;
   var scope, siis, ecs, cls, rs, tds, ess, IS, oof;

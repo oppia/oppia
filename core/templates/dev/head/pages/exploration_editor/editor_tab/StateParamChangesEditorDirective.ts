@@ -16,6 +16,11 @@
  * @fileoverview Directive for the param changes editor section of the
  * state editor.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+
 oppia.directive('stateParamChangesEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

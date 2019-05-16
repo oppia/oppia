@@ -18,6 +18,19 @@
  * keeps no mementos.
  */
 
+require('domain/exploration/StatesObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/NormalizeWhitespaceFilter.ts');
+require('pages/exploration_editor/AngularNameService.ts');
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ValidatorsService.ts');
+
 oppia.factory('ExplorationStatesService', [
   '$filter', '$injector', '$location', '$log', '$q', '$rootScope', '$uibModal',
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',

@@ -17,6 +17,9 @@
  * concept card. In the backend, this is referred to as SkillContents.
  */
 
+require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+
 oppia.factory('ConceptCardObjectFactory', [
   'ContentIdsToAudioTranslationsObjectFactory', 'SubtitledHtmlObjectFactory',
   'COMPONENT_NAME_EXPLANATION',

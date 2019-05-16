@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
+require('pages/exploration_editor/history_tab/HistoryTab.ts');
+
 describe('HistoryTab controller', function() {
   beforeEach(angular.mock.module('oppia'));
 

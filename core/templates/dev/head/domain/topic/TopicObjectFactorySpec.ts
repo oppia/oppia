@@ -16,6 +16,8 @@
  * @fileoverview Tests for TopicObjectFactory.
  */
 
+require('domain/topic/TopicObjectFactory.ts');
+
 describe('Topic object factory', function() {
   var TopicObjectFactory = null;
   var _sampleTopic = null;

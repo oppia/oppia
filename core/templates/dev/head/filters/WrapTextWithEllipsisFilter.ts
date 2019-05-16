@@ -16,6 +16,9 @@
  * @fileoverview WrapTextWithEllipsis filter for Oppia.
  */
 
+require('filters/NormalizeWhitespaceFilter.ts');
+require('services/UtilsService.ts');
+
 oppia.filter('wrapTextWithEllipsis', [
   '$filter', 'UtilsService', function($filter, UtilsService) {
     return function(input, characterCount) {

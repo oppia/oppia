@@ -16,6 +16,8 @@
  * @fileoverview Controller for oppia email dashboard page.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.controller('EmailDashboardResult', [
   '$http', '$scope', '$timeout', '$window', 'UrlInterpolationService',
   function($http, $scope, $timeout, $window, UrlInterpolationService) {

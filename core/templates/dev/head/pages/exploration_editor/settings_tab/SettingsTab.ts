@@ -16,6 +16,28 @@
  * @fileoverview Controllers for the exploration settings tab.
  */
 
+require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationAutomaticTextToSpeechService.ts');
+require('pages/exploration_editor/ExplorationCategoryService.ts');
+require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationEditor.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationLanguageCodeService.ts');
+require('pages/exploration_editor/ExplorationObjectiveService.ts');
+require('pages/exploration_editor/ExplorationParamChangesService.ts');
+require('pages/exploration_editor/ExplorationParamSpecsService.ts');
+require('pages/exploration_editor/ExplorationRightsService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/ExplorationTagsService.ts');
+require('pages/exploration_editor/ExplorationTitleService.ts');
+require('pages/exploration_editor/ExplorationWarningsService.ts');
+require('pages/exploration_editor/UserEmailPreferencesService.ts');
+require('services/AlertsService.ts');
+require('services/ExplorationFeaturesService.ts');
+
 oppia.controller('SettingsTab', [
   '$http', '$rootScope', '$scope', '$uibModal', '$window', 'AlertsService',
   'ChangeListService', 'EditableExplorationBackendApiService',

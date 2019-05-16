@@ -16,6 +16,12 @@
  * @fileoverview Service for interpolating expressions.
  */
 
+require('components/forms/ConvertHtmlToUnicodeFilter.ts');
+require('expressions/ExpressionEvaluatorService.ts');
+require('expressions/ExpressionParserService.js');
+require('expressions/ExpressionSyntaxTreeService.ts');
+require('services/HtmlEscaperService.ts');
+
 // Interpolates an HTML or a unicode string containing expressions.
 // The input value is evaluated against the supplied environments.
 //

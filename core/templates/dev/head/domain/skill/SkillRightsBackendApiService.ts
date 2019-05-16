@@ -16,6 +16,8 @@
  * @fileoverview Service to change the rights of skills in the backend.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.factory('SkillRightsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'SKILL_PUBLISH_URL_TEMPLATE', 'SKILL_RIGHTS_URL_TEMPLATE',

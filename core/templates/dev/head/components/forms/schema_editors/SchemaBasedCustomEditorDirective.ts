@@ -16,6 +16,9 @@
  * @fileoverview Directive for a schema-based editor for custom values.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
+
 oppia.directive('schemaBasedCustomEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',

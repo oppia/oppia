@@ -387,7 +387,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.render_template(
                     'pages/error/error_iframed.html', iframe_restriction=None)
             else:
-                self.render_template('pages/error/error.html')
+                self.render_template('dist/error.html')
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):

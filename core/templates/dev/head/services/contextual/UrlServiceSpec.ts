@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the BackgroundMaskService.
  */
 
+require('services/contextual/UrlService.ts');
+
 describe('Url Service', function() {
   var UrlService = null;
   var sampleHash = 'sampleHash';

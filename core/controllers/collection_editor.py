@@ -21,6 +21,7 @@ import base64
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_services
+from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import summary_services
@@ -67,9 +68,10 @@ class CollectionEditorPage(CollectionEditorHandler):
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
             'TAG_REGEX': feconf.TAG_REGEX,
             'title': collection.title,
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         })
 
-        self.render_template('pages/collection_editor/collection_editor.html')
+        self.render_template('dist/collection_editor.html')
 
 
 class EditableCollectionDataHandler(CollectionEditorHandler):

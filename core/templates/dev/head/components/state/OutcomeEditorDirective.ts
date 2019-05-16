@@ -16,6 +16,10 @@
  * @fileoverview Directives for the outcome editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+
 oppia.directive('outcomeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

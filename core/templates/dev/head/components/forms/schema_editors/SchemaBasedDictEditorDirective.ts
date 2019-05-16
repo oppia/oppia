@@ -16,6 +16,12 @@
  * @fileoverview Directive for a schema-based editor for dicts.
  */
 
+require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/IdGenerationService.ts');
+require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
+
 oppia.directive('schemaBasedDictEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',

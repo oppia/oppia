@@ -16,6 +16,8 @@
  * @fileoverview Service to extract image filenames in a State.
  */
 
+require('services/HtmlEscaperService.ts');
+
 oppia.factory('ExtractImageFilenamesFromStateService', [
   'HtmlEscaperService', function(HtmlEscaperService) {
     var INTERACTION_TYPE_MULTIPLE_CHOICE = 'MultipleChoiceInput';

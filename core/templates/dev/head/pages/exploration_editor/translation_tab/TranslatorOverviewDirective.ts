@@ -17,6 +17,12 @@
  * translation language.
  */
 
+require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
+require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
+
 oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
 
 oppia.directive('translatorOverview', [

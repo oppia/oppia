@@ -16,6 +16,10 @@
  * @fileoverview Tests for CollectionLinearizerService.
  */
 
+require('domain/collection/CollectionNodeObjectFactory.ts');
+require('domain/collection/CollectionObjectFactory.ts');
+require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
+
 describe('Collection linearizer service', function() {
   var CollectionObjectFactory = null;
   var CollectionNodeObjectFactory = null;

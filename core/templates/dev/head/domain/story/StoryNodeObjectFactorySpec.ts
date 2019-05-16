@@ -16,6 +16,8 @@
  * @fileoverview Tests for StoryContentsObjectFactory.
  */
 
+require('domain/story/StoryNodeObjectFactory.ts');
+
 describe('Story node object factory', function() {
   var StoryNodeObjectFactory = null;
   var _sampleSubtopic = null;

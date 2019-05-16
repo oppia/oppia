@@ -15,6 +15,29 @@
 /**
  * @fileoverview Directive containing the exploration material to be translated.
  */
+require('components/state/ResponseHeaderDirective.ts');
+require(
+  'pages/exploration_editor/translation_tab/AudioTranslationBarDirective.ts');
+require(
+  'pages/exploration_editor/translation_tab/' +
+  'StateTranslationEditorDirective.ts'
+);
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/ConvertToPlainTextFilter.ts');
+require('filters/ParameterizeRuleDescriptionFilter.ts');
+require('filters/TruncateFilter.ts');
+require('filters/WrapTextWithEllipsisFilter.ts');
+require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
+require(
+  'pages/exploration_editor/translation_tab/' +
+  'TranslationTabActiveContentIdService.ts'
+);
+require('pages/state_editor/state_properties/StateEditorService.ts');
 
 oppia.directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {

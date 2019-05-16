@@ -16,6 +16,12 @@
  * @fileoverview Directive for showing search results.
  */
 
+require('pages/library/ActivityTilesInfinityGridDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/UserService.ts');
+
 oppia.directive('searchResults', [
   '$q', 'UrlInterpolationService', function($q, UrlInterpolationService) {
     return {

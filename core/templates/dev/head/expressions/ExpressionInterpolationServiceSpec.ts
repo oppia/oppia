@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for ExpressionInterpolationService.
  */
 
+require('App.ts');
+require('expressions/ExpressionInterpolationService.ts');
+
 describe('Expression interpolation service', function() {
   beforeEach(angular.mock.module('oppia'));
 

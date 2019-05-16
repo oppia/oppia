@@ -16,6 +16,11 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
+require('components/SkillCreationService.ts');
+require('components/TopicCreationService.ts');
+require('domain/topic/EditableTopicBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('topicsAndSkillsDashboardNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -16,6 +16,16 @@
  * @fileoverview Unit tests for the state content editor directive.
  */
 
+require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/state_editor/state_properties/StateContentService.ts');
+require(
+  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
+require('services/EditabilityService.ts');
+
 describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, rvo, srvos;
   var mockExplorationData;

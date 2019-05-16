@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for the Hints/Solution Manager service.
  */
 
+require('domain/exploration/HintObjectFactory.ts');
+require('domain/exploration/SolutionObjectFactory.ts');
+require('pages/exploration_player/HintsAndSolutionManagerService.ts');
+
 describe('HintsAndSolutionManager service', function() {
   var $timeout;
   var $rootScope;

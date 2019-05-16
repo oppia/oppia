@@ -16,6 +16,8 @@
  * @fileoverview unit tests for outcome object factory.
  */
 
+require('domain/exploration/OutcomeObjectFactory.ts');
+
 describe('Outcome object factory', function() {
   var oof;
   beforeEach(angular.mock.module('oppia'));

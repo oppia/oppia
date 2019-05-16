@@ -16,6 +16,8 @@
  * @fileoverview Converts unicode to HTML.
  */
 
+require('services/HtmlEscaperService.ts');
+
 oppia.filter('convertUnicodeToHtml', [
   '$sanitize', 'HtmlEscaperService',
   function($sanitize, HtmlEscaperService) {

@@ -16,6 +16,14 @@
  * @fileoverview Directive for the state content editor.
  */
 
+require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require('directives/AngularHtmlBindDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/EditabilityService.ts');
+
 oppia.directive('stateContentEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

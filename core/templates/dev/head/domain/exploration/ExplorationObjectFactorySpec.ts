@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for the Exploration object factory.
  */
 
+require('domain/exploration/AudioTranslationObjectFactory.ts');
+require('domain/exploration/ExplorationObjectFactory.ts');
+require('domain/exploration/VoiceoverObjectFactory.ts');
+require('domain/state/StateObjectFactory.ts');
+
 describe('Exploration object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 

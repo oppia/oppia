@@ -16,6 +16,15 @@
  * @fileoverview Utility service for the pretests for an exploration.
  */
 
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/state_card/StateCardObjectFactory.ts');
+require('expressions/ExpressionInterpolationService.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 oppia.factory('PretestEngineService', [

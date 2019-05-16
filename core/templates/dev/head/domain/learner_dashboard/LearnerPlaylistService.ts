@@ -16,6 +16,9 @@
  * @fileoverview Service related to the learner playlist.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+
 oppia.factory('LearnerPlaylistService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($http, $uibModal, AlertsService, UrlInterpolationService) {

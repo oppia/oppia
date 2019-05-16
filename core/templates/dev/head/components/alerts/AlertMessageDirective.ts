@@ -16,6 +16,8 @@
  * @fileoverview Directive for Alert Messages
  */
 
+require('services/AlertsService.ts');
+
 oppia.directive('alertMessage', [function() {
   return {
     restrict: 'E',

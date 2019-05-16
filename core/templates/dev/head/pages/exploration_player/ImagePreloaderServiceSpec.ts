@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for the image preloader service.
  */
 
+require('domain/exploration/ExplorationObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/ImagePreloaderService.ts');
+require('services/AssetsBackendApiService.ts');
+require('services/ContextService.ts');
+
 describe('Image preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');

@@ -16,6 +16,9 @@
  * @fileoverview Service to send changes to a collection to the backend.
  */
 
+require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 // TODO(bhenning): I think that this might be better merged with the
 // CollectionBackendApiService. However, that violates the principle of a
 // backend API service being available for exactly one URL. To fix this, the
