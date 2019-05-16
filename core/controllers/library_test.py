@@ -193,8 +193,8 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'objective': 'Objective B',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
-        
- 
+
+
 class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -480,3 +480,16 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(summaries[0]['id'], self.PUBLIC_EXP_ID_EDITOR)
         self.assertEqual(summaries[0]['status'], 'public')
+
+
+class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
+
+    def test_access_empty_collection(self):
+        response_dict = self.get_json(
+            feconf.COLLECTION_SUMMARIES_DATA_URL,
+            params={'stringified_collection_ids': json.dumps('0')})
+        self.assertDictContainsSubset({
+            'summaries' : [],
+        }, response_dict)
+
+        # collection_services.load_demo('0');
