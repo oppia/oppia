@@ -277,7 +277,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     5, [self.skill_id], ''))
             self.assertEqual(len(question_summaries), 1)
             self.assertEqual(question_summaries[0].id, self.question_id)
-            self.assertEqual(grouped_skill_descriptions[0], ['Skill Description'])
+            self.assertEqual(
+                grouped_skill_descriptions[0], ['Skill Description'])
             self.logout()
 
     def test_delete_with_new_structures_disabled_returns_404_status(self):

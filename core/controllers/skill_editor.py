@@ -188,7 +188,7 @@ class EditableSkillDataHandler(base.BaseHandler):
         """Populates the data on the individual skill page."""
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
-        
+
         try:
             skill_ids = json.loads(skill_ids)
         except Exception:

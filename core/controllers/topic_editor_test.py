@@ -182,8 +182,8 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
                         question_summary_dicts[i]['skill_descriptions'],
                         ['Skill Description 2', 'Skill Description'])
                 self.assertEqual(
-                        question_summary_dicts_2[0]['skill_descriptions'],
-                        ['Skill Description 2', 'Skill Description'])
+                    question_summary_dicts_2[0]['skill_descriptions'],
+                    ['Skill Description 2', 'Skill Description'])
                 self.assertNotEqual(
                     question_summary_dicts[0]['summary']['id'],
                     question_summary_dicts_2[0]['summary']['id'])

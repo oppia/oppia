@@ -1792,6 +1792,7 @@ def can_edit_story(handler):
 
     return test_can_edit_story
 
+
 def can_edit_skill(handler):
     """Decorator to check whether the user can edit a skill, which can be
     independent or belong to a topic.
@@ -1860,6 +1861,7 @@ def can_edit_skill(handler):
 
     test_can_edit_skill.__wrapped__ = True
     return test_can_edit_skill
+
 
 def can_edit_skills(handler):
     """Decorator to check whether the user can edit multiple skills, which can
