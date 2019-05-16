@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the WrittenTranslation object factory.
  */
 
+require('domain/exploration/WrittenTranslationObjectFactory.ts');
+
 describe('WrittenTranslation object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 

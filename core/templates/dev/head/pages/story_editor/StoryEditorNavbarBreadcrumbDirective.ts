@@ -15,6 +15,13 @@
 /**
  * @fileoverview Controller for the navbar breadcrumb of the story editor.
  */
+
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/story_editor/StoryEditorStateService.ts');
+require('pages/story_editor/main_editor/StoryEditorDirective.ts');
+require('services/contextual/UrlService.ts');
+
 oppia.directive('storyEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

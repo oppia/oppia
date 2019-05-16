@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   {% if title %}
@@ -139,62 +139,6 @@
     {{ value_generators_js }}
   </script>
 
-  <script src="/templates/dev/head/directives/AngularHtmlBindDirective.js"></script>
-  <script src="/templates/dev/head/directives/MathjaxBindDirective.js"></script>
-
-  <script src="/templates/dev/head/filters/CamelCaseToHyphensFilter.js"></script>
-  <script src="/templates/dev/head/filters/CapitalizeFilter.js"></script>
-  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
-  <script src="/templates/dev/head/filters/FormatRtePreviewFilter.js"></script>
-  <script src="/templates/dev/head/filters/FormatTimerFilter.js"></script>
-  <script src="/templates/dev/head/filters/NormalizeWhitespaceFilter.js"></script>
-  <script src="/templates/dev/head/filters/NormalizeWhitespacePunctuationAndCaseFilter.js"></script>
-  <script src="/templates/dev/head/filters/ParameterizeRuleDescriptionFilter.js"></script>
-  <script src="/templates/dev/head/filters/RemoveDuplicatesInArrayFilter.js"></script>
-  <script src="/templates/dev/head/filters/ReplaceInputsWithEllipsesFilter.js"></script>
-  <script src="/templates/dev/head/filters/SummarizeNonnegativeNumberFilter.js"></script>
-  <script src="/templates/dev/head/filters/TruncateFilter.js"></script>
-  <script src="/templates/dev/head/filters/TruncateAndCapitalizeFilter.js"></script>
-  <script src="/templates/dev/head/filters/TruncateAtFirstEllipsisFilter.js"></script>
-  <script src="/templates/dev/head/filters/TruncateAtFirstLineFilter.js"></script>
-  <script src="/templates/dev/head/filters/TruncateInputBasedOnInteractionAnswerTypeFilter.js"></script>
-  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
-  <script src="/templates/dev/head/filters/WrapTextWithEllipsisFilter.js"></script>
-
-  <script src="/templates/dev/head/components/forms/ConvertUnicodeWithParamsToHtmlFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/ConvertHtmlToUnicodeFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/ConvertUnicodeToHtmlFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsAtLeastFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsAtMostFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsFloatFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsIntegerFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/validators/IsNonemptyFilter.js"></script>
-  <script src="/templates/dev/head/components/forms/ApplyValidationDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/RequireIsFloatDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedDictViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedListViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/Select2DropdownDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/ImageUploaderDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/AudioFileUploaderDirective.js"></script>
-
-  <script src="/templates/dev/head/components/loading/LoadingDotsDirective.js"></script>
-
   <script src="/extensions/objects/templates/BooleanEditorDirective.js"></script>
   <script src="/extensions/objects/templates/CodeStringEditorDirective.js"></script>
   <script src="/extensions/objects/templates/CoordTwoDimEditorDirective.js"></script>
@@ -224,6 +168,7 @@
   <script src="/extensions/objects/templates/SetOfUnicodeStringEditorDirective.js"></script>
   <script src="/extensions/objects/templates/UnicodeStringEditorDirective.js"></script>
 
+<<<<<<< HEAD
   <script src="/templates/dev/head/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="/templates/dev/head/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="/templates/dev/head/components/forms/HtmlSelectDirective.js"></script>
@@ -488,12 +433,17 @@
   <script src="/templates/dev/head/expressions/ExpressionEvaluatorService.js"></script>
   <script src="/templates/dev/head/expressions/ExpressionParserService.js"></script>
   <script src="/templates/dev/head/expressions/ExpressionInterpolationService.js"></script>
-
   <script src="/extensions/interactions/baseInteractionValidationService.js"></script>
-  <script src="/templates/dev/head/pages/suggestion_editor/ShowSuggestionModalForEditorViewService.js"></script>
-  <script src="/templates/dev/head/pages/suggestion_editor/SuggestionModalService.js"></script>
-  <script src="/templates/dev/head/pages/suggestion_editor/ShowSuggestionModalForEditorView.js"></script>
 
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
   {% include 'components/rich_text_components.html' %}
   {{ interaction_templates }}
   {{ visualizations_html }}

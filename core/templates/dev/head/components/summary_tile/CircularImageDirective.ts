@@ -16,19 +16,24 @@
  * @fileoverview Displays circled images with linking (when available).
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('circularImage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         src: '&',
         link: '&?'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/circular_image_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.isLinkAvailable = function() {
-          return $scope.link() ? true : false;
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.isLinkAvailable = function() {
+          return ctrl.link() ? true : false;
         };
       }]
     };
