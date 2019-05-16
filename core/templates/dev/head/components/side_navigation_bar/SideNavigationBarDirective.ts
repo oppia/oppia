@@ -21,13 +21,15 @@ oppia.directive('sideNavigationBar', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/side_navigation_bar/' +
         'side_navigation_bar_directive.html'),
-      controller: ['$scope', '$timeout', function(
-          $scope, $timeout) {
-        $scope.currentUrl = window.location.pathname;
-        $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+      controllerAs: '$ctrl',
+      controller: ['$timeout', function($timeout) {
+        var ctrl = this;
+        ctrl.currentUrl = window.location.pathname;
+        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
       }]
     };
   }]);

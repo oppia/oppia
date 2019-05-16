@@ -20,7 +20,11 @@ oppia.directive('loadingDots', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/loading/loading_dots_directive.html')
+        '/components/loading/loading_dots_directive.html'),
+      controllerAs: '$ctrl',
+      controller: [function() {}]
     };
   }]);

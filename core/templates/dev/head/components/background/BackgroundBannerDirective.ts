@@ -21,16 +21,18 @@ oppia.directive('backgroundBanner', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/background/background_banner_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope',
-        function($scope) {
+        function() {
+          var ctrl = this;
           var possibleBannerFilenames = [
             'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
           var bannerImageFilename = possibleBannerFilenames[
             Math.floor(Math.random() * possibleBannerFilenames.length)];
-          $scope.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+          ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
             '/background/' + bannerImageFilename);
         }
       ]

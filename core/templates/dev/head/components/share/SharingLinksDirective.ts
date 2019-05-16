@@ -20,7 +20,8 @@ oppia.directive('sharingLinks', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         layoutType: '@',
         layoutAlignType: '@',
         shareType: '@',
@@ -31,32 +32,34 @@ oppia.directive('sharingLinks', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/share/' +
         'sharing_links_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$window', 'HtmlEscaperService',
+        '$window', 'HtmlEscaperService',
         'ExplorationEmbedButtonService', 'SiteAnalyticsService',
         function(
-            $scope, $window, HtmlEscaperService,
+            $window, HtmlEscaperService,
             ExplorationEmbedButtonService, SiteAnalyticsService) {
-          $scope.registerShareEvent = null;
+          var ctrl = this;
+          ctrl.registerShareEvent = null;
 
-          if ($scope.shareType === 'exploration') {
-            $scope.explorationId = $scope.getExplorationId();
+          if (ctrl.shareType === 'exploration') {
+            ctrl.explorationId = ctrl.getExplorationId();
 
-            $scope.activityType = 'explore';
-            $scope.activityId = $scope.explorationId;
+            ctrl.activityType = 'explore';
+            ctrl.activityId = ctrl.explorationId;
 
-            $scope.registerShareEvent = (
+            ctrl.registerShareEvent = (
               SiteAnalyticsService.registerShareExplorationEvent);
 
-            $scope.showEmbedExplorationModal = (
+            ctrl.showEmbedExplorationModal = (
               ExplorationEmbedButtonService.showModal);
-          } else if ($scope.shareType === 'collection') {
-            $scope.collectionId = $scope.getCollectionId();
+          } else if (ctrl.shareType === 'collection') {
+            ctrl.collectionId = ctrl.getCollectionId();
 
-            $scope.activityType = 'collection';
-            $scope.activityId = $scope.collectionId;
+            ctrl.activityType = 'collection';
+            ctrl.activityId = ctrl.collectionId;
 
-            $scope.registerShareEvent = (
+            ctrl.registerShareEvent = (
               SiteAnalyticsService.registerShareCollectionEvent);
           } else {
             throw Error(
@@ -64,14 +67,14 @@ oppia.directive('sharingLinks', [
               'collection player or the exploration player');
           }
 
-          $scope.serverName = (
+          ctrl.serverName = (
             $window.location.protocol + '//' + $window.location.host);
 
-          $scope.escapedTwitterText = (
+          ctrl.escapedTwitterText = (
             HtmlEscaperService.unescapedStrToEscapedStr(
-              $scope.getTwitterText()));
+              ctrl.getTwitterText()));
 
-          $scope.classroomUrl = UrlInterpolationService.getStaticImageUrl(
+          ctrl.classroomUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/classroom.png');
         }
       ]

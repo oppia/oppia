@@ -19,17 +19,20 @@
 oppia.directive('ruleTypeSelector', [function() {
   return {
     restrict: 'E',
-    scope: {
+    scope: {},
+    bindToController: {
       localValue: '@',
       onSelectionChange: '&'
     },
     template: '<select></select>',
+    controllerAs: '$ctrl',
     controller: [
       '$scope', '$element', '$rootScope', '$filter',
       'StateInteractionIdService', 'INTERACTION_SPECS',
       function(
           $scope, $element, $rootScope, $filter,
           StateInteractionIdService, INTERACTION_SPECS) {
+        var ctrl = this;
         var choices = [];
         var numberOfRuleTypes = 0;
 
@@ -70,16 +73,16 @@ oppia.directive('ruleTypeSelector', [function() {
         });
 
         // Select the first choice by default.
-        if (!$scope.localValue) {
-          $scope.localValue = choices[0].id;
-          $scope.onSelectionChange()($scope.localValue);
+        if (!ctrl.localValue) {
+          ctrl.localValue = choices[0].id;
+          ctrl.onSelectionChange()(ctrl.localValue);
         }
 
         // Initialize the dropdown.
-        $(select2Node).val($scope.localValue).trigger('change');
+        $(select2Node).val(ctrl.localValue).trigger('change');
 
         $(select2Node).on('change', function(e) {
-          $scope.onSelectionChange()($(select2Node).val());
+          ctrl.onSelectionChange()($(select2Node).val());
           // This is needed to propagate the change and display input fields
           // for parameterizing the rule. Otherwise, the input fields do not
           // get updated when the rule type is changed.
