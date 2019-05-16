@@ -16,6 +16,14 @@
  * @fileoverview Directive for the rule editor.
  */
 
+require('filters/TruncateFilter.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/ValidatorsService.ts');
+
 // This directive controls an editor for selecting the type and input parameters
 // to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call
 // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These

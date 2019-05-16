@@ -84,7 +84,7 @@ class LibraryPage(base.BaseHandler):
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
         })
-        self.render_template('pages/library/library.html')
+        self.render_template('dist/library.html')
 
 
 class LibraryIndexHandler(base.BaseHandler):
@@ -157,7 +157,7 @@ class LibraryGroupPage(base.BaseHandler):
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
         })
-        self.render_template('pages/library/library.html')
+        self.render_template('dist/library.html')
 
 
 class LibraryGroupIndexHandler(base.BaseHandler):

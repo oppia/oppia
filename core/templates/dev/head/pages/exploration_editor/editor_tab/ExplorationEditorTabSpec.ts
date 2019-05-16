@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+require('App.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/editor_tab/ExplorationEditorTab.ts');
+require('pages/state_editor/state_properties/StateContentService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+
 describe('Exploration editor tab controller', function() {
   describe('ExplorationEditorTab', function() {
     var scope, ecs, ess, scs, rootScope;

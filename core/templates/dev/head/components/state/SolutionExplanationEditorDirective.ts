@@ -16,6 +16,10 @@
  * @fileoverview Directive for the solution explanation editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/EditabilityService.ts');
+
 oppia.directive('solutionExplanationEditor', [
   'StateSolutionService', 'UrlInterpolationService',
   function(StateSolutionService, UrlInterpolationService) {

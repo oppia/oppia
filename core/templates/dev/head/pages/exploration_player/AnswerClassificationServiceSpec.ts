@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
+require('domain/classifier/AnswerClassificationResultObjectFactory.ts');
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('domain/exploration/StatesObjectFactory.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+
 describe('Answer classification service with string classifier disabled',
   function() {
     beforeEach(angular.mock.module('oppia'));

@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/PlaythroughIssuesService.ts');
+
 oppia.directive('playthroughImprovementCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
