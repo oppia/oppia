@@ -422,7 +422,7 @@ oppia.factory('TopicEditorStateService', [
        */
       isSavingTopic: function() {
         return _topicIsBeingSaved;
-      },
+      }
     };
   }
 ]);

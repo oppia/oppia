@@ -162,7 +162,7 @@ oppia.factory('StoryEditorStateService', [
        */
       isSavingStory: function() {
         return _storyIsBeingSaved;
-      },
+      }
     };
   }
 ]);
