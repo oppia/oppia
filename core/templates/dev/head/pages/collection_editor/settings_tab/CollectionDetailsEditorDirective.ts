@@ -27,7 +27,7 @@ oppia.directive('collectionDetailsEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/settings_tab/' +
         'collection_details_editor_directive.html'),
-      controllerAs: 'collectionDetailsEditorCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
         'CollectionValidationService', 'AlertsService', 'ALL_CATEGORIES',

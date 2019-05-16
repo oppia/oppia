@@ -1,7 +1,7 @@
 <div class="oppia-activities-infinity-grid-container" infinite-scroll="
-     activityTilesInfinityGridCtrl.showMoreActivities()" infinite-scroll-distance="1"
-     infinite-scroll-disabled="activityTilesInfinityGridCtrl.endOfPageIsReached || activityTilesInfinityGridCtrl.searchResultsAreLoading">
-  <div ng-repeat="activity in activityTilesInfinityGridCtrl.allActivitiesInOrder track by $index" style="display: inline-block;">
+     $ctrl.showMoreActivities()" infinite-scroll-distance="1"
+     infinite-scroll-disabled="$ctrl.endOfPageIsReached || $ctrl.searchResultsAreLoading">
+  <div ng-repeat="activity in $ctrl.allActivitiesInOrder track by $index" style="display: inline-block;">
     <collection-summary-tile ng-if="activity.activity_type === 'collection'"
                              collection-id="activity.id"
                              collection-title="activity.title"
@@ -11,7 +11,7 @@
                              thumbnail-icon-url="activity.thumbnail_icon_url"
                              thumbnail-bg-color="activity.thumbnail_bg_color"
                              show-learner-dashboard-icons-if-possible="true"
-                             container-is-narrow="activityTilesInfinityGridCtrl.libraryWindowIsNarrow"
+                             container-is-narrow="$ctrl.libraryWindowIsNarrow"
                              class="protractor-test-collection-summary-tile">
     </collection-summary-tile>
     <exploration-summary-tile ng-if="activity.activity_type === 'exploration'"
@@ -28,13 +28,13 @@
                               is-community-owned="activity.community_owned"
                               is-community-editable="activity.community_editable"
                               show-learner-dashboard-icons-if-possible="true"
-                              container-is-narrow="activityTilesInfinityGridCtrl.libraryWindowIsNarrow"
+                              container-is-narrow="$ctrl.libraryWindowIsNarrow"
                               class="protractor-test-exp-summary-tile">
     </exploration-summary-tile>
   </div>
 </div>
 <div class="oppia-search-results-loading-message"
-     ng-if="activityTilesInfinityGridCtrl.searchResultsAreLoading">
+     ng-if="$ctrl.searchResultsAreLoading">
   Loading more results
   <loading-dots></loading-dots>
 </div>

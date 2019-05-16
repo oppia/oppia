@@ -33,7 +33,7 @@ oppia.directive('questionsList', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/questions_list/questions_list_directive.html'),
-      controllerAs: 'questionsListCtrl',
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$uibModal', '$window',
         'AlertsService', 'QuestionCreationService', 'UrlService',

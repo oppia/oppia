@@ -26,7 +26,7 @@ oppia.directive('adminProdModeActivitiesTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/activities_tab/' +
         'admin_prod_mode_activities_tab_directive.html'),
-      controllerAs: 'adminProdModeActivitiesTabCtrl',
+      controllerAs: '$ctrl',
       controller: [function() {}]
     };
   }

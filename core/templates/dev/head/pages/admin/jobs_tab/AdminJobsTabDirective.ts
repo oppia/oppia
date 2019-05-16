@@ -31,7 +31,7 @@ oppia.directive('adminJobsTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/jobs_tab/' +
         'admin_jobs_tab_directive.html'),
-      controllerAs: 'adminJobsTabCtrl',
+      controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
         ctrl.HUMAN_READABLE_CURRENT_TIME = (

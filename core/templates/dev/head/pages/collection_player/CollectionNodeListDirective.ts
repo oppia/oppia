@@ -29,7 +29,7 @@ oppia.directive('collectionNodeList', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_player/' +
         'collection_node_list_directive.html'),
-      controllerAs: 'collectionNodeListCtrl',
+      controllerAs: '$ctrl',
       controller: [function() {}]
     };
   }]);

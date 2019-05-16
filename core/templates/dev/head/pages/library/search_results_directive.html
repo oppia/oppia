@@ -20,15 +20,15 @@
   <div class="visible-xs" style="margin: 0 auto; width: fit-content;">
     <search-bar></search-bar>
   </div>
-  <div ng-if="!searchResultsCtrl.someResultsExist" class="oppia-search-results-intro" ng-cloak>
+  <div ng-if="!$ctrl.someResultsExist" class="oppia-search-results-intro" ng-cloak>
     <div class="oppia-search-results-no-match">
-      <img ng-src="<[searchResultsCtrl.noExplorationsImgUrl]>" alt="No explorations found">
+      <img ng-src="<[$ctrl.noExplorationsImgUrl]>" alt="No explorations found">
       <p style="text-align: center;">
         <span translate="I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY"></span><br><br>
-        <a ng-if="!searchResultsCtrl.userIsLoggedIn" href="" ng-click="searchResultsCtrl.onRedirectToLogin('/creator_dashboard?mode=create')"
+        <a ng-if="!$ctrl.userIsLoggedIn" href="" ng-click="$ctrl.onRedirectToLogin('/creator_dashboard?mode=create')"
            translate="I18N_LIBRARY_CREATE_EXPLORATION_QUESTION">
         </a>
-        <a ng-if="searchResultsCtrl.userIsLoggedIn" href="/creator_dashboard?mode=create"
+        <a ng-if="$ctrl.userIsLoggedIn" href="/creator_dashboard?mode=create"
            translate="I18N_LIBRARY_CREATE_EXPLORATION_QUESTION">
         </a>
       </p>

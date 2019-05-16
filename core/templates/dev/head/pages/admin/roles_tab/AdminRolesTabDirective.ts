@@ -30,7 +30,7 @@ oppia.directive('adminRolesTab', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/roles_tab/roles_tab_directive.html'),
-      controllerAs: 'adminRolesTabCtrl',
+      controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
         ctrl.UPDATABLE_ROLES = GLOBALS.UPDATABLE_ROLES;

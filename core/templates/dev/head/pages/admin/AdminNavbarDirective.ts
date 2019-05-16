@@ -31,7 +31,7 @@ oppia.directive('adminNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/' +
         'admin_navbar_directive.html'),
-      controllerAs: 'adminNavbarCtrl',
+      controllerAs: '$ctrl',
       controller: ['UserService', function(UserService) {
         var ctrl = this;
         ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;

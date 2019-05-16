@@ -31,7 +31,7 @@ oppia.directive('adminDevModeActivitiesTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/activities_tab/' +
         'admin_dev_mode_activities_tab_directive.html'),
-      controllerAs: 'adminDevModeActivitiesTabCtrl',
+      controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
         ctrl.reloadExploration = function(explorationId) {

@@ -25,7 +25,7 @@ oppia.directive('collectionHistoryTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/history_tab/' +
         'collection_history_tab_directive.html'),
-      controllerAs: 'collectionHistoryTabCtrl',
+      controllerAs: '$ctrl',
       controller: [function() {}]
     };
   }]);
