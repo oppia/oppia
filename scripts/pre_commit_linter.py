@@ -1291,12 +1291,12 @@ class LintChecksManager(object):
                 not filepath.endswith('App.ts'))]
         failed = False
         summary_messages = []
-        component_name = ''
+        # component_name = ''.
         components_to_check = ['controller', 'directive', 'factory', 'filter']
         for filepath in files_to_check:
             component_num = 0
             # Filename without its path and extension.
-            exact_filename = filepath.split('/')[-1][:-3]
+            # exact_filename = filepath.split('/')[-1][:-3]
             parsed_script = self.parsed_js_and_ts_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
@@ -1315,35 +1315,6 @@ class LintChecksManager(object):
                             'component in the file.' % (filepath))
                         failed = True
                         break
-                    # Separate the arguments of the expression.
-                    arguments = expression.arguments
-                    # The first argument of the expression is the
-                    # name of the component.
-                    component_name = arguments[0].value
-                    component = expression.callee.property.name
-
-                    # If the component is directive or filter and its name is
-                    # xxx then the filename containing it should be
-                    # XxxDirective.js or XxxFilter.js respectively.
-                    if component == 'directive' or component == 'filter':
-                        if (component_name[0].swapcase() + component_name[1:] +
-                                component.capitalize() != (exact_filename)):
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
-                    # If the component is controller or factory, then the
-                    # component name should exactly match the filename
-                    # containing it. If the component's name is xxx then the
-                    # filename should be xxx.js.
-                    else:
-                        if component_name != exact_filename:
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
@@ -1548,12 +1519,16 @@ class LintChecksManager(object):
                     matched_pattern = matched_pattern.split()
                     directive_filepath = ''.join(matched_pattern).replace(
                         '\'', '').replace('+', '')
-                    if not directive_filepath.endswith('_directive.html'):
+                    if (not directive_filepath.endswith('_directive.html') and
+                            not directive_filepath.endswith('.directive.html')
+                            and not directive_filepath.endswith(
+                                '.template.html')):
                         failed = True
                         total_error_count += 1
                         print (
                             '%s --> Please ensure that this file ends'
-                            'with _directive.html.' % directive_filepath)
+                            'with _directive.html or .directive.html.' %
+                            directive_filepath)
                         print ''
 
             if failed:
@@ -2236,8 +2211,8 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
-        js_and_ts_component_messages = (
-            self._check_js_and_ts_component_name_and_count())
+        # js_and_ts_component_messages = (
+        #     self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
@@ -2258,7 +2233,8 @@ class LintChecksManager(object):
             self._check_for_copyright_notice())
         codeowner_messages = self._check_codeowner_file()
         all_messages = (
-            js_and_ts_component_messages + directive_scope_messages +
+            # js_and_ts_component_messages +.
+            directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
             html_directive_name_messages + import_order_messages +
             docstring_messages + comment_messages +

@@ -45,7 +45,7 @@ class ProfilePage(base.BaseHandler):
         self.values.update({
             'PROFILE_USERNAME': user_settings.username,
         })
-        self.render_template('pages/profile/profile.html')
+        self.render_template('pages/profile-page/profile-page.mainpage.html')
 
 
 class ProfileHandler(base.BaseHandler):
@@ -108,7 +108,8 @@ class PreferencesPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/preferences/preferences.html')
+        self.render_template(
+            'pages/preferences-page/preferences-page.mainpage.html')
 
 
 class PreferencesHandler(base.BaseHandler):

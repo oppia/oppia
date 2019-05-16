@@ -67,7 +67,8 @@ class NotificationsDashboardPage(base.BaseHandler):
             'meta_description': feconf.CREATOR_DASHBOARD_PAGE_DESCRIPTION,
         })
         self.render_template(
-            'pages/notifications_dashboard/notifications_dashboard.html')
+            'pages/notifications-dashboard-page/' +
+            'notifications-dashboard-page.mainpage.html')
 
 
 class NotificationsDashboardHandler(base.BaseHandler):
@@ -145,7 +146,8 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
-        self.render_template('pages/creator_dashboard/creator_dashboard.html')
+        self.render_template(
+            'pages/creator-dashboard-page/creator-dashboard-page.mainpage.html')
 
 
 class CreatorDashboardHandler(base.BaseHandler):

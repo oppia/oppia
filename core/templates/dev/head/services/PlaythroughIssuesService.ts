@@ -125,8 +125,8 @@ oppia.factory('PlaythroughIssuesService', [
         this.getPlaythrough(playthroughId).then(function(playthrough) {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/statistics_tab/' +
-              'playthrough_modal_directive.html'),
+              '/pages/exploration-editor-page/statistics-tab/' +
+              'statistics-tab-templates/state-stats-modal.template.html'),
             backdrop: true,
             resolve: {
               playthrough: function() {

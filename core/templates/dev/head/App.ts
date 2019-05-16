@@ -25,7 +25,26 @@ var oppia = angular.module(
     'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
     'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
     'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-    'adminPageModule'
+    'adminPageModule',
+    'learnerDashboardPageModule', 'maintenancePageModule',
+    'moderatorPageModule', 'notificationsDashboardPageModule',
+    'practiceSessionPageModule', 'preferencesPageModule', 'profilePageModule',
+    'questionEditorPageModule', 'questionsListPageModule',
+    'questionPlayerPageModule', 'topicLandingPageModule', 'aboutPageModule',
+    'creatorDashboardPageModule', 'donatePageModule', 'errorPageModule',
+    'explorationEditorPageModule',
+    'collectionPlayerPageModule', 'emailDashboardPageModule',
+    'answerGroupEditorModule', 'buttonsDirectivesModule',
+    'ckEditorHelpersModule', 'codemirrorMergeviewModule',
+    'commonLayoutDirectivesModule', 'entityCreationServicesModule',
+    'libraryPageModule', 'filtersModule', 'formsModule',
+    'profileLinkDirectivesModule', 'ratingsModule', 'suggestionModalModule',
+    'summaryListHeaderModule', 'skillEditorModule',
+    'splashPageModule', 'stateEditorModule', 'stateModule', 'storyEditorModule',
+    'summaryTileDirectivesModule', 'summaryListHeaderModule',
+    'teachPageModule', 'thanksPageModule', 'topicsAndSkillsDashboardModule',
+    'topicEditorPageModule', 'topicViewerPageModule',
+    'visualDiffVisualizationModule'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
