@@ -493,7 +493,7 @@ class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
         }, response_dict)
 
     def test_access_collection(self):
-        collection_services.load_demo('0');
+        collection_services.load_demo('0')
         response_dict = self.get_json(
             feconf.COLLECTION_SUMMARIES_DATA_URL,
             params={'stringified_collection_ids': json.dumps('0')})
@@ -507,5 +507,3 @@ class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
             'tags': [],
             'node_count': 4,
         }, response_dict['summaries'][0])
-
-
