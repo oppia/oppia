@@ -60,7 +60,6 @@
 
 {% block footer_js %}
   {{ super() }}
-<<<<<<< HEAD
   <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
@@ -252,7 +251,6 @@
   {% include 'components/rich_text_components.html' %}
   {{ interaction_templates }}
   {{ dependencies_html }}
-=======
   <!-- This code is used for inserting webpack bundles
      https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
   <% for (var chunk in htmlWebpackPlugin.files.js) { %>
@@ -262,5 +260,4 @@
       <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
     <% } %>
   <% } %>
->>>>>>> upstream/develop
 {% endblock footer_js %}

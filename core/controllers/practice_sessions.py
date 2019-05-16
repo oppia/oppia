@@ -41,7 +41,6 @@ class PracticeSessionsPage(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given name doesn\'t exist.'))
 
-<<<<<<< HEAD
         interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
 
         interaction_dependency_ids = (
@@ -63,11 +62,7 @@ class PracticeSessionsPage(base.BaseHandler):
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
-
-        self.render_template('/pages/practice_session/practice_session.html')
-=======
         self.render_template('dist/practice_session.html')
->>>>>>> upstream/develop
 
 
 class PracticeSessionsPageDataHandler(base.BaseHandler):
