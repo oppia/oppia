@@ -29,8 +29,8 @@ angular.module('adminDevModeActivitiesTabModule').directive(
           setStatusMessage: '='
         },
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/admin-page/activities-tab/' +
-          'admin_dev_mode_activities-tab_directive.html'),
+          '/pages/admin-page/activities-tab/admin-dev-mode-activities-tab/' +
+          'admin-dev-mode-activities-tab.directive.html'),
         controller: ['$scope', function($scope) {
           $scope.reloadExploration = function(explorationId) {
             if (AdminTaskManagerService.isTaskRunning()) {

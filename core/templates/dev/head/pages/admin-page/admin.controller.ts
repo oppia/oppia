@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the Oppia admin page.
  */
 
-angular.module('adminModule').controller('Admin', [
+angular.module('adminPageModule').controller('Admin', [
   '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',
   function($http, $location, $scope, AdminRouterService, DEV_MODE) {
     $scope.userEmail = GLOBALS.USER_EMAIL;

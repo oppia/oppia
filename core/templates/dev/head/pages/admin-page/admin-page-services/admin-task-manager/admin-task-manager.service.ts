@@ -17,7 +17,7 @@
  * page.
  */
 
-oppia.factory('AdminTaskManagerService', [
+angular.module('adminPageModule').factory('AdminTaskManagerService', [
   function() {
     var taskIsRunning = false;
 
