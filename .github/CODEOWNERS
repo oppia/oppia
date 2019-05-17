@@ -402,6 +402,12 @@
 /typings @ankita240796
 
 
+#Webpack
+/webpack.prod.config.ts @vojtechjelinek
+/webpack.config.ts @vojtechjelinek
+/webpack.dev.config.ts @vojtechjelinek
+
+
 # User’s profile page.
 /core/controllers/profile*.py @kevinlee12
 /core/templates/dev/head/domain/user/ @kevinlee12
