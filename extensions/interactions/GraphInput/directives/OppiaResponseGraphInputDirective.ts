@@ -29,22 +29,25 @@ oppia.directive('oppiaResponseGraphInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
         'graph_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.VERTEX_RADIUS = GraphDetailService.VERTEX_RADIUS;
-        $scope.EDGE_WIDTH = GraphDetailService.EDGE_WIDTH;
-        $scope.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function(s$attrs) {
+        var ctrl = this;
+        ctrl.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        ctrl.VERTEX_RADIUS = GraphDetailService.VERTEX_RADIUS;
+        ctrl.EDGE_WIDTH = GraphDetailService.EDGE_WIDTH;
+        ctrl.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
 
-        $scope.getDirectedEdgeArrowPoints = function(index) {
+        ctrl.getDirectedEdgeArrowPoints = function(index) {
           return GraphDetailService.getDirectedEdgeArrowPoints(
-            $scope.graph, index);
+            ctrl.graph, index);
         };
 
-        $scope.getEdgeCentre = function(index) {
-          return GraphDetailService.getEdgeCentre($scope.graph, index);
+        ctrl.getEdgeCentre = function(index) {
+          return GraphDetailService.getEdgeCentre(ctrl.graph, index);
         };
       }]
     };
