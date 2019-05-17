@@ -105,7 +105,7 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
     };
 
     var _stopRecord = function() {
-      if (microphone && processor) {        
+      if (microphone && processor) {
         // disconnect mic and processor and stop processing
         microphone.disconnect();
         processor.disconnect();

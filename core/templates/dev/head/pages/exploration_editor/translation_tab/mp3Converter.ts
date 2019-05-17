@@ -15,7 +15,7 @@
 /**
  * @fileoverview Encoder for encoding raw audio to mp3.
  */
-(function (self: DedicatedWorkerGlobalScope){
+(function(self: DedicatedWorkerGlobalScope) {
   // for karma tests prevent automatic loading from main thread
   if ('function' === typeof importScripts) {
     console.warn('MP3 conversion worker started.');
@@ -23,7 +23,7 @@
   }
 
   self.onmessage = (e) => {
-    switch(e.data.cmd) {
+    switch (e.data.cmd) {
       case 'init':
         init();
         break;
@@ -45,7 +45,7 @@
   var encode = function(input: Float32Array) {
     samples = convertBuffer(input);
     var remaining = samples.length;
-    // make remaining greater than 0 check 
+    // make remaining greater than 0 check
     // because that will not exclude data from encoding
     for (var i = 0; remaining >= 0; i += maxSamples) {
       var mono = samples.subarray(i, i + maxSamples);
@@ -55,38 +55,37 @@
     }
   };
 
-  var finish = function () {
+  var finish = function() {
     appendToBuffer(mp3Encoder.flush());
-    console.log('done encoding, size=', buffer.length);
+    console.warn('done encoding, size=', buffer.length);
     self.postMessage({
       cmd: 'end',
       buf: buffer
     });
-    clearBuffer(); //free up memory
+    clearBuffer(); // free up memory
   };
 
   var clearBuffer = function() {
     buffer = [];
   };
 
-  var appendToBuffer = function (mp3Buf: Int8Array) {
+  var appendToBuffer = function(mp3Buf: Int8Array) {
     buffer.push(new Int8Array(mp3Buf));
   };
 
   // from mic to mp3 format
-  var convertBuffer = function(arrayBuffer: Float32Array){
+  var convertBuffer = function(arrayBuffer: Float32Array) {
     var data = new Float32Array(arrayBuffer);
     var out = new Int16Array(arrayBuffer.length);
-    floatTo16BitPCM(data, out)
+    floatTo16BitPCM(data, out);
     return out;
   };
 
   // convert from 32 bit float to 16 bit int
   var floatTo16BitPCM = function(input: Float32Array, output: Int16Array) {
-    //var offset = 0;
     for (var i = 0; i < input.length; i++) {
       var s = Math.max(-1, Math.min(1, input[i]));
       output[i] = (s < 0 ? s * 0x8000 : s * 0x7FFF);
     }
   };
-}(<DedicatedWorkerGlobalScope>self)); 
+}(<DedicatedWorkerGlobalScope>self));
