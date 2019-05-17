@@ -398,7 +398,10 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     """Tests for UserSubscriptionsModel."""
     USER_ID_1 = 'user_id_1'
     USER_ID_2 = 'user_id_2'
-    TEST_VALUE = '1'
+    CREATOR_IDS = ['4', '8', '16']
+    COLLECTION_IDS = ['23', '42', '4']
+    ACTIVITY_IDS = ['8', '16', '23']
+    GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -406,10 +409,11 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 
         user_model_2 = user_models.UserSubscriptionsModel(id=self.USER_ID_2)
-        user_model_2.creator_ids.append(self.TEST_VALUE)
-        user_model_2.collection_ids.append(self.TEST_VALUE)
-        user_model_2.activity_ids.append(self.TEST_VALUE)
-        user_model_2.general_feedback_thread_ids.append(self.TEST_VALUE)
+        user_model_2.creator_ids = self.CREATOR_IDS
+        user_model_2.collection_ids = self.COLLECTION_IDS
+        user_model_2.activity_ids = self.ACTIVITY_IDS
+        user_model_2.general_feedback_thread_ids = (
+            self.GENERAL_FEEDBACK_THREAD_IDS)
         user_models.UserSubscriptionsModel.put(user_model_2)
 
     def test_export_data_trivial(self):
@@ -430,10 +434,10 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         user_data = (
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_2))
         test_data = {
-            'creator_ids': [self.TEST_VALUE],
-            'collection_ids': [self.TEST_VALUE],
-            'activity_ids': [self.TEST_VALUE],
-            'general_feedback_thread_ids': [self.TEST_VALUE],
+            'creator_ids': self.CREATOR_IDS,
+            'collection_ids': self.COLLECTION_IDS,
+            'activity_ids': self.ACTIVITY_IDS,
+            'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
             'last_checked': None
         }
         self.assertEqual(user_data, test_data)
