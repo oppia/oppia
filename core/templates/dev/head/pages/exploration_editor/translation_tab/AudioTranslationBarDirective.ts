@@ -47,7 +47,7 @@ oppia.directive('audioTranslationBar', [
         isTranslationTabBusy: '='
       },
       link: function(scope: ICustomScope, elm) {
-        scope.getRecorderController();
+        scope.getRecorder();
 
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
@@ -112,7 +112,6 @@ oppia.directive('audioTranslationBar', [
           $scope.audioNeedsUpdate = false;
           $scope.canTranslate = false;
           $scope.showRecorderWarning = false;
-          $scope.isRecording = false;
           $scope.audioLoadingIndicatorIsShown = false;
           $scope.checkingMicrophonePermission = false;
           $scope.audioTimerIsShown = true;
@@ -191,8 +190,6 @@ oppia.directive('audioTranslationBar', [
               $scope.selectedRecording = true;
               $scope.checkingMicrophonePermission = false;
 
-              $scope.isRecording = true;
-              $scope.recordingComplete = false;
               // start timer
               $scope.elapsedTime = 0;
               $scope.timerInterval = $interval(function() {
@@ -214,7 +211,7 @@ oppia.directive('audioTranslationBar', [
 
           $scope.checkAndStartRecording = function() {
             $scope.recorder.initRecorder();
-            if (!$scope.recorder.isAvailable()) {
+            if (!$scope.recorder.status().isAvailable) {
               $scope.unsupportedBrowser = true;
               $scope.cannotRecord = true;
             } else {
@@ -231,7 +228,7 @@ oppia.directive('audioTranslationBar', [
             $scope.audioNeedsUpdate = !$scope.audioNeedsUpdate;
           };
 
-          $scope.getRecorderController = function() {
+          $scope.getRecorder = function() {
             $scope.recorder = TranslationRecordingService;
           };
 
@@ -251,8 +248,6 @@ oppia.directive('audioTranslationBar', [
 
           $scope.stopRecording = function() {
             $scope.recorder.stopRecord();
-            $scope.isRecording = false;
-            $scope.isMicAvailable = true;
             $scope.recordingComplete = true;
             cancelTimer();
             $scope.recorder.getMp3Data().then(function(audio) {
@@ -317,7 +312,7 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.$on('externalSave', function() {
-            if ($scope.isRecording) {
+            if ($scope.recorder.status().isRecording) {
               $scope.recorder.stopRecord();
               $scope.recorder.closeRecorder();
             }
@@ -412,15 +407,13 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.initAudioBar = function() {
-            // This stops angular-recorder when user navigate while recording.
+            // This stops the recorder when user navigate while recording.
             if ($scope.recorder) {
-              if ($scope.isRecording &&
+              if ($scope.recorder.status().isRecording &&
                 $scope.showRecorderWarning) {
                 $scope.recorder.stopRecord();
                 cancelTimer();
-                // when empty it runs fine but when set to anything else
-                // stuck on loading screen animation
-                $rootScope.loadingMessage = '';
+                $scope.recorder.closeRecorder();
               }
             }
             $scope.isTranslationTabBusy = false;
@@ -443,7 +436,6 @@ oppia.directive('audioTranslationBar', [
               $scope.isAudioAvailable = false;
               $scope.audioBlob = null;
               $scope.selectedRecording = false;
-              $scope.isRecording = false;
             }
           };
 

@@ -22,6 +22,7 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
       defer = null,
       definedAudioContext = null, // will be defined audio context
       isAvailable = null,
+      isRecording = false,
       microphone = null,
       microphoneStream = null,
       mp3Worker = null,
@@ -104,7 +105,7 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
     };
 
     var _stopRecord = function() {
-      if (microphone && processor) {
+      if (microphone && processor) {        
         // disconnect mic and processor and stop processing
         microphone.disconnect();
         processor.disconnect();
@@ -115,6 +116,7 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
         microphoneStream.getTracks().forEach(function(track) {
           track.stop();
         });
+        isRecording = false;
       }
     };
 
@@ -126,12 +128,16 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
       initRecorder: function() {
         _initRecorder();
       },
-      isAvailable: function() {
-        return isAvailable;
+      status: function() {
+        return {
+          isAvailable: isAvailable,
+          isRecording: isRecording
+        };
       },
       startRecord: function() {
         var navigator = _startMicrophone();
         navigator.then(function(stream) {
+          isRecording = true;
           // set microphone stream will be used for stopping track
           // stream in another function.
           microphoneStream = stream;
@@ -139,6 +145,7 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
         }, function(error) {
           console.warn('Microphone was not started because of' +
           'user denied permission.');
+          isRecording = false;
         });
 
         return navigator;
@@ -150,6 +157,7 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
         return defer.promise;
       },
       closeRecorder: function(onClose) {
+        // _stopRecord();
         _closeRecorder();
         if (onClose) {
           onClose();

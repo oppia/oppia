@@ -53,17 +53,17 @@
   </div>
   <div class="oppia-content-wrapper oppia-flex-1-wrapper">
     <div class="oppia-audio-visualiser">
-      <div class="oppia-mp3-converting" ng-if="isRecording">
+      <div class="oppia-mp3-converting" ng-if="recorder.status().isRecording">
         Recording to mp3<loading-dots></loading-dots>
       </div>
     </div>
   </div>
-  <div class="oppia-content-wrapper" ng-if="isRecording">
+  <div class="oppia-content-wrapper" ng-if="recorder.status().isRecording">
     <div class="oppia-recording-timer">
       {{recordingFormatTime}}
     </div>
   </div>
-  <div class="oppia-content-wrapper" ng-if="isRecording">
+  <div class="oppia-content-wrapper" ng-if="recorder.status().isRecording">
     <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
             uib-tooltip="Stop"
             tooltip-placement="above"
@@ -74,20 +74,20 @@
   </div>
   <div class="oppia-content-wrapper">
     <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition"
-            ng-if="!isRecording && audioBlob"
+            ng-if="!recorder.status().isRecording && audioBlob"
             ng-click="reRecord()"
             aria-label="Record again">
       Re-take
     </button>
   </div>
-  <div class="oppia-content-wrapper" ng-if="!isRecording && audioBlob">
+  <div class="oppia-content-wrapper" ng-if="!recorder.status().isRecording && audioBlob">
     <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition"
             ng-click="saveRecordedAudio()"
             aria-label="Save the recorded audio">
       Confirm
     </button>
   </div>
-  <div class="oppia-content-wrapper" ng-if="!isRecording && audioBlob">
+  <div class="oppia-content-wrapper" ng-if="!recorder.status().isRecording && audioBlob">
     <button class="btn oppia-cancel-button oppia-audio-bar-button-transition"
             ng-click="cancelRecording()"
             aria-label="Cancel the recorded audio">
