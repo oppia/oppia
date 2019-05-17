@@ -17,6 +17,8 @@
  * data for the feedback tab of the exploration editor.
  */
 
+require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
+
 describe('retrieving threads service', function() {
   var expId = '12345';
   beforeEach(

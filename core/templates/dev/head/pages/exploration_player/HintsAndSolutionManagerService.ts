@@ -16,6 +16,8 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
+require('pages/exploration_player/PlayerConstants.ts');
+
 oppia.factory('HintsAndSolutionManagerService', [
   '$rootScope', '$timeout',
   'DELAY_FOR_HINT_FEEDBACK_MSEC', 'EVENT_NEW_CARD_AVAILABLE',
