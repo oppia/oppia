@@ -18,6 +18,7 @@
  * retrieving the collection, saving it, and listening for changes.
  */
 
+require('domain/collection/CollectionUpdateService.ts');
 angular.module('collectionEditorPageModule').factory('CollectionLinearizerService', [
   'CollectionUpdateService',
   function(CollectionUpdateService) {

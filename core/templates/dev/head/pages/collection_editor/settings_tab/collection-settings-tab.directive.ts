@@ -16,6 +16,13 @@
  * @fileoverview Controller for the settings tab of the collection editor.
  */
 
+require(
+  'pages/collection_editor/settings_tab/CollectionDetailsEditorDirective.ts');
+require(
+  'pages/collection_editor/settings_tab/CollectionPermissionsCardDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('collectionSettingsTabModule').directive('collectionSettingsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

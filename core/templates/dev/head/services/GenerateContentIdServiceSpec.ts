@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for GenerateContentIdService.
  */
 
+require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+require('services/GenerateContentIdService.ts');
+
 describe('GenerateContentIdService', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('COMPONENT_NAME_FEEDBACK', 'feedback');

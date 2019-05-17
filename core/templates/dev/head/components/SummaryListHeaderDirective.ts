@@ -16,11 +16,14 @@
  * @fileoverview Directive for the header of items in a list.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('summaryListHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         isSortingDisabled: '&disableSorting',
         getIndex: '&index',
         getSummary: '&summary',
@@ -32,10 +35,12 @@ oppia.directive('summaryListHeader', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_list_header_directive.html'),
-      controller: ['$scope',
-        function($scope) {
-          $scope.deleteItem = function(evt) {
-            $scope.getOnDeleteFn()($scope.getIndex(), evt);
+      controllerAs: '$ctrl',
+      controller: [
+        function() {
+          var ctrl = this;
+          ctrl.deleteItem = function(evt) {
+            ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
           };
         }
       ]

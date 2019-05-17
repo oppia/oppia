@@ -16,6 +16,25 @@
  * @fileoverview Directive for the interaction editor section in the state
  * editor.
  */
+
+require('directives/AngularHtmlBindDirective.ts');
+
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
+require(
+  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+require('pages/state_editor/state_properties/StateContentService.ts');
+require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateHintsService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+require('pages/state_editor/state_properties/StateSolutionService.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/HtmlEscaperService.ts');
+
 oppia.directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -16,25 +16,30 @@
  * @fileoverview Component for a canonical story tile.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('storySummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getStoryId: '&storyId',
         getStoryTitle: '&title',
         getStoryDescription: '&description',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/story_summary_tile_directive.html'),
-      controller: ['$scope',
-        function($scope) {
-          $scope.getStoryLink = function() {
+      controllerAs: '$ctrl',
+      controller: [
+        function() {
+          var ctrl = this;
+          ctrl.getStoryLink = function() {
             return UrlInterpolationService.getStoryUrl(
-              '/story', $scope.getStoryId());
+              '/story', ctrl.getStoryId());
           };
 
-          $scope.getStaticImageUrl = function(url) {
+          ctrl.getStaticImageUrl = function(url) {
             return UrlInterpolationService.getStaticImageUrl(url);
           };
         }

@@ -17,6 +17,9 @@
  *   editor page.
  */
 
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationTitleService.ts');
+
 describe('Change list service', function() {
   beforeEach(angular.mock.module('oppia'));
 

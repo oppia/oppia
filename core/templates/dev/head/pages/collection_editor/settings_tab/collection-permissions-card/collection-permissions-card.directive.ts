@@ -17,6 +17,9 @@
  * permissions.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
+
 angular.module('collectionPermissionsCardModule').directive('collectionPermissionsCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

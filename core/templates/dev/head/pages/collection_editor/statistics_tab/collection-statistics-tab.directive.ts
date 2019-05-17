@@ -16,6 +16,8 @@
  * @fileoverview Controller for the statistics tab of the collection editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('collectionStatisticsTabModule').directive('collectionStatisticsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

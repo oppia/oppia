@@ -16,6 +16,8 @@
  * @fileoverview Service for keeping track of the learner's position.
  */
 
+require('pages/exploration_player/PlayerTranscriptService.ts');
+
 oppia.factory('PlayerPositionService', [
   'PlayerTranscriptService', function(PlayerTranscriptService) {
     var displayedCardIndex = null;
