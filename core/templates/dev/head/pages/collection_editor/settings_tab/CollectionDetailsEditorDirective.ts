@@ -23,7 +23,7 @@ require('components/forms/Select2DropdownDirective.ts');
 require('domain/collection/CollectionUpdateService.ts');
 require('domain/collection/CollectionValidationService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditor.ts');
+require('pages/collection_editor/CollectionEditorDirective.ts');
 require('pages/collection_editor/CollectionEditorStateService.ts');
 require('services/AlertsService.ts');
 
