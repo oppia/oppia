@@ -34,7 +34,7 @@ oppia.directive('oppiaResponseGraphInput', [
         '/interactions/GraphInput/directives/' +
         'graph_input_response_directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$attrs', function(s$attrs) {
+      controller: ['$attrs', function($attrs) {
         var ctrl = this;
         ctrl.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         ctrl.VERTEX_RADIUS = GraphDetailService.VERTEX_RADIUS;
