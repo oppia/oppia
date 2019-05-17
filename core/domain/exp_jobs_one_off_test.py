@@ -2097,8 +2097,8 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
 
-    VALID_EXP_ID = 'exp_id'
-    VALID_EXP_ID_1 = 'exp_id1'
+    VALID_EXP_ID_1 = 'exp_id_1'
+    VALID_EXP_ID_2 = 'exp_id_2'
 
     def setUp(self):
         super(ImagesAuditJobTests, self).setUp()
@@ -2115,14 +2115,14 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
 
         with self.swap(constants, 'DEV_MODE', False):
             exploration = exp_domain.Exploration.create_default_exploration(
-                self.VALID_EXP_ID, title='title', category='category')
-            exploration_1 = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID_1, title='title', category='category')
+            exploration_1 = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID_2, title='title', category='category')
 
             fs_internal = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(self.VALID_EXP_ID))
+                fs_domain.GcsFileSystem(self.VALID_EXP_ID_1))
             fs_external = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem('exploration/' + self.VALID_EXP_ID))
+                fs_domain.GcsFileSystem('exploration/' + self.VALID_EXP_ID_1))
 
             with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
                 raw_image = f.read()
@@ -2164,7 +2164,7 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
             actual_output = exp_jobs_one_off.ImagesAuditJob.get_output(
                 job_id)
             expected_output = [
-                '[u\'exp_id\', [u"Missing Images: [\'def.png\', '
+                '[u\'exp_id_1\', [u"Missing Images: [\'def.png\', '
                 '\'ghi.png\']"]]',
                 '[u\'Images verified\', 0]'
             ]
@@ -2182,9 +2182,9 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
             )
 
             fs_internal = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(self.VALID_EXP_ID_1))
+                fs_domain.GcsFileSystem(self.VALID_EXP_ID_2))
             fs_external = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem('exploration/' + self.VALID_EXP_ID_1))
+                fs_domain.GcsFileSystem('exploration/' + self.VALID_EXP_ID_2))
 
             with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
                 raw_image = f.read()
