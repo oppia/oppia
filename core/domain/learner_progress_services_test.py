@@ -541,6 +541,22 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE)
 
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        completed_exp_summaries = (
+            all_filtered_summaries.completed_exp_summaries)
+
+        # Test that completed exp summaries don't include private exploration.
+        # Ensure that completed_exp_summaries[0] matches EXP_ID_0.
+        self.assertEqual(
+            completed_exp_summaries[0].id, '0_en_arch_bridges_in_england')
+        # Ensure that completed_exp_summaries[1] matches EXP_ID_1.
+        self.assertEqual(
+            completed_exp_summaries[1].id, '1_fi_arch_sillat_suomi')
+        self.assertEqual(len(completed_exp_summaries), 2)
+
         # Publish EXP_ID_3 to change status back to ACTIVITY_STATUS_PUBLIC.
         self.publish_exploration(self.owner_id, self.EXP_ID_3)
         public_exploration = exp_services.get_exploration_summary_by_id(
@@ -641,6 +657,22 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.COL_ID_3)
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        completed_collection_summaries = (
+            all_filtered_summaries.completed_collection_summaries)
+
+        # Test that completed col summaries don't include private collection.
+        # Ensure that completed_collection_summaries[0] matches COL_ID_0.
+        self.assertEqual(
+            completed_collection_summaries[0].id, '0_arch_bridges_in_england')
+        # Ensure that completed_collection_summaries[1] matches COL_ID_1.
+        self.assertEqual(
+            completed_collection_summaries[1].id, '1_welcome_introduce_oppia')
+        self.assertEqual(len(completed_collection_summaries), 2)
 
         # Publish COL_ID_3 to change status back to ACTIVITY_STATUS_PUBLIC.
         self.publish_collection(self.owner_id, self.COL_ID_3)
@@ -752,6 +784,22 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE)
 
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        incomplete_exp_summaries = (
+            all_filtered_summaries.incomplete_exp_summaries)
+
+        # Test that incomplete exp summaries don't include private exploration.
+        # Ensure that incomplete_exp_summaries[0] matches EXP_ID_0.
+        self.assertEqual(
+            incomplete_exp_summaries[0].id, '0_en_arch_bridges_in_england')
+        # Ensure that incomplete_exp_summaries[1] matches EXP_ID_1.
+        self.assertEqual(
+            incomplete_exp_summaries[1].id, '1_fi_arch_sillat_suomi')
+        self.assertEqual(len(incomplete_exp_summaries), 2)
+
         # Publish EXP_ID_3 to change status back to ACTIVITY_STATUS_PUBLIC.
         self.publish_exploration(self.owner_id, self.EXP_ID_3)
         public_exploration = exp_services.get_exploration_summary_by_id(
@@ -852,6 +900,22 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.COL_ID_3)
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        incomplete_collection_summaries = (
+            all_filtered_summaries.incomplete_collection_summaries)
+
+        # Test that incomplete col summaries don't include private collection.
+        # Ensure that incomplete_collection_summaries[0] matches COL_ID_0.
+        self.assertEqual(
+            incomplete_collection_summaries[0].id, '0_arch_bridges_in_england')
+        # Ensure that incomplete_collection_summaries[1] matches COL_ID_1.
+        self.assertEqual(
+            incomplete_collection_summaries[1].id, '1_welcome_introduce_oppia')
+        self.assertEqual(len(incomplete_collection_summaries), 2)
 
         # Publish COL_ID_3 to change status back to ACTIVITY_STATUS_PUBLIC.
         self.publish_collection(self.owner_id, self.COL_ID_3)
