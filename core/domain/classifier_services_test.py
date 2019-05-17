@@ -80,7 +80,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         # Modify such that job creation is triggered.
         new_answer_group = copy.deepcopy(state.interaction.answer_groups[1])
         new_answer_group.outcome.feedback.content_id = 'new_feedback'
-        state.content_ids_to_audio_translations['new_feedback'] = {}
+        state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
         state.interaction.answer_groups.insert(3, new_answer_group)
         answer_groups = []
         for answer_group in state.interaction.answer_groups:
@@ -93,8 +93,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'state_name': 'Home',
-            'property_name': 'content_ids_to_audio_translations',
-            'new_value': state.content_ids_to_audio_translations
+            'property_name': 'recorded_voiceovers',
+            'new_value': state.recorded_voiceovers.to_dict()
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
@@ -505,3 +505,34 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
                 test_dict))
         self.assertDictEqual(expected_dict, output_dict)
+
+    def test_can_not_convert_strings_to_float_numbers_in_classifier_data(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected all classifier data objects to be '
+            'lists, dicts, strings, integers but received'):
+            (classifier_services.
+             convert_strings_to_float_numbers_in_classifier_data(2.0124))
+
+    def test_can_not_mark_training_jobs_complete_due_to_invalid_job_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The ClassifierTrainingJobModel corresponding to the '
+            'job_id of the ClassifierTrainingJob does not exist.'):
+            classifier_services.mark_training_job_complete('invalid_job_id')
+
+    def test_can_not_mark_training_jobs_failed_due_to_invalid_job_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The ClassifierTrainingJobModel corresponding to the '
+            'job_id of the ClassifierTrainingJob does not exist.'):
+            classifier_services.mark_training_jobs_failed(['invalid_job_id'])
+
+    def test_can_not_mark_training_jobs_pending_due_to_invalid_job_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The ClassifierTrainingJobModel corresponding to the '
+            'job_id of the ClassifierTrainingJob does not exist.'):
+            classifier_services.mark_training_job_pending('invalid_job_id')
+
+    def test_can_not_store_classifier_data_due_to_invalid_job_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The ClassifierTrainingJobModel corresponding to the '
+            'job_id of the ClassifierTrainingJob does not exist.'):
+            classifier_services.store_classifier_data('invalid_job_id', {})

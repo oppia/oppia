@@ -15,6 +15,16 @@
 /**
  * @fileoverview Controller for the main story editor.
  */
+
+require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require('directives/AngularHtmlBindDirective.ts');
+require('pages/story_editor/main_editor/StoryNodeEditorDirective.ts');
+
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/story/StoryUpdateService.ts');
+require('pages/story_editor/StoryEditorStateService.ts');
+require('services/AlertsService.ts');
+
 oppia.constant('EVENT_VIEW_STORY_NODE_EDITOR', 'viewStoryNodeEditor');
 
 oppia.directive('storyEditor', [
