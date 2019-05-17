@@ -1,4 +1,5 @@
 var argv = require('yargs').argv;
+var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
   generatedJs = (
@@ -151,7 +152,18 @@ module.exports = function(config) {
       module: {
         rules: [{
           test: /\.ts$/,
-          use: 'ts-loader',
+          include: path.resolve(__dirname, 'core/templates/dev/head'),
+          use: [
+            'cache-loader',
+            'thread-loader',
+            {
+              loader: 'ts-loader',
+              options: {
+                // this is needed for thread-loader to work correctly
+                happyPackMode: true
+              }
+            }
+          ]
         }]
       }
     }

@@ -26,23 +26,21 @@ module.exports = {
   entry: commonWebpackConfig.entries,
   plugins: commonWebpackConfig.plugins,
   module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        include: path.resolve(__dirname, 'core/templates/dev/head'),
-        use: [
-          'cache-loader',
-          'thread-loader',
-          {
-            loader: 'ts-loader',
-            options: {
-              // this is needed for thread-loader to work correctly
-              happyPackMode: true
-            }
+    rules: [{
+      test: /\.ts$/,
+      include: path.resolve(__dirname, 'core/templates/dev/head'),
+      use: [
+        'cache-loader',
+        'thread-loader',
+        {
+          loader: 'ts-loader',
+          options: {
+            // this is needed for thread-loader to work correctly
+            happyPackMode: true
           }
-        ]
-      }
-    ]
+        }
+      ]
+    }]
   },
   output: {
     filename: '[name].bundle.js',
