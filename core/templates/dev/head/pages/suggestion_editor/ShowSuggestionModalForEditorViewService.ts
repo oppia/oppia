@@ -16,6 +16,14 @@
  * @fileoverview Service to display suggestion modal in editor view.
  */
 
+require('domain/state/StateObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
+require('pages/suggestion_editor/ShowSuggestionModalForEditorView.ts');
+require('pages/suggestion_editor/SuggestionModalService.ts');
+
 oppia.factory('ShowSuggestionModalForEditorViewService', [
   '$log', '$rootScope', '$uibModal',
   'ExplorationDataService', 'ExplorationStatesService',
@@ -83,7 +91,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
               state.content.setHtml(
                 activeThread.getReplacementHtmlFromSuggestion());
               if (result.audioUpdateRequired) {
-                state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
+                state.recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
                   state.content.getContentId());
               }
               ExplorationDataService.data.version += 1;
