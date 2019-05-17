@@ -52,7 +52,7 @@ oppia.directive('musicPhraseEditor', [
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
         $scope.$watch('$ctrl.value', function(newValue) {
-          // TODO(sll): Check that ctrl.value is a list.
+          // TODO(sll): Check that $ctrl.value is a list.
           ctrl.localValue = [];
           if (newValue) {
             for (var i = 0; i < newValue.length; i++) {
