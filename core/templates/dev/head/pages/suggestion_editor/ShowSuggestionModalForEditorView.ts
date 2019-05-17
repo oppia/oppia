@@ -16,6 +16,9 @@
  * @fileoverview Controller to show suggestion modal in editor view.
  */
 
+require('pages/suggestion_editor/SuggestionModalService.ts');
+require('services/EditabilityService.ts');
+
 // TODO(Allan): Implement ability to edit suggestions before applying.
 oppia.controller('ShowSuggestionModalForEditorView', [
   '$log', '$scope', '$uibModalInstance', 'EditabilityService',

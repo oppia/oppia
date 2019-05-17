@@ -17,6 +17,23 @@
  * exploration editor.
  */
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/StatesObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/CamelCaseToHyphensFilter.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require(
+  'pages/exploration_editor/statistics_tab/' +
+  'StateImprovementSuggestionService.ts'
+);
+require('services/AlertsService.ts');
+require('services/ComputeGraphService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/StateRulesStatsService.ts');
+
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
