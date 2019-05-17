@@ -352,5 +352,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
   ]
 };

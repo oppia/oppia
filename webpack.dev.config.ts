@@ -28,10 +28,18 @@ module.exports = {
   module: {
     rules: [{
       test: /\.ts$/,
-      include: path.resolve(__dirname, 'core/templates/dev/head'),
+      include: [
+        path.resolve(__dirname, 'core/templates/dev/head'),
+        path.resolve(__dirname, 'typings')
+      ],
       use: [
         'cache-loader',
-        'thread-loader',
+        {
+          loader: 'thread-loader',
+          options: {
+            poolTimeout: Infinity,
+          }
+        },
         {
           loader: 'ts-loader',
           options: {
