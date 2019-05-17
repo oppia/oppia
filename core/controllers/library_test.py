@@ -18,6 +18,8 @@ import json
 import os
 
 from constants import constants
+from core.domain import activity_domain
+from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
@@ -199,14 +201,24 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(LibraryIndexHandlerTests, self).setUp()
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+    def test_library_index_handler_for_user_preferred_language(self):
+        self.login(self.VIEWER_EMAIL)
+        response = self.get_html_response('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'preferred_language_codes', 'data': ['de']},
+            csrf_token=csrf_token)
+        response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+        self.assertDictContainsSubset({
+            'activity_summary_dicts_by_category': [],
+            'preferred_language_codes': ['de'],
+        }, response_dict)
 
-    def test_library_index_handler(self):
+    def test_library_index_handler_for_top_rated(self):
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
             'activity_summary_dicts_by_category': [],
@@ -240,14 +252,70 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0]) # pylint: disable=line-too-long
 
+    def test_library_index_handler_for_featured(self):
+        response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+        self.assertDictContainsSubset({
+            'activity_summary_dicts_by_category': [],
+            'preferred_language_codes': ['en'],
+        }, response_dict)
+
+        exp_services.load_demo('0')
+        exploration_ref = activity_domain.ActivityReference(
+            constants.ACTIVITY_TYPE_EXPLORATION, '0')
+        activity_services.update_featured_activity_references([exploration_ref])
+
+        response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+        self.assertEqual(
+            len(response_dict['activity_summary_dicts_by_category']), 1)
+        self.assertDictContainsSubset({
+            'preferred_language_codes': ['en'],
+        }, response_dict)
+        self.assertDictContainsSubset({
+            'categories': [],
+            'header_i18n_id': (
+                feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES),
+            'has_full_results_page': False,
+            'full_results_url': None,
+        }, response_dict['activity_summary_dicts_by_category'][0])
+        self.assertEqual(
+            len(response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts']), 1)  # pylint: disable=line-too-long
+        self.assertDictContainsSubset({
+            'id': '0',
+            'category': 'Welcome',
+            'title': 'Welcome to Oppia!',
+            'language_code': 'en',
+            'objective': 'become familiar with Oppia\'s capabilities',
+            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0])  # pylint: disable=line-too-long
+
 
 class LibraryGroupPageTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(LibraryGroupPageTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_library_group_pages(self):
         """Test access to the top rated and recently published pages."""
         self.get_html_response(feconf.LIBRARY_TOP_RATED_URL)
 
         self.get_html_response(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
+
+    def test_library_group_page_for_user_preferred_language(self):
+        self.login(self.VIEWER_EMAIL)
+        response = self.get_html_response('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json(
+            '/preferenceshandler/data',
+            {'update_type': 'preferred_language_codes', 'data': ['de']},
+            csrf_token=csrf_token)
+        response_dict = self.get_json(
+            feconf.LIBRARY_GROUP_DATA_URL,
+            params={'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
+        self.assertDictContainsSubset({
+            'preferred_language_codes': ['de'],
+        }, response_dict)
 
     def test_handler_for_recently_published_library_group_page(self):
         """Test library handler for recently published group page."""
@@ -487,7 +555,7 @@ class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
     def test_access_empty_collection(self):
         response_dict = self.get_json(
             feconf.COLLECTION_SUMMARIES_DATA_URL,
-            params={'stringified_collection_ids': json.dumps('0')})
+            params={'stringified_collection_ids': json.dumps('1')})
         self.assertDictContainsSubset({
             'summaries': [],
         }, response_dict)
