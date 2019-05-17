@@ -8,10 +8,10 @@
       <div ng-if="!conceptCardExplanationEditorIsShown" class="review-material" style="padding-top: 0.5em;">
         <div ng-class="oppia-editable-section"
              ng-click="openConceptCardExplanationEditor()">
-          <i class="material-icons oppia-editor-edit-icon pull-right"
+          <i class="material-icons oppia-editor-edit-icon pull-right protractor-test-edit-concept-card"
              title="Edit Concept Card Explanation">&#xE254;
           </i>
-          <div class="oppia-state-content-display oppia-transition-200"
+          <div class="oppia-state-content-display oppia-transition-200 protractor-test-concept-card-explanation"
                ng-class="oppia-prevent-selection"
                title="Concept Card Explanation">
             <span class="oppia-placeholder" ng-show="skill.getConceptCard().getExplanation().getHtml() === ''">
@@ -27,11 +27,11 @@
       </div>
 
       <div ng-if="conceptCardExplanationEditorIsShown">
-        <schema-based-editor schema="HTML_SCHEMA" local-value="bindableFieldsDict.displayedConceptCardExplanation">
+        <schema-based-editor schema="HTML_SCHEMA" class="protractor-test-concept-card-text" local-value="bindableFieldsDict.displayedConceptCardExplanation">
         </schema-based-editor>
         <div class="editor-buttons">
           <button type="button"
-                  class="btn btn-success oppia-save-state-item-button pull-right"
+                  class="btn btn-success oppia-save-state-item-button pull-right protractor-test-save-concept-card"
                   ng-click="saveConceptCardExplanation()">
             Save
           </button>
@@ -56,7 +56,8 @@
         <ul class="nav oppia-option-list nav-stacked nav-pills"
             role="tablist"
             ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS"
-            ng-model="bindableFieldsDict.displayedWorkedExamples">
+            ng-model="bindableFieldsDict.displayedWorkedExamples"
+            style="position: relative;">
           <li ng-repeat="workedExample in bindableFieldsDict.displayedWorkedExamples"
               ng-class="{'active': activeWorkedExampleIndex === $index, 'last-element': $index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
               class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection"
@@ -67,7 +68,7 @@
               <img ng-src="<[dragDotsImgUrl]>" width="10">
             </span>
             <a ng-click="changeActiveWorkedExampleIndex($index)"
-               class="oppia-rule-tab"
+               class="oppia-rule-tab protractor-test-worked-example-<[$index]>"
                ng-class="{'oppia-rule-tab-active': activeWorkedExampleIndex === $index}">
               <summary-list-header index="$index"
                                    disable-sorting="bindableFieldsDict.displayedWorkedExamples.length === 1"
@@ -92,7 +93,7 @@
         </ul>
       </div>
       <button type="button"
-              class="btn"
+              class="btn protractor-test-add-worked-example"
               style="background-color: rgba(5,140,166,0.9); color: white;"
               ng-click="openAddWorkedExampleModal()">
         + Add Worked Example

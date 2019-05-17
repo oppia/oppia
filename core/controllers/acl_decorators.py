@@ -25,7 +25,9 @@ from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_services
+from core.domain import subtopic_page_services
 from core.domain import suggestion_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -1825,7 +1827,7 @@ def can_edit_skill(handler):
         return False
 
     def test_can_edit_skill(self, skill_id, **kwargs):
-        """ Test to see if user can edit a given skill by checking if
+        """Test to see if user can edit a given skill by checking if
         logged in and using can_user_edit_skill.
 
         Args:
@@ -2191,10 +2193,11 @@ def can_view_any_topic_editor(handler):
             if the user can view any topic editor.
     """
 
-    def test_can_view_any_topic_editor(self, **kwargs):
+    def test_can_view_any_topic_editor(self, topic_id, **kwargs):
         """Checks whether the user can view any topic editor.
 
         Args:
+            topic_id: str. The topic id.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2207,13 +2210,14 @@ def can_view_any_topic_editor(handler):
         """
         if not self.user_id:
             raise self.NotLoggedInException
+        topic_domain.Topic.require_valid_topic_id(topic_id)
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
         if (
                 role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
                 user_actions_info.actions):
-            return handler(self, **kwargs)
+            return handler(self, topic_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to view any topic editor.'
@@ -2389,6 +2393,42 @@ def can_access_story_viewer_page(handler):
             return handler(self, story_id, **kwargs)
         else:
             raise self.PageNotFoundException
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
+def can_access_subtopic_viewer_page(handler):
+    """Decorator to check whether user can access subtopic page viewer.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can access the give subtopic viewer page.
+    """
+
+    def test_can_access(self, topic_id, subtopic_id, **kwargs):
+        """Checks if the user can access subtopic viewer page.
+
+        Args:
+            topic_id: str. The id of the topic.
+            subtopic_id: str. The id of the Subtopic.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            topic_id, subtopic_id, strict=False)
+        if subtopic_page is None:
+            raise self.PageNotFoundException
+        else:
+            return handler(self, topic_id, subtopic_id, **kwargs)
     test_can_access.__wrapped__ = True
 
     return test_can_access

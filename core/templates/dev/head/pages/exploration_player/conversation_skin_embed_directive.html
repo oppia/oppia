@@ -64,7 +64,7 @@
         <div>
           <div class="nav-bar-bottom-visit-oppia">
             <span ng-if="isOnTerminalCard()" class="oppia-view-more-explorations">For more explorations, visit:</span>
-            <a class="oppia-link" ng-click="onNavigateFromIframe()" href="https://www.oppia.org/" target="_blank">
+            <a class="oppia-link" ng-click="onNavigateFromIframe()" href="https://www.oppia.org/" target="_blank" rel="noopener">
               <img class="logo-bottom-nav-bar" ng-src="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>">
             </a>
           </div>
@@ -85,11 +85,11 @@ directive. -->
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 1.0em;
     height: 100%;
-    position:fixed;
-    top:0;
-    bottom:0;
-    width:100%;
-    overflow-y:auto;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    overflow-y: auto;
   }
 
   .oppia-progress-dot {

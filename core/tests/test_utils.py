@@ -345,9 +345,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -365,6 +362,10 @@ states:
       id: null
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -374,9 +375,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -394,6 +392,10 @@ states:
       id: null
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -406,7 +408,7 @@ title: Title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATES_SCHEMA_VERSION)
+    feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
 blurb: ''
@@ -461,7 +463,7 @@ tags: []
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATES_SCHEMA_VERSION)
+    feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     def _get_unicode_test_string(self, suffix):
         """Returns a string that contains unicode characters and ends with the
@@ -563,10 +565,6 @@ tags: []
     def get_expected_login_url(self, slug):
         """Returns the expected login URL."""
         return current_user_services.create_login_url(slug)
-
-    def get_expected_logout_url(self, slug):
-        """Returns the expected logout URL."""
-        return current_user_services.create_logout_url(slug)
 
     def _get_response(
             self, url, expected_content_type, params=None,
@@ -1371,7 +1369,7 @@ tags: []
             description=description,
             title=title,
             language_code=language_code,
-            schema_version=1,
+            story_contents_schema_version=1,
             notes=notes,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT
         )
@@ -1451,6 +1449,11 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
         """
+        topic_rights_model = topic_models.TopicRightsModel(
+            id=topic_id,
+            manager_ids=[],
+            topic_is_published=True
+        )
         topic_model = topic_models.TopicModel(
             id=topic_id,
             name=name,
@@ -1466,6 +1469,11 @@ tags: []
         )
         commit_message = (
             'New topic created with name \'%s\'.' % name)
+        topic_rights_model.commit(
+            committer_id=owner_id,
+            commit_message='Created new topic rights',
+            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}]
+        )
         topic_model.commit(
             owner_id, commit_message, [{
                 'cmd': topic_domain.CMD_CREATE_NEW,
@@ -1489,7 +1497,7 @@ tags: []
         """
         question = question_domain.Question(
             question_id, question_state_data,
-            feconf.CURRENT_STATES_SCHEMA_VERSION, language_code, 0)
+            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0)
         question_services.add_question(owner_id, question)
         return question
 
@@ -1520,7 +1528,7 @@ tags: []
             question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_schema_version=27
+            question_state_data_schema_version=27
         )
         question_model.commit(
             owner_id, 'New question created',
@@ -1547,22 +1555,22 @@ tags: []
             Skill. A newly-created skill.
         """
         skill = skill_domain.Skill.create_default_skill(skill_id, description)
-        if misconceptions:
+        if misconceptions is not None:
             skill.misconceptions = misconceptions
-        if skill_contents:
+            skill.next_misconception_id = len(misconceptions) + 1
+        if skill_contents is not None:
             skill.skill_contents = skill_contents
         skill.language_code = language_code
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
         return skill
 
-    def save_new_skill_with_story_and_skill_contents_schema_version(
-            self, skill_id, owner_id,
-            description, next_misconception_id, misconceptions=None,
-            skill_contents=None, misconceptions_schema_version=1,
-            skill_contents_schema_version=1,
+    def save_new_skill_with_defined_schema_versions(
+            self, skill_id, owner_id, description, next_misconception_id,
+            misconceptions=None, skill_contents=None,
+            misconceptions_schema_version=1, skill_contents_schema_version=1,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Saves a new default skill with a default version 1 misconceptions
+        """Saves a new default skill with the given versions for misconceptions
         and skill contents.
 
         This function should only be used for creating skills in tests

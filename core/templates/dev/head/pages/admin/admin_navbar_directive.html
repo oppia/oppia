@@ -90,6 +90,7 @@
               <a ng-click="onMouseoutProfilePictureOrDropdown($event)"
                  href="/moderator"
                  target="_blank"
+                 rel="noopener"
                  style="color: #00376d">
                 Moderator Page
               </a>
@@ -98,6 +99,7 @@
               <a ng-click="onMouseoutProfilePictureOrDropdown($event)"
                  href="/admin"
                  target="_blank"
+                 rel="noopener"
                  style="color: #00376d">
                 Admin Page
               </a>
@@ -105,7 +107,7 @@
             <hr class="oppia-top-right-menu-item-separator">
             <li>
               <a ng-click="onMouseoutProfilePictureOrDropdown($event)"
-                 ng-href="<[getLogoutUrl()]>"
+                 ng-href="<[logoutUrl]>"
                  style="color: #00376d">
                 Logout
               </a>

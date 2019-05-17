@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
-
-import urllib
-import urlparse
+"""Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -48,10 +45,10 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            self.render_template('pages/splash/splash.html')
+            self.render_template('dist/splash.html')
         else:
             try:
-                self.render_template('pages/splash/splash_%s.html' % c_value)
+                self.render_template('dist/splash_%s.html' % c_value)
             except Exception:
                 # Old c values may have been deprecated, in which case we
                 # revert to the default splash page URL. When redirecting,
@@ -77,7 +74,7 @@ class AboutPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/about/about.html')
+        self.render_template('dist/about.html')
 
 
 class GetStartedPage(base.BaseHandler):
@@ -89,7 +86,7 @@ class GetStartedPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.GET_STARTED_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/get_started/get_started.html')
+        self.render_template('dist/get_started.html')
 
 
 class TeachPage(base.BaseHandler):
@@ -101,7 +98,7 @@ class TeachPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.TEACH_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/teach/teach.html')
+        self.render_template('dist/teach.html')
 
 
 class ContactPage(base.BaseHandler):
@@ -113,7 +110,7 @@ class ContactPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/contact/contact.html')
+        self.render_template('dist/contact.html')
 
 
 class DonatePage(base.BaseHandler):
@@ -125,7 +122,7 @@ class DonatePage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.DONATE_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/donate/donate.html')
+        self.render_template('dist/donate.html')
 
 
 class ThanksPage(base.BaseHandler):
@@ -137,31 +134,15 @@ class ThanksPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/thanks/thanks.html')
+        self.render_template('dist/thanks.html')
 
 
-class ForumPage(base.BaseHandler):
-    """Page with an embedded forum."""
-
+class ForumRedirectPage(base.BaseHandler):
+    """A handler to redirect to Oppia's Google group."""
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        # Note: if you are working in the development environment and
-        # are accessing this page at localhost, please replace
-        # 'localhost' with '127.0.0.1'.
-        _, netloc, _, _, _ = urlparse.urlsplit(self.request.uri)
-
-        self.values.update({
-            'full_google_group_url': (
-                '%s&showtabs=false&hideforumtitle=true&parenturl=%s' % (
-                    feconf.EMBEDDED_GOOGLE_GROUP_URL,
-                    urllib.quote(self.request.uri, safe=''),
-                )
-            ),
-            'meta_description': feconf.FORUM_PAGE_DESCRIPTION,
-            'on_localhost': netloc.startswith('localhost'),
-        })
-        self.render_template('pages/forum/forum.html')
+        self.redirect(feconf.GOOGLE_GROUP_URL)
 
 
 class TermsPage(base.BaseHandler):
@@ -174,7 +155,7 @@ class TermsPage(base.BaseHandler):
             'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
         })
 
-        self.render_template('pages/terms/terms.html')
+        self.render_template('dist/terms.html')
 
 
 class PrivacyPage(base.BaseHandler):
@@ -183,7 +164,7 @@ class PrivacyPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/privacy/privacy.html')
+        self.render_template('dist/privacy.html')
 
 
 class AboutRedirectPage(base.BaseHandler):
@@ -219,7 +200,7 @@ class ConsoleErrorPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/tests/console_errors.html')
+        self.render_template('dist/console_errors.html')
 
 
 class MaintenancePage(base.BaseHandler):
@@ -228,4 +209,4 @@ class MaintenancePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
-        self.render_template('pages/maintenance/maintenance.html')
+        self.render_template('dist/maintenance.html')

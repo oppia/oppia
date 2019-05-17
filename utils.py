@@ -424,8 +424,11 @@ def convert_to_hash(input_string, max_length):
             'Expected string, received %s of type %s' %
             (input_string, type(input_string)))
 
-    encoded_string = base64.urlsafe_b64encode(
-        hashlib.sha1(input_string.encode('utf-8')).digest())
+    # Encodes strings using the character set [A-Za-z0-9].
+    encoded_string = base64.b64encode(
+        hashlib.sha1(input_string.encode('utf-8')).digest(),
+        altchars='ab'
+    ).replace('=', 'c')
 
     return encoded_string[:max_length]
 
@@ -637,37 +640,6 @@ def is_valid_language_code(language_code):
     """
     language_codes = [lc['code'] for lc in constants.ALL_LANGUAGE_CODES]
     return language_code in language_codes
-
-
-def _get_short_language_description(full_language_description):
-    """Given one of the descriptions in constants.ALL_LANGUAGE_CODES, generates
-    the corresponding short description.
-
-    Args:
-        full_language_description: str. Short description of the language.
-
-    Returns:
-        str. Short description of the language.
-    """
-    if ' (' not in full_language_description:
-        return full_language_description
-    else:
-        ind = full_language_description.find(' (')
-        return full_language_description[:ind]
-
-
-def get_all_language_codes_and_names():
-    """It parses the list of language codes and their corresponding names,
-    defined in the app constants.
-
-    Returns:
-        list(dict(str, str)). List of dictionary containing language code and
-            name mapped to their corresponding value.
-    """
-    return [{
-        'code': lc['code'],
-        'name': _get_short_language_description(lc['description']),
-    } for lc in constants.ALL_LANGUAGE_CODES]
 
 
 def unescape_encoded_uri_component(escaped_string):

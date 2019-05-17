@@ -1,7 +1,25 @@
 {
   "compilerOptions": {
+    "allowJs": true,
+    "lib": ["es2017", "dom"],
+    "noImplicitUseStrict": true,
+    "outDir": "local_compiled_js",
+    "rootDir": ".",
+    "skipLibCheck": true,
     "target": "es5",
     "typeRoots": ["./node_modules/@types"],
-    "types": ["angular", "googlemaps", "jasmine", "jquery", "node", "q", "selenium-webdriver"]
-  }
+  },
+  "files": [
+    "assets/constants.js", 
+    "assets/rich_text_components_definitions.js", 
+    "core/tests/karma-globals.ts", 
+    "core/tests/karma.conf.ts",
+    "core/templates/dev/head/AppInit.ts",
+    "core/templates/dev/head/mathjaxConfig.ts",
+    "core/templates/dev/head/domain/classifier/PredictionResultObjectFactory.ts",
+    "core/templates/dev/head/expressions/ExpressionParserService.js",
+    "core/templates/dev/head/filters/ConvertToPlainTextFilter.ts",
+    "core/templates/dev/head/filters/TruncateAtFirstLineFilter.ts"
+  ],
+  "include": ["extensions", "typings"]
 }

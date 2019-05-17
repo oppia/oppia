@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   Learner Dashboard - Oppia
@@ -576,7 +576,7 @@
             <md-card class="oppia-subscription-card"
                      ng-repeat="subscription in subscriptionsList | orderBy:getValueOfSubscriptionSortKey:isCurrentSubscriptionSortDescending"
                      style="margin: 0 8px 0 4px; width: 197px;">
-              <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank">
+              <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank" rel="noopener">
                 <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
                 <span class="oppia-subscription-card-summary" style="color: black;">
                   <div style="margin-bottom: 5px; font-size: 17.5px;">
@@ -785,6 +785,10 @@
   </div>
   <style>
 
+    body {
+      overflow-x: visible;
+    }
+
     .oppia-learner-dashboard-container {
       margin: 0 auto 30px auto;
       max-width: 1400px;
@@ -814,7 +818,7 @@
 
     .oppia-learner-dashboard-menu {
       border: 1px solid #d0d0d0;
-      color: #009688;
+      color: black;
       font-family: 'Capriola', 'Roboto', Arial, sans-serif;
       font-size: 1em;
       font-weight: normal;
@@ -824,6 +828,8 @@
 
     .oppia-learner-dashboard-main-menu .oppia-learner-dashboard-sub-section-active {
       color: black;
+      background-color: #aed2e9;
+      border: 1px solid lightgreen;
     }
 
     .oppia-learner-dashboard-submenu {
@@ -1052,7 +1058,7 @@
     }
 
     .oppia-learner-dashboard-feedback-section .feedback-thread-warning {
-      color:#0277BD;
+      color: #0277BD;
       margin-left: 4px;
     }
 
@@ -1172,18 +1178,13 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
-  <script src="/templates/dev/head/components/summary_tile/CollectionSummaryTileDirective.js"></script>
-  <script src="/templates/dev/head/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
-  <script src="/templates/dev/head/components/RatingComputationService.js"></script>
-  <script src="/templates/dev/head/components/loading/LoadingDotsDirective.js"></script>
-
-  <script src="/templates/dev/head/domain/feedback_thread/FeedbackThreadSummaryObjectFactory.js"></script>
-  <script src="/templates/dev/head/domain/feedback_message/FeedbackMessageSummaryObjectFactory.js"></script>
-  <script src="/templates/dev/head/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
-  <script src="/templates/dev/head/domain/learner_dashboard/LearnerDashboardBackendApiService.js"></script>
-  <script src="/templates/dev/head/pages/learner_dashboard/LearnerDashboard.js"></script>
-  <script src="/templates/dev/head/pages/suggestion_editor/ShowSuggestionModalForLearnerViewService.js"></script>
-  <script src="/templates/dev/head/pages/suggestion_editor/SuggestionModalService.js"></script>
-  <script src="/templates/dev/head/pages/suggestion_editor/ShowSuggestionModalForLearnerView.js"></script>
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
 {% endblock footer_js %}

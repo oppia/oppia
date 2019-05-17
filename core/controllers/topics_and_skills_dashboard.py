@@ -36,9 +36,7 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
-        self.render_template(
-            'pages/topics_and_skills_dashboard/'
-            'topics_and_skills_dashboard.html', redirect_url_on_logout='/')
+        self.render_template('dist/topics_and_skills_dashboard.html')
 
 
 class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
@@ -199,6 +197,13 @@ class MergeSkillHandler(base.BaseHandler):
         question_services.update_skill_ids_of_questions(
             old_skill_id, old_skill.description, new_skill_id)
         changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'old_value': old_skill.superseding_skill_id,
+                'new_value': new_skill_id
+            }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
                 'property_name': (

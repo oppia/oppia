@@ -50,7 +50,7 @@ class QuestionModel(base_models.VersionedModel):
     # An object representing the question state data.
     question_state_data = ndb.JsonProperty(indexed=False, required=True)
     # The schema version for the question state data.
-    question_state_schema_version = ndb.IntegerProperty(
+    question_state_data_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
@@ -153,6 +153,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     question_id = ndb.StringProperty(required=True, indexed=True)
     # The ID of the skill to which the question is linked.
     skill_id = ndb.StringProperty(required=True, indexed=True)
+    # The difficulty of the skill.
+    skill_difficulty = ndb.FloatProperty(required=True, indexed=True)
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -168,12 +170,13 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return '%s:%s' % (question_id, skill_id)
 
     @classmethod
-    def create(cls, question_id, skill_id):
+    def create(cls, question_id, skill_id, skill_difficulty):
         """Creates a new QuestionSkillLinkModel entry.
 
         Args:
             question_id: str. The ID of the question.
             skill_id: str. The ID of the skill to which the question is linked.
+            skill_difficulty: float. The difficulty between [0, 1] of the skill.
 
         Raises:
             Exception. The given question is already linked to the given skill.
@@ -190,7 +193,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_skill_link_model_instance = cls(
             id=question_skill_link_id,
             question_id=question_id,
-            skill_id=skill_id
+            skill_id=skill_id,
+            skill_difficulty=skill_difficulty
         )
         return question_skill_link_model_instance
 
@@ -357,11 +361,13 @@ class QuestionSummaryModel(base_models.BaseModel):
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
-    question_model_last_updated = ndb.DateTimeProperty(indexed=True)
+    question_model_last_updated = ndb.DateTimeProperty(
+        indexed=True, required=True)
     # Time when the question model was created (not to be confused
     # with created_on, which is the time when the question *summary*
     # model was created).
-    question_model_created_on = ndb.DateTimeProperty(indexed=True)
+    question_model_created_on = ndb.DateTimeProperty(
+        indexed=True, required=True)
     # The html content for the question.
     question_content = ndb.TextProperty(indexed=False, required=True)
 

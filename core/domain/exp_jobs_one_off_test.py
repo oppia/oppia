@@ -934,7 +934,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         yaml_before_migration = exploration.to_yaml()
 
         # Start migration job on sample exploration.
@@ -946,7 +946,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         updated_exp = exp_services.get_exploration_by_id(self.VALID_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         after_converted_yaml = updated_exp.to_yaml()
         self.assertEqual(after_converted_yaml, yaml_before_migration)
 
@@ -967,7 +967,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         updated_exp = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             updated_exp.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         # Ensure the states structure within the exploration was changed.
         self.assertNotEqual(
@@ -1242,17 +1242,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_misconception_id': None
         }]
 
-        content_ids_to_audio_translations_dict = {
-            'content': {},
-            'default_outcome': {},
-            'feedback': {}
-        }
-
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_interaction_answer_groups(answer_group_list1)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict)
-
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
@@ -1301,8 +1292,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_interaction_answer_groups(answer_group_list2)
-        state2.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1331,12 +1320,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
 
         state1.update_interaction_id('ItemSelectionInput')
-
-        content_ids_to_audio_translations_dict = {
-            'content': {},
-            'default_outcome': {},
-            'feedback': {}
-        }
 
         customization_args_dict = {
             'choices': {'value': [
@@ -1374,8 +1357,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_interaction_answer_groups(answer_group_list)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1655,27 +1636,8 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
             }
         }]
 
-        content_ids_to_audio_translations_dict1 = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-            'hint2': {}
-        }
-
-        content_ids_to_audio_translations_dict2 = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-        }
-
         state1.update_interaction_hints(hint_list1)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict1)
-
         state2.update_interaction_hints(hint_list2)
-        state2.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict2)
-
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start HintsAuditOneOff job on sample exploration.
@@ -1722,26 +1684,9 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
             }
         }]
 
-        content_ids_to_audio_translations_dict1 = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-            'hint2': {}
-        }
-
-        content_ids_to_audio_translations_dict2 = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-        }
-
         state1.update_interaction_hints(hint_list1)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict1)
 
         state2.update_interaction_hints(hint_list2)
-        state2.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict2)
 
         exp_services.save_new_exploration(self.albert_id, exploration1)
 
@@ -1759,15 +1704,7 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
             }
         }]
 
-        content_ids_to_audio_translations_dict1 = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-        }
-
         state1.update_interaction_hints(hint_list1)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict1)
 
         exp_services.save_new_exploration(self.albert_id, exploration2)
 
@@ -1812,19 +1749,8 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
             }
         }]
 
-        content_ids_to_audio_translations_dict = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-            'hint2': {}
-        }
-
         state1.update_interaction_hints(hint_list)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict)
-
         exp_services.save_new_exploration(self.albert_id, exploration)
-
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
         run_job_for_deleted_exp(self, exp_jobs_one_off.HintsAuditOneOffJob)

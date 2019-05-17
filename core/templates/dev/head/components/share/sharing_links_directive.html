@@ -1,26 +1,26 @@
-<ul class="oppia-sharing-links" layout="<[layoutType]>" layout-align="<[layoutAlignType]>">
+<ul class="oppia-sharing-links" layout="<[$ctrl.layoutType]>" layout-align="<[$ctrl.layoutAlignType]>">
   <li>
-    <a ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[serverName]>/<[activityType]>/<[activityId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" ng-click="registerShareEvent('facebook')" target="_window">
+    <a title="Facebook" ng-href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u=<[$ctrl.serverName]>/<[$ctrl.activityType]>/<[$ctrl.activityId]>&display=popup&ref=plugin&src=share_button" onclick="return !window.open(this.href, '', 'height=336, width=640')" ng-click="$ctrl.registerShareEvent('facebook')" target="_window">
       <i class="oppia-share-icons fa fa-facebook-square"></i>
       <span class="oppia-icon-accessibility-label">Facebook</span>
     </a>
   </li>
 
   <li>
-    <a ng-href="https://twitter.com/share?text=<[escapedTwitterText]>&url=<[serverName]>/<[activityType]>/<[activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" ng-click="registerShareEvent('twitter')" target="_window">
+    <a title="Twitter" ng-href="https://twitter.com/share?text=<[$ctrl.escapedTwitterText]>&url=<[$ctrl.serverName]>/<[$ctrl.activityType]>/<[$ctrl.activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" ng-click="$ctrl.registerShareEvent('twitter')" target="_window">
       <i class="oppia-share-icons fa fa-twitter-square"></i>
       <span class="oppia-icon-accessibility-label">Twitter</span>
     </a>
   </li>
 
   <li>
-    <a ng-href="https://classroom.google.com/share?url=<[serverName]>/<[activityType]>/<[activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" ng-click="registerShareEvent('classroom')" target="_window">
-      <img class="share-option-img" ng-src="<[classroomUrl]>" alt="Classroom">
+    <a title="Google Classroom" ng-href="https://classroom.google.com/share?url=<[$ctrl.serverName]>/<[$ctrl.activityType]>/<[$ctrl.activityId]>" onclick="return !window.open(this.href, '', 'height=460, width=640')" ng-click="$ctrl.registerShareEvent('classroom')" target="_window">
+      <img class="share-option-img" ng-src="<[$ctrl.classroomUrl]>" alt="Classroom">
     </a>
   </li>
 
-  <li ng-if="shareType === 'exploration'">
-    <a href="" ng-click="showEmbedExplorationModal(explorationId)" tabindex="0">
+  <li ng-if="$ctrl.shareType === 'exploration'">
+    <a title="Embed this Exploration" href="" ng-click="$ctrl.showEmbedExplorationModal($ctrl.explorationId)" tabindex="0">
       <i class="material-icons md-48 embed-link">&#xE86F;</i>
       <span class="oppia-icon-accessibility-label">Embed this Exploration</span>
     </a>
@@ -63,7 +63,7 @@
   }
 
   ul.oppia-sharing-links i.oppia-share-icons {
-    font-size:  40px;
+    font-size: 40px;
     padding: 0 5px;
   }
 

@@ -891,7 +891,7 @@ title: Title
         exp = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exp.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     def test_loading_yaml_with_assets_loads_assets_from_filesystem(self):
         test_asset = (self.TEST_ASSET_PATH, self.TEST_ASSET_CONTENT)
@@ -903,7 +903,7 @@ title: Title
         self.assertEqual(
             fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
 
-    def test_can_load_yaml_with_audio_translations(self):
+    def test_can_load_yaml_with_voiceovers(self):
         exp_services.save_new_exploration_from_yaml_and_assets(
             self.owner_id, self.YAML_WITH_AUDIO_TRANSLATIONS, self.EXP_ID, [])
         exp = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -911,60 +911,54 @@ title: Title
         state = exp.states[exp.init_state_name]
         interaction = state.interaction
         content_id = state.content.content_id
-        content_translations = (
-            state.content_ids_to_audio_translations[content_id])
+        voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
+        content_voiceovers = voiceovers_mapping[content_id]
         feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
-        answer_group_translations = (
-            state.content_ids_to_audio_translations[feedback_id])
+        answer_group_voiceovers = voiceovers_mapping[feedback_id]
         default_outcome_id = interaction.default_outcome.feedback.content_id
-        default_outcome_translations = (
-            state.content_ids_to_audio_translations[default_outcome_id])
+        default_outcome_voiceovers = voiceovers_mapping[default_outcome_id]
         hint_id = interaction.hints[0].hint_content.content_id
-        hint_translations = state.content_ids_to_audio_translations[hint_id]
+        hint_voiceovers = voiceovers_mapping[hint_id]
         solution_id = interaction.solution.explanation.content_id
-        solution_translations = (
-            state.content_ids_to_audio_translations[solution_id])
+        solution_voiceovers = voiceovers_mapping[solution_id]
 
         self.assertEqual(
-            content_translations['en'].filename, self.INTRO_AUDIO_FILE)
+            content_voiceovers['en'].filename, self.INTRO_AUDIO_FILE)
         self.assertEqual(
-            answer_group_translations['en'].filename,
+            answer_group_voiceovers['en'].filename,
             self.ANSWER_GROUP_AUDIO_FILE)
         self.assertEqual(
-            default_outcome_translations['en'].filename,
+            default_outcome_voiceovers['en'].filename,
             self.DEFAULT_OUTCOME_AUDIO_FILE)
+        self.assertEqual(hint_voiceovers['en'].filename, self.HINT_AUDIO_FILE)
         self.assertEqual(
-            hint_translations['en'].filename, self.HINT_AUDIO_FILE)
-        self.assertEqual(
-            solution_translations['en'].filename, self.SOLUTION_AUDIO_FILE)
+            solution_voiceovers['en'].filename, self.SOLUTION_AUDIO_FILE)
 
-    def test_can_load_yaml_with_stripped_audio_translations(self):
+    def test_can_load_yaml_with_stripped_voiceovers(self):
         exp_services.save_new_exploration_from_yaml_and_assets(
             self.owner_id, self.YAML_WITH_AUDIO_TRANSLATIONS, self.EXP_ID, [],
-            strip_audio_translations=True)
+            strip_voiceovers=True)
         exp = exp_services.get_exploration_by_id(self.EXP_ID)
 
         state = exp.states[exp.init_state_name]
         interaction = state.interaction
         content_id = state.content.content_id
-        content_translations = (
-            state.content_ids_to_audio_translations[content_id])
+        voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
+        content_voiceovers = voiceovers_mapping[content_id]
         feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
-        answer_group_translations = (
-            state.content_ids_to_audio_translations[feedback_id])
+        answer_group_voiceovers = voiceovers_mapping[feedback_id]
         default_outcome_id = interaction.default_outcome.feedback.content_id
-        default_outcome_translations = (
-            state.content_ids_to_audio_translations[default_outcome_id])
+        default_outcome_voiceovers = voiceovers_mapping[default_outcome_id]
         hint_id = interaction.hints[0].hint_content.content_id
-        hint_translations = state.content_ids_to_audio_translations[hint_id]
+        hint_voiceovers = voiceovers_mapping[hint_id]
         solution_id = interaction.solution.explanation.content_id
-        solution_translations = (
-            state.content_ids_to_audio_translations[solution_id])
-        self.assertEqual(content_translations, {})
-        self.assertEqual(answer_group_translations, {})
-        self.assertEqual(default_outcome_translations, {})
-        self.assertEqual(hint_translations, {})
-        self.assertEqual(solution_translations, {})
+        solution_voiceovers = voiceovers_mapping[solution_id]
+
+        self.assertEqual(content_voiceovers, {})
+        self.assertEqual(answer_group_voiceovers, {})
+        self.assertEqual(default_outcome_voiceovers, {})
+        self.assertEqual(hint_voiceovers, {})
+        self.assertEqual(solution_voiceovers, {})
 
 
 class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
@@ -1248,9 +1242,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1272,6 +1263,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -1281,9 +1276,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1305,6 +1297,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -1317,7 +1313,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATES_SCHEMA_VERSION))
+    feconf.CURRENT_STATE_SCHEMA_VERSION))
 
     UPDATED_YAML_CONTENT = ("""author_notes: ''
 auto_tts_enabled: true
@@ -1336,9 +1332,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1360,6 +1353,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -1369,9 +1366,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1393,6 +1387,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -1405,7 +1403,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATES_SCHEMA_VERSION))
+    feconf.CURRENT_STATE_SCHEMA_VERSION))
 
     def test_export_to_zip_file(self):
         """Test the export_to_zip_file() method."""
@@ -1550,9 +1548,6 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
 content:
   content_id: content
   html: ''
-content_ids_to_audio_translations:
-  content: {}
-  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1574,6 +1569,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+recorded_voiceovers:
+  voiceovers_mapping:
+    content: {}
+    default_outcome: {}
 written_translations:
   translations_mapping:
     content: {}
@@ -1586,9 +1585,6 @@ written_translations:
 content:
   content_id: content
   html: ''
-content_ids_to_audio_translations:
-  content: {}
-  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1610,6 +1606,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+recorded_voiceovers:
+  voiceovers_mapping:
+    content: {}
+    default_outcome: {}
 written_translations:
   translations_mapping:
     content: {}
@@ -1623,9 +1623,6 @@ written_translations:
 content:
   content_id: content
   html: ''
-content_ids_to_audio_translations:
-  content: {}
-  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1647,6 +1644,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+recorded_voiceovers:
+  voiceovers_mapping:
+    content: {}
+    default_outcome: {}
 written_translations:
   translations_mapping:
     content: {}
@@ -1802,7 +1803,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }
 
     def test_add_state_cmd(self):
-        """ Test adding of states."""
+        """Test adding of states."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertNotIn('new state', exploration.states)
@@ -3089,8 +3090,6 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3102,6 +3101,9 @@ states:
       id: EndExploration
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -3110,9 +3112,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3132,6 +3131,10 @@ states:
       id: Continue
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -3143,7 +3146,7 @@ title: Old Title
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATES_SCHEMA_VERSION)
+    feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -3169,14 +3172,14 @@ title: Old Title
         exploration = exp_services.get_exploration_by_id(self.OLD_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
     def test_does_not_convert_up_to_date_exploration(self):
         exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.assertEqual(exploration.to_yaml(), self._up_to_date_yaml)
 
     def test_migration_then_reversion_maintains_valid_exploration(self):
@@ -3274,7 +3277,7 @@ title: Old Title
             exploration_model, run_conversion=False)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         # The exploration should be valid after conversion.
         exploration.validate(strict=True)
@@ -3314,12 +3317,12 @@ title: Old Title
             'committer_id': feconf.MIGRATION_BOT_USERNAME,
             'commit_message':
                 'Update exploration states from schema version 0 to %d.' %
-                feconf.CURRENT_STATES_SCHEMA_VERSION,
+                feconf.CURRENT_STATE_SCHEMA_VERSION,
             'commit_cmds': [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': '0',
                 'to_version': str(
-                    feconf.CURRENT_STATES_SCHEMA_VERSION)
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
             }],
             'version_number': 4,
         }
@@ -3368,7 +3371,7 @@ title: Old Title
         exploration = exp_services.get_exploration_by_id(exp_id)
         self.assertEqual(
             exploration.states_schema_version,
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         # The converted exploration should be up-to-date and properly
         # converted.

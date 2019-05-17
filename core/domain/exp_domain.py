@@ -45,8 +45,7 @@ import utils
 # 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
-STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = (
-    'content_ids_to_audio_translations')
+STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
@@ -113,7 +112,7 @@ class ExplorationChange(object):
     STATE_PROPERTIES = (
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
-        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+        STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
@@ -491,7 +490,7 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', feconf.CURRENT_STATES_SCHEMA_VERSION,
+            '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
@@ -578,15 +577,10 @@ class Exploration(object):
                 [state_domain.Hint.from_dict(h) for h in idict['hints']],
                 solution)
 
-            state.content_ids_to_audio_translations = {
-                content_id: {
-                    language_code: state_domain.AudioTranslation.from_dict(
-                        audio_translation_dict)
-                    for language_code, audio_translation_dict in
-                    audio_translations.iteritems()
-                } for content_id, audio_translations in (
-                    sdict['content_ids_to_audio_translations'].iteritems())
-            }
+            state.recorded_voiceovers = (
+                state_domain.RecordedVoiceovers.from_dict(
+                    sdict['recorded_voiceovers']))
+
             state.written_translations = (
                 state_domain.WrittenTranslations.from_dict(
                     sdict['written_translations']))
@@ -721,11 +715,6 @@ class Exploration(object):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
-            if self.language_code in (
-                    state.written_translations.get_available_languages()):
-                raise utils.ValidationError(
-                    'This exploration has a text translation in its own '
-                    'language.')
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -2182,6 +2171,26 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v27_dict_to_v28_dict(cls, states_dict):
+        """Converts from version 27 to 28. Version 28 replaces
+        content_ids_to_audio_translations with recorded_voiceovers.
+
+         Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.itervalues():
+            state_dict['recorded_voiceovers'] = {
+                'voiceovers_mapping': (
+                    state_dict.pop('content_ids_to_audio_translations'))
+            }
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2216,7 +2225,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 32
+    CURRENT_EXP_SCHEMA_VERSION = 33
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2571,7 +2580,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v17_dict_to_v18_dict(cls, exploration_dict):
-        """ Converts a v17 exploration dict into a v18 exploration dict.
+        """Converts a v17 exploration dict into a v18 exploration dict.
 
         Adds auto_tts_enabled property.
         """
@@ -2586,7 +2595,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v18_dict_to_v19_dict(cls, exploration_dict):
-        """ Converts a v18 exploration dict into a v19 exploration dict.
+        """Converts a v18 exploration dict into a v19 exploration dict.
 
         Adds audio translations to feedback, hints, and solutions.
         """
@@ -2600,7 +2609,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v19_dict_to_v20_dict(cls, exploration_dict):
-        """ Converts a v19 exploration dict into a v20 exploration dict.
+        """Converts a v19 exploration dict into a v20 exploration dict.
 
         Introduces a correctness property at the top level, and changes each
         answer group's "correct" field to "labelled_as_correct" instead.
@@ -2617,7 +2626,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v20_dict_to_v21_dict(cls, exploration_dict):
-        """ Converts a v20 exploration dict into a v21 exploration dict.
+        """Converts a v20 exploration dict into a v21 exploration dict.
 
         Adds a refresher_exploration_id field to each answer group outcome, and
         to the default outcome (if it exists).
@@ -2632,7 +2641,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v21_dict_to_v22_dict(cls, exploration_dict):
-        """ Converts a v21 exploration dict into a v22 exploration dict.
+        """Converts a v21 exploration dict into a v22 exploration dict.
 
         Moves the labelled_as_correct field from the answer group level to the
         outcome level, and adds two extra customization args to the
@@ -2648,7 +2657,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v22_dict_to_v23_dict(cls, exploration_dict):
-        """ Converts a v22 exploration dict into a v23 exploration dict.
+        """Converts a v22 exploration dict into a v23 exploration dict.
 
         Adds a new customization arg to FractionInput interactions
         which allows you to add custom placeholders.
@@ -2663,7 +2672,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v23_dict_to_v24_dict(cls, exploration_dict):
-        """ Converts a v23 exploration dict into a v24 exploration dict.
+        """Converts a v23 exploration dict into a v24 exploration dict.
 
         Adds training_data parameter to each answer group to store training
         data of corresponding answer group.
@@ -2678,7 +2687,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v24_dict_to_v25_dict(cls, exploration_dict):
-        """ Converts a v24 exploration dict into a v25 exploration dict.
+        """Converts a v24 exploration dict into a v25 exploration dict.
 
         Adds additional tagged_misconception_id and
         missing_prerequisite_skill_id fields to answer groups and outcomes
@@ -2694,7 +2703,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_v25_dict_to_v26_dict(cls, exploration_dict):
-        """ Converts a v25 exploration dict into a v26 exploration dict.
+        """Converts a v25 exploration dict into a v26 exploration dict.
 
         Move audio_translations into a seperate dict.
         """
@@ -2790,6 +2799,21 @@ class Exploration(object):
         exploration_dict['states'] = cls._convert_states_v26_dict_to_v27_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 27
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v32_dict_to_v33_dict(cls, exploration_dict):
+        """Converts a v32 exploration dict into a v33 exploration dict.
+
+        Replaces content_ids_to_audio_translations with recorded_voiceovers in
+        each state of the exploration.
+        """
+        exploration_dict['schema_version'] = 33
+
+        exploration_dict['states'] = cls._convert_states_v27_dict_to_v28_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 28
 
         return exploration_dict
 
@@ -2985,6 +3009,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v31_dict_to_v32_dict(
                 exploration_dict)
             exploration_schema_version = 32
+
+        if exploration_schema_version == 32:
+            exploration_dict = cls._convert_v32_dict_to_v33_dict(
+                exploration_dict)
+            exploration_schema_version = 33
 
         return (exploration_dict, initial_schema_version)
 

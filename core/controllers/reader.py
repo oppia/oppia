@@ -188,7 +188,7 @@ class ExplorationEmbedPage(base.BaseHandler):
         self.values.update(exploration_data_values)
         self.values['iframed'] = True
         self.render_template(
-            'pages/exploration_player/exploration_player.html',
+            'dist/exploration_player.html',
             iframe_restriction=None)
 
 
@@ -234,7 +234,7 @@ class ExplorationPage(base.BaseHandler):
         self.values.update(exploration_data_values)
         self.values['iframed'] = False
         self.render_template(
-            'pages/exploration_player/exploration_player.html')
+            'dist/exploration_player.html')
 
 
 class ExplorationHandler(base.BaseHandler):
@@ -1010,4 +1010,38 @@ class FlagExplorationHandler(base.BaseHandler):
             exploration_id,
             self.payload.get('report_text'),
             self.user_id)
+        self.render_json(self.values)
+
+
+class QuestionPlayerHandler(base.BaseHandler):
+    """Provides questions with given skill ids."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET request."""
+        start_cursor = self.request.get('start_cursor')
+        # Skill ids are given as a comma separated list because this is
+        # a GET request.
+
+        skill_ids = self.request.get('skill_ids').split(',')
+        question_count = self.request.get('question_count')
+
+        if not question_count.isdigit() or int(question_count) <= 0:
+            raise self.InvalidInputException(
+                'Question count has to be greater than 0')
+
+        questions, _, next_start_cursor = (
+            question_services.get_questions_and_skill_descriptions_by_skill_ids(
+                int(question_count),
+                skill_ids,
+                start_cursor)
+        )
+
+        question_dicts = [question.to_dict() for question in questions]
+        self.values.update({
+            'question_dicts': question_dicts,
+            'next_start_cursor': next_start_cursor
+        })
         self.render_json(self.values)

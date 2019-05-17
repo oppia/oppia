@@ -51,13 +51,13 @@ class StoryModel(base_models.VersionedModel):
     notes = ndb.TextProperty(indexed=False)
     # The ISO 639-1 code for the language this story is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
-    # The schema version for the story_contents.
-    schema_version = (
-        ndb.IntegerProperty(required=True, default=1, indexed=True))
     # The story contents dict specifying the list of story nodes and the
     # connection between them. Modelled by class StoryContents
     # (see story_domain.py for its current schema).
     story_contents = ndb.JsonProperty(default={}, indexed=False)
+    # The schema version for the story_contents.
+    story_contents_schema_version = (
+        ndb.IntegerProperty(required=True, indexed=True))
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

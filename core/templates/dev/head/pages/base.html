@@ -82,10 +82,7 @@
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         status_code: JSON.parse('{{status_code}}'),
         GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
-        SITE_FEEDBACK_FORM_URL: JSON.parse('{{SITE_FEEDBACK_FORM_URL|js_string}}'),
-        iframed: JSON.parse('{{iframed|js_string}}'),
         isTopicManager: JSON.parse('{{is_topic_manager|js_string}}'),
-        logoutUrl: JSON.parse('{{logout_url|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
     </script>
@@ -155,67 +152,28 @@
         </div>
       </div>
 
-      <div ng-if="DEV_MODE" class="oppia-dev-mode">
+      <div ng-if="DEV_MODE" class="oppia-dev-mode" ng-cloak>
         Dev Mode
       </div>
 
       <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank"
-         class="oppia-site-feedback oppia-transition-200">
+         rel="noopener" class="oppia-site-feedback oppia-transition-200">
         <i class="material-icons md-18">&#xE87F;</i>
         <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
       </a>
     </div>
 
     {% include 'pages/footer_js_libs.html' %}
-
-    <script src="/templates/dev/head/app.js"></script>
-    <script src="/templates/dev/head/directives.js"></script>
-    <script src="/templates/dev/head/filters.js"></script>
-    <script src="/templates/dev/head/i18n.js"></script>
-
-    <script src="/templates/dev/head/pages/Base.js"></script>
-
-    <script src="/templates/dev/head/services/AlertsService.js"></script>
-    <script src="/templates/dev/head/services/ContextService.js"></script>
-    <script src="/templates/dev/head/services/NavigationService.js"></script>
-    <script src="/templates/dev/head/services/UtilsService.js"></script>
-    <script src="/templates/dev/head/services/DebouncerService.js"></script>
-    <script src="/templates/dev/head/services/DateTimeFormatService.js"></script>
-    <script src="/templates/dev/head/services/IdGenerationService.js"></script>
-    <script src="/templates/dev/head/services/ValidatorsService.js"></script>
-    <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
-    <script src="/templates/dev/head/services/TranslationFileHashLoaderService.js"></script>
-    <script src="/templates/dev/head/services/RteHelperService.js"></script>
-    <script src="/templates/dev/head/services/StateRulesStatsService.js"></script>
-    <script src="/templates/dev/head/services/ConstructTranslationIdsService.js"></script>
-    <script src="/templates/dev/head/services/UserService.js"></script>
-    <script src="/templates/dev/head/services/PromoBarService.js"></script>
-    <script src="/templates/dev/head/services/contextual/DeviceInfoService.js"></script>
-    <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
-    <script src="/templates/dev/head/services/contextual/WindowDimensionsService.js"></script>
-    <script src="/templates/dev/head/services/stateful/BackgroundMaskService.js"></script>
-    <script src="/templates/dev/head/services/stateful/FocusManagerService.js"></script>
-    <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
-
-    <script src="/templates/dev/head/components/alerts/AlertMessageDirective.js"></script>
-    <script src="/templates/dev/head/components/create_button/CreateActivityButtonDirective.js"></script>
-
-    <script src="/templates/dev/head/components/forms/ObjectEditorDirective.js"></script>
-    <script src="/templates/dev/head/components/promo/PromoBarDirective.js"></script>
-    <script src="/templates/dev/head/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
-    <script src="/templates/dev/head/components/social_buttons/SocialButtonsDirective.js"></script>
-    <script src="/templates/dev/head/components/top_navigation_bar/TopNavigationBarDirective.js"></script>
-
-    <script src="/templates/dev/head/components/CollectionCreationService.js"></script>
-    <script src="/templates/dev/head/components/ExplorationCreationService.js"></script>
-    <script src="/templates/dev/head/components/TopicCreationService.js"></script>
-    <script src="/templates/dev/head/components/SkillCreationService.js"></script>
-    <script src="/templates/dev/head/components/StoryCreationService.js"></script>
-
-    <script src="/templates/dev/head/components/CkEditorRteDirective.js"></script>
-    <script src="/templates/dev/head/domain/sidebar/SidebarStatusService.js"></script>
-    <script src="/templates/dev/head/domain/user/UserInfoObjectFactory.js"></script>
-    <script src="/templates/dev/head/domain/utilities/UrlInterpolationService.js"></script>
+    <script src="/templates/dev/head/AppInit.js"></script>
+    <!-- This code is used for inserting webpack bundles
+       https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+    <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+      <% if (webpackConfig.mode == 'production') { %>
+        <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <% } else { %>
+        <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <% } %>
+    <% } %>
 
     {% block footer_js %}
     {% endblock footer_js %}

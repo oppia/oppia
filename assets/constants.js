@@ -30,6 +30,13 @@ var constants = {
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
 
+  // These categories are shown in the library navbar. The categories should
+  // be in sorted order.
+  "SEARCH_DROPDOWN_CATEGORIES": ["Algorithms", "Architecture", "Art",
+    "Biology", "Business", "Chemistry", "Economics", "English", "Geography",
+    "History", "Mathematics", "Medicine", "Music", "Physics", "Programming",
+    "Reading", "Statistics"],
+
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
@@ -431,12 +438,69 @@ var constants = {
     "LIST": "list"
   },
 
+  "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
+    "name": "General",
+    "interaction_ids": [
+        "MultipleChoiceInput",
+        "TextInput"
+    ]
+  }, {
+    "name": "Math",
+    "interaction_ids": [
+        "NumericInput"
+    ]
+  }],
+
+  // These categories and interactions are displayed in the order in which they
+  // appear in the interaction selector.
+  "ALLOWED_INTERACTION_CATEGORIES": [{
+    "name": "General",
+    "interaction_ids": [
+        "Continue",
+        "EndExploration",
+        "ImageClickInput",
+        "ItemSelectionInput",
+        "MultipleChoiceInput",
+        "TextInput",
+        "DragAndDropSortInput"
+    ]
+  }, {
+    "name": "Math",
+    "interaction_ids": [
+        "FractionInput",
+        "GraphInput",
+        "LogicProof",
+        "NumericInput",
+        "SetInput",
+        "MathExpressionInput",
+        "NumberWithUnits"
+    ]
+  }, {
+    "name": "Programming",
+    "interaction_ids": [
+        "CodeRepl",
+        "PencilCodeEditor"
+    ]
+  }, {
+    "name": "Music",
+    "interaction_ids": [
+        "MusicNotesInput"
+    ]
+  }, {
+    "name": "Geography",
+    "interaction_ids": [
+        "InteractiveMap"
+    ]
+  }],
+
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
   "ACTIVITY_STATUS_PRIVATE": "private",
   "ACTIVITY_STATUS_PUBLIC": "public",
+
+  "SITE_FEEDBACK_FORM_URL": "",
 
   "SYSTEM_USER_IDS": ["admin", "OppiaMigrationBot"],
 
@@ -454,7 +518,11 @@ var constants = {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
+  "DEFAULT_SKILL_DIFFICULTY": 0.3,
+
   "ENABLE_NEW_STRUCTURE_EDITORS": true,
+
+  "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_NEW_STRUCTURE_PLAYERS": false,
 
@@ -486,21 +554,21 @@ var constants = {
             "solution": null
         },
       "param_changes": [],
-      "content_ids_to_audio_translations": {
-          "content": {},
-          "default_outcome": {}
+      "recorded_voiceovers": {
+          "voiceovers_mapping": {
+              "content": {},
+              "default_outcome": {}
+          }
       },
       "written_translations": {
           "translations_mapping": {
-            "content": {},
-            "default_outcome": {}
+              "content": {},
+              "default_outcome": {}
           }
       }
   },
 
   "ALLOW_YAML_FILE_UPLOAD": false,
-
-  "CURRENT_STATES_SCHEMA_VERSION": 27,
 
   "DEV_MODE": true
 };

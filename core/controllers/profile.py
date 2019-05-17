@@ -14,6 +14,8 @@
 
 """Controllers for the profile page."""
 
+import re
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -43,7 +45,7 @@ class ProfilePage(base.BaseHandler):
         self.values.update({
             'PROFILE_USERNAME': user_settings.username,
         })
-        self.render_template('pages/profile/profile.html')
+        self.render_template('dist/profile.html')
 
 
 class ProfileHandler(base.BaseHandler):
@@ -105,11 +107,8 @@ class PreferencesPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
-            'LANGUAGE_CODES_AND_NAMES': (
-                utils.get_all_language_codes_and_names()),
         })
-        self.render_template(
-            'pages/preferences/preferences.html', redirect_url_on_logout='/')
+        self.render_template('dist/preferences.html')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -222,7 +221,7 @@ class ProfilePictureHandler(base.BaseHandler):
 
 
 class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
-    """ Provides the dataURI of the profile picture of the specified user,
+    """Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID.
     """
 
@@ -251,7 +250,9 @@ class SignupPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         return_url = str(self.request.get('return_url', self.request.uri))
-
+        # Validating return_url for no external redirections.
+        if re.match('^/[^//]', return_url) is None:
+            return_url = '/'
         if user_services.has_fully_registered(self.user_id):
             self.redirect(return_url)
             return
@@ -260,7 +261,7 @@ class SignupPage(base.BaseHandler):
             'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
             'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
         })
-        self.render_template('pages/signup/signup.html')
+        self.render_template('dist/signup.html')
 
 
 class SignupHandler(base.BaseHandler):
@@ -275,7 +276,8 @@ class SignupHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         self.render_json({
-            'has_agreed_to_latest_terms': (
+            'can_send_emails': feconf.CAN_SEND_EMAILS,
+            'has_agreed_to_latest_terms': bool(
                 user_settings.last_agreed_to_terms and
                 user_settings.last_agreed_to_terms >=
                 feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC),
@@ -385,6 +387,7 @@ class UserInfoHandler(base.BaseHandler):
             'is_admin': user_services.is_admin(self.user_id),
             'is_super_admin': (
                 current_user_services.is_current_user_super_admin()),
+            'is_topic_manager': user_services.is_topic_manager(self.user_id),
             'can_create_collections': bool(
                 role_services.ACTION_CREATE_COLLECTION in user_actions),
             'preferred_site_language_code': (

@@ -79,11 +79,17 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                     apply_custom_validators=False))
 
             if ca_spec['schema']['type'] == 'custom':
-                obj_class = obj_services.Registry.get_object_class_by_type(
-                    ca_spec['schema']['obj_type'])
-                self.assertEqual(
-                    ca_spec['default_value'],
-                    obj_class.normalize(ca_spec['default_value']))
+                # Default value of SanitizedUrl obj_type may be empty. The empty
+                # string is not considered valid for this object, so we don't
+                # attempt to normalize it.
+                if ca_spec['schema']['obj_type'] == 'SanitizedUrl':
+                    self.assertEqual(ca_spec['default_value'], '')
+                else:
+                    obj_class = obj_services.Registry.get_object_class_by_type(
+                        ca_spec['schema']['obj_type'])
+                    self.assertEqual(
+                        ca_spec['default_value'],
+                        obj_class.normalize(ca_spec['default_value']))
 
     def _listdir_omit_ignored(self, directory):
         """List all files and directories within 'directory', omitting the ones
@@ -145,19 +151,20 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(png_file))
             self.assertTrue(os.path.isfile(protractor_file))
 
-            main_js_file = os.path.join(
-                directives_dir, '%sDirective.js' % component_id)
+            main_ts_file = os.path.join(
+                directives_dir, 'OppiaNoninteractive%sDirective.ts'
+                % component_id)
             main_html_file = os.path.join(
                 directives_dir, '%s_directive.html' % component_id.lower())
 
-            self.assertTrue(os.path.isfile(main_js_file))
+            self.assertTrue(os.path.isfile(main_ts_file))
             self.assertTrue(os.path.isfile(main_html_file))
 
-            js_file_content = utils.get_file_contents(main_js_file)
+            ts_file_content = utils.get_file_contents(main_ts_file)
             self.assertIn(
-                'oppiaNoninteractive%s' % component_id, js_file_content)
-            self.assertNotIn('<script>', js_file_content)
-            self.assertNotIn('</script>', js_file_content)
+                'oppiaNoninteractive%s' % component_id, ts_file_content)
+            self.assertNotIn('<script>', ts_file_content)
+            self.assertNotIn('</script>', ts_file_content)
 
 
             # Check that the configuration file contains the correct
@@ -177,17 +184,18 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         for all directives of all RTE components.
         """
 
-        js_files_paths = []
+        ts_files_paths = []
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
             component_dir = os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, component_id)
             directives_dir = os.path.join(component_dir, 'directives')
             directive_filenames = os.listdir(directives_dir)
-            js_files_paths.extend(
+            ts_files_paths.extend(
                 os.path.join(directives_dir, filename) for filename
-                in directive_filenames if filename.endswith('.js'))
+                in directive_filenames if filename.endswith('.ts'))
 
-        js_files_paths.sort()
+        ts_files_paths.sort()
+        js_files_paths = [path.replace('.ts', '.js') for path in ts_files_paths]
         prefix = '<script src="/'
         suffix = '"></script>'
         html_script_tags = [

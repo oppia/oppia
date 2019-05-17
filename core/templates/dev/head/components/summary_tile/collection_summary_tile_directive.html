@@ -1,42 +1,42 @@
-<learner-dashboard-icons ng-if="showLearnerDashboardIconsIfPossible() && userIsLoggedIn"
-                         activity-type="ACTIVITY_TYPE_COLLECTION"
-                         activity-id="getCollectionId()"
-                         activity-title="getCollectionTitle()"
-                         container-is-narrow="isContainerNarrow()"
-                         activity-active="collectionIsCurrentlyHoveredOver"
-                         add-to-playlist-icon-is-shown="!isOwnedByCurrentUser()">
+<learner-dashboard-icons ng-if="$ctrl.showLearnerDashboardIconsIfPossible() && userIsLoggedIn"
+                         activity-type="$ctrl.ACTIVITY_TYPE_COLLECTION"
+                         activity-id="$ctrl.getCollectionId()"
+                         activity-title="$ctrl.getCollectionTitle()"
+                         container-is-narrow="$ctrl.isContainerNarrow()"
+                         activity-active="$ctrl.collectionIsCurrentlyHoveredOver"
+                         add-to-playlist-icon-is-shown="!$ctrl.isOwnedByCurrentUser()">
 </learner-dashboard-icons>
 <md-card class="oppia-activity-summary-tile"
-         ng-class="{'oppia-activity-playlist-tile': isPlaylistTile()}"
+         ng-class="{'oppia-activity-playlist-tile': $ctrl.isPlaylistTile()}"
          style="position: relative; z-index: 5;">
-  <a ng-href="<[getCollectionLink()]>" style="text-decoration: none;">
+  <a ng-href="<[$ctrl.getCollectionLink()]>" style="text-decoration: none;">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
-      <img class="collection-corner-image" ng-src="<[getStaticImageUrl('/general/collection_corner.svg')]>" alt="">
-      <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="isPlaylistTile() && {'top': '6px', 'width': '60px'}">
-      <h3 class="activity-title protractor-test-collection-summary-tile-title" ng-style="isPlaylistTile() && {'width': '93%', 'text-align': 'center'}"><[getCollectionTitle() || DEFAULT_EMPTY_TITLE]></h3>
+      <img class="collection-corner-image" ng-src="<[$ctrl.getStaticImageUrl('/general/collection_corner.svg')]>" alt="">
+      <img class="thumbnail-image" ng-src="<[$ctrl.getCompleteThumbnailIconUrl()]>" alt="<[$ctrl.getCategory()]>" ng-style="$ctrl.isPlaylistTile() && {'top': '6px', 'width': '60px'}">
+      <h3 class="activity-title protractor-test-collection-summary-tile-title" ng-style="$ctrl.isPlaylistTile() && {'width': '93%', 'text-align': 'center'}"><[$ctrl.getCollectionTitle() || $ctrl.DEFAULT_EMPTY_TITLE]></h3>
     </div>
 
-    <div ng-style="isPlaylistTile() && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
+    <div ng-style="$ctrl.isPlaylistTile() && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
       <div class="objective">
-        <[getObjective() | truncateAndCapitalize: 95]>
-        <span ng-if="!getObjective()">No objective specified.</span>
+        <[$ctrl.getObjective() | truncateAndCapitalize: 95]>
+        <span ng-if="!$ctrl.getObjective()">No objective specified.</span>
       </div>
       <ul layout="row" class="metrics" layout-align="space-between center">
         <li>
           <span>
-            COLLECTION (<[getNodeCount()]>)
+            COLLECTION (<[$ctrl.getNodeCount()]>)
           </span>
         </li>
         <li>
           <span>
             <span class="oppia-icon-accessibility-label">Last Updated</span>
-            <[getLastUpdatedDatetime()]>
+            <[$ctrl.getLastUpdatedDatetime()]>
           </span>
         </li>
       </ul>
     </div>
-    <div ng-if="!isPlaylistTile()" class="title-section-mask"
-         ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)">
+    <div ng-if="!$ctrl.isPlaylistTile()" class="title-section-mask"
+         ng-mouseenter="$ctrl.setHoverState(true)" ng-mouseleave="$ctrl.setHoverState(false)">
     </div>
   </a>
 </md-card>

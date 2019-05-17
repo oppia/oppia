@@ -139,6 +139,27 @@ var ExplorationEditorTranslationTab = function() {
   var numericalStatus = element(
     by.css('.protractor-test-translation-numerical-status'));
 
+  var translationTabContentAccessibility = element(
+    by.css('.protractor-test-accessibility-translation-content'));
+
+  var translationTabFeedbackAccessibility = element(
+    by.css('.protractor-test-accessibility-translation-feedback'));
+
+  var translationTabHintAccessibility = element(
+    by.css('.protractor-test-accessibility-translation-hint'));
+
+  var translationTabSolutionAccessibility = element(
+    by.css('.protractor-test-accessibility-translation-solution'));
+
+  var translationTabStartRecordingAccessibility = element(
+    by.css('.protractor-test-accessibility-translation-start-record'));
+
+  var translationTabUploadRecordingAccessibility = element(
+    by.css('.protractor-test-accessibility-translation-upload-audio'));
+
+  var translationTabPlayRecordingAccessibility = element(
+    by.css('.protractor-test-accessibility-translation-play-recorded-audio'));
+
   var _selectLanguage = function(language) {
     element(by.css('.protractor-test-translation-language-selector')).
       element(by.cssContainingText('option', language)).click();
@@ -156,7 +177,7 @@ var ExplorationEditorTranslationTab = function() {
       feedbackTabButton, 'Feedback Tab button is not clickable');
     feedbackTabButton.click();
     expect(feedbackList.count()).toEqual(contents.length);
-    for (index in contents) {
+    for (var index in contents) {
       translationFeedback(index).click();
       expect(translationFeedbackText(index).getText()).toMatch(contents[index]);
     }
@@ -166,7 +187,7 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.elementToBeClickable(
       hintsTabButton, 'Hints Tab button is not clickable');
     hintsTabButton.click();
-    for (index in contents) {
+    for (var index in contents) {
       translationHint(index).click();
       expect(translationHintText(index).getText()).toMatch(contents[index]);
     }
@@ -181,6 +202,45 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectNumericalStatusToMatch = function(content) {
     expect(numericalStatus.getText()).toMatch(content);
+  };
+
+  this.expectNumericalStatusAccessibilityToMatch = function(content) {
+    expect(numericalStatus.getAttribute('aria-label')).toMatch(content);
+  };
+
+  this.expectContentAccessibilityToMatch = function(content) {
+    expect(translationTabContentAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
+  };
+
+  this.expectFeedbackAccessibilityToMatch = function(content) {
+    expect(translationTabFeedbackAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
+  };
+
+  this.expectHintAccessibilityToMatch = function(content) {
+    expect(translationTabHintAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
+  };
+
+  this.expectSolutionAccessibilityToMatch = function(content) {
+    expect(translationTabSolutionAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
+  };
+
+  this.expectStartRecordingAccessibilityToMatch = function(content) {
+    expect(translationTabStartRecordingAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
+  };
+
+  this.expectUploadRecordingAccessibilityToMatch = function(content) {
+    expect(translationTabUploadRecordingAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
+  };
+
+  this.expectPlayRecordingAccessibilityToMatch = function(content) {
+    expect(translationTabPlayRecordingAccessibility.getAttribute(
+      'aria-label')).toMatch(content);
   };
 
   this.changeTranslationLanguage = function(language) {
