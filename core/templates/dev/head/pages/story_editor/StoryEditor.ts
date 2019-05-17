@@ -76,13 +76,10 @@ require('pages/story_editor/main_editor/StoryEditorDirective.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/story_editor/StoryEditorStateService.ts');
-require('services/contextual/UrlService.ts');
 require('services/PageTitleService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.constant('NODE_ID_PREFIX', 'node_');
-
-oppia.constant('EVENT_STORY_INITIALIZED', 'storyInitialized');
-oppia.constant('EVENT_STORY_REINITIALIZED', 'storyReinitialized');
 
 oppia.controller('StoryEditor', [
   '$scope', '$uibModal', '$window', 'PageTitleService',

@@ -75,16 +75,13 @@ require('pages/topic_editor/questions/QuestionsTabDirective.ts');
 require('pages/topic_editor/subtopics_editor/SubtopicsListTabDirective.ts');
 
 require('pages/topic_editor/TopicEditorStateService.ts');
-require('services/contextual/UrlService.ts');
 require('services/PageTitleService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 oppia.constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
-
-oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
-oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
 
 oppia.controller('TopicEditor', [
   '$scope', 'PageTitleService', 'TopicEditorStateService', 'UrlService',

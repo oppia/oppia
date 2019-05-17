@@ -32,7 +32,7 @@ class TopicViewerPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        self.render_template('/pages/topic_viewer/topic_viewer.html')
+        self.render_template('dist/topic_viewer.html')
 
 
 
