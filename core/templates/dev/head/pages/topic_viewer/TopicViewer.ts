@@ -22,8 +22,8 @@ require('pages/topic_viewer/TopicViewerNavbarBreadcrumbDirective.ts');
 
 require('domain/topic_viewer/TopicViewerBackendApiService.ts');
 require('services/AlertsService.ts');
-require('services/contextual/UrlService.ts');
 require('services/PageTitleService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.controller('TopicViewer', [
   '$rootScope', '$scope', '$window', 'AlertsService',
