@@ -36,9 +36,10 @@ module.exports = {
           {
             loader: 'ts-loader',
             options: {
+              // this is needed for thread-loader to work correctly
               happyPackMode: true
             }
-          }        
+          }
         ]
       }
     ]
