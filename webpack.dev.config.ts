@@ -29,7 +29,17 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        use: 'ts-loader',
+        include: path.resolve(__dirname, 'core/templates/dev/head'),
+        use: [
+          'cache-loader',
+          'thread-loader',
+          {
+            loader: 'ts-loader',
+            options: {
+              happyPackMode: true
+            }
+          }        
+        ]
       }
     ]
   },
