@@ -22,7 +22,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-states/exploration-states.service.ts');
 require(
-  'core/templates/dev/head/pages/exploration-editor-page/' +
+  'pages/exploration-editor-page/' +
   'exploration-editor-tab/state-name-editor/state-name-editor.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +

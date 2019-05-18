@@ -18,7 +18,7 @@
 
 require(
   'pages/exploration-editor-page/exploration-editor-tab/state-name-editor/' +
-  'state-name-editor.directive.tss');
+  'state-name-editor.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'state-param-changes-editor/state-param-changes-editor.directive.ts');

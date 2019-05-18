@@ -17,7 +17,8 @@
  */
 
 require(
-  'pages/exploration-editor-page/editor_tab/StateGraphVisualizationDirective.ts');
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'state-graph-visualization/state-graph-visualization.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(

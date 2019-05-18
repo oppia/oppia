@@ -26,7 +26,8 @@ require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 require(
-  'pages/exploration-editor-page/editor_tab/TrainingDataEditorPanelService.ts');
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/training-data-editor-panel.service.ts');
 require(
   'pages/state-editor/state-editor-properties-services/state-editor/' +
   'state-editor.service.ts');

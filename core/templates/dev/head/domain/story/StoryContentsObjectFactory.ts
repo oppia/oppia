@@ -19,7 +19,7 @@
 
 require('domain/story/StoryNodeObjectFactory.ts');
 require(
-  'core/templates/dev/head/pages/story-editor-page/' +
+  'pages/story-editor-page/' +
   'story-editor-page.controller.ts');
 
 oppia.factory('StoryContentsObjectFactory', [

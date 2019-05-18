@@ -129,7 +129,7 @@ module.exports = {
       chunks: ['creator_dashboard'],
       filename: 'creator-dashboard-page.mainpage.html',
       template:
-        commonPrefix + 'pages/creator-dashboard-page/creator-dashboard-page.mainpage.html',
+        commonPrefix + '/pages/creator-dashboard-page/creator-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -180,8 +180,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['get_started'],
-      filename: 'get_started.html',
-      template: commonPrefix + '/pages/get_started/get_started.html',
+      filename: 'get-started-page.mainpage.html',
+      template: commonPrefix + '/pages/get_started/get-started-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -268,7 +268,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['skill_editor'],
       filename: 'skill-editor-page.mainpage.html',
-      template: commonPrefix + 'pages/skill-editor-page/skill-editor-page.mainpage.html',
+      template: commonPrefix + '/pages/skill-editor-page/skill-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

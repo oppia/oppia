@@ -20,13 +20,16 @@
 require('domain/exploration/OutcomeObjectFactory.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'AnswerGroupsCacheService.ts');
+  'exploration-editor-tab-services/answer-groups-cache/' +
+  'answer-groups-cache.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'SolutionValidityService.ts');
+  'exploration-editor-tab-services/solution-validity/' +
+  'solution-validity.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'SolutionVerificationService.ts');
+  'exploration-editor-tab-services/solution-verification/' +
+  'solution-verification.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');

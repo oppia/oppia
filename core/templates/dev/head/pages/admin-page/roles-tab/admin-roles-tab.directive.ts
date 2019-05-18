@@ -16,7 +16,8 @@
  * @fileoverview Directive for the Roles tab in the admin panel.
  */
 
-require('pages/admin/roles_tab/RoleGraphDirective.ts');
+require(
+  'pages/admin-page/roles-tab/roles-graph/role-graph.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(

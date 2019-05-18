@@ -62,13 +62,13 @@ module.exports = function(config) {
       // is repaired, the templateCache is broken due to the fact that
       // webpack is not yet implemented for /extensions (#6732)
       'core/templates/dev/head/components/RatingDisplayDirectiveSpec.js',
-      ('core/templates/dev/head/pages/exploration-editor-page/editor_tab/' +
+      ('pages/exploration-editor-page/editor_tab/' +
        'SolutionVerificationServiceSpec.ts'),
-      ('core/templates/dev/head/pages/exploration-editor-page/editor_tab/' +
+      ('pages/exploration-editor-page/editor_tab/' +
        'StateNameEditorDirectiveSpec.ts'),
-      ('core/templates/dev/head/pages/state-editor/' +
+      ('pages/state-editor/' +
        'StateContentEditorDirectiveSpec.ts'),
-      ('core/templates/dev/head/pages/state-editor/' +
+      ('pages/state-editor/' +
        'StateInteractionEditorDirectiveSpec.ts'),
     ],
     proxies: {

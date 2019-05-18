@@ -23,20 +23,32 @@ require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +
   'state-translation.directive.ts');
 require(
-  'pages/exploration-editor-page/translation_tab/' +
-  'StateTranslationStatusGraphDirective.ts'
+  'pages/exploration-editor-page/translation-tab/' +
+  'state-translation-status-graph/state-translation-status-graph.directive.ts'
 );
 require(
-  'pages/exploration-editor-page/translation_tab/TranslatorOverviewDirective.ts');
+  'pages/exploration-editor-page/translation-tab/translator-overview/' +
+  'translator-overview.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration-editor-page/exploration-editor-page-services/exploration-data/exploration-data.service.ts');
-require('pages/exploration-editor-page/exploration-editor-page-services/exploration-states/exploration-states.service.ts');
-require('pages/exploration-editor-page/exploration-editor-page-services/state-tutorial-first-time.service.ts');
-require(   'pages/exploration-editor-page/exploration-editor-tab/' +   'exploration-editor-tab-services/responses.service.ts');
-require('require(   'pages/state-editor/state-editor-properties-services/state-property/' +   'state-property.service.ts');');
 require(
-  'pages/state-editor/state-editor-properties-services/state-recorded-voiceovers.service.ts');
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-data/exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'state-tutorial-first-time.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-recorded-voiceovers.service.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 

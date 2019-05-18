@@ -19,7 +19,9 @@
 require(
   'components/common-layout-directives/background-banner/' +
   'background-banner.directive.ts');
-require('pages/topics_and_skills_dashboard/SkillsListDirective.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/skills-list/' +
+  'skills-list.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page-navbar-breadcrumb/' +

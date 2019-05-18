@@ -18,7 +18,9 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('pages/collection_player/CollectionNodeListDirective.ts');
+require(
+  'pages/collection-player-page/collection-node-list/' +
+  'collection-node-list.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
@@ -30,8 +32,12 @@ require(
 require(
   'components/summary-tile-directives/exploration-summary-tile/' +
   'exploration-summary-tile.directive.ts');
-require('pages/collection_player/CollectionFooterDirective.ts');
-require('pages/collection_player/CollectionLocalNav.ts');
+require(
+  'pages/collection-player-page/collection-footer/' +
+  'collection-footer.directive.ts');
+require(
+  'pages/collection-player-page/collection-local-nav/' +
+  'collection-local-nav.controller.ts');
 
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionPlaythroughObjectFactory.ts');

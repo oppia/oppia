@@ -17,10 +17,11 @@
  */
 require('components/state/response-header/response-header.directive.ts');
 require(
-  'pages/exploration-editor-page/translation_tab/AudioTranslationBarDirective.ts');
+  'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
+  'audio-translation-bar.directive.ts');
 require(
-  'pages/exploration-editor-page/translation_tab/' +
-  'StateTranslationEditorDirective.ts'
+  'pages/exploration-editor-page/translation-tab/state-translation-editor/' +
+  'state-translation-editor.directive.ts'
 );
 
 require('domain/utilities/UrlInterpolationService.ts');
