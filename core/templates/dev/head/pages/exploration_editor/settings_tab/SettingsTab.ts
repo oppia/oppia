@@ -116,7 +116,8 @@ oppia.controller('SettingsTab', [
         if (ExplorationStatesService.isInitialized()) {
           var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
             function(categoryItem) {
-              return categoryItem.id === ExplorationCategoryService.savedMemento;
+              return (
+                categoryItem.id === ExplorationCategoryService.savedMemento);
             }
           );
 
