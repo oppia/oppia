@@ -397,7 +397,9 @@
 /core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
 /gulpfile.js @vojtechjelinek
 /jinja_utils*.py @vojtechjelinek
-
+/webpack.config.ts @vojtechjelinek
+/webpack.dev.config.ts @vojtechjelinek
+/webpack.prod.config.ts @vojtechjelinek
 
 # Typings.
 /typings @ankita240796
