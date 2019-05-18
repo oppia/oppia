@@ -92,6 +92,9 @@ def can_play_exploration(handler):
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise self.PageNotFoundException
 
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 

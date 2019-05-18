@@ -794,46 +794,6 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
         self.assertGreater(num_handlers_checked, 150)
 
 
-class HasSeenTutorialTests(test_utils.GenericTestBase):
-
-    class MockHandler(base.BaseHandler):
-        def get(self):
-            self.render_json({
-                'has_seen_editor_tutorial': self.has_seen_editor_tutorial,
-                'has_seen_translation_tutorial':
-                self.has_seen_translation_tutorial
-                })
-
-
-    def setUp(self):
-        super(HasSeenTutorialTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        # Modify the testapp to use the mock handler.
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
-            debug=feconf.DEBUG,
-        ))
-
-    def test_user_has_seen_editor_tutorial(self):
-        self.login(self.OWNER_EMAIL)
-        response = self.get_json('/mock')
-        self.assertFalse(response['has_seen_editor_tutorial'])
-        user_services.record_user_started_state_editor_tutorial(
-            self.owner_id)
-        response = self.get_json('/mock')
-        self.assertTrue(response['has_seen_editor_tutorial'])
-
-    def test_user_has_seen_translation_tutorial(self):
-        self.login(self.OWNER_EMAIL)
-        response = self.get_json('/mock')
-        self.assertFalse(response['has_seen_translation_tutorial'])
-        user_services.record_user_started_state_translation_tutorial(
-            self.owner_id)
-        response = self.get_json('/mock')
-        self.assertTrue(response['has_seen_translation_tutorial'])
-
-
 class IframeRestrictionTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
