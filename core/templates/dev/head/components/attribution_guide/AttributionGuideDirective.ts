@@ -16,19 +16,25 @@
  * @fileoverview Directive for the attribution guide.
  */
 
+require('domain/utilities/BrowserCheckerService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('attributionGuide', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/attribution_guide/' +
         'attribution_guide_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', 'BrowserCheckerService', 'UrlService', function(
-            $scope, BrowserCheckerService, UrlService) {
-          $scope.isMobileDevice = BrowserCheckerService.isMobileDevice();
-          $scope.iframed = UrlService.isIframed();
+        'BrowserCheckerService', 'UrlService', function(
+            BrowserCheckerService, UrlService) {
+          var ctrl = this;
+          ctrl.isMobileDevice = BrowserCheckerService.isMobileDevice();
+          ctrl.iframed = UrlService.isIframed();
         }
       ]
     };
