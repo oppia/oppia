@@ -54,5 +54,4 @@ class StewardsLandingPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.render_template(
-            'dist/topic-landing-page-stewards/' +
-            'topic-landing-page-stewards.mainpage.html')
+            'dist/topic-landing-page-stewards.mainpage.html')
