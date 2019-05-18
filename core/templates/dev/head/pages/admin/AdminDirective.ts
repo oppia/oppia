@@ -72,7 +72,7 @@ oppia.directive('admin', ['UrlInterpolationService',
         '/pages/admin/admin_directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$location', '$scope ', 'AdminRouterService', 'DEV_MODE',
+        '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',
         function($http, $location, $scope, AdminRouterService, DEV_MODE) {
           var ctrl = this;
           ctrl.userEmail = GLOBALS.USER_EMAIL;

@@ -28,12 +28,12 @@ var commonPrefix = './core/templates/dev/head';
 module.exports = {
   entries: {
     about: commonPrefix + '/pages/about/About.ts',
-    admin: commonPrefix + '/pages/admin/AdminDirective.ts',
+    admin: commonPrefix + '/pages/admin/Admin.ts',
     app: commonPrefix + '/App.ts',
     collection_editor:
-      commonPrefix + '/pages/collection_editor/CollectionEditorDirective.ts',
+      commonPrefix + '/pages/collection_editor/CollectionEditor.ts',
     collection_player:
-      commonPrefix + '/pages/collection_player/CollectionPlayerDirective.ts',
+      commonPrefix + '/pages/collection_player/CollectionPlayer.ts',
     contact: commonPrefix + '/pages/contact/Contact.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator_dashboard/CreatorDashboard.ts',
@@ -51,7 +51,7 @@ module.exports = {
     landing: commonPrefix + '/pages/landing/TopicLandingPage.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner_dashboard/LearnerDashboard.ts',
-    library: commonPrefix + '/pages/library/LibraryDirective.ts',
+    library: commonPrefix + '/pages/library/Library.ts',
     maintenance: commonPrefix + '/pages/maintenance/Maintenance.ts',
     moderator: commonPrefix + '/pages/moderator/Moderator.ts',
     notifications_dashboard:
