@@ -35,7 +35,6 @@ class TopicViewerPage(base.BaseHandler):
         self.render_template('dist/topic_viewer.html')
 
 
-
 class TopicPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the topic
     viewer page.
