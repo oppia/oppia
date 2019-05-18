@@ -13,6 +13,7 @@
 // limitations under the License.
 
 var CleanWebpackPlugin = require('clean-webpack-plugin');
+var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 var htmlMinifyConfig = {
@@ -352,5 +353,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
+    new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
   ]
 };
