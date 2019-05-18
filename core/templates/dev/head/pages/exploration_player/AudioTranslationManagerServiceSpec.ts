@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for the audio translation manager service.
  */
 
+require('domain/exploration/AudioTranslationObjectFactory.ts');
+require('domain/exploration/VoiceoverObjectFactory.ts');
+require('pages/exploration_player/AudioTranslationManagerService.ts');
+
 describe('Audio translation manager service', function() {
   beforeEach(angular.mock.module('oppia'));
 

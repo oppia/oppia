@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
+require('domain/topic/SubtopicPageObjectFactory.ts');
+require('domain/topic/TopicObjectFactory.ts');
+require('domain/topic/TopicRightsObjectFactory.ts');
+require('domain/topic/TopicUpdateService.ts');
+require('pages/topic_editor/TopicEditorStateService.ts');
+
 describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;

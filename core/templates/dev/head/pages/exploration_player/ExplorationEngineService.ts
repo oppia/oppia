@@ -16,6 +16,31 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
+require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/ExplorationObjectFactory.ts');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/state_card/StateCardObjectFactory.ts');
+require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('expressions/ExpressionInterpolationService.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require('pages/exploration_player/AudioPreloaderService.ts');
+require('pages/exploration_player/AudioTranslationLanguageService.ts');
+require('pages/exploration_player/ImagePreloaderService.ts');
+require('pages/exploration_player/LearnerParamsService.ts');
+require('pages/exploration_player/NumberAttemptsService.ts');
+require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('pages/exploration_player/StateClassifierMappingService.ts');
+require('pages/exploration_player/StatsReportingService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/UserService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 // A service that provides a number of utility functions for JS used by
