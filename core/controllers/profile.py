@@ -45,7 +45,7 @@ class ProfilePage(base.BaseHandler):
         self.values.update({
             'PROFILE_USERNAME': user_settings.username,
         })
-        self.render_template('pages/profile/profile.html')
+        self.render_template('dist/profile.html')
 
 
 class ProfileHandler(base.BaseHandler):
@@ -108,7 +108,7 @@ class PreferencesPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/preferences/preferences.html')
+        self.render_template('dist/preferences.html')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -261,7 +261,7 @@ class SignupPage(base.BaseHandler):
             'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
             'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
         })
-        self.render_template('pages/signup/signup.html')
+        self.render_template('dist/signup.html')
 
 
 class SignupHandler(base.BaseHandler):
@@ -277,7 +277,7 @@ class SignupHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(self.user_id)
         self.render_json({
             'can_send_emails': feconf.CAN_SEND_EMAILS,
-            'has_agreed_to_latest_terms': (
+            'has_agreed_to_latest_terms': bool(
                 user_settings.last_agreed_to_terms and
                 user_settings.last_agreed_to_terms >=
                 feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC),

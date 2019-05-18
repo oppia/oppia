@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the number attempts service.
  */
 
+require('pages/exploration_player/NumberAttemptsService.ts');
+
 describe('Number attempts service', function() {
   beforeEach(angular.mock.module('oppia'));
 

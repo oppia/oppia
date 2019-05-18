@@ -16,6 +16,12 @@
  * @fileoverview Controller for landing page.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/CapitalizeFilter.ts');
+require('pages/landing/TopicLandingPage.ts');
+require('services/PageTitleService.ts');
+require('services/SiteAnalyticsService.ts');
+
 // Note: This oppia constant needs to be keep in sync with
 // AVAILABLE_LANDING_PAGES constant defined in feconf.py file.
 oppia.constant('TOPIC_LANDING_PAGE_DATA', {
@@ -38,6 +44,8 @@ oppia.constant('TOPIC_LANDING_PAGE_DATA', {
     }
   }
 });
+
+
 
 oppia.controller('TopicLandingPage', [
   '$filter', '$scope', '$timeout', '$window', 'PageTitleService',
