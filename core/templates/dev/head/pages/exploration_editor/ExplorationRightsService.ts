@@ -17,6 +17,9 @@
  * about the rights for this exploration.
  */
 
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('services/AlertsService.ts');
+
 oppia.factory('ExplorationRightsService', [
   '$http', 'AlertsService', 'ExplorationDataService', 'ACTIVITY_STATUS_PRIVATE',
   'ACTIVITY_STATUS_PUBLIC',

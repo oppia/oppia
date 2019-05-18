@@ -45,15 +45,17 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     EXP_ID = 'exp1'
 
-    CONTENT_IDS_TO_AUDIO_TRANSLATION = {
-        'content': {
-            'en': {
-                'filename': 'testFile.mp3',
-                'file_size_bytes': 12200,
-                'needs_update': False
-            }
-        },
-        'default_outcome': {}
+    RECORDED_VOICEOVERS = {
+        'voiceovers_mapping': {
+            'content': {
+                'en': {
+                    'filename': 'testFile.mp3',
+                    'file_size_bytes': 12200,
+                    'needs_update': False
+                }
+            },
+            'default_outcome': {}
+        }
     }
 
     def setUp(self):
@@ -78,16 +80,16 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
                 'change_list': [{
                     'cmd': 'edit_state_property',
                     'state_name': state_name,
-                    'property_name': 'content_ids_to_audio_translations',
-                    'new_value': self.CONTENT_IDS_TO_AUDIO_TRANSLATION
+                    'property_name': 'recorded_voiceovers',
+                    'new_value': self.RECORDED_VOICEOVERS
                 }],
                 'commit_message': 'Translated first state content',
                 'version': 1
             }, csrf_token=self.csrf_token)
         # Checking the response to have audio translations.
         self.assertEqual(
-            response['states'][state_name]['content_ids_to_audio_translations'],
-            self.CONTENT_IDS_TO_AUDIO_TRANSLATION)
+            response['states'][state_name]['recorded_voiceovers'],
+            self.RECORDED_VOICEOVERS)
 
     def test_voice_artist_cannot_save_invalid_change_list(self):
         # Trying to change exploration objective.
@@ -119,22 +121,24 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
     NEWER_DATETIME = datetime.datetime.utcnow() + datetime.timedelta(30)
     # A date in the past.
     OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
-    CONTENT_IDS_TO_AUDIO_TRANSLATION = {
-        'content': {
-            'en': {
-                'filename': 'testFile.mp3',
-                'file_size_bytes': 12200,
-                'needs_update': False
-            }
-        },
-        'default_outcome': {}
+    RECORDED_VOICEOVERS = {
+        'voiceovers_mapping': {
+            'content': {
+                'en': {
+                    'filename': 'testFile.mp3',
+                    'file_size_bytes': 12200,
+                    'needs_update': False
+                }
+            },
+            'default_outcome': {}
+        }
     }
     VALID_DRAFT_CHANGELIST = [{
         'cmd': 'edit_state_property',
         'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-        'property_name': 'content_ids_to_audio_translations',
+        'property_name': 'recorded_voiceovers',
         'old_value': None,
-        'new_value': CONTENT_IDS_TO_AUDIO_TRANSLATION}]
+        'new_value': RECORDED_VOICEOVERS}]
     INVALID_DRAFT_CHANGELIST = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',

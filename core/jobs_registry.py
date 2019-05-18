@@ -51,6 +51,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.CopyToNewDirectoryJob,
+    exp_jobs_one_off.ImagesAuditJob,
     exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
     prod_validation_jobs_one_off.ProdValidationAuditOneOffJob,

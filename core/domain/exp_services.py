@@ -737,9 +737,15 @@ def apply_change_list(exploration_id, change_list):
 
                 elif (
                         change.property_name ==
-                        exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS): # pylint: disable=line-too-long
-                    state.update_content_ids_to_audio_translations(
-                        change.new_value)
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                    if not isinstance(change.new_value, dict):
+                        raise Exception(
+                            'Expected recorded_voiceovers to be a dict, '
+                            'received %s' % change.new_value)
+                    recorded_voiceovers = (
+                        state_domain.RecordedVoiceovers.from_dict(
+                            change.new_value))
+                    state.update_recorded_voiceovers(recorded_voiceovers)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
@@ -1465,7 +1471,7 @@ def get_demo_exploration_components(demo_path):
 
 def save_new_exploration_from_yaml_and_assets(
         committer_id, yaml_content, exploration_id, assets_list,
-        strip_audio_translations=False):
+        strip_voiceovers=False):
     """Note that the default title and category will be used if the YAML
     schema version is less than
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
@@ -1478,8 +1484,8 @@ def save_new_exploration_from_yaml_and_assets(
         exploration_id: str. The id of the exploration.
         assets_list: list(list(str)). A list of lists of assets, which contains
             asset's filename and content.
-        strip_audio_translations: bool. Whether to strip away all audio
-            translations from the imported exploration.
+        strip_voiceovers: bool. Whether to strip away all audio voiceovers
+            from the imported exploration.
 
     Raises:
         Exception: The yaml file is invalid due to a missing schema version.
@@ -1513,10 +1519,9 @@ def save_new_exploration_from_yaml_and_assets(
             exploration_id, yaml_content)
 
     # Check whether audio translations should be stripped.
-    if strip_audio_translations:
+    if strip_voiceovers:
         for state in exploration.states.values():
-            for content_id in state.content_ids_to_audio_translations:
-                state.content_ids_to_audio_translations[content_id] = {}
+            state.recorded_voiceovers.strip_all_existing_voiceovers()
 
     create_commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
@@ -1816,7 +1821,7 @@ def is_voiceover_change_list(change_list):
     """
     for change in change_list:
         if (change.property_name !=
-                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS):
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
             return False
     return True
 

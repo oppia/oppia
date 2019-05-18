@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for StateTopAnswersStatsBackendApiService.
  */
 
+require('services/StateTopAnswersStatsBackendApiService.ts');
+
 describe('StateTopAnswersStatsBackendApiService', function() {
   beforeEach(angular.mock.module('oppia'));
 
