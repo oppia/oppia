@@ -205,9 +205,12 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_library_index_handler_for_user_preferred_language(self):
+        """Test the access to user's preferences."""
         self.login(self.VIEWER_EMAIL)
         response = self.get_html_response('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
+
+        # Change the user's preferred language to de.
         self.put_json(
             '/preferenceshandler/data',
             {'update_type': 'preferred_language_codes', 'data': ['de']},
@@ -219,12 +222,14 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         }, response_dict)
 
     def test_library_index_handler_for_top_rated(self):
+        """Test the handler for top rated scenario."""
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
             'activity_summary_dicts_by_category': [],
             'preferred_language_codes': ['en'],
         }, response_dict)
 
+        # Load a demo.
         exp_services.load_demo('0')
         rating_services.assign_rating_to_exploration('user', '0', 2)
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
@@ -241,8 +246,10 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
             'protractor_id': 'top-rated',
         }, response_dict['activity_summary_dicts_by_category'][0])
+        activity_summary = response_dict['activity_summary_dicts_by_category'][
+            0]['activity_summary_dicts']
         self.assertEqual(
-            len(response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts']), 1) # pylint: disable=line-too-long
+            len(activity_summary), 1)
         self.assertDictContainsSubset({
             'id': '0',
             'category': 'Welcome',
@@ -250,15 +257,17 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0]) # pylint: disable=line-too-long
+        }, activity_summary[0])
 
     def test_library_index_handler_for_featured(self):
+        """Test the handler for featured scenario."""
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
             'activity_summary_dicts_by_category': [],
             'preferred_language_codes': ['en'],
         }, response_dict)
 
+        # Load a demo.
         exp_services.load_demo('0')
         exploration_ref = activity_domain.ActivityReference(
             constants.ACTIVITY_TYPE_EXPLORATION, '0')
@@ -277,8 +286,10 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'has_full_results_page': False,
             'full_results_url': None,
         }, response_dict['activity_summary_dicts_by_category'][0])
+        activity_summary = response_dict['activity_summary_dicts_by_category'][
+            0]['activity_summary_dicts']
         self.assertEqual(
-            len(response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts']), 1)  # pylint: disable=line-too-long
+            len(activity_summary), 1)
         self.assertDictContainsSubset({
             'id': '0',
             'category': 'Welcome',
@@ -286,7 +297,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, response_dict['activity_summary_dicts_by_category'][0]['activity_summary_dicts'][0])  # pylint: disable=line-too-long
+        }, activity_summary[0])
 
 
 class LibraryGroupPageTests(test_utils.GenericTestBase):
@@ -303,6 +314,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
         self.get_html_response(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
 
     def test_library_group_page_for_user_preferred_language(self):
+        """Test the access to user's preferences."""
         self.login(self.VIEWER_EMAIL)
         response = self.get_html_response('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -551,7 +563,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
 
 class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
-
+    """Test Collection Summaries Handler."""
     def test_access_empty_collection(self):
         response_dict = self.get_json(
             feconf.COLLECTION_SUMMARIES_DATA_URL,
@@ -560,7 +572,7 @@ class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
             'summaries': [],
         }, response_dict)
 
-    def test_access_collection(self):
+    def test_access_non_empty_collection(self):
         collection_services.load_demo('0')
         response_dict = self.get_json(
             feconf.COLLECTION_SUMMARIES_DATA_URL,
