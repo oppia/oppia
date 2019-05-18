@@ -2166,6 +2166,125 @@ class CopyToNewDirectoryJobTests(test_utils.GenericTestBase):
             self.assertEqual(actual_output[0], expected_output[0])
 
 
+class ImagesAuditJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID_1 = 'exp_id_1'
+    VALID_EXP_ID_2 = 'exp_id_2'
+
+    def setUp(self):
+        super(ImagesAuditJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_copying_of_image_and_audio_files(self):
+        """Checks that image audit job correctly returns verified or images
+        missing.
+        """
+
+        with self.swap(constants, 'DEV_MODE', False):
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID_1, title='title', category='category')
+            exploration_1 = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID_2, title='title', category='category')
+
+            fs_internal = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(self.VALID_EXP_ID_1))
+            fs_external = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem('exploration/' + self.VALID_EXP_ID_1))
+
+            with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+                raw_image = f.read()
+
+            fs_internal.commit(
+                self.albert_id, 'image/abc.png', raw_image,
+                mimetype='image/png'
+            )
+            fs_external.commit(
+                self.albert_id, 'image/abc.png', raw_image,
+                mimetype='image/png'
+            )
+
+            fs_internal.commit(
+                self.albert_id, 'image/def.png', raw_image,
+                mimetype='image/png'
+            )
+
+            fs_internal.commit(
+                self.albert_id, 'image/ghi.png', raw_image,
+                mimetype='image/png'
+            )
+
+            # External directory can have other images, as all new images are
+            # stored there.
+            fs_external.commit(
+                self.albert_id, 'image/xyz.png', raw_image,
+                mimetype='image/png'
+            )
+
+            exp_services.save_new_exploration(self.albert_id, exploration)
+            exp_services.save_new_exploration(self.albert_id, exploration_1)
+
+            # Start ImagesAuditJob job on sample exploration.
+            job_id = exp_jobs_one_off.ImagesAuditJob.create_new()
+            exp_jobs_one_off.ImagesAuditJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+            actual_output = exp_jobs_one_off.ImagesAuditJob.get_output(
+                job_id)
+            expected_output = [
+                '[u\'exp_id_1\', [u"Missing Images: [\'def.png\', '
+                '\'ghi.png\']"]]',
+                '[u\'Images verified\', 0]'
+            ]
+            self.assertEqual(len(actual_output), 2)
+            self.assertItemsEqual(actual_output, expected_output)
+
+            fs_external.commit(
+                self.albert_id, 'image/def.png', raw_image,
+                mimetype='image/png'
+            )
+
+            fs_external.commit(
+                self.albert_id, 'image/ghi.png', raw_image,
+                mimetype='image/png'
+            )
+
+            fs_internal = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(self.VALID_EXP_ID_2))
+            fs_external = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem('exploration/' + self.VALID_EXP_ID_2))
+
+            with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+                raw_image = f.read()
+
+            fs_internal.commit(
+                self.albert_id, 'image/abc.png', raw_image,
+                mimetype='image/png'
+            )
+            fs_external.commit(
+                self.albert_id, 'image/abc.png', raw_image,
+                mimetype='image/png'
+            )
+
+            job_id = exp_jobs_one_off.ImagesAuditJob.create_new()
+            exp_jobs_one_off.ImagesAuditJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+            actual_output = exp_jobs_one_off.ImagesAuditJob.get_output(
+                job_id)
+            expected_output = [
+                '[u\'Images verified\', 5]'
+            ]
+            self.assertEqual(len(actual_output), 1)
+            self.assertEqual(actual_output[0], expected_output[0])
+
+
 class InteractionCustomizationArgsValidationJobTests(
         test_utils.GenericTestBase):
 
