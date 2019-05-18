@@ -37,7 +37,7 @@
       </text>
     </g>
     <g ng-repeat="vertex in $ctrl.graph.vertices"
-       ng-attr-transform="$ctrl.translate(<[vertex.x - $ctrl.GRAPH_INPUT_LEFT_MARGIN]>, <[vertex.y]>)">
+       ng-attr-transform="translate(<[vertex.x - $ctrl.GRAPH_INPUT_LEFT_MARGIN]>, <[vertex.y]>)">
       <text ng-if="$ctrl.graph.isLabeled"
             x="0"
             y="-10"
