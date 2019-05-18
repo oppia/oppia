@@ -40,6 +40,7 @@ gae_image_services = models.Registry.import_gae_image_services()
 
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
+ALL_IMAGES_VERIFIED = 'Images verified'
 ERROR_IN_FILENAME = 'There is an error in the filename'
 FILE_COPIED = 'File Copied'
 FILE_ALREADY_EXISTS = 'File already exists in GCS'
@@ -63,6 +64,9 @@ GCS_AUDIO_ID_REGEX = re.compile(
         ALLOWED_AUDIO_EXTENSIONS) + '))$')
 GCS_IMAGE_ID_REGEX = re.compile(
     r'^/([^/]+)/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
+        ALLOWED_IMAGE_EXTENSIONS) + '))$')
+GCS_EXTERNAL_IMAGE_ID_REGEX = re.compile(
+    r'^/([^/]+)/exploration/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
         ALLOWED_IMAGE_EXTENSIONS) + '))$')
 SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
 
@@ -593,6 +597,61 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(status, values):
         if status == FILE_FOUND_IN_GCS:
             yield (status, len(values))
+        else:
+            yield (status, values)
+
+
+class ImagesAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for checking whether all images in {{exp_id}}/assets/image/
+    are also present in exploration/{{exp_id}}/assets/image/.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        if exp_model.deleted:
+            return
+
+        if not constants.DEV_MODE:
+            exp_id = exp_model.id
+            fs_internal = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(exp_id))
+            fs_external = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem('exploration/' + exp_id))
+            # We have to make sure we pass the dir name without starting or
+            # ending with '/'.
+            image_urls_internal = fs_internal.listdir('image')
+            image_urls_external = fs_external.listdir('image')
+
+            image_filenames_internal = set([
+                GCS_IMAGE_ID_REGEX.match(url).group(3)
+                for url in image_urls_internal])
+
+            image_filenames_external = set([
+                GCS_EXTERNAL_IMAGE_ID_REGEX.match(url).group(3)
+                for url in image_urls_external])
+
+            # Currently in editor.py and exp_services.py, all images are stored
+            # in exploration/{{exp_id}}/ external folder. So, we only need to
+            # check if all images in the internal folder are there in the
+            # external folder.
+            non_existent_images = image_filenames_internal.difference(
+                image_filenames_external)
+
+            if len(non_existent_images) > 0:
+                yield (
+                    exp_id,
+                    'Missing Images: %s' % list(non_existent_images))
+            else:
+                yield (
+                    ALL_IMAGES_VERIFIED, len(image_filenames_external))
+
+    @staticmethod
+    def reduce(status, values):
+        if status == ALL_IMAGES_VERIFIED:
+            yield (status, sum([int(elem) for elem in values]))
         else:
             yield (status, values)
 
